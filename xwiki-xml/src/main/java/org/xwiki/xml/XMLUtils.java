@@ -19,6 +19,8 @@
  */
 package org.xwiki.xml;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +29,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 
+import org.jdom.DocType;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -62,13 +65,19 @@ public final class XMLUtils
         private static final String AMPERSAND = "&";
 
         /**
+         * Whether to omit the document type when printing the W3C Document or not.
+         */
+        private boolean omitDocType;
+        
+        /**
          * {@inheritDoc}
          * 
          * @see XMLOutputter#XMLOutputter(Format)
          */
-        public XWikiXMLOutputter(Format format)
+        public XWikiXMLOutputter(Format format, boolean omitDocType)
         {
             super(format);
+            this.omitDocType = omitDocType;
         }
 
         /**
@@ -147,6 +156,19 @@ public final class XMLUtils
             }
             return buffer.toString();
         }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see XMLOutputter#printDocType
+         */
+        @Override
+        protected void printDocType(Writer out, DocType docType) throws IOException
+        {
+            if (!this.omitDocType) {
+                super.printDocType(out, docType);
+            }
+        }
     }
 
     /**
@@ -163,6 +185,17 @@ public final class XMLUtils
      */
     public static String toString(Document document)
     {
+        return XMLUtils.toString(document, false, false);
+    }
+    
+    /**
+     * @param document the W3C Document to transform into a String
+     * @param omitDeclaration whether the XML declaration should be printed or not
+     * @param omitDoctype whether the docuemnt type should be printed or not
+     * @return the XML as a String
+     */
+    public static String toString(Document document, boolean omitDeclaration, boolean omitDoctype)
+    {
         // Note: We don't use javax.xml.transform.Transformer since it prints our valid XHTML as HTML which is not
         // XHTML compliant. For example it transforms our "<hr/>" into "<hr>.
         DOMBuilder builder = new DOMBuilder();
@@ -172,8 +205,10 @@ public final class XMLUtils
         // Force newlines to use \n since otherwise the default is \n\r.
         // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
         format.setLineSeparator("\n");
+        
+        format.setOmitDeclaration(omitDeclaration);
 
-        XMLOutputter outputter = new XWikiXMLOutputter(format);
+        XMLOutputter outputter = new XWikiXMLOutputter(format, omitDoctype);
         return outputter.outputString(jdomDoc);
     }
 

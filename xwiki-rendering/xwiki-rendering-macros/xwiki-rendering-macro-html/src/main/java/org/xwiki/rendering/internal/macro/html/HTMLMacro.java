@@ -26,25 +26,32 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
-import org.xwiki.rendering.internal.parser.XWikiXHTMLWhitespaceXMLFilter;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.html.HTMLMacroParameters;
+import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.xml.XMLReaderFactory;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLConstants;
@@ -59,7 +66,7 @@ import org.xwiki.xml.html.HTMLUtils;
  * @since 1.6M1
  */
 @Component("html")
-public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
+public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Composable
 {
     /**
      * The description of the macro.
@@ -83,31 +90,37 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     private HTMLCleaner htmlCleaner;
 
     /**
-     * The factory that will allow us to create a XHTML renderer to convert the wiki syntax into XHTML.
+     * Used to find the parser from syntax identifier.
+     */
+    private ComponentManager componentManager;
+
+    /**
+     * Used to construct a XHTMLImageRenderer instance which we need for the HTML Macro XHTML Renderer so that
+     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
      */
     @Requirement
-    private PrintRendererFactory rendererFactory;
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * A special factory that create foolproof XML reader that have the following characteristics:
-     * <ul>
-     * <li>Use DTD caching when the underlying XML parser is Xerces</li>
-     * <li>Ignore SAX callbacks when the parser parses the DTD</li>
-     * <li>Accumulate onCharacters() calls since SAX parser may normally call this event several times.</li>
-     * <li>Remove non-semantic white spaces where needed</li>
-     * <li>Resolve DTDs locally to speed DTD loading/validation</li>
-     * </ul>
+     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that
+     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
      */
-    @Requirement("xwiki")
-    private XMLReaderFactory xmlReaderFactory;
+    @Requirement
+    private LinkLabelGenerator linkLabelGenerator;
 
     /**
-     * The parser to use when the user specifies that HTML content should be parsed in wiki syntax.
-     * 
-     * @todo make this generic by loading the parser dynamically from the Macro execution context syntax
+     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that
+     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
      */
-    @Requirement("xwiki/2.0")
-    private Parser wikiParser;
+    @Requirement
+    private AttachmentParser attachmentParser;
+
+    /**
+     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that
+     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
+     */
+    @Requirement
+    private DocumentNameSerializer documentNameSerializer;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -116,6 +129,16 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     {
         super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             HTMLMacroParameters.class));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
     }
 
     /**
@@ -139,42 +162,20 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
         List<Block> blocks;
 
         if (!StringUtils.isEmpty(content)) {
+            
             String normalizedContent = content;
+
+            // If the user has mentioned that there's wiki syntax in the macro then we parse the content using
+            // a wiki syntax parser and render it back using a special renderer to print the XDOM blocks into
+            // a text representing the resulting XHTML content.
+            if (parameters.getWiki()) {
+                normalizedContent = renderWikiSyntax(normalizedContent, context.getMacroTransformation(), 
+                    context.getSyntax());
+            }
 
             // Clean the HTML into valid XHTML if the user has asked (it's the default).
             if (parameters.getClean()) {
-                // Note that we trim the content since we want to be lenient with the user in case he has entered
-                // some spaces/newlines before a XML declaration (prolog). Otherwise the XML parser would fail to parse.
-                Document document = this.htmlCleaner.clean(new StringReader(content.trim()));
-
-                // Since XML can only have a single root node and since we want to allow users to put
-                // content such as the following, we need to wrap the content in a root node:
-                // <tag1>
-                // ..
-                // </tag1>
-                // <tag2>
-                // </tag2>
-                // In addition we also need to ensure the XHTML DTD is defined so that valid XHTML entities can be
-                // specified.
-
-                // Remove the HTML envelope since this macro is only a fragment of a page which will already have an
-                // HTML envelope when rendered. We remove it so that the HTML <head> tag isn't output.
-                HTMLUtils.stripHTMLEnvelope(document);
-
-                // If in inline mode remove the top level paragraph if there's one.
-                if (context.isInline()) {
-                    HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
-                }
-
-                normalizedContent = XMLUtils.toString(document);
-            }
-
-            // If the user has mentioned that there's wiki syntax in the macro then we need to parse the content using
-            // an XML parser. We also use a XML parser if the user has asked to clean since it's the easiest way to
-            // ignore XML declaration, doctype, html element and the first paragraph if in inline mode.
-            if (parameters.getClean() || parameters.getWiki()) {
-                normalizedContent = parseXHTML(normalizedContent, parameters.getClean(), parameters.getWiki(),
-                    context.getMacroTransformation());
+                normalizedContent = cleanHTML(normalizedContent, context.isInline());
             }
 
             blocks = Arrays.asList((Block) new RawBlock(normalizedContent, XHTML_SYNTAX));
@@ -186,39 +187,87 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     }
 
     /**
-     * Parse the XHTML using a XML parser since XML elements can contain wiki syntax which we parse with a XWiki syntax
-     * Parser and convert to XHTML.
+     * Clean the HTML entered by the user, transforming it into valid XHTML.
      * 
-     * @param xhtml the XHTML to parse
-     * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
-     * @param clean if true then the user has asked to clean up the HTML he entered
-     * @param wiki if true then XML element contents contain wiki syntax
-     * @param macroTransformation the macro transformation to execute macros when wiki is set to true
-     * @throws MacroExecutionException in case there's a parsing problem
+     * @param content the content to clean
+     * @param isInline true if the content is inline and thus if we need to remove the top level paragraph
+     *        element created by the cleaner
+     * @return the cleaned HTML as a string representing valid XHTML
      */
-    private String parseXHTML(String xhtml, boolean clean, boolean wiki, MacroTransformation macroTransformation) 
-        throws MacroExecutionException
+    private String cleanHTML(String content, boolean isInline)
     {
-        XMLBlockConverterHandler handler =
-            new XMLBlockConverterHandler(this.wikiParser, this.rendererFactory, clean, wiki, macroTransformation);
+        String cleanedContent = content;
 
-        try {
-            XMLReader xr = this.xmlReaderFactory.createXMLReader();
-            xr.setContentHandler(handler);
-            xr.setErrorHandler(handler);
+        // Note that we trim the content since we want to be lenient with the user in case he has entered
+        // some spaces/newlines before a XML declaration (prolog). Otherwise the XML parser would fail to parse.
+        Document document = this.htmlCleaner.clean(new StringReader(cleanedContent));
 
-            // Control whitespace stripping depending on whether XHTML elements contain wiki syntax or not.
-            xr.setProperty(XWikiXHTMLWhitespaceXMLFilter.SAX_CONTAINS_WIKI_SYNTAX_PROPERTY, wiki);
+        // Since XML can only have a single root node and since we want to allow users to put
+        // content such as the following, we need to wrap the content in a root node:
+        // <tag1>
+        // ..
+        // </tag1>
+        // <tag2>
+        // </tag2>
+        // In addition we also need to ensure the XHTML DTD is defined so that valid XHTML entities can be
+        // specified.
 
-            // Allow access to CDATA and XML Comments.
-            xr.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
+        // Remove the HTML envelope since this macro is only a fragment of a page which will already have an
+        // HTML envelope when rendered. We remove it so that the HTML <head> tag isn't output.
+        HTMLUtils.stripHTMLEnvelope(document);
 
-            xr.parse(new InputSource(new StringReader(xhtml)));
-
-        } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse HTML content [" + xhtml + "]", e);
+        // If in inline mode remove the top level paragraph if there's one.
+        if (isInline) {
+            HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
         }
 
-        return handler.getOutput();
+        // Don't print the XML declaration nor the XHTML DocType.
+        cleanedContent = XMLUtils.toString(document, true, true);
+        
+        // Don't print the top level html element (which is always present and at the same location
+        // since it's been normalized by the HTML cleaner)
+        // Note: we trim the first 7 characters since they correspond to a leading new line (generated by
+        // XMLUtils.toString() since the doctype is printed on a line by itself followed by a new line) +
+        // the 6 chars from "<html>".
+        cleanedContent = cleanedContent.substring(7, cleanedContent.length() - 8);
+        
+        return cleanedContent;
+    }
+
+    /**
+     * Parse the passed context using a wiki syntax parser and render the result as an XHTML string.
+     * 
+     * @param content the content to parse
+     * @param macroTransformation the macro transformation to execute macros when wiki is set to true
+     * @param wikiSyntax the wiki syntax used inside the HTML macro
+     * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
+     * @throws MacroExecutionException in case there's a parsing problem
+     */
+    private String renderWikiSyntax(String content, MacroTransformation macroTransformation, Syntax wikiSyntax) 
+        throws MacroExecutionException
+    {
+        String xhtml;
+        
+        try {
+            // Parse the wiki syntax
+            Parser parser = (Parser) this.componentManager.lookup(Parser.class, wikiSyntax.toIdString());
+            XDOM xdom = parser.parse(new StringReader(content));
+            macroTransformation.transform(xdom, parser.getSyntax());
+
+            // Render the whole parsed content as a XHTML string
+            WikiPrinter printer = new DefaultWikiPrinter(); 
+            PrintRenderer renderer = new HTMLMacroXHTMLRenderer(printer, 
+                new XWikiXHTMLLinkRenderer(this.documentAccessBridge, this.linkLabelGenerator, this.attachmentParser,
+                    this.documentNameSerializer), new XWikiXHTMLImageRenderer(this.documentAccessBridge));
+            xdom.traverse(renderer);
+            
+            xhtml = printer.toString();
+            
+        } catch (Exception e) {
+            throw new MacroExecutionException("Failed to parse content [" + content + "] written in ["
+                + wikiSyntax + "] syntax.", e);
+        }
+        
+        return xhtml;
     }
 }

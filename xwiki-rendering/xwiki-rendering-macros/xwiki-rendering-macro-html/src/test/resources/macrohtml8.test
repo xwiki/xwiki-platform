@@ -16,7 +16,9 @@ beginMacroMarkerStandalone [html] [] [
 <p>hello</p>
 <!-- comment2 -->
 ]
-onRawText [<!-- comment1 --><p>hello</p><!-- comment2 -->] [xhtml/1.0]
+onRawText [<!-- comment1 -->
+<p>hello</p>
+<!-- comment2 -->] [xhtml/1.0]
 endMacroMarkerStandalone [html] [] [
 <!-- comment1 -->
 <p>hello</p>
@@ -30,4 +32,6 @@ endDocument
 <!-\- comment1 -\->
 <p>hello</p>
 <!-\- comment2 -\->
---><!-- comment1 --><p>hello</p><!-- comment2 --><!--stopmacro-->
+--><!-- comment1 -->
+<p>hello</p>
+<!-- comment2 --><!--stopmacro-->

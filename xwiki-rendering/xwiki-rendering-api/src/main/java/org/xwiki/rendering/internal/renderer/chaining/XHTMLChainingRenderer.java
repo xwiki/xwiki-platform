@@ -59,8 +59,13 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
     /**
      * @param printer the object to which to write the XHTML output to
-     * @param documentAccessBridge see {@link #documentAccessBridge}
-     * @param configuration the rendering configuration
+     * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because
+     *        link rendering depends on how the underlying system wants to handle it. For example for XWiki we
+     *        check if the document exists, we get the document URL, etc.
+     * @param imageRenderer the object to render image events into XHTML. This is done so that it's pluggable
+     *        because image rendering depends on how the underlying system wants to handle it. For example for XWiki
+     *        we check if the image exists as a document attachments, we get its URL, etc.
+     * @param listenerChain the chain of listener filters used to compute various states
      */
     public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
         ListenerChain listenerChain)

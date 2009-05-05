@@ -6,4 +6,4 @@ non velocity
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html wiki=true}}$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}")){{/html}}{{/velocity}} non velocity
+{{velocity}}{{html wiki="true"}}$response.sendRedirect($diffDoc.getURL("view", "viewer=changes&rev1=${rev1}&rev2=${rev2}")){{/html}}{{/velocity}} non velocity

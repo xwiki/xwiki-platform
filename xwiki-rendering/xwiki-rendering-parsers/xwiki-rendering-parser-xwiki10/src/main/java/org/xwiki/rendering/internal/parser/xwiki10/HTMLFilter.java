@@ -96,8 +96,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         char[] array = content.toCharArray();
 
         HTMLFilterContext context = new HTMLFilterContext(filterContext);
-        StringBuffer nonHTMLContent = new StringBuffer();
-        StringBuffer htmlContent = new StringBuffer();
+
+        StringBuffer beforeHtmlBuffer = new StringBuffer();
+        StringBuffer htmlBuffer = new StringBuffer();
+        StringBuffer afterHtmlBuffer = new StringBuffer();
 
         boolean inHTMLMacro = false;
 
@@ -122,25 +124,25 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 if (!inHTMLMacro) {
                     inHTMLMacro = true;
                 } else {
-                    htmlContent.append(nonHTMLContent);
-                    nonHTMLContent.setLength(0);
+                    htmlBuffer.append(afterHtmlBuffer);
+                    afterHtmlBuffer.setLength(0);
                 }
 
                 if (context.isConversion()) {
                     if (context.isVelocityOpen()) {
-                        VelocityFilter.appendVelocityOpen(htmlContent, filterContext, false);
+                        VelocityFilter.appendVelocityOpen(htmlBuffer, filterContext, false);
                     }
 
-                    htmlContent.append(htmlBlock);
+                    htmlBuffer.append(htmlBlock);
 
                     if (context.isVelocityClose()) {
-                        VelocityFilter.appendVelocityClose(htmlContent, filterContext, false);
+                        VelocityFilter.appendVelocityClose(htmlBuffer, filterContext, false);
                     }
                 } else {
-                    htmlContent.append(htmlBlock);
+                    htmlBuffer.append(htmlBlock);
                 }
             } else {
-                StringBuffer nonHtmlbuffer = inHTMLMacro ? nonHTMLContent : result;
+                StringBuffer nonHtmlbuffer = inHTMLMacro ? afterHtmlBuffer : beforeHtmlBuffer;
 
                 if (context.isConversion()) {
                     if (context.isVelocityOpen()) {
@@ -159,33 +161,62 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             }
         }
 
-        // remove velocity macro marker from html content
-        String cleanedHtmlContent = htmlContent.toString();
+        if (htmlBuffer.length() > 0) {
+            String beforeHtmlContent = beforeHtmlBuffer.toString();
+            String htmlContent = htmlBuffer.toString();
+            String afterHtmlContent = afterHtmlBuffer.toString();
+            
+            boolean multilines = htmlContent.indexOf("\n") != -1;
 
-        // velocity open
-        Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(result);
-        boolean velocityOpenBefore = velocityOpenMatcher.find();
+            // Make sure html macro does not start in a block and ends in another by "eating" them
+            if (multilines && htmlContent.indexOf("\n\n") != -1) {
+                int beforeIndex = beforeHtmlContent.lastIndexOf("\n\n");
 
-        boolean velocityOpen = false;
-        if (!velocityOpenBefore) {
-            velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(cleanedHtmlContent);
-            velocityOpen = velocityOpenMatcher.find();
-            cleanedHtmlContent = velocityOpenMatcher.replaceFirst("");
-        }
+                if (beforeIndex == -1) {
+                    htmlContent = beforeHtmlContent + htmlContent;
+                    beforeHtmlContent = "";
+                } else {
+                    htmlContent = beforeHtmlContent.substring(beforeIndex + 2) + htmlContent;
+                    beforeHtmlContent = beforeHtmlContent.substring(0, beforeIndex + 2);
+                }
 
-        // velocity close
-        Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(result);
-        boolean velocityCloseBefore = velocityCloseMatcher.find();
+                int afterIndex = afterHtmlContent.lastIndexOf("\n\n");
 
-        boolean velocityClose = false;
-        if (!velocityCloseBefore) {
-            velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedHtmlContent);
-            velocityClose = velocityCloseMatcher.find();
-            cleanedHtmlContent = velocityCloseMatcher.replaceFirst("");
-        }
+                if (afterIndex == -1) {
+                    htmlContent += afterHtmlContent;
+                    afterHtmlContent = "";
+                } else {
+                    htmlContent += afterHtmlContent.substring(0, afterIndex);
+                    afterHtmlContent = afterHtmlContent.substring(afterIndex);
+                }
+            }
 
-        if (cleanedHtmlContent.length() > 0) {
-            boolean multilines = cleanedHtmlContent.indexOf("\n") != -1;
+            // velocity open
+            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(beforeHtmlContent);
+            boolean velocityOpenBefore = velocityOpenMatcher.find();
+
+            boolean velocityOpen = false;
+            if (!velocityOpenBefore) {
+                velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(htmlContent);
+                velocityOpen = velocityOpenMatcher.find();
+                htmlContent = velocityOpenMatcher.replaceFirst("");
+            }
+
+            // velocity close
+            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(beforeHtmlContent);
+            boolean velocityCloseBefore = velocityCloseMatcher.find();
+
+            boolean velocityClose = false;
+            if (!velocityCloseBefore) {
+                velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(htmlContent);
+                velocityClose = velocityCloseMatcher.find();
+                htmlContent = velocityCloseMatcher.replaceFirst("");
+            }
+
+            // Print
+
+            // print before html
+            result.append(beforeHtmlContent);
 
             // open html content
             if (velocityOpen) {
@@ -195,7 +226,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             }
 
             // print html content
-            result.append(cleanedHtmlContent);
+            result.append(htmlContent);
 
             // close html content
             if (velocityClose) {
@@ -203,10 +234,12 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             } else if (!velocityOpenBefore || velocityCloseBefore) {
                 appendHTMLClose(result, filterContext, multilines);
             }
-        }
 
-        // print end
-        result.append(nonHTMLContent);
+            // print after html
+            result.append(afterHtmlContent);
+        } else {
+            result = beforeHtmlBuffer;
+        }
 
         return result.toString();
     }
@@ -524,7 +557,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
         result.append(filterContext
-            .addProtectedContent("{{html wiki=true}}" + (nl ? "\n" : ""), HTMLOPEN_SUFFIX, false));
+            .addProtectedContent("{{html wiki=\"true\"}}" + (nl ? "\n" : ""), HTMLOPEN_SUFFIX, false));
     }
 
     public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)

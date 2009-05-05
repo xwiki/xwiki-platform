@@ -8,7 +8,7 @@ $var
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 {{velocity}}
-{{html wiki=true}}
+{{html wiki="true"}}
 $var <toto/> $var
 {{/html}}
 {{/velocity}}

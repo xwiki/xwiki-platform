@@ -5,4 +5,4 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html wiki=true}}#macro({{/html}}{{/velocity}}
+{{velocity}}{{html wiki="true"}}#macro({{/html}}{{/velocity}}

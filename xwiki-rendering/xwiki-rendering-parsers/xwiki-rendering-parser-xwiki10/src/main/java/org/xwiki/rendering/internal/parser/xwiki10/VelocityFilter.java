@@ -108,8 +108,10 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         char[] array = content.toCharArray();
 
         VelocityFilterContext context = new VelocityFilterContext(filterContext);
-        StringBuffer nonVelocityContent = new StringBuffer();
-        StringBuffer velocityContent = new StringBuffer();
+
+        StringBuffer beforeVelocityBuffer = new StringBuffer();
+        StringBuffer velocityBuffer = new StringBuffer();
+        StringBuffer afterVelocityBuffer = new StringBuffer();
 
         boolean inVelocityMacro = false;
         int i = 0;
@@ -133,19 +135,19 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                 if (!inVelocityMacro) {
                     inVelocityMacro = true;
                 } else {
-                    velocityContent.append(nonVelocityContent);
-                    nonVelocityContent.setLength(0);
+                    velocityBuffer.append(afterVelocityBuffer);
+                    afterVelocityBuffer.setLength(0);
                 }
 
                 if (context.isConversion()) {
                     if (!context.isInline()) {
-                        CleanUtil.setTrailingNewLines(velocityContent, 2);
+                        CleanUtil.setTrailingNewLines(velocityBuffer, 2);
                     }
                 }
 
-                velocityContent.append(filterContext.addProtectedContent(velocityBlock.toString(), context.isInline()));
+                velocityBuffer.append(filterContext.addProtectedContent(velocityBlock.toString(), context.isInline()));
             } else {
-                StringBuffer nonVelocityBuffer = inVelocityMacro ? nonVelocityContent : result;
+                StringBuffer nonVelocityBuffer = inVelocityMacro ? afterVelocityBuffer : beforeVelocityBuffer;
 
                 if (context.isConversion()) {
                     if (!context.isInline()) {
@@ -163,26 +165,58 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
         // fix not closed #if, #foreach
         if (context.getVelocityDepth() > 0) {
-            velocityContent.append(nonVelocityContent);
-            nonVelocityContent.setLength(0);
+            velocityBuffer.append(afterVelocityBuffer);
+            afterVelocityBuffer.setLength(0);
 
             // fix unclosed velocity blocks
             for (; context.getVelocityDepth() > 0; context.popVelocityDepth()) {
-                velocityContent.append(filterContext.addProtectedContent("#end"));
+                velocityBuffer.append(filterContext.addProtectedContent("#end"));
             }
         }
 
-        // print velocity content
-        if (velocityContent.length() > 0) {
-            boolean multilines = velocityContent.indexOf("\n") != -1;
+        if (velocityBuffer.length() > 0) {
+            String beforeVelocityContent = beforeVelocityBuffer.toString();
+            String velocityContent = velocityBuffer.toString();
+            String afterVelocityContent = afterVelocityBuffer.toString();
+            
+            boolean multilines = velocityBuffer.indexOf("\n") != -1;
+            
+            // Make sure velocity macro does not start in a block and ends in another by "eating" them
+            if (multilines && velocityContent.indexOf("\n\n") != -1) {
+                int beforeIndex = beforeVelocityContent.lastIndexOf("\n\n");
 
+                if (beforeIndex == -1) {
+                    velocityContent = beforeVelocityContent + velocityContent;
+                    beforeVelocityContent = "";
+                } else {
+                    velocityContent = beforeVelocityContent.substring(beforeIndex + 2) + velocityContent;
+                    beforeVelocityContent = beforeVelocityContent.substring(0, beforeIndex + 2);
+                }
+
+                int afterIndex = afterVelocityContent.lastIndexOf("\n\n");
+
+                if (afterIndex == -1) {
+                    velocityContent += afterVelocityContent;
+                    afterVelocityContent = "";
+                } else {
+                    velocityContent += afterVelocityContent.substring(0, afterIndex);
+                    afterVelocityContent = afterVelocityContent.substring(afterIndex);
+                }
+            }
+            
+            // print before velocity content
+            result.append(beforeVelocityContent);
+
+            // print velocity content
             appendVelocityOpen(result, filterContext, multilines);
             result.append(velocityContent);
             appendVelocityClose(result, filterContext, multilines);
-        }
 
-        // print end
-        result.append(nonVelocityContent);
+            // print after velocity content
+            result.append(afterVelocityContent);
+        } else {
+            result = beforeVelocityBuffer;
+        }
 
         return result.toString();
     }
@@ -641,7 +675,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
     public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{velocity}}" + (nl ? "\n" : "") + "{{html wiki=true}}"
+        result.append(filterContext.addProtectedContent("{{velocity}}" + (nl ? "\n" : "") + "{{html wiki=\"true\"}}"
             + (nl ? "\n" : ""), VELOCITYOPEN_SUFFIX, true));
     }
 

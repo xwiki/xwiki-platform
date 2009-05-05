@@ -8,7 +8,7 @@
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 {{velocity}}
-{{html wiki=true}}
+{{html wiki="true"}}
 {{{## some velocity}}}
 {{/html}}
 {{/velocity}}

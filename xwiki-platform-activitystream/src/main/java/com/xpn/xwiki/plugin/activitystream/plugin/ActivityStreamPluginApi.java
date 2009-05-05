@@ -215,6 +215,29 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
+     * Search in database activity events matching the given hql query. Retrieve events are ordered
+     * by date descending.
+     * 
+     * @param fromHql the "from" clause of the hql query to look events for
+     * @param hql the "where" clause of the hql query to look events for
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return a list of matching events, wrapped as
+     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
+     * @throws ActivityStreamException
+     */
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start)
+        throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, nb, start, context));
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Return the latest recorded events
      * 
      * @param filter if true, group the matched events by priority
@@ -355,9 +378,19 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         return getActivityStream().getFeedEntry(event.getEvent(), context);
     }
 
+    public SyndEntry getFeedEntry(com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent event, String suffix)
+    {
+        return getActivityStream().getFeedEntry(event.getEvent(), suffix, context);
+    }
+
     public SyndFeed getFeed(List<ActivityEvent> events)
     {
         return getActivityStream().getFeed(unwrapEvents(events), context);
+    }
+
+    public SyndFeed getFeed(List<ActivityEvent> events, String suffix)
+    {
+        return getActivityStream().getFeed(unwrapEvents(events), suffix, context);
     }
 
     public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
@@ -367,12 +400,26 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             copyright, encoding, url, context);
     }
 
+    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
+            String description, String copyright, String encoding, String url, String suffix)
+        {
+            return getActivityStream().getFeed(unwrapEvents(events), author, title, description,
+                copyright, encoding, url, suffix, context);
+        }
+
     public String getFeedOutput(List<ActivityEvent> events, String author, String title,
         String description, String copyright, String encoding, String url, String type)
     {
         return getActivityStream().getFeedOutput(unwrapEvents(events), author, title,
             description, copyright, encoding, url, type, context);
     }
+
+    public String getFeedOutput(List<ActivityEvent> events, String author, String title,
+            String description, String copyright, String encoding, String url, String type, String suffix)
+        {
+            return getActivityStream().getFeedOutput(unwrapEvents(events), author, title,
+                description, copyright, encoding, url, type, suffix, context);
+        }
 
     public String getFeedOutput(SyndFeed feed, String type)
     {

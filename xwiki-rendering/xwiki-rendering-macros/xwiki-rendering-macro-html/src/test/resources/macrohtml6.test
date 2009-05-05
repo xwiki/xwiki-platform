@@ -12,7 +12,7 @@ beginDocument
 beginMacroMarkerStandalone [html] [wiki=true] [
 &nbsp;
 ]
-onRawText [<p>&#160;</p>] [xhtml/1.0]
+onRawText [<p>&nbsp;</p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 &nbsp;
 ]

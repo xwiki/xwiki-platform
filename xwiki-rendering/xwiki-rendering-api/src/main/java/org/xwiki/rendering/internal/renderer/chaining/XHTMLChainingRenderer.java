@@ -59,31 +59,23 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
     /**
      * @param printer the object to which to write the XHTML output to
-     * @param documentAccessBridge see {@link #documentAccessBridge}
-     * @param configuration the rendering configuration
+     * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because
+     *        link rendering depends on how the underlying system wants to handle it. For example for XWiki we
+     *        check if the document exists, we get the document URL, etc.
+     * @param imageRenderer the object to render image events into XHTML. This is done so that it's pluggable
+     *        because image rendering depends on how the underlying system wants to handle it. For example for XWiki
+     *        we check if the image exists as a document attachments, we get its URL, etc.
+     * @param listenerChain the chain of listener filters used to compute various states
      */
     public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
         ListenerChain listenerChain)
     {
-        // If a XHTML Wiki printer is passed (this happens if the caller wants to use his own instance which could have
-        // already been used and thus have some state set - for ex if this XHTML renderer is called several times in a 
-        // row on some Blocks and he wants a continuity in white space handling) then extract the underlying WikiPrinter
-        // and use it. The XHTML Wiki printer should not be set since its underlying printer is reset in pushPrinter()
-        // in order for the XHTML wiki printer to always use the latest defined "normal" WikiPrinter (it would cause
-        // a cyclic dependency).
-        super(XHTMLWikiPrinter.class.isAssignableFrom(printer.getClass()) 
-            ? ((XHTMLWikiPrinter) printer).getWikiPrinter() : printer, listenerChain);
+        super(printer, listenerChain);
 
         this.linkRenderer = linkRenderer;
         this.imageRenderer = imageRenderer;
         this.macroRenderer = new XHTMLMacroRenderer();
-
-        // If the passed printer is already a XHTML printer then use it directly.
-        if (XHTMLWikiPrinter.class.isAssignableFrom(printer.getClass())) {
-            this.xhtmlWikiPrinter = (XHTMLWikiPrinter) printer;
-        } else {
-            this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
-        }
+        this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
     }
 
     // State

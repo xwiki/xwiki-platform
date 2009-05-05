@@ -11,6 +11,7 @@
       <tr>
         <td>
           * item
+
         </td>
       </tr>
     #end
@@ -31,6 +32,7 @@ beginMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
       <tr>
         <td>
           * item
+
         </td>
       </tr>
     #end
@@ -44,17 +46,29 @@ beginMacroMarkerStandalone [html] [wiki=true] [
           <tr>
         <td>
           * item
+
         </td>
       </tr>
           <tr>
         <td>
           * item
+
         </td>
       </tr>
       </table>
 </div>
 ]
-onRawText [<div><h1>Hello John</h1><table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table></div>] [xhtml/1.0]
+onRawText [<div>
+    <h1>Hello John</h1>
+  
+          
+        
+      
+          
+        
+      
+      <table><tbody><tr><td><ul><li>item</li></ul>        </td></tr><tr><td><ul><li>item</li></ul>        </td></tr></tbody></table>
+</div>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <div>
     <h1>Hello John</h1>
@@ -62,11 +76,13 @@ endMacroMarkerStandalone [html] [wiki=true] [
           <tr>
         <td>
           * item
+
         </td>
       </tr>
           <tr>
         <td>
           * item
+
         </td>
       </tr>
       </table>
@@ -82,6 +98,7 @@ endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
       <tr>
         <td>
           * item
+
         </td>
       </tr>
     #end
@@ -102,9 +119,22 @@ endDocument
       <tr>
         <td>
           * item
+
         </td>
       </tr>
     #end
   </table>
 </div>
-{{/html}}--><div><h1>Hello John</h1><table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table></div><!--stopmacro-->
+{{/html}}--><div>
+    <h1>Hello John</h1>
+.# TODO: Because of the following SF HTML Cleaner bug we have the new lines moved to the top:
+.# https://sourceforge.net/tracker/?func=detail&aid=2787208&group_id=183053&atid=903696 
+  
+          
+        
+      
+          
+        
+      
+      <table><tbody><tr><td><ul><li>item</li></ul>        </td></tr><tr><td><ul><li>item</li></ul>        </td></tr></tbody></table>
+</div><!--stopmacro-->

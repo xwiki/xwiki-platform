@@ -13,7 +13,7 @@ a <strong>b</strong> c
 </pre>
 <p> Some  <span>  text 
 </span>
-<!--comment-->  another  <![CDATA[
+<!~-~-comment~-~->  another  <![CDATA[
 hello  world
    ]]>
 </p>
@@ -30,12 +30,22 @@ a <strong>b</strong> c
 </pre>
 <p> Some  <span>  text 
 </span>
-<!--comment-->  another  <![CDATA[
+<!~-~-comment~-~->  another  <![CDATA[
 hello  world
    ]]>
 </p>
 ]
-onRawText [<p>a <strong>b</strong> c</p><pre>newline<br/>&nbsp;&nbsp;newline</pre><p>Some <span>text&nbsp;</span><!--comment-->another<![CDATA[hello &nbsp;world]]></p>] [xhtml/1.0]
+onRawText [<p>a <strong>b</strong> c 
+</p><pre>
+  newline
+  newline
+</pre>
+<p> Some  <span>  text 
+</span>
+<!--comment-->  another  <![CDATA[
+hello  world
+   ]]>
+</p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 a <strong>b</strong> c 
 <pre>
@@ -44,7 +54,7 @@ a <strong>b</strong> c
 </pre>
 <p> Some  <span>  text 
 </span>
-<!--comment-->  another  <![CDATA[
+<!~-~-comment~-~->  another  <![CDATA[
 hello  world
    ]]>
 </p>

@@ -14,29 +14,38 @@
 <tr>
 <td>
 * [[listitem]]
+
 </td>
 </tr>
 </table>
 {{/html}}
-.#-----------------------------------------------------
+.#-------------------------------------------------------------------------------------------
 .expect|event/1.0
-.#-----------------------------------------------------
+.#-------------------------------------------------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>
 <td>
 * [[listitem]]
+
 </td>
 </tr>
 </table>
 ]
-onRawText [<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikicreatelink"><a href="/xwiki/bin/view/listitem?parent=xwiki:Space.Page"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
+onRawText [
+.# TODO: Because of the following SF HTML Cleaner bug we have the new lines moved to the top:
+.# https://sourceforge.net/tracker/?func=detail&aid=2787208&group_id=183053&atid=903696 
+
+
+
+<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikicreatelink"><a href="/xwiki/bin/view/listitem?parent=xwiki:Space.Page"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>
 <td>
 * [[listitem]]
+
 </td>
 </tr>
 </table>

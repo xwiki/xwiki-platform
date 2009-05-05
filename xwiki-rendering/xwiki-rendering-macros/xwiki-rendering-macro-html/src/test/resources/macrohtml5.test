@@ -1,7 +1,7 @@
-.#------------------------------------------------------------------------------------------------------------
+.#---------------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify trimming of whitespaces/new lines when in non-wiki mode (wiki syntax not parsed in element content)
-.#------------------------------------------------------------------------------------------------------------
+.# Verify non trimming of whitespaces/new lines when in non-wiki mode (wiki syntax not parsed in element content)
+.#---------------------------------------------------------------------------------------------------------------
 {{html}}
 <pre>
   newline
@@ -33,9 +33,13 @@ hello  world
 onRawText [<pre>
   newline
   newline
-</pre><p>Some <span>text </span><!--comment-->another<![CDATA[
+</pre>
+<p> Some  <span>  text 
+</span> 
+<!--comment-->  another  <![CDATA[
 hello  world
-   ]]></p>] [xhtml/1.0]
+   ]]>
+</p>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [] [
 <pre>
   newline

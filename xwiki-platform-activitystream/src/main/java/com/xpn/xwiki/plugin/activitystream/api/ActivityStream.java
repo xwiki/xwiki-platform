@@ -84,6 +84,9 @@ public interface ActivityStream
     List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException;
 
+    List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
+            XWikiContext context) throws ActivityStreamException;
+
     List<ActivityEvent> getEvents(boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException;
 
@@ -104,15 +107,27 @@ public interface ActivityStream
 
     SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context);
 
+    SyndEntry getFeedEntry(ActivityEvent event, String suffix, XWikiContext context);
+
     SyndFeed getFeed(List<ActivityEvent> events, XWikiContext context);
+
+    SyndFeed getFeed(List<ActivityEvent> events, String suffix, XWikiContext context);
 
     SyndFeed getFeed(List<ActivityEvent> events, String author, String title, String description,
         String copyright, String encoding, String url, XWikiContext context);
+
+    SyndFeed getFeed(List<ActivityEvent> events, String author, String title, String description,
+            String copyright, String encoding, String url, String suffix, XWikiContext context);
 
     String getFeedOutput(List<ActivityEvent> events, String author, String title,
         String description, String copyright, String encoding, String url, String type,
         XWikiContext context);
 
+    String getFeedOutput(List<ActivityEvent> events, String author, String title,
+            String description, String copyright, String encoding, String url, String type,
+            String suffix, XWikiContext context);
+
+    
     String getFeedOutput(SyndFeed feed, String type);
 
 }

@@ -149,6 +149,25 @@ public class ActivityEvent extends Api {
     }
 
     /**
+     * Allows to modify the title of an event
+     * This might be useful to control the display or RSS feeds
+     */
+    public void setTitle(String title) {
+    	if (hasProgrammingRights())
+          event.setTitle(title);
+    }
+
+
+    /**
+     * Allows to modify the body of an event
+     * This might be useful to control the display or RSS feeds
+     */
+    public void setBody(String body) {
+    	if (hasProgrammingRights())
+            event.setBody(body);
+    }
+
+    /**
      * @return The first param of the event
      */
     public String getParam1() {
@@ -217,6 +236,13 @@ public class ActivityEvent extends Api {
      */
     public String getDisplayUser() {
         return event.getDisplayUser(context);
+    }
+
+    public com.xpn.xwiki.plugin.activitystream.api.ActivityEvent getProtectedEvent() {
+        if (hasProgrammingRights())
+    	 return event;
+        else
+         return null;
     }
 
     protected com.xpn.xwiki.plugin.activitystream.api.ActivityEvent getEvent() {

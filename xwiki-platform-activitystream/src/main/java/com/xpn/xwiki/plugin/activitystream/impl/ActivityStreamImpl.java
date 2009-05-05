@@ -43,6 +43,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -271,26 +272,41 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     }
 
     public List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start,
-        XWikiContext context) throws ActivityStreamException
-    {
-        String searchHql;
+    		XWikiContext context) throws ActivityStreamException {
+    	return searchEvents("", hql, filter, nb, start, context);
+    }
 
-        if (filter) {
-            searchHql =
-                "select act from ActivityEventImpl as act, ActivityEventImpl as act2 where act.eventId=act2.eventId and "
-                    + hql
-                    + " group by act.requestId having (act.priority)=max(act2.priority) order by act.date desc";
-        } else {
-            searchHql =
-                "select act from ActivityEventImpl as act where " + hql
-                    + " order by act.date desc";
-        }
+    /**
+     * Alternate searchEvents function for the Activiy Stream
+     * @param fromHql
+     * @param hql
+     * @param filter
+     * @param nb
+     * @param start
+     * @param context
+     * @return
+     * @throws ActivityStreamException
+     */
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
+    		XWikiContext context) throws ActivityStreamException {
+    	String searchHql;
 
-        try {
-            return context.getWiki().search(searchHql, nb, start, context);
-        } catch (XWikiException e) {
-            throw new ActivityStreamException(e);
-        }
+    	if (filter) {
+    		searchHql =
+    			"select act from ActivityEventImpl as act, ActivityEventImpl as act2 " + fromHql + " where act.eventId=act2.eventId and "
+    			+ hql
+    			+ " group by act.requestId having (act.priority)=max(act2.priority) order by act.date desc";
+    	} else {
+    		searchHql =
+    			"select act from ActivityEventImpl as act " + fromHql + " where " + hql
+    			+ " order by act.date desc";
+    	}
+
+    	try {
+    		return context.getWiki().search(searchHql, nb, start, context);
+    	} catch (XWikiException e) {
+    		throw new ActivityStreamException(e);
+    	}
     }
 
     public List<ActivityEvent> getEvents(boolean filter, int nb, int start, XWikiContext context)
@@ -389,12 +405,22 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
 
     public SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context)
     {
+    	return getFeedEntry(event, "", context);
+    }
+    
+    public SyndEntry getFeedEntry(ActivityEvent event, String suffix, XWikiContext context)
+    {
         SyndEntry entry = new SyndEntryImpl();
         String user = event.getUser();
         String displayUser = context.getWiki().getUserName(user, null, false, context);
         entry.setAuthor(displayUser);
+        event.setTitle(event.getTitle() + suffix);
         entry.setTitle(event.getDisplayTitle(context));
-        // entry.setDescription(event.getDisplayBody(context));
+        event.setBody(event.getBody() + suffix + "_body");
+        SyndContentImpl sc = new SyndContentImpl();
+        sc.setValue(event.getDisplayBody(context));
+        sc.setType("text/html");
+        entry.setDescription(sc);
         String url;
         try {
             url = (new URL(context.getURL(), event.getUrl())).toString();
@@ -405,14 +431,19 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         entry.setPublishedDate(event.getDate());
         entry.setUpdatedDate(event.getDate());
         return entry;
-    }
+   }
 
     public SyndFeed getFeed(List<ActivityEvent> events, XWikiContext context)
+    {
+       return getFeed(events, "", context);
+    }
+    
+    public SyndFeed getFeed(List<ActivityEvent> events, String suffix, XWikiContext context)
     {
         SyndFeed feed = new SyndFeedImpl();
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
         for (ActivityEvent event : events) {
-            SyndEntry entry = getFeedEntry(event, context);
+            SyndEntry entry = getFeedEntry(event, suffix, context);
             entries.add(entry);
         }
         feed.setEntries(entries);
@@ -420,9 +451,15 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     }
 
     public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
-        String description, String copyright, String encoding, String url, XWikiContext context)
+            String description, String copyright, String encoding, String url, XWikiContext context)
     {
-        SyndFeed feed = getFeed(events, context);
+    	return getFeed(events, author, title, description, copyright, encoding, url, "", context);
+    }
+    
+    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
+        String description, String copyright, String encoding, String url, String suffix, XWikiContext context)
+    {
+        SyndFeed feed = getFeed(events, suffix, context);
         feed.setAuthor(author);
         feed.setDescription(description);
         feed.setCopyright(copyright);
@@ -433,11 +470,18 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     }
 
     public String getFeedOutput(List<ActivityEvent> events, String author, String title,
+            String description, String copyright, String encoding, String url, String type,
+            XWikiContext context)
+    {
+    	return getFeedOutput(events, author, title, description, copyright, encoding, url, type, "", context);
+    }
+    
+    public String getFeedOutput(List<ActivityEvent> events, String author, String title,
         String description, String copyright, String encoding, String url, String type,
-        XWikiContext context)
+        String suffix, XWikiContext context)
     {
         SyndFeed feed =
-            getFeed(events, author, title, description, copyright, encoding, url, context);
+            getFeed(events, author, title, description, copyright, encoding, url, suffix, context);
         return getFeedOutput(feed, type);
     }
 

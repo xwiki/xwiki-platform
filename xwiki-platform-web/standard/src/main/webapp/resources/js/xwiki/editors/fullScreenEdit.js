@@ -62,7 +62,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     if (this.maximizedReference && this.maximizedReference.value != "") {
       var matches = $$(this.maximizedReference.value);
       if (matches && matches.length > 0) {
-        this.makeFullScreen(false, matches[0]);
+        this.makeFullScreen(matches[0]);
       }
     }
   },
@@ -183,7 +183,7 @@ XWiki.editors.FullScreenEditing = Class.create({
       src: "$xwiki.getSkinFile('icons/silk/arrow_out.gif')"
     });
     // Add functionality
-    fullScreenActivator.observe('click', this.makeFullScreen.bindAsEventListener(this, targetElement));
+    fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     fullScreenActivator.observe('mousedown', this.preventDrag.bindAsEventListener(this));
     // Remember the button associated with each maximizable element
     targetElement._x_fullScreenActivator = fullScreenActivator;
@@ -201,7 +201,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     });
     fullScreenActivator.update("${msg.get('core.editors.fullscreen.editFullScreen')} &raquo;")
     // Add functionality
-    fullScreenActivator.observe('click', this.makeFullScreen.bindAsEventListener(this, targetElement));
+    fullScreenActivator.observe('click', this.makeFullScreen.bind(this, targetElement));
     // Add it to the container
     fullScreenActivatorContainer.update(fullScreenActivator);
     // Remember the button associated with each maximizable element
@@ -254,10 +254,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     * - Hide the overflows of the body element, so that a scrollbar doesn't appear
     * - All the initial styles of the altered elements are remembered, so that they can be restored when exiting fullscreen
     */
-  makeFullScreen : function (event, targetElement) {
-    if (event) {
-      event.stop();
-    }
+  makeFullScreen : function (targetElement) {
     // Store the selector of the target element in the form, in the hidden input called 'x-maximized'.
     // This is needed so that the full screen can be reactivated when comming back from preview, if it was activate before
     // the user hit the preview button.
@@ -326,9 +323,7 @@ XWiki.editors.FullScreenEditing = Class.create({
         'padding' : parent.style['padding'],
         'margin' : parent.style['margin']
       };
-      
       parent.setStyle({'overflow': "visible", 'position': "absolute", width: "100%", height: "100%", left: 0, top:0, right:0, bottom: 0, padding: 0, margin: 0});
-      
       parent.siblings().each(function(item) {
         item._originalDisplay = item.style['display'];
         item.setStyle({display: "none"});

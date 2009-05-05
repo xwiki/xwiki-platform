@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.jmock.Mock;
@@ -255,7 +256,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         }
     }
 
-    public void testGetLinkedPages10()
+    public void testGetUniqueLinkedPages10()
     {
         XWikiDocument contextDocument = new XWikiDocument("contextdocspace", "contextdocpage");
         getContext().setDoc(contextDocument);
@@ -263,27 +264,28 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("exists").will(returnValue(true));
 
         this.document.setContent("[TargetPage][TargetLabel>TargetPage][TargetSpace.TargetPage]"
-            + "[TargetLabel>TargetSpace.TargetPage?param=value#anchor][http://externallink][mailto:mailto]");
+            + "[TargetLabel>TargetSpace.TargetPage?param=value#anchor][http://externallink][mailto:mailto][label>]");
 
-        List<String> linkedPages = this.document.getLinkedPages(getContext());
+        Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage",
-            "TargetSpace.TargetPage", "Space.TargetPage")), new HashSet<String>(linkedPages));
+        assertEquals(new HashSet<String>(Arrays.asList("xwiki:Space.TargetPage", "xwiki:TargetSpace.TargetPage")),
+            linkedPages);
     }
 
-    public void testGetLinkedPages()
+    public void testGetUniqueLinkedPages()
     {
         XWikiDocument contextDocument = new XWikiDocument("contextdocspace", "contextdocpage");
         getContext().setDoc(contextDocument);
 
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
-            + "[[]]");
+            + "[[]][[#anchor]][[?param=value]]");
         this.document.setSyntaxId("xwiki/2.0");
 
-        List<String> linkedPages = this.document.getLinkedPages(getContext());
+        Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "Space.WebHome"), linkedPages);
+        assertEquals(new HashSet<String>(Arrays.asList("xwiki:Space.TargetPage", "xwiki:TargetSpace.TargetPage",
+            "xwiki:Space.WebHome")), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
 import java.util.Vector;
@@ -1851,7 +1852,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 saveLinks10(doc, context, session);
             } else {
                 // When not in 1.0 content get WikiLinks directly from XDOM
-                List<XWikiLink> links = doc.getWikiLinkedPages(context);
+                Set<XWikiLink> links = doc.getUniqueWikiLinkedPages(context);
                 for (XWikiLink wikiLink : links) {
                     session.save(wikiLink);
                 }

@@ -38,6 +38,8 @@ public class DocumentNameTest extends TestCase
         assertFalse(documentName1.equals(new DocumentName("wiki2", "space", "page")));
         assertFalse(documentName1.equals(new DocumentName("wiki", "space2", "page")));
         assertFalse(documentName1.equals(new DocumentName("wiki", "space", "page2")));
+        assertFalse(documentName1.equals(new DocumentName(null, null, null)));
+        assertTrue(new DocumentName(null, null, null).equals(new DocumentName(null, null, null)));
     }
 
     public void testHashCode()

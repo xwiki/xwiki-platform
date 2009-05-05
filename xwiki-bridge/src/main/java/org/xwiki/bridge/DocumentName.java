@@ -22,7 +22,7 @@ package org.xwiki.bridge;
 /**
  * Represents a document name (wiki, space and page names).
  * 
- * @version $Id: DocumentName.java 17954 2009-03-24 07:36:32Z asiri $
+ * @version $Id: DocumentName.java 19380 2009-05-05 11:04:19Z tmortagne $
  * @since 1.8RC2
  */
 public class DocumentName
@@ -105,8 +105,10 @@ public class DocumentName
             DocumentName documentName = (DocumentName) obj;
 
             equals =
-                documentName.getWiki().equals(this.getWiki()) && documentName.getSpace().equals(this.getSpace())
-                    && documentName.getPage().equals(this.getPage());
+                (documentName.getWiki() == null ? getWiki() == null : documentName.getWiki().equals(getWiki()))
+                    && (documentName.getSpace() == null ? getSpace() == null : documentName.getSpace().equals(
+                        getSpace()))
+                    && (documentName.getPage() == null ? getPage() == null : documentName.getPage().equals(getPage()));
         }
 
         return equals;

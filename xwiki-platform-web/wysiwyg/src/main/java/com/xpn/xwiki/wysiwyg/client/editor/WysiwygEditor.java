@@ -111,7 +111,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      * The list of plug-ins that can be loaded by default. Can be overwritten from the configuration.
      */
     private static final String DEFAULT_PLUGINS =
-        "separator sync text valign justify list indent history format font color symbol link image table";
+        "submit line separator sync text valign justify list indent history format font color symbol link image table";
 
     /**
      * The list of features that can be placed on the tool bar by default. Can be overwritten from the configuration.
@@ -119,9 +119,9 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     private static final String DEFAULT_TOOLBAR =
         "bold italic underline strikethrough teletype | subscript superscript"
             + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
-            + " | undo redo | format | fontname fontsize | forecolor backcolor | hr symbol | link unlink | image"
-            + " | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter"
-            + " deletecol | sync";
+            + " | undo redo | format | fontname fontsize forecolor backcolor | hr removeformat symbol | link unlink"
+            + " | image | inserttable deletetable | insertrowbefore insertrowafter deleterow"
+            + " | insertcolbefore insertcolafter deletecol | sync";
 
     /**
      * The list of default menu entries. Can be overwritten from the configuration.

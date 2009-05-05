@@ -19,28 +19,23 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
-import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.TableCellElement;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.SourcesLoadEvents;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * Adjusts the behavior of the rich text area to meet the cross browser specification.<br/>
@@ -49,13 +44,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class BehaviorAdjuster implements LoadListener, CommandListener
+public class BehaviorAdjuster implements LoadListener
 {
-    /**
-     * The name of the <code>&lt;br/&gt;</code> tag.
-     */
-    public static final String BR = "br";
-
     /**
      * The name of the <code>&lt;li&gt;</code> tag.
      */
@@ -70,28 +60,6 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
      * The name of the <code>&lt;th&gt;</code> tag.
      */
     public static final String TH = "th";
-
-    /**
-     * The CSS class name associated with BRs added at edit time to make items like empty block-level elements editable.
-     */
-    public static final String SPACER = "spacer";
-
-    /**
-     * The CSS class name associated with BRs that are present in the rich text area's HTML input and which have to be
-     * kept even when they are placed at the end of a block-level element. We need to mark this initial BRs so they are
-     * not mistaken with the {@link #SPACER} BRs we add during the editing.
-     */
-    public static final String LINE_BREAK = "lineBreak";
-
-    /**
-     * The class name attribute.
-     */
-    public static final String CLASS_NAME = "class";
-
-    /**
-     * The command that stores the value of the rich text area in an HTML form field.
-     */
-    public static final Command SUBMIT = new Command("submit");
 
     /**
      * Collection of DOM utility methods.
@@ -124,9 +92,6 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
             throw new IllegalStateException("Text area has already been set!");
         }
         this.textArea = textArea;
-        if (textArea.getCommandManager() != null) {
-            textArea.getCommandManager().addCommandListener(this);
-        }
         // Workaround till GWT provides a way to detect when the rich text area has finished loading.
         if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof SourcesLoadEvents) {
             ((SourcesLoadEvents) textArea.getBasicFormatter()).addLoadListener(this);
@@ -179,36 +144,6 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
-     */
-    public boolean onBeforeCommand(CommandManager sender, Command command, String param)
-    {
-        if (SUBMIT.equals(command)) {
-            // The edited content might be submitted so we have to mark the BRs that have been added to allow the user
-            // to edit the empty block elements. These BRs will be removed from rich text area's HTML output on the
-            // server side.
-            markSpacers();
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandListener#onCommand(CommandManager, Command, String)
-     */
-    public void onCommand(CommandManager sender, Command command, String param)
-    {
-        if (SUBMIT.equals(command)) {
-            // Revert the changes made on before submit command in order avoid conflicts with the rich text area's
-            // history mechanism.
-            unMarkSpacers();
-        }
-    }
-
-    /**
      * Called when a KeyDown event is triggered inside the rich text area.
      */
     protected void onKeyDown()
@@ -237,9 +172,6 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
     {
         Event event = getTextArea().getCurrentEvent();
         switch (event.getKeyCode()) {
-            case KeyboardListener.KEY_ENTER:
-                onEnter();
-                break;
             case KeyboardListener.KEY_TAB:
                 onTab();
                 break;
@@ -251,256 +183,6 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
                 break;
             default:
                 break;
-        }
-    }
-
-    /**
-     * Overwrites the default rich text area behavior when the Enter key is being pressed.
-     */
-    protected void onEnter()
-    {
-        Selection selection = getTextArea().getDocument().getSelection();
-        if (selection.getRangeCount() == 0) {
-            return;
-        } else if (!selection.isCollapsed()) {
-            // Selection + Enter = Selection + Delete + Enter
-            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
-            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
-            // the Delete command instead which is HTML-aware.
-            getTextArea().getCommandManager().execute(Command.DELETE);
-        }
-
-        // At this point the selection should be collapsed.
-        Range range = selection.getRangeAt(0);
-        Node ancestor = domUtils.getNearestBlockContainer((range.getStartContainer()));
-        String tagName = ancestor.getNodeName().toLowerCase();
-        if (LI.equals(tagName)) {
-            // Leave the default behavior for now.
-        } else if (TD.equals(tagName) || TH.equals(tagName)) {
-            onEnterTableCell(ancestor);
-        } else {
-            onEnterParagraph(ancestor);
-        }
-    }
-
-    /**
-     * Handles the case when Enter is pressed inside a table cell.
-     * 
-     * @param cell The table cell where the Enter has been pressed.
-     */
-    protected void onEnterTableCell(Node cell)
-    {
-        // Cancel the event to prevent its default behavior.
-        getTextArea().getCurrentEvent().xPreventDefault();
-
-        Selection selection = getTextArea().getDocument().getSelection();
-        Range range = selection.getRangeAt(0);
-
-        onEnterParagraphOnce(cell, range);
-
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-
-    /**
-     * Behaves as if the caret is inside a paragraph. Precisely:
-     * <ul>
-     * <li>1 return key generates a line break (BR)</li>
-     * <li>2 consecutive return keys generate a paragraph</li>
-     * <li>3 or more consecutive return keys generate div's with class <em>wikimodel-emptyline</em> (their purpose is to
-     * separate block level elements).</li>
-     * </ul>
-     * 
-     * @param container The block level element containing the start of the first range.
-     */
-    protected void onEnterParagraph(Node container)
-    {
-        // Cancel the event to prevent its default behavior.
-        getTextArea().getCurrentEvent().xPreventDefault();
-
-        Selection selection = getTextArea().getDocument().getSelection();
-        Range range = selection.getRangeAt(0);
-
-        if (isAtStart(container, range)) {
-            onEnterParagraphThrice(container, range);
-        } else if (isAfterBR(container, range)) {
-            onEnterParagraphTwice(container, range);
-        } else {
-            onEnterParagraphOnce(container, range);
-        }
-
-        range.collapse(true);
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
-
-    /**
-     * @param container A block level element containing the start of the given range.
-     * @param range A DOM range.
-     * @return true if the start of the given range is at the beginning of its block level container.
-     */
-    protected boolean isAtStart(Node container, Range range)
-    {
-        if (!container.hasChildNodes()) {
-            return true;
-        }
-        if (range.getStartOffset() > 0) {
-            return false;
-        }
-        return domUtils.getFirstLeaf(container) == domUtils.getFirstLeaf(range.getStartContainer());
-    }
-
-    /**
-     * @param container A block level element containing the start of the given range.
-     * @param range A DOM range.
-     * @return true if the start of the given range is immediately after a BR element.
-     */
-    protected boolean isAfterBR(Node container, Range range)
-    {
-        Node leaf;
-        if (range.getStartOffset() > 0) {
-            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE) {
-                leaf = range.getStartContainer().getChildNodes().getItem(range.getStartOffset() - 1);
-                leaf = domUtils.getLastLeaf(leaf);
-            } else {
-                // We are in the middle of the text.
-                return false;
-            }
-        } else {
-            leaf = domUtils.getPreviousLeaf(range.getStartContainer());
-        }
-        // We have to additionally test if the found BR is in the given container.
-        return isBR(leaf) && container == domUtils.getNearestBlockContainer(leaf);
-    }
-
-    /**
-     * @param node A DOM node.
-     * @return true if the given node is a BR element.
-     */
-    protected boolean isBR(Node node)
-    {
-        return node != null && BR.equalsIgnoreCase(node.getNodeName());
-    }
-
-    /**
-     * Enter has been pressed once inside a block level element.
-     * 
-     * @param container The block level element.
-     * @param range The caret.
-     */
-    protected void onEnterParagraphOnce(Node container, Range range)
-    {
-        // Insert the BR.
-        Node br = getTextArea().getDocument().xCreateBRElement();
-        switch (range.getStartContainer().getNodeType()) {
-            case DOMUtils.CDATA_NODE:
-            case DOMUtils.COMMENT_NODE:
-                domUtils.insertAfter(br, range.getStartContainer());
-                break;
-            case Node.TEXT_NODE:
-                Node refNode = domUtils.splitNode(range.getStartContainer(), range.getStartOffset());
-                refNode.getParentNode().insertBefore(br, refNode);
-                break;
-            case Node.ELEMENT_NODE:
-                domUtils.insertAt(range.getStartContainer(), br, range.getStartOffset());
-                break;
-            default:
-                break;
-        }
-
-        // Place the caret after the inserted BR.
-        Node start = br.getNextSibling();
-        if (start == null || start.getNodeType() != Node.TEXT_NODE) {
-            start = getTextArea().getDocument().createTextNode("");
-            domUtils.insertAfter(start, br);
-        }
-        range.setStart(start, 0);
-    }
-
-    /**
-     * Enter has been pressed twice inside a block level element.
-     * 
-     * @param container The block level element containing the start of the given range.
-     * @param range The caret.
-     */
-    protected void onEnterParagraphTwice(Node container, Range range)
-    {
-        Node br;
-        // Find the BR.
-        if (range.getStartOffset() > 0) {
-            if (range.getStartContainer().getNodeType() == Node.ELEMENT_NODE) {
-                br = range.getStartContainer().getChildNodes().getItem(range.getStartOffset() - 1);
-                br = domUtils.getLastLeaf(br);
-            } else {
-                return;
-            }
-        } else {
-            br = domUtils.getPreviousLeaf(range.getStartContainer());
-        }
-
-        // Create a new paragraph.
-        Node paragraph = getTextArea().getDocument().xCreatePElement();
-
-        // This is the node that will contain the caret after the split.
-        Node start;
-
-        // Split the container after the found BR.
-        if (domUtils.isFlowContainer(container)) {
-            Node child = domUtils.getChild(container, br);
-            if (child != br) {
-                start = domUtils.splitNode(container, br.getParentNode(), domUtils.getNodeIndex(br));
-            } else {
-                start = paragraph;
-            }
-            // Insert the created paragraph before the split.
-            domUtils.insertAfter(paragraph, child);
-            // Move all the in-line nodes after the split in the created paragraph.
-            child = paragraph.getNextSibling();
-            while (child != null && domUtils.isInline(child)) {
-                paragraph.appendChild(child);
-                child = paragraph.getNextSibling();
-            }
-        } else {
-            start = domUtils.splitNode(container.getParentNode(), br.getParentNode(), domUtils.getNodeIndex(br));
-            if (start == container.getNextSibling()) {
-                start = paragraph;
-            }
-            paragraph.appendChild(Element.as(container.getNextSibling()).extractContents());
-            container.getParentNode().replaceChild(paragraph, container.getNextSibling());
-        }
-        br.getParentNode().removeChild(br);
-
-        // Place the caret inside the new container, at the beginning.
-        if (!start.hasChildNodes()) {
-            start.appendChild(getTextArea().getDocument().createTextNode(""));
-            start = start.getFirstChild();
-        }
-        range.setStart(start, 0);
-    }
-
-    /**
-     * Enter has been pressed thrice inside a block level element. We must be at the beginning of the given block so we
-     * insert an empty line before it. In other words we move the block one line below.
-     * 
-     * @param container The block level element.
-     * @param range The caret.
-     */
-    protected void onEnterParagraphThrice(Node container, Range range)
-    {
-        Document document = getTextArea().getDocument();
-        // Create a new paragraph.
-        Element paragraph = document.xCreatePElement().cast();
-
-        if (domUtils.isFlowContainer(container)) {
-            // We are at the beginning of a flow container. Since it can contain block elements we insert the paragraph
-            // before its first child.
-            domUtils.insertAt(container, paragraph, 0);
-            // We place the caret after the inserted paragraph.
-            range.setStartAfter(paragraph);
-        } else {
-            // Insert the paragraph before the container.
-            container.getParentNode().insertBefore(paragraph, container);
         }
     }
 
@@ -610,6 +292,22 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);
+    }
+
+    /**
+     * @param container A block level element containing the start of the given range.
+     * @param range A DOM range.
+     * @return true if the start of the given range is at the beginning of its block level container.
+     */
+    protected boolean isAtStart(Node container, Range range)
+    {
+        if (!container.hasChildNodes()) {
+            return true;
+        }
+        if (range.getStartOffset() > 0) {
+            return false;
+        }
+        return domUtils.getFirstLeaf(container) == domUtils.getFirstLeaf(range.getStartContainer());
     }
 
     /**
@@ -729,8 +427,6 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
     public void onLoad(Widget sender)
     {
         adjustDragDrop(textArea.getDocument());
-        markInitialLineBreaks();
-        replaceEmptyDivsWithParagraphs();
     }
 
     /**
@@ -741,111 +437,5 @@ public class BehaviorAdjuster implements LoadListener, CommandListener
     protected void adjustDragDrop(Document document)
     {
         // Nothing here by default. May be overridden by browser specific implementations.
-    }
-
-    /**
-     * Replaces empty DIVs with paragraphs. Empty DIVs are used by Wikimodel as empty lines between block level
-     * elements, but since the user should be able to write on these empty lines we convert them to paragraphs.
-     */
-    protected void replaceEmptyDivsWithParagraphs()
-    {
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> divs = document.getBody().getElementsByTagName("div");
-        // Since NodeList is updated when one of its nodes are detached, we have to store the empty DIVs in a separate
-        // list.
-        List<Node> emptyDivs = new ArrayList<Node>();
-        for (int i = 0; i < divs.getLength(); i++) {
-            Node div = divs.getItem(i);
-            if (!div.hasChildNodes()) {
-                emptyDivs.add(div);
-            }
-        }
-        // Replace the empty DIVs with paragraphs.
-        for (Node div : emptyDivs) {
-            div.getParentNode().replaceChild(document.xCreatePElement(), div);
-        }
-    }
-
-    /**
-     * @param leaf A DOM node which has not children.
-     * @return true if the given leaf needs space on the screen in order to be rendered.
-     */
-    protected boolean needsSpace(Node leaf)
-    {
-        switch (leaf.getNodeType()) {
-            case Node.TEXT_NODE:
-                return leaf.getNodeValue().length() > 0;
-            case Node.ELEMENT_NODE:
-                Element element = Element.as(leaf);
-                return BR.equalsIgnoreCase(element.getTagName()) || element.getOffsetHeight() > 0
-                    || element.getOffsetWidth() > 0;
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Marks the BRs that have been added as spacers during the editing. These BRs were added to overcome a Mozilla bug
-     * that prevents us from typing inside an empty block level element.
-     */
-    protected void markSpacers()
-    {
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
-        for (int i = 0; i < brs.getLength(); i++) {
-            Element br = brs.getItem(i).cast();
-            // Ignore the BRs that have been there from the beginning.
-            if (LINE_BREAK.equals(br.getClassName())) {
-                continue;
-            }
-            Node container = DOMUtils.getInstance().getNearestBlockContainer(br);
-            Node leaf = DOMUtils.getInstance().getNextLeaf(br);
-            boolean emptyLine = true;
-            // Look if there is any visible element on the new line, taking care to remain in the current block
-            // container.
-            while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf)) {
-                if (needsSpace(leaf)) {
-                    emptyLine = false;
-                    break;
-                }
-                leaf = DOMUtils.getInstance().getNextLeaf(leaf);
-            }
-            if (emptyLine) {
-                br.setClassName(SPACER);
-            } else {
-                br.removeAttribute(CLASS_NAME);
-            }
-        }
-    }
-
-    /**
-     * @see #markSpacers()
-     */
-    protected void unMarkSpacers()
-    {
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
-        for (int i = 0; i < brs.getLength(); i++) {
-            Element br = (Element) brs.getItem(i);
-            if (SPACER.equals(br.getClassName())) {
-                br.removeAttribute(CLASS_NAME);
-            }
-        }
-    }
-
-    /**
-     * Marks the initial line breaks so they are not mistaken as {@link #SPACER}.
-     */
-    protected void markInitialLineBreaks()
-    {
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
-        for (int i = 0; i < brs.getLength(); i++) {
-            Element br = (Element) brs.getItem(i);
-            // Skip the BRs added by the browser before the document was loaded.
-            if (!br.hasAttribute("_moz_dirty")) {
-                br.setClassName(LINE_BREAK);
-            }
-        }
     }
 }

@@ -30,6 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImporterPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.IndentPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.justify.JustifyPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.plugin.line.LinePluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroPluginFactory;
@@ -82,6 +83,7 @@ public final class WysiwygEditorFactory
         // add additional SyntaxValidator for other syntaxes
 
         pfm = new DefaultPluginFactoryManager();
+        pfm.addPluginFactory(LinePluginFactory.getInstance());
         pfm.addPluginFactory(SubmitPluginFactory.getInstance());
         pfm.addPluginFactory(SeparatorPluginFactory.getInstance());
         pfm.addPluginFactory(TextPluginFactory.getInstance());

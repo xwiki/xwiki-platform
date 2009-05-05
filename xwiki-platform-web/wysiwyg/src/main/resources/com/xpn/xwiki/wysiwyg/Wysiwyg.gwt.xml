@@ -62,7 +62,7 @@
       <when-property-is name="user.agent" value="ie6"/>
     </any>
   </replace-with>
-  
+
   <!-- List behavior adjuster -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
@@ -74,12 +74,12 @@
       <when-property-is name="user.agent" value="ie6"/>
     </any>
   </replace-with>
-  
+
   <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
     <any>
       <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>    
+      <when-property-is name="user.agent" value="gecko"/>
     </any>
   </replace-with>
 
@@ -119,6 +119,26 @@
     <any>
       <when-property-is name="user.agent" value="gecko1_8"/>
       <when-property-is name="user.agent" value="gecko"/>
+    </any>
+  </replace-with>
+
+  <!-- LinePlugin -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.line.LinePlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.line.LinePlugin"/>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.line.MozillaLinePlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.line.LinePlugin"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
+      <when-property-is name="user.agent" value="gecko"/>
+    </any>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.line.IELinePlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.line.LinePlugin"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
     </any>
   </replace-with>
 </module>

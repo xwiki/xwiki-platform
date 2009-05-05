@@ -19,15 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 
-import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
-import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
-import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
-import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -89,58 +84,6 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
             default:
                 super.onKeyDown();
                 break;
-        }
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a IE bug which makes empty paragraphs invisible. Setting the inner HTML to the empty
-     * string seems to do the trick.
-     * 
-     * @see BehaviorAdjuster#onEnterParagraphThrice(Node, Range)
-     */
-    protected void onEnterParagraphThrice(Node container, Range range)
-    {
-        super.onEnterParagraphThrice(container, range);
-
-        Node paragraph;
-        if (DOMUtils.getInstance().isFlowContainer(container)) {
-            paragraph = container.getFirstChild();
-        } else {
-            paragraph = container.getPreviousSibling();
-
-            if (!container.hasChildNodes()) {
-                // If the caret is inside an empty block level container and we insert a new paragraph before then the
-                // caret doesn't remain in its place. We have to reset the caret.
-                container.appendChild(container.getOwnerDocument().createTextNode(""));
-                range.selectNodeContents(container.getFirstChild());
-            }
-        }
-        // Empty paragraphs are not displayed in IE. Strangely, setting the inner HTML to the empty string
-        // forces IE to render the empty paragraphs. Appending an empty text node doesn't help.
-        Element.as(paragraph).setInnerHTML("");
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a IE bug which makes empty paragraphs invisible. Setting the inner HTML to the empty
-     * string seems to do the trick.
-     * 
-     * @see BehaviorAdjuster#replaceEmptyDivsWithParagraphs()
-     */
-    protected void replaceEmptyDivsWithParagraphs()
-    {
-        super.replaceEmptyDivsWithParagraphs();
-
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");
-        for (int i = 0; i < paragraphs.getLength(); i++) {
-            Element paragraph = paragraphs.getItem(i).cast();
-            if (!paragraph.hasChildNodes()) {
-                // Empty paragraphs are not displayed in IE. Strangely, setting the inner HTML to the empty string
-                // forces IE to render the empty paragraphs. Appending an empty text node doesn't help.
-                paragraph.setInnerHTML("");
-            }
         }
     }
 }

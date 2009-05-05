@@ -1980,7 +1980,8 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
             </xsl:choose>
         </xsl:variable>
         <!-- If both height and width are specified, allow the image to be transformed to a different aspect ration -->
-        <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>
+        <!-- Disabled, since images overlowing only one of the dimensions (e.g. larger width, but good height) will be stretched.
+        <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if> -->
         <!-- Allow images to be resized -->
         <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
         <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>

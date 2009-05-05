@@ -41,7 +41,7 @@ import org.xwiki.xml.XMLUtils;
  * @version $Id$
  * @since 1.9M1
  */
-public class XMLWikiPrinter implements WikiPrinter
+public class XMLWikiPrinter
 {
     protected WikiWriter wikiWriter;
 
@@ -66,30 +66,9 @@ public class XMLWikiPrinter implements WikiPrinter
         return this.xmlWriter;
     }
 
-    public WikiPrinter getWikiPrinter()
-    {
-        return this.wikiWriter.getWikiPrinter();
-    }
-
     public void setWikiPrinter(WikiPrinter printer)
     {
         this.wikiWriter.setWikiPrinter(printer);
-    }
-
-    /**
-     * Delegate printing to the wrapped printer.
-     */
-    public void print(String text)
-    {
-        this.wikiWriter.getWikiPrinter().print(text);
-    }
-
-    /**
-     * Delegate printing to the wrapped printer.
-     */
-    public void println(String text)
-    {
-        this.wikiWriter.getWikiPrinter().println(text);
     }
 
     /**

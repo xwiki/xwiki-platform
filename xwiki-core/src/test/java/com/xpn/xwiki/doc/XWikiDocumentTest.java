@@ -278,7 +278,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
-            + "[[]]");
+            + "[[]][[#anchor]][[?param=value]]");
         this.document.setSyntaxId("xwiki/2.0");
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());

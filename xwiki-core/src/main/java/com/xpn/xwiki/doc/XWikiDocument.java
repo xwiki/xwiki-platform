@@ -3119,14 +3119,18 @@ public class XWikiDocument implements DocumentModelBridge
                 for (LinkBlock linkBlock : linkBlocks) {
                     org.xwiki.rendering.listener.Link link = linkBlock.getLink();
                     if (link.getType() == LinkType.DOCUMENT) {
-                        // The reference may not have the space or even document specified (in case of an empty
-                        // string)
-                        // Thus we need to find the fully qualified document name
-                        DocumentName documentName = this.documentNameFactory.createDocumentName(link.getReference());
+                        if (!StringUtils.isEmpty(link.getReference())
+                            || (StringUtils.isEmpty(link.getAnchor()) && StringUtils.isEmpty(link.getQueryString()))) {
+                            // The reference may not have the space or even document specified (in case of an empty
+                            // string)
+                            // Thus we need to find the fully qualified document name
+                            DocumentName documentName =
+                                this.documentNameFactory.createDocumentName(link.getReference());
 
-                        // Verify that the link is not an autolink (i.e. a link to the current document)
-                        if (!documentName.equals(currentDocumentName)) {
-                            pageNameSet.add(this.documentNameSerializer.serialize(documentName));
+                            // Verify that the link is not an autolink (i.e. a link to the current document)
+                            if (!documentName.equals(currentDocumentName)) {
+                                pageNameSet.add(this.documentNameSerializer.serialize(documentName));
+                            }
                         }
                     }
                 }

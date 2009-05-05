@@ -52,7 +52,7 @@ public class HTMLUtilsTest extends AbstractXWikiComponentTestCase
     public void testStripHTMLEnvelope() throws Exception
     {
         Document document =
-            cleaner.clean(new StringReader("<html><head/><body><p>test1</p><p>test2</p></body></html>"));
+            cleaner.clean(new StringReader("<html><head><body><p>test1</p><p>test2</p></body></html>"));
         HTMLUtils.stripHTMLEnvelope(document);
         assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils
             .toString(document));
@@ -62,7 +62,7 @@ public class HTMLUtilsTest extends AbstractXWikiComponentTestCase
     {
         Document document = cleaner.clean(new StringReader("<html><head /><body><p>test</p></body></html>"));
         HTMLUtils.stripFirstElementInside(document, "body", "p");
-        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><head /><body>test</body></html>\n", 
+        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><head></head><body>test</body></html>\n", 
             XMLUtils.toString(document));
     }
 }

@@ -206,6 +206,10 @@ public final class XMLUtils
         // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
         format.setLineSeparator("\n");
         
+        // Make sure all elements are expanded so that they can also be rendered fine in browsers that only support 
+        // HTML.
+        format.setExpandEmptyElements(true);
+        
         format.setOmitDeclaration(omitDeclaration);
 
         XMLOutputter outputter = new XWikiXMLOutputter(format, omitDoctype);

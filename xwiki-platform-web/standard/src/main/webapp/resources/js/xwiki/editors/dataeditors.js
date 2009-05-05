@@ -11,7 +11,11 @@ document.observe('dom:loaded', function() {
         new Ajax.Request(item.href, {
           onSuccess : function() {
             var xobjectElement = item.up('.xobject');
-            xobjectElement.parentNode.removeChild(xobjectElement);
+            var xclassElement = xobjectElement.up('.xclass');
+            xobjectElement.remove();
+            if (xclassElement.select('.xobject').size() == 0) {
+              xclassElement.remove();
+            }
           }
         });
       }

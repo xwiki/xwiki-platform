@@ -22,7 +22,7 @@ package org.xwiki.bridge;
 /**
  * Represents a document name (wiki, space and page names).
  * 
- * @version $Id: DocumentName.java 19380 2009-05-05 11:04:19Z tmortagne $
+ * @version $Id$
  * @since 1.8RC2
  */
 public class DocumentName

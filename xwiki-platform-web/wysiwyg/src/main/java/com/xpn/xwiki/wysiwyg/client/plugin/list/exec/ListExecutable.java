@@ -60,8 +60,12 @@ public class ListExecutable extends DefaultExecutable
      */
     public boolean isExecuted(RichTextArea rta)
     {
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-        Node rangeContainer = range.getCommonAncestorContainer();
-        return (Element) DOMUtils.getInstance().getFirstAncestor(rangeContainer, ordered ? "ol" : "ul") != null;
+        if (rta.getDocument().getSelection().getRangeCount() > 0) {
+            Range range = rta.getDocument().getSelection().getRangeAt(0);
+            Node rangeContainer = range.getCommonAncestorContainer();
+            return (Element) DOMUtils.getInstance().getFirstAncestor(rangeContainer, ordered ? "ol" : "ul") != null;
+        } else {
+            return false;
+        }
     }
 }

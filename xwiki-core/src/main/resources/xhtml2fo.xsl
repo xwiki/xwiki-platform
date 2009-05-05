@@ -1949,6 +1949,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     </xsl:template>
 
     <xsl:template name="process-img">
+        <xsl:param name="dpi-resampling">0.75</xsl:param>
         <xsl:variable name="style" select="concat(';', translate(normalize-space(@style), ' ', ''))"/>
         <xsl:variable name="has-width" select="@width or contains($style, ';width:')"/>
         <xsl:variable name="has-height" select="@height or contains($style, ';height:')"/>
@@ -1980,12 +1981,47 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         </xsl:variable>
         <!-- If both height and width are specified, allow the image to be transformed to a different aspect ration -->
         <xsl:if test="$has-height and $has-width"><xsl:attribute name="scaling">non-uniform</xsl:attribute></xsl:if>
-        <!-- The img attribute set contains values that scale images to 75%, in order to transform from 72 to 96 DPI;
-             since the user specifies his own width and/or height, let the image scale to fit the specified values -->
-        <xsl:if test="$has-height or $has-width">
-            <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
-            <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
+        <!-- Allow images to be resized -->
+        <xsl:attribute name="content-height">scale-to-fit</xsl:attribute>
+        <xsl:attribute name="content-width">scale-to-fit</xsl:attribute>
+        <!-- Min and max width -->
+        <xsl:attribute name="inline-progression-dimension.minimum">auto</xsl:attribute>
+        <xsl:attribute name="inline-progression-dimension.maximum">100%</xsl:attribute>
+        <!-- Min and max height -->
+        <xsl:attribute name="block-progression-dimension.minimum">auto</xsl:attribute>
+        <xsl:attribute name="block-progression-dimension.maximum">700px</xsl:attribute>
+        <!-- Scale px lengths in order to get from 72 to 96 DPI -->
+        <xsl:if test="$has-width">
+            <!-- Preserve the original unit -->
+            <xsl:variable name="unit"><xsl:value-of select="translate($width, '01234567890.', '')"/></xsl:variable>
+            <!-- Extract the original dimension without the unit -->
+            <xsl:variable name="width-no-unit">
+                <xsl:choose>
+                    <xsl:when test="$unit = 'px' or $unit = ''">
+                        <xsl:value-of select="number(translate($width, 'pxtcminem%', '')) * $dpi-resampling"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="number(translate($width, 'pxtcminem%', ''))"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:attribute name="inline-progression-dimension.optimum"><xsl:value-of select="$width-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
         </xsl:if>
+        <xsl:if test="$has-height">
+            <xsl:variable name="unit"><xsl:value-of select="translate($height, '01234567890. ', '')"/></xsl:variable>
+            <xsl:variable name="height-no-unit">
+                <xsl:choose>
+                    <xsl:when test="$unit = 'px' or $unit = ''">
+                        <xsl:value-of select="number(translate($height, 'pxtcminem% ', '')) * $dpi-resampling"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="number(translate($height, 'pxtcminem% ', ''))"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+            <xsl:attribute name="block-progression-dimension.optimum"><xsl:value-of select="$height-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
+        </xsl:if>
+        <!-- The actual image reference -->
         <xsl:attribute name="src">
             <xsl:text>url('</xsl:text>
             <xsl:value-of select="@src"/>
@@ -1995,35 +2031,6 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
             <xsl:attribute name="role">
                 <xsl:value-of select="@alt"/>
             </xsl:attribute>
-        </xsl:if>
-        <!-- Scale px lengths in order to get from 72 to 96 DPI -->
-        <xsl:if test="$has-width">
-            <xsl:variable name="unit"><xsl:value-of select="translate($width, '01234567890.', '')"/></xsl:variable>
-            <xsl:variable name="width-no-unit">
-                <xsl:choose>
-                    <xsl:when test="$unit = 'px' or $unit = ''">
-                        <xsl:value-of select="number(translate($width, 'pxtcminem%', '')) * 0.75"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="number(translate($width, 'pxtcminem%', ''))"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:variable>
-            <xsl:attribute name="width"><xsl:value-of select="$width-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
-        </xsl:if>
-        <xsl:if test="$has-height">
-            <xsl:variable name="unit"><xsl:value-of select="translate($height, '01234567890. ', '')"/></xsl:variable>
-            <xsl:variable name="height-no-unit">
-                <xsl:choose>
-                    <xsl:when test="$unit = 'px' or $unit = ''">
-                        <xsl:value-of select="number(translate($height, 'pxtcminem% ', '')) * 0.75"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="number(translate($height, 'pxtcminem% ', ''))"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:variable>
-            <xsl:attribute name="height"><xsl:value-of select="$height-no-unit"/><xsl:value-of select="$unit"/></xsl:attribute>
         </xsl:if>
         <xsl:if test="@border">
             <xsl:attribute name="border">

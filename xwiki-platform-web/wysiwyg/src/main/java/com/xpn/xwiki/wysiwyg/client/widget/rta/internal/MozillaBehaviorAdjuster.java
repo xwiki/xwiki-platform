@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
@@ -30,7 +29,6 @@ import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.NodeList;
 
 /**
  * Adjusts the behavior of the rich text area in Mozilla based browsers, like Firefox.
@@ -56,101 +54,6 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
             event.stopPropagation();
         }, true);
     }-*/;
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which causes the caret to be rendered on the same line after you press
-     * Enter, if the new line doesn't have any visible contents. Once you start typing the caret moves below, but it
-     * looks strange before you type. We fixed the bug by adding a BR at the end of the new line.
-     * 
-     * @see BehaviorAdjuster#onEnterParagraphOnce(Node, Range)
-     */
-    protected void onEnterParagraphOnce(Node container, Range range)
-    {
-        super.onEnterParagraphOnce(container, range);
-
-        // Start container should be a text node.
-        Node lastLeaf;
-        Node leaf = range.getStartContainer();
-        // Look if there is any visible element on the new line, taking care to remain in the current block container.
-        do {
-            if (needsSpace(leaf)) {
-                return;
-            }
-            lastLeaf = leaf;
-            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
-        } while (leaf != null && container == DOMUtils.getInstance().getNearestBlockContainer(leaf));
-        // It seems there's no visible element on the new line. We should add one.
-        DOMUtils.getInstance().insertAfter(getTextArea().getDocument().xCreateBRElement(), lastLeaf);
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the created
-     * paragraph if it's empty.
-     * 
-     * @see BehaviorAdjuster#onEnterParagraphTwice(Node, Range)
-     */
-    protected void onEnterParagraphTwice(Node container, Range range)
-    {
-        super.onEnterParagraphTwice(container, range);
-
-        // The start point of the range should have been placed inside the new paragraph.
-        Node paragraph = DOMUtils.getInstance().getNearestBlockContainer(range.getStartContainer());
-        // Look if there is any visible element on the new line, taking care to remain in the current block container.
-        Node leaf = DOMUtils.getInstance().getFirstLeaf(paragraph);
-        do {
-            if (needsSpace(leaf)) {
-                return;
-            }
-            leaf = DOMUtils.getInstance().getNextLeaf(leaf);
-        } while (leaf != null && paragraph == DOMUtils.getInstance().getNearestBlockContainer(leaf));
-        // It seems there's no visible element inside the newly created paragraph. We should add one.
-        paragraph.appendChild(getTextArea().getDocument().xCreateBRElement());
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the newly
-     * created paragraph.
-     * 
-     * @see BehaviorAdjuster#onEnterParagraphThrice(Node, Range)
-     */
-    protected void onEnterParagraphThrice(Node container, Range range)
-    {
-        super.onEnterParagraphThrice(container, range);
-
-        Node paragraph;
-        if (DOMUtils.getInstance().isFlowContainer(container)) {
-            paragraph = container.getFirstChild();
-        } else {
-            paragraph = container.getPreviousSibling();
-        }
-        paragraph.appendChild(getTextArea().getDocument().xCreateBRElement());
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the newly
-     * created paragraph.
-     * 
-     * @see BehaviorAdjuster#replaceEmptyDivsWithParagraphs()
-     */
-    protected void replaceEmptyDivsWithParagraphs()
-    {
-        super.replaceEmptyDivsWithParagraphs();
-
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");
-        for (int i = 0; i < paragraphs.getLength(); i++) {
-            Node paragraph = paragraphs.getItem(i);
-            if (!paragraph.hasChildNodes()) {
-                // The user cannot place the caret inside an empty paragraph in Firefox. The workaround to make an empty
-                // paragraph editable is to append a BR.
-                paragraph.appendChild(document.xCreateBRElement());
-            }
-        }
-    }
 
     /**
      * {@inheritDoc}

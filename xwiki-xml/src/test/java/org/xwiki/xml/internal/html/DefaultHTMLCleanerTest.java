@@ -42,7 +42,7 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
             + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 
-    private static final String HEADER_FULL = HEADER + "<html><head /><body>";
+    private static final String HEADER_FULL = HEADER + "<html><head></head><body>";
 
     private static final String FOOTER = "</body></html>\n";
 
@@ -62,16 +62,16 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         // See the problem described here: http://sourceforge.net/forum/forum.php?thread_id=2243880&forum_id=637246
         assertHTML("<p>&quot;&amp;**notbold**&lt;notag&gt;&nbsp;</p>", "<p>&quot;&amp;**notbold**&lt;notag&gt;&nbsp;</p>");
         assertHTML("<p>\"&amp;</p>", "<p>\"&</p>");
-        assertHTML("<p><img src=\"http://host.com/a.gif?a=foo&amp;b=bar\" /></p>", "<img src=\"http://host.com/a.gif?a=foo&b=bar\" />");
+        assertHTML("<p><img src=\"http://host.com/a.gif?a=foo&amp;b=bar\"></img></p>", "<img src=\"http://host.com/a.gif?a=foo&b=bar\" />");
         assertHTML("<p>&#xA;</p>", "<p>&#xA;</p>");
         
         // Verify that double quotes are escaped in attibute values
-        assertHTML("<p value=\"script:&quot;&quot;\" />", "<p value='script:\"\"'");
+        assertHTML("<p value=\"script:&quot;&quot;\"></p>", "<p value='script:\"\"'");
 }
 
     public void testCloseUnbalancedTags()
     {
-        assertHTML("<hr /><p>hello</p>", "<hr><p>hello");
+        assertHTML("<hr></hr><p>hello</p>", "<hr><p>hello");
     }
 
     public void testConversionsFromHTML()
@@ -90,7 +90,7 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
 
     public void testConvertImplicitParagraphs()
     {
-        assertHTML("<p>word1</p><p>word2</p><p>word3</p><hr /><p>word4</p>", "word1<p>word2</p>word3<hr />word4");
+        assertHTML("<p>word1</p><p>word2</p><p>word3</p><hr></hr><p>word4</p>", "word1<p>word2</p>word3<hr />word4");
         
         // Don't convert when there are only spaces or new lines
         assertHTML("<p>word1</p>  \n  <p>word2</p>", "<p>word1</p>  \n  <p>word2</p>");

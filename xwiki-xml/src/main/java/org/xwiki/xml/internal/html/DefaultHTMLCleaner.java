@@ -191,6 +191,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         defaultProperties.setOmitUnknownTags(true);
         defaultProperties.setNamespacesAware(true);
         
+        // HTML Cleaner uses the compact notation by default but we don't want that since:
+        // - it's more work and not required since not compact notation is valid XHTML
+        // - expanded elements can also be rendered fine in browsers that only support HTML.
+        defaultProperties.setUseEmptyElementTags(false);
+        
         // Wrap script and style content in CDATA blocks
         defaultProperties.setUseCdataForScriptAndStyle(true);
         

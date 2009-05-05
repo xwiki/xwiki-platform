@@ -20,12 +20,7 @@
  */
 package org.xwiki.xml;
 
-import java.io.StringReader;
-
-import org.w3c.dom.Document;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
-import org.xwiki.xml.html.HTMLCleaner;
-import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 
 /**
  * Unit tests for {@link org.xwiki.xml.XMLUtils}.
@@ -35,8 +30,6 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
  */
 public class XMLUtilsTest extends AbstractXWikiComponentTestCase
 {
-    private HTMLCleaner cleaner;
-
     /**
      * {@inheritDoc}
      * 
@@ -46,7 +39,6 @@ public class XMLUtilsTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.ROLE, "default");
     }
 
     public void testEscapeXMLComment()

@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.wikimanager.doc;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.codehaus.plexus.util.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -303,7 +305,7 @@ public class XWikiServer extends DefaultXObjectDocument
      */
     public URL getWikiUrl(String pageFullName) throws MalformedURLException
     {
-        if (pageFullName != null) {
+        if (!StringUtils.isEmpty(pageFullName)) {
             XWikiDocument document = new XWikiDocument();
             document.setFullName(pageFullName);
 

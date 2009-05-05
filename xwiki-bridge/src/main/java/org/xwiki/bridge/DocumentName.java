@@ -22,7 +22,7 @@ package org.xwiki.bridge;
 /**
  * Represents a document name (wiki, space and page names).
  * 
- * @version $Id$
+ * @version $Id: DocumentName.java 17954 2009-03-24 07:36:32Z asiri $
  * @since 1.8RC2
  */
 public class DocumentName
@@ -31,14 +31,14 @@ public class DocumentName
      * @see #getWiki()
      */
     private String wiki;
-    
+
     /**
      * @see #getSpace()
      */
     private String space;
 
     /**
-     * @see #getPage() 
+     * @see #getPage()
      */
     private String page;
 
@@ -61,7 +61,7 @@ public class DocumentName
     {
         return this.wiki;
     }
-    
+
     /**
      * @return the space to which the document belongs to
      */
@@ -77,14 +77,49 @@ public class DocumentName
     {
         return this.page;
     }
-    
+
     /**
      * Converts this {@link DocumentName} into a string representation.
      * 
      * @return a string representing this {@link DocumentName} of the form wiki:space.page.
      */
+    @Override
     public String toString()
     {
         return getWiki() + ":" + getSpace() + "." + getPage();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        boolean equals = false;
+
+        if (obj == this) {
+            equals = true;
+        } else if (obj instanceof DocumentName) {
+            DocumentName documentName = (DocumentName) obj;
+
+            equals =
+                documentName.getWiki().equals(this.getWiki()) && documentName.getSpace().equals(this.getSpace())
+                    && documentName.getPage().equals(this.getPage());
+        }
+
+        return equals;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
     }
 }

@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,6 +74,7 @@ import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -296,6 +298,12 @@ public class XWikiDocument implements DocumentModelBridge
     private DocumentNameFactory documentNameFactory =
         (DocumentNameFactory) Utils.getComponent(DocumentNameFactory.ROLE);
 
+    /**
+     * Used to convert a proper Document Name to string.
+     */
+    private DocumentNameSerializer documentNameSerializer =
+        (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.ROLE);
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -510,7 +518,8 @@ public class XWikiDocument implements DocumentModelBridge
             if (is10Syntax()) {
                 renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
             } else {
-                renderedContent = performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
+                renderedContent =
+                    performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
             }
         } finally {
             if (isInRenderingEngine != null) {
@@ -519,7 +528,7 @@ public class XWikiDocument implements DocumentModelBridge
                 context.remove("isInRenderingEngine");
             }
         }
-        return renderedContent;        
+        return renderedContent;
     }
 
     /**
@@ -3094,39 +3103,39 @@ public class XWikiDocument implements DocumentModelBridge
             XDOM dom = getXDOM();
 
             List<LinkBlock> linkBlocks = dom.getChildrenByType(LinkBlock.class, true);
-            pageNames = new ArrayList<String>(linkBlocks.size());
-            for (LinkBlock linkBlock : linkBlocks) {
-                org.xwiki.rendering.listener.Link link = linkBlock.getLink();
-                if (link.getType() == LinkType.DOCUMENT) {
-                    // The reference may not have the space or even document specified (in case of an empty string)
-                    // Thus we need to find the fully qualified document name. For the moment this is done by calling
-                    // setFullName() on XWikiDocument.
-                    // TODO: In the future use a document name resolver class instead.
-                    XWikiDocument document = new XWikiDocument();
+            Set<String> pageNameSet = new LinkedHashSet<String>(linkBlocks.size());
 
-                    XWikiDocument contextDoc = context.getDoc();
-                    String contextWiki = context.getDatabase();
-                    try {
-                        // Make sure the right document is used as context document
-                        context.setDoc(this);
-                        // Make sure the right wiki is used as context document
-                        context.setDatabase(getDatabase());
+            DocumentName currentDocumentName = new DocumentName(getWikiName(), getSpaceName(), getPageName());
 
-                        document.setFullName(link.getReference(), context);
-                    } finally {
-                        context.setDoc(contextDoc);
-                        context.setDatabase(contextWiki);
-                    }
+            XWikiDocument contextDoc = context.getDoc();
+            String contextWiki = context.getDatabase();
 
-                    // Verify that the link is not an autolink (i.e. a link to the current document) and only add
-                    // if the link is not already in the list.
-                    // TODO: Would be better to use a Set instead of a Link but this needs to change the API and I'm
-                    // not ready to risk this right now: Vincent Massol, 22/02/2009 close to the 1.8RC2 release...
-                    if (!document.getFullName().equals(getFullName()) && !pageNames.contains(document.getFullName())) {
-                        pageNames.add(document.getFullName());
+            try {
+                // Make sure the right document is used as context document
+                context.setDoc(this);
+                // Make sure the right wiki is used as context document
+                context.setDatabase(getDatabase());
+
+                for (LinkBlock linkBlock : linkBlocks) {
+                    org.xwiki.rendering.listener.Link link = linkBlock.getLink();
+                    if (link.getType() == LinkType.DOCUMENT) {
+                        // The reference may not have the space or even document specified (in case of an empty
+                        // string)
+                        // Thus we need to find the fully qualified document name
+                        DocumentName documentName = this.documentNameFactory.createDocumentName(link.getReference());
+
+                        // Verify that the link is not an autolink (i.e. a link to the current document)
+                        if (!documentName.equals(currentDocumentName)) {
+                            pageNameSet.add(this.documentNameSerializer.serialize(documentName));
+                        }
                     }
                 }
+            } finally {
+                context.setDoc(contextDoc);
+                context.setDatabase(contextWiki);
             }
+
+            pageNames = new ArrayList<String>(pageNameSet);
         }
 
         return pageNames;
@@ -3191,11 +3200,13 @@ public class XWikiDocument implements DocumentModelBridge
 
             List<String> result = new ArrayList<String>();
             for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
-                
+
                 // - Add each document pointed to by the include macro
-                // - Also add all the included pages found in the velocity macro when using the deprecated #include* macros
-                //   This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to play
-                //   nice with people migrating from 1.0 to 2.0 syntax
+                // - Also add all the included pages found in the velocity macro when using the deprecated #include*
+                // macros
+                // This should be removed when we fully drop support for the XWiki Syntax 1.0 but for now we want to
+                // play
+                // nice with people migrating from 1.0 to 2.0 syntax
 
                 if (macroBlock.getName().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("document");
@@ -3203,9 +3214,8 @@ public class XWikiDocument implements DocumentModelBridge
                         documentName = getSpace() + "." + documentName;
                     }
                     result.add(documentName);
-                } else if (macroBlock.getName().equalsIgnoreCase("velocity") 
-                    && !StringUtils.isEmpty(macroBlock.getContent()))
-                {
+                } else if (macroBlock.getName().equalsIgnoreCase("velocity")
+                    && !StringUtils.isEmpty(macroBlock.getContent())) {
                     // Try to find matching content inside each velocity macro
                     result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
                 }
@@ -4114,7 +4124,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * @return "inline" if the document should be edited in inline mode by default or "edit" otherwise.
-     * 
      * @throws XWikiException if an error happens when computing the edit mode
      */
     public String getDefaultEditMode(XWikiContext context) throws XWikiException
@@ -4127,11 +4136,11 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             // Algorithm: look in all include macro and for all document included check if one of them
             // has an SheetClass object attached to it. If so then the edit mode is inline.
-            
+
             // Find all include macros and extract the document names
             for (MacroBlock macroBlock : getXDOM().getChildrenByType(MacroBlock.class, false)) {
                 // TODO: Is there a good way not to hardcode the macro name? The macro itself shouldn't know
-                // its own name since it's a deployment time concern. 
+                // its own name since it's a deployment time concern.
                 if ("include".equals(macroBlock.getName())) {
                     String documentName = macroBlock.getParameter("document");
                     if (documentName != null) {
@@ -4152,14 +4161,14 @@ public class XWikiDocument implements DocumentModelBridge
                 }
             }
         }
-        
+
         return "edit";
     }
-    
+
     public String getDefaultEditURL(XWikiContext context) throws XWikiException
     {
         String editMode = getDefaultEditMode(context);
-        
+
         if ("inline".equals(editMode)) {
             return getEditURL("inline", "", context);
         } else {

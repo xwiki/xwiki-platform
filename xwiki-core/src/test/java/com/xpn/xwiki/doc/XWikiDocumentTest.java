@@ -283,7 +283,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "Space.WebHome"), linkedPages);
+        assertEquals(Arrays.asList("xwiki:Space.TargetPage", "xwiki:TargetSpace.TargetPage", "xwiki:Space.WebHome"), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException

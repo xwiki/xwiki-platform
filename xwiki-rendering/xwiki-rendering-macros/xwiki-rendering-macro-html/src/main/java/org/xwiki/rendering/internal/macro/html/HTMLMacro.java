@@ -250,7 +250,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
         
         try {
             // Parse the wiki syntax
-            Parser parser = (Parser) this.componentManager.lookup(Parser.class, wikiSyntax.toIdString());
+            Parser parser = (Parser) this.componentManager.lookup(Parser.class.getName(), wikiSyntax.toIdString());
             XDOM xdom = parser.parse(new StringReader(content));
             macroTransformation.transform(xdom, parser.getSyntax());
 

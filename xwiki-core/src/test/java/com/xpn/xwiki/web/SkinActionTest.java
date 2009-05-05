@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ravenees
  */
 package com.xpn.xwiki.web;
 
@@ -32,6 +31,7 @@ public class SkinActionTest extends MockObjectTestCase
 {
     private SkinAction action;
 
+    @Override
     protected void setUp()
     {
         this.action = new SkinAction();

@@ -83,7 +83,7 @@ public class ListSyntaxFilter extends AbstractFilter implements Initializable
             return content;
         }
 
-        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 1));
+        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
 
         return result.toString();
     }

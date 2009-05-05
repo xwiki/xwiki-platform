@@ -228,12 +228,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         return i;
     }
 
-    public int getComment(char[] array, int currentIndex, StringBuffer htmlBlock, HTMLFilterContext context)
+    public int getComment(char[] array, int currentIndex, StringBuffer commentBlock, HTMLFilterContext context)
     {
         context.setType(HTMLType.COMMENT);
         context.setHTML(true);
-
-        StringBuffer commentBlock = new StringBuffer();
 
         commentBlock.append("<!--");
 
@@ -247,8 +245,6 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             }
             commentBlock.append(array[i]);
         }
-
-        htmlBlock.append(context.addProtectedContent(commentBlock.toString(), true));
 
         return i;
     }

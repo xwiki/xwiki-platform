@@ -311,20 +311,21 @@ public final class TableUtils
         NodeList<TableRowElement> rows = table.getRows();
         int index = cell.getCellIndex();
 
-        if (!insertBefore) {
-            index++;
-        }
-
         // Loop over table rows to create a new cell in each of them
         for (int i = 0; i < rows.getLength(); i++) {
             TableRowElement currentRow = rows.getItem(i);
             TableCellElement newCell;
             
             if (isHeaderRow(currentRow)) {
-                newCell = (TableCellElement) currentRow.insertBefore(doc.xCreateElement(COL_HNODENAME), 
-                    currentRow.getCells().getItem(index));
+                // lol
+                newCell = (TableCellElement) (Node) doc.xCreateElement(COL_HNODENAME);
+                if (insertBefore) {
+                    currentRow.insertBefore(newCell, currentRow.getCells().getItem(index));
+                } else {
+                    DOMUtils.getInstance().insertAfter(newCell, currentRow.getCells().getItem(index));
+                }  
             } else {
-                newCell = currentRow.insertCell(index);
+                newCell = currentRow.insertCell(insertBefore ? index : index + 1);
             }
             newCell.setInnerHTML(CELL_DEFAULTHTML);
         }

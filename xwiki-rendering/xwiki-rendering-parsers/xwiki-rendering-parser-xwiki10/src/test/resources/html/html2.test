@@ -54,8 +54,9 @@ some text
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-some text {{velocity}}
-{{html wiki=true}}
+{{velocity}}
+{{html wiki="true"}}
+some text
 ## commented
 
 ### commented
@@ -102,4 +103,6 @@ some text {{velocity}}
 
 
 
-(% class="${variable}" %)(((**bold** some text))){{/html}}{{/velocity}}
+(% class="${variable}" %)(((**bold** some text)))
+{{/html}}
+{{/velocity}}

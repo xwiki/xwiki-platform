@@ -1,8 +1,12 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-$var. method("$4novar")
+some text <element></element>
+
+another paragraph
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html wiki="true"}}$var{{/html}}{{/velocity}}. method("$4novar")
+some text {{html wiki="true"}}<element></element>{{/html}}
+
+another paragraph

@@ -42,6 +42,19 @@
       <groupId>org.wikimodel</groupId>
       <artifactId>org.wikimodel.wem</artifactId>
     </dependency>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -49,9 +62,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <includes>
-            <include>**/RenderingTests.java</include>
-          </includes>
+          <excludes>
+            <exclude>**/Mock*.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>

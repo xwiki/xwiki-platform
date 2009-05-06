@@ -46,8 +46,9 @@
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.26-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.8-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.19-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.20-SNAPSHOT</platform.skin.toucan.version>
+    <!-- Changes in Albatross 1.19 and Toucan 1.20 are not compatible with xwiki-web-1.8 anylonger. -->
+    <platform.skin.albatross.version>1.18</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.19</platform.skin.toucan.version>
   </properties>
   <profiles>
     <profile>

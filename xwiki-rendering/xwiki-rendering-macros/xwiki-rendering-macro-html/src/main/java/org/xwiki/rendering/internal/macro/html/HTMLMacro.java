@@ -26,6 +26,8 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
@@ -193,8 +195,9 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
      * @param isInline true if the content is inline and thus if we need to remove the top level paragraph
      *        element created by the cleaner
      * @return the cleaned HTML as a string representing valid XHTML
+     * @throws MacroExecutionException if the macro is inline and the content is not inline HTML
      */
-    private String cleanHTML(String content, boolean isInline)
+    private String cleanHTML(String content, boolean isInline) throws MacroExecutionException
     {
         String cleanedContent = content;
 
@@ -216,9 +219,20 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
         // HTML envelope when rendered. We remove it so that the HTML <head> tag isn't output.
         HTMLUtils.stripHTMLEnvelope(document);
 
-        // If in inline mode remove the top level paragraph if there's one.
+        // If in inline mode verify we have inline HTML content and remove the top level paragraph if there's one
         if (isInline) {
-            HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
+            // TODO: Improve this since when're inside a table cell or a list item we can allow non inline items too
+            Element root = document.getDocumentElement();
+            if (root.getChildNodes().getLength() == 1 && root.getFirstChild().getNodeType() == Node.ELEMENT_NODE
+                && root.getFirstChild().getNodeName().equalsIgnoreCase("p"))
+            {
+                HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
+            } else {    
+                throw new MacroExecutionException(
+                    "When using the HTML macro inline, you can only use inline HTML content."
+                        + " Block HTML content (such as tables) cannot be displayed."
+                        + " Try leaving an empty line before and after the HTML macro.");
+            }
         }
 
         // Don't print the XML declaration nor the XHTML DocType.

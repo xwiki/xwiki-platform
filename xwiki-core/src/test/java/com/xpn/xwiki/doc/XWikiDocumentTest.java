@@ -45,6 +45,8 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
+    private static final String DOCWIKI = "xwiki";
+
     private static final String DOCSPACE = "Space";
 
     private static final String DOCNAME = "Page";
@@ -70,7 +72,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument(DOCSPACE, DOCNAME);
+        this.document = new XWikiDocument(DOCWIKI, DOCSPACE, DOCNAME);
         this.document.setSyntaxId("xwiki/1.0");
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");

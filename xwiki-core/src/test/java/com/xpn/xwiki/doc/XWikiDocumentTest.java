@@ -278,12 +278,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
-            + "[[]][[#anchor]][[?param=value]]");
+            + "[[]][[#anchor]][[?param=value]][[otherwiki:Target.TargetPage]]");
         this.document.setSyntaxId("xwiki/2.0");
 
         List<String> linkedPages = this.document.getLinkedPages(getContext());
 
-        assertEquals(Arrays.asList("xwiki:Space.TargetPage", "xwiki:TargetSpace.TargetPage", "xwiki:Space.WebHome"), linkedPages);
+        assertEquals(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage", "Space.WebHome",
+            "otherwiki:Target.TargetPage"), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException

@@ -45,4 +45,4 @@ mkdir -p $JETTY_HOME/logs 2>/dev/null
 # Specify port and key to stop a running Jetty instance
 JAVA_OPTS="$JAVA_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=8079"
 
-LANG=fr_FR.ISO8859-1 java $JAVA_OPTS -Dfile.encoding=iso-8859-1 -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar
+java $JAVA_OPTS -Dfile.encoding=UTF8 -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar

@@ -13,4 +13,4 @@ if not exist %JETTY_HOME%\work mkdir %JETTY_HOME%\work
 REM Specify port and key to stop a running Jetty instance
 set JAVA_OPTS=%JAVA_OPTS% -DSTOP.KEY=xwiki -DSTOP.PORT=8079
 
-java %JAVA_OPTS% -Dfile.encoding=iso-8859-1 -Djetty.home=%JETTY_HOME% -Djetty.port=%JETTY_PORT% -jar %JETTY_HOME%/start.jar
+java %JAVA_OPTS% -Dfile.encoding=UTF8 -Djetty.home=%JETTY_HOME% -Djetty.port=%JETTY_PORT% -jar %JETTY_HOME%/start.jar

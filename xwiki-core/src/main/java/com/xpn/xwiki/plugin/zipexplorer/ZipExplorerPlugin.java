@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -47,7 +46,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
- *
+ * 
  * @version $Id$
  */
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
@@ -59,13 +58,14 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
     /**
      * Path separators for URL.
+     * 
      * @todo Define this somewhere else as this is not specific to this plugin
      */
     private static final String URL_SEPARATOR = "/";
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public ZipExplorerPlugin(String name, String className, XWikiContext context)
@@ -76,9 +76,10 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
+    @Override
     public String getName()
     {
         return "zipexplorer";
@@ -86,27 +87,27 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ZipExplorerPluginAPI((ZipExplorerPlugin) plugin, context);
     }
 
     /**
-     * For ZIP URLs of the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>
-     * return a new attachment containing the file pointed to inside the ZIP. If the original
-     * attachment does not point to a ZIP file or if it doesn't specify a location inside the ZIP
-     * then do nothing and return the original attachment.
-     *
+     * For ZIP URLs of the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code> return a new
+     * attachment containing the file pointed to inside the ZIP. If the original attachment does not point to a ZIP file
+     * or if it doesn't specify a location inside the ZIP then do nothing and return the original attachment.
+     * 
      * @param attachment the original attachment
-     * @param context the XWiki context, used to get the request URL corresponding to the download
-     *        request
-     * @return a new attachment pointing to the file pointed to by the URL inside the ZIP or the
-     *         original attachment if the requested URL doesn't specify a file inside a ZIP
+     * @param context the XWiki context, used to get the request URL corresponding to the download request
+     * @return a new attachment pointing to the file pointed to by the URL inside the ZIP or the original attachment if
+     *         the requested URL doesn't specify a file inside a ZIP
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#downloadAttachment
      */
+    @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
         String url = context.getRequest().getRequestURI();
@@ -163,20 +164,19 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      * @param document the document containing the ZIP file as an attachment
      * @param attachmentName the name under which the ZIP file is attached in the document
      * @param context not used
-     * @return the list of file entries in the ZIP file attached under the passed attachment name
-     *         inside the passed document
+     * @return the list of file entries in the ZIP file attached under the passed attachment name inside the passed
+     *         document
      * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileList
      */
-    public List getFileList(Document document, String attachmentName, XWikiContext context)
+    public List<String> getFileList(Document document, String attachmentName, XWikiContext context)
     {
-        List zipList = null;
-
+        List<String> zipList = null;
         Attachment attachment = document.getAttachment(attachmentName);
-        zipList = new ArrayList();
         try {
             byte[] stream = attachment.getContent();
             ByteArrayInputStream bais = new ByteArrayInputStream(stream);
             if (isZipFile(bais)) {
+                zipList = new ArrayList<String>();
                 ZipInputStream zis = new ZipInputStream(bais);
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
@@ -192,37 +192,31 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Finds the ZIP attachement with passed name from the passed document matching and parse the
-     * ZIP to generate a list of {@link com.xpn.xwiki.objects.classes.ListItem} elements
-     * representing a tree view of all directories and files in the ZIP. For example the following
-     * zip:
-     * <code><pre>
+     * Finds the ZIP attachement with passed name from the passed document matching and parse the ZIP to generate a list
+     * of {@link com.xpn.xwiki.objects.classes.ListItem} elements representing a tree view of all directories and files
+     * in the ZIP. For example the following zip: <code><pre>
      * zipfile.zip:
      *   Directory/File.txt
      *   File2.txt
-     * </pre></code>
-     * generates the following ListItem list:
-     * <code><pre>
+     * </pre></code> generates the following ListItem list: <code><pre>
      *   { id = "Directory/", value = "Directory", parent = ""}
      *   { id = "Directory/File.txt", value = "File.txt", parent = "Directory/"}
      *   { id = "File2.txt", value = "File2.txt", parent = ""}
      * </pre></code>
-     *
+     * 
      * @param document the document containing the ZIP file as an attachment
      * @param attachmentName the name under which the ZIP file is attached in the document
      * @param context not used
-     * @return a tree view list of {@link com.xpn.xwiki.objects.classes.ListItem} elements
-     *         representing the content of the ZIP file
+     * @return a tree view list of {@link com.xpn.xwiki.objects.classes.ListItem} elements representing the content of
+     *         the ZIP file
      * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileTreeList
      */
-    public List getFileTreeList(Document document, String attachmentName, XWikiContext context)
+    public List<ListItem> getFileTreeList(Document document, String attachmentName, XWikiContext context)
     {
-        List flatList = getFileList(document, attachmentName, context);
-        Map fileTree = new HashMap();
-        Iterator it = flatList.iterator();
-        List res = new ArrayList();
-        while (it.hasNext()) {
-            String url = (String) it.next();
+        List<String> flatList = getFileList(document, attachmentName, context);
+        Map<String, ListItem> fileTree = new HashMap<String, ListItem>();
+        List<ListItem> res = new ArrayList<ListItem>();
+        for (String url : flatList) {
             StringBuffer buf = new StringBuffer(url.length());
             String parentBuf = "";
             String[] aUrl = url.split(URL_SEPARATOR);
@@ -248,12 +242,11 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      * @param attachmentName the name under which the ZIP file is attached in the document
      * @param fileName the filename to concatenate at the end of the attachment URL
      * @param context not used
-     * @return the attachment URL of the passed attachement located in the passed document to which
-     *         the passed filename has been suffixed.
+     * @return the attachment URL of the passed attachement located in the passed document to which the passed filename
+     *         has been suffixed.
      * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI#getFileLink
      */
-    public String getFileLink(Document document, String attachmentName, String fileName,
-        XWikiContext context)
+    public String getFileLink(Document document, String attachmentName, String fileName, XWikiContext context)
     {
         return document.getAttachmentURL(attachmentName) + URL_SEPARATOR + fileName;
     }
@@ -261,15 +254,12 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     /**
      * @param url the URL to parse and from which to extract the relative file location
      * @param action the XWiki requested action (for example "download", "edit", "view", etc).
-     * @return the relative file location of a file in the ZIP file pointed to by the passed URL.
-     *         The ZIP URL must be of the format
-     *         <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>.
-     *         With the example above this method would return
-     *         <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL
+     * @return the relative file location of a file in the ZIP file pointed to by the passed URL. The ZIP URL must be of
+     *         the format <code>http://[...]/zipfile.zip/SomeDirectory/SomeFile.txt</code>. With the example above this
+     *         method would return <code>SomeDirectory/SomeFile.txt</code>. Return an empty string if the zip URL
      *         passed.
-     * @todo There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL
-     *       manipulation. Once this exists remove this code.
-     *       See http://jira.xwiki.org/jira/browse/XWIKI-437
+     * @todo There should a XWikiURL class possibly extended by a ZipXWikiURL class to handle URL manipulation. Once
+     *       this exists remove this code. See http://jira.xwiki.org/jira/browse/XWIKI-437
      */
     protected String getFileLocationFromZipURL(String url, String action)
     {
@@ -290,7 +280,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
         } catch (IOException e) {
             // In case of error we log the error and continue with the undecoded URL.
             // TODO: Ideally this should rather fail fast but we have no exception handling
-            // framework for scripting code. Change this when we have one. 
+            // framework for scripting code. Change this when we have one.
             LOG.error("Failed to decode URL path [" + path + "]", e);
         }
 

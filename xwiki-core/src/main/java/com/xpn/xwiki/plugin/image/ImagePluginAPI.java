@@ -20,36 +20,34 @@
  */
 package com.xpn.xwiki.plugin.image;
 
-import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.plugin.PluginApi;
 
-
-public class ImagePluginAPI  extends Api {
-    private ImagePlugin plugin;
-
-    public ImagePluginAPI(XWikiContext context) {
-        super(context);
+public class ImagePluginAPI extends PluginApi<ImagePlugin>
+{
+    public ImagePluginAPI(ImagePlugin imagePlugin, XWikiContext context)
+    {
+        super(imagePlugin, context);
     }
 
-    public ImagePluginAPI(ImagePlugin imagePlugin, XWikiContext context) {
-        super(context);
-        this.plugin = imagePlugin;
-    }
-
-    public int getHeight(String pageName, String attachmentName){
+    public int getHeight(String pageName, String attachmentName)
+    {
         try {
-            XWikiAttachment attachment = getXWikiContext().getWiki().getDocument(pageName, getXWikiContext()).getAttachment(attachmentName);
-            return plugin.getHeight(attachment, getXWikiContext());
+            XWikiAttachment attachment =
+                getXWikiContext().getWiki().getDocument(pageName, getXWikiContext()).getAttachment(attachmentName);
+            return getProtectedPlugin().getHeight(attachment, getXWikiContext());
         } catch (Exception e) {
             return -1;
         }
     }
 
-    public int getWidth(String pageName, String attachmentName){
+    public int getWidth(String pageName, String attachmentName)
+    {
         try {
-            XWikiAttachment attachment = getXWikiContext().getWiki().getDocument(pageName, getXWikiContext()).getAttachment(attachmentName);
-            return plugin.getWidth(attachment, getXWikiContext());
+            XWikiAttachment attachment =
+                getXWikiContext().getWiki().getDocument(pageName, getXWikiContext()).getAttachment(attachmentName);
+            return getProtectedPlugin().getWidth(attachment, getXWikiContext());
         } catch (Exception e) {
             return -1;
         }

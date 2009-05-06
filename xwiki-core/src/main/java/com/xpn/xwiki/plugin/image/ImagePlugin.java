@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.Cache;
@@ -51,26 +52,18 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 public class ImagePlugin extends XWikiDefaultPlugin
 {
-    /**
-     * Log4J logger object to log messages in this class.
-     */
+    /** Logging helper object. */
     protected static final Log LOG = LogFactory.getLog(ImagePlugin.class);
 
-    /**
-     * The image formats supported by the image plugin
-     */
+    /** The image formats supported by the image plugin. */
     public enum SupportedFormat
     {
         JPG(1, "image/jpg"), JPEG(1, "image/jpeg"), PNG(2, "image/png"), GIF(3, "image/gif"), BMP(4, "image/bmp");
 
-        /**
-         * The mime type associated to the supported format
-         */
+        /** The mime type associated to the supported format. */
         private String mimeType;
 
-        /**
-         * A integer code used to generate the image cache key
-         */
+        /** A integer code used to generate the image cache key. */
         private int code;
 
         SupportedFormat(int code, String mimeType)
@@ -123,6 +116,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * 
      * @see XWikiPluginInterface#getPluginApi(XWikiPluginInterface, XWikiContext)
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ImagePluginAPI((ImagePlugin) plugin, context);
@@ -133,11 +127,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
      * 
      * @see XWikiPluginInterface#getName()
      */
+    @Override
     public String getName()
     {
         return PLUGIN_NAME;
     }
 
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
@@ -150,7 +146,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
         configuration.setConfigurationId("xwiki.plugin.image");
 
-        // Set folder o store cache
+        // Set folder to store cache
         File tempDir = context.getWiki().getTempDirectory(context);
         File imgTempDir = new File(tempDir, configuration.getConfigurationId());
         try {
@@ -167,29 +163,41 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String capacityParam = "";
         try {
             capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
-            if ((capacityParam != null) && (!capacityParam.equals(""))) {
-                capacity = Integer.parseInt(capacityParam);
+            if (!StringUtils.isBlank(capacityParam) && StringUtils.isNumeric(capacityParam.trim())) {
+                this.capacity = Integer.parseInt(capacityParam.trim());
             }
         } catch (NumberFormatException ex) {
             LOG.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
         }
-        lru.setMaxEntries(capacity);
+        lru.setMaxEntries(this.capacity);
 
         try {
-            imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
+            this.imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
         } catch (CacheException e) {
             LOG.error("Error initializing the image cache", e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiPluginInterface#flushCache()
+     */
+    @Override
     public void flushCache()
     {
-        if (imageCache != null) {
-            imageCache.removeAll();
+        if (this.imageCache != null) {
+            this.imageCache.removeAll();
         }
-        imageCache = null;
+        this.imageCache = null;
     }
 
+    /**
+     * Allows to scale images server-side, in order to have real thumbnails for reduced traffic. The new image
+     * dimensions are passed in the request as the {@code width} and {@code height} parameters. If only one of the
+     * dimensions is specified, then the other one is comupted to preserve the original aspect ratio of the image.
+     */
+    @Override
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
         int height = 0;
@@ -203,11 +211,13 @@ public class ImagePlugin extends XWikiDefaultPlugin
         String sheight = context.getRequest().getParameter("height");
         String swidth = context.getRequest().getParameter("width");
 
-        if ((sheight == null || sheight.length() == 0) && (swidth == null || swidth.length() == 0)) {
+        // If no scaling is needed, return the original image.
+        if ((StringUtils.isBlank(sheight) || !StringUtils.isNumeric(sheight))
+            && (StringUtils.isBlank(swidth) || !StringUtils.isNumeric(swidth))) {
             return attachment;
         }
 
-        if (imageCache == null) {
+        if (this.imageCache == null) {
             initCache(context);
         }
 
@@ -224,8 +234,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
                 attachmentClone.getId() + "-" + attachmentClone.getVersion() + "-" + SupportedFormat.PNG.getCode()
                     + "-" + width + "-" + height;
 
-            if (imageCache != null) {
-                byte[] data = imageCache.get(key);
+            if (this.imageCache != null) {
+                byte[] data = this.imageCache.get(key);
 
                 if (data != null) {
                     attachmentClone.setContent(data);
@@ -238,7 +248,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
                         attachmentClone = this.getImage(attachmentClone, width, height, context);
                     }
 
-                    imageCache.set(key, attachmentClone.getContent(context));
+                    this.imageCache.set(key, attachmentClone.getContent(context));
                 }
             } else {
                 attachmentClone = this.getImageByHeight(attachmentClone, height, context);
@@ -252,7 +262,6 @@ public class ImagePlugin extends XWikiDefaultPlugin
     public XWikiAttachment getImageByHeight(XWikiAttachment attachment, int thumbnailHeight, XWikiContext context)
         throws Exception
     {
-
         if (getType(attachment.getMimeType(context)) == 0) {
             throw new PluginException(PLUGIN_NAME, XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
                 "Only JPG, GIF, PNG or BMP images are supported.");

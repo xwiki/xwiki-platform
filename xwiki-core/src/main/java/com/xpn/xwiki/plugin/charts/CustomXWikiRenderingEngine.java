@@ -20,8 +20,8 @@
  */
 package com.xpn.xwiki.plugin.charts;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -35,21 +35,18 @@ public class CustomXWikiRenderingEngine extends DefaultXWikiRenderingEngine
     public CustomXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
         super(xwiki, context);
-        Iterator it = getRendererNames().iterator();
-        LinkedHashMap map = new LinkedHashMap();
+        List<String> unneededRenderers = new LinkedList<String>();
         boolean found = false;
-        while (it.hasNext()) {
-            String name = (String) it.next();
+        for (String name : getRendererNames()) {
             XWikiRenderer renderer = getRenderer(name);
             if (renderer instanceof XWikiRadeoxRenderer || found) {
                 found = true;
-                map.put(name, renderer);
+                unneededRenderers.add(name);
             }
         }
 
-        it = map.keySet().iterator();
-        while (it.hasNext()) {
-            removeRenderer((String) it.next());
+        for (String name : unneededRenderers) {
+            removeRenderer(name);
         }
     }
 }

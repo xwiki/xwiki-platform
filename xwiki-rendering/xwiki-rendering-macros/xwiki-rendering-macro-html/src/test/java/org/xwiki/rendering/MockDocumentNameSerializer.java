@@ -43,7 +43,7 @@ public class MockDocumentNameSerializer implements DocumentNameSerializer
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
-        componentDescriptor.setRole(DocumentNameSerializer.class);
+        componentDescriptor.setRole(DocumentNameSerializer.class.getName());
         componentDescriptor.setImplementation(MockDocumentNameSerializer.class.getName());
 
         return componentDescriptor;

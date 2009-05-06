@@ -28,7 +28,7 @@
          encoding will be used later). -->
     <init-param>
       <param-name>encoding</param-name>
-      <param-value>ISO-8859-1</param-value>
+      <param-value>UTF-8</param-value>
     </init-param>
     <!-- Whether to ignore and override the encoding specified by the client, when this actually
          happens. For example, AJAX requests made through XmlHttpRequests specify UTF-8. When this

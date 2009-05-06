@@ -78,21 +78,21 @@
                 </select>
             </div>
         #end ## editor = spacerights
-        <table id="usersandgroupstable" class="xwiki-grid#if("$!editor"!="") $editor#end">
+        <table id="usersandgroupstable" class="xwiki-livetable#if("$!editor"!="") $editor#end">
 	      <tr>
-	        <td class="xwiki-grid-pagination" colspan="2">
-	          <span id="usersandgroupstable-limits" class="xwiki-grid-limits"></span>
-    	      <span id="usersandgroupstable-ajax-loader" class="xwiki-grid-loader"><img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('xe.grid.loading')" title="" />$msg.get("xe.grid.loading")</span>
+	        <td class="xwiki-livetable-pagination" colspan="2">
+	          <span id="usersandgroupstable-limits" class="xwiki-livetable-limits"></span>
+    	      <span id="usersandgroupstable-ajax-loader" class="xwiki-livetable-loader"><img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('xe.grid.loading')" title="" />$msg.get("xe.grid.loading")</span>
 	        <span class="pagination">
-	          <span id="usersandgroupstable-pagination-text" class="xwiki-grid-pagination-text">$msg.get("xe.pagination.page")</span>
-	          <span id="usersandgroupstable-pagination" class="xwiki-grid-pagination-content" ></span>
+	          <span id="usersandgroupstable-pagination-text" class="xwiki-livetable-pagination-text">$msg.get("xe.pagination.page")</span>
+	          <span id="usersandgroupstable-pagination" class="xwiki-livetable-pagination-content" ></span>
 	        </span>
 	      </td>
 	    </tr>
 	    <tr>
-	      <td class="xwiki-grid-display-container">
-	        <table class="xwiki-grid-display">
-	          <thead class="xwiki-grid-display-header">
+	      <td class="xwiki-livetable-display-container">
+	        <table class="xwiki-livetable-display">
+	          <thead class="xwiki-livetable-display-header">
 	             <tr class="userorgroups-header">
 				   <td class="usersorgroupsnames">
                      <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
@@ -123,7 +123,7 @@
                    <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
                  </tr>
                </thead>
-               <tbody id="usersandgroupstable-display" class="xwiki-grid-display-body"><tr><td>&nbsp;</td></tr></tbody>
+               <tbody id="usersandgroupstable-display" class="xwiki-livetable-display-body"><tr><td>&nbsp;</td></tr></tbody>
              </table>
            </td>
           </tr>

@@ -35,6 +35,7 @@
   #end
   #set($categoryDoc = $xwiki.getDocument($category))
 #end
+#getTargetCategory($categoryDoc)
 #getEntriesForCategory($categoryDoc.fullName $entries $totalEntries)
 #set($entries = $xwiki.wrapDocs($entries))
 #displayBlogCategoryRss($categoryDoc $categoryDoc $entries)</content>

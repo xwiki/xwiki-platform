@@ -134,6 +134,11 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     private static final String WHITE_SPACE_SEPARATOR = "\\s+";
 
     /**
+     * The command used to store the value of the rich text area before submitting the including form.
+     */
+    private static final Command SUBMIT = new Command("submit");
+
+    /**
      * A reference to the user interface.
      */
     private final RichTextEditor ui;
@@ -320,7 +325,8 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             initEditor();
             fillMenu();
             fillToolBar();
-            ui.getTextArea().getCommandManager().execute(new Command("update"));
+            // Update the state of the tool bar buttons and store the initial content of the editor.
+            ui.getTextArea().getCommandManager().execute(SUBMIT);
         }
     }
 
@@ -366,7 +372,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     private void initEditor()
     {
         // TODO: Transform the tool bar and the menu bar in root UI extensions.
-        String[] rootExtensionNames = config.getParameter("rootUI", "submit").split(WHITE_SPACE_SEPARATOR);
+        String[] rootExtensionNames = config.getParameter("rootUI", SUBMIT.toString()).split(WHITE_SPACE_SEPARATOR);
         for (int i = 0; i < rootExtensionNames.length; i++) {
             UIExtension rootExtension = pm.getUIExtension("root", rootExtensionNames[i]);
             if (rootExtension != null) {

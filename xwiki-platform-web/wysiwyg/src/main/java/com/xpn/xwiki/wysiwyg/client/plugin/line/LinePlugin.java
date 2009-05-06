@@ -105,6 +105,16 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
     private boolean ignoreNextKeyPress;
 
     /**
+     * Flag used to prevent the default browser behavior for the KeyPress event when the KeyDown event has been
+     * canceled. This is needed only in functional tests where keyboard events (KeyDown, KeyPress, KeyUp) are triggered
+     * independently and thus canceling KeyDown doesn't prevent the default KeyPress behavior. Without this flag, and
+     * because we have to handle the KeyDown event besides the KeyPress in order to overcome cross-browser
+     * inconsistencies, simulating keyboard typing in functional tests would trigger our custom behavior but also the
+     * default browser behavior.
+     */
+    private boolean cancelNextKeyPress;
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
@@ -143,6 +153,7 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
         if (sender == getTextArea()) {
             ignoreNextKeyPress = true;
             handleRepeatableKey(keyCode, modifiers);
+            cancelNextKeyPress = getTextArea().getCurrentEvent().isCancelled();
         }
     }
 
@@ -156,8 +167,11 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
         if (sender == getTextArea()) {
             if (!ignoreNextKeyPress) {
                 handleRepeatableKey(keyCode, modifiers);
+            } else if (cancelNextKeyPress) {
+                getTextArea().getCurrentEvent().xPreventDefault();
             }
             ignoreNextKeyPress = false;
+            cancelNextKeyPress = false;
         }
     }
 
@@ -169,6 +183,7 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
     public void onKeyUp(Widget sender, char keyCode, int modifiers)
     {
         ignoreNextKeyPress = false;
+        cancelNextKeyPress = false;
     }
 
     /**

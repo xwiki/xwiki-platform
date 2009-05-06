@@ -22,6 +22,7 @@ package com.xpn.xwiki.doc;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -46,6 +47,8 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  */
 public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {
+    private static final String DOCWIKI = "xwiki";
+
     private static final String DOCSPACE = "Space";
 
     private static final String DOCNAME = "Page";
@@ -71,7 +74,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.document = new XWikiDocument(DOCSPACE, DOCNAME);
+        this.document = new XWikiDocument(DOCWIKI, DOCSPACE, DOCNAME);
         this.document.setSyntaxId("xwiki/1.0");
         this.document.setLanguage("en");
         this.document.setDefaultLanguage("en");
@@ -268,8 +271,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("xwiki:Space.TargetPage", "xwiki:TargetSpace.TargetPage")),
-            linkedPages);
+        assertEquals(new HashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage")),
+            new HashSet<String>(linkedPages));
     }
 
     public void testGetUniqueLinkedPages()
@@ -279,13 +282,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[TargetLabel>>TargetSpace.TargetPage?param=value#anchor]][[http://externallink]][[mailto:mailto]]"
-            + "[[]][[#anchor]][[?param=value]]");
+            + "[[]][[#anchor]][[?param=value]][[targetwiki:TargetSpace.TargetPage]]");
         this.document.setSyntaxId("xwiki/2.0");
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("xwiki:Space.TargetPage", "xwiki:TargetSpace.TargetPage",
-            "xwiki:Space.WebHome")), linkedPages);
+        assertEquals(new LinkedHashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage",
+            "Space.WebHome", "targetwiki:TargetSpace.TargetPage")), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException

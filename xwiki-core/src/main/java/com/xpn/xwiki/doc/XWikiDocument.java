@@ -310,8 +310,8 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Used to convert a proper Document Name to string.
      */
-    private DocumentNameSerializer documentNameSerializer =
-        (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+    private DocumentNameSerializer compactDocumentNameSerializer =
+        (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class, "compact");
 
     public XWikiStoreInterface getStore(XWikiContext context)
     {
@@ -3076,7 +3076,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                     // Verify that the link is not an autolink (i.e. a link to the current document)
                     if (!documentName.equals(currentDocumentName)) {
-                        pageNames.add(this.documentNameSerializer.serialize(documentName));
+                        pageNames.add(this.compactDocumentNameSerializer.serialize(documentName));
                     }
                 }
             }
@@ -3134,7 +3134,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                             // Verify that the link is not an autolink (i.e. a link to the current document)
                             if (!documentName.equals(currentDocumentName)) {
-                                pageNames.add(this.documentNameSerializer.serialize(documentName));
+                                pageNames.add(this.compactDocumentNameSerializer.serialize(documentName));
                             }
                         }
                     }

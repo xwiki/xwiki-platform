@@ -75,6 +75,17 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
+      <role>org.xwiki.bridge.DocumentNameSerializer</role>
+      <role-hint>compact</role-hint>
+      <implementation>com.xpn.xwiki.doc.CompactDocumentNameSerializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.context.Execution</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
       <role>org.xwiki.bridge.SkinAccessBridge</role>
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.DefaultSkinAccessBridge</implementation>

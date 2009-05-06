@@ -23,9 +23,9 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
 
 /**
- * Generate a fully qualified document reference string (ie of the form
- * {@code <wiki>:<space>.<page>} out of a {@link DocumentName}.
- *  
+ * Generate a fully qualified document reference string (ie of the form {@code <wiki>:<space>.<page>} out of a
+ * {@link DocumentName}.
+ * 
  * @version $Id: $
  * @since 1.8.1
  */
@@ -33,6 +33,7 @@ public class DefaultDocumentNameSerializer implements DocumentNameSerializer
 {
     /**
      * {@inheritDoc}
+     * 
      * @see DocumentNameSerializer#serialize(DocumentName)
      */
     public String serialize(DocumentName documentName)
@@ -40,12 +41,28 @@ public class DefaultDocumentNameSerializer implements DocumentNameSerializer
         // A valid DocumentName must not have any null value and thus we don't need to check for nulls here.
         // It's the responsibility of creators of DocumentName factories to ensure it's valid.
         StringBuffer result = new StringBuffer();
+
+        appendWikiName(result, documentName);
+        appendSpaceName(result, documentName);
+        appendPageName(result, documentName);
+
+        return result.toString();
+    }
+
+    protected void appendWikiName(StringBuffer result, DocumentName documentName)
+    {
         result.append(documentName.getWiki());
         result.append(':');
+    }
+
+    protected void appendSpaceName(StringBuffer result, DocumentName documentName)
+    {
         result.append(documentName.getSpace());
         result.append('.');
+    }
+
+    protected void appendPageName(StringBuffer result, DocumentName documentName)
+    {
         result.append(documentName.getPage());
-        
-        return result.toString();
     }
 }

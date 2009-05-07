@@ -35,6 +35,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCallTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.separator.exec.InsertHRExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.EnableExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManagerTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
@@ -97,6 +98,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(IndentExecutableTest.class);
         suite.addTestSuite(OutdentExecutableTest.class);
         suite.addTestSuite(ColorPickerTest.class);
+        suite.addTestSuite(EnableExecutableTest.class);
     }
 
     /**

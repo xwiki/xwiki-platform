@@ -19,48 +19,34 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.submit;
 
-import com.google.gwt.core.client.GWT;
-import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
+import org.xwiki.gwt.dom.client.Element;
 
 /**
- * Factory for {@link SubmitPlugin}.
+ * Internet Explorer specific implementation of {@link SubmitPlugin}.
  * 
  * @version $Id$
  */
-public final class SubmitPluginFactory extends AbstractPluginFactory
+public class IESubmitPlugin extends SubmitPlugin
 {
     /**
-     * The singleton factory instance.
+     * {@inheritDoc}
+     * 
+     * @see SubmitPlugin#hookSubmitEvent(Element)
      */
-    private static SubmitPluginFactory instance;
-
-    /**
-     * Default constructor.
-     */
-    private SubmitPluginFactory()
-    {
-        super("submit");
-    }
-
-    /**
-     * @return the singleton factory instance
-     */
-    public static synchronized SubmitPluginFactory getInstance()
-    {
-        if (instance == null) {
-            instance = new SubmitPluginFactory();
-        }
-        return instance;
-    }
+    protected native void hookSubmitEvent(Element form)
+    /*-{
+        var handler = this.@com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPlugin::getSubmitHandler()();
+        form.attachEvent('onsubmit', handler);
+    }-*/;
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPluginFactory#newInstance()
+     * @see SubmitPlugin#unhookSubmitEvent(Element)
      */
-    public Plugin newInstance()
-    {
-        return GWT.create(SubmitPlugin.class);
-    }
+    protected native void unhookSubmitEvent(Element form)
+    /*-{
+        var handler = this.@com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPlugin::getSubmitHandler()();
+        form.detachEvent('onsubmit', handler);
+    }-*/;
 }

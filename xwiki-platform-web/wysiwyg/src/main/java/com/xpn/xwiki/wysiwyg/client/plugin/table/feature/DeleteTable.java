@@ -20,8 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
 import com.google.gwt.dom.client.TableElement;
-import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
@@ -39,7 +37,7 @@ public class DeleteTable extends AbstractTableFeature
     /**
      * Feature name.
      */
-    private static final String NAME = "deletetable";
+    public static final String NAME = "deletetable";
 
     /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
@@ -49,8 +47,7 @@ public class DeleteTable extends AbstractTableFeature
      */
     public DeleteTable(TablePlugin plugin)
     {
-        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.deleteTable().createImage(), plugin),
-            Strings.INSTANCE.deleteTable(), plugin);
+        super(NAME, new Command(NAME), Strings.INSTANCE.deleteTable(), plugin);
     }
 
     /**

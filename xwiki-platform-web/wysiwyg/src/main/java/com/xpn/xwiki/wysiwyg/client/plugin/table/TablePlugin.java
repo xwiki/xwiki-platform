@@ -22,8 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
@@ -35,6 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertColBefore;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowAfter;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowBefore;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertTable;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableMenuExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
@@ -43,7 +42,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class TablePlugin extends AbstractPlugin implements ClickListener
+public class TablePlugin extends AbstractPlugin
 {
     /**
      * List of table features (example : InsertTable, DeleteCol).
@@ -53,7 +52,12 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
     /**
      * The plug-in toolbar.
      */
-    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");   
+    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * The menu extension of this plugin.
+     */
+    private TableMenuExtension menuExtension;
 
     /**
      * Make a feature available.
@@ -64,7 +68,6 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
     private void addFeature(RichTextArea rta, TableFeature feature)
     {
         rta.getCommandManager().registerCommand(feature.getCommand(), feature);
-        toolBarExtension.addFeature(feature.getName(), feature.getButton());
         features.add(feature);        
     }
 
@@ -85,12 +88,23 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
         addFeature(rta, new InsertColAfter(this));
         addFeature(rta, new DeleteCol(this));
         addFeature(rta, new DeleteTable(this));
+
+        menuExtension = new TableMenuExtension(this);
+        getUIExtensionList().add(menuExtension);
         
         // Disable the standard table editing features of Firefox since they don't take
         // table headings (th) into account.
         rta.getDocument().execCommand("enableInlineTableEditing", "false");          
 
         getUIExtensionList().add(toolBarExtension);
+    }
+    
+    /**
+     * @return The list of the features exposed by the plugin.
+     */
+    public List<TableFeature> getFeatures()
+    {
+        return features;
     }
 
     /**
@@ -106,23 +120,5 @@ public class TablePlugin extends AbstractPlugin implements ClickListener
         }
         toolBarExtension.clearFeatures();
         super.destroy();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see ClickListener#onClick(Widget)
-     */
-    public void onClick(Widget sender)
-    {
-        for (TableFeature feature : features) {
-            if (sender == feature.getButton()) {
-                // Insert table feature opens a dialog so we shouldn't focus the rich text are in this case.
-                if (!(feature instanceof InsertTable)) {
-                    getTextArea().setFocus(true);
-                }
-                getTextArea().getCommandManager().execute(feature.getCommand());
-            }
-        }
     }
 }

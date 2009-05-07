@@ -26,8 +26,6 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableConfigDialog;
@@ -49,7 +47,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * Feature name.
      */
-    private static final String NAME = "inserttable";
+    public static final String NAME = "inserttable";
 
     /**
      * Table dialog.
@@ -64,8 +62,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public InsertTable(TablePlugin plugin)
     {
-        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertTable().createImage(), plugin),
-            Strings.INSTANCE.insertTable(), plugin);
+        super(NAME, new Command(NAME), Strings.INSTANCE.insertTable(), plugin);
     }
 
     /**
@@ -89,9 +86,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public void showDialog(RichTextArea rta)
     {
-        if (getButton().isEnabled()) {
-            getDialog().center();
-        }
+        getDialog().center();     
     }
 
     /**

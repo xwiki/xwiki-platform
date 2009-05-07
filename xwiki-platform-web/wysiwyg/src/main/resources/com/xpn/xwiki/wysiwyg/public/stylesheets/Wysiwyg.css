@@ -17,8 +17,20 @@
   padding: 0;
 }
 
+.xRichTextEditorTabPanel .gwt-TabBar .gwt-TabBarItem {
+  background-color :#DDDDDD
+}
+
+.xRichTextEditorTabPanel .gwt-TabBar .gwt-TabBarItem-selected {
+  background-color: #CCCCCC;
+}
+
 .xRichTextEditorTabPanel .gwt-TabPanelBottom {
-  background-color:#FFFFFF;
+  border-color: #CCCCCC;
+}
+
+.xRichTextEditorTabPanel .gwt-TabPanelBottom {
+  background-color: #FFFFFF;
   padding: 0;
 }
 

@@ -2,7 +2,13 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 {{groovy}}
-def list = ["one", "two"]
+def list = ["one", var]
+list.each { item ->
+  println "* ${item}"
+}
+{{/groovy}}
+{{groovy}}
+def list = ["one", var]
 list.each { item ->
   println "* ${item}"
 }
@@ -12,7 +18,7 @@ list.each { item ->
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [groovy] [] [
-def list = ["one", "two"]
+def list = ["one", var]
 list.each { item ->
   println "* ${item}"
 }
@@ -22,11 +28,31 @@ beginListItem
 onWord [one]
 endListItem
 beginListItem
-onWord [two]
+onWord [value]
 endListItem
 endList [BULLETED]
 endMacroMarkerStandalone [groovy] [] [
-def list = ["one", "two"]
+def list = ["one", var]
+list.each { item ->
+  println "* ${item}"
+}
+]
+beginMacroMarkerStandalone [groovy] [] [
+def list = ["one", var]
+list.each { item ->
+  println "* ${item}"
+}
+]
+beginList [BULLETED]
+beginListItem
+onWord [one]
+endListItem
+beginListItem
+onWord [value]
+endListItem
+endList [BULLETED]
+endMacroMarkerStandalone [groovy] [] [
+def list = ["one", var]
 list.each { item ->
   println "* ${item}"
 }

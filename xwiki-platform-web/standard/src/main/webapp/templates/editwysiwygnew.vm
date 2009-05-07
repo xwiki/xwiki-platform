@@ -94,11 +94,6 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #end
 #end
 ##
-## The editor will replace the following text area with its own widget.
-## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
-##
-$xwiki.getTextArea($tdoc.content)
-##
 ## Configure the WYSIWYG editor.
 ##
 <script type="text/javascript">
@@ -106,30 +101,38 @@ $xwiki.getTextArea($tdoc.content)
     // Global configuration.
     var Wysiwyg = {
         xwikiservice: '${request.contextPath}/XWikiService',
-        wysiwygServiceURL: '${request.contextPath}/WysiwygService'
+        wysiwygServiceURL: '${request.contextPath}/WysiwygService'        
     };
+    var WysiwygConfigurations = new Array();
+
     // Instance configuration.
-    var Wysiwyg0 = {
-        hookId: 'content',
+    WysiwygConfigurations.push({
+        hookId: "content",        
+        displayTabs: false,
+        defaultEditor: "wysiwyg",
         inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
-        plugins: 'submit line separator text valign list indent history format symbol link image table macro importer',
+        plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($request.sync) sync#end',
         syntax: "$doc.syntaxId",
-        toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
+        toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer | image | inserttable deletetable | insertrowbefore insertrowafter deleterow | insertcolbefore insertcolafter deletecol',
         wiki: '${doc.wiki.replace("'", "\'")}',
         space: '${doc.space.replace("'", "\'")}',
         page: '${doc.name.replace("'", "\'")}',
-        debug: #if($request.debug)'true'#else'false'#end
-    };
+        debug: #if($request.debug)'true'#else'false'#end        
 #if($request.sync)
-    // Additional configuration for the real-time editing feature.
-    Wysiwyg0.syncPage = '${doc.fullName.replace("'", "\'")}';
-    Wysiwyg0.plugins += ' sync';
+        // Additional configuration for the real-time editing feature.
+        syncPage: '${doc.fullName.replace("'", "\'")}',       
 #if($request.reset=="1")
-    Wysiwyg0.syncReset = 1;
+        syncReset: 1
 #end
 #end
+    });
 //]]>
 </script>
+##
+## The editor will replace the following text area with its own widget.
+## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
+##
+$xwiki.getTextArea($tdoc.content)
 #else
 #warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntaxId</em>.")
 #end

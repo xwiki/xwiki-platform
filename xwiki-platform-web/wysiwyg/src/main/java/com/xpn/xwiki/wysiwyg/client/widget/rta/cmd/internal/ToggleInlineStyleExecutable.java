@@ -303,7 +303,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
     {
         String computedValue = element.getComputedStyleProperty(getProperty().getJSName());
         if (getProperty().isMultipleValue()) {
-            return computedValue.toLowerCase().contains(value);
+            return computedValue != null && computedValue.toLowerCase().contains(value);
         } else {
             return value.equalsIgnoreCase(computedValue);
         }

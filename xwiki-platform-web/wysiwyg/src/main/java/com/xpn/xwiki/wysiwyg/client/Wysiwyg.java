@@ -19,15 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.MissingResourceException;
-
-import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
@@ -50,6 +49,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 {
     /**
+     * Wysiwyg editors.
+     */
+    private Map<String, WysiwygEditor> editors = new HashMap<String, WysiwygEditor>();
+
+    /**
      * {@inheritDoc}
      * 
      * @see EntryPoint#onModuleLoad()
@@ -70,58 +74,111 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                 public void onSuccess(Object result)
                 {
                     super.onSuccess(result);
-                    loadUI();
+                    init();
                 }
             });
         } else {
-            loadUI();
+            init();
         }
     }
 
     /**
-     * Loads all the WYSIWYG editors on the host page.
+     * Initialization of the WYSIWYG editors.
      */
-    private void loadUI()
+    private void init()
+    {        
+        loadConfigurations();
+        loadEditors();
+    }
+
+    /**
+     * Load all the configuration objects stored in Wysiwyg.configurations in the main Window object.
+     * This way we are able to load them with Dictionary.get(String).
+     */
+    private native void loadConfigurations()
+    /*-{
+        var configurations = $wnd.WysiwygConfigurations;
+        configurations.reverse();
+        while (configurations.size() > 0) {
+            var config = configurations.pop();
+            var configId = "wysiwygConfiguration_" + config.hookId;
+            $wnd[configId] = config;
+            this.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::addEditor(Ljava/lang/String;)(config.hookId);            
+        }
+    }-*/;
+
+    /**
+     * Add an editor to the list of the editors to load.
+     *
+     * @param id Id of the editor.
+     */
+    private void addEditor(String id)
+    {
+        editors.put(id, null);
+    }
+
+    /**
+     * Load the WYSIWYG editor from a configuration object.
+     *
+     * @param id Id of the editor.
+     * @return The newly created editor.
+     */
+    private WysiwygEditor loadEditor(String id)
     {
         if (!isRichTextEditingSupported()) {
-            return;
+            return null;
         }
-        for (final Config config : getConfigs()) {
-            String hookId = config.getParameter("hookId");
-            if (hookId == null) {
-                continue;
-            }
 
-            Element hook = DOM.getElementById(hookId);
-            if (hook == null) {
-                continue;
-            }
+        Config config = getConfig(id);
 
-            // Extract info from DOM
-            String height = String.valueOf(Math.max(hook.getOffsetHeight(), 100)) + "px";
-
-            // Prepare the DOM
-            // Hide the hook element
-            hook.getStyle().setProperty(Style.DISPLAY, Style.Display.NONE);
-            // Create a container for the editor UI
-            Element container = DOM.createDiv();
-            String containerId = hookId + "_container";
-            container.setId(containerId);
-            hook.getParentElement().insertBefore(container, hook);
-
-            // Create the WYSIWYG Editor
-            WysiwygEditor editor = WysiwygEditorFactory.getInstance().newEditor(config, this);
-            RichTextArea textArea = editor.getUI().getTextArea();
-            IFrameElement.as(textArea.getElement()).setSrc(config.getParameter("inputURL", "about:blank"));
-            textArea.setHeight(height);
-
-            // Insert the WYSIWYG Editor
-            if ("true".equals(config.getParameter("debug", "false"))) {
-                RootPanel.get(containerId).add(new WysiwygEditorDebugger(editor));
-            } else {
-                RootPanel.get(containerId).add(editor.getUI());
-            }
+        TextAreaElement hook = TextAreaElement.as(DOM.getElementById(id));
+        if (hook == null) {
+            return null;
         }
+        
+        // Prepare the DOM
+        Element container = DOM.createDiv();
+        String containerId = id + "_container";        
+        container.setId(containerId);                
+        hook.getParentElement().insertBefore(container, hook);
+
+        // Create the WYSIWYG Editor
+        WysiwygEditor wysiwygEditor = WysiwygEditorFactory.getInstance().newEditor(config, this);
+
+        // Insert the WYSIWYG Editor
+        if (Boolean.TRUE.toString().equals(config.getParameter("debug", "false"))) {
+            RootPanel.get(containerId).add(new WysiwygEditorDebugger(wysiwygEditor));
+        } else {            
+            RootPanel.get(containerId).add(wysiwygEditor.getUI());
+        }
+
+        // Add the editor to the editors list.
+        editors.put(id, wysiwygEditor);
+
+        return wysiwygEditor;
+    }
+
+    /**
+     * Load all the editors that have been found in the page.
+     */
+    public void loadEditors()
+    {
+        Set<String> ids = editors.keySet();
+        for (final String id : ids) {
+            loadEditor(id);
+        }
+    }
+
+    /**
+     * Get the WYSIWYG editor with the given ID.
+     * The id of an editor is the name of the TextArea that it wraps.
+     *
+     * @param id ID of the editor to get.
+     * @return The editor corresponding to the given ID.
+     */
+    public WysiwygEditor getEditor(String id)
+    {
+        return editors.get(id);
     }
 
     /**
@@ -129,38 +186,23 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private boolean isRichTextEditingSupported()
     {
-        RichTextArea rta = new RichTextArea(null);
-        return rta.getBasicFormatter() != null;
+        RichTextArea textArea = new RichTextArea(null);
+        return textArea.getBasicFormatter() != null;
     }
 
     /**
-     * @return The list of configuration objects present in the host page.
-     */
-    private List<Config> getConfigs()
-    {
-        List<Config> configs = new ArrayList<Config>();
-        int i = 0;
-        Config config = getConfig(i++);
-        while (config != null) {
-            configs.add(config);
-            config = getConfig(i++);
-        }
-        return configs;
-    }
-
-    /**
-     * Retrieves the configuration object associated with the WYSIWYG editor with the specified index. We can have more
-     * than one WYSIWYG editor in a host page and thus each editor will have an index. The first index is 0. A
-     * configuration object is a JavaScript object that can be loaded with GWT's {@link Dictionary} mechanism.
+     * Retrieves the configuration object associated with the WYSIWYG editor with the specified id. We can have more
+     * than one WYSIWYG editor in a host page and thus each editor is identified by the ID of the textarea is wraps.
+     * A configuration object is a JavaScript object that can be loaded with GWT's {@link Dictionary} mechanism.
      * 
-     * @param index The index of the editor whose configuration object must be retrieved.
+     * @param id Name of the editor to load.
      * @return The configuration object for the specified editor.
      */
-    private Config getConfig(int index)
+    private Config getConfig(String id)
     {
-        Dictionary dictionary = null;
+        Dictionary dictionary = null;        
         try {
-            dictionary = Dictionary.getDictionary(getName() + String.valueOf(index));
+            dictionary = Dictionary.getDictionary("wysiwygConfiguration_" + id);
             return new DefaultConfig(dictionary);
         } catch (MissingResourceException e) {
             return null;

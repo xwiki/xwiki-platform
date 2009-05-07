@@ -120,6 +120,22 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Load
     {
         return container;
     }
+        
+    /**
+     * Set the editor loading state. While in loading state a spinner will be displayed. 
+     * 
+     * @param loading true to display the editor in loading mode, false to remove the loading mode.
+     */
+    public void setLoading(boolean loading)
+    {        
+        if (loading) {
+            container.addStyleName(WysiwygEditor.STYLE_NAME_LOADING);
+            textArea.addStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
+        } else {
+            container.removeStyleName(WysiwygEditor.STYLE_NAME_LOADING);            
+            textArea.removeStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -128,7 +144,8 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Load
      */
     protected void onLoad()
     {
-        if (textArea.getBasicFormatter() == null || !(textArea.getBasicFormatter() instanceof SourcesLoadEvents)) {
+        if (textArea.getBasicFormatter() == null 
+                || !(textArea.getBasicFormatter() instanceof SourcesLoadEvents)) {
             // We defer the notification in order to allow the rich text area to complete its initialization.
             DeferredCommand.addCommand(new Command()
             {

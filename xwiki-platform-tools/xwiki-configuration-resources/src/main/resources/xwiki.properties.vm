@@ -56,6 +56,10 @@
 #-# Path to openoffice execution profile.
 # openoffice.profilePath=/home/user/.openoffice.org/3
 
+#-# [Since 1.9M2]
+#-# If the openoffice server should automatically start with XE.
+# openoffice.autoStart=false
+
 #-# [Since 1.8RC3]
 #-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process.
 # openoffice.maxTasksPerProcess=50

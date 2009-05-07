@@ -24,9 +24,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.xwiki.container.RequestInitializerManager;
+import org.xwiki.container.ApplicationContext;
+import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerException;
+import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -34,6 +36,8 @@ import org.xwiki.context.ExecutionContextManager;
 
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
+    private ApplicationContextListenerManager applicationContextListenerManager;
+
     private RequestInitializerManager requestInitializerManager;
 
     private ExecutionContextManager executionContextManager;
@@ -44,22 +48,24 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
 
     public void initializeApplicationContext(ServletContext servletContext)
     {
-        this.container.setApplicationContext(new ServletApplicationContext(servletContext));
+        ApplicationContext applicationContext = new ServletApplicationContext(servletContext);
+        this.container.setApplicationContext(applicationContext);
+        applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 
     public void initializeRequest(HttpServletRequest httpServletRequest, Object xwikiContext)
         throws ServletContainerException
     {
         // 1) Create an empty request. From this point forward request initializers can use the
-        //    Container object to get any data they want from the Request.
+        // Container object to get any data they want from the Request.
         this.container.setRequest(new ServletRequest(httpServletRequest));
 
         // 2) Create an empty Execution context so that the Container initializers can put things in the
-        //    execution context when they execute.
+        // execution context when they execute.
         this.execution.setContext(new ExecutionContext());
-        
+
         // 3) Bridge with old code to play well with new components. Old code relies on the
-        //    XWikiContext object whereas new code uses the Container component.
+        // XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
             this.execution.getContext().setProperty("xwikicontext", xwikiContext);
         }
@@ -82,8 +88,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         }
     }
 
-    public void initializeRequest(HttpServletRequest httpServletRequest)
-        throws ServletContainerException
+    public void initializeRequest(HttpServletRequest httpServletRequest) throws ServletContainerException
     {
         initializeRequest(httpServletRequest, null);
     }

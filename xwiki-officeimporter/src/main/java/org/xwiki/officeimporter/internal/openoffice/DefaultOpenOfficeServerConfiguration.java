@@ -46,6 +46,11 @@ public class DefaultOpenOfficeServerConfiguration implements OpenOfficeServerCon
     private String profilePath = OfficeUtils.getDefaultProfileDir().getAbsolutePath();
 
     /**
+     * A flag indicating if openoffice server should automatically start with XE.
+     */
+    private boolean autoStart = false;
+    
+    /**
      * Maximum number of simultaneous conversion tasks to be handled by a single oo process instance.
      */
     private int maxTasksPerProcess = 50;
@@ -137,5 +142,21 @@ public class DefaultOpenOfficeServerConfiguration implements OpenOfficeServerCon
     public void setTaskExecutionTimeout(long taskExecutionTimeout)
     {
         this.taskExecutionTimeout = taskExecutionTimeout;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isAutoStart()
+    {
+        return this.autoStart;
+    }    
+    
+    /**
+     * @param autoStart if openoffice server should start automatically with XE.
+     */
+    public void setAutoStart(boolean autoStart)
+    {
+        this.autoStart = autoStart;
     }
 }

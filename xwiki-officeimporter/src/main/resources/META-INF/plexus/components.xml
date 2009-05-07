@@ -274,6 +274,20 @@
         </requirement>
       </requirements>
     </component>
+    <!-- Application Context Initializer -->
+    <component>
+      <role>org.xwiki.container.ApplicationContextListener</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.OpenOfficeServerManagerApplicationContextListener</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration</role>
+        </requirement>      
+        <requirement>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
+        </requirement>        
+      </requirements>
+    </component>
     <!-- Velocity -->
     <component>
       <role>org.xwiki.velocity.VelocityContextInitializer</role>

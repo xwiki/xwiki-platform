@@ -29,8 +29,6 @@ import net.sf.jodconverter.office.OfficeException;
 import net.sf.jodconverter.office.OfficeManager;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
@@ -41,8 +39,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implements OpenOfficeServerManager,
-    Initializable
+public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implements OpenOfficeServerManager
 {
     /**
      * The {@link OpenOfficeServerConfiguration} component.
@@ -52,7 +49,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
     /**
      * Current oo server process state.
      */
-    private ServerState currentState;
+    private ServerState currentState = ServerState.NOT_RUNNING;
 
     /**
      * The {@link OfficeManager} used to control the openoffice server instance.
@@ -70,26 +67,6 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
     private OfficeDocumentConverter documentConverter;
 
     /**
-     * {@inheritDoc}
-     */
-    public void initialize() throws InitializationException
-    {
-        currentState = ServerState.NOT_RUNNING;
-        // Make sure there is no openoffice process left when XE shuts down.
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            public void run()
-            {
-                try {
-                    stopServer();
-                } catch (OpenOfficeServerManagerException ex) {
-                    // Nothing to do.
-                }
-            }
-        });
-    }
-
-    /**
      * Initializes the internal {@link OfficeManager}.
      */
     private void initializeOfficeManager() throws OpenOfficeServerManagerException
@@ -104,8 +81,7 @@ public class DefaultOpenOfficeServerManager extends AbstractLogEnabled implement
             configuration.setTemplateProfileDir(officeProfile);
             configuration.setMaxTasksPerProcess(serverConfiguration.getMaxTasksPerProcess());
             configuration.setTaskExecutionTimeout(serverConfiguration.getTaskExecutionTimeout());
-            ManagedProcessOfficeManager managedProcessOfficeManager =
-                new ManagedProcessOfficeManager(configuration);
+            ManagedProcessOfficeManager managedProcessOfficeManager = new ManagedProcessOfficeManager(configuration);
             this.officeManager = managedProcessOfficeManager;
             this.documentConverter = new OfficeDocumentConverter(officeManager);
             setOfficeManagerInitialized(true);

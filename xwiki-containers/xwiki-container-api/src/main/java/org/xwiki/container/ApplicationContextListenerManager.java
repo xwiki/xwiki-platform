@@ -16,43 +16,29 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
-package org.xwiki.officeimporter.openoffice;
+package org.xwiki.container;
 
 /**
- * Configuration properties for office importer module.
- * <p>
- * These configuration properties are defined in XWiki's global configuration file using the prefix of
- * "officeimporter".
- * </p>
+ * Component responsible for managing all {@link ApplicationContextListener} components.
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 1.9M2
  */
-public interface OpenOfficeServerConfiguration
+public interface ApplicationContextListenerManager
 {
     /**
-     * @return path to openoffice server installation.
+     * Looks up all {@link ApplicationContextListener} components and allows each of them to initialize.
+     * 
+     * @param applicationContext the {@link ApplicationContext}.
      */
-    String getHomePath();
-
-    /**
-     * @return path to openoffice execution profile.
-     */
-    String getProfilePath();
-
-    /**
-     * @return whether openoffice server should start automatically with XE.
-     */
-    boolean isAutoStart();
+    void initializeApplicationContext(ApplicationContext applicationContext);
     
     /**
-     * @return maximum number of simultaneous conversion tasks to be handled by a single oo process instance.
+     * Looks up all {@link ApplicationContextListener} components and allows each of them to finalize.
+     * 
+     * @param applicationContext the {@link ApplicationContext}.
      */
-    int getMaxTasksPerProcess();
-
-    /**
-     * @return timeout for document conversion tasks.
-     */
-    long getTaskExecutionTimeout();
+    void destroyApplicationContext(ApplicationContext applicationContext);
 }

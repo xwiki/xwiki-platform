@@ -19,6 +19,7 @@ XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
 XWiki.editor = "$!{editor}";
 XWiki.viewer = "$!{viewer}";
+XWiki.docisnew = $!doc.isNew();
 // ]]>
 </script>
 #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))

@@ -110,7 +110,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     if (textarea._toolbar) {
       textarea._toolbar.insert({top: this.createOpenButton(textarea)});
     } else {
-      this.addWikiTextareaButton(textarea);
+      this.addWikiFieldButton(textarea);
     }
   },
   /** Adds the fullscreen button in the TinyMCE WYSIWYG editor toolbar. */

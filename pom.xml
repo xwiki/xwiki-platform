@@ -27,7 +27,8 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>23-SNAPSHOT</version>
+    <!-- Since 23 root wiki pom is not compatible anymore with 1.8 branch (default encoding changed to UTF-8) -->
+    <version>22</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>

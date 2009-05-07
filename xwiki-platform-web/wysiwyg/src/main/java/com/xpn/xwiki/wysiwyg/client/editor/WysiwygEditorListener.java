@@ -167,7 +167,11 @@ public class WysiwygEditorListener implements TabListener
                 editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWysiwygCallback(editor));
         } else {
             WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-            wysiwygService.fromHTML(editor.getRichTextEditor().getTextArea().getHTML(), 
+            // Notify the plug-ins that the content of the rich text area is about to be submitted.
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
+            // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
+            // Make the request to convert the HTML to Wiki syntax.
+            wysiwygService.fromHTML(editor.getPlainTextEditor().getText(), 
                 editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWikiCallback(editor));
         }
     }

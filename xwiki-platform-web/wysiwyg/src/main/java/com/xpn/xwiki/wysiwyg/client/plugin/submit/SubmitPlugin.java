@@ -204,7 +204,7 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     public void onLostFocus(Widget sender)
     {
         if (sender == getTextArea()) {
-            getTextArea().getCommandManager().execute(SUBMIT);
+            onSubmit();
         }
     }
 
@@ -213,7 +213,10 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
      */
     protected void onSubmit()
     {
-        getTextArea().getCommandManager().execute(SUBMIT);
+        // Submit the content of the rich text area only if it is enabled.
+        if (getTextArea().getCommandManager().isExecuted(ENABLE)) {
+            getTextArea().getCommandManager().execute(SUBMIT);
+        }
     }
 
     /**

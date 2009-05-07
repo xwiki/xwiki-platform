@@ -235,14 +235,14 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     /**
      * @see XWIKI-3283: Hitting enter twice between 2 titles doesn't create new line in IE6
      */
-    public void testEnterTwiceBetweenHeadingsWithInnerSpan()
+    public void testEnterBetweenHeadingsWithInnerSpan()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestEnterTwiceBetweenHeadingsWithInnerSpan();
+                doTestEnterBetweenHeadingsWithInnerSpan();
                 finishTest();
             }
         }).schedule(START_DELAY);
@@ -251,7 +251,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     /**
      * @see XWIKI-3283: Hitting enter twice between 2 titles doesn't create new line in IE6
      */
-    private void doTestEnterTwiceBetweenHeadingsWithInnerSpan()
+    private void doTestEnterBetweenHeadingsWithInnerSpan()
     {
         rta.setHTML("<h2><span>title 2</span></h2><h3><span>title 3</span></h3>");
 
@@ -261,9 +261,8 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         range.collapse(false);
         select(range);
 
-        // Type Enter twice.
+        // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
         dispatcher.keyPress(KeyboardListener.KEY_ENTER);
 
         // Check if the caret is inside a span which is inside paragraph.
@@ -273,27 +272,27 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Tests if the caret is placed inside a new paragraph after pressing Enter twice between two headings that contain
-     * only text.
+     * Tests if the caret is placed inside a new paragraph after pressing Enter between two headings that contain only
+     * text.
      */
-    public void testEnterTwiceBetweenHeadingsWithoutInnerSpan()
+    public void testEnterBetweenHeadingsWithoutInnerSpan()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestEnterTwiceBetweenHeadingsWithoutInnerSpan();
+                doTestEnterBetweenHeadingsWithoutInnerSpan();
                 finishTest();
             }
         }).schedule(START_DELAY);
     }
 
     /**
-     * Tests if the caret is placed inside a new paragraph after pressing Enter twice between two headings that contain
-     * only text.
+     * Tests if the caret is placed inside a new paragraph after pressing Enter between two headings that contain only
+     * text.
      */
-    private void doTestEnterTwiceBetweenHeadingsWithoutInnerSpan()
+    private void doTestEnterBetweenHeadingsWithoutInnerSpan()
     {
         rta.setHTML("<h2>title 2</h2><h3>title 3/h3>");
 
@@ -303,9 +302,8 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         range.collapse(false);
         select(range);
 
-        // Type Enter twice.
+        // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
         dispatcher.keyPress(KeyboardListener.KEY_ENTER);
 
         // Check if the caret is inside a paragraph.
@@ -314,27 +312,27 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
-     * direct child of body.
+     * Tests if the caret is placed inside a new paragraph after pressing Enter inside a text node that is a direct
+     * child of body.
      */
-    public void testEnterTwiceInBodyWithPlainText()
+    public void testEnterInBodyWithPlainText()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestEnterTwiceInBodyWithPlainText();
+                doTestEnterInBodyWithPlainText();
                 finishTest();
             }
         }).schedule(START_DELAY);
     }
 
     /**
-     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
-     * direct child of body.
+     * Tests if the caret is placed inside a new paragraph after pressing Enter inside a text node that is a direct
+     * child of body.
      */
-    private void doTestEnterTwiceInBodyWithPlainText()
+    private void doTestEnterInBodyWithPlainText()
     {
         rta.setHTML("amazing!");
 
@@ -344,9 +342,8 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         range.setEnd(getBody().getFirstChild(), 3);
         select(range);
 
-        // Type Enter twice.
+        // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
         dispatcher.keyPress(KeyboardListener.KEY_ENTER);
 
         // Check if the caret is inside a paragraph.
@@ -358,27 +355,27 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
-     * descendant of body with only in-line parents.
+     * Tests if the caret is placed inside a new paragraph after pressing Enter inside a text node that is a descendant
+     * of body with only in-line parents.
      */
-    public void testEnterTwiceInBodyWithStyledText()
+    public void testEnterInBodyWithStyledText()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestEnterTwiceInBodyWithStyledText();
+                doTestEnterInBodyWithStyledText();
                 finishTest();
             }
         }).schedule(START_DELAY);
     }
 
     /**
-     * Tests if the caret is placed inside a new paragraph after pressing Enter twice inside a text node that is a
-     * descendant of body with only in-line parents.
+     * Tests if the caret is placed inside a new paragraph after pressing Enter inside a text node that is a descendant
+     * of body with only in-line parents.
      */
-    private void doTestEnterTwiceInBodyWithStyledText()
+    private void doTestEnterInBodyWithStyledText()
     {
         rta.setHTML("<strong>xwiki</strong>enterprise");
 
@@ -388,9 +385,8 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         range.collapse(false);
         select(range);
 
-        // Type Enter twice.
+        // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
         dispatcher.keyPress(KeyboardListener.KEY_ENTER);
 
         // Check if the caret is inside a strong element which is inside a paragraph.

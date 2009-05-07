@@ -141,4 +141,16 @@
       <when-property-is name="user.agent" value="ie6"/>
     </any>
   </replace-with>
+
+  <!-- SubmitPlugin -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPlugin"/>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.submit.IESubmitPlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPlugin"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+    </any>
+  </replace-with>
 </module>

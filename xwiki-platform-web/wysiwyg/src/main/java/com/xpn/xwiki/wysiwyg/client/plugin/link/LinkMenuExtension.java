@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -116,10 +117,11 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
             });
 
         createLinkMenus = new ArrayList<UIObject>();
-        createLinkMenus.add(webPageLink);
-        createLinkMenus.add(emailLink);
-        createLinkMenus.add(wikiPageLink);
+        createLinkMenus.add(wikiPageLink);        
         createLinkMenus.add(attachmentLink);
+        createLinkMenus.add(new MenuItemSeparator());
+        createLinkMenus.add(webPageLink);
+        createLinkMenus.add(emailLink);                
 
         MenuItem editLink = new MenuItem(Strings.INSTANCE.linkEdit(), new com.google.gwt.user.client.Command()
         {

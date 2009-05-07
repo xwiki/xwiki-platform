@@ -438,7 +438,7 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
   #end
   #if($theDoc.convertSyntax($newSyntaxId))
     ## Conversion successful. The "ok:" prefix is needed, since otherwise an empty content will result in a "This template does not exist" exception.
-    ok:{pre}$theDoc.content{/pre}#set($void = $theDoc.save("Document converted from syntax $oldSyntax to syntax $newSyntaxId"))
+    ok:{pre}$theDoc.content{/pre}#set($void = $theDoc.save("Document converted from $oldSyntax syntax to $newSyntaxId syntax"))
   #else
     $response.setStatus(501)
     ## TODO: Find a way to put the exception in the context and send it to the client.

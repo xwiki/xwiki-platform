@@ -39,8 +39,14 @@ public class MozillaDOMUtils extends DOMUtils
      */
     public native String getComputedStyleProperty(Element el, String propertyName)
     /*-{
-        // We force it to be a string because we treat it as a string in the java code.
-        return '' + el.ownerDocument.defaultView.getComputedStyle(el, null)[propertyName];
+        var computedStyle = el.ownerDocument.defaultView.getComputedStyle(el, null);
+        if (computedStyle) {
+          // We force it to be a string because we treat it as a string in the java code.
+          return '' + computedStyle[propertyName];
+        } else {
+          // Computed style can be null if the element is not displayed.
+          return null;
+        }
     }-*/;
 
     /**

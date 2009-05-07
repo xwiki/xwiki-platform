@@ -18,6 +18,10 @@ public interface Strings extends Constants
     String yes();
 
     String no();
+    
+    String wysiwyg();
+    
+    String wiki();
 
     String apply();
 

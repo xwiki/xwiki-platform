@@ -11,12 +11,28 @@
 @import url('symbol.css');
 @import url('table.css');
 
+.xRichTextEditorTabPanel {
+  width: 100%;
+  background-color: #F0F0EE;
+  padding: 0;
+}
+
+.xRichTextEditorTabPanel .gwt-TabPanelBottom {
+  background-color:#FFFFFF;
+  padding: 0;
+}
+
 .xRichTextEditor .gwt-RichTextArea {
   width:100%;
   background:#FFFFFF none repeat scroll 0%;
   border:0 none;
   margin:0;
   padding:0;
+}
+
+.xPlainTextEditor {
+  width: 100%;
+  height: 100%;
 }
 
 .xListBox {

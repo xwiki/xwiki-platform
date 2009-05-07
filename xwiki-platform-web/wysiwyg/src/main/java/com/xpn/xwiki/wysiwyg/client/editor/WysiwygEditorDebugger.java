@@ -83,7 +83,7 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
 
         FlowPanel panel = new FlowPanel();
         panel.setWidth("100%");
-        panel.add(editor.getUI());
+        panel.add(editor.getRichTextEditor());
 
         String width = "400px";
         String height = "220px";
@@ -109,7 +109,7 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
         panel.add(eventsTextArea);
 
         // get the transformed HTML Content
-        dirtyHTMLTextArea.setText(editor.getUI().getTextArea().getHTML());
+        dirtyHTMLTextArea.setText(editor.getRichTextEditor().getTextArea().getHTML());
 
         initWidget(panel);
 
@@ -123,7 +123,7 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
      */
     public void refreshData()
     {
-        String currentHTML = editor.getUI().getTextArea().getHTML();
+        String currentHTML = editor.getRichTextEditor().getTextArea().getHTML();
         if (previousHTML.equals(currentHTML)) {
             return;
         }

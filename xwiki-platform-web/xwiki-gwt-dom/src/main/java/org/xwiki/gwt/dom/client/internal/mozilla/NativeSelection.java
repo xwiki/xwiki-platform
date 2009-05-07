@@ -46,7 +46,16 @@ public final class NativeSelection extends JavaScriptObject
      */
     public static native NativeSelection getInstance(Document document)
     /*-{
-        return document.defaultView.getSelection();
+        var selection = document.defaultView.getSelection();
+        // The selection is null if the window or one of its ancestors is hidden with display:none.
+        if (selection) {
+            // Let's save a reference to the selection object in order to use it when the window is hidden.
+            document.defaultView.__selection = selection;
+        } else {
+            // Use the saved reference to the selection object when the window is hidden.
+            selection = document.defaultView.__selection;
+        }
+        return selection;
     }-*/;
 
     /**

@@ -57,6 +57,10 @@ public class MockScriptContextManager implements ScriptContextManager
      */
     public ScriptContext getScriptContext()
     {
-        return new SimpleScriptContext();
+        SimpleScriptContext scriptContext = new SimpleScriptContext();
+
+        scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
+
+        return scriptContext;
     }
 }

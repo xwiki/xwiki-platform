@@ -241,6 +241,7 @@
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/table/ui/TableMenuExtension.java,
             com/xpn/xwiki/wysiwyg/server/sync/**/*,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygService.java,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java,

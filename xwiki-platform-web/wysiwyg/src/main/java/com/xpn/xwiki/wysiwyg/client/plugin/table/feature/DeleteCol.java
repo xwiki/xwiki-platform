@@ -23,12 +23,10 @@ import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableRowElement;
-import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
@@ -42,7 +40,7 @@ public class DeleteCol extends AbstractTableFeature
     /**
      * Feature name.
      */
-    private static final String NAME = "deletecol";
+    public static final String NAME = "deletecol";
 
     /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
@@ -52,8 +50,7 @@ public class DeleteCol extends AbstractTableFeature
      */
     public DeleteCol(TablePlugin plugin)
     {
-        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.deleteCol().createImage(), plugin),
-            Strings.INSTANCE.deleteCol(), plugin);
+        super(NAME, new Command(NAME), Strings.INSTANCE.deleteCol(), plugin);
     }
 
     /**

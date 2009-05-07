@@ -20,8 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
 import com.google.gwt.dom.client.TableCellElement;
-import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
@@ -40,7 +38,7 @@ public class InsertRowAfter extends AbstractTableFeature
     /**
      * Feature name.
      */
-    private static final String NAME = "insertrowafter";
+    public static final String NAME = "insertrowafter";
 
     /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
@@ -50,8 +48,7 @@ public class InsertRowAfter extends AbstractTableFeature
      */
     public InsertRowAfter(TablePlugin plugin)
     {
-        super(NAME, new Command(NAME), new PushButton(Images.INSTANCE.insertRowAfter().createImage(), plugin),
-            Strings.INSTANCE.insertRowAfter(), plugin);
+        super(NAME, new Command(NAME), Strings.INSTANCE.insertRowAfter(), plugin);
     }
 
     /**

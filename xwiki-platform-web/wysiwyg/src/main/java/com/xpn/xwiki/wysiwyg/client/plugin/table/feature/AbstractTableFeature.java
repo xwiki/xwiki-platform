@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableFeature;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -39,11 +37,6 @@ public abstract class AbstractTableFeature extends AbstractExecutable implements
     private final String name;
 
     /**
-     * Feature toolbar push-button.
-     */
-    private final PushButton button;
-
-    /**
      * Feature command.
      */
     private final Command command;
@@ -58,16 +51,13 @@ public abstract class AbstractTableFeature extends AbstractExecutable implements
      * 
      * @param name feature name.
      * @param command feature command.
-     * @param button feature button.
      * @param title feature button title.
      * @param plugin table plug-in.
      */
-    public AbstractTableFeature(String name, Command command, PushButton button, String title, TablePlugin plugin)
+    public AbstractTableFeature(String name, Command command, String title, TablePlugin plugin)
     {
         this.name = name;
         this.command = command;
-        this.button = button;
-        button.setTitle(title);
         this.plugin = plugin;
     }
 
@@ -79,16 +69,6 @@ public abstract class AbstractTableFeature extends AbstractExecutable implements
     public String getName()
     {
         return name;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see TableFeature#getButton()
-     */
-    public PushButton getButton()
-    {
-        return button;
     }
 
     /**
@@ -118,7 +98,5 @@ public abstract class AbstractTableFeature extends AbstractExecutable implements
      */
     public void destroy()
     {
-        getButton().removeFromParent();
-        getButton().removeClickListener((ClickListener) getPlugin());
     }
 }

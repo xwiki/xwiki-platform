@@ -135,17 +135,17 @@
 <category>Navigation</category>
 </property>
 <property>
-<content>#panelheader($msg.get("xe.panels.navigation"))
-#set ($hiddenSpaces = ["XWiki", "Admin", "Panels"])
-#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.LuceneSearch", "Main.WebSearchRss", "Main.BlogRss", "Blog.Macros", "Main.TagsRss", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
-#set ($blackListedPages = ["WebPreferences"])
+<content>#panelheader($msg.get('xe.panels.navigation'))
+#set ($hiddenSpaces = ['XWiki', 'Admin', 'Panels'])
+#set ($hiddenPages = ['Main.WebRss', 'Main.WebSearch', 'Main.LuceneSearch', 'Main.WebSearchRss', 'Main.BlogRss', 'Blog.Macros', 'Main.TagsRss', 'Main.RegisterNewUserAction', 'Main.SpaceIndex', 'Blog.Category'])
+#set ($blackListedPages = ['WebPreferences'])
 &lt;div id="xwikinavcontainer"&gt;
 #set($spaces = $xwiki.spaces)
 #set($i = 0)
 #set($spacecount = 0)
 &lt;div id="xwikinav" class="accordion"&gt;
 #foreach($space in $spaces)
-#if (!$hiddenSpaces.contains($space) || ($hiddenSpaces.contains($space) &amp;&amp; $xwiki.hasAdminRights()))
+#if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$hiddenSpaces.contains($space)))
 #if ($doc.space == $space)
 #set ($spacecount = $i)
 #end
@@ -156,12 +156,12 @@
 #set ($escapedSpace = $space.replaceAll("'", "''"))
 #set($hql = $xwiki.searchDocuments("doc.space='$escapedSpace' order by doc.name"))
 #foreach($page in $hql)
-#if (!$hiddenPages.contains($page) || ($hiddenPages.contains($page) &amp;&amp; $xwiki.hasAdminRights()))
-#set($dotIndex = $page.indexOf(".")+1)
+#if (!$hiddenPages.contains($page) || $hasAdmin)
+#set($dotIndex = $page.indexOf('.')+1)
 #set($pageName = $page.substring($dotIndex, $page.length()))
-#if (!$blackListedPages.contains($pageName) || ($blackListedPages.contains($pageName) &amp;&amp; $xwiki.hasAdminRights()))
+#if (!$blackListedPages.contains($pageName) || $hasAdmin)
 #if ($doc.fullName == $page)
-- *$xwiki.getDocument($page).name*
+- *${doc.name}*
 #else
 - [$page]
 #end

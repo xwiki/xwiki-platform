@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.transformation;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
@@ -29,11 +30,15 @@ import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
+@Component("testprioritymacro")
 public class TestPriorityMacro extends AbstractNoParameterMacro
 {
     public TestPriorityMacro()
     {
         super("Priority Macro");
+
+        // Ensure that this macro gets executed before the other macros for testing priorities
+        setPriority(500);
     }
 
     /**

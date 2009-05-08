@@ -1,0 +1,8 @@
+org.xwiki.rendering.internal.transformation.TestSimpleMacro
+org.xwiki.rendering.internal.transformation.TestSimpleInlineMacro
+org.xwiki.rendering.internal.transformation.TestContentMacro
+org.xwiki.rendering.internal.transformation.TestNestedMacro
+org.xwiki.rendering.internal.transformation.TestRecursiveMacro
+org.xwiki.rendering.internal.transformation.TestPriorityMacro
+org.xwiki.rendering.internal.transformation.TestFailingMacro
+org.xwiki.rendering.internal.transformation.TestFormatMacro

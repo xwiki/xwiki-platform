@@ -108,7 +108,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
     // Instance configuration.
     WysiwygConfigurations.push({
         hookId: "content",        
-        displayTabs: true,
+        displayTabs: false,
         defaultEditor: "wysiwyg",
         inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
         plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($request.sync) sync#end',

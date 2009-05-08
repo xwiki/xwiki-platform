@@ -24,6 +24,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SourcesTabEvents;
 import com.google.gwt.user.client.ui.TabListener;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -134,12 +135,7 @@ public class WysiwygEditorListener implements TabListener
     /**
      * WysiwygEditor instance.
      */
-    private final WysiwygEditor editor;       
-    
-    /**
-     * Tab index after the previous switch.
-     */
-    private int previousIndex = -1;
+    private final WysiwygEditor editor;
 
     /**
      * Constructor.
@@ -155,7 +151,11 @@ public class WysiwygEditorListener implements TabListener
      * {@inheritDoc}
      */
     public boolean onBeforeTabSelected(SourcesTabEvents sender, int index)
-    {        
+    {
+        TabPanel tabPanel = (TabPanel) sender;
+        if (tabPanel.getTabBar().getSelectedTab() == index) {
+            return false;
+        }
         return true;
     }
 
@@ -164,23 +164,19 @@ public class WysiwygEditorListener implements TabListener
      */
     public void onTabSelected(SourcesTabEvents sender, int index)
     {
-        if (previousIndex != index) {
-            editor.setLoading(true);
-            if (index == WysiwygEditor.WYSIWYG_TAB_INDEX) {
-                previousIndex = WysiwygEditor.WYSIWYG_TAB_INDEX;
-                WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-                wysiwygService.toHTML(editor.getPlainTextEditor().getText(), 
-                    editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWysiwygCallback(editor));
-            } else {
-                previousIndex = WysiwygEditor.WIKI_TAB_INDEX;
-                WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-                // Notify the plug-ins that the content of the rich text area is about to be submitted.
-                editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
-                // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
-                // Make the request to convert the HTML to Wiki syntax.
-                wysiwygService.fromHTML(editor.getPlainTextEditor().getText(), 
-                    editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWikiCallback(editor));
-            }
+        editor.setLoading(true);
+        if (index == WysiwygEditor.WYSIWYG_TAB_INDEX) {
+            WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
+            wysiwygService.toHTML(editor.getPlainTextEditor().getText(), 
+                editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWysiwygCallback(editor));
+        } else {
+            WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
+            // Notify the plug-ins that the content of the rich text area is about to be submitted.
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
+            // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
+            // Make the request to convert the HTML to Wiki syntax.
+            wysiwygService.fromHTML(editor.getPlainTextEditor().getText(), 
+                editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWikiCallback(editor));
         }
     }
 }

@@ -170,19 +170,18 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
      */
     public List<String> getFileList(Document document, String attachmentName, XWikiContext context)
     {
-        List<String> zipList = null;
+        List<String> zipList = new ArrayList<String>();
         Attachment attachment = document.getAttachment(attachmentName);
         try {
             byte[] stream = attachment.getContent();
             ByteArrayInputStream bais = new ByteArrayInputStream(stream);
             if (isZipFile(bais)) {
-                zipList = new ArrayList<String>();
                 ZipInputStream zis = new ZipInputStream(bais);
                 ZipEntry entry;
                 while ((entry = zis.getNextEntry()) != null) {
                     zipList.add(entry.getName());
                 }
-            } 
+            }
         } catch (XWikiException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -288,7 +287,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * @param filecontent the  content of the file
+     * @param filecontent the content of the file
      * @return true if the file is in zip format (.zip, .jar etc) or false otherwise
      */
     protected boolean isZipFile(ByteArrayInputStream filecontent)

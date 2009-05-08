@@ -113,7 +113,7 @@
                 <!-- Required since we're using test components in the integration test module  -->
                 <include>**/Test*Macro.class</include>
                 <include>**/Test*Macro$*.class</include>
-                <include>**/components.xml</include>
+                <include>**/components.txt</include>
               </includes>
             </configuration>
           </execution>

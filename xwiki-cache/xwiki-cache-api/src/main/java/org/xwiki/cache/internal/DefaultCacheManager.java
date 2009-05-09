@@ -26,6 +26,8 @@ import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
@@ -37,6 +39,7 @@ import org.xwiki.component.phase.Composable;
  * @version $Id$
  * @since 1.7M1
  */
+@Component
 public class DefaultCacheManager implements CacheManager, Composable
 {
     /**
@@ -47,6 +50,7 @@ public class DefaultCacheManager implements CacheManager, Composable
     /**
      * The configuration component for {@link CacheManager}. Injected by component manager.
      */
+    @Requirement
     private CacheManagerConfiguration configuration;
 
     /**

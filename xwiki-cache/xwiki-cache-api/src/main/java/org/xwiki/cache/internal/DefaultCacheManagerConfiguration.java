@@ -20,6 +20,8 @@
 package org.xwiki.cache.internal;
 
 import org.xwiki.cache.CacheManagerConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationManager;
@@ -30,6 +32,7 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
  * 
  * @version $Id$
  */
+@Component
 public class DefaultCacheManagerConfiguration implements CacheManagerConfiguration, Initializable
 {
     /**
@@ -45,11 +48,13 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
     /**
      * Injected by the Component Manager.
      */
+    @Requirement
     private ConfigurationManager configurationManager;
 
     /**
      * Injected by the Component Manager.
      */
+    @Requirement
     private ConfigurationSourceCollection sourceCollection;
 
     /**
@@ -60,7 +65,7 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
     /**
      * The role hint of configured default local cache component.
      */
-    private String defaultLocalCach = DEFAULT_LOCALCACHE_HINT;
+    private String defaultLocalCache = DEFAULT_LOCALCACHE_HINT;
 
     /**
      * {@inheritDoc}
@@ -90,7 +95,7 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
      */
     public String getDefaultLocalCache()
     {
-        return this.defaultLocalCach;
+        return this.defaultLocalCache;
     }
 
     /**
@@ -106,6 +111,6 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
      */
     public void setLocalDefaultCache(String localCacheHint)
     {
-        this.defaultLocalCach = localCacheHint;
+        this.defaultLocalCache = localCacheHint;
     }
 }

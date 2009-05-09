@@ -49,22 +49,34 @@ public class ConfigurationManagerMock extends AbstractLogEnabled implements Conf
     /**
      * Create and return a descriptor for this component.
      * 
-     * @param cache the cache hint.
-     * @param localCache the local cache hint.
      * @return the descriptor of the component.
      */
-    public static ComponentDescriptor getComponentDescriptor(String cache, String localCache)
+    public static ComponentDescriptor getComponentDescriptor()
     {
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
         componentDescriptor.setRole(ConfigurationManager.class);
         componentDescriptor.setImplementation(ConfigurationManagerMock.class.getName());
-        componentDescriptor.addComponentProperty("cache", cache);
-        componentDescriptor.addComponentProperty("localCache", localCache);
 
         return componentDescriptor;
     }
 
+    /**
+     * @param cacheHint the cache hint.
+     */
+    public void setCacheHint(String cacheHint)
+    {
+        this.cache = cacheHint;
+    }
+
+    /**
+     * @param localCacheHint the local cache hint.
+     */
+    public void setLocalCacheHint(String localCacheHint)
+    {
+        this.localCache = localCacheHint;
+    }
+    
     /**
      * {@inheritDoc}
      * 
@@ -77,8 +89,8 @@ public class ConfigurationManagerMock extends AbstractLogEnabled implements Conf
         CacheManagerConfiguration cacheManagerConfiguration = (CacheManagerConfiguration) configurationBean;
 
         try {
-            BeanUtils.setProperty(cacheManagerConfiguration, "defaultCache", cache);
-            BeanUtils.setProperty(cacheManagerConfiguration, "defaultLocalCache", localCache);
+            BeanUtils.setProperty(cacheManagerConfiguration, "defaultCache", this.cache);
+            BeanUtils.setProperty(cacheManagerConfiguration, "defaultLocalCache", this.localCache);
         } catch (Exception e) {
             getLogger().error("Failed to set CacheManager configuration", e);
         }

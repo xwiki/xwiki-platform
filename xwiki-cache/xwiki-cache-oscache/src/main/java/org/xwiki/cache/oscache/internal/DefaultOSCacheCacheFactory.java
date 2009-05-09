@@ -17,29 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.internal;
+package org.xwiki.cache.oscache.internal;
 
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.annotation.Component;
 
 /**
- * Default implementation of {@link CacheFactory}.
+ * Implements {@link CacheFactory} based on OSCache.
  * 
  * @version $Id: $
  */
-@Component
-public class DefaultCacheFactory implements CacheFactory
+@Component("oscache")
+public class DefaultOSCacheCacheFactory extends AbstractOSCacheCacheFactory
 {
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
+     * @see AbstractJBossCacheCacheFactory#getDefaultPropsId()
      */
-    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
+    @Override
+    protected String getDefaultPropsId()
     {
-        return new DefaultCache<T>();
+        return "default";
     }
 }

@@ -1,0 +1,2 @@
+org.xwiki.cache.oscache.internal.DefaultOSCacheCacheFactory
+org.xwiki.cache.oscache.internal.LocalOSCacheCacheFactory

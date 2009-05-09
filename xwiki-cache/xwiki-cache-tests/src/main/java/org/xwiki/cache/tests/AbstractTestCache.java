@@ -27,10 +27,10 @@ import java.net.URL;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
-
 
 /**
  * Base class for testing cache component implementation.
@@ -87,9 +87,12 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     {
         super.setUp();
 
-        getComponentManager().registerComponent(
-            ConfigurationManagerMock.getComponentDescriptor(this.roleHint, null));
+        getComponentManager().registerComponent(ConfigurationManagerMock.getComponentDescriptor());
         getComponentManager().registerComponent(ConfigurationSourceCollectionMock.getComponentDescriptor());
+        
+        ConfigurationManagerMock configurationMock = 
+            (ConfigurationManagerMock) getComponentManager().lookup(ConfigurationManager.class);
+        configurationMock.setCacheHint(this.roleHint);
     }
 
     /**

@@ -19,50 +19,32 @@
  */
 package org.xwiki.cache.oscache.internal;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.Container;
 
 /**
- * Implements {@link CacheFactory} based on OSCache.
- * 
+ * Base implementation for OSCache support.
+ *  
  * @version $Id: $
+ * @since 1.9M2
  */
-public class OSCacheCacheFactory implements CacheFactory
+public abstract class AbstractOSCacheCacheFactory extends AbstractLogEnabled implements CacheFactory
 {
-    /**
-     * This component's role hint, used when code needs to look it up.
-     */
-    public static final String ROLEHINT = "oscache";
-
-    /**
-     * The logging tool.
-     */
-    private static final Log LOG = LogFactory.getLog(OSCacheCacheFactory.class);
-
     /**
      * The container used to access configuration files.
      */
+    @Requirement
     private Container container;
-
+    
     /**
-     * The default configuration identifier used to load cache configuration file.
+     * @return the default configuration identifier used to load cache configuration file
      */
-    private String defaultPropsId;
-
-    /**
-     * Default constructor.
-     */
-    public OSCacheCacheFactory()
-    {
-        if (this.defaultPropsId == null) {
-            this.defaultPropsId = "default";
-        }
-    }
-
+    protected abstract String getDefaultPropsId();
+    
     /**
      * {@inheritDoc}
      * 
@@ -70,15 +52,15 @@ public class OSCacheCacheFactory implements CacheFactory
      */
     public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Start OScache cache initialisation");
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug("Start OSCache initialisation");
         }
 
         OSCacheCache<T> cache = new OSCacheCache<T>();
-        cache.initialize(new OSCacheCacheConfiguration(this.container, configuration, this.defaultPropsId));
+        cache.initialize(new OSCacheCacheConfiguration(this.container, configuration, getDefaultPropsId()));
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("End OScache cache initialisation");
+        if (getLogger().isDebugEnabled()) {
+            getLogger().debug("End OSCache initialisation");
         }
 
         return cache;

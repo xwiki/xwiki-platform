@@ -66,9 +66,9 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
-import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xwiki.container.Container;
+import org.xwiki.xml.EntityResolver;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -303,7 +303,7 @@ public class PdfExportImpl implements PdfExport
             docFactory.setNamespaceAware(true);
             docFactory.setValidating(false);
             DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-            docBuilder.setEntityResolver((EntityResolver) Utils.getComponent(EntityResolver.class));
+            docBuilder.setEntityResolver((org.xml.sax.EntityResolver) Utils.getComponent(EntityResolver.class));
             Document xslt = docBuilder.parse(new InputSource(xsltinputstream));
             Document xmldoc = docBuilder.parse(new InputSource(xmlinputstream));
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new DOMSource(xslt));

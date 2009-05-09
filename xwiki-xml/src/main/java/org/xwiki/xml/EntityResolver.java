@@ -19,28 +19,16 @@
  */
 package org.xwiki.xml;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Factory to create optimised {@link XMLReader}. This gives us a level of indirection versus
- * using directly {@link javax.xml.parsers.SAXParserFactory}. We use that for example to
- * verify if we're using Xerces and if so we configure it to cache parsed DTD grammars for
- * better performance.
- *  
- * @version $Id$
- * @since 1.7.1
+ * XWiki's wrapping of the {@link org.xml.sax.EntityResolver} interface so that we can create components that
+ * implement it.
+ * 
+ * @version $Id: $
+ * @since 1.9M2
  */
 @ComponentRole
-public interface XMLReaderFactory
+public interface EntityResolver extends org.xml.sax.EntityResolver
 {
-    /**
-     * @return the optimised XML Reader instance
-     * @throws SAXException in case of an error in the creation of the XML Reader instance
-     * @throws ParserConfigurationException in case of an error in the creation of the XML Reader instance
-     */
-    XMLReader createXMLReader() throws SAXException, ParserConfigurationException;
 }

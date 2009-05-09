@@ -25,6 +25,7 @@ import java.util.Map;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 import org.xwiki.xml.html.filter.ElementSelector;
 
@@ -55,6 +56,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
  * @version $Id: $
  * @since 1.6M1
  */
+@Component("list")
 public class ListFilter extends AbstractHTMLFilter
 {
 

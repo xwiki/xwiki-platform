@@ -22,6 +22,7 @@ package org.xwiki.xml.html.filter;
 import java.util.Map;
 
 import org.w3c.dom.Document;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Defines an interface for filters that will filter HTML documents.
@@ -29,6 +30,7 @@ import org.w3c.dom.Document;
  * @version $Id$
  * @since 1.8RC2
  */
+@ComponentRole
 public interface HTMLFilter
 {
     /**

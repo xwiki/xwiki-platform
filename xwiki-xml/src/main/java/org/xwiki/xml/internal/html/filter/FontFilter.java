@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -33,6 +34,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8RC2
  */
+@Component("font")
 public class FontFilter extends AbstractHTMLFilter
 {
     /**

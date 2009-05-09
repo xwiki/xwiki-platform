@@ -1,0 +1,6 @@
+org.xwiki.xml.internal.html.filter.ListFilter
+org.xwiki.xml.internal.html.filter.FontFilter
+org.xwiki.xml.internal.html.filter.BodyFilter
+org.xwiki.xml.internal.html.DefaultHTMLCleaner
+org.xwiki.xml.internal.LocalEntityResolver
+org.xwiki.xml.internal.DefaultXMLReaderFactory

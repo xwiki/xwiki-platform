@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.xml;
+package org.xwiki.xml.internal;
 
-import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.xml.EntityResolver;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +38,7 @@ import java.net.URISyntaxException;
  *  
  * @version $Id$
  */
+@Component
 public class LocalEntityResolver extends AbstractLogEnabled implements EntityResolver
 {
     /**

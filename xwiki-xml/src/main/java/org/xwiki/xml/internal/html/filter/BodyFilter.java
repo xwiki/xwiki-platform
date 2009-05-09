@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.HTMLConstants;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
@@ -37,6 +38,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id: $
  * @since 1.8RC3
  */
+@Component("body")
 public class BodyFilter extends AbstractHTMLFilter
 {
     /**

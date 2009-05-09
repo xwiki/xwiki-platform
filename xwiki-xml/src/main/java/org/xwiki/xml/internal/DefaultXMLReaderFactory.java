@@ -27,6 +27,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.XMLReaderFactory;
@@ -39,6 +40,7 @@ import org.xwiki.xml.XMLReaderFactory;
  * @version $Id$
  * @since 1.7.1
  */
+@Component
 public class DefaultXMLReaderFactory implements XMLReaderFactory, Initializable
 {
     /**

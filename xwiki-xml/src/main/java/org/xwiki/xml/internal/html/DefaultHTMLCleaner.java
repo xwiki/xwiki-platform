@@ -36,6 +36,7 @@ import org.htmlcleaner.TagTransformation;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -60,16 +61,19 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     /**
      * {@link HTMLFilter} for filtering html lists.
      */
+    @Requirement("list")
     private HTMLFilter listFilter;
 
     /**
      * {@link HTMLFilter} for filtering HTML font elements.
      */
+    @Requirement("font")
     private HTMLFilter fontFilter;
 
     /**
      * {@link HTMLFilter} for wrapping invalid body elements with paragraphs.
      */
+    @Requirement("body")
     private HTMLFilter bodyFilter;
 
     /**

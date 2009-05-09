@@ -29,7 +29,6 @@
     <artifactId>xwiki-core-url</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-url-default</artifactId>
   <name>XWiki Platform - Core - URL - Default Implementation</name>
   <packaging>jar</packaging>

@@ -25,6 +25,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
+    <!-- Since 23 root wiki pom is not compatible anymore with 1.8 branch (default encoding changed to UTF-8) -->
     <version>22</version>
     <relativePath>../pom</relativePath>
   </parent>
@@ -46,7 +47,7 @@
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <!-- Since 1.26, the configuration files are no longer compatible, since the default encoding has been changed. -->
     <platform.tool.configuration.version>1.25</platform.tool.configuration.version>
-    <platform.core.version>1.8.3</platform.core.version>
+    <platform.core.version>1.8-SNAPSHOT</platform.core.version>
     <!-- Changes in Albatross 1.19 and Toucan 1.20 are not compatible with xwiki-web-1.8 anylonger. -->
     <platform.skin.albatross.version>1.18</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.19</platform.skin.toucan.version>

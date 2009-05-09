@@ -18,12 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.context;
+package org.xwiki.context.internal;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.xwiki.context.internal.DefaultExecutionContextManager;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextInitializer;
 
 import junit.framework.TestCase;
 

@@ -18,9 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.url;
+package org.xwiki.url.internal;
 
 import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.url.XWikiURL;
+import org.xwiki.url.XWikiURLFactory;
 
 /**
  * Unit tests for {@link RegexXWikiURLFactory}.

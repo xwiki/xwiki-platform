@@ -18,11 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.context;
+package org.xwiki.context.internal;
 
 import java.util.Stack;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 
 /**
  * Holds the Execution Context object. Note that we require since we want to be able to pass the Execution Context to

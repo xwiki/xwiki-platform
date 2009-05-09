@@ -23,6 +23,8 @@ package org.xwiki.context;
 import java.util.Arrays;
 import java.util.List;
 
+import org.xwiki.context.internal.DefaultExecutionContextManager;
+
 import junit.framework.TestCase;
 
 /**

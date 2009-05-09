@@ -18,13 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.context;
+package org.xwiki.context.internal;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextInitializer;
+import org.xwiki.context.ExecutionContextManager;
 
 @Component
 public class DefaultExecutionContextManager implements ExecutionContextManager

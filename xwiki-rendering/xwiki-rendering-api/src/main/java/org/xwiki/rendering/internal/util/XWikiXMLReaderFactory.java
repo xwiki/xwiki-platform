@@ -4,10 +4,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.wikimodel.wem.xhtml.filter.AccumulationXMLFilter;
 import org.wikimodel.wem.xhtml.filter.DTDXMLFilter;
-import org.xml.sax.EntityResolver;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.internal.parser.XWikiXHTMLWhitespaceXMLFilter;
+import org.xwiki.xml.EntityResolver;
 import org.xwiki.xml.XMLReaderFactory;
 
 /**
@@ -23,17 +25,20 @@ import org.xwiki.xml.XMLReaderFactory;
  * @version $Id: $
  * @since 1.8.3
  */
+@Component("xwiki")
 public class XWikiXMLReaderFactory implements XMLReaderFactory
 {
     /**
      * Used to create an optimized SAX XML Reader. In general SAX parsers don't cache DTD grammars and as a consequence
      * parsing a document with a grammar such as the XHTML DTD takes a lot more time than required.
      */
+    @Requirement
     private XMLReaderFactory xmlReaderFactory;
 
     /**
      * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally.
      */
+    @Requirement
     protected EntityResolver entityResolver;
 
     public XMLReader createXMLReader() throws SAXException, ParserConfigurationException

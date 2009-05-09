@@ -21,6 +21,8 @@ package org.xwiki.configuration;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Contains a list of {@link ConfigurationSource}s that can be used by modules requiring a configuration. The idea
  * is to offer a default list of sources that all modules can use and share in order to have some centralized
@@ -30,6 +32,7 @@ import java.util.List;
  * @version $Id: $
  * @since 1.6M1
  */
+@ComponentRole
 public interface ConfigurationSourceCollection
 {
     List<ConfigurationSource> getConfigurationSources();

@@ -1,0 +1,2 @@
+org.xwiki.configuration.internal.DefaultConfigurationManager
+org.xwiki.configuration.internal.DefaultConfigurationSourceCollection

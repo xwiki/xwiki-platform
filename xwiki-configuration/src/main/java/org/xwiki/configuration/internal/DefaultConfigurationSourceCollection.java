@@ -27,6 +27,8 @@ import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
@@ -41,6 +43,7 @@ import org.xwiki.container.Container;
  * @version $Id: $
  * @since 1.6M1
  */
+@Component
 public class DefaultConfigurationSourceCollection implements ConfigurationSourceCollection, Initializable
 {
     private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
@@ -48,6 +51,7 @@ public class DefaultConfigurationSourceCollection implements ConfigurationSource
     /**
      * Injected by the Component Manager.
      */
+    @Requirement
     private Container container;
 
     private List<ConfigurationSource> sources;

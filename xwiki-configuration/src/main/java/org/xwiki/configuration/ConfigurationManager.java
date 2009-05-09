@@ -21,12 +21,14 @@ package org.xwiki.configuration;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.phase.InitializationException;
 
 /**
  * @version $Id: $
  * @since 1.6M1
  */
+@ComponentRole
 public interface ConfigurationManager
 {
     void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources, String namespace)

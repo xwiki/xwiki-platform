@@ -24,6 +24,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.xwiki.configuration.internal.commons.CommonsConfigurationAdapter;
 import org.xwiki.configuration.ConfigurationManager;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
 
 import java.util.List;
@@ -35,6 +36,7 @@ import java.util.HashMap;
  * @version $Id: $
  * @since 1.6M1
  */
+@Component
 public class DefaultConfigurationManager implements ConfigurationManager
 {
     public void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources,

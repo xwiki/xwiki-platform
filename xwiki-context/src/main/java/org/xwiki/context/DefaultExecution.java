@@ -22,6 +22,8 @@ package org.xwiki.context;
 
 import java.util.Stack;
 
+import org.xwiki.component.annotation.Component;
+
 /**
  * Holds the Execution Context object. Note that we require since we want to be able to pass the Execution Context to
  * singleton components. Thus this holder is a singleton itself and the Execution Context is saved as a ThreadLocal
@@ -30,6 +32,7 @@ import java.util.Stack;
  * @version $Id$
  * @since 1.5M2
  */
+@Component
 public class DefaultExecution implements Execution
 {
     private ThreadLocal<Stack<ExecutionContext>> context =

@@ -23,8 +23,13 @@ package org.xwiki.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+
+@Component
 public class DefaultExecutionContextManager implements ExecutionContextManager
 {
+    @Requirement(role = ExecutionContextInitializer.class)
     private List<ExecutionContextInitializer> initializers = new ArrayList<ExecutionContextInitializer>();
     
     public ExecutionContext clone(ExecutionContext context) throws ExecutionContextException

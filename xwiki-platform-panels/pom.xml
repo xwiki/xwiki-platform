@@ -31,13 +31,7 @@
   </parent>
   <artifactId>xwiki-application-panels</artifactId>
   <name>XWiki Platform - Applications - Panels</name>
-  <version>1.20</version>
+  <version>1.21-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-panels-1.20</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-panels-1.20</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-panels-1.20</url>
-  </scm>
 </project>

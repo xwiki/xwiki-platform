@@ -1,0 +1,2 @@
+org.xwiki.context.DefaultExecution
+org.xwiki.context.DefaultExecutionContextManager

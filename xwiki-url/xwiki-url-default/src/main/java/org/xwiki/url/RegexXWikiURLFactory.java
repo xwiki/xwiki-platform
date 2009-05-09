@@ -21,9 +21,11 @@
 package org.xwiki.url;
 
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -33,10 +35,13 @@ import java.util.regex.Pattern;
  * @todo how do we support removing the view/ part of the url for example?
  * @todo how do we support hierarchical spaces?
  */
+@Component
 public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
 {
-    private String pattern;
+    // TODO: Move to a configuration parameter
+    private String pattern = "(?:http[s]?://([a-zA-Z-]*)[a-zA-Z-.]*[:]?\\d*)?/\\w*/\\w*/(\\w*)/(\\w*)/?(\\w*)\\??(.*)";
 
+    // TODO: Move to a configuration parameter
     private Map<String, String> regexMappings;
     
     private Pattern regexPattern;
@@ -47,6 +52,13 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
     public void initialize() throws InitializationException
     {
        this.regexPattern = Pattern.compile(this.pattern);
+
+       this.regexMappings = new HashMap<String, String>();
+       this.regexMappings.put("wiki", "1");
+       this.regexMappings.put("action", "2");
+       this.regexMappings.put("space", "3");
+       this.regexMappings.put("page", "4");
+       this.regexMappings.put("queryString", "5");
     }
 
     public XWikiURL createURL(String urlAsString) throws InvalidURLException

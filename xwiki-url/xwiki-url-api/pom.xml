@@ -40,5 +40,10 @@
       <artifactId>xwiki-core-bridge</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
   </dependencies>
 </project>

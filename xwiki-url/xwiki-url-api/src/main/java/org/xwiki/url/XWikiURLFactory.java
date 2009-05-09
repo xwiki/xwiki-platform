@@ -20,6 +20,9 @@
  */
 package org.xwiki.url;
 
+import org.xwiki.component.annotation.ComponentRole;
+
+@ComponentRole
 public interface XWikiURLFactory
 {
     XWikiURL createURL(String urlAsString) throws InvalidURLException;

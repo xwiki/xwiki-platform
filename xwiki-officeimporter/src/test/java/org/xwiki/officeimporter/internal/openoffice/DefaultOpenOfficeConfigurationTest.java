@@ -20,11 +20,11 @@
 package org.xwiki.officeimporter.internal.openoffice;
 
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
- * Test case for {@link DefaultOpenOfficeServerConfiguration}.
+ * Test case for {@link DefaultOpenOfficeConfiguration}.
  * 
  * @version $Id$
  * @since 1.8RC3
@@ -34,7 +34,7 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractRenderingTestCas
     /**
      * Office importer configuration.
      */
-    private OpenOfficeServerConfiguration configuration;
+    private OpenOfficeConfiguration configuration;
 
     /**
      * {@inheritDoc}
@@ -45,8 +45,8 @@ public class DefaultOpenOfficeConfigurationTest extends AbstractRenderingTestCas
         super.setUp();
 
         this.configuration =
-            (OpenOfficeServerConfiguration) getComponentManager()
-                .lookup(OpenOfficeServerConfiguration.class, "default");
+            (OpenOfficeConfiguration) getComponentManager()
+                .lookup(OpenOfficeConfiguration.class, "default");
     }
 
     /**

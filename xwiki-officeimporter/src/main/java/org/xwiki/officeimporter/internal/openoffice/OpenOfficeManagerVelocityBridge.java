@@ -22,16 +22,16 @@ package org.xwiki.officeimporter.internal.openoffice;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.context.Execution;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 
 /**
- * A bridge between {@link OpenOfficeServerManager} and velocity scripts.
+ * A bridge between {@link OpenOfficeManager} and velocity scripts.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class OpenOfficeServerManagerVelocityBridge
+public class OpenOfficeManagerVelocityBridge
 {
     /**
      * The key used to place any error messages while trying to control the oo server instance.
@@ -44,9 +44,9 @@ public class OpenOfficeServerManagerVelocityBridge
     private Execution execution;
 
     /**
-     * The {@link OpenOfficeServerManager} component.
+     * The {@link OpenOfficeManager} component.
      */
-    private OpenOfficeServerManager oomanager;
+    private OpenOfficeManager ooManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
@@ -59,13 +59,13 @@ public class OpenOfficeServerManagerVelocityBridge
     private Logger logger;
 
     /**
-     * Creates a new {@link OpenOfficeServerManagerVelocityBridge} with the provided {@link OpenOfficeServerManager}
+     * Creates a new {@link OpenOfficeManagerVelocityBridge} with the provided {@link OpenOfficeManager}
      * component.
      */
-    public OpenOfficeServerManagerVelocityBridge(OpenOfficeServerManager oomanager, DocumentAccessBridge docBridge,
+    public OpenOfficeManagerVelocityBridge(OpenOfficeManager oomanager, DocumentAccessBridge docBridge,
         Execution execution, Logger logger)
     {
-        this.oomanager = oomanager;
+        this.ooManager = oomanager;
         this.docBridge = docBridge;
         this.execution = execution;
         this.logger = logger;
@@ -81,9 +81,9 @@ public class OpenOfficeServerManagerVelocityBridge
         boolean success = false;
         if (docBridge.hasProgrammingRights()) {
             try {
-                oomanager.startServer();
+                ooManager.start();
                 success = true;
-            } catch (OpenOfficeServerManagerException ex) {
+            } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
                 execution.getContext().setProperty(OFFICE_MANAGER_ERROR, ex.getMessage());
             }
@@ -103,9 +103,9 @@ public class OpenOfficeServerManagerVelocityBridge
         boolean success = false;
         if (docBridge.hasProgrammingRights()) {
             try {
-                oomanager.stopServer();
+                ooManager.stop();
                 success = true;
-            } catch (OpenOfficeServerManagerException ex) {
+            } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
                 execution.getContext().setProperty(OFFICE_MANAGER_ERROR, ex.getMessage());
             }
@@ -116,27 +116,11 @@ public class OpenOfficeServerManagerVelocityBridge
     }
 
     /**
-     * @return path to openoffice server installation.
-     */
-    public String getOfficeHome()
-    {
-        return oomanager.getOfficeHome();
-    }
-
-    /**
-     * @return path to openoffice execution profile.
-     */
-    public String getOfficeProfile()
-    {
-        return oomanager.getOfficeProfile();
-    }
-
-    /**
      * @return current status of the oo server process as a string.
      */
     public String getServerState()
     {
-        return oomanager.getServerState().toString();
+        return ooManager.getState().toString();
     }
 
     /**

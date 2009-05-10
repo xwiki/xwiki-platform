@@ -23,16 +23,16 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
- * Puts a reference to {@link OpenOfficeServerManager} in newly created velocity contexts.
+ * Puts a reference to {@link OpenOfficeManager} in newly created velocity contexts.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class OpenOfficeServerManagerVelocityContextInitializer extends AbstractLogEnabled implements
+public class OpenOfficeManagerVelocityContextInitializer extends AbstractLogEnabled implements
     VelocityContextInitializer
 {
     /**
@@ -46,9 +46,9 @@ public class OpenOfficeServerManagerVelocityContextInitializer extends AbstractL
     private Execution execution;
 
     /**
-     * The {@link OpenOfficeServerManager} component.
+     * The {@link OpenOfficeManager} component.
      */
-    private OpenOfficeServerManager oomanager;
+    private OpenOfficeManager ooManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
@@ -58,16 +58,16 @@ public class OpenOfficeServerManagerVelocityContextInitializer extends AbstractL
     /**
      * The velocity bridge.
      */
-    private OpenOfficeServerManagerVelocityBridge velocityBridge;
+    private OpenOfficeManagerVelocityBridge veloBridge;
 
     /**
      * {@inheritDoc}
      */
     public void initialize(VelocityContext context)
     {
-        if (null == velocityBridge) {
-            velocityBridge = new OpenOfficeServerManagerVelocityBridge(oomanager, docBridge, execution, getLogger());
+        if (null == veloBridge) {
+            veloBridge = new OpenOfficeManagerVelocityBridge(ooManager, docBridge, execution, getLogger());
         }
-        context.put(VELOCITY_CONTEXT_KEY, velocityBridge);
+        context.put(VELOCITY_CONTEXT_KEY, veloBridge);
     }
 }

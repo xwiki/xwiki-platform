@@ -20,11 +20,12 @@
 package org.xwiki.officeimporter.internal.openoffice;
 
 import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
- * Test case for {@link DefaultOpenOfficeServerManager}.
+ * Test case for {@link DefaultOpenOfficeManager}.
  * 
  * @version $Id$
  * @since 1.8RC3
@@ -32,19 +33,24 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 public class DefaultOpenOfficeServerManagerTest extends AbstractRenderingTestCase
 {
     /**
-     * The {@link OpenOfficeServerManager} component.
+     * The {@link OpenOfficeManager} component.
      */
-    private OpenOfficeServerManager manager;
+    private OpenOfficeManager oomanager;
+
+    /**
+     * The {@link OpenOfficeConfiguration} component.
+     */
+    private OpenOfficeConfiguration ooconfig;
 
     /**
      * {@inheritDoc}
      */
-    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-
-        this.manager = (OpenOfficeServerManager) getComponentManager().lookup(OpenOfficeServerManager.class, "default");
+        this.oomanager = (OpenOfficeManager) getComponentManager().lookup(OpenOfficeManager.class);
+        this.ooconfig =
+            (OpenOfficeConfiguration) getComponentManager().lookup(OpenOfficeConfiguration.class);
     }
 
     /**
@@ -52,11 +58,9 @@ public class DefaultOpenOfficeServerManagerTest extends AbstractRenderingTestCas
      * 
      * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
      */
-    @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
-
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
     }
 
@@ -65,8 +69,10 @@ public class DefaultOpenOfficeServerManagerTest extends AbstractRenderingTestCas
      */
     public void testInitialStatus()
     {
-        assertNotNull(manager.getOfficeHome());
-        assertNotNull(manager.getOfficeProfile());
-        assertEquals(OpenOfficeServerManager.ServerState.NOT_RUNNING, manager.getServerState());
+        assertEquals(OpenOfficeConfiguration.SERVER_TYPE_INTERNAL, ooconfig.getServerType());
+        assertEquals(8100, ooconfig.getServerPort());
+        assertNotNull(ooconfig.getHomePath());
+        assertNotNull(ooconfig.getProfilePath());
+        assertEquals(OpenOfficeManager.ManagerState.NOT_CONNECTED, oomanager.getState());
     }
 }

@@ -22,56 +22,56 @@ package org.xwiki.officeimporter.openoffice;
 import net.sf.jodconverter.OfficeDocumentConverter;
 
 /**
- * Component interface for managing the oo server process.
+ * Component interface for managing openoffice server connection / process.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public interface OpenOfficeServerManager
+public interface OpenOfficeManager
 {
     /**
-     * Enum type used to represent the state of the oo server process.
+     * Enum type used to represent the state of {@link OpenOfficeManager}.
      * 
      * @version $Id$
      * @since 1.9M1
      */
-    enum ServerState
+    public enum ManagerState
     {
         /**
-         * Running.
+         * Connected.
          */
-        RUNNING("Running"),
+        CONNECTED("Connected"),
 
         /**
-         * Not running.
+         * Not connected.
          */
-        NOT_RUNNING("Not Running"),
+        NOT_CONNECTED("Not connected"),
 
         /**
          * Configuration error.
          */
         CONF_ERROR("Invalid configuration"),
-        
+
         /**
-         * Unknown server state.
+         * Error.
          */
-        UNKNOWN("Unknown");
-        
+        ERROR("Error");
+
         /**
          * Description of current server state.
          */
         private String stateDescription;
-        
+
         /**
          * Enum constructor.
          * 
          * @param stateDescription description of current server state.
          */
-        private ServerState(String stateDescription)
+        private ManagerState(String stateDescription)
         {
             this.stateDescription = stateDescription;
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -80,38 +80,34 @@ public interface OpenOfficeServerManager
             return this.stateDescription;
         }
     }
-
-    /**
-     * @return path to openoffice server installation.
-     */
-    String getOfficeHome();
-
-    /**
-     * @return path to openoffice execution profile.
-     */
-    String getOfficeProfile();
-
-    /**
-     * @return current state of oo server process.
-     */
-    ServerState getServerState();
-
-    /**
-     * Starts the oo server with configuration details from xwiki.properties file (or default values).
-     * 
-     * @throws OOServerManagerException if OpenOfficeServerManagerExceptioner start operation fails.
-     */
-    void startServer() throws OpenOfficeServerManagerException;
-
-    /**
-     * Terminates the oo server instance.
-     * 
-     * @throws OOServerManagerException if OpenOfficeServerManagerExceptioner stop operation fails.
-     */
-    void stopServer() throws OpenOfficeServerManagerException;
     
     /**
-     * @return a {@link OfficeDocumentConverter} associated with this oo server process.
+     * If an internally managed openoffice server is configured (xwiki.properties), this method will start an openoffice
+     * server process and connect to it. Otherwise this method will try to connect to an external openoffice server
+     * instance configured through xwiki.properties. Calling {@link OpenOfficeManager#start()} on an already started /
+     * connected {@link OpenOfficeManager} has no effect.
+     * 
+     * @throws OpenOfficeManagerException if the start operation fails.
+     */
+    void start() throws OpenOfficeManagerException;
+
+    /**
+     * If an internally managed openoffice server is configured (xwiki.properties), this method will disconnect from the
+     * openoffice server and terminate the server process. Otherwise this method will simply disconnect from the
+     * external openoffice server. Calling {@link OpenOfficeManager#stop()} on an already stopped / disconnected
+     * {@link OpenOfficeManager} has no effect.
+     * 
+     * @throws OpenOfficeManagerException if stop operation fails.
+     */
+    void stop() throws OpenOfficeManagerException;
+
+    /**
+     * @return current state of {@link OpenOfficeManager}.
+     */
+    ManagerState getState();
+
+    /**
+     * @return a {@link OfficeDocumentConverter} associated with this {@link OpenOfficeManager}.
      */
     OfficeDocumentConverter getDocumentConverter();
 }

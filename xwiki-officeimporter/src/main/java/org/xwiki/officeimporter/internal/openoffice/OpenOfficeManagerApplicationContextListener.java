@@ -22,9 +22,9 @@ package org.xwiki.officeimporter.internal.openoffice;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListener;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 
 /**
  * {@link ApplicationContextListener} responsible for automatically starting openoffice server instance if required.
@@ -32,28 +32,28 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeServerManagerException;
  * @version $Id$
  * @since 1.9M2
  */
-public class OpenOfficeServerManagerApplicationContextListener extends AbstractLogEnabled implements
+public class OpenOfficeManagerApplicationContextListener extends AbstractLogEnabled implements
     ApplicationContextListener
 {
     /**
-     * The {@link OpenOfficeServerConfiguration} component.
+     * The {@link OpenOfficeConfiguration} component.
      */
-    private OpenOfficeServerConfiguration serverConfiguration;
+    private OpenOfficeConfiguration ooConfig;
 
     /**
-     * The {@link OpenOfficeServerManager} component.
+     * The {@link OpenOfficeManager} component.
      */
-    private OpenOfficeServerManager serverManager;
+    private OpenOfficeManager ooManager;
 
     /**
      * {@inheritDoc}
      */
     public void initializeApplicationContext(ApplicationContext applicationContext)
     {
-        if (serverConfiguration.isAutoStart()) {
+        if (ooConfig.isAutoStart()) {
             try {
-                serverManager.startServer();
-            } catch (OpenOfficeServerManagerException ex) {
+                ooManager.start();
+            } catch (OpenOfficeManagerException ex) {
                 getLogger().error(ex.getMessage(), ex);
             }
         }
@@ -65,8 +65,8 @@ public class OpenOfficeServerManagerApplicationContextListener extends AbstractL
     public void destroyApplicationContext(ApplicationContext applicationContext)
     {
         try {
-            serverManager.stopServer();
-        } catch (OpenOfficeServerManagerException ex) {
+            ooManager.stop();
+        } catch (OpenOfficeManagerException ex) {
             getLogger().error(ex.getMessage(), ex);
         }
     }        

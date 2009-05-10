@@ -39,7 +39,7 @@ ${Msz}Mb##
 #if($hasEdit || $hasAdmin)
           <span class="xwikibuttonlinks">
             ## Delete attachment link
-            <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=${redirect}")" onclick="return confirm('$msg.get('core.viewers.attachments.confirmDelete')');" title="$msg.get('core.viewers.attachments.deleteTitle', [$xwiki.getXMLEncoded($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
+            <a class="deletelink" href="$doc.getAttachmentURL(${attach.filename}, 'delattachment', "xredirect=${redirect}")"  title="$msg.get('core.viewers.attachments.deleteTitle', [$xwiki.getXMLEncoded($attach.filename)])">$msg.get('core.viewers.attachments.delete')</a>
             ## Dav Edit attachment link. We display the link hidden by default, and let the WebDAV JSX extension display it if
             ## the browser supports Dav Edit 
 	    #set($documentUrl=$doc.getExternalURL("download"))
@@ -51,7 +51,7 @@ ${Msz}Mb##
               #set($prefix=$listtool.get($fragments, 0))
               #set($suffix=$listtool.get($fragments, 1))
               #set($davUrl="$prefix$webdavSignature$suffix")
-              <a class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get("webdaveditattachment")</a>
+              <a title="$msg.get('core.viewers.attachments.webdavEdit.title')" class="editlink hidden" href="$davUrl" onclick="if(XWiki && XWiki.WebDAV){XWiki.WebDAV.davEdit('$davUrl')}; return false;">$msg.get('core.viewers.attachments.webdavEdit')</a>
             #end
          </span>
 #end ## hasEdit

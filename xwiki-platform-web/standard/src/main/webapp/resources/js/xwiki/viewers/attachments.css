@@ -1,3 +1,4 @@
+/* Attachment form style */
 .attachmentActionButton {
   background-color: transparent;
   border: none;
@@ -7,7 +8,6 @@
   background: transparent 2px center no-repeat;
   padding-left: 20px;
 }
-
 .add-file-input {
   margin-left: 10px;
   background-position: 2px top;
@@ -16,7 +16,6 @@
 .add-file-input:hover {
   color: #070;
 }
-
 .remove-file-input {
   background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
   width: 16px;
@@ -25,8 +24,25 @@
 .remove-file-input:hover {
   color: #D00;
 }
-
 .uploadFileInput {
   margin: 5px 10px !important;
   border: 1px solid #ddd !important;
+}
+/* Attachment "toolbox" style */
+.attachment .xwikibuttonlinks a {
+  width: 16px;
+  height: 16px;
+  text-indent: 30px;
+  line-height: 30px;
+  overflow: hidden;
+  background: transparent left top no-repeat;
+  display: block;
+  float: right;
+  margin: 0 0 0 4px;
+}
+.attachment .xwikibuttonlinks a.deletelink {
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+}
+.attachment .xwikibuttonlinks a.editlink {
+  background-image: url($xwiki.getSkinFile('icons/silk/pencil.gif'));
 }

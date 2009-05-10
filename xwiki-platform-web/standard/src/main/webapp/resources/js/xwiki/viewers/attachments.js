@@ -16,11 +16,67 @@ XWiki.viewers.Attachments = Class.create({
   /** Constructor. Adds all the JS improvements of the Attachment area. */
   initialize : function() {
     if ($("attachform")) {
+      // Listeners for AJAX attachment deletion
+      this.addDeleteListener();
       // If the upload form is already visible, enhance it.
       this.prepareForm();
     } else {
       // Otherwise, we wait for a notification for the AJAX loading of the Attachments metadata tab.
       this.addTabLoadListener();
+    }
+  },
+  /**
+   * Ajax attachment deletion.
+   * For all delete buttons, listen to "click", and make ajax request to remove the attachment. Remove the corresponding
+   * HTML element on succes. Display error message (alert) on failure.
+   */
+  addDeleteListener : function() {
+    $$('.attachment .xwikibuttonlinks a.deletelink').each(function(item) {
+      item.observe('click', function(event) {
+        item.blur();
+        event.stop();
+        if (item.disabled) {
+          // Do nothing if the button was already clicked and it's waiting for a response from the server.
+          return;
+        } else if (confirm("$msg.get('core.viewers.attachments.delete.confirm')")) { // "Are you sure you want to delete?"
+          // Disable the button, to avoid a cascade of clicks from inpatient users
+          item.disabled = true;
+          // Make request to delete the attachment
+          new Ajax.Request(item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"), {
+            // Success: delete de corresponding HTML element
+            onSuccess : function() {
+              var attachment = item.up(".attachment");
+              attachment.remove();
+              this.updateCount();
+            }.bind(this),
+            // Failure: inform the user why the deletion failed
+            onFailure : function(response) {
+              var failureReason = response.statusText;
+              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                failureReason = 'Server not responding';
+              }
+              alert("$msg.get('core.viewers.attachments.delete.failed')" + failureReason);
+            },
+            // IE converts 204 status code into 1223...
+            on1223 : function(response) {
+              response.request.options.onSuccess(response);
+            },
+            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
+            on0 : function(response) {
+              response.request.options.onFailure(response);
+            },
+            // In the end: re-inable the button
+            onComplete : function() {
+              item.disabled = false;
+            }
+          });
+        }
+      }.bindAsEventListener(this));
+    }.bind(this));
+  },
+  updateCount : function() {
+    if ($("Attachmentstab") && $("Attachmentstab").down(".itemcount")) {
+      $("Attachmentstab").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $$(".attachment").size()));
     }
   },
   /** Enhance the upload form with JS behaviors. */
@@ -117,6 +173,7 @@ XWiki.viewers.Attachments = Class.create({
   addTabLoadListener : function(event) {
     var listener = function(event) {
       if (event.memo.id == 'Attachments') {
+        this.addDeleteListener();
         this.prepareForm();
         document.stopObserving("xwiki:docextra:loaded", listener);
         delete listener;

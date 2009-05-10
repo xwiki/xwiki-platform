@@ -1,51 +1,127 @@
 ###
 ### List document comments
-###
-### TODO: web service?
-###
+##
+$xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${context.language}})
+$xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
+##
+#set($xCommentClass = 'XWiki.XWikiComments')
+##
+##
+##
+#macro(addCommentToThreads $comment $commentThreads $rootKey)
+  #set($thread = $commentThreads.get("$!{comment.replyto}"))
+  #if("$!{thread}" == '')
+    #set($thread = $commentThreads.get($rootKey))
+  #end
+  #set($discard = $thread.add($comment.number))
+  #set($thread = '')
+#end
+##
+##
+##
+#macro(displayThread $key $commentThreads)
+  #if("$!{request.replyto}" == "$!{key}")
+    #displayCommentForm()
+    #set($replied = true)
+  #end
+  #set($thread = $commentThreads.get("$!key"))
+  #if($thread.size() > 0)
+    <ul class="commentreplies">
+    #foreach($commentID in $thread)
+      <li class="reply">
+      #displayComment($doc.getObject($xCommentClass, $commentID))
+      <div class="commentthread">
+        #displayThread($commentID, $commentThreads)
+      </div>
+      </li>
+    #end
+    </ul>
+  #end
+#end
+##
+##
+##
+#macro(displayComment $comment)
+  <div id="xwikicomment_${comment.number}" class="xwikicomment">
+    ##<div class="commentavatar">#useravatar($comment.author)</div>
+    <div class="commentheader">
+      <div>
+      <span class="commentauthor">$!xwiki.getUserName($doc.display('author', 'view', $comment))</span>##
+      #set($date = $comment.getProperty('date').value)
+## Don't indent, otherwise the comma will be misplaced
+#if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
+      </div>
+      <span class="commenttools">
+      #if($xwiki.hasAccessLevel('comment') && "$!{request.replyto}" != "${comment.number}")
+        <span class="commenttool commentreply"><a class="commentreply" href="${request.getRequestURL()}?replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')">$msg.get('core.viewers.comments.reply')</a></span>
+      #end
+      #if($hasEdit) 
+        <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>
+      #end
+      </span>## commenttools
+    </div>## commentheader
+    <div class="commentcontent">$doc.display('comment', 'view', $comment)</div>
+  </div>## xwikicomment
+#end
+##
+##
+##
+#macro(displayCommentForm)
+  #if($xwiki.hasAccessLevel('comment'))
+    <form action="$doc.getURL('commentadd')" method="post" id="AddComment">
+      <fieldset class="expanded" id="commentform">
+        <legend>$msg.get('core.viewers.comments.add.title')</legend>
+        <input type="hidden" name="xredirect" value="${doc.getURL('view')}#Comments" />
+        #if($context.user != 'XWiki.XWikiGuest')
+           <label>$msg.get('core.viewers.comments.add.guestName.prompt') $xwiki.getUserName($context.user)</label>
+           <input type="hidden" name="${xCommentClass}_author" value="$context.user"/>
+        #else
+          <label>$msg.get('core.viewers.comments.add.guestName.prompt') <input type="text" name="${xCommentClass}_author" value="$msg.get('core.viewers.comments.add.guestName.default')"/></label>
+        #end
+        <input type="hidden" name="${xCommentClass}_date" value=""/>
+        <input type="hidden" name="${xCommentClass}_replyto" value="$!{request.replyto}"/>
+        <div class="commentcontainer">
+           <label>$msg.get('core.viewers.comments.add.comment.label')</label>
+           <textarea id='${xCommentClass}_comment' rows='5' cols="80" name='${xCommentClass}_comment'></textarea>
+        </div>
+        <div>
+          <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.comments.add.submit')" class="button"/></span>
+          <span class="buttonwrapper"><input #if("$!{request.replyto}" == '') type="reset" #else type="submit" #end value="$msg.get('core.viewers.comments.add.cancel')" class="button" name="action_cancel"/></span> 
+        </div>
+      </fieldset>
+    </form>
+  #end
+#end
+##
+##
+##
 #if($xwiki.getWebPreferenceAsInt('commentsorder', 1) == 1)
   #set($comments = $doc.getComments())
 #else
   #set($comments = $doc.getComments(false))
 #end
-  <div id="commentscontent" class="xwikiintracontent">
-    <div id="_comments">
-#if($comments.size()>0)
-#foreach($comment in $comments)
-#if($velocityCount > 1)    <hr class="commentspacer"/>
-#end
-    <div id="xwikicomment_${velocityCount}" class="xwikicomment #if($velocityCount % 2 == 1) odd #else even #end">
-##      <div class="commentavatar">#useravatar($comment.author)</div>
-      <div class="commentheader"><span class="commentauthor">$!xwiki.getUserName($doc.display('author', 'view', $comment))</span>
-#set($date = $comment.getProperty("date").value)
-#if($date)
- | <span class="commentdate">$!xwiki.formatDate($date)</span>
-#end
-#if($hasEdit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL('objectremove', "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
-    onclick="return confirm('$msg.get('core.viewers.comments.confirmDelete')')">$msg.get('core.viewers.comments.delete')</a></span>#end
-      </div>
-      <div class="commentcontent">$doc.getRenderedContent($doc.display('comment', 'view', $comment))</div>
-    </div>
-#end
+##
+##
+<div id="commentscontent" class="xwikiintracontent">
+  <div id="_comments">
+#if($comments.size() > 0)
+  #set($rootKey = "-1")
+  #set($commentThreads = $util.hashMap)
+  #set($discard = $commentThreads.put($rootKey, $util.arrayList))
+  #foreach($comment in $comments)
+    #set($discard = $commentThreads.put("${comment.number}", $util.arrayList))
+  #end
+  #foreach($comment in $comments)
+    #addCommentToThreads($comment, $commentThreads, $rootKey)
+  #end
+  #displayThread($rootKey, $commentThreads)
 #else
-$msg.get('core.viewers.comments.noComments')
+  <p class="nocomments">$msg.get('core.viewers.comments.noComments')</p>
 #end
-#if($xwiki.hasAccessLevel('comment'))
-#set($cclass = $xwiki.getDocument('XWiki.XWikiComments').getxWikiClass())
-#set($comment = $cclass.newObject())
-      <form action="$doc.getURL('commentadd')" method="post">
-        <fieldset class="expanded" id="commentform">
-        <legend onclick="toggleForm(this.form)">$msg.get('core.viewers.comments.add.title')<span class="expands">...</span></legend>
-        <input type="hidden" name="xredirect" value="${doc.getURL('view')}#Comments" />
-        <input type="hidden" name="XWiki.XWikiComments_author" value="$context.user"/>
-        <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
-        <div><textarea id='XWiki.XWikiComments_comment' rows='5' cols="80" name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
-        <div>
-        <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.comments.add.submit')" class="button"/></span>
-        <span class="buttonwrapper"><input type="reset" value="$msg.get('core.viewers.comments.add.cancel')" onclick="hideForm(this.form);" class="button"/></span>
-        </div>
-        </fieldset>
-      </form>
+##
+##
+#if(!$replied)
+  #displayCommentForm()
 #end
-    </div> ## comments
-  </div> ## commentscontent
+  </div> ## comments
+</div> ## commentscontent

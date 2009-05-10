@@ -22,6 +22,8 @@
   #end
   #set($docextras = $util.arrayList)
   #if($showcomments != false && $showcomments != "no" && $showcomments != "0" && $showcomments != "false")
+    $xwiki.jsfx.use('uicomponents/viewers/comments.js', {'forceSkinAction': true, 'language': ${context.language}})
+    $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
     #set ($discard = $docextras.add(["Comments", "comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size(), "commentsinline.vm", $msg.get("core.shortcuts.view.comments")]))
   #end
   #if($showattachments != false && $showattachments != "no" && $showattachments != "0" && $showattachments != "false")
@@ -71,7 +73,7 @@
           <li id="${extraAnchor}tab">
             #set ($args = "viewer=${extraName}")
             <a id="${extraAnchor}link" href="$doc.getURL('view', $args)">
-              $extraTabText #if($extraNbOfItems >= 0) $msg.get("docextra.extranb", [$extraNbOfItems]) #end
+              $extraTabText #if($extraNbOfItems >= 0) <span class="itemcount">$msg.get("docextra.extranb", [$extraNbOfItems])</span> #end
             </a>
           </li>
         #end
@@ -91,8 +93,6 @@
     ## JavaScript code generation
     ##
     <script type="text/javascript">
-      window.docviewurl = "${doc.getURL('view')}";
-      window.docsaveurl = "${doc.getURL('save')}";
       var hashviewer = self.document.location.hash.substring(1);
       #foreach($docextra in $docextras)
         #set ($extraAnchor = $listtool.get($docextra, 0))

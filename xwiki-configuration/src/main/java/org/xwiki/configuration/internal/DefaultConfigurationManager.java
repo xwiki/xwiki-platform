@@ -53,14 +53,41 @@ public class DefaultConfigurationManager implements ConfigurationManager
         // Look for all properties starting with the namespace prefix.
         Map<String, Object> properties = new HashMap<String, Object>();
         Iterator keys = compositeConfiguration.getKeys(namespace);
+        
         while (keys.hasNext()) {
             String key = (String) keys.next();
+            
+            // List values are handled automatically (the configuration bean must simply have a setXXX(List) signature.
+            // However we also want to handle properties in values. For ex:
+            // some.property = prop1=value1
+            // some.property = prop2=value2
+            Object valueObject = compositeConfiguration.getProperty(key);
+
+            // Verify all values are of the type key=value and if so create a Properties object.
+            if (List.class.isAssignableFrom(valueObject.getClass())) {
+                boolean isProperty = true;
+                for (Object value : (List) valueObject) {
+                    if (String.class.isAssignableFrom(value.getClass())) {
+                        String valueAsString = (String) value;
+                        if (valueAsString.indexOf('=') == -1) {
+                            isProperty = false;
+                            break;
+                        }
+                    } else {
+                        isProperty = false;
+                        break;
+                    }
+                }
+                if (isProperty) {
+                    valueObject = compositeConfiguration.getProperties(key);
+                }
+            }
+            
             // Remove the namespace prefix for each key so that BeanUtils can call the correct
             // method on the bean.
-            properties.put(key.substring(key.indexOf(namespace) + namespace.length() + 1),
-                compositeConfiguration.getProperty(key));
+            properties.put(key.substring(key.indexOf(namespace) + namespace.length() + 1), valueObject);
         }
-
+        
         // For all found properties load the java bean using BeanUtils
         try {
             BeanUtils.populate(configurationBean, properties);

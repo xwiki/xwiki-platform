@@ -33,7 +33,7 @@ li.reply {
   background-color: #FFD;
 }
 .commentauthor {
-  font-size: 100%;   /* Overriding toucan */
+  font-size: 120%;   /* Overriding toucan */
 }
 .commentdate {
   font-size: 80%;
@@ -42,7 +42,7 @@ li.reply {
   border: none;       /* Overriding toucan */
   padding: 0 36px 0 32px;
   margin: 0;
-  font-size: 80%;
+  font-size: 100%;
   font-style: italic;
   text-align: justify;
 }
@@ -71,7 +71,7 @@ li.reply {
 }
 /* Form */
 #AddComment {
-  border-top: 1px solid; 
+  border-top: 1px solid #999;
 }
 .commentthread #AddComment legend {
   display: none;     /* For replies, don't display the legend, because it is unnecessary and does not integrate well. */

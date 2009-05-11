@@ -113,6 +113,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
         inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
         plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($request.sync) sync#end',
         syntax: "$doc.syntaxId",
+        menu: 'link image table macro',
         toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
         wiki: '${doc.wiki.replace("'", "\'")}',
         space: '${doc.space.replace("'", "\'")}',

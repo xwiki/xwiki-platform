@@ -951,10 +951,10 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 
     <xsl:template name="process-style">
         <xsl:param name="style"/>
-        <!-- e.g., style="text-align: center; color: red"
-        converted to text-align="center" color="red" -->
+        <!-- e.g., style="text-align: center; color: red" converted to text-align="center" color="red" -->
+        <!-- Lowercase property names. Since we're not using XPath 2.0, we must use translate() instead of lower-case(). -->
         <xsl:variable name="name"
-                      select="normalize-space(substring-before($style, ':'))"/>
+                      select="translate(normalize-space(substring-before($style, ':')), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"/>
         <xsl:if test="$name">
             <xsl:variable name="value-and-rest"
                           select="normalize-space(substring-after($style, ':'))"/>

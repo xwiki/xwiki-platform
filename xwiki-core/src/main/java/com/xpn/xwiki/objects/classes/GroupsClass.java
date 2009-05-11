@@ -2,7 +2,6 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,9 @@ public class GroupsClass extends ListClass
     {
         List<String> list;
         try {
-            list = (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0, null, context);
+            list =
+                (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0, null,
+                    context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList<String>();
@@ -52,9 +53,9 @@ public class GroupsClass extends ListClass
     }
 
     @Override
-    public Map getMap(XWikiContext context)
+    public Map<String, ListItem> getMap(XWikiContext context)
     {
-        return new HashMap();
+        return new HashMap<String, ListItem>();
     }
 
     public boolean isUsesList()
@@ -103,7 +104,7 @@ public class GroupsClass extends ListClass
 
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);        
+        return getListFromString(value, ",", false);
     }
 
     @Override
@@ -113,18 +114,18 @@ public class GroupsClass extends ListClass
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
 
-        List list;
+        List<String> list;
         if (isUsesList()) {
             list = getList(context);
         } else {
-            list = new ArrayList();
+            list = new ArrayList<String>();
         }
 
-        List selectlist;
+        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
+            selectlist = new ArrayList<String>();
         } else {
             selectlist = getListFromString((String) prop.getValue());
         }
@@ -138,14 +139,12 @@ public class GroupsClass extends ListClass
 
         // Add options from Set
 
-        for (Iterator it = selectlist.iterator(); it.hasNext();) {
-            String value = it.next().toString();
+        for (String value : selectlist) {
             if (!list.contains(value)) {
                 list.add(value);
             }
         }
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            String value = it.next().toString();
+        for (String value : list) {
             String display = getText(value, context);
             option option = new option(display, value);
             option.addElement(display);

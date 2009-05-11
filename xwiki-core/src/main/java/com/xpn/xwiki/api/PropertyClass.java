@@ -31,58 +31,140 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.util.Programming;
 
+/**
+ * <p>
+ * XProperty definition API.
+ * </p>
+ * <p>
+ * A <strong>property definition</strong> is the instantiation of a {@link com.xpn.xwiki.objects.meta.PropertyMetaClass}
+ * for a particular <strong>Object definition</strong> ({@link Class XClass}), that customizes a property type to suit
+ * the needs of the class. For example, it can set the number type for a
+ * {@link com.xpn.xwiki.objects.classes.NumberClass}, the list of possible values for a
+ * {@link com.xpn.xwiki.objects.classes.StaticListClass}, etc.
+ * </p>
+ * 
+ * @version $Id$
+ */
 public class PropertyClass extends Collection
 {
-    public PropertyClass(com.xpn.xwiki.objects.classes.PropertyClass property,
-        XWikiContext context)
+    /**
+     * Default API constructor that creates a wrapper for a {@link com.xpn.xwiki.objects.classes.PropertyClass}, given a
+     * {@link com.xpn.xwiki.XWikiContext context}.
+     * 
+     * @param property the property definition to wrap
+     * @param context the current request context
+     */
+    public PropertyClass(com.xpn.xwiki.objects.classes.PropertyClass property, XWikiContext context)
     {
         super(property, context);
     }
 
+    /**
+     * Internal access to the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass}.
+     * 
+     * @return the wrapped property definition
+     */
     protected com.xpn.xwiki.objects.classes.PropertyClass getBasePropertyClass()
     {
         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
     }
 
+    /**
+     * Get the full name of the actual class of the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass}. The
+     * returned value is the canonical class name of the runtime object representing this property definition, for
+     * example {@code com.xpn.xwiki.objects.classes.StringClass}.
+     * 
+     * @return the canonical class name of the wrapped property definition
+     * @see #getType() {@code getType()} for a more user-friendly type
+     */
     public String getClassType()
     {
         return getBasePropertyClass().getClassType();
     }
 
+    /**
+     * Get the actual type of the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass}. The returned value is
+     * extracted from the class name of the runtime object representing this property definition, and denotes a
+     * user-friendly data type name, for example {@code StringClass}, {@code NumberClass} or {@code StaticListClass}.
+     * 
+     * @return the type of this property definition
+     * @see #getClassType() {@code getClassType()} for a more formal type
+     */
     public String getType()
     {
-        String result = getBasePropertyClass().getClassType();
-        return result.substring(result.lastIndexOf(".") + 1);
+        return StringUtils.substringAfterLast(getClassType(), ".");
     }
 
+    /**
+     * Get the name of the {@link com.xpn.xwiki.api.Class XClass} (Object Definition) this property definition belongs
+     * to. For example, {@code XWiki.XWikiUsers} or {@code Blog.BlogPostClass}.
+     * 
+     * @return the name of the owner XClass
+     */
     public String getClassName()
     {
-        return getCollection().getClassName();
+        return getBasePropertyClass().getObject().getName();
     }
 
+    /**
+     * Provides access to the wrapped {@link com.xpn.xwiki.objects.classes.PropertyClass} if Programming Rights are
+     * present.
+     * 
+     * @return the wrapped property definition
+     */
+    @Programming
     public com.xpn.xwiki.objects.classes.PropertyClass getPropertyClass()
     {
         if (hasProgrammingRights()) {
-            return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
+            return getBasePropertyClass();
         }
         return null;
     }
 
+    /**
+     * Get the untranslated user-friendly name of this property. For example, {@code User type} instead of the internal
+     * {@code usertype}.
+     * 
+     * @return the configured pretty name of this property definition
+     * @see #getName() {@code getName()} returns the actual property name
+     */
+    @Override
     public String getPrettyName()
     {
         return getBasePropertyClass().getPrettyName();
     }
 
+    /**
+     * Get the message that should be displayed when a value for an instance of this property definition fails the
+     * validation. For example, {@code Please enter a valid IP address}.
+     * 
+     * @return the configured validation message
+     * @see #getValidationRegExp() {@code getValidationRegExp()} returns the regular expression used for validating the
+     *      property value
+     */
     public String getValidationMessage()
     {
         return getBasePropertyClass().getValidationMessage();
     }
 
+    /**
+     * Get the regular expression used for validating a value for an instance of this property definition.
+     * 
+     * @return a string representation of the validation regular expression
+     * @see #getValidationMessage() {@code getValidationMessage()} returns the message that should be displayed in case
+     *      the validation failed
+     */
     public String getValidationRegExp()
     {
         return getBasePropertyClass().getValidationRegExp();
     }
 
+    /**
+     * Get a tooltip string that should be displayed for input fields for instances of this property definition.
+     * 
+     * @return A raw tooltip string. The value does not escape special HTML characters, so the caller should manually
+     *         escape quotes if the tooltip should be used as a value for the HTML {@code title} attribute.
+     */
     public String getTooltip()
     {
         return getBasePropertyClass().getTooltip();

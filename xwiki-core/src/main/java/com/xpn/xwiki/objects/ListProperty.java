@@ -33,7 +33,7 @@ import org.hibernate.collection.PersistentCollection;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
-    protected List list = new ArrayList();
+    protected List<String> list = new ArrayList<String>();
 
     private String formStringSeparator = "|";
 
@@ -66,7 +66,7 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public void setValue(Object value)
     {
-        this.setList((List) value);
+        this.setList((List<String>) value);
     }
 
     public String getTextValue()
@@ -100,8 +100,8 @@ public class ListProperty extends BaseProperty implements Cloneable
         CharacterFilter filter = new CharacterFilter();
         filter.addAttribute(this.formStringSeparator, "\\" + this.formStringSeparator);
 
-        List list = getList();
-        Iterator it = list.iterator();
+        List<String> list = getList();
+        Iterator<String> it = list.iterator();
         if (!it.hasNext()) {
             return "";
         }
@@ -109,7 +109,7 @@ public class ListProperty extends BaseProperty implements Cloneable
         result.append(it.next());
         while (it.hasNext()) {
             result.append(this.formStringSeparator);
-            result.append(filter.process((String) it.next()));
+            result.append(filter.process(it.next()));
         }
 
         return result.toString();
@@ -127,8 +127,8 @@ public class ListProperty extends BaseProperty implements Cloneable
             return false;
         }
 
-        List list1 = (List) getValue();
-        List list2 = (List) ((BaseProperty) obj).getValue();
+        List<String> list1 = getList();
+        List<String> list2 = (List<String>) ((BaseProperty) obj).getValue();
 
         // If the collection was not yet initialized by Hibernate
         // Let's use the super result..
@@ -165,31 +165,31 @@ public class ListProperty extends BaseProperty implements Cloneable
     public Object clone()
     {
         ListProperty property = (ListProperty) super.clone();
-        List list = new ArrayList();
-        for (Iterator it = getList().iterator(); it.hasNext();) {
-            list.add(it.next());
+        List<String> list = new ArrayList<String>();
+        for (String entry : getList()) {
+            list.add(entry);
         }
         property.setValue(list);
 
         return property;
     }
 
-    public List getList()
+    public List<String> getList()
     {
         return this.list;
     }
 
-    public void setList(List list)
+    public void setList(List<String> list)
     {
         if (list == null) {
-            this.list = new ArrayList();
+            this.list = new ArrayList<String>();
         } else {
             this.list = list;
             // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
             // safe to assume that a retrieved NULL value should actually be an empty string.
-            for (int i = 0; i < list.size(); ++i) {
-                if (list.get(i) == null) {
-                    list.remove(i--);
+            for (Iterator<String> it = this.list.iterator(); it.hasNext();) {
+                if (it.next() == null) {
+                    it.remove();
                 }
             }
         }
@@ -204,13 +204,11 @@ public class ListProperty extends BaseProperty implements Cloneable
     public Element toXML()
     {
         Element el = new DOMElement(getName());
-        List list = (List) getValue();
-        for (int i = 0; i < list.size(); i++) {
-            Object obj = list.get(i);
-            if (obj != null) {
-                String value = obj.toString();
+        List<String> list = getList();
+        for (String value : list) {
+            if (value != null) {
                 Element vel = new DOMElement("value");
-                vel.setText((value == null) ? "" : value);
+                vel.setText(value);
                 el.add(vel);
             }
         }

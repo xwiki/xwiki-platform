@@ -21,16 +21,18 @@
 
 package com.xpn.xwiki.user.api;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.List;
-
-public interface XWikiRightService {
+public interface XWikiRightService
+{
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context) throws XWikiException;
+    public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
+        throws XWikiException;
 
     public boolean hasProgrammingRights(XWikiContext context);
 
@@ -38,5 +40,5 @@ public interface XWikiRightService {
 
     public boolean hasAdminRights(XWikiContext context);
 
-    public List listAllLevels(XWikiContext context) throws XWikiException;
+    public List<String> listAllLevels(XWikiContext context) throws XWikiException;
 }

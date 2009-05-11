@@ -2,7 +2,6 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,14 +32,15 @@ public class LevelsClass extends ListClass
         this(null);
     }
 
-    public List getList(XWikiContext context)
+    @Override
+    public List<String> getList(XWikiContext context)
     {
-        List list;
+        List<String> list;
         try {
             list = context.getWiki().getRightService().listAllLevels(context);
         } catch (XWikiException e) {
             // TODO add log exception
-            list = new ArrayList();
+            list = new ArrayList<String>();
         }
 
         XWikiRequest req = context.getRequest();
@@ -54,16 +54,19 @@ public class LevelsClass extends ListClass
         return list;
     }
 
-    public Map getMap(XWikiContext context)
+    @Override
+    public Map<String, ListItem> getMap(XWikiContext context)
     {
-        return new HashMap();
+        return new HashMap<String, ListItem>();
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         return new StringProperty();
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         BaseProperty prop = newProperty();
@@ -71,16 +74,17 @@ public class LevelsClass extends ListClass
         return prop;
     }
 
+    @Override
     public BaseProperty fromStringArray(String[] strings)
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         for (int i = 0; i < strings.length; i++) {
             if (!strings[i].trim().equals("")) {
                 list.add(strings[i]);
             }
         }
         BaseProperty prop = newProperty();
-        prop.setValue(StringUtils.join(list.toArray(), ","));
+        prop.setValue(StringUtils.join(list, ","));
         return prop;
     }
 
@@ -91,29 +95,28 @@ public class LevelsClass extends ListClass
 
     public static List<String> getListFromString(String value)
     {
-        return getListFromString(value, ",", false);        
+        return getListFromString(value, ",", false);
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
 
-        List list = getList(context);
-        List selectlist;
+        List<String> list = getList(context);
+        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
+            selectlist = new ArrayList<String>();
         } else {
             selectlist = getListFromString((String) prop.getValue());
         }
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            String value = it.next().toString();
+        for (String value : list) {
             String display = getText(value, context);
             option option = new option(display, value);
             option.addElement(display);
@@ -134,6 +137,7 @@ public class LevelsClass extends ListClass
         buffer.append(in.toString());
     }
 
+    @Override
     public BaseProperty newPropertyfromXML(Element ppcel)
     {
         String value = ppcel.getText();

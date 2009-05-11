@@ -20,47 +20,89 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-public class ListItem {
+/**
+ * An entry in a List or in a Tree.
+ * 
+ * @version $Id$
+ */
+public class ListItem
+{
+    /** A unique identifier of this item, the actual value stored in the database when selecting items from a list. */
     private String id = "";
+
+    /** A user-friendly value that gets displayed in the user interface, representing this item. */
     private String value = "";
+
+    /** An optional reference to another item that allows to build parent-child relations, forming a tree. */
     private String parent = "";
 
-    public ListItem(String id) {
+    /**
+     * Constructor that initializes both the {@link #id internal ID} and the {@link #value displayed value} with the
+     * same value, leaving the {@link #parent} field empty.
+     * 
+     * @param id the value to use for the id and the displayed value
+     */
+    public ListItem(String id)
+    {
         this.setId(id);
         this.setValue(id);
     }
 
-    public ListItem(String id, String value) {
-        this(id);
+    /**
+     * Constructor that initializes the {@link #id internal ID} and the {@link #value displayed value}, leaving the
+     * {@link #parent} field empty.
+     * 
+     * @param id the value to use for the internal id
+     * @param value the value to use for the displayed value
+     */
+    public ListItem(String id, String value)
+    {
+        this.setId(id);
         this.setValue(value);
     }
-    public ListItem(String id, String value, String parent) {
-        this(id, value);
+
+    /**
+     * Constructor that initializes all of the {@link #id internal ID}, the {@link #value displayed value}, and the
+     * {@link #parent} fields.
+     * 
+     * @param id the value to use for the internal id
+     * @param value the value to use for the displayed value
+     * @param parent the value to use for the item's parent
+     */
+    public ListItem(String id, String value, String parent)
+    {
+        this.setId(id);
+        this.setValue(value);
         this.setParent(parent);
     }
 
-
-    public String getId() {
-        return id;
+    public String getId()
+    {
+        return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(String id)
+    {
         this.id = id;
     }
 
-    public String getValue() {
-        return value;
+    public String getValue()
+    {
+        return this.value;
     }
 
-    public void setValue(String value) {
+    public void setValue(String value)
+    {
         this.value = value;
     }
 
-    public String getParent() {
-        return parent;
+    public String getParent()
+    {
+        return this.parent;
     }
 
-    public void setParent(String parent) {
+    public void setParent(String parent)
+    {
         this.parent = parent;
     }
 }

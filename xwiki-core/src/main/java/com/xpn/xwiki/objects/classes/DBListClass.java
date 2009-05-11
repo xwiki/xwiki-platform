@@ -23,7 +23,6 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -37,7 +36,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
@@ -48,7 +46,7 @@ public class DBListClass extends ListClass
 
     private static final Log LOG = LogFactory.getLog(DBListClass.class);
 
-    private List cachedDBList;
+    private List<ListItem> cachedDBList;
 
     public DBListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
@@ -65,43 +63,41 @@ public class DBListClass extends ListClass
         this(null);
     }
 
-    public List makeList(List list)
+    public List<ListItem> makeList(List<Object> list)
     {
-        List list2 = new ArrayList();
-        for (int i = 0; i < list.size(); i++) {
-            Object result = list.get(i);
-
+        List<ListItem> result = new ArrayList<ListItem>();
+        for (Object item : list) {
             // Oracle databases treat NULL and empty strings similarly. Thus the list passed
             // as parameter can have some elements being NULL (for XWiki string properties which
             // were empty strings). This means we need to check for NULL and ignore NULL entries
             // from the list.
-            if (result != null) {
-                if (result instanceof String) {
-                    list2.add(new ListItem((String) result));
+            if (item != null) {
+                if (item instanceof String) {
+                    result.add(new ListItem((String) item));
                 } else {
-                    Object[] res = (Object[]) result;
+                    Object[] res = (Object[]) item;
                     if (res.length == 1) {
-                        list2.add(new ListItem(res[0].toString()));
+                        result.add(new ListItem(res[0].toString()));
                     } else if (res.length == 2) {
-                        list2.add(new ListItem(res[0].toString(), res[1].toString()));
+                        result.add(new ListItem(res[0].toString(), res[1].toString()));
                     } else {
-                        list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2].toString()));
+                        result.add(new ListItem(res[0].toString(), res[1].toString(), res[2].toString()));
                     }
                 }
             }
         }
-        return list2;
+        return result;
     }
 
-    public List getDBList(XWikiContext context)
+    public List<ListItem> getDBList(XWikiContext context)
     {
-        List list = getCachedDBList(context);
+        List<ListItem> list = getCachedDBList(context);
         if (list == null || getIntValue("cache") != 1) {
             XWiki xwiki = context.getWiki();
             String query = getQuery(context);
 
             if (query == null) {
-                list = new ArrayList();
+                list = new ArrayList<ListItem>();
             } else {
                 try {
                     if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
@@ -111,7 +107,7 @@ public class DBListClass extends ListClass
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    list = new ArrayList();
+                    list = new ArrayList<ListItem>();
                 }
             }
             setCachedDBList(list, context);
@@ -120,34 +116,34 @@ public class DBListClass extends ListClass
     }
 
     @Override
-    public List getList(XWikiContext context)
+    public List<String> getList(XWikiContext context)
     {
-        List dblist = getDBList(context);
-        List list = new ArrayList();
+        List<ListItem> dblist = getDBList(context);
+        List<String> result = new ArrayList<String>();
         for (int i = 0; i < dblist.size(); i++) {
-            list.add(((ListItem) dblist.get(i)).getId());
+            result.add((dblist.get(i)).getId());
         }
-        return list;
+        return result;
     }
 
     @Override
-    public Map getMap(XWikiContext context)
+    public Map<String, ListItem> getMap(XWikiContext context)
     {
-        List list = getDBList(context);
-        Map map = new HashMap();
+        List<ListItem> list = getDBList(context);
+        Map<String, ListItem> result = new HashMap<String, ListItem>();
         if ((list == null) || (list.size() == 0)) {
-            return map;
+            return result;
         }
         for (int i = 0; i < list.size(); i++) {
             Object res = list.get(i);
             if (res instanceof String) {
-                map.put(res, res);
+                result.put((String) res, new ListItem((String) res));
             } else {
                 ListItem item = (ListItem) res;
-                map.put(item.getId(), item);
+                result.put(item.getId(), item);
             }
         }
-        return map;
+        return result;
     }
 
     /**
@@ -231,8 +227,8 @@ public class DBListClass extends ListClass
                 // Build the query in this variable.
                 StringBuffer select = new StringBuffer("select distinct ");
                 // These will hold the components of the from and where parts of the query.
-                ArrayList fromStatements = new ArrayList();
-                ArrayList whereStatements = new ArrayList();
+                List<String> fromStatements = new ArrayList<String>();
+                List<String> whereStatements = new ArrayList<String>();
 
                 // Add the document to the query only if it is needed.
                 if (usesDoc) {
@@ -336,16 +332,16 @@ public class DBListClass extends ListClass
         setStringValue("valueField", valueField);
     }
 
-    public List getCachedDBList(XWikiContext context)
+    public List<ListItem> getCachedDBList(XWikiContext context)
     {
         if (isCache()) {
             return this.cachedDBList;
         } else {
-            return (List) context.get(context.getDatabase() + ":" + getFieldFullName());
+            return (List<ListItem>) context.get(context.getDatabase() + ":" + getFieldFullName());
         }
     }
 
-    public void setCachedDBList(List cachedDBList, XWikiContext context)
+    public void setCachedDBList(List<ListItem> cachedDBList, XWikiContext context)
     {
         if (isCache()) {
             this.cachedDBList = cachedDBList;
@@ -360,7 +356,7 @@ public class DBListClass extends ListClass
         this.cachedDBList = null;
     }
 
-    // return first or second col from user query
+    // return first or second column from user query
     public String returnCol(String hibquery, boolean first)
     {
         String firstCol = "-", secondCol = "-";
@@ -562,17 +558,17 @@ public class DBListClass extends ListClass
                 buffer.append(getDisplayValue(val, name, map, context));
             }
         } else {
-            List selectlist;
+            List<String> selectlist;
             String separator = getSeparator();
             BaseProperty prop = (BaseProperty) object.safeget(name);
-            Map map = getMap(context);
-            if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-                selectlist = (List) prop.getValue();
-                List newlist = new ArrayList();
-                for (Iterator it = selectlist.iterator(); it.hasNext();) {
-                    newlist.add(getDisplayValue(it.next(), name, map, context));
+            Map<String, ListItem> map = getMap(context);
+            if (prop instanceof ListProperty) {
+                selectlist = ((ListProperty) prop).getList();
+                List<String> newlist = new ArrayList<String>();
+                for (String entry : selectlist) {
+                    newlist.add(getDisplayValue(entry, name, map, context));
                 }
-                buffer.append(StringUtils.join(newlist.toArray(), separator));
+                buffer.append(StringUtils.join(newlist, separator));
             } else {
                 buffer.append(getDisplayValue(prop.getValue(), name, map, context));
             }

@@ -26,6 +26,7 @@ import java.util.Comparator;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class Class extends Collection
@@ -40,6 +41,7 @@ public class Class extends Collection
         return (BaseClass) getCollection();
     }
 
+    @Override
     public java.lang.Object[] getPropertyNames()
     {
         Element[] properties = getProperties();
@@ -57,10 +59,11 @@ public class Class extends Collection
     /**
      * @return an array with the properties of the class
      */
+    @Override
     public Element[] getProperties()
     {
-        java.util.Collection<com.xpn.xwiki.objects.classes.PropertyClass> coll =
-            getCollection().getFieldList();
+        @SuppressWarnings("unchecked")
+        java.util.Collection<com.xpn.xwiki.objects.classes.PropertyClass> coll = getCollection().getFieldList();
         if (coll == null) {
             return null;
         }
@@ -81,8 +84,8 @@ public class Class extends Collection
      */
     public Element get(String name)
     {
-        return new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) getCollection()
-            .safeget(name), getXWikiContext());
+        return new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name),
+            getXWikiContext());
     }
 
     /**
@@ -107,18 +110,10 @@ public class Class extends Collection
     }
 }
 
-class PropertyComparator implements Comparator
+class PropertyComparator implements Comparator<PropertyClass>
 {
-    public int compare(java.lang.Object o1, java.lang.Object o2)
+    public int compare(PropertyClass o1, PropertyClass o2)
     {
-        PropertyClass po1 = (PropertyClass) o1;
-        PropertyClass po2 = (PropertyClass) o2;
-        if (po1.getNumber() < po2.getNumber()) {
-            return -1;
-        }
-        if (po1.getNumber() > po2.getNumber()) {
-            return 1;
-        }
-        return 0;
+        return o1.getNumber() - o2.getNumber();
     }
 }

@@ -679,7 +679,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                     level = new LevelTree();
                     rightsMap.put(levelName, level);
                 } else {
-                    level = (LevelTree) rightsMap.get(levelName);
+                    level = rightsMap.get(levelName);
                 }
 
                 AllowDeny allowdeny;
@@ -734,7 +734,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             }
 
             for (String levelName : levelsToMatch) {
-                if (!rightsMap.containsKey(levelName) || ((LevelTree) rightsMap.get(levelName)).inherited == null) {
+                if (!rightsMap.containsKey(levelName) || (rightsMap.get(levelName)).inherited == null) {
                     levelInherited.add(levelName);
                 }
             }
@@ -860,7 +860,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         Map<String, LevelTree> rightsMap = getLevelTreeMap(doc, rights, global, context);
 
-        return (LevelTree) rightsMap.get(levelName);
+        return rightsMap.get(levelName);
     }
 
     /**

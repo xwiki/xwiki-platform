@@ -201,9 +201,9 @@ public abstract class ListClass extends PropertyClass
         return list;
     }
 
-    public static Map getMapFromString(String value)
+    public static Map<String, ListItem> getMapFromString(String value)
     {
-        Map map = new HashMap();
+        Map<String, ListItem> map = new HashMap<String, ListItem>();
         if (value == null) {
             return map;
         }
@@ -261,7 +261,7 @@ public abstract class ListClass extends PropertyClass
             return fromString(strings[0]);
         }
 
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         ((ListProperty) prop).setList(list);
 
         if (strings.length == 0) {
@@ -290,18 +290,19 @@ public abstract class ListClass extends PropertyClass
             return super.newPropertyfromXML(ppcel);
         }
 
-        List elist = ppcel.elements("value");
+        @SuppressWarnings("unchecked")
+        List<Element> elist = ppcel.elements("value");
         BaseProperty lprop = newProperty();
 
         if (lprop instanceof ListProperty) {
-            List llist = ((ListProperty) lprop).getList();
+            List<String> llist = ((ListProperty) lprop).getList();
             for (int i = 0; i < elist.size(); i++) {
-                Element el = (Element) elist.get(i);
+                Element el = elist.get(i);
                 llist.add(el.getText());
             }
         } else {
             for (int i = 0; i < elist.size(); i++) {
-                Element el = (Element) elist.get(i);
+                Element el = elist.get(i);
                 ((StringProperty) lprop).setValue(el.getText());
             }
         }
@@ -413,17 +414,17 @@ public abstract class ListClass extends PropertyClass
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        List selectlist;
+        List<String> selectlist;
         String separator = getSeparator();
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        Map map = getMap(context);
-        if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
-            List newlist = new ArrayList();
-            for (Iterator it = selectlist.iterator(); it.hasNext();) {
-                newlist.add(getDisplayValue(it.next(), name, map, context));
+        Map<String, ListItem> map = getMap(context);
+        if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
+            List<String> newlist = new ArrayList<String>();
+            for (String value : selectlist) {
+                newlist.add(getDisplayValue(value, name, map, context));
             }
-            buffer.append(StringUtils.join(newlist.toArray(), separator));
+            buffer.append(StringUtils.join(newlist, separator));
         } else {
             buffer.append(getDisplayValue(prop.getValue(), name, map, context));
         }
@@ -458,23 +459,22 @@ public abstract class ListClass extends PropertyClass
     protected void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        List list = getList(context);
-        Map map = getMap(context);
-        List selectlist;
+        List<String> list = getList(context);
+        Map<String, ListItem> map = getMap(context);
+        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
-        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
+            selectlist = new ArrayList<String>();
+        } else if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList();
-            selectlist.add(prop.getValue());
+            selectlist = new ArrayList<String>();
+            selectlist.add(String.valueOf(prop.getValue()));
         }
 
         // TODO: add elements that are in the values but not in the predefined list..
-        for (Iterator it = selectlist.iterator(); it.hasNext();) {
-            String item = (String) it.next();
+        for (String item : selectlist) {
             if (!list.contains(item)) {
                 list.add(item);
             }
@@ -482,8 +482,7 @@ public abstract class ListClass extends PropertyClass
 
         // Add options from Set
         int count = 0;
-        for (Iterator it = list.iterator(); it.hasNext(); count++) {
-            Object rawvalue = it.next();
+        for (Object rawvalue : list) {
             String value = getElementValue(rawvalue);
             input radio =
                 new input((getDisplayType().equals("radio") && !isMultiSelect()) ? input.radio : input.checkbox, prefix
@@ -591,9 +590,9 @@ public abstract class ListClass extends PropertyClass
         buffer.append(select.toString());
     }
 
-    public abstract List getList(XWikiContext context);
+    public abstract List<String> getList(XWikiContext context);
 
-    public abstract Map getMap(XWikiContext context);
+    public abstract Map<String, ListItem> getMap(XWikiContext context);
 
     @Override
     public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)

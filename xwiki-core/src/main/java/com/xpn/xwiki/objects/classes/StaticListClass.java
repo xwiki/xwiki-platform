@@ -21,48 +21,57 @@
 
 package com.xpn.xwiki.objects.classes;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.meta.PropertyMetaClass;
-import com.xpn.xwiki.XWiki;
-
 import java.util.List;
 import java.util.Map;
 
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseProperty;
 import org.apache.ecs.xhtml.input;
 
-public class StaticListClass extends ListClass {
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-    public StaticListClass(PropertyMetaClass wclass) {
+public class StaticListClass extends ListClass
+{
+
+    public StaticListClass(PropertyMetaClass wclass)
+    {
         super("staticlist", "Static List", wclass);
         setSeparators(" ,|");
     }
 
-    public StaticListClass() {
+    public StaticListClass()
+    {
         this(null);
     }
 
-    public String getValues() {
+    public String getValues()
+    {
         return getStringValue("values");
     }
 
-    public void setValues(String values) {
+    public void setValues(String values)
+    {
         setStringValue("values", values);
     }
 
-    public List getList(XWikiContext context) {
+    @Override
+    public List<String> getList(XWikiContext context)
+    {
         String values = getValues();
         return getListFromString(values);
     }
 
-    public Map getMap(XWikiContext context) {
+    @Override
+    public Map<String, ListItem> getMap(XWikiContext context)
+    {
         String values = getValues();
         return getMapFromString(values);
     }
-    
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         if (getDisplayType().equals("input")) {
             input input = new input();
@@ -74,34 +83,38 @@ public class StaticListClass extends ListClass {
             input.setSize(getSize());
             input.setName(prefix + name);
             input.setID(prefix + name);
-            
-            if(isPicker()) {
-            	input.addAttribute("autocomplete", "off");
-            	String path = "";
-           	 	XWiki xwiki = context.getWiki();
-           	 	path = xwiki.getURL("Main.WebHome", "view", context);
-            	
-            	String classname = this.getObject().getName();
-           	 	String fieldname = this.getName();
-           	 	String secondCol = "-", firstCol = "-";
-           	 	
-           	 	String script = "\""+path+"?xpage=suggest&amp;classname="+classname+"&amp;fieldname="+fieldname+"&amp;firCol="+firstCol+"&amp;secCol="+secondCol+"&amp;\"";
-        	 	String varname = "\"input\"";
-        	 	String seps = "\""+this.getSeparators()+"\"";
-        	 	if(isMultiSelect())
-        	 		input.setOnFocus("new ajaxSuggest(this, {script:"+script+", varname:"+varname+", seps:"+seps+"} )");
-        	 	else
-        	 		input.setOnFocus("new ajaxSuggest(this, {script:"+script+", varname:"+varname+"} )");
+
+            if (isPicker()) {
+                input.addAttribute("autocomplete", "off");
+                String path = "";
+                XWiki xwiki = context.getWiki();
+                path = xwiki.getURL("Main.WebHome", "view", context);
+
+                String classname = this.getObject().getName();
+                String fieldname = this.getName();
+                String secondCol = "-", firstCol = "-";
+
+                String script =
+                    "\"" + path + "?xpage=suggest&amp;classname=" + classname + "&amp;fieldname=" + fieldname
+                        + "&amp;firCol=" + firstCol + "&amp;secCol=" + secondCol + "&amp;\"";
+                String varname = "\"input\"";
+                String seps = "\"" + this.getSeparators() + "\"";
+                if (isMultiSelect()) {
+                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + ", seps:"
+                        + seps + "} )");
+                } else {
+                    input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:" + varname + "} )");
+                }
             }
-            
+
             buffer.append(input.toString());
-            
+
         } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
             displaySelectEdit(buffer, name, prefix, object, context);
         }
-    		
+
         if (!getDisplayType().equals("input")) {
             org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
             buffer.append(hidden);

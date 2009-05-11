@@ -74,6 +74,11 @@
       <version>${jetty.version}</version>
     </dependency>        
   </dependencies>
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/xwiki-jetty-resources</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/xwiki-jetty-resources</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/xwiki-jetty-resources</url>
+  </scm>
   <build>
     <plugins>
       <plugin>

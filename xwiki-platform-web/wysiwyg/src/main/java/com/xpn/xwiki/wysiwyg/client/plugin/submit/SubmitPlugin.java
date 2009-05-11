@@ -33,6 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.EnableExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.ResetExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.SubmitExecutable;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -116,7 +117,9 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
             Element hook = (Element) Document.get().getElementById(hookId);
             // See if the hook is inside an HTML form.
             form = (Element) DOMUtils.getInstance().getFirstAncestor(hook, "form");
-            if (form != null && hook.hasAttribute(NAME_ATTRIBUTE)) {
+            // We don't use hook.hasAttribute because the name attribute appears as unspecified in IE if it has been set
+            // from JavaScript.
+            if (form != null && !StringUtils.isEmpty(hook.getAttribute(NAME_ATTRIBUTE))) {
                 // Put additional hidden data on the HTML form.
                 hiddenConfig = new HiddenConfig();
                 // All the parameters of this hidden configuration will be prefixed with the name of the hook.

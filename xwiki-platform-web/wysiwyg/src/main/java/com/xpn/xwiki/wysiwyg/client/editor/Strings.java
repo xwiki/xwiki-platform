@@ -21,7 +21,7 @@ public interface Strings extends Constants
     
     String wysiwyg();
     
-    String wiki();
+    String source();
 
     String apply();
 

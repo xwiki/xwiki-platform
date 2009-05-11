@@ -54,6 +54,11 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
     public static final Command SUBMIT = new Command("submit");
 
     /**
+     * The command that notifies us when the content of the rich text area has been reset.
+     */
+    public static final Command RESET = new Command("reset");
+
+    /**
      * The CSS class name associated with BRs added at edit time to make items like empty block-level elements editable.
      */
     public static final String SPACER = "spacer";
@@ -126,8 +131,8 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
         getTextArea().addKeyboardListener(this);
         getTextArea().getCommandManager().addCommandListener(this);
 
-        markInitialLineBreaks();
-        replaceEmptyDivsWithParagraphs();
+        // Adjust the initial content of the rich text area.
+        onReset();
     }
 
     /**
@@ -233,6 +238,8 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
             // Revert the changes made on before submit command in order avoid conflicts with the rich text area's
             // history mechanism.
             unMarkSpacers();
+        } else if (RESET.equals(command)) {
+            onReset();
         }
     }
 
@@ -622,5 +629,14 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
             child = child.getNextSibling();
         }
         return true;
+    }
+
+    /**
+     * Called after the content of the rich text area has been reset.
+     */
+    protected void onReset()
+    {
+        markInitialLineBreaks();
+        replaceEmptyDivsWithParagraphs();
     }
 }

@@ -24,6 +24,7 @@ import org.xwiki.gwt.dom.client.Style;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
@@ -130,11 +131,16 @@ public class RefreshExecutable extends AbstractExecutable
             {
                 rta.setFocus(true);
                 waiting.getElement().getParentNode().removeChild(waiting.getElement());
+                Console.getInstance().error(caught.getMessage());
             }
 
             public void onSuccess(String result)
             {
-                rta.setHTML(result);
+                // Reset the content of the rich text area.
+                rta.getCommandManager().execute(new Command("reset"), result);
+                // Store the initial value of the rich text area in case it is submitted without gaining focus.
+                rta.getCommandManager().execute(SUBMIT, true);
+                // Try to focus the rich text area.
                 rta.setFocus(true);
                 waiting.getElement().getParentNode().removeChild(waiting.getElement());
             }

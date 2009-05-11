@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.IncrementalCommand;
-import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.LoadListener;
@@ -90,7 +90,8 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             try {
                 if (iterator.hasNext()) {
                     Map.Entry<String, UIExtension> entry = iterator.next();
-                    entry.getValue().setEnabled(entry.getKey(), sv.isValid(entry.getKey(), richTextEditor.getTextArea()));
+                    entry.getValue().setEnabled(entry.getKey(),
+                        sv.isValid(entry.getKey(), richTextEditor.getTextArea()));
                     return true;
                 } else {
                     return false;
@@ -103,15 +104,20 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     }
 
     /**
+     * The default storage syntax.
+     */
+    public static final String DEFAULT_SYNTAX = "xhtml/1.0";
+
+    /**
      * The CSS class name used to make an element invisible.
      */
-    protected static final String STYLE_NAME_INVISIBLE = "invisible";    
-    
+    protected static final String STYLE_NAME_INVISIBLE = "invisible";
+
     /**
      * The CSS class name used to display a spinner in the middle of an element.
      */
     protected static final String STYLE_NAME_LOADING = "loading";
-    
+
     /**
      * WYWISYWG tab index in the TabPanel.
      */
@@ -134,9 +140,11 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
 
     /**
      * The list of plug-ins that can be loaded by default. Can be overwritten from the configuration.
+     * <p>
+     * NOTE: By default we load only the plug-ins that can work offline, without the need of a service.
      */
     private static final String DEFAULT_PLUGINS =
-        "submit line separator sync text valign justify list indent history format font color symbol link image table";
+        "submit line separator text valign justify list indent history format font color symbol table";
 
     /**
      * The list of features that can be placed on the tool bar by default. Can be overwritten from the configuration.
@@ -144,20 +152,15 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     private static final String DEFAULT_TOOLBAR =
         "bold italic underline strikethrough teletype | subscript superscript"
             + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
-            + " | undo redo | format | fontname fontsize forecolor backcolor | hr removeformat symbol | link unlink"
-            + " | image | inserttable deletetable | insertrowbefore insertrowafter deleterow"
-            + " | insertcolbefore insertcolafter deletecol | sync";
-
-    /**
-     * The list of default menu entries. Can be overwritten from the configuration.
-     */
-    private static final String DEFAULT_MENU = "link image table macro";
+            + " | undo redo | format | fontname fontsize forecolor backcolor | hr removeformat symbol"
+            + " | inserttable deletetable | insertrowbefore insertrowafter deleterow"
+            + " | insertcolbefore insertcolafter deletecol";
 
     /**
      * The regular expression used to express the separator for tool bar and menu bar feature names in configuration.
      */
     private static final String WHITE_SPACE_SEPARATOR = "\\s+";
-    
+
     /**
      * The command used to store the value of the rich text area before submitting the including form.
      */
@@ -167,7 +170,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      * Main Container.
      */
     private final FlowPanel ui;
-        
+
     /**
      * The WYSIWYG entry point.
      */
@@ -177,42 +180,42 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      * The configuration object.
      */
     private final Config config;
-    
+
     /**
      * The plug-in factory manager.
      */
-    private final PluginFactoryManager pfm;   
+    private final PluginFactoryManager pfm;
 
     /**
      * The syntax validator manager.
      */
     private final SyntaxValidatorManager svm;
-        
+
     /**
      * Flag set to true when the editor has a TabBar.
      */
     private final boolean isTabbed;
-    
+
     /**
      * A reference to the rich text editor panel.
      */
     private final FlowPanel richTextEditorWrapper;
-    
+
     /**
      * Schedules updates and executes only the most recent one.
      */
     private final DeferredUpdater updater = new DeferredUpdater(this);
-    
+
     /**
      * Listen to events and takes the appropriate actions.
      */
     private final WysiwygEditorListener listener = new WysiwygEditorListener(this);
-    
+
     /**
      * Height of the editor.
      */
     private final String height;
-    
+
     /**
      * The plug-in manager.
      */
@@ -227,7 +230,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      * A reference to the rich text editor.
      */
     private RichTextEditor richTextEditor;
-    
+
     /**
      * A reference to the plain text editor.
      */
@@ -245,34 +248,34 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      * @param wysiwyg The application context.
      * @param config The configuration object.
      * @param svm The syntax validation manager used for enabling or disabling plugin features.
-     * @param pfm The plugin factory manager used to instantiate plugins. 
+     * @param pfm The plugin factory manager used to instantiate plugins.
      */
     public WysiwygEditor(Wysiwyg wysiwyg, Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
         this.wysiwyg = wysiwyg;
         this.config = config;
         this.svm = svm;
-        this.pfm = pfm;               
-        
+        this.pfm = pfm;
+
         TextAreaElement originalTextArea = TextAreaElement.as(DOM.getElementById(config.getParameter("hookId")));
         height = Math.max(originalTextArea.getOffsetHeight(), 100) + "px";
-        
+
         ui = new FlowPanel();
         richTextEditorWrapper = new FlowPanel();
-        
+
         if (Boolean.TRUE.toString().equals(config.getParameter("displayTabs"))) {
             isTabbed = true;
-            plainTextEditor = new PlainTextEditor(originalTextArea);            
-            if ("wysiwyg".equals(config.getParameter("defaultEditor"))) {                
+            plainTextEditor = new PlainTextEditor(originalTextArea);
+            if ("wysiwyg".equals(config.getParameter("defaultEditor"))) {
                 ui.add(createTabPanel(true));
                 // Call the getter to be sure the RichTextEditor is created.
                 getRichTextEditor();
-            } else {                       
+            } else {
                 ui.add(createTabPanel(false));
-                plainTextEditor.setFocus(true);                
+                plainTextEditor.setFocus(true);
             }
         } else {
-            isTabbed = false;            
+            isTabbed = false;
             plainTextEditor = null;
             originalTextArea.getStyle().setProperty("display", "none");
             // Call the getter to be sure the RichTextEditor is created.
@@ -467,30 +470,29 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             }
         }
     }
-    
+
     /**
-     * Build the editor tab panel.
-     * This panel contains two tabs, one for the WYSIWYG editor and one for the wiki editor.
+     * Build the editor tab panel. This panel contains two tabs, one for the WYSIWYG editor and one for the wiki editor.
      * 
-     * @param defaultIsWysiwyg True if the WYSIWYG editor must be displayed by default.  
+     * @param defaultIsWysiwyg True if the WYSIWYG editor must be displayed by default.
      * @return The newly created tab panel.
      */
     public TabPanel createTabPanel(boolean defaultIsWysiwyg)
     {
         TabPanel tabs = new TabPanel();
-        
+
         tabs.add(richTextEditorWrapper, Strings.INSTANCE.wysiwyg());
-        tabs.add(plainTextEditor, Strings.INSTANCE.wiki());        
-        tabs.setStyleName("xRichTextEditorTabPanel");        
-        
+        tabs.add(plainTextEditor, Strings.INSTANCE.source());
+        tabs.setStyleName("xRichTextEditorTabPanel");
+
         if (defaultIsWysiwyg) {
-            tabs.selectTab(WYSIWYG_TAB_INDEX);            
+            tabs.selectTab(WYSIWYG_TAB_INDEX);
         } else {
             tabs.selectTab(WIKI_TAB_INDEX);
         }
-        
+
         tabs.addTabListener(listener);
-                
+
         return tabs;
     }
 
@@ -499,7 +501,8 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      */
     private void fillMenu()
     {
-        String[] entries = config.getParameter(MENU_ROLE, DEFAULT_MENU).split(WHITE_SPACE_SEPARATOR);
+        // By default we don't show the menu (the list of menu entries is empty if not specified in the configuration).
+        String[] entries = config.getParameter(MENU_ROLE, "").split(WHITE_SPACE_SEPARATOR);
         for (int i = 0; i < entries.length; i++) {
             UIExtension uie = pm.getUIExtension(MENU_ROLE, entries[i]);
             if (uie != null) {
@@ -507,7 +510,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             }
         }
     }
-    
+
     /**
      * Fills the tool bar of the editor with the features specified in the configuration.
      */
@@ -528,10 +531,12 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
                         continue;
                     } else {
                         if (verticalBar != null) {
-                            getRichTextEditor().getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
+                            getRichTextEditor().getToolbar().add(
+                                (Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
                             toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         } else if (lineBreak != null) {
-                            getRichTextEditor().getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                            getRichTextEditor().getToolbar().add(
+                                (Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
                             toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                             lineBreak = null;
                         }
@@ -544,7 +549,8 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
                         continue;
                     } else {
                         if (lineBreak != null) {
-                            getRichTextEditor().getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                            getRichTextEditor().getToolbar().add(
+                                (Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
                             toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         }
                         lineBreak = uie;
@@ -555,11 +561,13 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
                     }
                 } else {
                     if (verticalBar != null) {
-                        getRichTextEditor().getToolbar().add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
+                        getRichTextEditor().getToolbar().add(
+                            (Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
                         toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         verticalBar = null;
                     } else if (lineBreak != null) {
-                        getRichTextEditor().getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                        getRichTextEditor().getToolbar().add(
+                            (Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
                         toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         lineBreak = null;
                     }
@@ -573,15 +581,15 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             }
         }
     }
-    
+
     /**
      * Puts the editor in loading state or get it out of it.
-     *
+     * 
      * @param loading {@code true} to put the editor in loading state, {@code false} to get it out of it
      */
     protected void setLoading(boolean loading)
     {
-        if (isTabbed) {            
+        if (isTabbed) {
             getRichTextEditor().setLoading(loading);
             getPlainTextEditor().setLoading(loading);
         } else {
@@ -600,8 +608,8 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     }
 
     /**
-     * In a Model-View-Controller architecture the UI represents the View component, while this class
-     * represents the Controller. The model could be considered the DOM document edited.
+     * In a Model-View-Controller architecture the UI represents the View component, while this class represents the
+     * Controller. The model could be considered the DOM document edited.
      * 
      * @return The editor User Interface main panel.
      */
@@ -617,25 +625,26 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
      */
     public RichTextEditor getRichTextEditor()
     {
-        if (richTextEditor == null) {            
+        if (richTextEditor == null) {
             richTextEditor = new RichTextEditor();
             richTextEditor.addLoadListener(this);
             richTextEditor.getTextArea().addMouseListener(this);
             richTextEditor.getTextArea().addKeyboardListener(this);
             richTextEditor.getTextArea().getCommandManager().addCommandListener(this);
-            IFrameElement.as(richTextEditor.getTextArea().getElement()).setSrc(config.getParameter("inputURL", "about:blank"));
+            IFrameElement.as(richTextEditor.getTextArea().getElement()).setSrc(
+                config.getParameter("inputURL", "about:blank"));
             richTextEditor.getTextArea().setHeight(height);
 
             richTextEditorWrapper.add(richTextEditor);
-    
-            sv = svm.getSyntaxValidator(getConfig().getParameter("syntax"));
-    
+
+            sv = svm.getSyntaxValidator(getConfig().getParameter("syntax", DEFAULT_SYNTAX));
+
             pm = new DefaultPluginManager(wysiwyg, richTextEditor.getTextArea(), config);
             pm.setPluginFactoryManager(pfm);
         }
         return richTextEditor;
     }
-    
+
     /**
      * Get the plain text editor.
      * 

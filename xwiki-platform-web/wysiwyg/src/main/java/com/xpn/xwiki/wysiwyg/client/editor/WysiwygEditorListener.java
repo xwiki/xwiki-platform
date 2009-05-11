@@ -35,7 +35,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * @version $Id: $
  */
 public class WysiwygEditorListener implements TabListener
-{    
+{
     /**
      * Switch from Wiki to WYSIWYG editor.
      */
@@ -44,7 +44,7 @@ public class WysiwygEditorListener implements TabListener
         /**
          * WysiwygEditor instance.
          */
-        private WysiwygEditor editor;  
+        private WysiwygEditor editor;
 
         /**
          * Constructor.
@@ -62,16 +62,19 @@ public class WysiwygEditorListener implements TabListener
         public void onSuccess(String result)
         {
             editor.setLoading(false);
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(WysiwygEditorListener.ENABLE, true);
-            editor.getRichTextEditor().getTextArea().setHTML(result);
-            editor.getPlainTextEditor().setText(result);                       
+            // Enable the rich text area in order to be able to submit its content.
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
+            // Reset the content of the rich text area.
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(new Command("reset"), result);
+            // Store the initial value of the rich text area in case it is submitted without gaining focus.
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
         }
 
         /**
          * {@inheritDoc}
          */
         public void onFailure(Throwable caught)
-        {            
+        {
             Window.alert(caught.getMessage());
             editor.setLoading(false);
         }
@@ -103,6 +106,7 @@ public class WysiwygEditorListener implements TabListener
         public void onSuccess(String result)
         {
             editor.setLoading(false);
+            // Disable the rich text area to avoid submitting its content.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(WysiwygEditorListener.ENABLE, false);
             editor.getPlainTextEditor().setText(result);
         }
@@ -113,20 +117,20 @@ public class WysiwygEditorListener implements TabListener
         public void onFailure(Throwable caught)
         {
             Window.alert(caught.getMessage());
-            editor.setLoading(false);            
+            editor.setLoading(false);
         }
     }
-    
+
     /**
      * The command used to store the value of the rich text area before submitting the including form.
      */
     protected static final Command SUBMIT = new Command("submit");
-    
+
     /**
      * Disable command.
      */
     protected static final Command ENABLE = new Command("enable");
-    
+
     /**
      * Field describing the syntax used in the editor configuration.
      */
@@ -140,11 +144,11 @@ public class WysiwygEditorListener implements TabListener
     /**
      * Constructor.
      * 
-     * @param editor WysiwygEditor instance. 
+     * @param editor WysiwygEditor instance.
      */
     WysiwygEditorListener(WysiwygEditor editor)
-    {        
-        this.editor = editor;        
+    {
+        this.editor = editor;
     }
 
     /**
@@ -167,16 +171,16 @@ public class WysiwygEditorListener implements TabListener
         editor.setLoading(true);
         if (index == WysiwygEditor.WYSIWYG_TAB_INDEX) {
             WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-            wysiwygService.toHTML(editor.getPlainTextEditor().getText(), 
-                editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWysiwygCallback(editor));
+            wysiwygService.toHTML(editor.getPlainTextEditor().getText(), editor.getConfig().getParameter(
+                SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWysiwygCallback(editor));
         } else {
             WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
             // Notify the plug-ins that the content of the rich text area is about to be submitted.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
             // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
             // Make the request to convert the HTML to Wiki syntax.
-            wysiwygService.fromHTML(editor.getPlainTextEditor().getText(), 
-                editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER), new SwitchToWikiCallback(editor));
+            wysiwygService.fromHTML(editor.getPlainTextEditor().getText(), editor.getConfig().getParameter(
+                SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWikiCallback(editor));
         }
     }
 }

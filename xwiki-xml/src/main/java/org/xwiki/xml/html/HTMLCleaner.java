@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 /**
  * Transforms any HTML content into valid XHTML that can be feed to the XHTML Parser for example.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public interface HTMLCleaner

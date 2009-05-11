@@ -47,7 +47,7 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the <a href="HTML Cleaner
  * framework>http://htmlcleaner.sourceforge.net/</a>.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultHTMLCleaner implements HTMLCleaner, Initializable

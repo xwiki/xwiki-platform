@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty Configuration Resources</name>
-  <version>1.15-SNAPSHOT</version>
+  <version>1.14-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Packages a Jetty installation</description>
   <properties>

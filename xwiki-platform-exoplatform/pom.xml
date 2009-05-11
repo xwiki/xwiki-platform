@@ -34,14 +34,12 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - eXo Platform</description>
   <dependencies>
-
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>1.7.1</version>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>exo</groupId>
       <artifactId>exoplatform.services.jcr.impl</artifactId>
@@ -56,8 +54,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-
   </dependencies>
-
+  <!-- We must configure SCM in each module. For more information see:
+       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/exoplatform</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/exoplatform</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/exoplatform</url>
+  </scm>
 </project>
         

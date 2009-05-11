@@ -38,6 +38,11 @@
     configuration, XWiki cfg file, etc. This module is meant to be used with the
     Maven Remote Resources plugin in other build modules to inject a XWiki configuration.
   </description>
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-configuration-resources</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-configuration-resources</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-configuration-resources</url>
+  </scm>
   <build>
     <plugins>
      <plugin>

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-configuration-resources</artifactId>
   <name>XWiki Platform - Tools - XWiki Configuration Resources</name>
-  <version>1.26-SNAPSHOT</version>
+  <version>1.26</version>
   <packaging>jar</packaging>
   <description>
     Common XWiki resources for configuring XWiki. Contains config files like Hibernate
@@ -39,9 +39,9 @@
     Maven Remote Resources plugin in other build modules to inject a XWiki configuration.
   </description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-configuration-resources</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-configuration-resources</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-configuration-resources</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-configuration-resources-1.26</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-configuration-resources-1.26</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-configuration-resources-1.26</url>
   </scm>
   <build>
     <plugins>

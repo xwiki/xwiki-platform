@@ -38,4 +38,11 @@
     <module>wiki</module>
     <!--module>web</module-->
   </modules>
+  <!-- We must configure SCM in each module. For more information see:
+       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/s5</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/s5</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/s5</url>
+  </scm>  
 </project>

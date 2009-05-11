@@ -36,26 +36,27 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Adwords</description>
   <dependencies>
-
     <!-- Dependencies that we need to fix so that we don't need to have them in our custom remote repository -->
-
     <dependency>
       <groupId>com.google</groupId>
       <artifactId>googleadwords</artifactId>
       <version>UNKNOWN</version>
       <classifier>xwiki</classifier>
     </dependency>
-
     <!-- Standard dependencies found in the main Maven remote repository -->
-
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>1.7.1</version>
       <scope>provided</scope>
     </dependency>
-
   </dependencies>
-
+  <!-- We must configure SCM in each module. For more information see:
+       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/adwords</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/adwords</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/adwords</url>
+  </scm>
 </project>
         

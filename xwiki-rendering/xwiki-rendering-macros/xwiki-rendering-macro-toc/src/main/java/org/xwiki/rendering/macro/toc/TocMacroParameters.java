@@ -25,13 +25,13 @@ import org.xwiki.rendering.macro.parameter.ParameterValueTooLowException;
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.toc.TocMacro} Macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class TocMacroParameters
 {
     /**
-     * @version $Id: TocMacroDescriptor.java 11982 2008-08-22 17:49:14Z tmortagne $
+     * @version $Id$
      */
     public enum Scope
     {

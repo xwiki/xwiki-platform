@@ -22,7 +22,7 @@ package org.xwiki.cache.oscache.internal;
 /**
  * Exception raised when failed to load OSCache configuration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class PropertiesLoadingCacheException extends OSCacheCacheException
 {

@@ -34,7 +34,7 @@ import org.xwiki.rendering.parser.SyntaxType;
  * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
  * Model/Skin/etc for the Rendering module's unit tests.
  * 
- * @version $Id: MockVelocityManager.java 10176 2008-06-09 16:11:28Z vmassol $
+ * @version $Id$
  * @since 1.6M1
  */
 public class MockDocumentAccessBridge implements DocumentAccessBridge

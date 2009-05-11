@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * Transforms any HTML content into valid XHTML that can be feed to the XHTML Parser for example.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 @ComponentRole

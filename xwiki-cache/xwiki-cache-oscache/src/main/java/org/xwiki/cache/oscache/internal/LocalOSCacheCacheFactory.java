@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Component;
 /**
  * Implements {@link CacheFactory} based on OSCache.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 @Component("oscache/local")
 public class LocalOSCacheCacheFactory extends AbstractOSCacheCacheFactory

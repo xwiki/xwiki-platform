@@ -27,7 +27,7 @@ import org.xwiki.cache.event.CacheEntryListener;
  * value associated with a key.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultCache<T> implements Cache<T>
 {

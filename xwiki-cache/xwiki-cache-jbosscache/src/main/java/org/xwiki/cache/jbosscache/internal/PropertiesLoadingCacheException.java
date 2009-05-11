@@ -22,7 +22,7 @@ package org.xwiki.cache.jbosscache.internal;
 /**
  * Exception raised when failed to load OSCache configuration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class PropertiesLoadingCacheException extends JBossCacheCacheException
 {

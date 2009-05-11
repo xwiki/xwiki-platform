@@ -23,7 +23,7 @@ package org.xwiki.cache.eviction;
  * An helper for {@link EntryEvictionConfiguration.Algorithm#NONE} cache algorithm. Evicts the least recently used entry
  * when thresholds are hit.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class LRUEvictionConfiguration extends EntryEvictionConfiguration
 {

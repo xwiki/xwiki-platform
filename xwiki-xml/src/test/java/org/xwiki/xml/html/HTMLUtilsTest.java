@@ -30,7 +30,7 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 /**
  * Unit tests for {@link org.xwiki.xml.html.HTMLUtils}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.3
  */
 public class HTMLUtilsTest extends AbstractXWikiComponentTestCase

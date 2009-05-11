@@ -29,7 +29,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  * Simple implementation that considers all links external links and thus that adds the link reference as the XHTML HREF
  * value.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class SimpleXHTMLLinkRenderer implements XHTMLLinkRenderer

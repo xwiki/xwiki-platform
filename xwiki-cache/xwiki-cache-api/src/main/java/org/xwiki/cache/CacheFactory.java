@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * This interface is implemented by a XWiki cache component implementation to provide cache creation. It's the entry
  * point of the cache component.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 @ComponentRole
 public interface CacheFactory

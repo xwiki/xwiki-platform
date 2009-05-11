@@ -41,7 +41,7 @@ import com.opensymphony.oscache.plugins.diskpersistence.HashDiskPersistenceListe
 /**
  * Convert XWiki cache configuration into OSCache configuration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
 {

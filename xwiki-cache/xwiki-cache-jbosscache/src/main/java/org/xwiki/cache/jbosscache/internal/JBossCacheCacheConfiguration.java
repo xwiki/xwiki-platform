@@ -46,7 +46,7 @@ import org.xwiki.container.Container;
 /**
  * Convert XWiki cache configuration into JBossCache configuration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoader
 {

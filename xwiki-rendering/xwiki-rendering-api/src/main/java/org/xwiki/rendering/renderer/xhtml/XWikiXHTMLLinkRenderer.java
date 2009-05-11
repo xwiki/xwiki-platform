@@ -37,7 +37,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 /**
  * Default XWiki implementation for rendering links as XHTML using XWiki Documents.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer

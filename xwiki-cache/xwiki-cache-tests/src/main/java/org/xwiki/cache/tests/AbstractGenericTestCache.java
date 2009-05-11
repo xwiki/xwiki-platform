@@ -26,7 +26,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 /**
  * Base class for testing cache component implementation.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractGenericTestCache extends AbstractTestCache
 {

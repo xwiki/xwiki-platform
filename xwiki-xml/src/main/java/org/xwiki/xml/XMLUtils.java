@@ -39,7 +39,7 @@ import org.w3c.dom.Node;
 /**
  * XML Utility methods.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public final class XMLUtils

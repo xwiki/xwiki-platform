@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * XWiki's wrapping of the {@link org.xml.sax.EntityResolver} interface so that we can create components that
  * implement it.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.9M2
  */
 @ComponentRole

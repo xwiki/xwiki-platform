@@ -35,7 +35,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * Wraps direct children of the Body tag with paragraphs. For example {@code a <table>...</table> b <p>c</p> d} is
  * transformed into {@link <p>a </p><table>...</table><p> b </p><p>c</p><p> d</p>}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 @Component("body")

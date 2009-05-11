@@ -23,7 +23,7 @@ package org.xwiki.cache;
 /**
  * Any exception raised in the XWiki Cache component must raise an exception of this type.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class CacheException extends Exception
 {

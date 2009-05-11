@@ -33,7 +33,7 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
  * Resolve configuration link format using the defined Rendering Configuration
  * (see {@link org.xwiki.rendering.configuration.RenderingConfiguration}).
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 @Component

@@ -29,7 +29,7 @@ import org.xwiki.container.Container;
 /**
  * Base implementation for JBoss Cache support.
  *  
- * @version $Id: $
+ * @version $Id$
  * @since 1.9M2
  */
 public abstract class AbstractJBossCacheCacheFactory extends AbstractLogEnabled implements CacheFactory

@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 /**
  * Unit tests for {@link ComponentAnnotationLoader}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class ComponentAnnotationLoaderTest extends TestCase

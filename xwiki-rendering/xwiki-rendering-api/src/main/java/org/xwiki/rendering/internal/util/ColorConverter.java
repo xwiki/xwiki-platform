@@ -27,7 +27,7 @@ import org.apache.commons.beanutils.converters.AbstractConverter;
 /**
  * Bean Utils converter that converts a value into an {@link Color} object.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public final class ColorConverter extends AbstractConverter

@@ -26,7 +26,7 @@ import org.w3c.dom.NodeList;
 /**
  * HTML Utility methods.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.3
  */
 public final class HTMLUtils

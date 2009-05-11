@@ -33,7 +33,7 @@ import java.util.HashMap;
  * conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
  * </code>
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class EntryEvictionConfiguration extends HashMap<String, Object>
 {
@@ -50,7 +50,7 @@ public class EntryEvictionConfiguration extends HashMap<String, Object>
     /**
      * The ordering/storing algorithm used by the cache.
      * 
-     * @version $Id: $
+     * @version $Id$
      */
     public enum Algorithm
     {

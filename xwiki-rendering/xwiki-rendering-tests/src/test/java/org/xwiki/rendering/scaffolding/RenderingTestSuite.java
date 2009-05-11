@@ -39,7 +39,7 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class RenderingTestSuite extends TestSuite

@@ -29,7 +29,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Generate a Document Name from a raw string reference.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class DefaultDocumentNameFactory implements DocumentNameFactory

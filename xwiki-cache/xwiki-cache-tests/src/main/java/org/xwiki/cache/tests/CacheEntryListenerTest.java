@@ -25,7 +25,7 @@ import org.xwiki.cache.event.CacheEntryListener;
 /**
  * Class used to test cache event management.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class CacheEntryListenerTest implements CacheEntryListener<Object>
 {

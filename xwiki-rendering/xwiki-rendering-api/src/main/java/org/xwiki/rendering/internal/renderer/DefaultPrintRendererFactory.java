@@ -40,7 +40,7 @@ import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
 /**
  * Easily create Print Renderers instances.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  * @see PrintRendererFactory
  */

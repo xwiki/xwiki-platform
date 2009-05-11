@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
 /**
  * Default implementation of {@link CacheFactory}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 @Component
 public class DefaultCacheFactory implements CacheFactory

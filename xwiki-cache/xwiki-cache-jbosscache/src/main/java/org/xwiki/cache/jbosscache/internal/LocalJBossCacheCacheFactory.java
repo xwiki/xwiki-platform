@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Component;
 /**
  * Implements {@link CacheFactory} based on JBossCache.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 @Component("jbosscache/local")
 public class LocalJBossCacheCacheFactory extends AbstractJBossCacheCacheFactory

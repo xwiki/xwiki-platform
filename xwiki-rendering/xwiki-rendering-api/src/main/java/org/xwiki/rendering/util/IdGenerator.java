@@ -26,7 +26,7 @@ import java.util.Set;
  * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance of it
  * should be used for each document.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class IdGenerator

@@ -7,7 +7,7 @@ import org.xwiki.rendering.parser.Syntax;
 /**
  * A Listener wrapping another Listener.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WrappingListener implements Listener
 {

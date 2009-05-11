@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Generates XWiki Syntax for a Macro Block.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.5RC1
  */
 public class XWikiMacroPrinter

@@ -29,7 +29,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
  * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
  * Model/Skin/etc for the Rendering module's unit tests.
  * 
- * @version $Id: MockDocumentNameSerializer.java 19152 2009-04-27 21:02:41Z tmortagne $
+ * @version $Id$
  * @since 1.9M2
  */
 public class MockDocumentNameSerializer implements DocumentNameSerializer

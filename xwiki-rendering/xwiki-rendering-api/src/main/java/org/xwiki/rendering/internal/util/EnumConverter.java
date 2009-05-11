@@ -25,7 +25,7 @@ import org.apache.commons.beanutils.converters.AbstractConverter;
 /**
  * Bean Utils converter that converts a value into an enumeration class value.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class EnumConverter extends AbstractConverter

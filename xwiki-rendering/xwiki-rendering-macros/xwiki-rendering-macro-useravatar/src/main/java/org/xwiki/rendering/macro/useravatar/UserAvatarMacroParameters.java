@@ -25,7 +25,7 @@ import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.useravatar.UserAvatarMacro} Macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC2
  */
 public class UserAvatarMacroParameters

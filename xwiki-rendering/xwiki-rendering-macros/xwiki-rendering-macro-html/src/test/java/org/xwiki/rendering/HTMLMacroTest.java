@@ -30,7 +30,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Unit tests for {@link HTMLMacro} that cannot be performed using the Rendering Test framework.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.3
  */
 public class HTMLMacroTest extends AbstractXWikiComponentTestCase 

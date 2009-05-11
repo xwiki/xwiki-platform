@@ -38,7 +38,7 @@ import org.xwiki.rendering.parser.Syntax;
  * This specific macro manager retrieves all {@link Macro} implementations that are registered
  * against XWiki's component manager.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.9M1
  */
 @Component

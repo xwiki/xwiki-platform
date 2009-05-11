@@ -26,7 +26,7 @@ import org.xwiki.cache.CacheEntry;
  * Implements {@link org.xwiki.cache.CacheEntry} based on JBossCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class JBossCacheCacheEntry<T> implements CacheEntry<T>
 {

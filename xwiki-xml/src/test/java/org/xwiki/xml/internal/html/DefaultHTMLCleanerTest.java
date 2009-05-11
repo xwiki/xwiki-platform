@@ -33,7 +33,7 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 /**
  * Unit tests for {@link org.xwiki.xml.internal.html.DefaultHTMLCleaner}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase

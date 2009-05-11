@@ -23,7 +23,7 @@ package org.xwiki.xml.html;
 /**
  * HTML Constants.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public interface HTMLConstants

@@ -25,7 +25,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Unit tests for {@link org.xwiki.xml.XMLUtils}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class XMLUtilsTest extends AbstractXWikiComponentTestCase

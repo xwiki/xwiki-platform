@@ -35,7 +35,7 @@ import org.xwiki.rendering.parser.SyntaxFactory;
  * that extend this class are responsible to initialize and keep up to date the two maps {@link #allSyntaxesMacros} and
  * {@link #syntaxSpecificMacros}.
  * 
- * @version $Id: AbstractMacro.java 12439 2008-09-05 14:19:58Z tmortagne $
+ * @version $Id$
  * @since 1.9M1
  */
 public abstract class AbstractMacroSource extends AbstractLogEnabled implements MacroSource

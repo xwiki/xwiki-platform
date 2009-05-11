@@ -55,7 +55,7 @@ import org.xwiki.rendering.parser.LinkParser;
  * <li>Hello World?param1=1&param2=2</li>
  * </ul>
  * 
- * @version $Id: XWikiLinkParser.java 18100 2009-03-27 18:16:06Z vmassol $
+ * @version $Id$
  * @since 1.5M2
  */
 public abstract class AbstractLinkParser  implements LinkParser

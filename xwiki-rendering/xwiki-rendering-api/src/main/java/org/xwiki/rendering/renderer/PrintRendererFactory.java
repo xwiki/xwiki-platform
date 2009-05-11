@@ -29,7 +29,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * have to be passed manually to its constructor. Since the implementation of this interface is a component it's
  * automatically injected all components required to construct the Print renderers.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 @ComponentRole

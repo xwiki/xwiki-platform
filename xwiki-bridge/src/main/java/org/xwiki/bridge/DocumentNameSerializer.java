@@ -23,7 +23,7 @@ package org.xwiki.bridge;
  * Generate a fully qualified document reference string (ie of the form
  * {@code wiki:space.page}) out of a {@link DocumentName}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public interface DocumentNameSerializer

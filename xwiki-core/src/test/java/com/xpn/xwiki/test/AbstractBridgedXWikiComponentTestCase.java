@@ -32,7 +32,7 @@ import com.xpn.xwiki.web.Utils;
  * Extension of {@link org.xwiki.test.AbstractXWikiComponentTestCase} that sets up a bridge between the new Execution
  * Context and the old XWikiContext. This allows code that uses XWikiContext to be tested using this Test Case class.
  * 
- * @version $Id: AbstractBridgedXWikiComponentTestCase.java 11544 2008-07-29 14:43:19Z amelentev $
+ * @version $Id$
  * @since 1.6M1
  */
 public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWikiComponentTestCase

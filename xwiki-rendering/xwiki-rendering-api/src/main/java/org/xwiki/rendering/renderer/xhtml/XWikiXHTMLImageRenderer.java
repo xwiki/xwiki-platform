@@ -33,7 +33,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 /**
  * Default XWiki implementation for rendering images as XHTML using XWiki Documents.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer

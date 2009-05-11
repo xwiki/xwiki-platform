@@ -53,7 +53,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
  *   </ul>
  * </pre></code>
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 @Component("list")

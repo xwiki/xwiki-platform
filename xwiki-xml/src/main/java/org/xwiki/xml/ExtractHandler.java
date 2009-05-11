@@ -42,7 +42,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * <br/>is:<br/> <code>&lt;p&gt;ck &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to&lt;/p&gt;</code>
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class ExtractHandler extends DefaultHandler

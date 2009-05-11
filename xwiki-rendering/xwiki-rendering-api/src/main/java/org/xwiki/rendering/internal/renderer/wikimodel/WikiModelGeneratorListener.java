@@ -40,7 +40,7 @@ import org.xwiki.rendering.parser.Syntax;
 /**
  * Map XWiki Listener events on to WikiModel events.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.5RC1
  */
 public class WikiModelGeneratorListener implements Listener

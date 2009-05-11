@@ -267,7 +267,11 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
             Parser parser = (Parser) this.componentManager.lookup(Parser.ROLE, wikiSyntax.toIdString());
             XDOM xdom = parser.parse(new StringReader(content));
 
-            // Force clean=false for sub HTML macro
+            // Force clean=false for sub HTML macro:
+            // - at this point we don't know the context of the macro, it can be some <div> directly followed by the
+            // html macro, it this case the macro will be parsed as inline block
+            // - by forcing clean=false, we also make the html macro merge the whole html before cleaning so the cleaner
+            // have the chole context and can clean better
             List<MacroBlock> macros = xdom.getChildrenByType(MacroBlock.class, true);
             for (MacroBlock macro : macros) {
                 if (macro.getName().equals("html")) {

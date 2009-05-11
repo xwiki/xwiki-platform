@@ -35,6 +35,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
@@ -97,29 +98,29 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
     private ComponentManager componentManager;
 
     /**
-     * Used to construct a XHTMLImageRenderer instance which we need for the HTML Macro XHTML Renderer so that
-     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
+     * Used to construct a XHTMLImageRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
+     * generate XHTML content when the user has specified the macro contains wiki syntax.
      */
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that
-     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
+     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
+     * generate XHTML content when the user has specified the macro contains wiki syntax.
      */
     @Requirement
     private LinkLabelGenerator linkLabelGenerator;
 
     /**
-     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that
-     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
+     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
+     * generate XHTML content when the user has specified the macro contains wiki syntax.
      */
     @Requirement
     private AttachmentParser attachmentParser;
 
     /**
-     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that
-     * we can generate XHTML content when the user has specified the macro contains wiki syntax.
+     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
+     * generate XHTML content when the user has specified the macro contains wiki syntax.
      */
     @Requirement
     private DocumentNameSerializer documentNameSerializer;
@@ -164,15 +165,15 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
         List<Block> blocks;
 
         if (!StringUtils.isEmpty(content)) {
-            
+
             String normalizedContent = content;
 
             // If the user has mentioned that there's wiki syntax in the macro then we parse the content using
             // a wiki syntax parser and render it back using a special renderer to print the XDOM blocks into
             // a text representing the resulting XHTML content.
             if (parameters.getWiki()) {
-                normalizedContent = renderWikiSyntax(normalizedContent, context.getMacroTransformation(), 
-                    context.getSyntax());
+                normalizedContent =
+                    renderWikiSyntax(normalizedContent, context.getMacroTransformation(), context.getSyntax());
             }
 
             // Clean the HTML into valid XHTML if the user has asked (it's the default).
@@ -192,8 +193,8 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
      * Clean the HTML entered by the user, transforming it into valid XHTML.
      * 
      * @param content the content to clean
-     * @param isInline true if the content is inline and thus if we need to remove the top level paragraph
-     *        element created by the cleaner
+     * @param isInline true if the content is inline and thus if we need to remove the top level paragraph element
+     *            created by the cleaner
      * @return the cleaned HTML as a string representing valid XHTML
      * @throws MacroExecutionException if the macro is inline and the content is not inline HTML
      */
@@ -224,10 +225,9 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
             // TODO: Improve this since when're inside a table cell or a list item we can allow non inline items too
             Element root = document.getDocumentElement();
             if (root.getChildNodes().getLength() == 1 && root.getFirstChild().getNodeType() == Node.ELEMENT_NODE
-                && root.getFirstChild().getNodeName().equalsIgnoreCase("p"))
-            {
+                && root.getFirstChild().getNodeName().equalsIgnoreCase("p")) {
                 HTMLUtils.stripFirstElementInside(document, HTMLConstants.TAG_HTML, HTMLConstants.TAG_P);
-            } else {    
+            } else {
                 throw new MacroExecutionException(
                     "When using the HTML macro inline, you can only use inline HTML content."
                         + " Block HTML content (such as tables) cannot be displayed."
@@ -237,14 +237,14 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
 
         // Don't print the XML declaration nor the XHTML DocType.
         cleanedContent = XMLUtils.toString(document, true, true);
-        
+
         // Don't print the top level html element (which is always present and at the same location
         // since it's been normalized by the HTML cleaner)
         // Note: we trim the first 7 characters since they correspond to a leading new line (generated by
         // XMLUtils.toString() since the doctype is printed on a line by itself followed by a new line) +
         // the 6 chars from "<html>".
         cleanedContent = cleanedContent.substring(7, cleanedContent.length() - 8);
-        
+
         return cleanedContent;
     }
 
@@ -257,31 +257,42 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
      * @return the output XHTML as a string containing the XWiki Syntax resolved as XHTML
      * @throws MacroExecutionException in case there's a parsing problem
      */
-    private String renderWikiSyntax(String content, MacroTransformation macroTransformation, Syntax wikiSyntax) 
+    private String renderWikiSyntax(String content, MacroTransformation macroTransformation, Syntax wikiSyntax)
         throws MacroExecutionException
     {
         String xhtml;
-        
+
         try {
             // Parse the wiki syntax
-            Parser parser = (Parser) this.componentManager.lookup(Parser.class.getName(), wikiSyntax.toIdString());
+            Parser parser = (Parser) this.componentManager.lookup(Parser.ROLE, wikiSyntax.toIdString());
             XDOM xdom = parser.parse(new StringReader(content));
+
+            // Force clean=false for sub HTML macro
+            List<MacroBlock> macros = xdom.getChildrenByType(MacroBlock.class, true);
+            for (MacroBlock macro : macros) {
+                if (macro.getName().equals("html")) {
+                    macro.setParameter("clean", "false");
+                }
+            }
+
+            // Execute transformations
             macroTransformation.transform(xdom, parser.getSyntax());
 
             // Render the whole parsed content as a XHTML string
-            WikiPrinter printer = new DefaultWikiPrinter(); 
-            PrintRenderer renderer = new HTMLMacroXHTMLRenderer(printer, 
-                new XWikiXHTMLLinkRenderer(this.documentAccessBridge, this.linkLabelGenerator, this.attachmentParser,
-                    this.documentNameSerializer), new XWikiXHTMLImageRenderer(this.documentAccessBridge));
+            WikiPrinter printer = new DefaultWikiPrinter();
+            PrintRenderer renderer =
+                new HTMLMacroXHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
+                    this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer),
+                    new XWikiXHTMLImageRenderer(this.documentAccessBridge));
             xdom.traverse(renderer);
-            
+
             xhtml = printer.toString();
-            
+
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse content [" + content + "] written in ["
-                + wikiSyntax + "] syntax.", e);
+            throw new MacroExecutionException("Failed to parse content [" + content + "] written in [" + wikiSyntax
+                + "] syntax.", e);
         }
-        
+
         return xhtml;
     }
 }

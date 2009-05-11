@@ -13,4 +13,4 @@
 <p>hello</p>
 {{html}}world{{/html}}
 --><p>hello</p><p>
-<!--startmacro:html|-||-|world-->world<!--stopmacro--></p><!--stopmacro-->
+<!--startmacro:html|-|clean="false"|-|world-->world<!--stopmacro--></p><!--stopmacro-->

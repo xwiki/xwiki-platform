@@ -1,0 +1,19 @@
+.#---------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify clean=false is forced in inner html macros
+.#---------------------------------------------------------------
+{{html clean=true wiki="true"}}
+<div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
+{{/html}}
+
+{{html clean=false wiki="true"}}
+<div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
+{{/html}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:html|-|clean="true" wiki="true"|-|
+<div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
+--><div><!--startmacro:html|-|clean="false"|-|<ul><li>standalone content</li></ul>--><ul><li>standalone content</li></ul><!--stopmacro--></div><!--stopmacro--><!--startmacro:html|-|clean="false" wiki="true"|-|
+<div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
+--><div><!--startmacro:html|-|clean="false"|-|<ul><li>standalone content</li></ul>--><ul><li>standalone content</li></ul><!--stopmacro--></div><!--stopmacro-->

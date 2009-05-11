@@ -34,4 +34,11 @@
   <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Photo album application for XWiki</description>
+  <!-- We must configure SCM in each module. For more information see:
+       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/photoalbum</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/photoalbum</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/photoalbum</url>
+  </scm>
 </project>

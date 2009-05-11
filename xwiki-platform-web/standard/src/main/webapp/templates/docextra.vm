@@ -55,9 +55,7 @@
 <span id="aboutdate">$msg.get("lastmodifiedon") $!xwiki.formatDate($tdoc.date)</span>
 </div>
 #end
-#if($docextras.size() < 1)
-  #docabout()
-#end
+#docabout()
 ##
 ## Display tabs
 ##
@@ -78,7 +76,6 @@
           </li>
         #end
       </ul>
-      #docabout()
     </div>
     ##
     ## Display panes (AJAX placeholders)

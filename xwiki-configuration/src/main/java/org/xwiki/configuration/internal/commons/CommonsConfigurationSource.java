@@ -31,7 +31,7 @@ import java.util.ArrayList;
  * us to reuse the <a href= "http://commons.apache.org/configuration/"numerous types of
  * Configuration<a/> provided by Commons Configuration (properties file, XML files, databases, etc).
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class CommonsConfigurationSource implements ConfigurationSource

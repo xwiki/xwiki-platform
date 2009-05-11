@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * configuration sources. However since this is implemented as a component it's also possible for a user to override
  * the component implementation and replace it by theirs thus effectively changing the sources of configuration data. 
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 @ComponentRole

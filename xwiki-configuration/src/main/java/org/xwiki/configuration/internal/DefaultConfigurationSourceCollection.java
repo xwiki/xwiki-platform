@@ -40,7 +40,7 @@ import org.xwiki.container.Container;
  * Default list of {@link org.xwiki.configuration.ConfigurationSource}s that contain the default global XWiki
  * configuration file (xwiki.properties).
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 @Component

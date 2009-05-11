@@ -32,7 +32,7 @@ import java.util.Properties;
 /**
  * Unit tests for {@link org.xwiki.configuration.internal.DefaultConfigurationManagerTest}.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultConfigurationManagerTest extends TestCase

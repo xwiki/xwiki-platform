@@ -508,12 +508,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setSyntaxId("xwiki/2.0");
 
-        assertEquals("{{html wiki=\"false\"}}string{{/html}}", this.document.display("string", "view", getContext()));
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}string{{/html}}", this.document.display("string", "view",
+            getContext()));
         assertEquals(
-            "{{html wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
+            "{{html clean=\"false\" wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
             this.document.display("string", "edit", getContext()));
 
-        assertEquals("{{html wiki=\"false\"}}<p>area</p>{{/html}}", this.document.display("area", "view", getContext()));
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}<p>area</p>{{/html}}", this.document.display("area",
+            "view", getContext()));
     }
 
     public void testDisplay1020()
@@ -538,15 +540,17 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         doc10.setSyntaxId("xwiki/2.0");
         getContext().setDoc(doc10);
 
-        assertEquals("{{html wiki=\"false\"}}string{{/html}}", this.document.display("string", "view", getContext()));
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}string{{/html}}", this.document.display("string", "view",
+            getContext()));
         assertEquals(
-            "{{html wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
+            "{{html clean=\"false\" wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
             this.document.display("string", "edit", getContext()));
 
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(
             returnValue("area"));
 
-        assertEquals("{{html wiki=\"false\"}}area{{/html}}", this.document.display("area", "view", getContext()));
+        assertEquals("{{html clean=\"false\" wiki=\"false\"}}area{{/html}}", this.document.display("area", "view",
+            getContext()));
     }
 
     public void testDisplayTemplate10()

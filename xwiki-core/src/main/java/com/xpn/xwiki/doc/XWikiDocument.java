@@ -1708,7 +1708,7 @@ public class XWikiDocument implements DocumentModelBridge
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             if (isInRenderingEngine && !is10Syntax(syntaxId)) {
-                result.insert(0, "{{html wiki=\"false\"}}");
+                result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");
             }
 

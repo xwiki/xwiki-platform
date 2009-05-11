@@ -22,7 +22,7 @@ package org.xwiki.rendering.listener;
 /**
  * Represents a link. Note that this representation is independent of any wiki syntax.
  * 
- * @version $Id: Link.java 10608 2008-06-23 12:25:23Z vmassol $
+ * @version $Id$
  * @since 1.5M2
  */
 public class Link implements Cloneable

@@ -28,7 +28,7 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  * Represents a configuration for the {@link HTMLCleaner} and allows to configure the
  * cleaning parameters and cleaning filters to apply.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public interface HTMLCleanerConfiguration

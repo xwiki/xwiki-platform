@@ -20,7 +20,7 @@ import org.xwiki.xml.XMLReaderFactory;
  * <li>Resolve DTDs locally to speed DTD loading/validation</li> 
  * </ul>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.3
  */
 public class XWikiXMLReaderFactory implements XMLReaderFactory

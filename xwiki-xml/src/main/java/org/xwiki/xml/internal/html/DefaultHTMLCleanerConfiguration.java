@@ -29,7 +29,7 @@ import org.xwiki.xml.html.filter.HTMLFilter;
 /**
  * Default and basic implementation used by the {@link DefaultHTMLCleaner} implementation.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class DefaultHTMLCleanerConfiguration implements HTMLCleanerConfiguration

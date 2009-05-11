@@ -28,7 +28,7 @@ import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelPrinterAdapter;
 /**
  * Print in LaTeX syntax.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class TexRenderer extends WrappingListener implements PrintRenderer
 {

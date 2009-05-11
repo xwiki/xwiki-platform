@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.parameter;
 /**
  * Exception used when the macro parameter is two low.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ParameterValueTooLowException extends MacroParameterException
 {

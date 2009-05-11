@@ -50,7 +50,7 @@ import org.w3c.dom.Element;
  *   <li>https://sourceforge.net/tracker/?func=detail&aid=2761963&group_id=183053&atid=903696</li>
  * </ul>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.2
  */
 public class XWikiDOMSerializer

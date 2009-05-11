@@ -43,7 +43,7 @@ import org.xwiki.rendering.listener.URLImage;
 /**
  * Allows displaying the avatar for a specific user.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC2
  */
 @Component("useravatar")

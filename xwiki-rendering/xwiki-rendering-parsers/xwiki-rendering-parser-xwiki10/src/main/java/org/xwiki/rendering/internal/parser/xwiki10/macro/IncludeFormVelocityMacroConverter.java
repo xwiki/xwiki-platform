@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 import org.xwiki.component.annotation.Component;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 @Component("includeForm")

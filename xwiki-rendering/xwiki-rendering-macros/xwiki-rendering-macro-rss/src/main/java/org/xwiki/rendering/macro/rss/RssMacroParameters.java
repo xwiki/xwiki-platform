@@ -29,7 +29,7 @@ import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.rss.RssMacro} Macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC1
  */
 public class RssMacroParameters

@@ -31,7 +31,7 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
  * Mock {@link org.xwiki.configuration.ConfigurationSourceCollection} that returns an empty list of configuration
  * sources.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class MockConfigurationSourceCollection implements ConfigurationSourceCollection

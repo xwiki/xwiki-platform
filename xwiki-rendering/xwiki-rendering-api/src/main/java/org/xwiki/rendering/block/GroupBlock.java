@@ -28,7 +28,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents a grouping of blocks.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.3
  */
 public class GroupBlock extends AbstractFatherBlock

@@ -29,7 +29,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 /**
  * All configuration options for the rendering subsystem.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultRenderingConfiguration implements Initializable, RenderingConfiguration

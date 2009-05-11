@@ -32,7 +32,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 /**
  * A mock macro which invokes, in turn, the Rss Macro setting its feed to a test feed.xml file.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC1
  */
 public class TestRssMacro extends RssMacro

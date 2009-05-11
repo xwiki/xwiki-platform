@@ -22,7 +22,7 @@ package org.xwiki.rendering.renderer.printer;
 /**
  * Printer using a {@link StringBuffer} as the underlying output target.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultWikiPrinter implements WikiPrinter

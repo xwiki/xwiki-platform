@@ -28,7 +28,7 @@ import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 /**
  * All Rendering integration tests defined in text files using a special format.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class RenderingTests extends TestCase

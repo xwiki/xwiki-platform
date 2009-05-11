@@ -30,7 +30,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 /**
  * Simple implementation that considers image sources as external URLs.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class SimpleXHTMLImageRenderer implements XHTMLImageRenderer

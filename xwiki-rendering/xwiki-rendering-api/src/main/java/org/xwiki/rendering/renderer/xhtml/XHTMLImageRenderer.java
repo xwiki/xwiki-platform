@@ -25,7 +25,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 /**
  * Renders images as XHTML.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public interface XHTMLImageRenderer extends ImageListener

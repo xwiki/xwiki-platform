@@ -37,7 +37,7 @@ import junit.framework.TestCase;
  * Verify that it's possible to use the XHTML Renderer as a POJO using the Simple XHTML Link and Image
  * Renderers.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class XHTMLRendererTest extends TestCase

@@ -26,7 +26,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 @Component

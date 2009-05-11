@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents a quotation line. There can be several quotation lines in a quotation block.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class QuotationLineBlock extends AbstractFatherBlock

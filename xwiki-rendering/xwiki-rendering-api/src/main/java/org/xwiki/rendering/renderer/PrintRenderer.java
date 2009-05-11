@@ -24,7 +24,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 /**
  * A Print Renderer is a {@link Renderer} that outputs its results to a {@link WikiPrinter}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public interface PrintRenderer extends Renderer

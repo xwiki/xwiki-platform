@@ -25,7 +25,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Unit tests for {@link RegexXWikiURLFactory}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase

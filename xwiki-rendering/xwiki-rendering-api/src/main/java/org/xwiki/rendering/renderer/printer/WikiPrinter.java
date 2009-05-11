@@ -22,7 +22,7 @@ package org.xwiki.rendering.renderer.printer;
 /**
  * Printer for {@link org.xwiki.rendering.renderer.PrintRenderer}s.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public interface WikiPrinter

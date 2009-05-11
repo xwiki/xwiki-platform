@@ -26,7 +26,7 @@ import org.xwiki.url.XWikiURL;
 /**
  * Generate a Document name from a XWiki URL.
  *
- * @version $Id: $ 
+ * @version $Id$ 
  * @since 1.6M1
  */
 public class DocumentNameSerializer

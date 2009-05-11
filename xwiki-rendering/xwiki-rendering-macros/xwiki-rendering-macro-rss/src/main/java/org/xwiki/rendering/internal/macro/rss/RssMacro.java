@@ -51,7 +51,7 @@ import org.xwiki.rendering.util.ParserUtils;
 /**
  * Macro that output latest feed entries from a RSS feed.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC1
  */
 @Component("rss")

@@ -33,7 +33,7 @@ import org.xwiki.rendering.parser.SyntaxType;
 /**
  * Parser for Confluence syntax.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.2
  */
 @Component("confluence/1.0")

@@ -28,7 +28,7 @@ import org.xwiki.url.XWikiURL;
 /**
  * Unit tests for {@link org.xwiki.url.serializer.DocumentNameSerializer}.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DocumentNameSerializerTest extends TestCase

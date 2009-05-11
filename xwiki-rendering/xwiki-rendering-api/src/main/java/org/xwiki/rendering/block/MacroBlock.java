@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents a Macro (standalone or inline) defined in a page.
  * 
- * @version $Id: MacroBlock.java 16357 2009-02-06 16:41:42Z tmortagne $
+ * @version $Id$
  * @since 1.8M2
  */
 public class MacroBlock extends AbstractBlock

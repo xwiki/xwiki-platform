@@ -31,7 +31,7 @@ import org.jmock.cglib.MockObjectTestCase;
 import java.io.StringReader;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class RenderingTestCase extends MockObjectTestCase

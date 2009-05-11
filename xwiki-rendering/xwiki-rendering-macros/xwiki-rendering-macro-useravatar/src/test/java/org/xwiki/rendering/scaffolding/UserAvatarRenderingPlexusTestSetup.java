@@ -26,7 +26,7 @@ import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
 import junit.framework.TestSuite;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 18RC2
  */
 public class UserAvatarRenderingPlexusTestSetup extends RenderingPlexusTestSetup

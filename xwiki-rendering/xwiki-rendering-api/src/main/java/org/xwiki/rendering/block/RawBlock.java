@@ -28,7 +28,7 @@ import org.xwiki.rendering.parser.Syntax;
  * or not. For example if it's in "xhtml/1.0" syntax then the XHTML Renderer can insert it directly
  * in the XHTML output.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.3
  */
 public class RawBlock extends AbstractBlock

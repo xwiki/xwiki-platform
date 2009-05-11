@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * global configuration file using a prefix of "rendering" followed by the property name. For example:
  * <code>rendering.linkLabelFormat = %s.%p</code>
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 @ComponentRole

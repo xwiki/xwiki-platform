@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
@@ -42,6 +41,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowAfter;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowBefore;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertTable;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.RichTextAreaCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
@@ -50,7 +50,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Provides user interface for manipulating tables through the WYSIWYG top-level menu.
- *
+ * 
  * @version $Id$
  */
 public class TableMenuExtension extends MenuItemUIExtension implements Updatable, MenuListener
@@ -79,7 +79,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
      * Map of the menu items.
      */
     private Map<String, MenuItem> editMenuItems = new HashMap<String, MenuItem>();
-    
+
     /**
      * The submenu holding the various table options.
      */
@@ -88,11 +88,11 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
     /**
      * The toplevel menu item corresponding to this menu extension.
      */
-    private MenuItem menu;       
+    private MenuItem menu;
 
     /**
      * Builds the menu extension using the passed plugin.
-     *
+     * 
      * @param plugin the plugin to use for the creation of this menu extension.
      */
     public TableMenuExtension(final TablePlugin plugin)
@@ -100,97 +100,40 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
         super("menu");
         this.plugin = plugin;
 
-        MenuItem insertTable = 
-            new MenuItem(Strings.INSTANCE.insertTable(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(InsertTable.NAME));
-                }
-            });
-        
+        MenuItem insertTable = new MenuItem(Strings.INSTANCE.insertTable(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertTable.NAME), null, false));
+
         createTableMenus.add(insertTable);
 
-        MenuItem deleteCol = 
-            new MenuItem(Strings.INSTANCE.deleteCol(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(DeleteCol.NAME));
-                }
-            });
+        MenuItem deleteCol = new MenuItem(Strings.INSTANCE.deleteCol(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(DeleteCol.NAME)));
+        MenuItem deleteRow = new MenuItem(Strings.INSTANCE.deleteRow(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(DeleteRow.NAME)));
+        MenuItem deleteTable = new MenuItem(Strings.INSTANCE.deleteTable(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(DeleteTable.NAME)));
+        MenuItem insertColAfter = new MenuItem(Strings.INSTANCE.insertColAfter(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertColAfter.NAME)));
+        MenuItem insertColBefore = new MenuItem(Strings.INSTANCE.insertColBefore(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertColBefore.NAME)));
+        MenuItem insertRowAfter = new MenuItem(Strings.INSTANCE.insertRowAfter(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertRowAfter.NAME)));
+        MenuItem insertRowBefore = new MenuItem(Strings.INSTANCE.insertRowBefore(),
+            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertRowBefore.NAME)));
 
-        MenuItem deleteRow = 
-            new MenuItem(Strings.INSTANCE.deleteRow(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(DeleteRow.NAME));
-                }
-            });
-
-        MenuItem deleteTable = 
-            new MenuItem(Strings.INSTANCE.deleteTable(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(DeleteTable.NAME));
-                }
-            });
-
-        MenuItem insertColAfter = 
-            new MenuItem(Strings.INSTANCE.insertColAfter(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(InsertColAfter.NAME));
-                }
-            });
-
-
-        MenuItem insertColBefore = 
-            new MenuItem(Strings.INSTANCE.insertColBefore(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(InsertColBefore.NAME));
-                }
-            });
-
-
-        MenuItem insertRowAfter = 
-            new MenuItem(Strings.INSTANCE.insertRowAfter(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(InsertRowAfter.NAME));
-                }
-            }); 
-
-
-        MenuItem insertRowBefore = 
-            new MenuItem(Strings.INSTANCE.insertRowBefore(), new com.google.gwt.user.client.Command()
-            {
-                public void execute()
-                {
-                    plugin.getTextArea().getCommandManager().execute(new Command(InsertRowBefore.NAME));
-                }
-            });        
-        
         editMenuItems.put(DeleteCol.NAME, deleteCol);
         editMenuItems.put(DeleteRow.NAME, deleteRow);
         editMenuItems.put(DeleteTable.NAME, deleteTable);
         editMenuItems.put(InsertColAfter.NAME, insertColAfter);
         editMenuItems.put(InsertColBefore.NAME, insertColBefore);
         editMenuItems.put(InsertRowAfter.NAME, insertRowAfter);
-        editMenuItems.put(InsertRowBefore.NAME, insertRowBefore);        
-        
+        editMenuItems.put(InsertRowBefore.NAME, insertRowBefore);
+
         editTableMenus.add(insertColBefore);
-        editTableMenus.add(insertColAfter);        
+        editTableMenus.add(insertColAfter);
         editTableMenus.add(deleteCol);
         editTableMenus.add(new MenuItemSeparator());
         editTableMenus.add(insertRowBefore);
-        editTableMenus.add(insertRowAfter);        
+        editTableMenus.add(insertRowAfter);
         editTableMenus.add(deleteRow);
         editTableMenus.add(new MenuItemSeparator());
         editTableMenus.add(deleteTable);
@@ -205,7 +148,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
 
         addFeature(TablePluginFactory.getInstance().getPluginName(), menu);
     }
-    
+
     /**
      * Cleans up this menu extension on destroy.
      */
@@ -229,7 +172,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.wysiwyg.client.widget.MenuListener#onMenuItemSelected(com.xpn.xwiki.wysiwyg.client.widget.MenuItem)
      */
     public void onMenuItemSelected(MenuItem menuItem)
@@ -240,7 +183,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.wysiwyg.client.util.Updatable#update()
      */
     public void update()
@@ -249,25 +192,24 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
         if (plugin.getTextArea().getCommandManager().isEnabled(new Command(DeleteTable.NAME))) {
             // activate the edit submenu
             if (submenu.getItem(0) != editTableMenus.get(0)) {
-                submenu.clearItems();                
+                submenu.clearItems();
                 submenu.addAll(editTableMenus);
-            } 
+            }
 
             // Enable / disable menu entries.
             List<TableFeature> features = plugin.getFeatures();
-            for (TableFeature feature : features) {                                
+            for (TableFeature feature : features) {
                 if (editMenuItems.containsKey(feature.getName())) {
                     editMenuItems.get(feature.getName()).setEnabled(feature.isEnabled(plugin.getTextArea()));
                 }
-            }            
+            }
         } else {
             // the create table list must be setup, and disabled if create table is not possible
             if (submenu.getItem(0) != createTableMenus.get(0)) {
                 submenu.clearItems();
                 submenu.addAll(createTableMenus);
             }
-            boolean canCreateTable = plugin.getTextArea().getCommandManager().isEnabled(
-                new Command(InsertTable.NAME));
+            boolean canCreateTable = plugin.getTextArea().getCommandManager().isEnabled(new Command(InsertTable.NAME));
             // set enabling state of the menu items in the submenu
             for (UIObject m : createTableMenus) {
                 if (m instanceof MenuItem) {

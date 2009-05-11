@@ -19,47 +19,30 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
-import org.xwiki.gwt.dom.client.Element;
-
-import com.google.gwt.dom.client.Document;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
- * Stores the value of the rich text area in a HTML form field before submitting it to the server.
+ * Resets the content of the rich text area. This executable should be used, instead of setting the content of the rich
+ * text area directly, in order to let command listeners to be notified and adjust the content. There is a difference
+ * between listening to the command associated with this executable and listening to inner HTML changes on the rich text
+ * area's document body. The later implies that the new content was generated on the client (like an undo operation),
+ * while the reset executable implies the new content comes from the server and is more like the initial content of the
+ * rich text area.
  * 
  * @version $Id$
  */
-public class SubmitExecutable implements Executable
+public class ResetExecutable implements Executable
 {
-    /**
-     * The form field identifier.
-     */
-    private final String fieldId;
-
-    /**
-     * Creates a new submit executable that bind a rich text area to the specified form field.
-     * 
-     * @param fieldId the form field identifier
-     */
-    public SubmitExecutable(String fieldId)
-    {
-        this.fieldId = fieldId;
-    }
-
     /**
      * {@inheritDoc}
      * 
      * @see Executable#execute(RichTextArea, String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(RichTextArea rta, String parameter)
     {
-        Element field = (Element) Document.get().getElementById(fieldId);
-        if (field != null) {
-            field.setPropertyString("value", rta.getHTML());
-            return true;
-        }
-        return false;
+        rta.setHTML(parameter);
+        return true;
     }
 
     /**
@@ -69,7 +52,7 @@ public class SubmitExecutable implements Executable
      */
     public String getParameter(RichTextArea rta)
     {
-        return null;
+        return rta.getHTML();
     }
 
     /**
@@ -89,7 +72,7 @@ public class SubmitExecutable implements Executable
      */
     public boolean isExecuted(RichTextArea rta)
     {
-        return false;
+        return rta.isEnabled();
     }
 
     /**
@@ -99,6 +82,6 @@ public class SubmitExecutable implements Executable
      */
     public boolean isSupported(RichTextArea rta)
     {
-        return rta != null && fieldId != null && Document.get().getElementById(fieldId) != null;
+        return rta != null;
     }
 }

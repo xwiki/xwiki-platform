@@ -28,6 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.RichTextAreaCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
@@ -105,30 +106,13 @@ public class MacroMenuExtension implements Updatable, MenuListener
     {
         this.plugin = plugin;
 
-        MenuItem refresh = new MenuItem(Strings.INSTANCE.macroRefresh(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.getTextArea().getCommandManager().execute(MacroPlugin.REFRESH);
-            }
-        });
+        MenuItem refresh = new MenuItem(Strings.INSTANCE.macroRefresh(),
+            new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.REFRESH, null, false));
         refresh.setIcon(Images.INSTANCE.macroRefresh().createElement());
-        collapse = new MenuItem(Strings.INSTANCE.macroCollapseAll(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.getTextArea().setFocus(true);
-                plugin.getTextArea().getCommandManager().execute(MacroPlugin.COLLAPSE);
-            }
-        });
-        expand = new MenuItem(Strings.INSTANCE.macroExpandAll(), new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                plugin.getTextArea().setFocus(true);
-                plugin.getTextArea().getCommandManager().execute(MacroPlugin.EXPAND);
-            }
-        });
+        collapse = new MenuItem(Strings.INSTANCE.macroCollapseAll(),
+            new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.COLLAPSE));
+        expand = new MenuItem(Strings.INSTANCE.macroExpandAll(),
+            new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.EXPAND));
         edit = new MenuItem(Strings.INSTANCE.macroEdit(), new com.google.gwt.user.client.Command()
         {
             public void execute()

@@ -30,6 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatelessUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.EnableExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.ResetExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.SubmitExecutable;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
@@ -46,6 +47,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 public class SubmitPlugin extends AbstractPlugin implements FocusListener, CommandListener
 {
     /**
+     * The name attribute, used by HTML form elements to pass data to the server when the form is submitted.
+     */
+    private static final String NAME_ATTRIBUTE = "name";
+
+    /**
      * The name of the syntax configuration parameter.
      */
     private static final String SYNTAX = "syntax";
@@ -53,7 +59,7 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     /**
      * Default syntax. Can be overwritten from the configuration.
      */
-    private static final String DEFAULT_SYNTAX = "xwiki/2.0";
+    private static final String DEFAULT_SYNTAX = "xhtml/1.0";
 
     /**
      * The command used to store the value of the rich text area before submitting the including form.
@@ -85,7 +91,7 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     /**
      * Additional data to be sent to the server, besides the content of the rich text area.
      */
-    private final HiddenConfig hiddenConfig = new HiddenConfig();
+    private HiddenConfig hiddenConfig;
 
     /**
      * The HTML form that contains the rich text area.
@@ -104,27 +110,31 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
         String hookId = getConfig().getParameter("hookId");
         getTextArea().getCommandManager().registerCommand(SUBMIT, new SubmitExecutable(hookId));
         getTextArea().getCommandManager().registerCommand(ENABLE, new EnableExecutable());
+        getTextArea().getCommandManager().registerCommand(new Command("reset"), new ResetExecutable());
 
         if (getTextArea().getCommandManager().isSupported(SUBMIT)) {
             Element hook = (Element) Document.get().getElementById(hookId);
-            // All the parameters of this hidden configuration will be prefixed with the name of the hook.
-            hiddenConfig.setNameSpace(hook.getAttribute("name"));
-            // This flag is needed in order to detect that a server request contains rich text area data.
-            hiddenConfig.addFlag(WYSIWYG_FLAG);
-            // The storage syntax for this rich text area.
-            hiddenConfig.setParameter(SYNTAX, config.getParameter(SYNTAX, DEFAULT_SYNTAX));
-            rootExtension.addFeature(SUBMIT.toString(), hiddenConfig);
-
             // See if the hook is inside an HTML form.
             form = (Element) DOMUtils.getInstance().getFirstAncestor(hook, "form");
-            if (form != null) {
+            if (form != null && hook.hasAttribute(NAME_ATTRIBUTE)) {
+                // Put additional hidden data on the HTML form.
+                hiddenConfig = new HiddenConfig();
+                // All the parameters of this hidden configuration will be prefixed with the name of the hook.
+                hiddenConfig.setNameSpace(hook.getAttribute(NAME_ATTRIBUTE));
+                // This flag is needed in order to detect that a server request contains rich text area data.
+                hiddenConfig.addFlag(WYSIWYG_FLAG);
+                // The storage syntax for this rich text area.
+                hiddenConfig.setParameter(SYNTAX, config.getParameter(SYNTAX, DEFAULT_SYNTAX));
+
+                rootExtension.addFeature(SUBMIT.toString(), hiddenConfig);
+                getUIExtensionList().add(rootExtension);
+
                 // Listen to submit event.
                 hookSubmitEvent(form);
             }
 
             getTextArea().addFocusListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
-            getUIExtensionList().add(rootExtension);
         }
     }
 
@@ -136,16 +146,15 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     public void destroy()
     {
         if (rootExtension.getFeatures().length > 0) {
-            if (form != null) {
-                unhookSubmitEvent(form);
-                form = null;
-                submitHandler = null;
-            }
-
-            getTextArea().removeFocusListener(this);
-            getTextArea().getCommandManager().removeCommandListener(this);
+            unhookSubmitEvent(form);
+            form = null;
+            hiddenConfig = null;
+            submitHandler = null;
             rootExtension.clearFeatures();
         }
+
+        getTextArea().removeFocusListener(this);
+        getTextArea().getCommandManager().removeCommandListener(this);
 
         super.destroy();
     }
@@ -237,7 +246,7 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
      */
     public void onCommand(CommandManager sender, Command command, String param)
     {
-        if (sender == getTextArea().getCommandManager() && ENABLE.equals(command)) {
+        if (hiddenConfig != null && sender == getTextArea().getCommandManager() && ENABLE.equals(command)) {
             if (getTextArea().getCommandManager().isExecuted(ENABLE)) {
                 hiddenConfig.addFlag(WYSIWYG_FLAG);
             } else {

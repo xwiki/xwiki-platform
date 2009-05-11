@@ -74,6 +74,11 @@
       <version>${jetty.version}</version>
     </dependency>        
   </dependencies>
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.14</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.14</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.14</url>
+  </scm>
   <build>
     <plugins>
       <plugin>
@@ -95,10 +100,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.14</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.14</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-jetty-resources-1.14</url>
-  </scm>
 </project>

@@ -418,6 +418,12 @@ public abstract class ListClass extends PropertyClass
         String separator = getSeparator();
         BaseProperty prop = (BaseProperty) object.safeget(name);
         Map<String, ListItem> map = getMap(context);
+
+        // Skip unset values.
+        if (prop == null) {
+            return;
+        }
+
         if (prop instanceof ListProperty) {
             selectlist = ((ListProperty) prop).getList();
             List<String> newlist = new ArrayList<String>();

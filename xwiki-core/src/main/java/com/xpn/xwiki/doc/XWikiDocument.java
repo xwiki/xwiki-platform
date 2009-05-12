@@ -1635,6 +1635,9 @@ public class XWikiDocument implements DocumentModelBridge
     public String display(String fieldname, String type, String pref, BaseObject obj, String syntaxId,
         XWikiContext context)
     {
+        if (obj == null) {
+            return "";
+        }
         boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
@@ -1752,10 +1755,9 @@ public class XWikiDocument implements DocumentModelBridge
             }
             return display(fieldname, object, context);
         } catch (Exception e) {
-            LOG.error("Faild to display fiedl " + fieldname + "of document" + getFullName(), e);
-
-            return "";
+            LOG.error("Failed to display field " + fieldname + " of document " + getFullName(), e);
         }
+        return "";
     }
 
     public String display(String fieldname, String mode, XWikiContext context)

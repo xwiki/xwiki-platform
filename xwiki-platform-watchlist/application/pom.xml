@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-watchlist</artifactId>
   <name>XWiki Platform - Applications - WatchList</name>
-  <version>1.15</version>
+  <version>1.16-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>WatchList email template</description>
   <dependencies>
@@ -46,8 +46,8 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.15</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.15</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-watchlist-1.15</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/watchlist</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/watchlist</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/watchlist</url>
   </scm>
 </project>

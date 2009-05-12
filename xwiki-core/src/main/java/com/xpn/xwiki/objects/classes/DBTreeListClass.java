@@ -72,8 +72,16 @@ public class DBTreeListClass extends DBListClass
         if ((list == null) || (list.size() == 0)) {
             return map;
         }
+        // The root of the tree is considered to be the empty string.
+        // Make sure that entries with invalid parents end up in the tree.
+        // TODO: Detect cycles, as these also don't appear in the tree.
+        List<String> validParents = this.getList(context);
         for (ListItem item : list) {
-            addToList(map, item.getParent(), item);
+            if (validParents.contains(item.getParent())) {
+                addToList(map, item.getParent(), item);
+            } else {
+                addToList(map, "", item);
+            }
         }
         return map;
     }

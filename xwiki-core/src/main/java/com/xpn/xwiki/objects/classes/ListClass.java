@@ -327,9 +327,9 @@ public abstract class ListClass extends PropertyClass
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
-    protected String getDisplayValue(String value, String name, Map map, XWikiContext context)
+    protected String getDisplayValue(String value, String name, Map<String, ListItem> map, XWikiContext context)
     {
-        ListItem item = (ListItem) map.get(value);
+        ListItem item = map.get(value);
         String displayValue;
         if (item == null) {
             displayValue = value;
@@ -366,7 +366,7 @@ public abstract class ListClass extends PropertyClass
      * @param context The request context.
      * @return The text that should be displayed, representing a human-understandable name for the internal value.
      */
-    protected String getDisplayValue(Object rawvalue, String name, Map map, XWikiContext context)
+    protected String getDisplayValue(Object rawvalue, String name, Map<String, ListItem> map, XWikiContext context)
     {
         if (rawvalue == null) {
             return "";
@@ -502,19 +502,19 @@ public abstract class ListClass extends PropertyClass
         buffer.append(hidden);
     }
 
-    protected class MapComparator implements Comparator
+    protected class MapComparator implements Comparator<String>
     {
-        protected Map map;
+        protected Map<String, ListItem> map;
 
-        public MapComparator(Map map)
+        public MapComparator(Map<String, ListItem> map)
         {
             this.map = map;
         }
 
-        public int compare(Object o1, Object o2)
+        public int compare(String o1, String o2)
         {
-            ListItem s1 = (ListItem) this.map.get(o1);
-            ListItem s2 = (ListItem) this.map.get(o2);
+            ListItem s1 = this.map.get(o1);
+            ListItem s2 = this.map.get(o2);
 
             if ((s1 == null) && (s2 == null)) {
                 return 0;
@@ -541,8 +541,8 @@ public abstract class ListClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
 
-        List list = getList(context);
-        Map map = getMap(context);
+        List<String> list = getList(context);
+        Map<String, ListItem> map = getMap(context);
 
         String sort = getSort();
         if (!"none".equals(sort)) {
@@ -554,29 +554,27 @@ public abstract class ListClass extends PropertyClass
             }
         }
 
-        List selectlist;
+        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
-        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
+            selectlist = new ArrayList<String>();
+        } else if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList();
-            selectlist.add(prop.getValue());
+            selectlist = new ArrayList<String>();
+            selectlist.add(String.valueOf(prop.getValue()));
         }
 
         // TODO: add elements that are in the values but not in the predefined list..
-        for (Iterator it = selectlist.iterator(); it.hasNext();) {
-            String item = (String) it.next();
+        for (String item : selectlist) {
             if (!list.contains(item)) {
                 list.add(item);
             }
         }
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Object rawvalue = it.next();
+        for (String rawvalue : list) {
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, map, context);
             option option = new option(display, value);
@@ -609,8 +607,8 @@ public abstract class ListClass extends PropertyClass
     protected String displayRadioSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        List list = getList(context);
-        List selectlist = new ArrayList();
+        List<String> list = getList(context);
+        List<String> selectlist = new ArrayList<String>();
 
         /*
          * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist = new ArrayList(); }
@@ -619,8 +617,8 @@ public abstract class ListClass extends PropertyClass
          */
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Object rawvalue = it.next();
+        for (Iterator<String> it = list.iterator(); it.hasNext();) {
+            String rawvalue = it.next();
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, getMap(context), context);
             input radio =
@@ -646,10 +644,10 @@ public abstract class ListClass extends PropertyClass
         select.setName(prefix + name);
         select.setID(prefix + name);
 
-        List list = getList(context);
+        List<String> list = getList(context);
         String fieldFullName = getFieldFullName();
         String[] selectArray = ((String[]) criteria.getParameter(fieldFullName));
-        List selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList();
+        List<String> selectlist = (selectArray != null) ? Arrays.asList(selectArray) : new ArrayList<String>();
 
         /*
          * BaseProperty prop = (BaseProperty)object.safeget(name); if (prop==null) { selectlist = new ArrayList(); }
@@ -658,8 +656,7 @@ public abstract class ListClass extends PropertyClass
          */
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Object rawvalue = it.next();
+        for (String rawvalue : list) {
             String value = getElementValue(rawvalue);
             String display = getDisplayValue(rawvalue, name, getMap(context), context);
             option option = new option(display, value);

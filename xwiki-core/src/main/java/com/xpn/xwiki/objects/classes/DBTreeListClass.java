@@ -22,7 +22,6 @@ package com.xpn.xwiki.objects.classes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,6 @@ import org.apache.velocity.VelocityContext;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
@@ -67,22 +65,15 @@ public class DBTreeListClass extends DBListClass
         setStringValue("parentField", parentField);
     }
 
-    public Map getTreeMap(XWikiContext context)
+    public Map<String, List<ListItem>> getTreeMap(XWikiContext context)
     {
-        List list = getDBList(context);
-        Map map = new HashMap();
+        List<ListItem> list = getDBList(context);
+        Map<String, List<ListItem>> map = new HashMap<String, List<ListItem>>();
         if ((list == null) || (list.size() == 0)) {
             return map;
         }
-        for (int i = 0; i < list.size(); i++) {
-            Object result = list.get(i);
-            if (result instanceof String) {
-                ListItem item = new ListItem((String) result);
-                map.put(result, item);
-            } else {
-                ListItem item = (ListItem) result;
-                addToList(map, item.getParent(), item);
-            }
+        for (ListItem item : list) {
+            addToList(map, item.getParent(), item);
         }
         return map;
     }
@@ -93,19 +84,20 @@ public class DBTreeListClass extends DBListClass
      * @param treemap
      * @return list of ListItems
      */
-    protected List getTreeList(Map treemap, Map map, XWikiContext context)
+    protected List<ListItem> getTreeList(Map<String, List<ListItem>> treemap, Map<String, ListItem> map,
+        XWikiContext context)
     {
-        List list = new ArrayList();
+        List<ListItem> list = new ArrayList<ListItem>();
         addToTreeList(list, treemap, map, "", context);
         return list;
     }
 
-    protected void addToTreeList(List treelist, Map treemap, Map map, String parent, XWikiContext context)
+    protected void addToTreeList(List<ListItem> treelist, Map<String, List<ListItem>> treemap,
+        Map<String, ListItem> map, String parent, XWikiContext context)
     {
-        List list = (List) treemap.get(parent);
+        List<ListItem> list = treemap.get(parent);
         if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                ListItem item = (ListItem) list.get(i);
+            for (ListItem item : list) {
                 ListItem item2 =
                     new ListItem(item.getId(), getDisplayValue(item.getId(), "", map, context), item.getParent());
                 treelist.add(item2);
@@ -114,11 +106,11 @@ public class DBTreeListClass extends DBListClass
         }
     }
 
-    protected void addToList(Map map, String key, ListItem item)
+    protected void addToList(Map<String, List<ListItem>> map, String key, ListItem item)
     {
-        List list = (List) map.get(key);
+        List<ListItem> list = map.get(key);
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<ListItem>();
             map.put(key, list);
         }
         list.add(item);
@@ -127,15 +119,15 @@ public class DBTreeListClass extends DBListClass
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        List selectlist;
+        List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
-        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
+            selectlist = new ArrayList<String>();
+        } else if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList();
-            selectlist.add(prop.getValue());
+            selectlist = new ArrayList<String>();
+            selectlist.add(String.valueOf(prop.getValue()));
         }
         String result = displayFlatView(selectlist, context);
         if (result.equals("")) {
@@ -148,15 +140,15 @@ public class DBTreeListClass extends DBListClass
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
-        List selectlist;
+        List<String> selectlist;
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
-        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
+            selectlist = new ArrayList<String>();
+        } else if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList();
-            selectlist.add(prop.getValue());
+            selectlist = new ArrayList<String>();
+            selectlist.add(String.valueOf(prop.getValue()));
         }
 
         if (isPicker()) {
@@ -172,31 +164,29 @@ public class DBTreeListClass extends DBListClass
         }
     }
 
-    private String displayFlatView(List selectlist, XWikiContext context)
+    private String displayFlatView(List<String> selectlist, XWikiContext context)
     {
-        Map map = getMap(context);
-        Map treemap = getTreeMap(context);
-        List fullTreeList = getTreeList(treemap, map, context);
-        List resList = new ArrayList(selectlist.size());
+        Map<String, ListItem> map = getMap(context);
+        Map<String, List<ListItem>> treemap = getTreeMap(context);
+        List<ListItem> fullTreeList = getTreeList(treemap, map, context);
+        List<List<ListItem>> resList = new ArrayList<List<ListItem>>(selectlist.size());
 
-        Iterator it = selectlist.iterator();
-        while (it.hasNext()) {
-            String item = (String) it.next();
-            List itemPath = getItemPath(item, fullTreeList, new ArrayList());
+        for (String item : selectlist) {
+            List<ListItem> itemPath = getItemPath(item, fullTreeList, new ArrayList<ListItem>());
             mergeItems(itemPath, resList);
         }
 
         return renderItemsList(resList);
     }
 
-    protected String renderItemsList(List resList)
+    protected String renderItemsList(List<List<ListItem>> resList)
     {
         StringBuffer buff = new StringBuffer();
 
         for (int i = 0; i < resList.size(); i++) {
-            List items = (List) resList.get(i);
+            List<ListItem> items = resList.get(i);
             for (int j = 0; j < items.size(); j++) {
-                ListItem item = (ListItem) items.get(j);
+                ListItem item = items.get(j);
                 buff.append(item.getValue());
                 if (j < items.size() - 1) {
                     buff.append(" &gt; ");
@@ -209,24 +199,24 @@ public class DBTreeListClass extends DBListClass
         return buff.toString();
     }
 
-    private void mergeItems(List itemPath, List resList)
+    private void mergeItems(List<ListItem> itemPath, List<List<ListItem>> resList)
     {
         if (itemPath.size() == 0) {
             return;
         }
 
         for (int i = 0; i < resList.size(); i++) {
-            List items = (List) resList.get(i);
+            List<ListItem> items = resList.get(i);
             if (items.size() < itemPath.size()) {
-                ListItem item1 = (ListItem) items.get(items.size() - 1);
-                ListItem item2 = (ListItem) itemPath.get(items.size() - 1);
+                ListItem item1 = items.get(items.size() - 1);
+                ListItem item2 = itemPath.get(items.size() - 1);
                 if (item1.equals(item2)) {
                     resList.set(i, itemPath);
                     return;
                 }
             } else {
-                ListItem item1 = (ListItem) items.get(itemPath.size() - 1);
-                ListItem item2 = (ListItem) itemPath.get(itemPath.size() - 1);
+                ListItem item1 = items.get(itemPath.size() - 1);
+                ListItem item2 = itemPath.get(itemPath.size() - 1);
                 if (item1.equals(item2)) {
                     return;
                 }
@@ -235,11 +225,9 @@ public class DBTreeListClass extends DBListClass
         resList.add(itemPath);
     }
 
-    private List getItemPath(String item, List treeList, ArrayList resList)
+    private List<ListItem> getItemPath(String item, List<ListItem> treeList, ArrayList<ListItem> resList)
     {
-        Iterator it = treeList.iterator();
-        while (it.hasNext()) {
-            ListItem tmpItem = (ListItem) it.next();
+        for (ListItem tmpItem : treeList) {
             if (item.equals(tmpItem.getId())) {
                 if (tmpItem.getParent().length() > 0) {
                     getItemPath(tmpItem.getParent(), treeList, resList);
@@ -251,11 +239,11 @@ public class DBTreeListClass extends DBListClass
         return null;
     }
 
-    private String displayTree(String name, String prefix, List selectlist, String mode, XWikiContext context)
+    private String displayTree(String name, String prefix, List<String> selectlist, String mode, XWikiContext context)
     {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        Map map = getMap(context);
-        Map treemap = getTreeMap(context);
+        Map<String, ListItem> map = getMap(context);
+        Map<String, List<ListItem>> treemap = getTreeMap(context);
         vcontext.put("selectlist", selectlist);
         vcontext.put("fieldname", prefix + name);
         vcontext.put("tree", map);
@@ -264,13 +252,12 @@ public class DBTreeListClass extends DBListClass
         return context.getWiki().parseTemplate("treeview.vm", context);
     }
 
-    protected void addToSelect(select select, List selectlist, Map map, Map treemap, String parent, String level,
-        XWikiContext context)
+    protected void addToSelect(select select, List<String> selectlist, Map<String, ListItem> map,
+        Map<String, List<ListItem>> treemap, String parent, String level, XWikiContext context)
     {
-        List list = (List) treemap.get(parent);
+        List<ListItem> list = treemap.get(parent);
         if (list != null) {
-            for (int i = 0; i < list.size(); i++) {
-                ListItem item = (ListItem) list.get(i);
+            for (ListItem item : list) {
                 String display = level + getDisplayValue(item.getId(), "", map, context);
                 option option = new option(display, item.getId());
                 option.addElement(display);
@@ -292,18 +279,18 @@ public class DBTreeListClass extends DBListClass
         select.setName(prefix + name);
         select.setID(prefix + name);
 
-        Map map = getMap(context);
-        Map treemap = getTreeMap(context);
-        List selectlist;
+        Map<String, ListItem> map = getMap(context);
+        Map<String, List<ListItem>> treemap = getTreeMap(context);
+        List<String> selectlist;
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop == null) {
-            selectlist = new ArrayList();
-        } else if ((prop instanceof ListProperty) || (prop instanceof DBStringListProperty)) {
-            selectlist = (List) prop.getValue();
+            selectlist = new ArrayList<String>();
+        } else if (prop instanceof ListProperty) {
+            selectlist = ((ListProperty) prop).getList();
         } else {
-            selectlist = new ArrayList();
-            selectlist.add(prop.getValue());
+            selectlist = new ArrayList<String>();
+            selectlist.add(String.valueOf(prop.getValue()));
         }
 
         // Add options from Set
@@ -408,8 +395,8 @@ public class DBTreeListClass extends DBListClass
                 // Build the query in this variable.
                 StringBuffer select = new StringBuffer("select distinct ");
                 // These will hold the components of the from and where parts of the query.
-                ArrayList fromStatements = new ArrayList();
-                ArrayList whereStatements = new ArrayList();
+                ArrayList<String> fromStatements = new ArrayList<String>();
+                ArrayList<String> whereStatements = new ArrayList<String>();
 
                 // Add the document to the query only if it is needed.
                 if (usesDoc) {

@@ -105,4 +105,15 @@ public class ListItem
     {
         this.parent = parent;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "[" + getId() + ", " + getValue() + ", " + getParent() + "]";
+    }
 }

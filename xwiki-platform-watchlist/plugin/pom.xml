@@ -36,8 +36,8 @@
   <properties>
     <platform.core.version>1.8-SNAPSHOT</platform.core.version>
     <platform.plugin.scheduler.version>1.8-SNAPSHOT</platform.plugin.scheduler.version>
-    <platform.plugin.lucene.version>1.7-SNAPSHOT</platform.plugin.lucene.version>
-    <platform.plugin.mailsender.version>1.8-SNAPSHOT</platform.plugin.mailsender.version>
+    <platform.plugin.lucene.version>1.9-SNAPSHOT</platform.plugin.lucene.version>
+    <platform.plugin.mailsender.version>1.9-SNAPSHOT</platform.plugin.mailsender.version>
   </properties>
   <dependencies>
     <dependency>
@@ -50,16 +50,19 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
       <version>${platform.plugin.scheduler.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
       <version>${platform.plugin.mailsender.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-lucene</artifactId>
       <version>${platform.plugin.lucene.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>

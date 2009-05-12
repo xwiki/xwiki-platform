@@ -2,13 +2,13 @@
   <parent>
     <artifactId>xwiki-core-rendering-macros-parent</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>1.9-milestone-2</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-rendering-macro-rss</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - RSS Reader</name>
-  <version>1.9-milestone-2</version>
+  <version>1.9-SNAPSHOT</version>
   <description>XWiki Platform - Core - Rendering - Macro - RSS Reader</description>
   <build>
     <plugins>

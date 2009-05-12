@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-configuration-resources</artifactId>
   <name>XWiki Platform - Tools - XWiki Configuration Resources</name>
-  <version>1.25</version>
+  <version>1.25-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>
     Common XWiki resources for configuring XWiki. Contains config files like Hibernate

@@ -5,7 +5,8 @@
 [label>href]
 [label>href>_blank]
 http://xwiki.org/
+svn://xwiki.org
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-[[href]] [[label>>href]] [[label>>href||target="_blank"]] http://xwiki.org/
+[[href]] [[label>>href]] [[label>>href||target="_blank"]] http://xwiki.org/ svn:~/~/xwiki.org

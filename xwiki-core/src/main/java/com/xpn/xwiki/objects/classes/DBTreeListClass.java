@@ -201,7 +201,7 @@ public class DBTreeListClass extends DBListClass
 
     private void mergeItems(List<ListItem> itemPath, List<List<ListItem>> resList)
     {
-        if (itemPath.size() == 0) {
+        if (itemPath == null || itemPath.size() == 0) {
             return;
         }
 

@@ -5089,8 +5089,10 @@ public class XWikiDocument implements DocumentModelBridge
                             TextAreaClass textAreaClass = (TextAreaClass) fieldClass;
                             LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
-                            field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId,
-                                false));
+                            if (field != null) {
+                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId,
+                                    false));
+                            }
                         }
                     }
                 }

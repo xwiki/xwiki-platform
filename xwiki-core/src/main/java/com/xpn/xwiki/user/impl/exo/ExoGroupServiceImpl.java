@@ -21,26 +21,33 @@
 
 package com.xpn.xwiki.user.impl.exo;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.lang.NotImplementedException;
+import org.exoplatform.commons.utils.PageList;
+import org.exoplatform.container.PortalContainer;
+import org.exoplatform.services.organization.Group;
+import org.exoplatform.services.organization.GroupHandler;
+import org.exoplatform.services.organization.MembershipHandler;
+import org.exoplatform.services.organization.MembershipType;
+import org.exoplatform.services.organization.MembershipTypeHandler;
+import org.exoplatform.services.organization.OrganizationService;
+import org.exoplatform.services.organization.User;
+import org.exoplatform.services.organization.UserHandler;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 
-import org.apache.commons.lang.NotImplementedException;
-import org.exoplatform.commons.utils.PageList;
-import org.exoplatform.container.PortalContainer;
-import org.exoplatform.services.organization.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
 public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiGroupService
 {
     private static OrganizationService organizationService;
 
+    @Override
     public void init(XWiki xwiki, XWikiContext context) throws XWikiException
     {
         super.init(xwiki, context);
@@ -58,9 +65,7 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
     {
         if (organizationService == null) {
             PortalContainer manager = PortalContainer.getInstance();
-            organizationService =
-                (OrganizationService) manager
-                    .getComponentInstanceOfType(OrganizationService.class);
+            organizationService = (OrganizationService) manager.getComponentInstanceOfType(OrganizationService.class);
         }
         return organizationService;
     }
@@ -89,23 +94,22 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
         return organizationService.getMembershipTypeHandler();
     }
 
-    public Collection listGroupsForUser(String username, XWikiContext context)
-        throws XWikiException
+    @Override
+    public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException
     {
         GroupHandler groupHandler = getGroupHandler();
-        Collection groups = null;
+        Collection<Group> groups = null;
         try {
             if (username.startsWith("XWiki.")) {
                 username = username.substring(6);
                 groups = groupHandler.findGroupsOfUser(username);
             }
 
-            ArrayList list = new ArrayList();
-            if (groups == null)
+            ArrayList<String> list = new ArrayList<String>();
+            if (groups == null) {
                 return list;
-            Iterator it = groups.iterator();
-            while (it.hasNext()) {
-                Group group = (Group) it.next();
+            }
+            for (Group group : groups) {
                 list.add(group.getGroupName());
             }
             return list;
@@ -113,15 +117,13 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
             Object[] args = {username};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_LISTING_USERS,
-                "Exception while listing groups for user {0}",
-                e,
-                args);
+                "Exception while listing groups for user {0}", e, args);
 
         }
     }
 
-    public void addUserToGroup(String user, String database, String group, XWikiContext context)
-        throws XWikiException
+    @Override
+    public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException
     {
         // TODO: test this code
         MembershipHandler membershipHandler = getMembershipHandler();
@@ -149,30 +151,29 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
             Object[] args = {user, group};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_ADDING_USERS,
-                "Exception while adding user {0} to group {1}",
-                e,
-                args);
+                "Exception while adding user {0} to group {1}", e, args);
         }
     }
 
-    public List listMemberForGroup(String group, XWikiContext context) throws XWikiException
+    @Override
+    public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
         UserHandler userHandler = getUserHandler();
 
-        List usersList = new ArrayList();
-        List exoList = null;
+        List<String> usersList = new ArrayList<String>();
+        List<User> exoList = null;
 
         try {
             if (group == null) {
                 PageList plist = null;
                 plist = userHandler.getUserPageList(100);
                 exoList = plist.getAll();
-            } else
+            } else {
                 exoList = userHandler.findUsersByGroup(group).getAll();
+            }
 
             if (exoList != null) {
-                for (int i = 0; i < exoList.size(); i++) {
-                    User user = (User) exoList.get(i);
+                for (User user : exoList) {
                     usersList.add(user.getUserName());
                 }
             }
@@ -180,24 +181,22 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
         } catch (Exception e) {
             Object[] args = {group};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS,
-                "Exception while listing users for group {0}",
-                e,
-                args);
+                XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS, "Exception while listing users for group {0}",
+                e, args);
         }
     }
 
-    public List listAllGroups(XWikiContext context) throws XWikiException
+    @Override
+    public List<String> listAllGroups(XWikiContext context) throws XWikiException
     {
         GroupHandler handlerGroup = getGroupHandler();
-        List allGroups = new ArrayList();
-        List exoGroups = null;
+        List<String> allGroups = new ArrayList<String>();
+        List<Group> exoGroups = null;
         try {
-            exoGroups = (List) handlerGroup.getAllGroups();
+            exoGroups = (List<Group>) handlerGroup.getAllGroups();
 
             if (exoGroups != null) {
-                for (int i = 0; i < exoGroups.size(); i++) {
-                    Group group = (Group) exoGroups.get(i);
+                for (Group group : exoGroups) {
                     allGroups.add(group.getId());
                 }
             }
@@ -205,29 +204,25 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
         } catch (Exception e) {
             Object[] args = {};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS,
-                "Exception while listing groups",
-                e,
-                args);
+                XWikiException.ERROR_XWIKI_ACCESS_EXO_EXCEPTION_USERS, "Exception while listing groups", e, args);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedUsers(java.lang.Object[][],
-     *      boolean, int, int, java.lang.Object[][], com.xpn.xwiki.XWikiContext) TODO: fully
-     *      implements this method.
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedUsers(java.lang.Object[][], boolean, int,
+     *      int, java.lang.Object[][], com.xpn.xwiki.XWikiContext) TODO: fully implements this method.
      */
-    public List getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb,
-        int start, Object[][] order, XWikiContext context) throws XWikiException
+    @Override
+    public List<String> getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
+        Object[][] order, XWikiContext context) throws XWikiException
     {
-        if ((matchFields != null && matchFields.length > 0) || withdetails
-            || (order != null && order.length > 0)) {
+        if ((matchFields != null && matchFields.length > 0) || withdetails || (order != null && order.length > 0)) {
             throw new NotImplementedException();
         }
 
-        List usersList = listMemberForGroup(null, context);
+        List<String> usersList = listMemberForGroup(null, context);
 
         if (nb > 0 || start > 0) {
             int fromIndex = start < 0 ? 0 : start;
@@ -242,20 +237,20 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedGroups(java.lang.Object[][],
-     *      boolean, int, int, java.lang.Object[][], com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedGroups(java.lang.Object[][], boolean, int,
+     *      int, java.lang.Object[][], com.xpn.xwiki.XWikiContext)
      */
-    public List getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb,
-        int start, Object[][] order, XWikiContext context) throws XWikiException
+    @Override
+    public List<String> getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
+        Object[][] order, XWikiContext context) throws XWikiException
     {
         // TODO : fully implement this methods for eXo platform
 
-        if ((matchFields != null && matchFields.length > 0) || withdetails
-            || (order != null && order.length > 0)) {
+        if ((matchFields != null && matchFields.length > 0) || withdetails || (order != null && order.length > 0)) {
             throw new NotImplementedException();
         }
 
-        List groupList = listAllGroups(context);
+        List<String> groupList = listAllGroups(context);
 
         if (nb > 0 || start > 0) {
             int fromIndex = start < 0 ? 0 : start;
@@ -273,8 +268,8 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedUsers(java.lang.Object[][],
      *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedUsers(Object[][] matchFields, XWikiContext context)
-        throws XWikiException
+    @Override
+    public int countAllMatchedUsers(Object[][] matchFields, XWikiContext context) throws XWikiException
     {
         return getAllMatchedGroups(matchFields, false, 0, 0, null, context).size();
     }
@@ -285,8 +280,8 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedGroups(java.lang.Object[][],
      *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context)
-        throws XWikiException
+    @Override
+    public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context) throws XWikiException
     {
         return getAllMatchedUsers(matchFields, false, 0, 0, null, context).size();
     }
@@ -295,11 +290,11 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#removeUserOrGroupFromAllGroups(java.lang.String,
-     *      java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext) TODO: fully implements
-     *      this method.
+     *      java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext) TODO: fully implements this method.
      */
-    public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace,
-        String memberName, XWikiContext context) throws XWikiException
+    @Override
+    public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace, String memberName,
+        XWikiContext context) throws XWikiException
     {
         throw new NotImplementedException();
     }

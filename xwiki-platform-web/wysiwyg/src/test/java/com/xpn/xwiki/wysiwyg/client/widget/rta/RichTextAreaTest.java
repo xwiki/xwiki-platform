@@ -21,7 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
 
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -92,7 +94,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
      * Unit test for {@link DOMUtils#getFirstLeaf(Range)} and {@link DOMUtils#getLastLeaf(Range)}. We put the test here
      * because we needed an empty document.
      */
-    public void doTestGetRangeFirstAndLastLeafWithEmptyBody()
+    private void doTestGetRangeFirstAndLastLeafWithEmptyBody()
     {
         rta.setHTML("");
         Range range = rta.getDocument().getSelection().getRangeAt(0);
@@ -113,7 +115,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         {
             public void run()
             {
-                doTestGetRangeFirstAndLastLeafWithEmptyBody();
+                doTestRangeSetStartAfterWithEmptyBody();
                 finishTest();
             }
         }).schedule(START_DELAY);
@@ -123,11 +125,16 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
      * Unit test for {@link Range#setStartAfter(com.google.gwt.dom.client.Node)}. We put the test here because we needed
      * an empty document.
      */
-    public void doTestRangeSetStartAfterWithEmptyBody()
+    private void doTestRangeSetStartAfterWithEmptyBody()
     {
         rta.setHTML("");
         getBody().appendChild(rta.getDocument().xCreateSpanElement());
-        rta.getDocument().getSelection().getRangeAt(0).setStartAfter(getBody().getFirstChild());
+
+        Range range = rta.getDocument().createRange();
+        range.setStartAfter(getBody().getFirstChild());
+        range.collapse(true);
+        select(range);
+
         assertTrue(new InsertHTMLExecutable().execute(rta, "*"));
         assertEquals("<span></span>*", clean(rta.getHTML()));
     }
@@ -179,6 +186,168 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     }
 
     /**
+     * Tests if the text selection is readable when the rich text area doesn't have the focus.
+     */
+    public void testTextSelectionIsReadableWithoutFocus()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestTextSelectionIsReadableWithoutFocus();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the text selection is readable when the rich text area doesn't have the focus.
+     */
+    private void doTestTextSelectionIsReadableWithoutFocus()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("abc");
+
+        // Make a text selection.
+        String selectedText = "b";
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 2);
+        select(range);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Read the current selection when the rich text area doesn't have the focus.
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
+
+    /**
+     * Tests if the text selection is writable when the rich text area doesn't have the focus.
+     */
+    public void testTextSelectionIsWritableWithoutFocus()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestTextSelectionIsWritableWithoutFocus();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the text selection is writable when the rich text area doesn't have the focus.
+     */
+    private void doTestTextSelectionIsWritableWithoutFocus()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("xyz");
+
+        // Make a text selection.
+        String selectedText = "y";
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 2);
+        select(range);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Read the current selection when the rich text area doesn't have the focus.
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Change the current selection when the rich text area doesn't have the focus.
+        selectedText = "z";
+        range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 2);
+        range.setEnd(getBody().getFirstChild(), 3);
+        select(range);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
+
+    /**
+     * Tests if the caret at the end of a block-level element (like paragraph, heading, list item or table cell) is
+     * preserved when the rich text area looses the focus.
+     */
+    public void testCaretAtTheEndOfABlockIsPreservedOnBlur()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestCaretAtTheEndOfABlockIsPreservedOnBlur();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the caret at the end of a block-level element (like paragraph, heading, list item or table cell) is
+     * preserved when the rich text area looses the focus.
+     */
+    private void doTestCaretAtTheEndOfABlockIsPreservedOnBlur()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("<h1>mhz</h1><h2>xyz</h2>");
+
+        // Place the caret at the end of the first heading.
+        String text = "mhz";
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild(), 3);
+        range.setEnd(getBody().getFirstChild().getFirstChild(), 3);
+        select(range);
+
+        // Verify the selection before moving the focus.
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertTrue(range.isCollapsed());
+        assertEquals(3, range.getStartOffset());
+        assertEquals(text, range.getStartContainer().getNodeValue());
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        range = rta.getDocument().getSelection().getRangeAt(0);
+        assertTrue(range.isCollapsed());
+        assertEquals(3, range.getStartOffset());
+        assertEquals(text, range.getStartContainer().getNodeValue());
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
+
+    /**
      * Tests that control selection is not lost when the rich text area looses focus.
      */
     public void testControlSelectionIsNotLostOnBlur()
@@ -206,30 +375,159 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         rta.setHTML("):<img/>:(");
 
         // Make a control selection.
+        Node selectedNode = getBody().getChildNodes().getItem(1);
         Range range = rta.getDocument().createRange();
-        range.selectNode(getBody().getChildNodes().getItem(1));
+        range.selectNode(selectedNode);
         select(range);
 
         // Verify the control selection.
-        range = rta.getDocument().getSelection().getRangeAt(0);
-        assertEquals(getBody(), range.getStartContainer());
-        assertEquals(getBody(), range.getEndContainer());
-        assertEquals(1, range.getStartOffset());
-        assertEquals(2, range.getEndOffset());
+        assertSelectionWrapsNode(selectedNode);
 
         // Move the focus out of the rich text area.
         textBox.setFocus(true);
 
         // Move the focus back and test the selection.
         rta.setFocus(true);
-        range = rta.getDocument().getSelection().getRangeAt(0);
-        assertEquals(getBody(), range.getStartContainer());
-        assertEquals(getBody(), range.getEndContainer());
-        assertEquals(1, range.getStartOffset());
-        assertEquals(2, range.getEndOffset());
+        assertSelectionWrapsNode(selectedNode);
 
         // Cleanup
         textBox.removeFromParent();
+    }
+
+    /**
+     * Tests if the control selection is readable when the rich text area doesn't have the focus.
+     */
+    public void testControlSelectionIsReadableWithoutFocus()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestControlSelectionIsReadableWithoutFocus();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the control selection is readable when the rich text area doesn't have the focus.
+     */
+    private void doTestControlSelectionIsReadableWithoutFocus()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("1<img/>2");
+
+        // Make a control selection.
+        Node selectedNode = getBody().getChildNodes().getItem(1);
+        Range range = rta.getDocument().createRange();
+        range.selectNode(selectedNode);
+        select(range);
+
+        // Verify the control selection.
+        assertSelectionWrapsNode(selectedNode);
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Verify the control selection when the rich text area doesn't have the focus.
+        assertSelectionWrapsNode(selectedNode);
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        assertSelectionWrapsNode(selectedNode);
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
+
+    /**
+     * Tests if the control selection is writable when the rich text area doesn't have the focus.
+     */
+    public void testControlSelectionIsWritableWithoutFocus()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestControlSelectionIsWritableWithoutFocus();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the control selection is writable when the rich text area doesn't have the focus.
+     */
+    private void doTestControlSelectionIsWritableWithoutFocus()
+    {
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+
+        rta.setHTML("1<img/>2<img/>3");
+
+        // Make a control selection.
+        Node selectedNode = getBody().getChildNodes().getItem(1);
+        Range range = rta.getDocument().createRange();
+        range.selectNode(selectedNode);
+        select(range);
+
+        // Verify the control selection.
+        assertSelectionWrapsNode(selectedNode);
+
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Verify the control selection when the rich text area doesn't have the focus.
+        assertSelectionWrapsNode(selectedNode);
+
+        // Change the control selection when the rich text area doesn't have the focus.
+        selectedNode = getBody().getChildNodes().getItem(3);
+        range = rta.getDocument().createRange();
+        range.selectNode(selectedNode);
+        select(range);
+
+        // Verify the changed selection.
+        assertSelectionWrapsNode(selectedNode);
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        assertSelectionWrapsNode(selectedNode);
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
+
+    /**
+     * Asserts the current selection of the rich text area wraps the give node.
+     * 
+     * @param node a DOM node
+     */
+    protected void assertSelectionWrapsNode(Node node)
+    {
+        Selection selection = rta.getDocument().getSelection();
+        assertEquals(1, selection.getRangeCount());
+        assertRangeWrapsNode(selection.getRangeAt(0), node);
+    }
+
+    /**
+     * Asserts that the given range wraps the specified node.
+     * 
+     * @param range a DOM range
+     * @param node a DOM node
+     */
+    protected void assertRangeWrapsNode(Range range, Node node)
+    {
+        assertEquals(node.getParentNode(), range.getStartContainer());
+        assertEquals(node.getParentNode(), range.getEndContainer());
+        int index = DOMUtils.getInstance().getNodeIndex(node);
+        assertEquals(index, range.getStartOffset());
+        assertEquals(index + 1, range.getEndOffset());
     }
 
     /**

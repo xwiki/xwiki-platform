@@ -126,7 +126,8 @@ public class DOMUtilsTest extends AbstractDOMTest
         Node anchor = wrappingSpan.getFirstChild();
         Node boldWiki = anchor.getChildNodes().getItem(1);
         Node labelBoldWiki = boldWiki.getFirstChild();
-        String anchorTagName = anchor.getNodeName();
+        String anchorTagName = "a";
+        String spanTagName = "span";
 
         // check if there is a first ancestor of type a for the bold inside the anchor
         assertSame("There isn't an anchor ancestor for the bold inside the anchor", anchor, domUtils.getFirstAncestor(
@@ -143,6 +144,16 @@ public class DOMUtilsTest extends AbstractDOMTest
         // check div ancestor search stops at startContainer
         assertSame("Div ancestor search for the anchor does not stop at first div", container.getFirstChild(), DOMUtils
             .getInstance().getFirstAncestor(anchor, container.getTagName()));
+        // check that the anchor is the first ancestor with tag name a or span of the text inside the strong element
+        assertSame("Anchor or span ancestor search does not stop at first anchor", anchor, domUtils.getFirstAncestor(
+            labelBoldWiki, anchorTagName, spanTagName));
+        // check that the anchor is the first ancestor with tag name a or span of the text inside the strong element,
+        // regardless of the order of the arguments
+        assertSame("Span or ancestor ancestor search does not stop at first anchor", anchor, domUtils.getFirstAncestor(
+            labelBoldWiki, spanTagName, anchorTagName));
+        // check that the first ancestor search is case insensitive
+        assertSame("Anchor or ul ancestor in upper case search does not stop at first anchor", anchor, domUtils
+            .getFirstAncestor(labelBoldWiki, anchorTagName.toUpperCase(), "UL"));
     }
 
     /**

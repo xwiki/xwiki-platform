@@ -444,20 +444,26 @@ public abstract class DOMUtils
     }-*/;
 
     /**
-     * Searches for the first ancestor with the name <code>tagName</code> of the passed node, including the node itself.
-     * The search order starts with <code>node</code> and continued to the root of the tree.
+     * Searches for the first ancestor with a name from {@code tagNames} of the passed node, including the node itself.
+     * The search order starts with {@code node} and continues to the root of the tree.
      * 
      * @param node the node to find ancestor for
-     * @param tagName the tag name to look for up in the DOM tree.
-     * @return the first node with name <code>tagName</code> found.
+     * @param tagNames the tag names to look for up in the DOM tree.
+     * @return the first node a name from <code>tagNames</code> found.
      */
-    public Node getFirstAncestor(Node node, String tagName)
+    public Node getFirstAncestor(Node node, String... tagNames)
     {
+        // transform the tagNames to look for to lower case, to be able to do case insensitive comparison
+        List<String> lowerCaseNames = new ArrayList<String>();
+        for (String name : tagNames) {
+            lowerCaseNames.add(name.toLowerCase());
+        }
         Node parent = node;
         // While there is a parent
         while (parent != null) {
             // Check if this node is the needed element
-            if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeName().equalsIgnoreCase(tagName)) {
+            if (parent.getNodeType() == Node.ELEMENT_NODE
+                && lowerCaseNames.contains(parent.getNodeName().toLowerCase())) {
                 return parent;
             }
             parent = parent.getParentNode();

@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.list;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.dom.client.Node;
@@ -41,7 +40,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener, CommandListener
+public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
 {
     /**
      * List item element name.
@@ -59,20 +58,14 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
     protected static final String ORDERED_LIST_TAG = "ol";
 
     /**
+     * The command that notifies when the content of the rich text area has been reset.
+     */
+    protected static final Command RESET_COMMAND = new Command("reset");
+
+    /**
      * The rich text area to do adjustments for.
      */
     private RichTextArea textArea;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see InnerHTMLListener#onInnerHTMLChange(Element)
-     */
-    public void onInnerHTMLChange(Element element)
-    {
-        // Clean up the lists in this element
-        cleanUp(element);
-    }
 
     /**
      * Executes lists clean up on the subtree rooted in the element passed as parameter. Lists cleanup consists of:
@@ -186,14 +179,17 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
             }
             nextLeafAncestorLi = (Element) DOMUtils.getInstance().getFirstAncestor(nextLeaf, LIST_ITEM_TAG);
         }
-        // if we're in the same list item, we still have things to delete, so fall to default behaviour
-        if (nextLeafAncestorLi == li || nextLeafAncestorLi == null) {
+        // if the next leaf is not in a list item, fallback on default behavior
+        if (nextLeafAncestorLi == null) {
             return;
         }
 
-        // execute the delete
-        executeDelete(li, nextLeafAncestorLi, nextEmptyItemPlacehodlerLeaf, range);
-        getTextArea().getCurrentEvent().xPreventDefault();
+        if (needsDeleteAdjustment(nextLeafAncestorLi, li)) {
+            // execute the delete
+            executeDelete(range.getEndContainer(), nextLeafAncestorLi, nextEmptyItemPlacehodlerLeaf, range);
+            getTextArea().getCurrentEvent().xPreventDefault();
+        }
+        // else browser default
     }
 
     /**
@@ -234,40 +230,71 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         // skipped and looked for the leaf before
         Node previousEmptyItemPlacehodlerLeaf = null;
 
-        // if the leaf is still in this list item (there are more things to delete) or it's not in a list item, return
-        if (previousLeafAncestorLi == li || previousLeafAncestorLi == null) {
+        // if the previous leaf is not in a list item, return
+        if (previousLeafAncestorLi == null) {
             return;
         }
 
-        // setup the range before move, put it in a convenient place: if the leaf is an empty placeholder,
-        // put it before the leaf, and set the placeholder as the skipped item to delete on move
-        if (isEmptyListItemPlaceholder(previousLeaf)) {
-            range.setEndBefore(previousLeaf);
-            previousEmptyItemPlacehodlerLeaf = previousLeaf;
-        } else if (previousLeaf.getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)) {
-            // if the previousLeaf is an empty list item (<li />)
-            range.setEnd(previousLeafAncestorLi, 0);
-        } else {
-            range.setEndAfter(previousLeaf);
+        if (needsDeleteAdjustment(li, previousLeafAncestorLi)) {
+            // setup the range before move, put it in a convenient place: if the leaf is an empty placeholder,
+            // put it before the leaf, and set the placeholder as the skipped item to delete on move
+            if (isEmptyListItemPlaceholder(previousLeaf)) {
+                range.setEndBefore(previousLeaf);
+                previousEmptyItemPlacehodlerLeaf = previousLeaf;
+            } else if (previousLeaf.getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)) {
+                // if the previousLeaf is an empty list item (<li />)
+                range.setEnd(previousLeafAncestorLi, 0);
+            } else {
+                range.setEndAfter(previousLeaf);
+            }
+            // effectively execute the move
+            executeDelete(previousLeaf, li, previousEmptyItemPlacehodlerLeaf, range);
+            getTextArea().getCurrentEvent().xPreventDefault();
         }
+        // else browser default
+    }
 
-        // effectively execute the move
-        executeDelete(previousLeafAncestorLi, li, previousEmptyItemPlacehodlerLeaf, range);
-        getTextArea().getCurrentEvent().xPreventDefault();
+    /**
+     * Helper function to determine whether deleting at the end / backspacing at the beginning of one of the list items
+     * when next list item / previous list item is the other needs special handling or will fall back on the browser
+     * default. The idea is to interfere only with backspace / delete inside the same list, between different levels
+     * list items. If the two list items are in different lists (and none of them is included in the other), the delete
+     * between them will be done with the browser default algorithm. Also, if the source list item is an ancestor of the
+     * destination list item, the default browser behavior will be executed.
+     * 
+     * @param sourceListItem the list item from which content should be moved
+     * @param destListItem the list item to which content should be moved
+     * @return {@code true} if the delete / backspace between the two needs special handling, {@code false} otherwise
+     */
+    protected boolean needsDeleteAdjustment(Element sourceListItem, Element destListItem)
+    {
+        if (sourceListItem == destListItem) {
+            return false;
+        }
+        // check that the destination list item is not a child of the source list item
+        if (sourceListItem.isOrHasChild(destListItem)) {
+            return false;
+        }
+        // check if the two list items do have a common ul or ol ancestor and this ul / ol is the parent of one of them
+        Node commonAncestor = DOMUtils.getInstance().getNearestCommonAncestor(sourceListItem, destListItem);
+        Node commonListAncestor =
+            DOMUtils.getInstance().getFirstAncestor(commonAncestor, ORDERED_LIST_TAG, UNORDERED_LIST_TAG);
+        return commonListAncestor != null && commonListAncestor == sourceListItem.getParentNode()
+            || commonListAncestor == destListItem.getParentNode();
     }
 
     /**
      * Effectively executes the delete operation at the end of a list item by moving the next list item in this one, for
      * the passed parameters.
      * 
-     * @param li the list item in which the delete was hit
+     * @param reference the reference element, to move the content of the {@code nextLi} after it
      * @param nextLi the next list item after the current list item end, to move in the current list item
      * @param range the selection range for which this operation is executed, used to determine where the {@code nextLi}
      *            needs to be inserted and how selection needs to be restored
      * @param skippedEmptyPlaceHolder the first empty list item placeholder that was skipped by the next leaf lookup
      *            algorithm in this delete operation, and which needs to be removed with the execution of the delete
      */
-    protected void executeDelete(Element li, Element nextLi, Node skippedEmptyPlaceHolder, Range range)
+    protected void executeDelete(Node reference, Element nextLi, Node skippedEmptyPlaceHolder, Range range)
     {
         // save the position of the cursor to restore it after insert
         int endOffset = range.getEndOffset();
@@ -276,13 +303,8 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
         // else get the next leaf's li from its parent and put it here
         Node extractedLi =
             DOMUtils.getInstance().extractNodeContents(nextLi, 0, DOMUtils.getInstance().getLength(nextLi));
-        // insert the content of the found next list item, with the li as a parent
-        if (endContainer == li) {
-            DOMUtils.getInstance().insertAt(li, extractedLi, range.getEndOffset());
-        } else {
-            Node insertAfter = DOMUtils.getInstance().getChild(li, endContainer);
-            DOMUtils.getInstance().insertAfter(extractedLi, insertAfter);
-        }
+        // insert the content of the found next list item, after the reference node
+        DOMUtils.getInstance().insertAfter(extractedLi, reference);
 
         // restore the position of the cursor
         range.setEnd(endContainer, endOffset);
@@ -428,8 +450,9 @@ public class ListBehaviorAdjuster implements InnerHTMLListener, KeyboardListener
      */
     public void onCommand(CommandManager sender, Command command, String param)
     {
-        // clean up the lists in the document on the delete command
-        if (command == Command.DELETE || command == Command.INDENT || command == Command.OUTDENT) {
+        // clean up the lists in the document on delete, indent, outdent and reset
+        if (command == Command.DELETE || command == Command.INDENT || command == Command.OUTDENT
+            || command.equals(RESET_COMMAND)) {
             cleanUp(getTextArea().getDocument().getDocumentElement());
         }
     }

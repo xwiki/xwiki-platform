@@ -22,6 +22,7 @@ package org.xwiki.officeimporter.openoffice;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
 
@@ -31,6 +32,7 @@ import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
  * @version $Id$
  * @since 1.8RC3
  */
+@ComponentRole
 public interface OpenOfficeDocumentConverter
 {
     /**

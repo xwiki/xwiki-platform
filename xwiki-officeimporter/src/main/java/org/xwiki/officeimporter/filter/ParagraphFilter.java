@@ -27,6 +27,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 import org.xwiki.xml.html.filter.ElementSelector;
 
@@ -40,6 +41,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
  * into xwiki/2.0 syntax the generated xwiki syntax is also invalid (obviously). The purpose of this filter is to clean
  * up such html content by merging consecutive paragraph sequences and appropriately inserting {@code<br/>} elements.
  */
+@Component("officeimporter/paragraph")
 public class ParagraphFilter extends AbstractHTMLFilter
 {
     /**

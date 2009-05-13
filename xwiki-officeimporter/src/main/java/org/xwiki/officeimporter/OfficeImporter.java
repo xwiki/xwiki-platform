@@ -22,6 +22,7 @@ package org.xwiki.officeimporter;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
@@ -31,6 +32,7 @@ import org.xwiki.rendering.parser.SyntaxType;
  * @version $Id$
  * @since 1.8M1
  */
+@ComponentRole
 public interface OfficeImporter
 {
     /**

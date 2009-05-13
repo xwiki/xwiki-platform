@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.internal.openoffice;
 
 import net.sf.jodconverter.office.OfficeUtils;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationManager;
@@ -33,6 +35,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
  * @version $Id$
  * @since 1.8RC3
  */
+@Component
 public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, Initializable
 {
     /**
@@ -73,11 +76,13 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     /**
      * The {@link ConfigurationManager} component.
      */
+    @Requirement
     private ConfigurationManager configurationManager;
 
     /**
      * The {@link ConfigurationSourceCollection} component.
      */
+    @Requirement
     private ConfigurationSourceCollection sourceCollection;
 
     /**

@@ -26,6 +26,8 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -35,11 +37,13 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("officeimporter/image")
 public class ImageFilter extends AbstractHTMLFilter
 {
     /**
      * The {@link DocumentAccessBridge}
      */
+    @Requirement
     private DocumentAccessBridge docBridge;
 
     /**

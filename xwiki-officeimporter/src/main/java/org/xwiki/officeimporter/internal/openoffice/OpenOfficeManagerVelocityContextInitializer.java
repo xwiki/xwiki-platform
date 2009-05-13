@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.internal.openoffice;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
@@ -32,6 +34,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.8RC3
  */
+@Component("oomanager")
 public class OpenOfficeManagerVelocityContextInitializer extends AbstractLogEnabled implements
     VelocityContextInitializer
 {
@@ -43,16 +46,19 @@ public class OpenOfficeManagerVelocityContextInitializer extends AbstractLogEnab
     /**
      * The {@link Execution} component.
      */
+    @Requirement
     private Execution execution;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
+    @Requirement
     private OpenOfficeManager ooManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
      */
+    @Requirement
     private DocumentAccessBridge docBridge;
 
     /**

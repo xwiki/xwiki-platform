@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.w3c.dom.Document;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
@@ -37,51 +39,61 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("wysiwyg")
 public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleaner
 {
     /**
      * The {@link DefaultHTMLCleaner} used internally.
      */
+    @Requirement
     private HTMLCleaner defaultHtmlCleaner;
     
     /**
      * {@link HTMLFilter} for stripping various tags.
      */
+    @Requirement("officeimporter/stripper")
     private HTMLFilter stripperFilter;
     
     /**
      * {@link HTMLFilter} filtering styles.
      */
+    @Requirement("officeimporter/style")
     private HTMLFilter styleFilter;
     
     /**
      * {@link HTMLFilter} for stripping redundant tags.
      */
+    @Requirement("officeimporter/redundancy")
     private HTMLFilter redundancyFilter;
     
     /**
      * {@link HTMLFilter} for cleaning empty paragraphs.
      */
+    @Requirement("officeimporter/paragraph")
     private HTMLFilter paragraphFilter;
     
     /**
      * {@link HTMLFilter} for filtering image tags.
      */
+    @Requirement("officeimporter/image")
     private HTMLFilter imageFilter;
     
     /**
      * {@link HTMLFilter} for filtering html links.
      */
+    @Requirement("officeimporter/link")
     private HTMLFilter linkFilter;
     
     /**
      * {@link HTMLFilter} for filtering lists.
      */
+    @Requirement("officeimporter/list")
     private HTMLFilter listFilter;
     
     /**
      * {@link HTMLFilter} for filtering tables.
      */
+    @Requirement("officeimporter/table")
     private HTMLFilter tableFilter;
 
     /**

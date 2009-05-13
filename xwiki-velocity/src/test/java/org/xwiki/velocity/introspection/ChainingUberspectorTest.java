@@ -20,7 +20,6 @@
  */
 package org.xwiki.velocity.introspection;
 
-import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Date;
@@ -30,21 +29,30 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.util.introspection.SecureUberspector;
 import org.apache.velocity.util.introspection.UberspectImpl;
-import org.codehaus.plexus.util.StringOutputStream;
+import org.jmock.Mock;
+import org.jmock.core.stub.DefaultResultStub;
+import org.xwiki.component.logging.Logger;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.internal.DefaultVelocityEngine;
 
 /**
  * Unit tests for {@link ChainingUberspector}.
  */
 public class ChainingUberspectorTest extends AbstractXWikiComponentTestCase
 {
-    private VelocityEngine engine;
+    private DefaultVelocityEngine engine;
 
+    private Mock mockLogger;
+    
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.engine = (VelocityEngine) getComponentManager().lookup(VelocityEngine.class);
+        this.engine = (DefaultVelocityEngine) getComponentManager().lookup(VelocityEngine.class);
+        
+        this.mockLogger = mock(Logger.class);
+        this.mockLogger.setDefaultStub(new DefaultResultStub());
+        this.engine.enableLogging((Logger) this.mockLogger.proxy());
     }
 
     /*
@@ -213,17 +221,16 @@ public class ChainingUberspectorTest extends AbstractXWikiComponentTestCase
         VelocityContext context = new org.apache.velocity.VelocityContext();
         Date d = new Date();
         context.put("date", d);
-        // TODO It would be better to use a custom logger class, how to do that?
-        StringOutputStream log = new StringOutputStream();
-        PrintStream out = System.out;
-        System.setOut(new PrintStream(log));
+
+        // Define expectations on the Logger
+        this.mockLogger.expects(once()).method("warn").with(eq(
+            "Deprecated usage of method [java.util.Date.getYear] in mytemplate@1,19"));
+        this.mockLogger.expects(once()).method("warn").with(eq(
+            "Deprecated usage of getter [java.util.Date.getMonth] in mytemplate@1,40"));
+
         engine.evaluate(context, writer, "mytemplate",
             new StringReader("#set($foo = $date.getYear())$foo $date.month"));
-        System.setOut(out);
-        assertTrue(log.toString().indexOf(
-            "Deprecated usage of method [java.util.Date.getYear] in mytemplate@1,19") >= 0);
-        assertTrue(log.toString().indexOf(
-            "Deprecated usage of getter [java.util.Date.getMonth] in mytemplate@1,40") >= 0);
+
         assertEquals(d.getYear() + " " + d.getMonth(), writer.toString());
         assertEquals(1, TestingUberspector.methodCalls);
         assertEquals(1, TestingUberspector.getterCalls);

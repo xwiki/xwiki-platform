@@ -22,9 +22,8 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
+import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.PlexusTestSetup;
 
 /**
  * All Rendering integration tests defined in text files using a special format.

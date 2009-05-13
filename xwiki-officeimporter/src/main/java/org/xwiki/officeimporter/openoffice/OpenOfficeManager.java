@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 import net.sf.jodconverter.OfficeDocumentConverter;
 
 /**
@@ -27,6 +29,7 @@ import net.sf.jodconverter.OfficeDocumentConverter;
  * @version $Id$
  * @since 1.8RC3
  */
+@ComponentRole
 public interface OpenOfficeManager
 {
     /**

@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.openoffice;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Configuration properties for office importer module.
  * <p>
@@ -28,6 +30,7 @@ package org.xwiki.officeimporter.openoffice;
  * @version $Id$
  * @since 1.8RC3
  */
+@ComponentRole
 public interface OpenOfficeConfiguration
 {
     /**

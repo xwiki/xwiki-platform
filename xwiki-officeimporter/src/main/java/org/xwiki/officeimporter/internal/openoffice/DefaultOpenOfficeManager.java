@@ -29,6 +29,8 @@ import net.sf.jodconverter.office.OfficeConnectionMode;
 import net.sf.jodconverter.office.OfficeException;
 import net.sf.jodconverter.office.OfficeManager;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
@@ -40,11 +42,13 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @version $Id$
  * @since 1.8RC3
  */
+@Component("default")
 public class DefaultOpenOfficeManager extends AbstractLogEnabled implements OpenOfficeManager
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
+    @Requirement("default")
     private OpenOfficeConfiguration ooConfig;
 
     /**
@@ -64,7 +68,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
 
     /**
      * The {@link OfficeDocumentConverter} used to convert office documents.
-     */
+     */    
     private OfficeDocumentConverter documentConverter;
 
     /**

@@ -21,6 +21,8 @@ package org.xwiki.officeimporter.internal;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.OfficeImporter;
@@ -32,6 +34,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("officeimporter")
 public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled implements VelocityContextInitializer
 {
     /**
@@ -42,16 +45,19 @@ public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled
     /**
      * The {@link Execution} component.
      */
+    @Requirement("default")
     private Execution execution;
 
     /**
      * The {@link OfficeImporter} component.
      */
+    @Requirement("default")
     private OfficeImporter officeImporter;
 
     /**
      * The {@link DocumentAccessBridge}.
      */
+    @Requirement("default")
     private DocumentAccessBridge docBridge;
 
     /**

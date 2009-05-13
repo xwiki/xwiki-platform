@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListener;
@@ -32,17 +34,20 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @version $Id$
  * @since 1.9M2
  */
+@Component("openofficemanager")
 public class OpenOfficeManagerApplicationContextListener extends AbstractLogEnabled implements
     ApplicationContextListener
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
+    @Requirement("default")
     private OpenOfficeConfiguration ooConfig;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
+    @Requirement("default")
     private OpenOfficeManager ooManager;
 
     /**

@@ -38,6 +38,8 @@ import java.util.zip.ZipOutputStream;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -74,6 +76,7 @@ import org.xwiki.xml.html.HTMLUtils;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("default")
 public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeImporter
 {
     /**
@@ -89,36 +92,43 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * Document access bridge used to access wiki documents.
      */
+    @Requirement("default")
     private DocumentAccessBridge docBridge;
 
     /**
      * OpenOffice document converter.
      */
+    @Requirement("default")
     private OpenOfficeDocumentConverter ooConverter;
 
     /**
      * OpenOffice html cleaner.
      */
+    @Requirement("openoffice")
     private HTMLCleaner ooHtmlCleaner;
 
     /**
      * XHTML/1.0 syntax parser.
      */
+    @Requirement("xhtml/1.0")
     private Parser xHtmlParser;
 
     /**
      * XWiki/2.0 syntax parser.
      */
+    @Requirement("xwiki/2.0")
     private Parser xwikiParser;
 
     /**
      * Factory to get various syntax renderers.
      */
+    @Requirement("default")
     private PrintRendererFactory rendererFactory;
 
     /**
      * The {@link DocumentSplitter} used for splitting documents.
      */
+    @Requirement("default")
     private DocumentSplitter documentSplitter;
 
     /**

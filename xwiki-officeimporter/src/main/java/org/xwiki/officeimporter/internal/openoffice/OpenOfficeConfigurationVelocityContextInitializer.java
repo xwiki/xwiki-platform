@@ -20,6 +20,8 @@
 package org.xwiki.officeimporter.internal.openoffice;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -29,6 +31,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.9RC1
  */
+@Component("ooconfig")
 public class OpenOfficeConfigurationVelocityContextInitializer implements VelocityContextInitializer
 {
     /**
@@ -39,6 +42,7 @@ public class OpenOfficeConfigurationVelocityContextInitializer implements Veloci
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
+    @Requirement("default")
     private OpenOfficeConfiguration ooConfig;
 
     /**

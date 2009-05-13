@@ -27,6 +27,7 @@ import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 
 /**
@@ -41,6 +42,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * @version $Id$
  * @since 1.8M1
  */
+@Component("officeimporter/anchor")
 public class AnchorFilter extends AbstractHTMLFilter
 {
     /**

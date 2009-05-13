@@ -31,6 +31,8 @@ import net.sf.jodconverter.DefaultDocumentFormatRegistry;
 import net.sf.jodconverter.DocumentFormat;
 import net.sf.jodconverter.DocumentFormatRegistry;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -45,12 +47,14 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
  * @version $Id$
  * @since 1.8RC3
  */
+@Component("default")
 public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled implements OpenOfficeDocumentConverter,
     Initializable
 {
     /**
      * The {@link OpenOfficeManager} component.
      */
+    @Requirement("default")
     private OpenOfficeManager ooManager;
 
     /**

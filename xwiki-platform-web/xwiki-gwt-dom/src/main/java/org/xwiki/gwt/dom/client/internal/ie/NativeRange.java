@@ -44,22 +44,13 @@ public class NativeRange extends JavaScriptObject
      */
     public final native void select()
     /*-{
-        // If the owner document has the focus, and thus the current selection, then apply this range directly.
-        // Otherwise, use the bookmark to save this range; later, when the owner document receives the focus, this
-        // range will be reconstructed and applied.
-        if (typeof(this.ownerDocument.body.__bookmark) == 'undefined') {
-            // The owner document holds the current selection.
+        // Test if the owner document holds the current selection.
+        if (typeof(this.ownerDocument.parentWindow.__savedRange) == 'undefined') {
+            // Apply this range.
             this.select();
-        // Save this range in the bookmark to be applied later, when the owner document receives the focus.
-        } else if (this.getBookmark) {
-            // Text range.
-            this.ownerDocument.body.__bookmark = this.getBookmark();
-        } else if (this.item && this.length > 0) {
-            // Control range.
-            this.ownerDocument.body.__bookmark = this.item(0);
         } else {
-            // No range. Set the bookmark to an unsupported value.
-            this.ownerDocument.body.__bookmark = false;
+            // Save this range till the owner document gains the focus.
+            this.ownerDocument.parentWindow.__savedRange = this;
         }
     }-*/;
 

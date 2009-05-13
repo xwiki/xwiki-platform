@@ -23,6 +23,8 @@ import java.util.List;
 
 import javax.script.SimpleScriptContext;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextException;
@@ -34,6 +36,7 @@ import org.xwiki.script.ScriptContextInitializer;
  * 
  * @version $Id$
  */
+@Component("scriptContext")
 public class ScriptExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
@@ -44,6 +47,7 @@ public class ScriptExecutionContextInitializer implements ExecutionContextInitia
     /**
      * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
      */
+    @Requirement(role = ScriptContextInitializer.class)
     private List<ScriptContextInitializer> scriptContextInitializerList;
 
     /**

@@ -21,11 +21,14 @@ package org.xwiki.script;
 
 import javax.script.ScriptContext;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Helpers for {@link ScriptContext} management. Like context initialization, etc.
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface ScriptContextManager
 {
     /**

@@ -1,0 +1,2 @@
+org.xwiki.script.internal.DefaultScriptContextManager
+org.xwiki.script.internal.ScriptExecutionContextInitializer

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.rss.RssMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -30,14 +31,14 @@ import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * A mock macro which invokes, in turn, the Rss Macro setting its feed to a test feed.xml file.
+ * A mock macro which invokes, in turn, the RSS Macro setting its feed to a test feed.xml file.
  * 
  * @version $Id$
  * @since 1.8RC1
  */
+@Component("testrssmacro")
 public class TestRssMacro extends RssMacro
 {
-    
     /**
      * {@inheritDoc}
      * 

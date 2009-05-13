@@ -1,0 +1,2 @@
+org.xwiki.rendering.macro.rss.TestRssMacro
+org.xwiki.rendering.macro.rss.TestRssMacro2

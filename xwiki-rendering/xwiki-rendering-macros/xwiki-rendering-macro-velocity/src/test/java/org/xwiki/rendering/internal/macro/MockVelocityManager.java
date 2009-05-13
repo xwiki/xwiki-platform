@@ -23,7 +23,6 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;

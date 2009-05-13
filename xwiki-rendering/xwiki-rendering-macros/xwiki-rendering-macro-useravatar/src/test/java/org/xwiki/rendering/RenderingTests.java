@@ -19,11 +19,18 @@
  */
 package org.xwiki.rendering;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.UserAvatarRenderingPlexusTestSetup;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.rendering.internal.MockDocumentAccessBridge;
+import org.xwiki.rendering.internal.MockSkinAccessBridge;
+import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.test.PlexusTestSetup;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -41,6 +48,11 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrouseravatar2", true);
         suite.addTestsFromResource("macrouseravatar3", true);
         
-        return new UserAvatarRenderingPlexusTestSetup(suite);
+        List<ComponentDescriptor> mocks = 
+            new ArrayList<ComponentDescriptor>(RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
+        mocks.add(MockSkinAccessBridge.getComponentDescriptor());
+
+        return new PlexusTestSetup(suite, mocks);
     }
 }

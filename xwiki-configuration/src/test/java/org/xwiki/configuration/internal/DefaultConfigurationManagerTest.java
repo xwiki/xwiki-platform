@@ -45,6 +45,7 @@ public class DefaultConfigurationManagerTest extends TestCase
         private List<String> field4;
         private Properties field5;
         private Properties field6;
+        private Properties field7;
         
         public void setField1(String field)
         {
@@ -105,6 +106,16 @@ public class DefaultConfigurationManagerTest extends TestCase
         {
             this.field6 = properties;
         }
+
+        public Properties getField7()
+        {
+            return this.field7;
+        }
+        
+        public void setField7(Properties properties)
+        {
+            this.field7 = properties;
+        }
     }
 
     public void testInitializeConfiguration() throws Exception
@@ -130,6 +141,9 @@ public class DefaultConfigurationManagerTest extends TestCase
         baseConfiguration.addProperty("prefix.field5", "property2=value2");
         baseConfiguration.setProperty("prefix.field6", "property1=value1, property2=value2");
         
+        // Properties type but as a String (not a List)
+        baseConfiguration.addProperty("prefix.field7", "property=value");
+        
         ConfigurationSource source = new CommonsConfigurationSource(baseConfiguration);
 
         manager.initializeConfiguration(configuration, Arrays.asList(source), "prefix");
@@ -148,5 +162,7 @@ public class DefaultConfigurationManagerTest extends TestCase
         assertEquals(2, configuration.getField6().size());
         assertEquals("value1", configuration.getField6().getProperty("property1"));
         assertEquals("value2", configuration.getField6().getProperty("property2"));
+        assertEquals(1, configuration.getField7().size());
+        assertEquals("value", configuration.getField7().getProperty("property"));
     }
 }

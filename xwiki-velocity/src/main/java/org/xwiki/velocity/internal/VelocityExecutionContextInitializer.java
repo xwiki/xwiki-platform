@@ -18,12 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.velocity;
+package org.xwiki.velocity.internal;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextException;
+import org.xwiki.velocity.VelocityContextFactory;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Allow registering the Velocity Context in the Execution Context object since it's shared during the whole execution
@@ -33,6 +37,7 @@ import org.xwiki.context.ExecutionContextException;
  * @since 1.5M1
  * @version $Id$
  */
+@Component("velocity")
 public class VelocityExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**
@@ -44,6 +49,7 @@ public class VelocityExecutionContextInitializer implements ExecutionContextInit
      * The Velocity context factory component used for creating the Velocity Context (injected automatically by the
      * Component subsystem).
      */
+    @Requirement
     private VelocityContextFactory velocityContextFactory;
 
     /**

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.velocity;
+package org.xwiki.velocity.internal;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -32,10 +32,17 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
 import org.apache.velocity.runtime.parser.node.SimpleNode;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletApplicationContext;
+import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Default implementation of the Velocity service which initializes the Velocity system using configuration values
@@ -44,6 +51,8 @@ import org.xwiki.container.servlet.ServletApplicationContext;
  * 
  * @version $Id$
  */
+@Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
 {
     /**
@@ -58,15 +67,16 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     private org.apache.velocity.app.VelocityEngine engine;
 
     /**
-     * The list of properties to set on the Velocity Engine. These are injected automatically by the Component
-     * subsystem.
+     * Velocity configuration to get the list of configured Velocity properties.
      */
-    private Properties properties;
+    @Requirement
+    private VelocityConfiguration velocityConfiguration;
 
     /**
-     * The Container component (Injected automatically by the Component subsystem). We need it in order to store the
-     * ServletContext as a property in the Application Context so that the Velocity Tools WebappLoader can find it.
+     * The Container component. We need it in order to store the ServletContext as a property in the Application 
+     * Context so that the Velocity Tools WebappLoader can find it.
      */
+    @Requirement
     private Container container;
 
     /**
@@ -83,11 +93,14 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     {
         this.engine = new org.apache.velocity.app.VelocityEngine();
 
+        Properties velocityProperties = this.velocityConfiguration.getProperties();
+        
         // If the Velocity configuration uses the
         // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> Velocity Tools class
         // then we need to set the ServletContext object as a Velocity Application Attribute as
         // it's used to load resources from the webapp directory in WebapLoader.
-        String resourceLoader = properties.getProperty(RESOURCE_LOADER, this.properties.getProperty(RESOURCE_LOADER));
+        String resourceLoader = 
+            properties.getProperty(RESOURCE_LOADER, velocityProperties.getProperty(RESOURCE_LOADER));
         if (resourceLoader.equals("webapp")) {
             ApplicationContext context = this.container.getApplicationContext();
             if (context instanceof ServletApplicationContext) {
@@ -103,12 +116,12 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
         getEngine().setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, this);
 
         // Configure Velocity by passing the properties defined in this component's configuration
-        if (this.properties != null) {
-            for (Enumeration< ? > e = this.properties.propertyNames(); e.hasMoreElements();) {
+        if (velocityProperties != null) {
+            for (Enumeration< ? > e = velocityProperties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
                 // Only set a property if it's not overridden by one of the passed properties
                 if (!properties.containsKey(key)) {
-                    String value = this.properties.getProperty(key);
+                    String value = velocityProperties.getProperty(key);
                     getEngine().setProperty(key, value);
                     getLogger().debug("Setting property [" + key + "] = [" + value + "]");
                 }

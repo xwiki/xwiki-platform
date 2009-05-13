@@ -25,7 +25,7 @@ import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
-
+import org.xwiki.velocity.internal.DefaultVelocityContextFactory;
 
 /**
  * Unit tests for {@link DefaultVelocityContextFactory}.
@@ -50,8 +50,9 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
         VelocityContext context1 = this.factory.createContext();
         context1.put("param", "value");
 
-        VelocityContext context2= this.factory.createContext();
+        VelocityContext context2 = this.factory.createContext();
         assertNotSame(context1, context2);
+        assertNotNull(context1.get("listtool"));
         assertSame(context2.get("listtool"), context1.get("listtool"));
         assertNull(context2.get("param"));
     }

@@ -32,10 +32,10 @@ import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityExecutionContextInitializer;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.velocity.internal.VelocityExecutionContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Context;

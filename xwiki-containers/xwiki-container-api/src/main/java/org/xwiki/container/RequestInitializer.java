@@ -20,11 +20,14 @@
  */
 package org.xwiki.container;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Let any component that need to perform further initializations involving the Request
  * do so. For example the Velocity component creates a brand new Velocity Context which
  * it puts in the Request.
  */
+@ComponentRole
 public interface RequestInitializer
 {
     /**

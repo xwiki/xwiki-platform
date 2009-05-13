@@ -34,7 +34,6 @@ import org.codehaus.plexus.util.StringOutputStream;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.velocity.VelocityEngine;
 
-
 /**
  * Unit tests for {@link ChainingUberspector}.
  */

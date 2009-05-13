@@ -23,7 +23,10 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
+import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.phase.Composable;
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 
@@ -39,6 +42,21 @@ import java.util.Properties;
 public class MockVelocityManager implements VelocityManager, Composable
 {
     private ComponentManager componentManager;
+
+    /**
+     * Create and return a descriptor for this component.
+     * 
+     * @return the descriptor of the component.
+     */
+    public static ComponentDescriptor getComponentDescriptor()
+    {
+        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+
+        componentDescriptor.setRole(VelocityManager.class);
+        componentDescriptor.setImplementation(MockVelocityManager.class.getName());
+
+        return componentDescriptor;
+    }
 
     public void compose(ComponentManager componentManager)
     {
@@ -59,7 +77,7 @@ public class MockVelocityManager implements VelocityManager, Composable
             throw new XWikiVelocityException("Failed to look up Velocity Engine", e);
         }
 
-        // Configure the Velocity Engine not to use the Resource Webadd Loader since we don't
+        // Configure the Velocity Engine not to use the Resource Webapp Loader since we don't
         // need it and we would need to setup the Container component's ApplicationContext
         // otherwise.
         Properties properties = new Properties();

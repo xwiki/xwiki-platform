@@ -18,16 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.velocity;
+package org.xwiki.velocity.internal;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityFactory;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Default implementation for {@link VelocityFactory}.
@@ -35,6 +39,7 @@ import org.xwiki.component.phase.Composable;
  * @see VelocityFactory
  * @version $Id$
  */
+@Component
 public class DefaultVelocityFactory extends AbstractLogEnabled implements VelocityFactory, Composable
 {
     /**

@@ -49,10 +49,6 @@ public interface ComponentManager
      */
     Object lookup(Class< ? > role, String roleHint) throws ComponentLookupException;
 
-    boolean hasComponent(Class< ? > role);
-
-    boolean hasComponent(Class< ? > role, String roleHint);
-
     void release(Object component) throws ComponentLifecycleException;
 
     Map lookupMap(Class< ? > role) throws ComponentLookupException;

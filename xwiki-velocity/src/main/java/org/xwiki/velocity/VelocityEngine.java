@@ -25,12 +25,14 @@ import java.io.Writer;
 import java.util.Properties;
 
 import org.apache.velocity.context.Context;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Initialize a Velocity Engine and make Velocity services available.
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface VelocityEngine
 {
     /**

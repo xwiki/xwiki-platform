@@ -18,14 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container;
+package org.xwiki.container.internal;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
+import org.xwiki.container.ApplicationContext;
+import org.xwiki.container.ApplicationContextListener;
+import org.xwiki.container.ApplicationContextListenerManager;
 
 /**
  * Default implementation of {@link ApplicationContextListenerManager}.
@@ -33,6 +37,7 @@ import org.xwiki.component.phase.Composable;
  * @version $Id$
  * @since 1.9M2
  */
+@Component
 public class DefaultApplicationContextListenerManager extends AbstractLogEnabled implements Composable,
     ApplicationContextListenerManager
 {

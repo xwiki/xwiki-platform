@@ -19,9 +19,16 @@
  */
 package org.xwiki.test;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.plexus.manager.PlexusComponentManager;
+import org.xwiki.container.ApplicationContext;
+import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -34,7 +41,39 @@ public class XWikiComponentInitializer
 
     private ComponentAnnotationLoader componentAnnotationInitializer = new ComponentAnnotationLoader();
     
-    public void initialize() throws Exception
+    /**
+     * This method should be called before {@link #initializeExecution()} since some components will require the Container
+     * component to be set up (for example to access resource such as the XWikiconfiguration file).
+     */
+    public void initializeContainer() throws Exception
+    {
+        Container container = (Container) getComponentManager().lookup(Container.class);
+
+        // We set up a default stubbed ApplicationContext implementation. Tests that need a more controlled
+        // version can use Mocks and call setApplicationContext(), setRequest(), etc on the Container object.
+        container.setApplicationContext(new ApplicationContext()
+        {
+            public URL getResource(String resourceName) throws MalformedURLException
+            {
+                if (resourceName.contains("xwiki.properties")) {
+                    return this.getClass().getClassLoader().getResource("xwiki.properties");
+                }
+                throw new RuntimeException("Not implemented");
+            }
+
+            public InputStream getResourceAsStream(String resourceName)
+            {
+                throw new RuntimeException("Not implemented");
+            }
+
+            public File getTemporaryDirectory()
+            {
+                throw new RuntimeException("Not implemented");
+            }
+        });
+    }
+    
+    public void initializeExecution() throws Exception
     {
         // Initialize the Execution Context
         ExecutionContextManager ecm =
@@ -70,12 +109,15 @@ public class XWikiComponentInitializer
     public ComponentManager getComponentManager() throws Exception
     {
         if (this.componentManager == null) {
+
             DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
             configuration.setContainerConfiguration("/plexus.xml");
             DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
             this.componentManager = new PlexusComponentManager(container);
+            
             // Initialize dynamically all components defined using annotations
-            this.componentAnnotationInitializer.initialize(this.componentManager, this.getClass().getClassLoader());
+            this.componentAnnotationInitializer.initialize(componentManager, this.getClass().getClassLoader());
+
         }
 
         return this.componentManager;

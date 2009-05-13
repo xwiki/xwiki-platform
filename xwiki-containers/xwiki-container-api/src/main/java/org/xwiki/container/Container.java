@@ -20,6 +20,9 @@
  */
 package org.xwiki.container;
 
+import org.xwiki.component.annotation.ComponentRole;
+
+@ComponentRole
 public interface Container
 {
     ApplicationContext getApplicationContext();

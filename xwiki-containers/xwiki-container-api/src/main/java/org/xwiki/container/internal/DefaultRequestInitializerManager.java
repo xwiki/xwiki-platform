@@ -18,16 +18,22 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container;
+package org.xwiki.container.internal;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
+import org.xwiki.container.Request;
+import org.xwiki.container.RequestInitializer;
+import org.xwiki.container.RequestInitializerException;
+import org.xwiki.container.RequestInitializerManager;
 
 /**
  * Default implementation for {@link org.xwiki.container.RequestInitializerManager}
  * @see org.xwiki.container.RequestInitializerManager
  */
+@Component
 public class DefaultRequestInitializerManager implements RequestInitializerManager, Composable
 {
     /**

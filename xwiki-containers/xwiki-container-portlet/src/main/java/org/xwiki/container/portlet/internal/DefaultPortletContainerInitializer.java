@@ -18,37 +18,51 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container.portlet;
+package org.xwiki.container.portlet.internal;
 
 import javax.portlet.PortletContext;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerException;
 import org.xwiki.container.RequestInitializerManager;
+import org.xwiki.container.portlet.PortletApplicationContext;
+import org.xwiki.container.portlet.PortletContainerException;
+import org.xwiki.container.portlet.PortletContainerInitializer;
+import org.xwiki.container.portlet.PortletRequest;
+import org.xwiki.container.portlet.PortletResponse;
+import org.xwiki.container.portlet.PortletSession;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
+@Component
 public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
+    @Requirement
     private ApplicationContextListenerManager applicationContextListenerManager;
 
+    @Requirement
     private RequestInitializerManager requestInitializerManager;
 
+    @Requirement
     private ExecutionContextManager executionContextManager;
 
+    @Requirement
     private Container container;
 
+    @Requirement
     private Execution execution;
 
     public void initializeApplicationContext(PortletContext portletContext)
     {
         ApplicationContext applicationContext = new PortletApplicationContext(portletContext);
         this.container.setApplicationContext(applicationContext);
-        applicationContextListenerManager.initializeApplicationContext(applicationContext);
+        this.applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 
     public void initializeRequest(javax.portlet.PortletRequest portletRequest, Object xwikiContext)

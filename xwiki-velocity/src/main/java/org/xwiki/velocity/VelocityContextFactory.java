@@ -21,6 +21,7 @@
 package org.xwiki.velocity;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Creates Velocity Context instances, pre-populated with the Velocity Tools enabled in the component's configuration,
@@ -30,6 +31,7 @@ import org.apache.velocity.VelocityContext;
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface VelocityContextFactory
 {
     /**

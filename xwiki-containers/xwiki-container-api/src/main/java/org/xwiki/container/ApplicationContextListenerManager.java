@@ -20,12 +20,15 @@
  */
 package org.xwiki.container;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Component responsible for managing all {@link ApplicationContextListener} components.
  * 
  * @version $Id$
  * @since 1.9M2
  */
+@ComponentRole
 public interface ApplicationContextListenerManager
 {
     /**

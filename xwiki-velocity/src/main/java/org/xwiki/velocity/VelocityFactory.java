@@ -22,6 +22,8 @@ package org.xwiki.velocity;
 
 import java.util.Properties;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Allows creating different Velocity engine instances. This is useful when you need to have different Velocity engines
  * running in the same JVM but with different configurations. Since global templates in Velocity are part of the
@@ -30,6 +32,7 @@ import java.util.Properties;
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface VelocityFactory
 {
     /**

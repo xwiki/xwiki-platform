@@ -27,10 +27,14 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
 
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * @version $Id$
@@ -53,7 +57,11 @@ public class DefaultConfigurationManager implements ConfigurationManager
         // Look for all properties starting with the namespace prefix.
         Map<String, Object> properties = new HashMap<String, Object>();
         Iterator keys = compositeConfiguration.getKeys(namespace);
-        
+
+        // Prepare a Map of BeanInfo property descriptors to facilitate the lookup later on.
+        Map<String, PropertyDescriptor> descriptors = getBeanInfoPropertyDescriptors(configurationBean.getClass());
+
+        // Iterate over all configuration properties to set.
         while (keys.hasNext()) {
             String key = (String) keys.next();
             
@@ -63,29 +71,17 @@ public class DefaultConfigurationManager implements ConfigurationManager
             // some.property = prop2=value2
             Object valueObject = compositeConfiguration.getProperty(key);
 
-            // Verify all values are of the type key=value and if so create a Properties object.
-            if (List.class.isAssignableFrom(valueObject.getClass())) {
-                boolean isProperty = true;
-                for (Object value : (List) valueObject) {
-                    if (String.class.isAssignableFrom(value.getClass())) {
-                        String valueAsString = (String) value;
-                        if (valueAsString.indexOf('=') == -1) {
-                            isProperty = false;
-                            break;
-                        }
-                    } else {
-                        isProperty = false;
-                        break;
-                    }
-                }
-                if (isProperty) {
-                    valueObject = compositeConfiguration.getProperties(key);
-                }
-            }
-            
             // Remove the namespace prefix for each key so that BeanUtils can call the correct
             // method on the bean.
-            properties.put(key.substring(key.indexOf(namespace) + namespace.length() + 1), valueObject);
+            String normalizedKey = key.substring(key.indexOf(namespace) + namespace.length() + 1);
+                
+            // If the property in the bean is of type Property then get a Properties object from Commons Configuration
+            PropertyDescriptor descriptor = descriptors.get(normalizedKey);
+            if (descriptor != null && Properties.class.getName().equals(descriptor.getPropertyType().getName())) {
+                valueObject = compositeConfiguration.getProperties(key);
+            }
+            
+            properties.put(normalizedKey, valueObject);
         }
         
         // For all found properties load the java bean using BeanUtils
@@ -95,5 +91,23 @@ public class DefaultConfigurationManager implements ConfigurationManager
             throw new InitializationException("Failed to initialize bean ["
                 + configurationBean.getClass().getName() + "]", e);
         }
+    }
+    
+    private Map<String, PropertyDescriptor> getBeanInfoPropertyDescriptors(Class configurationBeanClass)
+        throws InitializationException
+    {
+        Map<String, PropertyDescriptor> descriptors = new HashMap<String, PropertyDescriptor>();
+        try {
+            for (PropertyDescriptor descriptor : 
+                Introspector.getBeanInfo(configurationBeanClass).getPropertyDescriptors())
+            {
+                descriptors.put(descriptor.getName(), descriptor);
+            }
+        } catch (IntrospectionException e) {
+            throw new InitializationException("Failed to load bean descriptor for [" 
+                + configurationBeanClass.getName() + "]", e);
+        }
+
+        return descriptors;
     }
 }

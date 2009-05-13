@@ -18,9 +18,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container;
+package org.xwiki.container.internal;
 
 import java.util.Stack;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.container.ApplicationContext;
+import org.xwiki.container.Container;
+import org.xwiki.container.Request;
+import org.xwiki.container.Response;
+import org.xwiki.container.Session;
 
 /**
  * We're using ThreadLocals to store the request, response and session so that each thread 
@@ -28,6 +35,7 @@ import java.util.Stack;
  * to create a new request, response or session even while in the same thread. For this use case
  * we've added the possibility to push/pop different implementations for these Objects.
  */
+@Component
 public class DefaultContainer implements Container
 {
     private ApplicationContext applicationContext;

@@ -18,25 +18,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.velocity;
+package org.xwiki.velocity.internal;
 
 import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.VelocityContextFactory;
+import org.xwiki.velocity.VelocityContextInitializer;
+import org.xwiki.velocity.XWikiVelocityException;
 
 /**
  * Default implementation for {@link VelocityContextFactory}.
  * 
  * @version $Id$
  */
+@Component
 public class DefaultVelocityContextFactory extends AbstractLogEnabled implements VelocityContextFactory, Initializable,
     Composable
 {
@@ -47,9 +54,10 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
     private ComponentManager componentManager;
 
     /**
-     * Context configuration, injected by the Component Manager; holds the Velocity tools.
+     * Velocity configuration to get the list of configured Velocity tools.
      */
-    private Properties properties;
+    @Requirement
+    private VelocityConfiguration velocityConfiguration;
 
     /**
      * An internal read-only Velocity Context containing the Tools defined in the component's configuration. We reuse
@@ -77,10 +85,11 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
         this.toolsContext = new VelocityContext();
 
         // Instantiate Velocity tools
-        if (this.properties != null) {
-            for (Enumeration< ? > props = this.properties.propertyNames(); props.hasMoreElements();) {
+        Properties properties = this.velocityConfiguration.getTools();
+        if (properties != null) {
+            for (Enumeration< ? > props = properties.propertyNames(); props.hasMoreElements();) {
                 String key = props.nextElement().toString();
-                String value = this.properties.getProperty(key);
+                String value = properties.getProperty(key);
                 Object toolInstance;
                 try {
                     toolInstance = Class.forName(value).newInstance();

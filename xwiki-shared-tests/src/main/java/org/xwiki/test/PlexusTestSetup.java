@@ -24,9 +24,12 @@ import junit.extensions.TestSetup;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.lang.reflect.Method;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -40,9 +43,17 @@ public class PlexusTestSetup extends TestSetup
 {
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
+    private List<ComponentDescriptor> componentDescriptors = new ArrayList<ComponentDescriptor>();
+    
     public PlexusTestSetup(TestSuite suite)
     {
         super(suite);
+    }
+
+    public PlexusTestSetup(TestSuite suite, List<ComponentDescriptor> componentDescriptors) throws Exception
+    {
+        super(suite);
+        this.componentDescriptors.addAll(componentDescriptors);
     }
 
     /**
@@ -74,8 +85,15 @@ public class PlexusTestSetup extends TestSetup
     @Override
     protected void setUp() throws Exception
     {
-        this.initializer.initialize();
+        this.initializer.initializeContainer();
 
+        // Register defined component descriptors as components 
+        for (ComponentDescriptor descriptor : this.componentDescriptors) {
+            getComponentManager().registerComponent(descriptor);
+        }
+
+        this.initializer.initializeExecution();
+        
         for (Enumeration tests = getTest().tests(); tests.hasMoreElements();) {
             Test test = (Test) tests.nextElement();
             try {

@@ -21,6 +21,7 @@
 package org.xwiki.velocity;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Populates new Velocity contexts with custom entries.
@@ -28,6 +29,7 @@ import org.apache.velocity.VelocityContext;
  * @version $Id$
  * @since 1.5M1
  */
+@ComponentRole
 public interface VelocityContextInitializer
 {
     /**

@@ -22,6 +22,9 @@ package org.xwiki.container.portlet;
 
 import javax.portlet.PortletContext;
 
+import org.xwiki.component.annotation.ComponentRole;
+
+@ComponentRole
 public interface PortletContainerInitializer
 {
     void initializeRequest(javax.portlet.PortletRequest request, Object xwikiContext)

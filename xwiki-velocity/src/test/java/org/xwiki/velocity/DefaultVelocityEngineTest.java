@@ -25,6 +25,7 @@ import java.io.StringWriter;
 import java.util.Properties;
 
 import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.velocity.internal.DefaultVelocityEngine;
 
 
 /**
@@ -42,18 +43,18 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
 
     public void testEvaluateReader() throws Exception
     {
-        engine.initialize(new Properties());
+        this.engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
-        engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
+        this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             new StringReader("#set($foo='hello')$foo World"));
         assertEquals("hello World", writer.toString());
     }
 
     public void testEvaluateString() throws Exception
     {
-        engine.initialize(new Properties());
+        this.engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
-        engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
+        this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo='hello')$foo World");
         assertEquals("hello World", writer.toString());
     }
@@ -63,9 +64,9 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
      */
     public void testSecureUberspectorActiveByDefault() throws Exception
     {
-        engine.initialize(new Properties());
+        this.engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
-        engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
+        this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
             + ".newInstance())$object.size()");
         assertEquals("$object.size()", writer.toString());
@@ -77,9 +78,9 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         Properties properties = new Properties();
         properties.setProperty("runtime.introspector.uberspect",
             "org.apache.velocity.util.introspection.UberspectImpl");
-        engine.initialize(properties);
+        this.engine.initialize(properties);
         StringWriter writer = new StringWriter();
-        engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
+        this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
             + ".newInstance())$object.size()");
         assertEquals("0", writer.toString());

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>XWiki</web>
@@ -22,6 +22,7 @@
 <comment></comment>
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <class>
 <name>XWiki.XWikiPreferences</name>
 <customClass></customClass>
@@ -180,6 +181,22 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </convertmail>
+<core.defaultDocumentSyntax>
+<name>core.defaultDocumentSyntax</name>
+<number>59</number>
+<prettyName>Default document syntax</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</core.defaultDocumentSyntax>
+<dateformat>
+<name>dateformat</name>
+<number>54</number>
+<prettyName>Date Format</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</dateformat>
 <default_language>
 <customDisplay></customDisplay>
 <name>default_language</name>
@@ -306,6 +323,15 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </invitation_email_content>
+<javamail_extra_props>
+<name>javamail_extra_props</name>
+<number>58</number>
+<prettyName>Additional JavaMail properties</prettyName>
+<rows>6</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</javamail_extra_props>
 <languages>
 <customDisplay></customDisplay>
 <name>languages</name>
@@ -318,6 +344,146 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </languages>
+<ldap>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap</name>
+<number>60</number>
+<prettyName>Ldap</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap>
+<ldap_UID_attr>
+<name>ldap_UID_attr</name>
+<number>69</number>
+<prettyName>Ldap UID attribute name</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_UID_attr>
+<ldap_base_DN>
+<name>ldap_base_DN</name>
+<number>68</number>
+<prettyName>Ldap base DN</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_base_DN>
+<ldap_bind_DN>
+<name>ldap_bind_DN</name>
+<number>63</number>
+<prettyName>Ldap login matching</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_bind_DN>
+<ldap_bind_pass>
+<name>ldap_bind_pass</name>
+<number>64</number>
+<prettyName>Ldap password matching</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_bind_pass>
+<ldap_exclude_group>
+<name>ldap_exclude_group</name>
+<number>67</number>
+<prettyName>Ldap group to exclude</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_exclude_group>
+<ldap_fields_mapping>
+<name>ldap_fields_mapping</name>
+<number>70</number>
+<prettyName>Ldap user fiels mapping</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_fields_mapping>
+<ldap_group_mapping>
+<name>ldap_group_mapping</name>
+<number>72</number>
+<prettyName>Ldap groups mapping</prettyName>
+<rows>5</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</ldap_group_mapping>
+<ldap_groupcache_expiration>
+<name>ldap_groupcache_expiration</name>
+<number>73</number>
+<prettyName>LDAP groups members cache</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_groupcache_expiration>
+<ldap_mode_group_sync>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>ldap_mode_group_sync</name>
+<number>74</number>
+<prettyName>LDAP groups sync mode</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>|always|create</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</ldap_mode_group_sync>
+<ldap_port>
+<name>ldap_port</name>
+<number>62</number>
+<prettyName>Ldap server port</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_port>
+<ldap_server>
+<name>ldap_server</name>
+<number>61</number>
+<prettyName>Ldap server adress</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_server>
+<ldap_trylocal>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap_trylocal</name>
+<number>75</number>
+<prettyName>Try local login</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap_trylocal>
+<ldap_update_user>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap_update_user</name>
+<number>71</number>
+<prettyName>Update user from LDAP</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap_update_user>
+<ldap_user_group>
+<name>ldap_user_group</name>
+<number>66</number>
+<prettyName>Ldap group filter</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_user_group>
+<ldap_validate_password>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap_validate_password</name>
+<number>65</number>
+<prettyName>Validate Ldap user/password</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap_validate_password>
 <leftPanels>
 <customDisplay></customDisplay>
 <name>leftPanels</name>
@@ -638,6 +804,14 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </skin>
+<smtp_port>
+<name>smtp_port</name>
+<number>55</number>
+<prettyName>SMTP Port</prettyName>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_port>
 <smtp_server>
 <customDisplay></customDisplay>
 <name>smtp_server</name>
@@ -650,6 +824,22 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </smtp_server>
+<smtp_server_password>
+<name>smtp_server_password</name>
+<number>57</number>
+<prettyName>Server password (optional)</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_password>
+<smtp_server_username>
+<name>smtp_server_username</name>
+<number>56</number>
+<prettyName>Server username (optional)</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_username>
 <stylesheet>
 <customDisplay></customDisplay>
 <name>stylesheet</name>
@@ -840,6 +1030,7 @@
 <name>XWiki.XWikiPreferences</name>
 <number>0</number>
 <className>XWiki.XWikiGlobalRights</className>
+<guid>369eb46f-6311-437b-a3a1-38755f324898</guid>
 <property>
 <allow>1</allow>
 </property>
@@ -918,6 +1109,7 @@
 <name>XWiki.XWikiPreferences</name>
 <number>1</number>
 <className>XWiki.XWikiGlobalRights</className>
+<guid>e9630277-a371-4228-8659-8a1abc7bacfa</guid>
 <property>
 <allow>1</allow>
 </property>
@@ -996,6 +1188,7 @@
 <name>XWiki.XWikiPreferences</name>
 <number>2</number>
 <className>XWiki.XWikiGlobalRights</className>
+<guid>4ab252d2-8d57-4135-a966-76aba09f9bc6</guid>
 <property>
 <allow>1</allow>
 </property>
@@ -1168,6 +1361,22 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </convertmail>
+<core.defaultDocumentSyntax>
+<name>core.defaultDocumentSyntax</name>
+<number>59</number>
+<prettyName>Default document syntax</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</core.defaultDocumentSyntax>
+<dateformat>
+<name>dateformat</name>
+<number>54</number>
+<prettyName>Date Format</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</dateformat>
 <default_language>
 <customDisplay></customDisplay>
 <name>default_language</name>
@@ -1294,6 +1503,15 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </invitation_email_content>
+<javamail_extra_props>
+<name>javamail_extra_props</name>
+<number>58</number>
+<prettyName>Additional JavaMail properties</prettyName>
+<rows>6</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</javamail_extra_props>
 <languages>
 <customDisplay></customDisplay>
 <name>languages</name>
@@ -1306,6 +1524,146 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </languages>
+<ldap>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap</name>
+<number>60</number>
+<prettyName>Ldap</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap>
+<ldap_UID_attr>
+<name>ldap_UID_attr</name>
+<number>69</number>
+<prettyName>Ldap UID attribute name</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_UID_attr>
+<ldap_base_DN>
+<name>ldap_base_DN</name>
+<number>68</number>
+<prettyName>Ldap base DN</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_base_DN>
+<ldap_bind_DN>
+<name>ldap_bind_DN</name>
+<number>63</number>
+<prettyName>Ldap login matching</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_bind_DN>
+<ldap_bind_pass>
+<name>ldap_bind_pass</name>
+<number>64</number>
+<prettyName>Ldap password matching</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_bind_pass>
+<ldap_exclude_group>
+<name>ldap_exclude_group</name>
+<number>67</number>
+<prettyName>Ldap group to exclude</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_exclude_group>
+<ldap_fields_mapping>
+<name>ldap_fields_mapping</name>
+<number>70</number>
+<prettyName>Ldap user fiels mapping</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_fields_mapping>
+<ldap_group_mapping>
+<name>ldap_group_mapping</name>
+<number>72</number>
+<prettyName>Ldap groups mapping</prettyName>
+<rows>5</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</ldap_group_mapping>
+<ldap_groupcache_expiration>
+<name>ldap_groupcache_expiration</name>
+<number>73</number>
+<prettyName>LDAP groups members cache</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_groupcache_expiration>
+<ldap_mode_group_sync>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>ldap_mode_group_sync</name>
+<number>74</number>
+<prettyName>LDAP groups sync mode</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>|always|create</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</ldap_mode_group_sync>
+<ldap_port>
+<name>ldap_port</name>
+<number>62</number>
+<prettyName>Ldap server port</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_port>
+<ldap_server>
+<name>ldap_server</name>
+<number>61</number>
+<prettyName>Ldap server adress</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_server>
+<ldap_trylocal>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap_trylocal</name>
+<number>75</number>
+<prettyName>Try local login</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap_trylocal>
+<ldap_update_user>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap_update_user</name>
+<number>71</number>
+<prettyName>Update user from LDAP</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap_update_user>
+<ldap_user_group>
+<name>ldap_user_group</name>
+<number>66</number>
+<prettyName>Ldap group filter</prettyName>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</ldap_user_group>
+<ldap_validate_password>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>ldap_validate_password</name>
+<number>65</number>
+<prettyName>Validate Ldap user/password</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</ldap_validate_password>
 <leftPanels>
 <customDisplay></customDisplay>
 <name>leftPanels</name>
@@ -1626,6 +1984,14 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </skin>
+<smtp_port>
+<name>smtp_port</name>
+<number>55</number>
+<prettyName>SMTP Port</prettyName>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_port>
 <smtp_server>
 <customDisplay></customDisplay>
 <name>smtp_server</name>
@@ -1638,6 +2004,22 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </smtp_server>
+<smtp_server_password>
+<name>smtp_server_password</name>
+<number>57</number>
+<prettyName>Server password (optional)</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_password>
+<smtp_server_username>
+<name>smtp_server_username</name>
+<number>56</number>
+<prettyName>Server username (optional)</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</smtp_server_username>
 <stylesheet>
 <customDisplay></customDisplay>
 <name>stylesheet</name>
@@ -1766,6 +2148,7 @@
 <name>XWiki.XWikiPreferences</name>
 <number>0</number>
 <className>XWiki.XWikiPreferences</className>
+<guid>a2464e0e-d798-467c-8f3e-8ae4443cd4fe</guid>
 <property>
 <ad_clientid></ad_clientid>
 </property>

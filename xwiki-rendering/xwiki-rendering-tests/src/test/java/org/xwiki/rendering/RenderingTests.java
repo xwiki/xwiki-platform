@@ -22,8 +22,9 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
+import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.test.PlexusTestSetup;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -48,6 +49,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("group/group8", false);
         suite.addTestsFromResource("group/group9", false);
         suite.addTestsFromResource("group/group10", false);
+        suite.addTestsFromResource("group/group11", false);
 
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);

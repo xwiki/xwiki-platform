@@ -46,19 +46,19 @@ public class OpenOfficeManagerVelocityContextInitializer extends AbstractLogEnab
     /**
      * The {@link Execution} component.
      */
-    @Requirement("default")
+    @Requirement
     private Execution execution;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeManager ooManager;
 
     /**
      * The {@link DocumentAccessBridge} component.
      */
-    @Requirement("default")
+    @Requirement
     private DocumentAccessBridge docBridge;
 
     /**

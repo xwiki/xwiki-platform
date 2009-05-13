@@ -42,13 +42,13 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @version $Id$
  * @since 1.8RC3
  */
-@Component("default")
+@Component
 public class DefaultOpenOfficeManager extends AbstractLogEnabled implements OpenOfficeManager
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeConfiguration ooConfig;
 
     /**

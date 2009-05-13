@@ -45,7 +45,7 @@ public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleane
     /**
      * The {@link DefaultHTMLCleaner} used internally.
      */
-    @Requirement("default")
+    @Requirement
     private HTMLCleaner defaultHtmlCleaner;
     
     /**

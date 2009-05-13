@@ -42,7 +42,7 @@ public class OpenOfficeConfigurationVelocityContextInitializer implements Veloci
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeConfiguration ooConfig;
 
     /**

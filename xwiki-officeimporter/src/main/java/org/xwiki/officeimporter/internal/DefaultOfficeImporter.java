@@ -76,7 +76,7 @@ import org.xwiki.xml.html.HTMLUtils;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("default")
+@Component
 public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeImporter
 {
     /**
@@ -92,13 +92,13 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * Document access bridge used to access wiki documents.
      */
-    @Requirement("default")
+    @Requirement
     private DocumentAccessBridge docBridge;
 
     /**
      * OpenOffice document converter.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeDocumentConverter ooConverter;
 
     /**
@@ -122,13 +122,13 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * Factory to get various syntax renderers.
      */
-    @Requirement("default")
+    @Requirement
     private PrintRendererFactory rendererFactory;
 
     /**
      * The {@link DocumentSplitter} used for splitting documents.
      */
-    @Requirement("default")
+    @Requirement
     private DocumentSplitter documentSplitter;
 
     /**

@@ -34,20 +34,20 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
  * @version $Id$
  * @since 1.9M2
  */
-@Component("openofficemanager")
+@Component("oomanager")
 public class OpenOfficeManagerApplicationContextListener extends AbstractLogEnabled implements
     ApplicationContextListener
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeConfiguration ooConfig;
 
     /**
      * The {@link OpenOfficeManager} component.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeManager ooManager;
 
     /**

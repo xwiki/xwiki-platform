@@ -47,14 +47,14 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
  * @version $Id$
  * @since 1.8RC3
  */
-@Component("default")
+@Component
 public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled implements OpenOfficeDocumentConverter,
     Initializable
 {
     /**
      * The {@link OpenOfficeManager} component.
      */
-    @Requirement("default")
+    @Requirement
     private OpenOfficeManager ooManager;
 
     /**

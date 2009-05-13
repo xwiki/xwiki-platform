@@ -43,7 +43,7 @@ public class ImageFilter extends AbstractHTMLFilter
     /**
      * The {@link DocumentAccessBridge}
      */
-    @Requirement("default")
+    @Requirement
     private DocumentAccessBridge docBridge;
 
     /**

@@ -46,7 +46,7 @@ public class OpenOfficeHTMLCleaner extends AbstractLogEnabled implements HTMLCle
     /**
      * The {@link DefaultHTMLCleaner} used internally. 
      */
-    @Requirement("default")
+    @Requirement
     private HTMLCleaner defaultHtmlCleaner;
     
     /**

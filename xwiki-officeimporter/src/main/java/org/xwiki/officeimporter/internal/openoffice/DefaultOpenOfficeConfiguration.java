@@ -35,7 +35,7 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
  * @version $Id$
  * @since 1.8RC3
  */
-@Component("default")
+@Component
 public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, Initializable
 {
     /**
@@ -76,13 +76,13 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, 
     /**
      * The {@link ConfigurationManager} component.
      */
-    @Requirement("default")
+    @Requirement
     private ConfigurationManager configurationManager;
 
     /**
      * The {@link ConfigurationSourceCollection} component.
      */
-    @Requirement("default")
+    @Requirement
     private ConfigurationSourceCollection sourceCollection;
 
     /**

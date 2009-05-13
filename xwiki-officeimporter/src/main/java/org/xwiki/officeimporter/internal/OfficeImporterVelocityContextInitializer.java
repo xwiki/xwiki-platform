@@ -45,19 +45,19 @@ public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled
     /**
      * The {@link Execution} component.
      */
-    @Requirement("default")
+    @Requirement
     private Execution execution;
 
     /**
      * The {@link OfficeImporter} component.
      */
-    @Requirement("default")
+    @Requirement
     private OfficeImporter officeImporter;
 
     /**
      * The {@link DocumentAccessBridge}.
      */
-    @Requirement("default")
+    @Requirement
     private DocumentAccessBridge docBridge;
 
     /**

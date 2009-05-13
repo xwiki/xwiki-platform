@@ -21,6 +21,8 @@ package com.xpn.xwiki.store;
 
 import java.util.Date;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -32,6 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 1.2M1
  */
+@ComponentRole
 public interface XWikiRecycleBinStoreInterface
 {
     /**

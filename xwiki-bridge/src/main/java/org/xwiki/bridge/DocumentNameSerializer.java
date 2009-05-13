@@ -19,6 +19,8 @@
  */
 package org.xwiki.bridge;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Generate a fully qualified document reference string (ie of the form
  * {@code wiki:space.page}) out of a {@link DocumentName}.
@@ -26,6 +28,7 @@ package org.xwiki.bridge;
  * @version $Id$
  * @since 1.8.1
  */
+@ComponentRole
 public interface DocumentNameSerializer
 {
     /**

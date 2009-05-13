@@ -21,6 +21,8 @@ package com.xpn.xwiki.store;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -31,6 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface XWikiAttachmentStoreInterface
 {
     void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)

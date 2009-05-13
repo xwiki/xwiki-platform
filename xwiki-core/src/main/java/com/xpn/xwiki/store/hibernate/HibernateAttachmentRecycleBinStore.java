@@ -28,6 +28,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @version $Id$
  * @since 1.4M1
  */
+@Component
 public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore implements AttachmentRecycleBinStore
 {
     /** String used to annotate unchecked exceptions. */

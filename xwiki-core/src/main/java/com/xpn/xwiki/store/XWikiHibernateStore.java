@@ -53,6 +53,8 @@ import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.impl.SessionFactoryImpl;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWiki;
@@ -91,6 +93,7 @@ import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
+@Component
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
     private static final Log log = LogFactory.getLog(XWikiHibernateStore.class);
@@ -98,8 +101,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
     /**
-     * QueryManager for this store. Injected via component manager.
+     * QueryManager for this store.
      */
+    @Requirement
     private QueryManager queryManager;
 
     /**

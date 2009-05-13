@@ -21,6 +21,8 @@ package org.xwiki.query;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Interface for execute a queries.
  * Components should be registered with hint = query language.
@@ -28,6 +30,7 @@ import java.util.List;
  * @version $Id$
  * @since 1.6M1
  */
+@ComponentRole
 public interface QueryExecutor
 {
     /**

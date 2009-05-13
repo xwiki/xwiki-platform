@@ -26,6 +26,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -37,6 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
+@Component
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements XWikiRecycleBinStoreInterface
 {
     /**

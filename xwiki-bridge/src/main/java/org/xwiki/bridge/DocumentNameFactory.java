@@ -19,12 +19,15 @@
  */
 package org.xwiki.bridge;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Generate a Document Name from a raw string reference.
  *  
  * @version $Id$
  * @since 1.8.1
  */
+@ComponentRole
 public interface DocumentNameFactory
 {
     /**

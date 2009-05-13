@@ -21,6 +21,8 @@ package org.xwiki.bridge;
 
 import java.util.Map;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
  * services.
@@ -28,6 +30,7 @@ import java.util.Map;
  * @version $Id$
  * @since 1.6M1
  */
+@ComponentRole
 public interface DocumentAccessBridge
 {
     /**

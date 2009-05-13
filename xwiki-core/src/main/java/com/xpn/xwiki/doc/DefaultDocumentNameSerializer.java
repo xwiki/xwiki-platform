@@ -21,6 +21,7 @@ package com.xpn.xwiki.doc;
 
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.component.annotation.Component;
 
 /**
  * Generate a fully qualified document reference string (ie of the form {@code <wiki>:<space>.<page>} out of a
@@ -29,6 +30,7 @@ import org.xwiki.bridge.DocumentNameSerializer;
  * @version $Id$
  * @since 1.8.1
  */
+@Component
 public class DefaultDocumentNameSerializer implements DocumentNameSerializer
 {
     /**

@@ -19,12 +19,15 @@
  */
 package org.xwiki.bridge;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Exposes methods for accessing Skin data.
  * 
  * @version $Id$ 
  * @since 1.7
  */
+@ComponentRole
 public interface SkinAccessBridge
 {
     /**

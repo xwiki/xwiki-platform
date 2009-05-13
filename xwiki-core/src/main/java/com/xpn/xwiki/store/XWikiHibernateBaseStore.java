@@ -22,6 +22,7 @@ import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -43,6 +44,7 @@ public class XWikiHibernateBaseStore implements Initializable
 
     private int nbConnections = 0;
 
+    @Requirement
     private HibernateSessionFactory sessionFactory;
 
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";

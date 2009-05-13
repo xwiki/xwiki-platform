@@ -23,6 +23,7 @@ package com.xpn.xwiki.store;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -32,6 +33,7 @@ import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+@ComponentRole
 public interface XWikiStoreInterface
 {
     void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;

@@ -27,6 +27,8 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
@@ -50,6 +52,7 @@ import com.xpn.xwiki.web.Utils;
  * @version $Id$
  * @since 1.5M1
  */
+@Component
 public class DefaultVelocityManager implements VelocityManager, Composable
 {
     private ComponentManager componentManager;
@@ -59,6 +62,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
      */
     private Map<String, VelocityEngine> velocityManagers = new HashMap<String, VelocityEngine>();
 
+    @Requirement
     private Execution execution;
 
     /**

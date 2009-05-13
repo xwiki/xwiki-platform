@@ -34,6 +34,13 @@
   <name>XWiki Platform - Core - Bridge</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Temporary bridge between new components and the old core, until the old core is completely split into components</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

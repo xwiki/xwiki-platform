@@ -19,65 +19,29 @@
  */
 package com.xpn.xwiki.store.hibernate;
 
-import java.io.InputStream;
-
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-
-import com.xpn.xwiki.util.Util;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Class used by hibernate stores for obtain sessions. Simple holder for real sessionFactory and configuration for now.
+ * Class used by Hibernate stores for obtain sessions. Simple holder for real sessionFactory and configuration for now.
  * 
  * @version $Id$
  * @since 1.6M1
  */
-public class HibernateSessionFactory
+@ComponentRole
+public interface HibernateSessionFactory
 {
-    /**
-     * Hibernate configuration object.
-     */
-    private Configuration configuration = new Configuration()
-    {
-        private static final long serialVersionUID = 1L;
-
-        // there is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
-        @Override
-        protected InputStream getConfigurationInputStream(String resource) throws HibernateException
-        {
-            InputStream stream = Util.getResourceAsStream(resource);
-            if (stream == null) {
-                throw new HibernateException("Can't find [" + resource + "] for hibernate configuration");
-            }
-            return stream;
-        }
-    };
-
-    /**
-     * Real hibernate session factory.
-     */
-    private SessionFactory sessionFactory;
-
     /**
      * @return Hibernate Configuration object
      */
-    public Configuration getConfiguration()
-    {
-        return configuration;
-    }
+    Configuration getConfiguration();
 
     /**
-     * @return Real hibernate session factory
+     * @return Real Hibernate session factory
      */
-    public SessionFactory getSessionFactory()
-    {
-        return sessionFactory;
-    }
+    SessionFactory getSessionFactory();
 
     // NOTE: this method will be removed in 3rd step of XWIKI-2332
-    public void setSessionFactory(SessionFactory sessionFactory)
-    {
-        this.sessionFactory = sessionFactory;
-    }
+    void setSessionFactory(SessionFactory sessionFactory);
 }

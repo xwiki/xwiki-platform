@@ -24,6 +24,7 @@ import java.util.Date;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * @version $Id$
  * @since 1.4M2
  */
+@Component("void")
 public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /**

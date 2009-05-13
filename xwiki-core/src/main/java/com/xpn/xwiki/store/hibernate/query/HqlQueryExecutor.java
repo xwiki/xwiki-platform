@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
@@ -44,11 +46,13 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 1.6M1
  */
+@Component("hql")
 public class HqlQueryExecutor implements QueryExecutor, Initializable
 {
     /**
-     * Session factory needed for register named queries mapping. Injected via component manager.
+     * Session factory needed for register named queries mapping.
      */
+    @Requirement
     private HibernateSessionFactory sessionFactory;
 
     /**
@@ -57,12 +61,14 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
     private String mappingPath = "queries.hbm.xml";
 
     /**
-     * Used for access to XWikiContext. Injected via component manager.
+     * Used for access to XWikiContext.
      */
+    @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
+     * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {

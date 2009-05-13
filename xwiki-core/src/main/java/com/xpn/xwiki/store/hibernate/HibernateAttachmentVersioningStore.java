@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @version $Id$
  * @since 1.4M2
  */
+@Component
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {
     /** logger. */

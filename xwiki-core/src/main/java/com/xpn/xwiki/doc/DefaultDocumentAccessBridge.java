@@ -26,6 +26,8 @@ import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
@@ -42,9 +44,11 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * @version $Id$
  * @since 1.6M1
  */
+@Component
 public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 {
     /** Execution context handler, needed for accessing the XWikiContext. */
+    @Requirement
     private Execution execution;
 
     private XWikiContext getContext()

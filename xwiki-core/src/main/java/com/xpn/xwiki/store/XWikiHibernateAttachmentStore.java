@@ -7,6 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -15,6 +16,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Component
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface
 {
     private static final Log log = LogFactory.getLog(XWikiHibernateAttachmentStore.class);

@@ -30,6 +30,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -45,6 +46,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * 
  * @version $Id$
  */
+@Component
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface
 {
     /** Logger. */

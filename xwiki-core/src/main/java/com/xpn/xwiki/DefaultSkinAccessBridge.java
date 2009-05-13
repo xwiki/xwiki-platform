@@ -22,6 +22,8 @@
 package com.xpn.xwiki;
 
 import org.xwiki.bridge.SkinAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 /**
@@ -30,9 +32,11 @@ import org.xwiki.context.Execution;
  * @version $Id$ 
  * @since 1.7
  */
+@Component
 public class DefaultSkinAccessBridge implements SkinAccessBridge
 {
     /** Execution context handler, needed for accessing the XWikiContext. */
+    @Requirement
     private Execution execution;
 
     private XWikiContext getContext()

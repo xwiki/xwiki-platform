@@ -20,6 +20,8 @@
 package com.xpn.xwiki.doc;
 
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
@@ -30,11 +32,13 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 1.8.3
  */
+@Component("compact")
 public class CompactDocumentNameSerializer extends DefaultDocumentNameSerializer
 {
     /**
      * Execution context handler, needed for accessing the XWikiContext.
      */
+    @Requirement
     private Execution execution;
 
     /**

@@ -22,6 +22,8 @@ package com.xpn.xwiki.doc;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
@@ -32,6 +34,7 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 1.8.1
  */
+@Component
 public class DefaultDocumentNameFactory implements DocumentNameFactory
 {
     /**
@@ -56,6 +59,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
     /** 
      * Execution context handler, needed for accessing the XWikiContext. 
      */
+    @Requirement
     private Execution execution;
     
     public DocumentName createDocumentName(String reference)

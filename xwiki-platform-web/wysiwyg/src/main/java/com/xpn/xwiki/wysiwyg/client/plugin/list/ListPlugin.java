@@ -22,8 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.list;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.gwt.dom.client.Element;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FocusWidget;
@@ -90,8 +88,8 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             // Initialize the behavior adjuster and set it up with this text area
             behaviorAdjuster = (ListBehaviorAdjuster) GWT.create(ListBehaviorAdjuster.class);
             behaviorAdjuster.setTextArea(getTextArea());
-            // handle all list item elements in the loaded document
-            behaviorAdjuster.onInnerHTMLChange(Element.as(getTextArea().getDocument().getBody()));
+            // fake a reset command to handle the loaded document
+            behaviorAdjuster.onCommand(getTextArea().getCommandManager(), new Command("reset"), null);
             // add key listener to the rta
             getTextArea().addKeyboardListener(behaviorAdjuster);
             getTextArea().getCommandManager().addCommandListener(behaviorAdjuster);

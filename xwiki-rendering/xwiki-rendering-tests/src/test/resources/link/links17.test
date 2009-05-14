@@ -22,3 +22,7 @@ endDocument
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 [[http://xwiki2.org>>http://xwiki.org]]
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startwikilink:http://xwiki2.org--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://xwiki2.org"><span class="wikigeneratedlinkcontent">http://xwiki2.org</span></a></span><!--stopwikilink--></a></span><!--stopwikilink--></p>

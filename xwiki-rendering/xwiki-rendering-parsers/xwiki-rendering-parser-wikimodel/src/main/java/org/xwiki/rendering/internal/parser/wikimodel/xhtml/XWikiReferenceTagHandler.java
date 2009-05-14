@@ -27,17 +27,14 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 
 /**
- * Override the default WikiModel Reference handler to handle XWiki references
- * since we store some information in comments. We also need to handle the span
- * elements introduced by XWiki.
+ * Override the default WikiModel Reference handler to handle XWiki references since we store some information in
+ * comments. We also need to handle the span elements introduced by XWiki.
  * 
  * @version $Id$
  * @since 1.7M1
  */
 public class XWikiReferenceTagHandler extends ReferenceTagHandler
 {
-    private WikiScannerContext originalContext;
-
     @Override
     public void initialize(TagStack stack)
     {
@@ -51,15 +48,14 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
     {
         boolean isInLink = (Boolean) context.getTagStack().getStackParameter("isInLink");
         if (isInLink) {
-            this.originalContext = context.getScannerContext();
-            XDOMGeneratorListener listener = 
+            XDOMGeneratorListener listener =
                 (XDOMGeneratorListener) context.getTagStack().getStackParameter("xdomGeneratorListener");
-            context.getTagStack().setScannerContext(new WikiScannerContext(listener));
-            
+            context.getTagStack().pushScannerContext(new WikiScannerContext(listener));
+
             // Ensure we simulate a new document being parsed
             context.getScannerContext().beginDocument();
-            
-            // Verify if it's a freestanding link and if so save the information so that we can get it in 
+
+            // Verify if it's a freestanding link and if so save the information so that we can get it in
             // XWikiCommentHandler.
             if (isFreeStandingReference(context)) {
                 context.getTagStack().setStackParameter("isFreeStandingLink", true);
@@ -70,7 +66,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
                 params = params.remove("href");
                 context.getTagStack().setStackParameter("linkParameters", params);
             }
-            
+
             setAccumulateContent(false);
         } else {
             super.begin(context);
@@ -85,7 +81,7 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
             // Ensure we simulate a document parsing end
             context.getScannerContext().endDocument();
 
-            context.getTagStack().setScannerContext(this.originalContext);
+            context.getTagStack().popScannerContext();
         } else {
             super.end(context);
         }

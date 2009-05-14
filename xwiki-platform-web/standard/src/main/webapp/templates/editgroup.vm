@@ -1,3 +1,4 @@
+#template('xwikivars.vm')
 ##check to see if the XWiki.XWkiGroupSheet exists
 #if($xwiki.getDocument("XWiki.XWikiGroupSheet").isNew())
 <div id="groupwrap">

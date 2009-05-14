@@ -50,37 +50,37 @@ public final class XWikiDavUtils
     public static final String XWIKI_WEBDAV_SIGNATURE = "/xwiki/webdav/spaces/";
 
     /**
-     * An interface for collecting all resource hints used.
+     * An interface for collecting all base views.
      */
-    public interface ResourceHints
+    public interface BaseViews
     {
         /**
-         * Resource hint for root view.
+         * Root view.
          */
         public static final String ROOT = "root";
 
         /**
-         * Resource hint for 'pages' base view.
+         * Pages view.
          */
-        public static final String PAGES = "pages";
+        public static final String PAGES = "spaces";
 
         /**
-         * Resource hint for 'attachments' base view.
+         * Attachments view.
          */
         public static final String ATTACHMENTS = "attachments";
 
         /**
-         * Resource hint for 'home' base view.
+         * Home view.
          */
         public static final String HOME = "home";
 
         /**
-         * Resource hint for 'orphans' base view.
+         * Orphans view.
          */
         public static final String ORPHANS = "orphans";
 
         /**
-         * Resource hint for 'whatsnew' base view.
+         * Whatsnew view.
          */
         public static final String WHATSNEW = "whatsnew";
     }    

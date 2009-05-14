@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.internal.RoleHint;
 
 public interface ComponentManager
 {
@@ -66,4 +67,11 @@ public interface ComponentManager
      * @since 1.7M1
      */
     void registerComponent(ComponentDescriptor componentDescriptor) throws ComponentRepositoryException;
+
+    /**
+     * @param role the role identifying the component
+     * @param roleHint the hint identifying the component
+     * @return the descriptor for the component matching the passed parameter or null if this component doesn't exist
+     */
+    ComponentDescriptor getComponentDescriptor(Class< ? > role, String roleHint);
 }

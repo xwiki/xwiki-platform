@@ -29,7 +29,10 @@ import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentProperty;
+import org.xwiki.component.descriptor.DefaultComponentDependency;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -227,5 +230,58 @@ public class PlexusComponentManager implements ComponentManager
         } catch (org.codehaus.plexus.component.repository.exception.ComponentRepositoryException e) {
             throw new ComponentRepositoryException("Failed add component descriptor [" + componentDescriptor + "]", e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#getComponentDescriptor(Class, String)
+     */
+    public ComponentDescriptor getComponentDescriptor(Class< ? > role, String roleHint)
+    {
+        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
+            this.plexusContainer.getComponentDescriptor(role.getName(), roleHint);
+
+        DefaultComponentDescriptor descriptor = null;
+        
+        if (pcd != null) {
+            descriptor = new DefaultComponentDescriptor();
+            descriptor.setImplementation(pcd.getImplementation());
+            descriptor.setRoleHint(pcd.getRoleHint());
+            descriptor.setRole(loadClass(pcd.getRole()));
+            
+            if ("per-lookup".equals(pcd.getInstantiationStrategy())) {
+                descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP);
+            } else {
+                descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+            }
+    
+            // Copy dependencies
+            for (ComponentRequirement requirement : (List<ComponentRequirement>) pcd.getRequirements()) {
+                DefaultComponentDependency dependency = new DefaultComponentDependency();
+                dependency.setRole(loadClass(requirement.getRole()));
+                dependency.setRoleHint(requirement.getRoleHint());
+                dependency.setMappingType(loadClass(requirement.getFieldMappingType()));
+                dependency.setName(requirement.getFieldName());
+                
+                // TODO: Handle specific hints when we move to a more recent Plexus version.
+                // See createPlexusComponentDescriptor
+                descriptor.addComponentDependency(dependency);
+            }
+        }
+        
+        return descriptor;
+    }
+    
+    private Class< ? > loadClass(String className)
+    {
+        Class result;
+        try {
+            result = this.getClass().getClassLoader().loadClass(className);
+        } catch (Exception e) {
+            // This is not supposed to happen since the Class was able to created the first time the component was
+            // registered.
+            throw new RuntimeException("Failed to load class [" + className + "]");
+        }
+        return result;
     }
 }

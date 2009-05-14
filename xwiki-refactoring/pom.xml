@@ -1,0 +1,58 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>xwiki-core-parent</artifactId>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <version>1.9-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-core-refactoring</artifactId>
+  <name>XWiki Platform - Core - Refactoring</name>
+  <version>1.8-SNAPSHOT</version>
+  <description>XWiki Platform - Core - Refactoring</description>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.xwiki.platform</groupId>
+  		<artifactId>xwiki-core-bridge</artifactId>
+  		<version>${pom.version}</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.xwiki.platform</groupId>
+  		<artifactId>xwiki-core-rendering-api</artifactId>
+  		<version>${pom.version}</version>
+  	</dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
+      <version>${pom.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
+      <version>${pom.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/Abstract*.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

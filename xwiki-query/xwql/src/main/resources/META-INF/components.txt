@@ -1,0 +1,2 @@
+org.xwiki.query.xwql.hql.XWQLtoHQLTranslator
+org.xwiki.query.xwql.XWQLQueryExecutor

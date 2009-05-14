@@ -19,6 +19,9 @@
  */
 package org.xwiki.query.xwql;
 
+import org.xwiki.component.annotation.ComponentRole;
+
+@ComponentRole
 public interface QueryTranslator
 {
     String getOutputLanguage();

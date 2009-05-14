@@ -27,9 +27,13 @@ import org.xwiki.query.xwql.QueryTranslator;
 import org.xwiki.query.Query;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 
+@Component("hql")
 public class XWQLtoHQLTranslator implements QueryTranslator
 {
+    @Requirement
     protected DocumentAccessBridge documentAccessBridge;
 
     public String translate(String input) throws Exception

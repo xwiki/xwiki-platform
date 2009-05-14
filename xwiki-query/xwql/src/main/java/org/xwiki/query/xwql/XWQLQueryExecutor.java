@@ -22,6 +22,8 @@ package org.xwiki.query.xwql;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
@@ -30,8 +32,10 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 
+@Component("xwql")
 public class XWQLQueryExecutor implements QueryExecutor, Composable
 {
+    @Requirement("hql")
     private QueryTranslator translator;
 
     private ComponentManager componentManager;

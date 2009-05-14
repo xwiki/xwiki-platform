@@ -19,12 +19,9 @@
  */
 package org.xwiki.query.internal;
 
-import java.util.Set;
-
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryException;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.QueryExecutorManager;
-import org.xwiki.query.QueryManager;
 
 /**
  * This is default QueryManager implementation.
@@ -33,54 +30,20 @@ import org.xwiki.query.QueryManager;
  * @version $Id$
  * @since 1.6M1
  */
-public class DefaultQueryManager implements QueryManager
+@Component
+public class DefaultQueryManager extends AbstractQueryManager
 {
     /**
      * {@link QueryExecutorManager} for execute Queries.
      */
+    @Requirement
     protected QueryExecutorManager queryExecutorManager;
-
-    /**
-     * {@inheritDoc}
-     */
-    public Set<String> getLanguages()
-    {
-        return getQueryExecutorManager().getLanguages();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean hasLanguage(String language)
-    {
-        return getLanguages().contains(language);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Query createQuery(String statement, String language) throws QueryException
-    {
-        if (hasLanguage(language)) {
-            return new DefaultQuery(statement, language, getQueryExecutorManager());
-        } else {
-            throw new QueryException("Language [" + language + "] is not supported", null, null);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Query getNamedQuery(String queryName) throws QueryException
-    {
-        return new DefaultQuery(queryName, getQueryExecutorManager());
-    }
 
     /**
      * @return {@link QueryExecutorManager}
      */
     protected QueryExecutorManager getQueryExecutorManager()
     {
-        return queryExecutorManager;
+        return this.queryExecutorManager;
     }
 }

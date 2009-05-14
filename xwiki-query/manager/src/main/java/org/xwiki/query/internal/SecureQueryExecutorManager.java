@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutorManager;
@@ -31,16 +33,22 @@ import org.xwiki.query.QueryExecutorManager;
  * {@link QueryExecutorManager} with access rights checking.
  * @version $Id$
  */
+//Note that we force the Component annotation so that this component is only registered as a QueryExecutorManager
+//and not a QueryExecutor too since we don't want this manager to be visible to users as a valid QueryExecutor
+//component.
+@Component(value = "secure", roles = { QueryExecutorManager.class })
 public class SecureQueryExecutorManager implements QueryExecutorManager
 {
     /**
      * Nested {@link QueryExecutorManager}.
      */
+    @Requirement
     private QueryExecutorManager nestedQueryExecutorManager;
 
     /**
      * Bridge to xwiki-core for check programming right.
      */
+    @Requirement
     private DocumentAccessBridge bridge;
 
     /**

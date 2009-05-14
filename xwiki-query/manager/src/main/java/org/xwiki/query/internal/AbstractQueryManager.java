@@ -19,57 +19,60 @@
  */
 package org.xwiki.query.internal;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryExecutorManager;
+import org.xwiki.query.QueryManager;
 
 /**
- * Default implementation of {@link QueryExecutorManager}.
- * @version $Id$
+ * Base QueryManager implementation.
+ * 
+ * @version $Id: $
+ * @since 2.0M1
  */
-// Note that we force the Component annotation so that this component is only registered as a QueryExecutorManager
-// and not a QueryExecutor too since we don't want this manager to be visible to users as a valid QueryExecutor
-// component.
-@Component(roles = { QueryExecutorManager.class })
-public class DefaultQueryExecutorManager implements QueryExecutorManager
+public abstract class AbstractQueryManager implements QueryManager
 {
     /**
-     * Map from language to its executor.
+     * @return the query executor manager to use. This allows extending classes to provide their version of it 
+     *         (for example using the Default manager or the Secure one or any other)
      */
-    @Requirement(role = QueryExecutor.class)
-    private Map<String, QueryExecutor> executors;
-
+    protected abstract QueryExecutorManager getQueryExecutorManager();
+ 
     /**
-     * Executor for named HQL queries.
+     * {@inheritDoc}
      */
-    @Requirement("hql")
-    private QueryExecutor namedQueryExecutor;
+    public Set<String> getLanguages()
+    {
+        return getQueryExecutorManager().getLanguages();
+    }
 
     /**
      * {@inheritDoc}
      */
-    public <T> List<T> execute(Query query) throws QueryException
+    public boolean hasLanguage(String language)
     {
-        if (query.isNamed()) {
-            return namedQueryExecutor.execute(query);
+        return getLanguages().contains(language);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query createQuery(String statement, String language) throws QueryException
+    {
+        if (hasLanguage(language)) {
+            return new DefaultQuery(statement, language, getQueryExecutorManager());
         } else {
-            return executors.get(query.getLanguage()).execute(query);
+            throw new QueryException("Language [" + language + "] is not supported", null, null);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public Set<String> getLanguages()
+    public Query getNamedQuery(String queryName) throws QueryException
     {
-        return Collections.unmodifiableSet(executors.keySet());
+        return new DefaultQuery(queryName, getQueryExecutorManager());
     }
 }

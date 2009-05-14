@@ -19,15 +19,33 @@
  */
 package org.xwiki.query.internal;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutorManager;
 
 /**
  * QueryManager implementation for use in scripts.
  * @version $Id$
  */
-public class SecureQueryManager extends DefaultQueryManager
+@Component("secure")
+public class SecureQueryManager extends AbstractQueryManager
 {
+    /**
+     * {@link QueryExecutorManager} for execute Queries.
+     */
+    @Requirement("secure")
+    protected QueryExecutorManager queryExecutorManager;
+
+    /**
+     * @return {@link QueryExecutorManager}
+     */
+    protected QueryExecutorManager getQueryExecutorManager()
+    {
+        return this.queryExecutorManager;
+    }
+
     /**
      * @param statement XWQL statement
      * @return Query

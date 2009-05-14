@@ -21,11 +21,14 @@ package org.xwiki.query;
 
 import java.util.Set;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Executes queries for several languages.
  * @see QueryExecutor
  * @version $Id$
  */
+@ComponentRole
 public interface QueryExecutorManager extends QueryExecutor
 {
     /**

@@ -44,22 +44,36 @@
 #-# The cache component to use as local cache component. 
 # cache.defaultLocalCache=jbosscache/local
 
-#-------------------------------------------------------------------------------------
-# Settings for the OpenOffice server instance controlled by the OfficeImporter plugin
-#-------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------
+# Settings for the OpenOffice server instance consumed by the OfficeImporter plugin
+#----------------------------------------------------------------------------------
+ 
+#-# [Since 1.9M2]
+#-# Type of the openoffice server instance used by officeimporter plugin.
+#-# 0 - Internally managed server instance.
+#-# 1 - Externally managed (local) server instance.
+# openoffice.serverType=0
+
+#-# [Since 1.9M2]
+#-# Port number used for connecting to the openoffice server instance. 
+# openoffice.serverPort=8100
+
+#-# [Since 1.9M2]
+#-# If the openoffice server should be started / connected upon XE start.
+# openoffice.autoStart=false
 
 #-# [Since 1.8RC3]
-#-# Path to openoffice installation.
+#-# Path to openoffice installation (serverType:0 only).
 # openoffice.homePath=/opt/openoffice.org3/
 
 #-# [Since 1.8RC3]
-#-# Path to openoffice execution profile.
+#-# Path to openoffice execution profile (serverType:0 only).
 # openoffice.profilePath=/home/user/.openoffice.org/3
 
 #-# [Since 1.8RC3]
-#-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process.
+#-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process (serverType:0 only).
 # openoffice.maxTasksPerProcess=50
 
 #-# [Since 1.8RC3]
-#-# Timeout for conversion tasks (in miliseconds).
+#-# Timeout for conversion tasks (in miliseconds) (serverType:0 only).
 # openoffice.taskExecutionTimeout=30000

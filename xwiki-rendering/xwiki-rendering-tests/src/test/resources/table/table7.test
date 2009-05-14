@@ -1,0 +1,30 @@
+.#--------------------------------------------------------------------------------
+.input|xhtml/1.0
+.# Verify header in table cell support
+.#--------------------------------------------------------------------------------
+<table><tr><td><h1>x</h1></td><td>y</td></tr></table>
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginTable
+beginTableRow
+beginTableCell
+beginGroup
+beginSection
+beginHeader [1, Hx]
+onWord [x]
+endHeader [1, Hx]
+endSection
+endGroup
+endTableCell
+beginTableCell
+onWord [y]
+endTableCell
+endTableRow
+endTable
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+|(((= x =)))|y

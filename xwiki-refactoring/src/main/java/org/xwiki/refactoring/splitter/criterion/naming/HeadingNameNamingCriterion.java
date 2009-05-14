@@ -29,6 +29,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Listener;
@@ -71,7 +72,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
      * Name of the base page name.
      */
     private String basePageName;
-    
+
     /**
      * Space name to be used with generated page names.
      */
@@ -81,7 +82,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
      * Flag indicating if each generated page name should be prepended with base page name.
      */
     private boolean prependBasePageName;
-    
+
     /**
      * Constructs a new {@link HeadingNameNamingCriterion}.
      * 
@@ -119,7 +120,8 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                     public List<Block> filter(Block block)
                     {
                         List<Block> blocks = new ArrayList<Block>();
-                        if (block instanceof WordBlock || block instanceof SpaceBlock) {
+                        if (block instanceof WordBlock || block instanceof SpaceBlock
+                            || block instanceof SpecialSymbolBlock) {
                             blocks.add(block);
                         }
                         return blocks;

@@ -35,7 +35,7 @@ XWiki.widgets.LiveTable = Class.create({
     * @todo Make this a valid ARIA table: http://www.w3.org/TR/aria-role/#structural
     */
   initialize: function(url, domNodeName, handler, options)
-  { 
+  {
     if (!options) {
       var options = {};
     }
@@ -187,7 +187,7 @@ XWiki.widgets.LiveTable = Class.create({
     var off = (this.totalRows > 0) ? offset : 0;
     var msg = "<strong>" + off + "</strong> - <strong>" + f + "</strong> $msg.get('xe.pagination.results.of') <strong>" + this.totalRows + "</strong>";
     var msg = msg.toLowerCase();
-        
+
     this.limitsDisplay.innerHTML = "$msg.get('xe.pagination.results') " + msg;
     this.clearDisplay();
 
@@ -314,6 +314,15 @@ XWiki.widgets.LiveTable = Class.create({
        fragment += ($(this.domNodeName).down("th.selected").hasClassName('desc') ? 'desc' : 'asc');
     }
     return fragment;
+  },
+
+  /**
+   * Remove all the fetched data from the cache.
+   */
+  clearCache: function()
+  {
+    this.fetchedRows.clear();
+    this.totalRows = -1;
   },
 
   /**

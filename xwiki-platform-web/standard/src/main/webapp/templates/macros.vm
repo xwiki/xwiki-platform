@@ -1648,8 +1648,7 @@ $html
  * @internal
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
-function (row, i, table)
-{
+function (row, i, table) {
   // This callback method code has been generated from velocity. 
   var tr = new Element("tr");
   if (row.doc_viewable) {
@@ -1708,17 +1707,28 @@ function (row, i, table)
         if(row.doc_hasadmin) {
           var td = new Element("td", {'class':'actions'});
           #foreach($action in $colprop.get("actions"))
-             #if($velocityCount > 1) 
-             td.insert(" ");
-             #end
-             #if($msg.get("xe.livetable._actions.${action}") != "xe.livetable._actions.${action}")
-               #set($text = $msg.get("xe.livetable._actions.${action}"))
-             #elseif($msg.get("${transprefix}._actions.${action}") != "${transprefix}._actions.${action}")
-               #set($text = "${transprefix}._actions.${action}")
-             #else
-               #set($text = "$action")
-             #end
-             td.insert(new Element("a", {"href": row.doc_${action}_url, "class":"action action${action}"}).update("$text"));
+            #if($velocityCount > 1) 
+            td.insert(" ");
+            #end
+            #if($transprefix != '' && $msg.get("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")
+              #set($text = $msg.get("${transprefix}_actions.${action}"))
+            #elseif($msg.get("xe.livetable._actions.${action}") != "xe.livetable._actions.${action}")
+              #set($text = $msg.get("xe.livetable._actions.${action}"))
+            #else
+              #set($text = "$action")
+            #end
+            var link = new Element("a", {"href": row.doc_${action}_url, "class":"action action${action}"}).update("$text");
+            #if("$!colprop.ajaxActions.get($action)" == 'true')
+              link.observe('click', function(event) {
+                event.stop();
+                new Ajax.Request(link.href, {
+                  onSuccess : function() {
+                    $colprop.actionCallbacks.get($action)
+                  }
+                });
+              });
+            #end
+            td.insert(link);
           #end
           tr.appendChild(td);
         }

@@ -28,9 +28,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -46,6 +49,11 @@ public class ComponentAnnotationLoader
      * annotations.
      */
     private static final String COMPONENT_LIST = "META-INF/components.txt";
+
+    /**
+     * Factory to create a Component Descriptor from an annotated class.
+     */
+    private ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
     
     /**
      * Loads all components defined using annotations.
@@ -61,26 +69,46 @@ public class ComponentAnnotationLoader
             List<String> componentClassNames = findAnnotatedComponentClasses(classLoader);
 
             // 2) For each component class name found, load its class and use introspection to find the necessary 
-            //    annotations required to register it as a component
-            ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
+            //    annotations required to create a Component Descriptor.
+            Map<RoleHint, ComponentDescriptor> descriptorMap = new HashMap<RoleHint, ComponentDescriptor>();
             for (String componentClassName : componentClassNames) {
                 Class< ? > componentClass = classLoader.loadClass(componentClassName);
 
                 // Look for ComponentRole annotations and register one component per ComponentRole found
                 for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
-                    ComponentDescriptor descriptor = 
-                        factory.createComponentDescriptor(componentClass, componentRoleClass);
-                    manager.registerComponent(descriptor);
+                    for (ComponentDescriptor descriptor : factory.createComponentDescriptors(componentClass,
+                        componentRoleClass))
+                    {
+                        // If there's already a existing role/hint in the list of descriptors then decide which one 
+                        // to keep.
+                        if (descriptorMap.containsKey(new RoleHint(componentRoleClass, descriptor.getRoleHint()))) {
+                            // For now the last override the first
+                            // TODO: Log a message in debug mode
+                            // SOP.println("WARNING: component [" + descriptor.getImplementation() + "] for role [" 
+                            //    + componentRoleClass.getName() + "] and hint [" + descriptor.getRoleHint() 
+                            //    + "] has already been registered with implementation [" + descriptors.get(
+                            //        new RoleHint(componentRoleClass, descriptor.getRoleHint())).getImplementation() 
+                            //        + "]. Ignoring it.");
+                            descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()), descriptor);
+                        } else {
+                            descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()), descriptor);
+                        }
+                    }
                 }
             }
 
+            // 3) Activate all component descriptors
+            for (ComponentDescriptor descriptor : descriptorMap.values()) {
+                manager.registerComponent(descriptor);
+            }
+            
         } catch (Exception e) {
             // Make sure we make the calling code fail in order to fail fast and prevent the application to start
             // if something is amiss.
             throw new RuntimeException("Failed to dynamically load components with annotations", e);
         }
     }
-    
+
     /**
      * Finds the interfaces that implement component roles by looking recursively in all interfaces of
      * the passed component implementation class. If the roles annotation value is specified then use 

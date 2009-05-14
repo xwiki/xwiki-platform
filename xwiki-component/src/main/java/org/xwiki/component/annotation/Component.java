@@ -48,6 +48,12 @@ public @interface Component
     String value() default "";
 
     /**
+     * Sometimes you want to register the component several times with different hints. In this case the
+     * default annotation value is ignored and the passed list of hints is used instead.
+     */
+    String[] hints() default { };
+    
+    /**
      * When specified forces the component to be registered as many times as there are roles specified. Otherwise
      * the superclass/interface hierarchy is scanned for ComponentRole annotations and the component is registered
      * under all roles found. 

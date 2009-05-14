@@ -92,6 +92,14 @@ public class ComponentDescriptorFactoryTest extends TestCase
         private FieldRole fieldRole;
     }
 
+    /**
+     * Test that we can have a component implementing several roles.
+     */
+    @Component(hints = {"hint1", "hint2"})
+    public class MultipleRolesImpl implements Role
+    {
+    }
+
     public void testCreateComponentDescriptor()
     {
         assertComponentDescriptor(RoleImpl.class, "default");
@@ -106,10 +114,25 @@ public class ComponentDescriptorFactoryTest extends TestCase
         assertComponentDescriptor(SuperRoleImpl.class, "other");
     }
     
+    public void testMultipleRolesForComponent()
+    {
+        ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
+        List<ComponentDescriptor> descriptors = 
+            factory.createComponentDescriptors(MultipleRolesImpl.class, Role.class);
+               
+        assertEquals(2, descriptors.size());
+        assertEquals("hint1", descriptors.get(0).getRoleHint());
+        assertEquals("hint2", descriptors.get(1).getRoleHint());
+    }
+
     private void assertComponentDescriptor(Class< ? > componentClass, String fieldRoleName)
     {
         ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
-        ComponentDescriptor descriptor = factory.createComponentDescriptor(componentClass, ExtendedRole.class);
+        List<ComponentDescriptor> descriptors = factory.createComponentDescriptors(componentClass, ExtendedRole.class);
+        
+        assertEquals(1, descriptors.size());
+        ComponentDescriptor descriptor = descriptors.get(0);
+        
         assertEquals(componentClass.getName(), descriptor.getImplementation());
         assertEquals(ExtendedRole.class.getName(), descriptor.getRole().getName());
         assertEquals("default", descriptor.getRoleHint());

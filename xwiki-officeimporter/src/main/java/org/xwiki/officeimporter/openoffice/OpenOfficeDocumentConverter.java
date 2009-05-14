@@ -34,11 +34,6 @@ import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
 public interface OpenOfficeDocumentConverter
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = OpenOfficeDocumentConverter.class.getName();
-    
-    /**
      * Converts the input office document into html. This conversion results in multiple files on disk including
      * output.html which holds the html equivalent of the office document. Non textual data present in the document will
      * be converted into images. This method returns an {@link InputStream} object for each resulting output file.

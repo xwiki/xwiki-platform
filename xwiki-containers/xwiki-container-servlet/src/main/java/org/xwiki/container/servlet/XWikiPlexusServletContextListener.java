@@ -20,17 +20,26 @@
  */
 package org.xwiki.container.servlet;
 
-import org.codehaus.plexus.servlet.PlexusServletContextListener;
-import org.codehaus.plexus.servlet.PlexusServletUtils;
-import org.codehaus.plexus.PlexusContainer;
-import org.xwiki.component.annotation.ComponentAnnotationLoader;
-import org.xwiki.plexus.manager.PlexusComponentManager;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.servlet.PlexusServletContextListener;
+import org.codehaus.plexus.servlet.PlexusServletUtils;
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.ApplicationContextListenerManager;
+import org.xwiki.container.Container;
+import org.xwiki.plexus.manager.PlexusComponentManager;
+
 public class XWikiPlexusServletContextListener extends PlexusServletContextListener
 {
+    /**
+     * The component manager used to lookup for other components.
+     */
+    private ComponentManager componentManager;
+
     /**
      * {@inheritDoc}
      * 
@@ -45,9 +54,9 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // Register all components defined using annotations
         PlexusContainer plexusContainer =
             PlexusServletUtils.getPlexusContainer(servletContextEvent.getServletContext());
-        org.xwiki.component.manager.ComponentManager xwikiManager = new PlexusComponentManager(plexusContainer);
-        new ComponentAnnotationLoader().initialize(xwikiManager, this.getClass().getClassLoader());
-        
+        componentManager = new PlexusComponentManager(plexusContainer);
+        new ComponentAnnotationLoader().initialize(componentManager, this.getClass().getClassLoader());
+
         // Initializes XWiki's Container with the Servlet Context.
         try {
             ServletContainerInitializer containerInitializer =
@@ -67,6 +76,23 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // need to define the Components they require as field members and configure the Plexus
         // deployment descriptors (components.xml) so that they are automatically injected.
         servletContextEvent.getServletContext().setAttribute(
-            org.xwiki.component.manager.ComponentManager.class.getName(), xwikiManager);
+            org.xwiki.component.manager.ComponentManager.class.getName(), componentManager);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void contextDestroyed(ServletContextEvent sce)
+    {
+        try {
+            ApplicationContextListenerManager applicationContextListenerManager =
+                (ApplicationContextListenerManager) componentManager
+                    .lookup(ApplicationContextListenerManager.ROLE);
+            Container container = (Container) componentManager.lookup(Container.ROLE);
+            applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
+        } catch (ComponentLookupException ex) {
+            // Nothing to do here.
+        }
+        super.contextDestroyed(sce);
     }
 }

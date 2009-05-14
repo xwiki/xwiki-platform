@@ -90,7 +90,7 @@ public class OfficeImporterVelocityBridge
     {
         boolean success = false;
         try {
-            validateRequest(targetDocument);
+            validateRequest(targetDocument, options);
             importer.importStream(new ByteArrayInputStream(fileContent), fileName, targetDocument, options);
             success = true;
         } catch (OfficeImporterException ex) {
@@ -105,25 +105,31 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * Checks if this request is valid. For a request to be valid, the requested target document should not exist and
-     * the user should have enough privileges to create & edit that particular page.
+     * Checks if this request is valid. For a request to be valid, the target document should be editable by the current
+     * user. And if this is not an append request, the target document should not exist.
      * 
      * @param targetDocument the target document.
      * @throws OfficeImporterException if the request is invalid.
      */
-    private void validateRequest(String targetDocument) throws OfficeImporterException
+    private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException
     {
-        boolean exists = true;
-        try {
-            exists = docBridge.exists(targetDocument);
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Internal error.", ex);
-        }
-        if (exists) {
-            throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
-        } else if (!docBridge.isDocumentEditable(targetDocument)) {
+        if (!docBridge.isDocumentEditable(targetDocument)) {
             throw new OfficeImporterException("Inadequate privileges.");
+        } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
+            throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
         }
+    }
+
+    /**
+     * Utility method for checking if a request is made to append the importer result to an existing page.
+     * 
+     * @param options additional parameters passed in for the import operation.
+     * @return true if the params indicate that this is an append request.
+     */
+    private boolean isAppendRequest(Map<String, String> options)
+    {
+        String appendParam = options.get("appendContent");
+        return (appendParam != null) ? appendParam.equals("true") : false;
     }
 
     /**

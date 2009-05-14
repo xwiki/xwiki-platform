@@ -227,17 +227,20 @@
           <role>org.xwiki.rendering.parser.Parser</role>
           <role-hint>xwiki/2.0</role-hint>
           <field-name>xwikiParser</field-name>
-        </requirement>
+        </requirement>        
         <requirement>
           <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.refactoring.splitter.DocumentSplitter</role>
         </requirement>        
       </requirements>      
     </component>
-    <!-- Configuration -->
+    <!-- OpenOffice Configuration -->
     <component>
-      <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration</role>
+      <role>org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeServerConfiguration</implementation>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeConfiguration</implementation>
       <requirements>
         <requirement>
           <role>org.xwiki.configuration.ConfigurationManager</role>
@@ -249,14 +252,14 @@
         </requirement>
       </requirements>
     </component>
-    <!-- OpenOffice Server Manager -->
+    <!-- OpenOffice Manager -->
     <component>
-      <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
+      <role>org.xwiki.officeimporter.openoffice.OpenOfficeManager</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeServerManager</implementation>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeManager</implementation>
       <requirements>
         <requirement>
-          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration</role>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration</role>
         </requirement>
       </requirements>
     </component>
@@ -267,11 +270,25 @@
       <implementation>org.xwiki.officeimporter.internal.openoffice.DefaultOpenOfficeDocumentConverter</implementation>
       <requirements>
         <requirement>
-          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeManager</role>
         </requirement>
       </requirements>
     </component>
-    <!-- Velocity -->
+    <!-- Application Context Initializer -->
+    <component>
+      <role>org.xwiki.container.ApplicationContextListener</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.OpenOfficeManagerApplicationContextListener</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration</role>
+        </requirement>      
+        <requirement>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeManager</role>
+        </requirement>        
+      </requirements>
+    </component>
+    <!-- Velocity Context Initializers -->
     <component>
       <role>org.xwiki.velocity.VelocityContextInitializer</role>
       <role-hint>officeimporter</role-hint>
@@ -291,8 +308,8 @@
     </component>
     <component>
       <role>org.xwiki.velocity.VelocityContextInitializer</role>
-      <role-hint>openoffice</role-hint>
-      <implementation>org.xwiki.officeimporter.internal.openoffice.OpenOfficeServerManagerVelocityContextInitializer</implementation>
+      <role-hint>oomanager</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.OpenOfficeManagerVelocityContextInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -302,7 +319,18 @@
           <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.officeimporter.openoffice.OpenOfficeServerManager</role>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeManager</role>
+        </requirement>        
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.velocity.VelocityContextInitializer</role>
+      <role-hint>ooconfig</role-hint>
+      <implementation>org.xwiki.officeimporter.internal.openoffice.OpenOfficeConfigurationVelocityContextInitializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration</role>
         </requirement>        
       </requirements>
     </component>

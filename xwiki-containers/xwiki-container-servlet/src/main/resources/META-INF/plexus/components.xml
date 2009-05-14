@@ -31,6 +31,10 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
+          <role>org.xwiki.container.ApplicationContextListenerManager</role>
+          <role-hint>default</role-hint>
+        </requirement>      
+        <requirement>
           <role>org.xwiki.container.Container</role>
           <role-hint>default</role-hint>
         </requirement>

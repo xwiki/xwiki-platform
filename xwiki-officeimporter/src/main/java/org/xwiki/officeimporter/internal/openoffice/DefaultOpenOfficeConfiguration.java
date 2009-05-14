@@ -25,33 +25,48 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationManager;
 import org.xwiki.configuration.ConfigurationSourceCollection;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 
 /**
- * Default implementation of {@link OpenOfficeServerConfiguration}.
+ * Default implementation of {@link OpenOfficeConfiguration}.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeServerConfiguration implements OpenOfficeServerConfiguration, Initializable
+public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, Initializable
 {
     /**
-     * Path to openoffice server installation.
+     * @see OpenOfficeConfiguration#getServerType()
+     */
+    private int serverType = SERVER_TYPE_INTERNAL;
+
+    /**
+     * @see OpenOfficeServerConfiguration#getServerPort();
+     */
+    private int serverPort = 8100;
+
+    /**
+     * @see OpenOfficeConfiguration#getHomePath()
      */
     private String homePath = OfficeUtils.getDefaultOfficeHome().getAbsolutePath();
 
     /**
-     * Path to openoffice execution profile.
+     * @see OpenOfficeConfiguration#getProfilePath()
      */
     private String profilePath = OfficeUtils.getDefaultProfileDir().getAbsolutePath();
 
     /**
-     * Maximum number of simultaneous conversion tasks to be handled by a single oo process instance.
+     * @see OpenOfficeConfiguration#isAutoStart()
+     */
+    private boolean autoStart = false;
+
+    /**
+     * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
      */
     private int maxTasksPerProcess = 50;
 
     /**
-     * Timeout for document conversion tasks.
+     * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
     private long taskExecutionTimeout = 30000;
 
@@ -72,6 +87,54 @@ public class DefaultOpenOfficeServerConfiguration implements OpenOfficeServerCon
     {
         this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
             "openoffice");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getServerType()
+    {
+        return serverType;
+    }
+
+    /**
+     * @param serverType the type of the openoffice server instance consumed by officeimporter.
+     */
+    public void setServerType(int serverType)
+    {
+        this.serverType = serverType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getServerPort()
+    {
+        return serverPort;
+    }
+
+    /**
+     * @param serverPort port number used for connecting to the openoffice server instance.
+     */
+    public void setServerPort(int serverPort)
+    {
+        this.serverPort = serverPort;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isAutoStart()
+    {
+        return this.autoStart;
+    }
+
+    /**
+     * @param autoStart if openoffice server should start automatically with XE.
+     */
+    public void setAutoStart(boolean autoStart)
+    {
+        this.autoStart = autoStart;
     }
 
     /**

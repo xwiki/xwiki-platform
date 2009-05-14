@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.portlet.PortletContainerException;
 import org.xwiki.container.portlet.PortletContainerInitializer;
@@ -440,5 +441,17 @@ public class XWikiPortlet extends GenericPortlet
         container.removeResponse();
         container.removeSession();
         execution.removeContext();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void destroy()
+    {
+        Container container = (Container) Utils.getComponent(Container.ROLE);
+        ApplicationContextListenerManager applicationContextListenerManager =
+            (ApplicationContextListenerManager) Utils.getComponent(ApplicationContextListenerManager.ROLE);
+        applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
+        super.destroy();
     }
 }

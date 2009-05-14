@@ -37,7 +37,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
 import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeServerManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 
 /**
  * Default implementation of {@link OpenOfficeDocumentConverter}.
@@ -49,9 +49,9 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
     Initializable
 {
     /**
-     * The {@link OpenOfficeServerManager} component.
+     * The {@link OpenOfficeManager} component.
      */
-    private OpenOfficeServerManager ooManager;
+    private OpenOfficeManager ooManager;
 
     /**
      * Output format of this transformer.
@@ -73,9 +73,9 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
     public Map<String, InputStream> convert(InputStream in, OfficeImporterFileStorage storage)
         throws OfficeImporterException
     {
-        // Make sure the openoffice server is running.    
-        if (ooManager.getServerState() != OpenOfficeServerManager.ServerState.RUNNING) {
-            throw new OfficeImporterException("OpenOffice server is unavailable.");
+        // Make sure the openoffice server is connected.    
+        if (ooManager.getState() != OpenOfficeManager.ManagerState.CONNECTED) {
+            throw new OfficeImporterException("openoffice server not found.");
         }   
         // Prepare the result.
         Map<String, InputStream> result = new HashMap<String, InputStream>();

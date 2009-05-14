@@ -20,12 +20,12 @@
 package org.xwiki.officeimporter.openoffice;
 
 /**
- * Represents exceptions encountered during operations related to openoffice server management.
+ * Represents exceptions encountered during operations related to {@link OpenOfficeManager} operations.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class OpenOfficeServerManagerException extends Exception
+public class OpenOfficeManagerException extends Exception
 {
     /**
      * Class version.
@@ -33,23 +33,23 @@ public class OpenOfficeServerManagerException extends Exception
     private static final long serialVersionUID = 4165514722538231532L;
 
     /**
-     * Constructs a new {@link OpenOfficeServerManagerException}.
+     * Constructs a new {@link OpenOfficeManagerException}.
+     * 
+     * @param message the string explaining the error.
+     */
+    public OpenOfficeManagerException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * Constructs a new {@link OpenOfficeManagerException}.
      * 
      * @param message the string explaining the error.
      * @param throwable the {@link Throwable} which is the cause of this exception.
      */
-    public OpenOfficeServerManagerException(String message, Throwable throwable)
+    public OpenOfficeManagerException(String message, Throwable throwable)
     {
         super(message, throwable);
     }
-    
-    /**
-     * Constructs a new {@link OpenOfficeServerManagerException}.
-     * 
-     * @param throwable the {@link Throwable} which is the cause of this exception.
-     */
-    public OpenOfficeServerManagerException(Throwable throwable)
-    {
-        super(throwable);
-    }    
 }

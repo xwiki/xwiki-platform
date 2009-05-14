@@ -22,16 +22,20 @@ package org.xwiki.container.portlet;
 
 import javax.portlet.PortletContext;
 
-import org.xwiki.container.RequestInitializerManager;
+import org.xwiki.container.ApplicationContext;
+import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerException;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContext;
+import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
 public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
+    private ApplicationContextListenerManager applicationContextListenerManager;
+
     private RequestInitializerManager requestInitializerManager;
 
     private ExecutionContextManager executionContextManager;
@@ -42,7 +46,9 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
 
     public void initializeApplicationContext(PortletContext portletContext)
     {
-        this.container.setApplicationContext(new PortletApplicationContext(portletContext));
+        ApplicationContext applicationContext = new PortletApplicationContext(portletContext);
+        this.container.setApplicationContext(applicationContext);
+        applicationContextListenerManager.initializeApplicationContext(applicationContext);
     }
 
     public void initializeRequest(javax.portlet.PortletRequest portletRequest, Object xwikiContext)
@@ -53,7 +59,7 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         this.container.setRequest(new PortletRequest(portletRequest));
 
         // 2) Create en empty Execution context so that the Container initializers can put things in the
-        //    execution context when they execute.
+        // execution context when they execute.
         this.execution.setContext(new ExecutionContext());
 
         // 3) Bridge with old code to play well with new components. Old code relies on the

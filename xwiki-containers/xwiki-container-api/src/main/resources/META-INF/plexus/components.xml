@@ -31,6 +31,12 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
+      <role>org.xwiki.container.ApplicationContextListenerManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.container.DefaultApplicationContextListenerManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>    
+    <component>
       <role>org.xwiki.container.RequestInitializerManager</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.container.DefaultRequestInitializerManager</implementation>

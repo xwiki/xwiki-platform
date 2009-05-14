@@ -23,6 +23,8 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -39,16 +41,23 @@ import org.xwiki.localization.WikiInformation;
  * 
  * @version $Id$
  */
+@Component
 public class DefaultLocalizationManager extends AbstractLogEnabled implements LocalizationManager, Initializable,
     LogEnabled, Composable
 {
-    /** Provides access to wiki localization information. Injected by the Component Manager. */
+    /** 
+     * Provides access to wiki localization information.
+     */
+    @Requirement
     private WikiInformation wikiInfo;
 
     /** Provides access to different bundles based on their hint. Needed in {@link #use(String, String)} */
     private ComponentManager componentManager;
 
-    /** The list of {@link Bundle}s to use. Injected by the component manager. */
+    /** 
+     * The list of {@link Bundle}s to use.
+     */
+    @Requirement(role = Bundle.class)
     private List<Bundle> bundles;
 
     /**

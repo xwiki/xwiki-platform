@@ -17,9 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization;
+package org.xwiki.localization.internal;
 
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.localization.Bundle;
+import org.xwiki.localization.WikiInformation;
 
 /**
  * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>, filled in by
@@ -29,16 +32,16 @@ import org.xwiki.component.logging.AbstractLogEnabled;
  */
 public abstract class AbstractBundle extends AbstractLogEnabled implements Bundle
 {
+    /** Provides access to wiki localization information. */
+    @Requirement
+    protected WikiInformation wikiInfo;
+
     /**
-     * The bundle priority, when searching for a translation. Lower is better. Configured by the component manager.
-     * 
+     * @see #setPriority(int)
      * @see #compareTo(Bundle)
      * @see Bundle#getPriority()
      */
-    protected int priority;
-
-    /** Provides access to wiki localization information. Injected by the Component Manager. */
-    protected WikiInformation wikiInfo;
+    private int priority;
 
     /**
      * {@inheritDoc}
@@ -50,6 +53,14 @@ public abstract class AbstractBundle extends AbstractLogEnabled implements Bundl
         return this.priority;
     }
 
+    /**
+     * @param priority the Bundle priority, when searching for a translation. Lower is better.
+     */
+    public void setPriority(int priority)
+    {
+        this.priority = priority;
+    }
+    
     /**
      * {@inheritDoc}
      * 

@@ -20,6 +20,8 @@
 package org.xwiki.localization.internal;
 
 import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.localization.LocalizationManager;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -29,12 +31,14 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @see VelocityContextInitializer
  */
+@Component("localization")
 public class LocalizationManagerVelocityContextInitializer implements VelocityContextInitializer
 {
     /** The key to use for the localization manager in the velocity context. */
     public static final String VELOCITY_CONTEXT_KEY = "l10n";
 
-    /** The localization manager to put in the velocity context. Injected by the component manager. */
+    /** The localization manager to put in the velocity context. */
+    @Requirement
     private LocalizationManager localizationManager;
 
     /**

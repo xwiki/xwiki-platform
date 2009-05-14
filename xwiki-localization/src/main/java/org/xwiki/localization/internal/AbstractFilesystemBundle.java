@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization;
+package org.xwiki.localization.internal;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
+
+import org.xwiki.localization.Bundle;
 
 /**
  * Base class for {@link Bundle}s using {@link ResourceBundle} resources. Provides methods for loading properties from

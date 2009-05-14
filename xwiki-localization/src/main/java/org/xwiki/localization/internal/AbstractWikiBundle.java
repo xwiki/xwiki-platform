@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.localization;
+package org.xwiki.localization.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,6 +31,9 @@ import java.util.Properties;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.localization.Bundle;
+import org.xwiki.localization.WikiInformation;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
@@ -54,10 +57,12 @@ public abstract class AbstractWikiBundle extends AbstractBundle implements Bundl
     /** The encoding assumed by the ResourceBundle loader. */
     protected static final String DEFAULT_RESOURCE_BYTE_ENCODING = "ISO-8859-1";
 
-    /** Allows to register for receiving notifications about document changes. Injected by the Component Manager. */
+    /** Allows to register for receiving notifications about document changes. */
+    @Requirement
     protected ObservationManager observation;
 
-    /** Provides access to documents. Injected by the Component Manager. */
+    /** Provides access to documents. */
+    @Requirement
     protected DocumentAccessBridge documentAccessBridge;
 
     /**

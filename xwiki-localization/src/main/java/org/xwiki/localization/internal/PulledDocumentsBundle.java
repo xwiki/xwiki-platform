@@ -25,10 +25,11 @@ import java.util.List;
 import java.util.Properties;
 
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
-import org.xwiki.localization.AbstractWikiBundle;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.WikiInformation;
 import org.xwiki.observation.EventListener;
@@ -42,13 +43,32 @@ import org.xwiki.observation.event.filter.RegexEventFilter;
  * 
  * @version $Id$
  */
+@Component("document")
 public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable
 {
     /** The key used for placing the list of pulled document bundles in the current execution context. */
     public static final String PULLED_CONTEXT_KEY = PulledDocumentsBundle.class.getName() + "_bundles";
 
     /** Provides access to the request context. */
+    @Requirement
     protected Execution execution;
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Register an event listener for all wiki preferences documents, so that when the default language is changed, all
+     * cached bundles from that wiki are invalidated.
+     * 
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        // Set the Bundle priority
+        setPriority(100);
+        
+        this.observation.addListener(new DocumentUpdateEvent(new RegexEventFilter(".+:"
+            + WikiInformation.PREFERENCES_DOCUMENT_NAME)), this);
+    }
 
     /**
      * {@inheritDoc}
@@ -154,19 +174,5 @@ public class PulledDocumentsBundle extends AbstractWikiBundle implements Bundle,
                 }
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Register an event listener for all wiki preferences documents, so that when the default language is changed, all
-     * cached bundles from that wiki are invalidated.
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        this.observation.addListener(new DocumentUpdateEvent(new RegexEventFilter(".+:"
-            + WikiInformation.PREFERENCES_DOCUMENT_NAME)), this);
     }
 }

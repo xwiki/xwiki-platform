@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.localization.WikiInformation;
@@ -34,6 +36,7 @@ import org.xwiki.localization.WikiInformation;
  * 
  * @version $Id$
  */
+@Component
 public class DefaultWikiInformation extends AbstractLogEnabled implements WikiInformation
 {
     /** The default wiki name to use when the context does not define one. */
@@ -56,10 +59,12 @@ public class DefaultWikiInformation extends AbstractLogEnabled implements WikiIn
     /** The key used for placing the configured locale in the current execution context. */
     private static final String LOCALE_CONTEXT_KEY = "locale";
 
-    /** Provides access to the request context. Injected by the Component Manager. */
+    /** Provides access to the request context. */
+    @Requirement
     private Execution execution;
 
-    /** Provides access to documents. Injected by the Component Manager. */
+    /** Provides access to documents. */
+    @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
     /**

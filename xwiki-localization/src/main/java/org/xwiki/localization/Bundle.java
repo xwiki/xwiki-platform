@@ -19,11 +19,14 @@
  */
 package org.xwiki.localization;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * A collection of translation properties.
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface Bundle extends Comparable<Bundle>
 {
     /**

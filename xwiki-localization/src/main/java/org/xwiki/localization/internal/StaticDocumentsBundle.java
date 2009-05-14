@@ -26,7 +26,9 @@ import java.util.Properties;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.localization.AbstractWikiBundle;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.localization.Bundle;
 import org.xwiki.localization.WikiInformation;
 import org.xwiki.observation.EventListener;
@@ -40,7 +42,8 @@ import org.xwiki.observation.event.Event;
  * 
  * @version $Id$
  */
-public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener
+@Component("staticDocuments")
+public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle, EventListener, Initializable
 {
     /** The name of the property containing the list of global document bundles. */
     private static final String DOCUMENT_BUNDLE_PROPERTY = "documentBundles";
@@ -70,6 +73,16 @@ public class StaticDocumentsBundle extends AbstractWikiBundle implements Bundle,
      * </p>
      */
     private Map<String, String[]> staticBundleNames = new HashMap<String, String[]>();
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        // Set the Bundle priority
+        setPriority(300);
+    }
 
     /**
      * {@inheritDoc}

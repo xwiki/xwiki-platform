@@ -23,8 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
-import org.xwiki.localization.AbstractFilesystemBundle;
 import org.xwiki.localization.Bundle;
 
 /**
@@ -33,13 +36,25 @@ import org.xwiki.localization.Bundle;
  * 
  * @version $Id$
  */
-public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundle
+@Component("resource")
+public class PulledFilesBundle extends AbstractFilesystemBundle implements Bundle, Initializable
 {
     /** The key used for placing the list of pulled file bundles in the current execution context. */
     public static final String PULLED_CONTEXT_KEY = PulledFilesBundle.class.getName() + "_bundles";
 
-    /** Provides access to the request context. Injected by the component manager. */
+    /** Provides access to the request context. */
+    @Requirement
     protected Execution execution;
+
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        // Set the Bundle priority
+        setPriority(200);
+    }
 
     /**
      * {@inheritDoc}

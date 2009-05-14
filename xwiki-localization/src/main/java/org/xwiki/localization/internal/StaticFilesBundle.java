@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.localization.AbstractFilesystemBundle;
 import org.xwiki.localization.Bundle;
 
 /**
@@ -35,14 +35,9 @@ import org.xwiki.localization.Bundle;
  * 
  * @version $Id$
  */
+@Component("staticResources")
 public class StaticFilesBundle extends AbstractFilesystemBundle implements Bundle, Initializable
 {
-    /**
-     * The default bundle to use when there is not value configured. This assures backwards compatibility with previous
-     * XWiki versions.
-     */
-    private static final String DEFAULT_BUNDLE = "ApplicationResources";
-
     /**
      * <p>
      * Cached bundles corresponding to all the resources globally registered in the module preferences. For each
@@ -56,8 +51,23 @@ public class StaticFilesBundle extends AbstractFilesystemBundle implements Bundl
      */
     private Map<String, Properties> bundles = new HashMap<String, Properties>();
 
-    /** The list of global resource bundles to use. Configured by the component manager. */
-    private String[] staticBundles;
+    /** The list of global resource bundles to use. */
+    private String[] staticBundles = new String[] {"ApplicationResources", "CoreResources"};
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * In case there is no static bundle configured by the component manager, then use the default bundle for this
+     * purpose.
+     * </p>
+     * 
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        // Set the Bundle priority
+        setPriority(400);
+    }
 
     /**
      * {@inheritDoc}
@@ -107,22 +117,5 @@ public class StaticFilesBundle extends AbstractFilesystemBundle implements Bundl
             props.putAll(getFileBundle(bundleName, language));
         }
         return props;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * In case there is no static bundle configured by the component manager, then use the default bundle for this
-     * purpose.
-     * </p>
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        if (this.staticBundles == null) {
-            this.staticBundles = new String[1];
-            this.staticBundles[0] = DEFAULT_BUNDLE;
-        }
     }
 }

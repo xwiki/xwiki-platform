@@ -21,6 +21,8 @@ package org.xwiki.localization;
 
 import java.util.List;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * <p>
  * Internationalization service based on key/property values. The key is the id of the message being looked for, and the
@@ -38,6 +40,7 @@ import java.util.List;
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface LocalizationManager
 {
     /**

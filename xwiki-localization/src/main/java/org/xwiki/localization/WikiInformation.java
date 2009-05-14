@@ -21,12 +21,15 @@ package org.xwiki.localization;
 
 import java.util.Locale;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Provides helper methods used by the {@link LocalizationManager} and {@link Bundle}s, such as extracting the current
  * language and current wiki name from the execution context.
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface WikiInformation
 {
     /**

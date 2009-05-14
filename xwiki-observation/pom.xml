@@ -36,6 +36,11 @@
   <description>XWiki Platform - Core - Observation</description>
   <dependencies>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.2</version>

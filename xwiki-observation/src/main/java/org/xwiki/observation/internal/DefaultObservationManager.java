@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -35,6 +36,7 @@ import org.xwiki.observation.event.Event;
  * 
  * @version $Id$
  */
+@Component
 public class DefaultObservationManager implements ObservationManager
 {
     /**

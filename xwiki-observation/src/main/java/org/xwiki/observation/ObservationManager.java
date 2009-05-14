@@ -20,6 +20,7 @@
  */
 package org.xwiki.observation;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -29,6 +30,7 @@ import org.xwiki.observation.event.Event;
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface ObservationManager
 {
     /**

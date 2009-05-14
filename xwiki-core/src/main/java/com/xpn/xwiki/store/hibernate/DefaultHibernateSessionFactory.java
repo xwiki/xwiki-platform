@@ -31,7 +31,7 @@ import com.xpn.xwiki.util.Util;
 /**
  * Default implementation for {@link HibernateSessionFactory}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  * @todo this was coded by Artem. Find out why we need this as a component.
  */

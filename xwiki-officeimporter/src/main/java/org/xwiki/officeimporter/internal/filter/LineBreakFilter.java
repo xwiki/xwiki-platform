@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.filter;
+package org.xwiki.officeimporter.internal.filter;
 
 import java.util.Arrays;
 import java.util.List;

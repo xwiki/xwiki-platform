@@ -91,9 +91,9 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
         // Test name clash resolution
         assertEquals("Test.Heading-1", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test heading text cleaning
-        xdom = xwikiParser.parse(new StringReader("= Very.Weird:Heading! ="));
+        xdom = xwikiParser.parse(new StringReader("= This-Very.Weird:Heading! ="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals("Test.VeryWeirdHeading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
+        assertEquals("Test.This-Very-Weird-Heading!", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test fallback operation
         assertEquals("Test.Test-1", namingCriterion.getDocumentName(xdom));
         // Test fallback operation under empty heading names

@@ -34,6 +34,7 @@ import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Link;
@@ -53,11 +54,11 @@ public class DefaultDocumentSplitter implements DocumentSplitter
     public List<WikiDocument> split(WikiDocument rootDoc, SplittingCriterion splittingCriterion,
         NamingCriterion namingCriterion)
     {
-        List<WikiDocument> result = new ArrayList<WikiDocument>();        
+        List<WikiDocument> result = new ArrayList<WikiDocument>();
         // Add the rootDoc into the result
-        result.add(rootDoc);        
+        result.add(rootDoc);
         // Recursively split the root document.
-        split(rootDoc, rootDoc.getXdom().getChildren(), 1, result, splittingCriterion, namingCriterion);                
+        split(rootDoc, rootDoc.getXdom().getChildren(), 1, result, splittingCriterion, namingCriterion);
         return result;
     }
 
@@ -82,7 +83,7 @@ public class DefaultDocumentSplitter implements DocumentSplitter
                 XDOM xdom = new XDOM(block.getChildren());
                 String newDocumentName = namingCriterion.getDocumentName(xdom);
                 WikiDocument newDoc = new WikiDocument(newDocumentName, xdom, parentDoc);
-                result.add(newDoc);                
+                result.add(newDoc);
                 // Remove the original block from the parent document.
                 it.remove();
                 // Place a link from the parent to child.
@@ -119,7 +120,8 @@ public class DefaultDocumentSplitter implements DocumentSplitter
                 public List<Block> filter(Block block)
                 {
                     List<Block> blocks = new ArrayList<Block>();
-                    if (block instanceof WordBlock || block instanceof SpaceBlock) {
+                    if (block instanceof WordBlock || block instanceof SpaceBlock
+                        || block instanceof SpecialSymbolBlock) {
                         blocks.add(block);
                     }
                     return blocks;

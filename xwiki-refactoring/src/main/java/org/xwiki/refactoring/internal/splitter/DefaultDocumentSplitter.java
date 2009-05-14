@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
@@ -46,6 +47,7 @@ import org.xwiki.rendering.listener.LinkType;
  * @version $Id$
  * @since 1.9M1
  */
+@Component
 public class DefaultDocumentSplitter implements DocumentSplitter
 {
     /**

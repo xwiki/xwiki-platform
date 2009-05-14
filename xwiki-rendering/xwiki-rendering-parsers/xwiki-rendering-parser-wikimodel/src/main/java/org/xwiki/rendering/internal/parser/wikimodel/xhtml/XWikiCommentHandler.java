@@ -104,9 +104,12 @@ public class XWikiCommentHandler extends CommentHandler
 
     private void handleLinkCommentStart(String content, TagStack stack)
     {
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.parser, this.linkParser, this.imageParser);
-        stack.setStackParameter("xdomGeneratorListener", listener);
-        stack.setStackParameter("isInLink", true);
+        stack.pushStackParameter("xdomGeneratorListener", new XDOMGeneratorListener(this.parser, this.linkParser,
+            this.imageParser));
+        stack.pushStackParameter("isInLink", true);
+        stack.pushStackParameter("isFreeStandingLink", false);
+        stack.pushStackParameter("linkParameters", WikiParameters.EMPTY);
+
         this.commentContentStack.push(content.substring("startwikilink:".length()));
     }
 
@@ -129,7 +132,7 @@ public class XWikiCommentHandler extends CommentHandler
         XWikiSyntaxRenderer renderer =
             (XWikiSyntaxRenderer) this.printRendererFactory
                 .createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
-        XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.getStackParameter("xdomGeneratorListener");
+        XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.popStackParameter("xdomGeneratorListener");
 
         renderer.beginDocument(Collections.<String, String> emptyMap());
         // We make sure we have the right states to have the right escaping but we want only the label so we can't
@@ -157,10 +160,9 @@ public class XWikiCommentHandler extends CommentHandler
             stack.getScannerContext().onReference(wikiReference);
         }
 
-        stack.setStackParameter("xdomGeneratorListener", null);
-        stack.setStackParameter("isInLink", false);
-        stack.setStackParameter("isFreeStandingLink", false);
-        stack.setStackParameter("linkParameters", WikiParameters.EMPTY);
+        stack.popStackParameter("isInLink");
+        stack.popStackParameter("isFreeStandingLink");
+        stack.popStackParameter("linkParameters");
     }
 
     private void handleImageCommentStart(String content, TagStack stack)

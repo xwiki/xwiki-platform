@@ -19,9 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableBlockElementsInTable;
 import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableIndentOutsideList;
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableListInHeader;
 
 /**
  * Validator for the <em>xwiki/2.0</em> syntax.
@@ -38,9 +36,6 @@ public class XWikiSyntaxValidator extends DefaultSyntaxValidator
         super("xwiki/2.0");
 
         // add XWiki specific validation rules
-        addValidationRule(new DisableListInHeader());
         addValidationRule(new DisableIndentOutsideList());
-        // FIXME : find a generic way of disabling inline/block/both elements on some identified elements
-        addValidationRule(new DisableBlockElementsInTable());
     }
 }

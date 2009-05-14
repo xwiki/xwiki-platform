@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
 import java.io.StringReader;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -36,6 +37,7 @@ import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
  * 
  * @version $Id$
  */
+@Component("events")
 public class EventsHTMLConverter implements HTMLConverter
 {
     /**

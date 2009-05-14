@@ -19,11 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.server.converter;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Converts HTML to/from a specific syntax.
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface HTMLConverter
 {
     /**

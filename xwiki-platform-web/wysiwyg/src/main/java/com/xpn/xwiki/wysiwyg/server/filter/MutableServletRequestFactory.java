@@ -21,6 +21,8 @@ package com.xpn.xwiki.wysiwyg.server.filter;
 
 import javax.servlet.ServletRequest;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * A factory for mutable servlet requests. This factory is needed because concrete mutable servlet requests don't have a
  * default constructor and I couldn't make the component manager (Plexus) inject the current servlet request when
@@ -28,6 +30,7 @@ import javax.servlet.ServletRequest;
  * 
  * @version $Id$
  */
+@ComponentRole
 public interface MutableServletRequestFactory
 {
     /**

@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.server.filter.internal.http;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
 import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
 
@@ -30,6 +32,7 @@ import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequestFactory;
  * 
  * @version $Id$
  */
+@Component(hints = {"HTTP/1.1", "HTTP/1.0" })
 public class MutableHttpServletRequestFactory implements MutableServletRequestFactory
 {
     /**

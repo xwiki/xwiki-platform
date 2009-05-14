@@ -367,8 +367,19 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
 
         // At this point the selection should be collapsed.
         Range caret = selection.getRangeAt(0);
-        // Look for the nearest block-level element that contains the caret.
-        Node container = domUtils.getNearestBlockContainer((caret.getStartContainer()));
+
+        Node container = null;
+        // CTRL and META modifiers force the Enter key to be handled by the nearest block-level container. Otherwise we
+        // look for special containers like the list item.
+        if (modifiers != KeyboardListener.MODIFIER_CTRL && modifiers != KeyboardListener.MODIFIER_META) {
+            // See if the caret is inside a list item.
+            container = domUtils.getFirstAncestor(caret.getStartContainer(), LI);
+        }
+        if (container == null) {
+            // Look for the nearest block-level element that contains the caret.
+            container = domUtils.getNearestBlockContainer((caret.getStartContainer()));
+        }
+
         String containerName = container.getNodeName().toLowerCase();
         if (LI.equals(containerName)) {
             // Leave the default behavior for now.

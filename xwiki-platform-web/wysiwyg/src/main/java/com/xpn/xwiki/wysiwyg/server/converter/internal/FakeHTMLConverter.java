@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
+import org.xwiki.component.annotation.Component;
+
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
@@ -26,6 +28,7 @@ import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
  * 
  * @version $Id$
  */
+@Component(hints = {"xhtml/1.0", "html/4.01" })
 public class FakeHTMLConverter implements HTMLConverter
 {
     /**

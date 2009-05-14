@@ -101,5 +101,6 @@
     <module>xwiki-webdav</module>
     <module>xwiki-officeimporter</module>
     <module>xwiki-rest</module>
+    <module>xwiki-refactoring</module>
   </modules>
 </project>

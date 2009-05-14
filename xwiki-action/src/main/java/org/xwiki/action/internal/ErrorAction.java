@@ -18,8 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.action;
+package org.xwiki.action.internal;
 
+import org.xwiki.action.Action;
+import org.xwiki.action.ActionException;
+import org.xwiki.component.annotation.Component;
+
+@Component("error")
 public class ErrorAction implements Action
 {
     public void execute() throws ActionException

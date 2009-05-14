@@ -18,19 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.action;
+package org.xwiki.action.internal;
 
+import org.xwiki.action.Action;
+import org.xwiki.action.ActionException;
+import org.xwiki.action.ActionManager;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.container.Container;
 import org.xwiki.url.XWikiURL;
 
+@Component
 public class DefaultActionManager implements ActionManager, Composable
 {
     private ComponentManager componentManager;
 
+    @Requirement
     private Container container;
-    
+
+    @Requirement("error")
     private Action errorAction;
 
     public void compose(ComponentManager componentManager)

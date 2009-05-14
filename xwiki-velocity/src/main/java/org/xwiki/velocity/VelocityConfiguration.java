@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * global configuration file using a prefix of "velocity" followed by the property name. For example:
  * <code>velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool</code>
  *
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @ComponentRole

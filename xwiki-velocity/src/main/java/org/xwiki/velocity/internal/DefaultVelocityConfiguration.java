@@ -33,7 +33,7 @@ import org.xwiki.velocity.VelocityConfiguration;
 /**
  * All configuration options for the Velocity subsystem.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @Component

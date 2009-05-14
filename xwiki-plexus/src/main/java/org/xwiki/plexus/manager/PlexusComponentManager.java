@@ -235,6 +235,7 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * @see ComponentManager#getComponentDescriptor(Class, String)
+     * @since 2.0M1
      */
     public ComponentDescriptor getComponentDescriptor(Class< ? > role, String roleHint)
     {

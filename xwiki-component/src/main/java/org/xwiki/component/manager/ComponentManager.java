@@ -72,6 +72,7 @@ public interface ComponentManager
      * @param role the role identifying the component
      * @param roleHint the hint identifying the component
      * @return the descriptor for the component matching the passed parameter or null if this component doesn't exist
+     * @since 2.0M1
      */
     ComponentDescriptor getComponentDescriptor(Class< ? > role, String roleHint);
 }

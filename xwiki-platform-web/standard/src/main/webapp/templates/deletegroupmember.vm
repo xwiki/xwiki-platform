@@ -8,3 +8,10 @@
   added empty group
 #end
 #set($discard = $doc.save())
+#if($request.ajax)
+  ok
+#elseif($request.xredirect)
+  $response.sendRedirect($request.xredirect)
+#else
+  $response.sendRedirect($doc.getURL('view'))
+#end

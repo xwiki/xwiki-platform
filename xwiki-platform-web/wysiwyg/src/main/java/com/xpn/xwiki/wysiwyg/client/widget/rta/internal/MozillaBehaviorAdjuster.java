@@ -72,6 +72,9 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         Document document = getTextArea().getDocument();
         Node paragraph = document.getSelection().getRangeAt(0).getStartContainer().getParentNode();
         paragraph.appendChild(document.xCreateBRElement());
+
+        // We need to refresh the selection in order to make the table resize handlers disappear.
+        refreshSelection();
     }
 
     /**

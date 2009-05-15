@@ -329,8 +329,8 @@ public class BehaviorAdjuster implements LoadListener
     /**
      * Inserts a paragraph before or after the table containing the selection.
      * <p>
-     * We decided to use Ctrl+UpArrow for inserting a paragraph before a table and Ctrl+DownArrow for inserting a
-     * paragraph after a table. Here's the rationale:
+     * We decided to use Control/Meta+UpArrow for inserting a paragraph before a table and Control/Meta+DownArrow for
+     * inserting a paragraph after a table. Here's the rationale:
      * <ul>
      * <li>We can't reliably detect if the user can place the caret before of after a table. Our playground is the DOM
      * tree which we fully control but in the end the browser decides how to render each node. The table can have
@@ -351,7 +351,8 @@ public class BehaviorAdjuster implements LoadListener
     protected void navigateOutsideTableCell(boolean before)
     {
         Event event = getTextArea().getCurrentEvent();
-        if (!event.getCtrlKey() || event.getAltKey() || event.getShiftKey() || event.getMetaKey()) {
+        // Navigate only if the Control or Meta modifiers are pressed along with the Up/Down arrow keys.
+        if (event.getAltKey() || event.getShiftKey() || !(event.getCtrlKey() ^ event.getMetaKey())) {
             return;
         }
 

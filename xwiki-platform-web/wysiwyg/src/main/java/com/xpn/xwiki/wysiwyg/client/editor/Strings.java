@@ -18,9 +18,9 @@ public interface Strings extends Constants
     String yes();
 
     String no();
-    
+
     String wysiwyg();
-    
+
     String source();
 
     String apply();
@@ -70,6 +70,8 @@ public interface Strings extends Constants
     String formatHeader4();
 
     String formatHeader5();
+
+    String formatHeader6();
 
     String hr();
 

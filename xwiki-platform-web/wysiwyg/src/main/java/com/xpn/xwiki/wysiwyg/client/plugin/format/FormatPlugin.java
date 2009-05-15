@@ -89,6 +89,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
             levels.addItem(Strings.INSTANCE.formatHeader3(), "h3");
             levels.addItem(Strings.INSTANCE.formatHeader4(), "h4");
             levels.addItem(Strings.INSTANCE.formatHeader5(), "h5");
+            levels.addItem(Strings.INSTANCE.formatHeader6(), "h6");
 
             toolBarExtension.addFeature("format", levels);
         }

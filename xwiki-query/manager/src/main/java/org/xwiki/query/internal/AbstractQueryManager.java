@@ -29,7 +29,7 @@ import org.xwiki.query.QueryManager;
 /**
  * Base QueryManager implementation.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 public abstract class AbstractQueryManager implements QueryManager

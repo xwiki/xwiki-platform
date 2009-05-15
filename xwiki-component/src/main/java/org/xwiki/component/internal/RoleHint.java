@@ -23,7 +23,7 @@ package org.xwiki.component.internal;
 /**
  * Represent the unique identifier of a Component (pair Role/Hint).
  *   
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 public class RoleHint

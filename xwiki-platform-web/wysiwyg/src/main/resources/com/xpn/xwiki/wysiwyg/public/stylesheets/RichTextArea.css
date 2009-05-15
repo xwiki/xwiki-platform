@@ -20,6 +20,12 @@ html {
 }
 
 body.main {
+  /*
+    We force the background color to white because the Albatross skin uses a dark background color which makes the text
+    difficult to read. The best solution would be to have a separate style sheet which affects only the page content
+    and to import it without the rest of the style sheets.
+  */
+  background-color: #FFFFFF !important;
   background-image: none;
   /*
     We use float:left in order to remove the body from the normal flow and thus prevent collapsing margins between

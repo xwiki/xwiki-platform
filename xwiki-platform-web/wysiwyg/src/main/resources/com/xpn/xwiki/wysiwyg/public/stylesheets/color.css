@@ -1,5 +1,6 @@
 .xColorPicker {
   border:1px solid #B5B6B5;
+  z-index:99;
 }
 
 .xColorPalette {

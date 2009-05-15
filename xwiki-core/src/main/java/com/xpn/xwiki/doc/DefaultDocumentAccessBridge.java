@@ -119,7 +119,15 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getDocumentContent(String documentName, String language) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWiki().getDocument(documentName, xcontext).getTranslatedContent(language, xcontext);
+        String originalRev = (String) xcontext.get("rev");
+        try {
+            xcontext.remove("rev");
+            return xcontext.getWiki().getDocument(documentName, xcontext).getTranslatedContent(language, xcontext);
+        } finally {
+            if (originalRev != null) {
+                xcontext.put("rev", originalRev);
+            }
+        }
     }
 
     /**

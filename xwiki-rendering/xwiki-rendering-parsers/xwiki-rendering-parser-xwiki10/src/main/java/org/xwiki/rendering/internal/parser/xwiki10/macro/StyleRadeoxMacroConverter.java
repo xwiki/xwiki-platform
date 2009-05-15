@@ -22,10 +22,10 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroConverter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameter;
 import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 
@@ -39,15 +39,20 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     public StyleRadeoxMacroConverter()
     {
         registerParameter("type");
-        registerParameter("id");
-        registerParameter("class");
-        registerParameter("align");
-        registerParameter("font-size");
-        registerParameter("color");
-        registerParameter("font-family");
-        registerParameter("width");
-        registerParameter("height");
-        registerParameter("text");
+        registerParameter("id", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("class", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("align", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("name", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("font-size", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("font-family", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("color", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("background-color", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("float", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("width", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("height", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("border", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
+        registerParameter("document");
+        registerParameter("icon", RadeoxMacroConverter.PARAMETER_NOTEMPTYNONE);
     }
 
     @Override
@@ -130,52 +135,52 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         RadeoxMacroParameter border = parameters.get("border");
 
         // add class support
-        if ((!"none".equals(classes)) && (classes != null) && !StringUtils.isEmpty(classes.getValue().trim())) {
+        if (classes != null) {
             boxParameters.put("class", classes.getValue().trim());
-        } else if ((!"none".equals(icon)) && (icon != null) && !StringUtils.isEmpty(icon.getValue().trim())) {
+        } else if (icon != null) {
             boxParameters.put("class", "stylemacro");
         }
 
         // add id support
-        if ((!"none".equals(id)) && (id != null) && !StringUtils.isEmpty(id.getValue())) {
+        if (id != null) {
             boxParameters.put("id", id.getValue().trim());
         }
 
         // add name support
-        if ((!"none".equals(name)) && (name != null) && !StringUtils.isEmpty(name.getValue())) {
+        if (name != null) {
             boxParameters.put("name", name.getValue().trim());
         }
 
         // add align support
-        if ((!"none".equals(align)) && (align != null) && !StringUtils.isEmpty(align.getValue())) {
+        if (align != null) {
             boxParameters.put("align", align.getValue().trim());
         }
 
         // add style support
         StringBuffer styleStr = new StringBuffer();
 
-        if ((!"none".equals(size)) && (size != null) && !StringUtils.isEmpty(size.getValue())) {
+        if (size != null) {
             styleStr.append("font-size:" + size.getValue().trim() + "; ");
         }
-        if ((!"none".equals(font)) && (font != null) && !StringUtils.isEmpty(font.getValue().trim())) {
+        if (font != null) {
             styleStr.append("font-family:" + font.getValue().trim() + "; ");
         }
-        if ((!"none".equals(color)) && (color != null) && !StringUtils.isEmpty(color.getValue().trim())) {
+        if (color != null) {
             styleStr.append("color:" + color.getValue().trim() + "; ");
         }
-        if ((!"none".equals(bgcolor)) && (bgcolor != null) && !StringUtils.isEmpty(bgcolor.getValue().trim())) {
+        if (bgcolor != null) {
             styleStr.append("background-color:" + bgcolor.getValue().trim() + "; ");
         }
-        if ((!"none".equals(width)) && (width != null) && !StringUtils.isEmpty(width.getValue().trim())) {
+        if (width != null) {
             styleStr.append("width:" + width.getValue().trim() + "; ");
         }
-        if ((!"none".equals(fl)) && (fl != null) && !StringUtils.isEmpty(fl.getValue().trim())) {
+        if (fl != null) {
             styleStr.append("float:" + fl.getValue().trim() + "; ");
         }
-        if ((!"none".equals(height)) && (height != null) && !StringUtils.isEmpty(height.getValue().trim())) {
+        if (height != null) {
             styleStr.append("height:" + height.getValue().trim() + "; ");
         }
-        if ((!"none".equals(border)) && (border != null) && !StringUtils.isEmpty(border.getValue().trim())) {
+        if (border != null) {
             styleStr.append("border:" + border.getValue().trim() + "; ");
         }
 
@@ -196,7 +201,7 @@ public class StyleRadeoxMacroConverter extends AbstractRadeoxMacroConverter
             document = null;
         }
 
-        if ((!"none".equals(icon)) && (icon != null) && !StringUtils.isEmpty(icon.getValue().trim())) {
+        if (icon != null) {
             hasIcon = true;
         }
 

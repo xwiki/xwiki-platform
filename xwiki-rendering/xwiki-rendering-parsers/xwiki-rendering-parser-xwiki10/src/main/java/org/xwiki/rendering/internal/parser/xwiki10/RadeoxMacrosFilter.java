@@ -207,7 +207,8 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
                 String parameter = parameterTable[parameterIndex];
                 int equalIndex = parameter.indexOf('=');
 
-                String parameterName = null;
+                int parameterType = macroConverter.getParameterType(parameterIndex);
+                String parameterName;
                 String parameterValue;
                 if (equalIndex >= 0) {
                     parameterName = parameter.substring(0, equalIndex);
@@ -215,6 +216,13 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
                 } else {
                     parameterName = macroConverter.getParameterName(parameterIndex);
                     parameterValue = parameter;
+                }
+
+                if (parameterType != RadeoxMacroConverter.PARAMETER_SIMPLE
+                    && ((parameterType & RadeoxMacroConverter.PARAMETER_NOTEMPTY) != 0 && parameterValue.trim()
+                        .length() == 0)
+                    || (((parameterType & RadeoxMacroConverter.PARAMETER_NOTNONE) != 0 && parameterValue.equals("none")))) {
+                    parameterValue = null;
                 }
 
                 parameterMap.addParameter(parameterIndex, parameterName, parameterValue);

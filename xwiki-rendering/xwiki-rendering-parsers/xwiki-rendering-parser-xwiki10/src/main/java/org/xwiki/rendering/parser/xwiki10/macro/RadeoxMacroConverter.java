@@ -31,7 +31,17 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @ComponentRole
 public interface RadeoxMacroConverter
 {
-    public String getParameterName(int parameterIndex);
+    final static int PARAMETER_SIMPLE = 0;
+
+    final static int PARAMETER_NOTNONE = 1;
+
+    final static int PARAMETER_NOTEMPTY = 2;
+
+    final static int PARAMETER_NOTEMPTYNONE = PARAMETER_NOTNONE | PARAMETER_NOTEMPTY;
+
+    String getParameterName(int parameterIndex);
+
+    int getParameterType(int parameterIndex);
 
     boolean supportContent();
 

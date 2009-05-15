@@ -46,6 +46,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrovelocity1", true);
         suite.addTestsFromResource("macrovelocity2", true);
         suite.addTestsFromResource("macrovelocity3", true);
+        suite.addTestsFromResource("macrovelocity4", true);
+        suite.addTestsFromResource("macrovelocity5", true);
 
         List<ComponentDescriptor> mocks = 
             new ArrayList<ComponentDescriptor>(RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);

@@ -36,7 +36,7 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
 {
     private String name;
 
-    private List<String> parametersNames = new ArrayList<String>();
+    private List<Object[]> parametersNames = new ArrayList<Object[]>();
 
     protected AbstractRadeoxMacroConverter()
     {
@@ -50,12 +50,32 @@ public abstract class AbstractRadeoxMacroConverter implements RadeoxMacroConvert
 
     public String getParameterName(int parameterIndex)
     {
-        return parametersNames.get(parameterIndex);
+        return getParameterName(this.parametersNames.get(parameterIndex));
+    }
+
+    public int getParameterType(int parameterIndex)
+    {
+        return getParameterType(this.parametersNames.get(parameterIndex));
+    }
+    
+    private String getParameterName(Object[] objects)
+    {
+        return objects == null ? null : (String) objects[0];
+    }
+    
+    private int getParameterType(Object[] objects)
+    {
+        return objects == null ? PARAMETER_SIMPLE : (Integer) objects[1];
     }
 
     protected void registerParameter(String parameterName)
     {
-        this.parametersNames.add(parameterName);
+        registerParameter(parameterName, PARAMETER_SIMPLE);
+    }
+
+    protected void registerParameter(String parameterName, int paramType)
+    {
+        this.parametersNames.add(new Object[] {parameterName, paramType});
     }
 
     public boolean protectResult()

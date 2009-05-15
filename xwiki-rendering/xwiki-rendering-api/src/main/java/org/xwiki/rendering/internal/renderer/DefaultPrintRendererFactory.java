@@ -19,11 +19,8 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
@@ -34,8 +31,7 @@ import org.xwiki.rendering.renderer.TexRenderer;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
 
 /**
  * Easily create Print Renderers instances.
@@ -47,17 +43,14 @@ import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
 @Component
 public class DefaultPrintRendererFactory implements PrintRendererFactory
 {
+    /**
+     * Factory to easily create an XHTML Image and Link Renderer.
+     */
     @Requirement
-    private DocumentAccessBridge documentAccessBridge;
+    private XHTMLRendererFactory xhtmlRendererFactory;
 
     @Requirement
     private LinkLabelGenerator linkLabelGenerator;
-
-    @Requirement
-    private AttachmentParser attachmentParser;
-
-    @Requirement
-    private DocumentNameSerializer documentNameSerializer;
 
     /**
      * {@inheritDoc}
@@ -70,9 +63,8 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         PrintRenderer result;
 
         if (targetSyntax.toIdString().equals("xhtml/1.0")) {
-            result = new XHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
-                this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer),
-                new XWikiXHTMLImageRenderer(this.documentAccessBridge));
+            result = new XHTMLRenderer(printer, this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
+                this.xhtmlRendererFactory.createXHTMLImageRenderer());
         } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
             result = new XWikiSyntaxRenderer(printer);
         } else if (targetSyntax.toIdString().equals("event/1.0")) {
@@ -88,26 +80,8 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         return result;
     }
 
-    public void setDocumentAccessBridge(DocumentAccessBridge bridge)
-    {
-        this.documentAccessBridge = bridge;
-    }
-
     public void setLinkLabelGenerator(LinkLabelGenerator linkLabelGenerator)
     {
         this.linkLabelGenerator = linkLabelGenerator;
-    }
-
-    /**
-     * @since 1.7.1
-     */
-    public void setAttachmentParser(AttachmentParser attachmentParser)
-    {
-        this.attachmentParser = attachmentParser;
-    }
-    
-    public void setDocumentNameSerializer(DocumentNameSerializer documentNameSerializer)
-    {
-        this.documentNameSerializer = documentNameSerializer;
     }
 }

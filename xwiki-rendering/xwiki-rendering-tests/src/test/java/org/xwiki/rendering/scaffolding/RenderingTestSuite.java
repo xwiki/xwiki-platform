@@ -28,15 +28,18 @@ import java.util.StringTokenizer;
 
 import junit.framework.TestSuite;
 
+import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;
 import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
+import org.xwiki.rendering.internal.renderer.xhtml.DefaultXHTMLRendererFactory;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
 
 /**
  * @version $Id$
@@ -59,18 +62,21 @@ public class RenderingTestSuite extends TestSuite
     {
         super(name);
 
-        this.rendererFactory = new DefaultPrintRendererFactory();
-        this.rendererFactory.setDocumentAccessBridge(new MockDocumentAccessBridge());
-
         DefaultLinkLabelGenerator linkLabelGenerator = new DefaultLinkLabelGenerator();
         linkLabelGenerator.setDocumentAccessBridge(new MockDocumentAccessBridge());
         linkLabelGenerator.setRenderingConfiguration(new DefaultRenderingConfiguration());
-        this.rendererFactory.setLinkLabelGenerator(linkLabelGenerator);
 
-        this.rendererFactory.setAttachmentParser(new DefaultAttachmentParser());
+        XHTMLRendererFactory xhtmlRendererFactory = new DefaultXHTMLRendererFactory();
+        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "documentAccessBridge", new MockDocumentAccessBridge());
+        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "linkLabelGenerator", linkLabelGenerator);
+        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "attachmentParser", new DefaultAttachmentParser());
+        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "documentNameSerializer", new MockDocumentNameSerializer());
+        
+        this.rendererFactory = new DefaultPrintRendererFactory();
+        ReflectionUtils.setFieldValue(this.rendererFactory, "xhtmlRendererFactory", xhtmlRendererFactory);
+        ReflectionUtils.setFieldValue(this.rendererFactory, "linkLabelGenerator", linkLabelGenerator);
+
         this.syntaxFactory = new DefaultSyntaxFactory();
-
-        this.rendererFactory.setDocumentNameSerializer(new MockDocumentNameSerializer());
     }
 
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception

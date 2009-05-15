@@ -12,3 +12,4 @@ org.xwiki.rendering.internal.macro.RealmMacroSource
 org.xwiki.rendering.internal.macro.DefaultMacroManager
 org.xwiki.rendering.internal.transformation.DefaultTransformationManager
 org.xwiki.rendering.internal.util.XWikiXMLReaderFactory
+org.xwiki.rendering.internal.renderer.xhtml.DefaultXHTMLRendererFactory

@@ -28,8 +28,6 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
@@ -44,16 +42,13 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.html.HTMLMacroParameters;
-import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -98,33 +93,11 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
     private ComponentManager componentManager;
 
     /**
-     * Used to construct a XHTMLImageRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
-     * generate XHTML content when the user has specified the macro contains wiki syntax.
+     * Factory to easily create an XHTML Image and Link Renderer.
      */
     @Requirement
-    private DocumentAccessBridge documentAccessBridge;
-
-    /**
-     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
-     * generate XHTML content when the user has specified the macro contains wiki syntax.
-     */
-    @Requirement
-    private LinkLabelGenerator linkLabelGenerator;
-
-    /**
-     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
-     * generate XHTML content when the user has specified the macro contains wiki syntax.
-     */
-    @Requirement
-    private AttachmentParser attachmentParser;
-
-    /**
-     * Used to construct a XHTMLLinkRenderer instance which we need for the HTML Macro XHTML Renderer so that we can
-     * generate XHTML content when the user has specified the macro contains wiki syntax.
-     */
-    @Requirement
-    private DocumentNameSerializer documentNameSerializer;
-
+    private XHTMLRendererFactory xhtmlRendererFactory;
+    
     /**
      * Create and initialize the descriptor of the macro.
      */
@@ -284,10 +257,9 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
 
             // Render the whole parsed content as a XHTML string
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRenderer renderer =
-                new HTMLMacroXHTMLRenderer(printer, new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
-                    this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer),
-                    new XWikiXHTMLImageRenderer(this.documentAccessBridge));
+            PrintRenderer renderer = new HTMLMacroXHTMLRenderer(printer, 
+                this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
+                this.xhtmlRendererFactory.createXHTMLImageRenderer());
             xdom.traverse(renderer);
 
             xhtml = printer.toString();

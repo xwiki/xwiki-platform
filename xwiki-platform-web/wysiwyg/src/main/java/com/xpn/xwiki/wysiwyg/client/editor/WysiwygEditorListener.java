@@ -108,7 +108,7 @@ public class WysiwygEditorListener implements TabListener
             editor.setLoading(false);
             // Disable the rich text area to avoid submitting its content.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(WysiwygEditorListener.ENABLE, false);
-            editor.getPlainTextEditor().setText(result);
+            editor.getPlainTextEditor().getTextArea().setText(result);
         }
 
         /**
@@ -169,18 +169,22 @@ public class WysiwygEditorListener implements TabListener
     public void onTabSelected(SourcesTabEvents sender, int index)
     {
         editor.setLoading(true);
-        if (index == WysiwygEditor.WYSIWYG_TAB_INDEX) {
-            WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-            wysiwygService.toHTML(editor.getPlainTextEditor().getText(), editor.getConfig().getParameter(
+        WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
+        // We test if the RTE textarea is disabled to be sure that the editor is not already being switched.
+        if (index == WysiwygEditor.WYSIWYG_TAB_INDEX && !editor.getRichTextEditor().getTextArea().isEnabled()) {
+            wysiwygService.toHTML(editor.getPlainTextEditor().getTextArea().getText(), editor.getConfig().getParameter(
                 SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWysiwygCallback(editor));
         } else {
-            WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-            // Notify the plug-ins that the content of the rich text area is about to be submitted.
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
-            // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
-            // Make the request to convert the HTML to Wiki syntax.
-            wysiwygService.fromHTML(editor.getPlainTextEditor().getText(), editor.getConfig().getParameter(
-                SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWikiCallback(editor));
+            // We test if the RTE textarea is enabled to be sure that the editor is not already being switched.  
+            if (index == WysiwygEditor.WIKI_TAB_INDEX && editor.getRichTextEditor().getTextArea().isEnabled()) {
+                // Notify the plug-ins that the content of the rich text area is about to be submitted.
+                editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
+                // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
+                // Make the request to convert the HTML to Wiki syntax.
+                wysiwygService.fromHTML(editor.getPlainTextEditor().getTextArea().getText(), 
+                    editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), 
+                    new SwitchToWikiCallback(editor));
+            }
         }
     }
 }

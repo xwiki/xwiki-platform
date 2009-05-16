@@ -87,6 +87,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private void init()
     {        
+        createController(this);
         loadConfigurations();
         loadEditors();
     }
@@ -105,6 +106,28 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             $wnd[configId] = config;
             this.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::addEditor(Ljava/lang/String;)(config.hookId);            
         }
+    }-*/;
+    
+    /**
+     * Creates the WYSIWYG controller JavaScript object.
+     * Stored in the window object, the controller provides the following methods:
+     *
+     * <ul>
+     *   <li>Wysiwyg.getPlainTextArea(String): get the TextArea for the editor with the given ID.</li>
+     * </ul>
+     *
+     * @param wysiwygEntryPoint We pass the current object to the method. Using 'this' is supposed to work but does not.
+     */
+    private native void createController(Wysiwyg wysiwygEntryPoint)
+    /*-{        
+        $wnd.Wysiwyg.getPlainTextArea = function(id) {
+            return 
+              wysiwygEntryPoint.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::getPlainTextAreaElement(Ljava/lang/String;)(id);
+        };
+        $wnd.Wysiwyg.getRichTextArea = function(id) {
+            return 
+              wysiwygEntryPoint.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::getRichTextAreaElement(Ljava/lang/String;)(id);
+        };
     }-*/;
 
     /**
@@ -179,6 +202,28 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     public WysiwygEditor getEditor(String id)
     {
         return editors.get(id);
+    }
+    
+    /**
+     * Get the plain textarea element (textarea) for the editor with the given ID.
+     * 
+     * @param id ID of the editor.
+     * @return The plain textarea element for the editor with the given ID.
+     */
+    public Element getPlainTextAreaElement(String id)
+    {
+        return getEditor(id).getPlainTextEditor().getTextArea().getElement();
+    }
+    
+    /**
+     * Get the rich textarea element (iframe) for the editor with the given ID.
+     * 
+     * @param id ID of the editor.
+     * @return The rich textarea element for the editor with the given ID.
+     */
+    public Element getRichTextAreaElement(String id)
+    {
+        return getEditor(id).getRichTextEditor().getTextArea().getElement();
     }
 
     /**

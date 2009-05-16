@@ -59,26 +59,16 @@ public class PlainTextEditor extends Composite
         container.add(textArea);        
         originalTextArea.getParentElement().removeChild(originalTextArea);
         initWidget(container);
-    }       
-    
-    /**
-     * Set the content of the editor.
-     * 
-     * @param text The editor new text.
-     */
-    public void setText(String text)
-    {
-        textArea.setText(text);
     }
     
     /**
-     * Get the content of the editor.
+     * Get the TextArea of the editor.
      * 
-     * @return The editor text.
+     * @return The TextArea for this editor.
      */
-    public String getText()
+    public TextArea getTextArea()
     {
-        return textArea.getText();
+        return textArea;
     }
     
     /**

@@ -31,7 +31,7 @@ XWiki.widgets.ModalPopup = Class.create({
 
     this.content = content || "Hello world!";
     // Add the new shortcuts
-    Object.extend(this.shortcuts, shortcuts || { });
+    this.shortcuts = Object.extend(Object.clone(this.shortcuts), shortcuts || { });
     // Add the custom options
     this.options = Object.extend(Object.clone(this.options), options || { });
     // Register a shortcut for showing the dialog.

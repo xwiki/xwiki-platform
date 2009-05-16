@@ -29,7 +29,7 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
     $super(
       content,
       {
-        "show" : { method : this.createDialog, keys : ['Meta+G','Ctrl+G', 'Ctrl+/', 'Meta+/'] },
+        "show" : { method : this.showDialog, keys : ['Meta+G','Ctrl+G', 'Ctrl+/', 'Meta+/'] },
         "view" : { method : this.openDocument, keys : ['Enter', 'Meta+V','Ctrl+V'] },
         "edit" : { method : this.openDocument, keys : ['Meta+E','Ctrl+E'] }
       },
@@ -69,10 +69,10 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
   },
   /** Called when the dialog is displayed. Enables the key listeners and gives focus to the (cleared) input. */
   showDialog : function($super) {
-    // Clear the input field
-    this.input.value = '';
     // Display the dialog
     $super();
+    // Clear the input field
+    this.input.value = '';
     // Focus the input field
     this.input.focus();
   },
@@ -94,7 +94,7 @@ XWiki.widgets.JumpToPage = Class.create(XWiki.widgets.ModalPopup, {
       var jumpToPageActivator = new Element('span', {'class': "jmp-activator"});
       jumpToPageActivator.update("Jump to any page in the wiki (Meta+G)"); // TODO: i18n!
       Event.observe(jumpToPageActivator, "click", function(event) {
-        this.createDialog(event);
+        this.showDialog(event);
       }.bindAsEventListener(this));
       item.appendChild(jumpToPageActivator);
     }.bind(this));

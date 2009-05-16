@@ -42,7 +42,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
 /**
  * Wizard step to handle the upload of a file to a wiki page: display the file input and upload on finish. <br/>
  * 
- * @version $Id: AbstractFileUploadWizardStep.java 18936 2009-04-22 12:10:16Z lucaa $
+ * @version $Id$
  */
 public abstract class AbstractFileUploadWizardStep implements WizardStep
 {

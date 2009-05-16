@@ -62,7 +62,7 @@ import java.util.List;
 /**
  * Holds a delete-delta between to revisions of a text.
  * 
- * @version $Id: DeleteDelta.java,v 1.1 2006/03/12 00:24:21 juanca Exp $
+ * @version $Id$
  * @author <a href="mailto:juanco@suigeneris.org">Juanco Anez</a>
  * @see Delta
  * @see Diff

@@ -126,47 +126,14 @@ XWiki.actionButtons.EditActions = Class.create({
 // ======================================
 // Save and continue button: Ajax improvements
 XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
-  effectDuration : 1.0,
-  hideDuration : 2.0,
   initialize : function() {
     this.createMessages();
     this.addListeners();
   },
   createMessages : function() {
-    this.container = new Element('div').setStyle({
-      'fontWeight' : 'bold',
-      position : 'fixed',
-      bottom: '8px',
-      left: '0%',
-      width: '100%',
-      'textAlign': 'center',
-      zIndex: 1200
-    }).hide();
-    var innerContainer = new Element('div');
-    this.savingBox = new Element('span', { 'class' : 'plainmessage' }).setStyle({
-      background: "#000 url($xwiki.getSkinFile('icons/xwiki/ajax-loader-white.gif')) 8px center no-repeat",
-      margin: 'auto',
-      padding: '8px 32px',
-      color: '#FFF'
-    }).update('Saving...').hide();
-    this.savedBox = new Element('span').setStyle({
-      background: "#000 url($xwiki.getSkinFile('icons/silk/tick.gif')) 8px center no-repeat",
-      margin: 'auto',
-      padding: '8px 32px',
-      color: '#FFF'
-    }).update('Saved').hide();
-    this.failedBox = new Element('span').setStyle({
-      background: "#DDD url($xwiki.getSkinFile('icons/msgerror.png')) 8px center no-repeat",
-      margin: 'auto',
-      padding: '6px 32px 4px',
-      color: '#F00',
-      border: '2px solid #F00'
-    }).update('Failed to save the document. Reason: <span id="ajaxRequestFailureReason"></span>').hide();
-    innerContainer.appendChild(this.savingBox);
-    innerContainer.appendChild(this.savedBox);
-    innerContainer.appendChild(this.failedBox);
-    this.container.appendChild(innerContainer);
-    document.body.appendChild(this.container);
+    this.savingBox = new XWiki.widgets.Notification("Saving...", "inprogress", {inactive: true});
+    this.savedBox = new XWiki.widgets.Notification("Saved", "done", {inactive: true});
+    this.failedBox = new XWiki.widgets.Notification("Failed to save the document. Reason: <span id=\"ajaxRequestFailureReason\"></span>", "error", {inactive: true});
   },
   addListeners : function() {
     document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
@@ -180,7 +147,6 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
       this.savedBox.hide();
       this.failedBox.hide();
       this.savingBox.show();
-      this.showMessage();
       var formData = new Hash(event.memo.form.serialize({hash: true, submit: 'action_saveandcontinue'}));
       if (!Prototype.Browser.Opera) {
         // Opera can't handle properly 204 responses.
@@ -210,42 +176,15 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
       this.form.template.disabled = true;
       this.form.template.value = "";
     }
-    this.savingBox.hide();
-    this.savedBox.show();
-    this.hideDuration = 2.0;
-    this.hideMessage();
+    this.savingBox.replace(this.savedBox);
   },
   onFailure : function(response) {
+    this.savingBox.replace(this.failedBox);
     if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
       $('ajaxRequestFailureReason').update('Server not responding');
     } else {
       $('ajaxRequestFailureReason').update(response.statusText);
     }
-    this.savingBox.hide();
-    this.failedBox.show();
-    this.hideDuration = 10.0;
-    this.hideMessage();
-  },
-  showMessage : function() {
-    if (this.hideEffect) {
-      this.hideEffect.cancel();
-      delete this.hideEffect;
-    }
-    if (Prototype.Browser.IE) {
-      this.container.setStyle({position : 'absolute', 'bottom': '0px'});
-    }
-    if (!this.showEffect && !this.container.visible()) {
-      this.showEffect = new Effect.Appear(this.container, {duration: 0.2, afterFinish: function() {
-        delete this.showEffect;
-      }.bind(this)});
-    }
-  },
-  hideMessage : function() {
-    this.hideEffect = new Effect.Fade(this.container, {duration: this.effectDuration, delay: this.hideDuration, afterFinish: function() {
-      this.savedBox.hide();
-      this.failedBox.hide();
-      delete this.hideEffect;
-    }.bind(this)});
   }
 });
 document.observe('dom:loaded', function() {

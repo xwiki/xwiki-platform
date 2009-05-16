@@ -63,6 +63,8 @@ XWiki.viewers.Comments = Class.create({
         } else if (confirm("$msg.get('core.viewers.comments.delete.confirm')")) { // "Are you sure you want to delete?"
           // Disable the button, to avoid a cascade of clicks from inpatient users
           item.disabled = true;
+          // Notify the user that deletion is in progress
+          item._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.delete.inProgress')", "inprogress");
           // Make request to delete the comment object
           new Ajax.Request(item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"), {
             // Success: delete de corresponding HTML element and notify the user
@@ -74,6 +76,7 @@ XWiki.viewers.Comments = Class.create({
               }
               comment.replace(this.createNotification("$msg.get('core.viewers.comments.commentDeleted')"));
               this.updateCount();
+              item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.delete.done')", "done"));
             }.bind(this),
             // Failure: inform the user why the deletion failed
             onFailure : function(response) {
@@ -81,7 +84,7 @@ XWiki.viewers.Comments = Class.create({
               if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                 failureReason = 'Server not responding';
               }
-              alert("$msg.get('core.viewers.comments.delete.failed')" + failureReason);
+              item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.delete.failed')" + failureReason, "error"));
             },
             // IE converts 204 status code into 1223...
             on1223 : function(response) {
@@ -137,10 +140,6 @@ XWiki.viewers.Comments = Class.create({
    */
   addSubmitListener : function() {
     if (this.form) {
-      // Create a notification message to display to the user when the submit is being sent
-      this.form.sendingNotification = this.createNotification("$msg.get('core.viewers.comments.add.inProgress')");
-      this.form.sendingNotification.hide();
-      this.form.insert(this.form.sendingNotification);
       // Add listener for submit
       this.form.down("input[type='submit']").observe('click', function(event) {
         event.stop();
@@ -148,7 +147,8 @@ XWiki.viewers.Comments = Class.create({
           var formData = new Hash(this.form.serialize(true));
           formData.set('xredirect', window.docviewurl + '?xpage=xpart&vm=' + this.generatorTemplate);
           formData.unset('action_cancel');
-          this.form.sendingNotification.show();
+          // Create a notification message to display to the user when the submit is being sent
+          this.form._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.inProgress')", "inprogress");
           this.form.disable();
           this.restartNeeded = false;
           new Ajax.Request(this.form.action, {
@@ -156,13 +156,14 @@ XWiki.viewers.Comments = Class.create({
             parameters : formData,
             onSuccess : function () {
               this.restartNeeded = true;
+              this.form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.done')", "done"));
             }.bind(this),
             onFailure : function (response) {
               var failureReason = response.statusText;
               if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                 failureReason = 'Server not responding';
               }
-              alert("$msg.get('core.viewers.comments.add.failed')" + failureReason);
+              this.form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.failed')" + failureReason, "error"));
             }.bind(this),
             on0 : function (response) {
               response.request.options.onFailure(response);
@@ -177,7 +178,6 @@ XWiki.viewers.Comments = Class.create({
                 this.updateCount();
               } else {
                 this.form.enable();
-                this.form.sendingNotification.hide();
               }
             }.bind(this)
           });

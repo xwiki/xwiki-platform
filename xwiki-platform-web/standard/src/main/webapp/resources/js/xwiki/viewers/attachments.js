@@ -41,6 +41,8 @@ XWiki.viewers.Attachments = Class.create({
         } else if (confirm("$msg.get('core.viewers.attachments.delete.confirm')")) { // "Are you sure you want to delete?"
           // Disable the button, to avoid a cascade of clicks from inpatient users
           item.disabled = true;
+          // Notify the user that deletion is in progress
+          item._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.attachments.delete.inProgress')", "inprogress");
           // Make request to delete the attachment
           new Ajax.Request(item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"), {
             // Success: delete de corresponding HTML element
@@ -48,6 +50,7 @@ XWiki.viewers.Attachments = Class.create({
               var attachment = item.up(".attachment");
               attachment.remove();
               this.updateCount();
+              item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.attachments.delete.done')", "done"));
             }.bind(this),
             // Failure: inform the user why the deletion failed
             onFailure : function(response) {
@@ -55,7 +58,7 @@ XWiki.viewers.Attachments = Class.create({
               if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
                 failureReason = 'Server not responding';
               }
-              alert("$msg.get('core.viewers.attachments.delete.failed')" + failureReason);
+              item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.attachments.delete.failed')" + failureReason, "error"));
             },
             // IE converts 204 status code into 1223...
             on1223 : function(response) {
@@ -76,7 +79,7 @@ XWiki.viewers.Attachments = Class.create({
   },
   updateCount : function() {
     if ($("Attachmentstab") && $("Attachmentstab").down(".itemcount")) {
-      $("Attachmentstab").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $$(".attachment").size()));
+      $("Attachmentstab").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
     }
   },
   /** Enhance the upload form with JS behaviors. */

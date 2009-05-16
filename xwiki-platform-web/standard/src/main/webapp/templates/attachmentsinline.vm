@@ -71,10 +71,10 @@ if (XWiki && XWiki.WebDAV) { XWiki.WebDAV.displayDavLinks($('_attachments')); }
 // ]]>
 </script>
 #else ## No attachments
-<div>$msg.get('core.viewers.attachments.noAttachments')</div>
+<p class="noitems">$msg.get('core.viewers.attachments.noAttachments')</p>
 #end
 #if($hasEdit || $hasAdmin)
-      <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
+      <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" id="AddAttachment">
 <div>
 <input type="hidden" name="xredirect" value="${xwiki.getFormEncoded($redirect)}" />
 <fieldset id="attachform">

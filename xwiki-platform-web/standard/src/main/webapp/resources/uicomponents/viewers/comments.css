@@ -71,7 +71,7 @@ li.reply {
 }
 /* Form */
 #AddComment {
-  border-top: 1px solid #999;
+  border-top: 1px solid #DDD;
 }
 .commentthread #AddComment legend {
   display: none;     /* For replies, don't display the legend, because it is unnecessary and does not integrate well. */
@@ -110,7 +110,7 @@ li.reply {
   font-weight: bold;
 }
 /* The message that appears in the place of a comment deleted with ajax */
-div.notification, p.nocomments {
+div.notification {
   background-color: #FFD;
   padding: 2px 32px;
   border: 1px solid #DDD;

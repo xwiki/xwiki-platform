@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.TextArea;
 /**
  * Source editor.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class PlainTextEditor extends Composite
 {   

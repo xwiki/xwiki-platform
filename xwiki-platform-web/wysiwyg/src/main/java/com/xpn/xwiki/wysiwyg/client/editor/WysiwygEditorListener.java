@@ -32,7 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 /**
  * Editor tab events handler.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WysiwygEditorListener implements TabListener
 {

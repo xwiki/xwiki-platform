@@ -46,3 +46,6 @@
 .attachment .xwikibuttonlinks a.editlink {
   background-image: url($xwiki.getSkinFile('icons/silk/pencil.gif'));
 }
+#AddAttachment {
+  border-top: 1px solid #DDD;
+}

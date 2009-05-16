@@ -116,7 +116,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
   #end
   #displayThread($rootKey, $commentThreads)
 #else
-  <p class="nocomments">$msg.get('core.viewers.comments.noComments')</p>
+  <p class="noitems">$msg.get('core.viewers.comments.noComments')</p>
 #end
 ##
 ##

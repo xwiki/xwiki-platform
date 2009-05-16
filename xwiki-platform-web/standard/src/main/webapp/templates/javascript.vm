@@ -14,6 +14,8 @@ $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)
 $xwiki.jsfx.use('js/xwiki/widgets/jumpToPage.js', true)
 $xwiki.ssfx.use('js/xwiki/widgets/jumpToPage.css', true)
+$xwiki.jsfx.use('uicomponents/widgets/notification.js', true)
+$xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 <script type="text/javascript" src="$xwiki.getSkinFile("js/prototype/prototype.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/xwiki.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/suggest/ajaxSuggest.js")"></script>

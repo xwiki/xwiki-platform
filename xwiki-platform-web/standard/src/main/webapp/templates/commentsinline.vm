@@ -42,7 +42,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 ##
 ##
 #macro(displayComment $comment)
-  <div id="xwikicomment_${comment.number}" class="xwikicomment">
+  <div id="xwikicomment_${comment.number}" class="xwikicomment#if($comment.getProperty('author').value == $doc.creator) commentByCreator#end">
     ##<div class="commentavatar">#useravatar($comment.author)</div>
     <div class="commentheader">
       <div>

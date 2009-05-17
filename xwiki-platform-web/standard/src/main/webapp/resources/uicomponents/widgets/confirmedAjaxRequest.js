@@ -1,5 +1,5 @@
 // Make sure the XWiki 'namespace' and the ModalPopup class exist.
-if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeof(XWiki.widgets.ModalPopup) == "undefined") {
+if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeof(XWiki.widgets.ConfirmationBox) == "undefined") {
   if (typeof console != "undefined" && typeof console.warn == "function") {
     console.warn("[MessageBox widget] Required class missing: XWiki.widgets.ModalPopup");
   }
@@ -30,19 +30,7 @@ if(typeof(XWiki) == "undefined" || typeof(XWiki.widgets) == "undefined" || typeo
  *      <li><tt>failureMessageText</tt>: the text for the "failed" notification. Default: "Failed: &lt;status text&gt;"</li>
  * </dl>
  */
-XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ModalPopup, {
-  /** Default displayed texts */
-  defaultInteractionParameters : {
-    confirmationText: "$msg.get('core.widgets.confirmationBox.defaultQuestion')",
-    yesButtonText: "$msg.get('core.widgets.confirmationBox.button.yes')",
-    noButtonText: "$msg.get('core.widgets.confirmationBox.button.no')",
-    displayProgressMessage: true,
-    progressMessageText : "$msg.get('core.widgets.confirmationBox.notification.inProgress')",
-    displaySuccessMessage: true,
-    successMessageText : "$msg.get('core.widgets.confirmationBox.notification.done')",
-    displayFailureMessage: true,
-    failureMessageText : "$msg.get('core.widgets.confirmationBox.notification.failed')"
-  },
+XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox, {
   /** Some functions to fix several browser specific problems */
   defaultAjaxRequestParameters : {
     // IE converts 204 status code into 1223...
@@ -56,20 +44,14 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ModalPopup, {
   },
   /** Constructor. Registers the key listener that pops up the dialog. */
   initialize : function($super, requestUrl, ajaxRequestParameters, interactionParameters) {
-    this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
-    $super(
-      this.createContent(this.interactionParameters),
-      {
-        "show"  : { method : this.showDialog,  keys : [] },
-        "go"    : { method : this.go,   keys : ['Enter']},
-        "close" : { method : this.closeDialog, keys : ['Esc'] }
-      },
-      {
-         displayCloseButton : false
-      }
-    );
-    this.showDialog();
-    this.setClass("confirmation");
+    this.interactionParameters = Object.extend({
+      displayProgressMessage: true,
+      progressMessageText : "$msg.get('core.widgets.confirmationBox.notification.inProgress')",
+      displaySuccessMessage: true,
+      successMessageText : "$msg.get('core.widgets.confirmationBox.notification.done')",
+      displayFailureMessage: true,
+      failureMessageText : "$msg.get('core.widgets.confirmationBox.notification.failed')"
+    }, interactionParameters || {});
     this.requestUrl = requestUrl;
     this.ajaxRequestParameters = Object.extend(Object.clone(this.defaultAjaxRequestParameters), ajaxRequestParameters || {});
     Object.extend(this.ajaxRequestParameters, {
@@ -106,29 +88,16 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ModalPopup, {
         }
       }.bind(this)
     });
-  },
-  /** Create the content of the confirmation dialog: icon + question text, buttons */
-  createContent : function (data) {
-    var question = new Element("div", {"class" : "question"}).update(data.confirmationText);
-    var buttons = new Element("div", {"class" : "buttons"});
-    var goButton = this.createButton("button", data.yesButtonText, "(Enter)", "");
-    var cancelButton = this.createButton("button", data.noButtonText, "(Esc)", "");
-    buttons.insert(goButton);
-    buttons.insert(cancelButton);
-    var content =  new Element("div");
-    content.insert(question).insert(buttons);
-    Event.observe(goButton, "click", this.go.bindAsEventListener(this));
-    Event.observe(cancelButton, "click", this.closeDialog.bindAsEventListener(this));
-    return content;
-  },
-  /** Performs the Ajax request */
-  go : function () {
-    this.closeDialog();
-    if (this.interactionParameters.displayProgressMessage) {
-      this.progressNotification = new XWiki.widgets.Notification(this.interactionParameters.progressMessageText, "inprogress");
-    }
-    // perform the ajax request
-    new Ajax.Request(this.requestUrl, this.ajaxRequestParameters);
+    $super({
+      onYes : function() {
+        if (this.interactionParameters.displayProgressMessage) {
+          this.progressNotification = new XWiki.widgets.Notification(this.interactionParameters.progressMessageText, "inprogress");
+        }
+        // perform the ajax request
+        new Ajax.Request(this.requestUrl, this.ajaxRequestParameters);
+      }.bind(this)
+    }, this.interactionParameters
+    );
   }
 });
 

@@ -33,11 +33,15 @@
 .xdialog-close {
   float: right;
   cursor: pointer;
-  margin: -5px -5px 5px 5px;
-  width: 16px;
-  height: 16px;
+  margin: -8px -8px 8px 5px;
+  width: 12px;
+  height: 12px;
   text-align : center; 
   font-weight: bold;
+  font-size: 13px;
+  text-transform: lowercase;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 8px;
 }
 .xdialog-title {
   font-size: 80%;

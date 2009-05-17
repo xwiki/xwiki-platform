@@ -272,6 +272,7 @@
                 <exclude>resources/js/smartclient/**</exclude>
                 <!-- Exclude files with Velocity inside -->
                 <exclude>**/actionButtons.js</exclude>
+                <exclude>**/notification.css</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -399,6 +400,7 @@
                 <exclude>resources/js/smartclient/**</exclude>
                 <!-- Exclude files with Velocity inside -->
                 <exclude>**/actionButtons.js</exclude>
+                <exclude>**/notification.css</exclude>
               </excludes>
             </configuration>
           </plugin>          

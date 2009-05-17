@@ -7,23 +7,42 @@ document.observe('dom:loaded', function() {
     item.observe('click', function(event) {
       item.blur();
       event.stop();
-      if (confirm('Are you sure you want to delete this object? After the object is deleted, canceling the modifications will not restore deleted objects.')) {
-        new Ajax.Request(item.href, {
-          onSuccess : function() {
-            var xobjectElement = item.up('.xobject');
-            var xclassElement = xobjectElement.up('.xclass');
-            xobjectElement.remove();
-            if (xclassElement.select('.xobject').size() == 0) {
-              xclassElement.remove();
+      if (!item.disabled) {
+        new XWiki.widgets.ConfirmedAjaxRequest(
+          /* Ajax request URL */
+          item.href,
+          /* Ajax request parameters */
+          {
+            onCreate : function() {
+              item.disabled = true;
+            },
+            onSuccess : function() {
+              var xobjectElement = item.up('.xobject');
+              var xclassElement = xobjectElement.up('.xclass');
+              xobjectElement.remove();
+              if (xclassElement.select('.xobject').size() == 0) {
+                xclassElement.remove();
+              }
+            }.bind(this),
+            onComplete : function() {
+              item.disabled = false;
             }
+          },
+          /* Interaction parameters */
+          {
+            confirmationText: "$msg.get('core.editors.object.delete.confirm')",
+            progressMessageText : "$msg.get('core.editors.object.delete.inProgress')",
+            successMessageText : "$msg.get('core.editors.object.delete.done')",
+            failureMessageText : "$msg.get('core.editors.object.delete.failed')"
           }
-        });
+        );
       }
     }.bindAsEventListener());
   });
   // ------------------------------------
   // Edit button behavior
   $$('#xwikiobjects a.edit').each(function(item) {
+    // Prevent from collapsing the object subtree when clicking on edit
     item.observe('click', function(event) {
       item.blur();
       event.stop();

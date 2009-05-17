@@ -60,45 +60,40 @@ XWiki.viewers.Comments = Class.create({
         if (item.disabled) {
           // Do nothing if the button was already clicked and it's waiting for a response from the server.
           return;
-        } else if (confirm("$msg.get('core.viewers.comments.delete.confirm')")) { // "Are you sure you want to delete?"
-          // Disable the button, to avoid a cascade of clicks from inpatient users
-          item.disabled = true;
-          // Notify the user that deletion is in progress
-          item._x_notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.delete.inProgress')", "inprogress");
-          // Make request to delete the comment object
-          new Ajax.Request(item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"), {
-            // Success: delete de corresponding HTML element and notify the user
-            onSuccess : function() {
-              var comment = item.up(this.xcommentSelector);
-              // If the form is inside this comment's reply thread, move it back to the bottom.
-              if (this.form.descendantOf(comment.next('.commentthread'))) {
-                this.resetForm();
+        } else {
+          new XWiki.widgets.ConfirmedAjaxRequest(
+            /* Ajax request URL */
+            item.href + (Prototype.Browser.Opera ? "" : "&ajax=1"),
+            /* Ajax request parameters */
+            {
+              onCreate : function() {
+                // Disable the button, to avoid a cascade of clicks from impatient users
+                item.disabled = true;
+              },
+              onSuccess : function() {
+                // Remove the corresponding HTML element from the UI and update the comment count
+                var comment = item.up(this.xcommentSelector);
+                // If the form is inside this comment's reply thread, move it back to the bottom.
+                if (this.form.descendantOf(comment.next('.commentthread'))) {
+                  this.resetForm();
+                }
+                // Replace the comment with a "deleted comment" placeholder
+                comment.replace(this.createNotification("$msg.get('core.viewers.comments.commentDeleted')"));
+                this.updateCount();
+              }.bind(this),
+              onComplete : function() {
+                // In the end: re-inable the button
+                item.disabled = false;
               }
-              comment.replace(this.createNotification("$msg.get('core.viewers.comments.commentDeleted')"));
-              this.updateCount();
-              item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.delete.done')", "done"));
-            }.bind(this),
-            // Failure: inform the user why the deletion failed
-            onFailure : function(response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
-              item._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.delete.failed')" + failureReason, "error"));
             },
-            // IE converts 204 status code into 1223...
-            on1223 : function(response) {
-              response.request.options.onSuccess(response);
-            },
-            // 0 is returned for network failures, except on IE where a strange large number (12031) is returned.
-            on0 : function(response) {
-              response.request.options.onFailure(response);
-            },
-            // In the end: re-inable the button
-            onComplete : function() {
-              item.disabled = false;
+            /* Interaction parameters */
+            {
+               confirmationText: "$msg.get('core.viewers.comments.delete.confirm')",
+               progressMessageText : "$msg.get('core.viewers.comments.delete.inProgress')",
+               successMessageText : "$msg.get('core.viewers.comments.delete.done')",
+               failureMessageText : "$msg.get('core.viewers.comments.delete.failed')"
             }
-          });
+          );
         }
       }.bindAsEventListener(this));
     }.bind(this));

@@ -6,7 +6,7 @@ some text {{id name="idname"/}} and other
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>some text <!--startmacro:id|-|name="idname"|-|--><a id="idname" name="idname"></a><!--stopmacro--> and other</p>
+<p>some text <!--startmacro:id|-|name="idname"--><a id="idname" name="idname"></a><!--stopmacro--> and other</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

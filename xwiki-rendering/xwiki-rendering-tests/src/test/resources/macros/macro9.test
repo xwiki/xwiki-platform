@@ -10,14 +10,14 @@ beginDocument
 beginParagraph
 onWord [Execution]
 onSpace
-beginMacroMarkerInline [testfailingmacro] [] []
+beginMacroMarkerInline [testfailingmacro] []
 beginFormat [NONE] [[class]=[xwikirenderingerror]]
 onWord [Failed to execute macro: testfailingmacro]
 endFormat [NONE] [[class]=[xwikirenderingerror]]
 beginFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 onVerbatim [stack trace here] [true]
 endFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
-endMacroMarkerInline [testfailingmacro] [] []
+endMacroMarkerInline [testfailingmacro] []
 onSpace
 onWord [error]
 endParagraph
@@ -25,7 +25,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Execution <!--startmacro:testfailingmacro|-||-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p>
+<p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -33,4 +33,4 @@ Execution {{testfailingmacro/}} error
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Execution <!--startmacro:testfailingmacro|-||-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p></html>
+<p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p>

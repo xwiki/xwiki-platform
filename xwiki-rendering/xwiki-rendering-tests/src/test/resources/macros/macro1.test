@@ -13,8 +13,8 @@ content
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onMacroStandalone [testsimplemacro] [] []
-onMacroStandalone [testsimplemacro] [param1=value1|param2=value2] []
+onMacroStandalone [testsimplemacro] []
+onMacroStandalone [testsimplemacro] [param1=value1|param2=value2]
 onMacroStandalone [testsimplemacro] [param1=value1|param2=value2] [
 content
 ]
@@ -25,7 +25,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testsimplemacro|-||-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
+<!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
 content
 --><!--stopmacro--><!--startmacro:testsimplemacro|-||-|
 content
@@ -47,11 +47,11 @@ content
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:testsimplemacro|-||-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
+<!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
 content
 --><!--stopmacro--><!--startmacro:testsimplemacro|-||-|
 content
---><!--stopmacro--></html>
+--><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|plain/1.0
 .#-----------------------------------------------------

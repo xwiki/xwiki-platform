@@ -663,13 +663,11 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
         macroBuffer.append(parametersBuffer);
         macroBuffer.append("]");
 
-        // FIXME: differenciate between no content and empty content when WYSIWYG will support it. See
-        // http://jira.xwiki.org/jira/browse/XWIKI-3735
-        // if (content != null) {
-        macroBuffer.append(" [");
-        macroBuffer.append(content == null ? "" : content);
-        macroBuffer.append("]");
-        // }
+        if (content != null) {
+            macroBuffer.append(" [");
+            macroBuffer.append(content);
+            macroBuffer.append("]");
+        }
 
         getPrinter().println(macroBuffer.toString());
     }

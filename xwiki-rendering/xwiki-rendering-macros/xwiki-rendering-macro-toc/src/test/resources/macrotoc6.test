@@ -9,8 +9,8 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [toc] [] []
-endMacroMarkerStandalone [toc] [] []
+beginMacroMarkerStandalone [toc] []
+endMacroMarkerStandalone [toc] []
 beginSection
 beginHeader [1, Hheader]
 onWord [header]

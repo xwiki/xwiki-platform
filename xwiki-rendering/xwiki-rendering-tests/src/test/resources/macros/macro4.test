@@ -11,9 +11,9 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-onMacroStandalone [macro] [] []
+onMacroStandalone [macro] []
 onEmptyLines [2]
-onMacroStandalone [macro] [] []
+onMacroStandalone [macro] []
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0

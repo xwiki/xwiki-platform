@@ -10,18 +10,18 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [testformatmacro] [] []
+beginMacroMarkerStandalone [testformatmacro] []
 beginFormat [NONE] [[param]=[value]]
 onWord [formatmacro1]
 endFormat [NONE] [[param]=[value]]
-endMacroMarkerStandalone [testformatmacro] [] []
+endMacroMarkerStandalone [testformatmacro] []
 beginParagraph
 beginFormat [NONE] [[a]=[b]]
-beginMacroMarkerInline [testformatmacro] [] []
+beginMacroMarkerInline [testformatmacro] []
 beginFormat [NONE] [[param]=[value]]
 onWord [formatmacro2]
 endFormat [NONE] [[param]=[value]]
-endMacroMarkerInline [testformatmacro] [] []
+endMacroMarkerInline [testformatmacro] []
 onSpace
 onWord [text]
 endFormat [NONE] [[a]=[b]]
@@ -30,7 +30,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testformatmacro|-||-|--><span param="value">formatmacro1</span><!--stopmacro--><p><span a="b"><!--startmacro:testformatmacro|-||-|--><span param="value">formatmacro2</span><!--stopmacro--> text</span></p>
+<!--startmacro:testformatmacro|-|--><span param="value">formatmacro1</span><!--stopmacro--><p><span a="b"><!--startmacro:testformatmacro|-|--><span param="value">formatmacro2</span><!--stopmacro--> text</span></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -40,4 +40,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:testformatmacro|-||-|--><span param="value">formatmacro1</span><!--stopmacro--><p><span a="b"><!--startmacro:testformatmacro|-||-|--><span param="value">formatmacro2</span><!--stopmacro--> text</span></p></html>
+<!--startmacro:testformatmacro|-|--><span param="value">formatmacro1</span><!--stopmacro--><p><span a="b"><!--startmacro:testformatmacro|-|--><span param="value">formatmacro2</span><!--stopmacro--> text</span></p>

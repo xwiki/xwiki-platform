@@ -61,12 +61,10 @@ public class XHTMLMacroRenderer
         }
 
         // Print content
-        // FIXME: differenciate between no content and empty content when WYSIWYG will support it. See
-        // http://jira.xwiki.org/jira/browse/XWIKI-3735
-        // if (content != null) {
-        buffer.append(SEPARATOR);
-        buffer.append(content == null ? "" : content);
-        // }
+        if (content != null) {
+            buffer.append(SEPARATOR);
+            buffer.append(content);
+        }
 
         printer.printXMLComment(buffer.toString(), true);
     }

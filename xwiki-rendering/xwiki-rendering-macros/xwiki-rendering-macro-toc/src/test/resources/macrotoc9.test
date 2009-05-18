@@ -25,7 +25,7 @@ onWord [Level]
 onSpace
 onWord [1]
 endHeader [1, HLevel1]
-beginMacroMarkerStandalone [toc] [start=1|depth=3|numbered=false|scope=page] []
+beginMacroMarkerStandalone [toc] [start=1|depth=3|numbered=false|scope=page]
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [HLevel1]] [false]
@@ -80,7 +80,7 @@ endListItem
 endList [BULLETED]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [toc] [start=1|depth=3|numbered=false|scope=page] []
+endMacroMarkerStandalone [toc] [start=1|depth=3|numbered=false|scope=page]
 beginSection
 beginHeader [2, HLevel2a]
 onWord [Level]
@@ -123,8 +123,8 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<h1 id="HLevel1"><span>Level 1</span></h1><!--startmacro:toc|-|start="1" depth="3" numbered="false" scope="page"|-|--><ul><li><!--startwikilink:#HLevel1--><span class="wikilink"><a href="#HLevel1">Level 1</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel2a--><span class="wikilink"><a href="#HLevel2a">Level 2a</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel3a--><span class="wikilink"><a href="#HLevel3a">Level 3a</a></span><!--stopwikilink--></li><li><!--startwikilink:#HLevel3b--><span class="wikilink"><a href="#HLevel3b">Level 3b</a></span><!--stopwikilink--></li></ul></li></ul></li><li><!--startwikilink:#HLevel2b--><span class="wikilink"><a href="#HLevel2b">Level 2b</a></span><!--stopwikilink--><ul><li><ul><li><!--startwikilink:#HLevel3c--><span class="wikilink"><a href="#HLevel3c">Level 3c</a></span><!--stopwikilink--></li></ul></li></ul></li></ul><!--stopmacro--><h2 id="HLevel2a"><span>Level 2a</span></h2><h3 id="HLevel3a"><span>Level 3a</span></h3><h3 id="HLevel3b"><span>Level 3b</span></h3><h1 id="HLevel2b"><span>Level 2b</span></h1><h3 id="HLevel3c"><span>Level 3c</span></h3>
+<h1 id="HLevel1"><span>Level 1</span></h1><!--startmacro:toc|-|start="1" depth="3" numbered="false" scope="page"--><ul><li><!--startwikilink:#HLevel1--><span class="wikilink"><a href="#HLevel1">Level 1</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel2a--><span class="wikilink"><a href="#HLevel2a">Level 2a</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel3a--><span class="wikilink"><a href="#HLevel3a">Level 3a</a></span><!--stopwikilink--></li><li><!--startwikilink:#HLevel3b--><span class="wikilink"><a href="#HLevel3b">Level 3b</a></span><!--stopwikilink--></li></ul></li></ul></li><li><!--startwikilink:#HLevel2b--><span class="wikilink"><a href="#HLevel2b">Level 2b</a></span><!--stopwikilink--><ul><li><ul><li><!--startwikilink:#HLevel3c--><span class="wikilink"><a href="#HLevel3c">Level 3c</a></span><!--stopwikilink--></li></ul></li></ul></li></ul><!--stopmacro--><h2 id="HLevel2a"><span>Level 2a</span></h2><h3 id="HLevel3a"><span>Level 3a</span></h3><h3 id="HLevel3b"><span>Level 3b</span></h3><h1 id="HLevel2b"><span>Level 2b</span></h1><h3 id="HLevel3c"><span>Level 3c</span></h3>
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><h1 id="HLevel1"><span>Level 1</span></h1><!--startmacro:toc|-|start="1" depth="3" numbered="false" scope="page"|-|--><ul><li><!--startwikilink:#HLevel1--><span class="wikilink"><a href="#HLevel1">Level 1</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel2a--><span class="wikilink"><a href="#HLevel2a">Level 2a</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel3a--><span class="wikilink"><a href="#HLevel3a">Level 3a</a></span><!--stopwikilink--></li><li><!--startwikilink:#HLevel3b--><span class="wikilink"><a href="#HLevel3b">Level 3b</a></span><!--stopwikilink--></li></ul></li></ul></li><li><!--startwikilink:#HLevel2b--><span class="wikilink"><a href="#HLevel2b">Level 2b</a></span><!--stopwikilink--><ul><li><ul><li><!--startwikilink:#HLevel3c--><span class="wikilink"><a href="#HLevel3c">Level 3c</a></span><!--stopwikilink--></li></ul></li></ul></li></ul><!--stopmacro--><h2 id="HLevel2a"><span>Level 2a</span></h2><h3 id="HLevel3a"><span>Level 3a</span></h3><h3 id="HLevel3b"><span>Level 3b</span></h3><h1 id="HLevel2b"><span>Level 2b</span></h1><h3 id="HLevel3c"><span>Level 3c</span></h3></html>
+<h1 id="HLevel1"><span>Level 1</span></h1><!--startmacro:toc|-|start="1" depth="3" numbered="false" scope="page"--><ul><li><!--startwikilink:#HLevel1--><span class="wikilink"><a href="#HLevel1">Level 1</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel2a--><span class="wikilink"><a href="#HLevel2a">Level 2a</a></span><!--stopwikilink--><ul><li><!--startwikilink:#HLevel3a--><span class="wikilink"><a href="#HLevel3a">Level 3a</a></span><!--stopwikilink--></li><li><!--startwikilink:#HLevel3b--><span class="wikilink"><a href="#HLevel3b">Level 3b</a></span><!--stopwikilink--></li></ul></li></ul></li><li><!--startwikilink:#HLevel2b--><span class="wikilink"><a href="#HLevel2b">Level 2b</a></span><!--stopwikilink--><ul><li><ul><li><!--startwikilink:#HLevel3c--><span class="wikilink"><a href="#HLevel3c">Level 3c</a></span><!--stopwikilink--></li></ul></li></ul></li></ul><!--stopmacro--><h2 id="HLevel2a"><span>Level 2a</span></h2><h3 id="HLevel3a"><span>Level 3a</span></h3><h3 id="HLevel3b"><span>Level 3b</span></h3><h1 id="HLevel2b"><span>Level 2b</span></h1><h3 id="HLevel3c"><span>Level 3c</span></h3>

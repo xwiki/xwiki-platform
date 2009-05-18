@@ -61,8 +61,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         String expected = "beginDocument\n"
             + "beginMacroMarkerStandalone [velocity] [] [$myvar]\n"
             + "beginParagraph\n"
-            + "onSpecialSymbol [$]\n"
-            + "onWord [myvar]\n"
+            + "onWord [hello]\n"
             + "endParagraph\n"
             + "endMacroMarkerStandalone [velocity] [] [$myvar]\n"
             + "endDocument";
@@ -104,7 +103,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
         String expected = "beginDocument\n"
-            + "onMacroStandalone [someMacro] [] []\n"
+            + "onMacroStandalone [someMacro] []\n"
             + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");

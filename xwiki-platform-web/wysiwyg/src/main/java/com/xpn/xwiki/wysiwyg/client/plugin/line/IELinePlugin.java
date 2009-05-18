@@ -19,20 +19,45 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.line;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
+import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Internet Explorer specific implementation of the {@link LinePlugin}.
  * 
  * @version $Id$
  */
-public class IELinePlugin extends LinePlugin
+public class IELinePlugin extends LinePlugin implements InnerHTMLListener
 {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LinePlugin#init(Wysiwyg, RichTextArea, Config)
+     */
+    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    {
+        super.init(wysiwyg, textArea, config);
+        getTextArea().getDocument().addInnerHTMLListener(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LinePlugin#destroy()
+     */
+    public void destroy()
+    {
+        getTextArea().getDocument().removeInnerHTMLListener(this);
+        super.destroy();
+    }
+
     /**
      * {@inheritDoc}<br/>
      * We overwrite in order to fix a IE bug which makes empty lines invisible. Setting the inner HTML to the empty
@@ -72,9 +97,17 @@ public class IELinePlugin extends LinePlugin
     protected void replaceEmptyDivsWithParagraphs()
     {
         super.replaceEmptyDivsWithParagraphs();
+        ensureEmptyLinesAreEditable((Element) getTextArea().getDocument().getBody().cast());
+    }
 
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");
+    /**
+     * Ensures all the empty lines inside the given container are editable.
+     * 
+     * @param container the element where to look for empty lines
+     */
+    protected void ensureEmptyLinesAreEditable(Element container)
+    {
+        NodeList<com.google.gwt.dom.client.Element> paragraphs = container.getElementsByTagName("p");
         for (int i = 0; i < paragraphs.getLength(); i++) {
             Element paragraph = paragraphs.getItem(i).cast();
             if (!paragraph.hasChildNodes()) {
@@ -83,5 +116,15 @@ public class IELinePlugin extends LinePlugin
                 paragraph.setInnerHTML("");
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see InnerHTMLListener#onInnerHTMLChange(Element)
+     */
+    public void onInnerHTMLChange(Element element)
+    {
+        ensureEmptyLinesAreEditable(element);
     }
 }

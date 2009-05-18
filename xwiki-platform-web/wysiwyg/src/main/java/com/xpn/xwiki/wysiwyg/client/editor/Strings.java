@@ -229,7 +229,7 @@ public interface Strings extends Constants
 
     String selectorSelectFromAllPages();
 
-    String linkErrorLoadingData();
+    String linkErrorLoadingData();   
 
     String fileUploadLabel();
 
@@ -246,6 +246,8 @@ public interface Strings extends Constants
     String fileUploadSubmitError();
 
     String fileUploadNoPathError();
+    
+    String fileGetSubmitError();
 
     String image();
 

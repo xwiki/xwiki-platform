@@ -221,7 +221,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedWiki()
     /*-{
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-        return self.getSelectedWiki();
+        return self.getSelectedResourceProperty("wiki");
     }-*/;
 
     /**
@@ -232,7 +232,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedSpace()
     /*-{
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-        return self.getSelectedSpace();
+        return self.getSelectedResourceProperty("space");
     }-*/;
 
     /**
@@ -243,7 +243,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedPage()
     /*-{
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-        return self.getSelectedPage();
+        return self.getSelectedResourceProperty("name");
     }-*/;
 
     /**
@@ -254,7 +254,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedAttachment()
     /*-{
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-        return self.getSelectedAttachment();
+        return self.getSelectedResourceProperty("attachment");
     }-*/;
 
     /**
@@ -265,7 +265,7 @@ public class XWikiExplorer extends TreeGrid
     public native String getSelectedAnchor()
     /*-{
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-        return self.getSelectedAnchor();
+        return self.getSelectedResourceProperty("anchor");
     }-*/;
 
     /**
@@ -289,16 +289,4 @@ public class XWikiExplorer extends TreeGrid
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
         return self.isNewAttachment();
     }-*/;
-
-    /**
-     * Get the URL of the selected node in the Tree.
-     * 
-     * @return the URL of the selected node in the Tree.
-     */
-    public native String getSelectedResourceURL()
-    /*-{
-        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
-        return self.getSelectedUrl();
-    }-*/;
-
 };

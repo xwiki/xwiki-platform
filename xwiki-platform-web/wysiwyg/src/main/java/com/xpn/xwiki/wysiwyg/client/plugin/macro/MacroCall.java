@@ -88,7 +88,7 @@ public class MacroCall
         start = end + SEPARATOR.length();
         int equalIndex = text.indexOf('=', start);
         int separatorIndex = text.indexOf(SEPARATOR, start);
-        while (equalIndex < separatorIndex && equalIndex > 0) {
+        while (equalIndex > 0 && (separatorIndex < 0 || equalIndex < separatorIndex)) {
             String argumentName = text.substring(start, equalIndex).trim();
 
             // Opening quote.
@@ -109,8 +109,10 @@ public class MacroCall
             separatorIndex = text.indexOf(SEPARATOR, start);
         }
 
-        // Extract macro content.
-        content = text.substring(separatorIndex + SEPARATOR.length());
+        // Extract macro content, if there is any.
+        if (separatorIndex >= 0) {
+            content = text.substring(separatorIndex + SEPARATOR.length());
+        }
     }
 
     /**
@@ -211,8 +213,10 @@ public class MacroCall
             strBuff.append(escapeMacroParameterValue(entry.getValue()));
             strBuff.append("\" ");
         }
-        strBuff.append(SEPARATOR);
-        strBuff.append(getContent());
+        if (content != null) {
+            strBuff.append(SEPARATOR);
+            strBuff.append(content);
+        }
 
         return escapeComment(strBuff.toString());
     }

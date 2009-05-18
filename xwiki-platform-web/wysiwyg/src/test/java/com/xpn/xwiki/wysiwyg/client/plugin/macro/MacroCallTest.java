@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +35,11 @@ import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
  */
 public class MacroCallTest extends AbstractWysiwygClientTest
 {
+    /**
+     * The empty list of macro call arguments.
+     */
+    public static final Map<String, String> NO_ARGUMENTS = Collections.emptyMap();
+
     /**
      * Tests if the start macro comment is parsed correctly when macro content and macro parameter values contain
      * special symbols like {@code "} and {@code \} or the separator {@code |-|}.
@@ -74,6 +80,23 @@ public class MacroCallTest extends AbstractWysiwygClientTest
         assertEquals("2", call.getArgument(sTaRt));
 
         assertEquals("startmacro:box|-|sTaRt=\"2\" |-|", call.toString());
+    }
+
+    /**
+     * @see XWIKI-3735: Differentiate macros with empty content from macros without content.
+     */
+    public void testDifferentiateMacrosWithEmptyContentFromMacrosWithoutContent()
+    {
+        // No content and no arguments.
+        testSerializeAndDeserialize("x", null, NO_ARGUMENTS);
+        // Empty content and no arguments.
+        testSerializeAndDeserialize("y", "", NO_ARGUMENTS);
+        // No content but with arguments.
+        Map<String, String> args = new HashMap<String, String>();
+        args.put("c", "1|-|2");
+        testSerializeAndDeserialize("z", null, args);
+        // Empty content with arguments.
+        testSerializeAndDeserialize("w", "", args);
     }
 
     /**

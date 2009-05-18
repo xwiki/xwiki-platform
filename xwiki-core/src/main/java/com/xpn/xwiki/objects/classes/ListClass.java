@@ -165,7 +165,7 @@ public abstract class ListClass extends PropertyClass
         setStringValue("separator", separator);
     }
 
-    public static List getListFromString(String value)
+    public static List<String> getListFromString(String value)
     {
         return getListFromString(value, "|", true);
     }
@@ -233,10 +233,6 @@ public abstract class ListClass extends PropertyClass
             lprop = new StringListProperty();
         } else {
             lprop = new StringProperty();
-        }
-
-        if (isMultiSelect() && getDisplayType().equals("input")) {
-            ((ListProperty) lprop).setFormStringSeparator("" + getSeparators().charAt(0));
         }
 
         return lprop;

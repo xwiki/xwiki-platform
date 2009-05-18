@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -49,30 +48,25 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger logger =
-        LoggerFactory.getLogger(AttachmentsBySpaceNameSubView.class);
+    private static final Logger logger = LoggerFactory.getLogger(AttachmentsBySpaceNameSubView.class);
 
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            boolean last = (next == tokens.length - 1);
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if ((nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX) && nextToken
-                .endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX))
-                && !(last && getContext().isCreateOrMoveRequest())) {
-                AttachmentsByFirstLettersSubView subView = new AttachmentsByFirstLettersSubView();
-                subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
-                stack.push(subView);
-                subView.decode(stack, tokens, next + 1);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if ((nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX) && nextToken
+            .endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX))
+            && !(last && getContext().isCreateOrMoveRequest())) {
+            AttachmentsByFirstLettersSubView subView = new AttachmentsByFirstLettersSubView();
+            subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());            
+            return last ? subView : subView.decode(tokens, next + 1);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 
@@ -84,8 +78,7 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
         List<DavResource> children = new ArrayList<DavResource>();
         try {
             String sql =
-                ", XWikiAttachment as attach where doc.id = attach.docId and doc.web = '"
-                    + getDisplayName() + "'";
+                ", XWikiAttachment as attach where doc.id = attach.docId and doc.web = '" + getDisplayName() + "'";
             List<String> docNames = getContext().searchDocumentsNames(sql);
             Set<String> subViewNames = new HashSet<String>();
             int subViewNameLength = XWikiDavUtils.getSubViewNameLength(docNames.size());
@@ -104,10 +97,8 @@ public class AttachmentsBySpaceNameSubView extends AbstractDavView
             for (String subViewName : subViewNames) {
                 try {
                     String modName =
-                        XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX + subViewName
-                            + XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX;
-                    AttachmentsByFirstLettersSubView subView =
-                        new AttachmentsByFirstLettersSubView();
+                        XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX + subViewName + XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX;
+                    AttachmentsByFirstLettersSubView subView = new AttachmentsByFirstLettersSubView();
                     subView.init(this, modName, "/" + modName);
                     children.add(subView);
                 } catch (DavException e) {

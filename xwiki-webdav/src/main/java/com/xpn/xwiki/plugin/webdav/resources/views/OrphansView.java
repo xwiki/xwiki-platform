@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.webdav.resources.views;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -38,9 +37,8 @@ import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 
 /**
- * This view allows to view the other entry points in the wiki that are not linked to
- * 'Main.WebHome'. All pages that do not have a parent that exists in the wiki are shown in this
- * view.
+ * This view allows to view the other entry points in the wiki that are not linked to 'Main.WebHome'. All pages that do
+ * not have a parent that exists in the wiki are shown in this view.
  * 
  * @version $Id$
  */
@@ -54,23 +52,18 @@ public class OrphansView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            boolean last = (next == tokens.length - 1);
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if (getContext().exists(nextToken)
-                && !(last && getContext().isCreateOrMoveRequest())) {
-                DavPage page = new DavPage();
-                page.init(this, nextToken, "/" + nextToken);
-                stack.push(page);
-                page.decode(stack, tokens, next + 1);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if (getContext().exists(nextToken) && !(last && getContext().isCreateOrMoveRequest())) {
+            DavPage page = new DavPage();
+            page.init(this, nextToken, "/" + nextToken);
+            return last ? page : page.decode(tokens, next + 1);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 

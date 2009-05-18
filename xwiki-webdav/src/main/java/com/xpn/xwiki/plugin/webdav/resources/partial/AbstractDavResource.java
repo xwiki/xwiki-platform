@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavConstants;
 import org.apache.jackrabbit.webdav.DavException;
@@ -84,13 +83,11 @@ public abstract class AbstractDavResource implements XWikiDavResource
     /**
      * {@inheritDoc}
      */
-    public void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException
+    public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         DavResourceLocator locator =
-            parent.getLocator().getFactory().createResourceLocator(
-                parent.getLocator().getPrefix(), parent.getLocator().getWorkspacePath(),
-                parent.getLocator().getResourcePath() + relativePath);
+            parent.getLocator().getFactory().createResourceLocator(parent.getLocator().getPrefix(),
+                parent.getLocator().getWorkspacePath(), parent.getLocator().getResourcePath() + relativePath);
         init(name, locator, parent.getContext());
         this.parentResource = parent;
 
@@ -99,8 +96,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
     /**
      * {@inheritDoc}
      */
-    public void init(String name, DavResourceLocator locator, XWikiDavContext context)
-        throws DavException
+    public void init(String name, DavResourceLocator locator, XWikiDavContext context) throws DavException
     {
         this.name = name;
         this.locator = locator;
@@ -123,8 +119,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
             propertySet.add(new DefaultDavProperty(DavPropertyName.ISCOLLECTION, "0"));
         }
         /*
-         * set current lock information. If no lock is set to this resource, an empty lockdiscovery
-         * will be returned in the response.
+         * set current lock information. If no lock is set to this resource, an empty lockdiscovery will be returned in
+         * the response.
          */
         propertySet.add(new LockDiscovery(getLock(Type.WRITE, Scope.EXCLUSIVE)));
         /*
@@ -137,34 +133,32 @@ public abstract class AbstractDavResource implements XWikiDavResource
 
     /**
      * <p>
-     * The default decode implementation assumes the next resource in chain to be a temporary
-     * resource. Sub classes should override this method to provide their own implementation.
+     * The default decode implementation assumes the next resource in chain to be a temporary resource. Sub classes
+     * should override this method to provide their own implementation.
      * </p>
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            DavTempFile resource = new DavTempFile();
-            String method = getContext().getMethod();
-            if (method != null && DavMethods.getMethodCode(method) == DavMethods.DAV_MKCOL) {
-                resource.setCollection();
-            }
-            resource.init(this, nextToken, "/" + nextToken);
-            // Search inside session resources to see if we already have this resource stored.
-            int index = getVirtualMembers().indexOf(resource);
-            if (index != -1) {
-                // Use the old resource instead.
-                resource = (DavTempFile) getVirtualMembers().get(index);
-                // Re-init the old resource.
-                resource.init(this, nextToken, "/" + nextToken);
-            }
-            stack.push(resource);
-            if (resource.isCollection()) {
-                resource.decode(stack, tokens, next + 1);
-            }
+        if (!isCollection()) {
+           throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        DavTempFile resource = new DavTempFile();
+        String method = getContext().getMethod();
+        if (method != null && DavMethods.getMethodCode(method) == DavMethods.DAV_MKCOL) {
+            resource.setCollection();
+        }
+        resource.init(this, nextToken, "/" + nextToken);
+        // Search inside session resources to see if we already have this resource stored
+        int index = getVirtualMembers().indexOf(resource);
+        if (index != -1) {
+            // Use the old resource instead.
+            resource = (DavTempFile) getVirtualMembers().get(index);
+            // Re-init the old resource.
+            resource.init(this, nextToken, "/" + nextToken);
+        }
+        return last ? resource : resource.decode(tokens, next + 1);
     }
 
     /**
@@ -277,8 +271,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
     /**
      * {@inheritDoc}
      */
-    public MultiStatusResponse alterProperties(DavPropertySet setProperties,
-        DavPropertyNameSet removePropertyNames) throws DavException
+    public MultiStatusResponse alterProperties(DavPropertySet setProperties, DavPropertyNameSet removePropertyNames)
+        throws DavException
     {
         getProperties().addAll(setProperties);
         DavPropertyNameIterator it = removePropertyNames.iterator();
@@ -427,8 +421,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public List<XWikiDavResource> getVirtualMembers()
     {
-        Map<String, List<XWikiDavResource>> vResourcesMap =
-            getContext().getUserStorage().getResourcesMap();
+        Map<String, List<XWikiDavResource>> vResourcesMap = getContext().getUserStorage().getResourcesMap();
         if (vResourcesMap.get(getResourcePath()) == null) {
             vResourcesMap.put(getResourcePath(), getInitMembers());
         }
@@ -440,8 +433,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public DavPropertySet getVirtualProperties()
     {
-        Map<String, DavPropertySet> vPropertiesMap =
-            getContext().getUserStorage().getPropertiesMap();
+        Map<String, DavPropertySet> vPropertiesMap = getContext().getUserStorage().getPropertiesMap();
         if (vPropertiesMap.get(getResourcePath()) == null) {
             vPropertiesMap.put(getResourcePath(), new DavPropertySet());
         }
@@ -461,10 +453,8 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public void clearCache()
     {
-        Map<String, List<XWikiDavResource>> vResourcesMap =
-            getContext().getUserStorage().getResourcesMap();
-        Map<String, DavPropertySet> vPropertiesMap =
-            getContext().getUserStorage().getPropertiesMap();
+        Map<String, List<XWikiDavResource>> vResourcesMap = getContext().getUserStorage().getResourcesMap();
+        Map<String, DavPropertySet> vPropertiesMap = getContext().getUserStorage().getPropertiesMap();
         vResourcesMap.remove(getResourcePath());
         vPropertiesMap.remove(getResourcePath());
     }
@@ -475,8 +465,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      * @param resource {@link XWikiDavResource} instance.
      * @param inputContext {@link InputContext}
      */
-    public void addVirtualMember(DavResource resource, InputContext inputContext)
-        throws DavException
+    public void addVirtualMember(DavResource resource, InputContext inputContext) throws DavException
     {
         XWikiDavResource davResource = (XWikiDavResource) resource;
         boolean isFile = (inputContext.getInputStream() != null);
@@ -517,8 +506,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      * Checks if the given resource name corresponds to a temporary resource.
      * 
      * @param resourceName Name of the resource.
-     * @return True if the resourceName corresponds to a temporary file / directory. False
-     *         otherwise.
+     * @return True if the resourceName corresponds to a temporary file / directory. False otherwise.
      */
     public boolean isTempResource(String resourceName)
     {

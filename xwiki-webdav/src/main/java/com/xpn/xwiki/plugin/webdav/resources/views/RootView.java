@@ -21,13 +21,11 @@ package com.xpn.xwiki.plugin.webdav.resources.views;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
-import org.apache.jackrabbit.webdav.DavResourceLocator;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
@@ -53,59 +51,32 @@ public class RootView extends AbstractDavView
     private static final Logger logger = LoggerFactory.getLogger(RootView.class);
 
     /**
-     * Starts the process of decoding a url.
-     * 
-     * @param locator The locator which holds the url.
-     * @return The resource which corresponds to the whole url.
-     * @throws DavException If the url cannot be decoded.
+     * {@inheritDoc}
      */
-    public XWikiDavResource decode(DavResourceLocator locator) throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        String workspacePath = locator.getWorkspacePath();
-        if (workspacePath == null) {
-            return this;
-        } else if (workspacePath.equals(BASE_URI)) {
-            Stack<XWikiDavResource> stack = new Stack<XWikiDavResource>();
-            stack.push(this);
-            decode(stack, locator.getResourcePath().split("/"), 2);
-            return stack.pop();
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        XWikiDavResource resource = null;
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if (last && getContext().isCreateOrMoveRequest()) {
+            throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        } else if (nextToken.equals(BaseViews.HOME)) {
+            resource = new HomeView();
+        } else if (nextToken.equals(BaseViews.PAGES)) {
+            resource = new PagesView();
+        } else if (nextToken.equals(BaseViews.ORPHANS)) {
+            resource = new OrphansView();
+        } else if (nextToken.equals(BaseViews.WHATSNEW)) {
+            resource = new WhatsnewView();
+        } else if (nextToken.equals(BaseViews.ATTACHMENTS)) {
+            resource = new AttachmentsView();
         } else {
             throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
-    {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            boolean last = (next == tokens.length - 1);
-            XWikiDavResource resource = null;
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if (last && getContext().isCreateOrMoveRequest()) {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            } else if (nextToken.equals(BaseViews.HOME)) {
-                resource = new HomeView();
-            } else if (nextToken.equals(BaseViews.ATTACHMENTS)) {
-                resource = new AttachmentsView();
-            } else if (nextToken.equals(BaseViews.ORPHANS)) {
-                resource = new OrphansView();
-            } else if (nextToken.equals(BaseViews.PAGES)) {
-                resource = new PagesView();
-            } else if (nextToken.equals(BaseViews.WHATSNEW)) {
-                resource = new WhatsnewView();
-            } else {
-                throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
-            }
-            if (null != resource) {
-                resource.init(this, nextToken, "/" + nextToken);
-                stack.push(resource);
-                resource.decode(stack, tokens, next + 1);
-            }
-        }
+        resource.init(this, nextToken, "/" + nextToken);
+        return last ? resource : resource.decode(tokens, next + 1);        
     }
 
     /**

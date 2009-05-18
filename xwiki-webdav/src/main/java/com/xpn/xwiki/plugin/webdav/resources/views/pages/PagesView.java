@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.webdav.resources.views.pages;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -52,22 +51,18 @@ public class PagesView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            boolean last = (next == tokens.length - 1);
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if (!(last && getContext().isCreateFileRequest())) {
-                PagesBySpaceNameSubView subView = new PagesBySpaceNameSubView();
-                subView.init(this, nextToken, "/" + nextToken);
-                stack.push(subView);
-                subView.decode(stack, tokens, next + 1);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if (!(last && getContext().isCreateFileRequest())) {
+            PagesBySpaceNameSubView subView = new PagesBySpaceNameSubView();
+            subView.init(this, nextToken, "/" + nextToken);
+            return last ? subView : subView.decode(tokens, next + 1);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 

@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
@@ -111,11 +110,10 @@ public class DavTempFile extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
+    public XWikiDavResource decode(String[] tokens, int next)
         throws DavException
     {
-        // Simply invoke the default decode method.
-        super.decode(stack, tokens, next);
+        return super.decode(tokens, next);
     }
 
     /**

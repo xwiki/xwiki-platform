@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.webdav.resources.domain;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavConstants;
@@ -67,8 +66,7 @@ public class DavPage extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    public void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException
+    public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
         int dot = name.lastIndexOf('.');
@@ -83,45 +81,36 @@ public class DavPage extends AbstractDavResource
         timeStamp = DavConstants.modificationDateFormat.format(doc.getContentUpdateDate());
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, timeStamp));
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETETAG, timeStamp));
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, "text/directory"));
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, doc.getLanguage()));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, "text/directory"));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, doc.getLanguage()));
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, 0));
     }
 
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            boolean last = (next == tokens.length - 1);
-            String relativePath = "/" + nextToken;
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if (nextToken.equals(DavWikiFile.WIKI_TXT)
-                || nextToken.equals(DavWikiFile.WIKI_XML)) {
-                DavWikiFile wikiFile = new DavWikiFile();
-                wikiFile.init(this, nextToken, relativePath);
-                stack.push(wikiFile);
-            } else if (doc.getAttachment(nextToken) != null
-                || (last && getContext().isCreateFileRequest())
-                || (last && getContext().isMoveAttachmentRequest(doc))) {
-                DavAttachment attachment = new DavAttachment();
-                attachment.init(this, nextToken, relativePath);
-                stack.push(attachment);
-            } else {
-                int dot = nextToken.indexOf('.');
-                String pageName = (dot != -1) ? nextToken : this.spaceName + "." + nextToken;
-                DavPage davPage = new DavPage();
-                davPage.init(this, pageName, relativePath);
-                stack.push(davPage);
-                davPage.decode(stack, tokens, next + 1);
-            }
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        XWikiDavResource resource = null;
+        String relativePath = "/" + nextToken;
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if (nextToken.equals(DavWikiFile.WIKI_TXT) || nextToken.equals(DavWikiFile.WIKI_XML)) {
+            resource = new DavWikiFile();
+            resource.init(this, nextToken, relativePath);
+        } else if (doc.getAttachment(nextToken) != null || (last && getContext().isCreateFileRequest())
+            || (last && getContext().isMoveAttachmentRequest(doc))) {
+            resource = new DavAttachment();
+            resource.init(this, nextToken, relativePath);
+        } else {
+            int dot = nextToken.indexOf('.');
+            String pageName = (dot != -1) ? nextToken : this.spaceName + "." + nextToken;
+            resource = new DavPage();
+            resource.init(this, pageName, relativePath);
         }
+        return last ? resource : resource.decode(tokens, next + 1);
     }
 
     /**
@@ -160,8 +149,7 @@ public class DavPage extends AbstractDavResource
             }
             sql =
                 "select attach.filename from XWikiAttachment as attach, "
-                    + "XWikiDocument as doc where attach.docId=doc.id and doc.fullName='"
-                    + this.name + "'";
+                    + "XWikiDocument as doc where attach.docId=doc.id and doc.fullName='" + this.name + "'";
             List attachments = getContext().search(sql);
             for (int i = 0; i < attachments.size(); i++) {
                 String filename = (String) attachments.get(i);
@@ -201,18 +189,16 @@ public class DavPage extends AbstractDavResource
             } else if (fName.equals(DavWikiFile.WIKI_XML)) {
                 throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
                 /*
-                 * // These values should not be writable. String oldVersion = doc.getVersion();
-                 * String oldContentAuthor = doc.getContentAuthor(); // Keep for determining if the
-                 * content was changed or not. String oldContent = doc.getContent();
-                 * getContext().fromXML(doc, new String(data)); // Ignore the version received in
-                 * the XML. It will be automatically increased // when saving the doc.
-                 * doc.setVersion(oldVersion); // Don't allow setting the contentAuthor, as it
-                 * determines the programming // right. doc.setContentAuthor(oldContentAuthor); if
-                 * (!StringUtils.equals(oldContent, doc.getContent())) { // Force setting the
-                 * contentUpdateDate and contentAuthor if the content was // changed.
-                 * doc.setContentDirty(true); } // Force setting the current date and increasing the
-                 * version doc.setMetaDataDirty(true); // Force setting the author.
-                 * doc.setAuthor(getContext().getUser()); getContext().saveDocument(doc);
+                 * // These values should not be writable. String oldVersion = doc.getVersion(); String oldContentAuthor
+                 * = doc.getContentAuthor(); // Keep for determining if the content was changed or not. String
+                 * oldContent = doc.getContent(); getContext().fromXML(doc, new String(data)); // Ignore the version
+                 * received in the XML. It will be automatically increased // when saving the doc.
+                 * doc.setVersion(oldVersion); // Don't allow setting the contentAuthor, as it determines the
+                 * programming // right. doc.setContentAuthor(oldContentAuthor); if (!StringUtils.equals(oldContent,
+                 * doc.getContent())) { // Force setting the contentUpdateDate and contentAuthor if the content was //
+                 * changed. doc.setContentDirty(true); } // Force setting the current date and increasing the version
+                 * doc.setMetaDataDirty(true); // Force setting the author. doc.setAuthor(getContext().getUser());
+                 * getContext().saveDocument(doc);
                  */
             } else {
                 getContext().addAttachment(doc, data, fName);

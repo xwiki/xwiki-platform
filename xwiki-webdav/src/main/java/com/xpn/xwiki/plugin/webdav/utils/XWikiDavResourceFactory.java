@@ -58,14 +58,14 @@ public class XWikiDavResourceFactory implements DavResourceFactory
     public XWikiDavResourceFactory(ServletContext servletContext) throws ServletException
     {
         this.lockManager = new SimpleLockManager();
-        this.servletContext = servletContext;       
+        this.servletContext = servletContext;
     }
 
     /**
      * {@inheritDoc}
      */
-    public DavResource createResource(DavResourceLocator locator, DavServletRequest request,
-        DavServletResponse response) throws DavException
+    public DavResource createResource(DavResourceLocator locator, DavServletRequest request, DavServletResponse response)
+        throws DavException
     {
         return createResource(locator, request.getDavSession(), request, response);
     }
@@ -73,8 +73,7 @@ public class XWikiDavResourceFactory implements DavResourceFactory
     /**
      * {@inheritDoc}
      */
-    public DavResource createResource(DavResourceLocator locator, DavSession session)
-        throws DavException
+    public DavResource createResource(DavResourceLocator locator, DavSession session) throws DavException
     {
         return createResource(locator, session, null, null);
     }
@@ -82,16 +81,21 @@ public class XWikiDavResourceFactory implements DavResourceFactory
     /**
      * {@inheritDoc}
      */
-    public XWikiDavResource createResource(DavResourceLocator locator, DavSession session,
-        DavServletRequest request, DavServletResponse response) throws DavException
+    public XWikiDavResource createResource(DavResourceLocator locator, DavSession session, DavServletRequest request,
+        DavServletResponse response) throws DavException
     {
+        String baseURI = XWikiDavResource.BASE_URI;
         DavResourceLocator rootLocator =
-            locator.getFactory().createResourceLocator(locator.getPrefix(),
-                XWikiDavResource.BASE_URI, XWikiDavResource.BASE_URI);
-        XWikiDavContext context =
-            new XWikiDavContext(request, response, servletContext, this, session, lockManager);
-        RootView rootView = new RootView();
-        rootView.init("webdav", rootLocator, context);
-        return rootView.decode(locator);
+            locator.getFactory().createResourceLocator(locator.getPrefix(), baseURI, baseURI);
+        XWikiDavContext context = new XWikiDavContext(request, response, servletContext, this, session, lockManager);
+        XWikiDavResource root = new RootView();
+        root.init("webdav", rootLocator, context);
+        String workspacePath = locator.getWorkspacePath();
+        String[] tokens = locator.getResourcePath().split("/");
+        if (workspacePath != null && workspacePath.equals(baseURI) && (tokens.length >= 2)) {
+            return (tokens.length == 2) ? root : root.decode(tokens, 2);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+        }
     }
 }

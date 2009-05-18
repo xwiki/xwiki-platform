@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.plugin.webdav.resources.partial;
 
-import java.util.Stack;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
@@ -40,9 +38,9 @@ public abstract class AbstractDavFile extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
+        throw new DavException(DavServletResponse.SC_BAD_REQUEST);
     }
 
     /**

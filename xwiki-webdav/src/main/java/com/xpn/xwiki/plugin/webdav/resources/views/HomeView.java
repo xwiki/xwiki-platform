@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.plugin.webdav.resources.views;
 
-import java.util.Stack;
-
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
@@ -35,8 +33,7 @@ import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 
 /**
- * This view allows to browse the pages starting from Main.WebHome using the parent child
- * relationship.
+ * This view allows to browse the pages starting from Main.WebHome using the parent child relationship.
  * 
  * @version $Id$
  */
@@ -50,8 +47,7 @@ public class HomeView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException
+    public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
         mPage = new DavPage();
@@ -61,18 +57,15 @@ public class HomeView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            if (mPage.exists()) {
-                mPage.decode(stack, tokens, next);
-            } else if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        String nextToken = tokens[next];
+        if (mPage.exists()) {
+            return mPage.decode(tokens, next);
+        } else if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 
@@ -97,8 +90,7 @@ public class HomeView extends AbstractDavView
      */
     public DavResourceIterator getMembers()
     {
-        return mPage.exists() ? mPage.getMembers()
-            : new DavResourceIteratorImpl(getVirtualMembers());
+        return mPage.exists() ? mPage.getMembers() : new DavResourceIteratorImpl(getVirtualMembers());
     }
 
     /**

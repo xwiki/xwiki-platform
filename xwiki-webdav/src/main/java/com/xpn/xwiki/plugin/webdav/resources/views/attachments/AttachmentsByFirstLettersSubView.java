@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.webdav.resources.views.attachments;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -39,8 +38,7 @@ import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
 /**
- * The view responsible for holding a set of pages (with attachments) all of which begin with a
- * particular phrase.
+ * The view responsible for holding a set of pages (with attachments) all of which begin with a particular phrase.
  * 
  * @version $Id$
  */
@@ -49,19 +47,16 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger logger =
-        LoggerFactory.getLogger(AttachmentsByFirstLettersSubView.class);
+    private static final Logger logger = LoggerFactory.getLogger(AttachmentsByFirstLettersSubView.class);
 
     /**
      * {@inheritDoc}
      */
-    public void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException
+    public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
         if (!name.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
-            || !name.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)
-            || !name.equals(name.toUpperCase())) {
+            || !name.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX) || !name.equals(name.toUpperCase())) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -69,24 +64,19 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            String pageName = getCollection().getDisplayName() + "." + nextToken;
-            boolean last = (next == tokens.length - 1);
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if (getContext().exists(pageName)
-                && !(last && getContext().isCreateOrMoveRequest())) {
-                DavPage page = new DavPage();
-                page.init(this, pageName, "/" + nextToken);
-                stack.push(page);
-                page.decode(stack, tokens, next + 1);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        String nextToken = tokens[next];
+        String pageName = getCollection().getDisplayName() + "." + nextToken;
+        boolean last = (next == tokens.length - 1);
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if (getContext().exists(pageName) && !(last && getContext().isCreateOrMoveRequest())) {
+            DavPage page = new DavPage();
+            page.init(this, pageName, "/" + nextToken);
+            return last ? page : page.decode(tokens, next + 1);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 
@@ -101,9 +91,7 @@ public class AttachmentsByFirstLettersSubView extends AbstractDavView
             getDisplayName().substring(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX.length(),
                 getDisplayName().length() - XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX.length());
         try {
-            String sql =
-                ", XWikiAttachment as attach where doc.id = attach.docId and doc.web = '"
-                    + spaceName + "'";
+            String sql = ", XWikiAttachment as attach where doc.id = attach.docId and doc.web = '" + spaceName + "'";
             List<String> docNames = getContext().searchDocumentsNames(sql);
             for (String docName : docNames) {
                 if (getContext().hasAccess("view", docName)) {

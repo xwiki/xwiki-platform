@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.webdav.resources.views.pages;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -48,19 +47,16 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     /**
      * Logger instance.
      */
-    private static final Logger logger =
-        LoggerFactory.getLogger(PagesByFirstLettersSubView.class);
+    private static final Logger logger = LoggerFactory.getLogger(PagesByFirstLettersSubView.class);
 
     /**
      * {@inheritDoc}
      */
-    public void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException
+    public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
         if (!name.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX)
-            || !name.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX)
-            || !name.equals(name.toUpperCase())) {
+            || !name.endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX) || !name.equals(name.toUpperCase())) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -68,23 +64,19 @@ public class PagesByFirstLettersSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         String spaceName = getCollection().getDisplayName();
-        if (next < tokens.length) {
-            boolean last = (next == tokens.length - 1);
-            String nextToken = tokens[next];
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if (!(last && getContext().isCreateFileRequest())) {
-                DavPage page = new DavPage();
-                page.init(this, spaceName + "." + nextToken, "/" + nextToken);
-                stack.push(page);
-                page.decode(stack, tokens, next + 1);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        boolean last = (next == tokens.length - 1);
+        String nextToken = tokens[next];
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if (!(last && getContext().isCreateFileRequest())) {
+            DavPage page = new DavPage();
+            page.init(this, spaceName + "." + nextToken, "/" + nextToken);
+            return last ? page : page.decode(tokens, next + 1);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
     }
 

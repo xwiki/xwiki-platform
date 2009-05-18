@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
@@ -56,35 +55,29 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     /**
      * {@inheritDoc}
      */
-    public void decode(Stack<XWikiDavResource> stack, String[] tokens, int next) throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
-        if (next < tokens.length) {
-            String nextToken = tokens[next];
-            boolean last = (next == tokens.length - 1);
-            if (isTempResource(nextToken)) {
-                super.decode(stack, tokens, next);
-            } else if ((nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX) && nextToken
-                .endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX))
-                && !(last && getContext().isCreateOrMoveRequest())) {
-                PagesByFirstLettersSubView subView = new PagesByFirstLettersSubView();
-                subView.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
-                stack.push(subView);
-                subView.decode(stack, tokens, next + 1);
-            } else if (getContext().isCreateCollectionRequest() || getContext().exists(this.name + "." + nextToken)) {
-                DavPage page = new DavPage();
-                page.init(this, this.name + "." + nextToken, "/" + nextToken);
-                stack.push(page);
-                page.decode(stack, tokens, next + 1);
-            } else if (nextToken.startsWith(this.name + ".") && getContext().exists(nextToken)) {
-                // For compatibility with FoXWiki
-                DavPage page = new DavPage();
-                page.init(this, nextToken, "/" + nextToken);
-                stack.push(page);
-                page.decode(stack, tokens, next + 1);
-            } else {
-                throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-            }
+        String nextToken = tokens[next];
+        boolean last = (next == tokens.length - 1);
+        XWikiDavResource resource = null;
+        if (isTempResource(nextToken)) {
+            return super.decode(tokens, next);
+        } else if ((nextToken.startsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_PREFIX) && nextToken
+            .endsWith(XWikiDavUtils.VIRTUAL_DIRECTORY_POSTFIX))
+            && !(last && getContext().isCreateOrMoveRequest())) {
+            resource = new PagesByFirstLettersSubView();
+            resource.init(this, nextToken.toUpperCase(), "/" + nextToken.toUpperCase());
+        } else if (getContext().isCreateCollectionRequest() || getContext().exists(this.name + "." + nextToken)) {
+            resource = new DavPage();
+            resource.init(this, this.name + "." + nextToken, "/" + nextToken);
+        } else if (nextToken.startsWith(this.name + ".") && getContext().exists(nextToken)) {
+            // For compatibility with FoXWiki
+            resource = new DavPage();
+            resource.init(this, nextToken, "/" + nextToken);
+        } else {
+            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
         }
+        return last ? resource : resource.decode(tokens, next + 1);
     }
 
     /**

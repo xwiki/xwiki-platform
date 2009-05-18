@@ -26,6 +26,10 @@ $xwiki.ssfx.use('uicomponents/widgets/notification.css', true)
 // <![CDATA[
 XWiki.webapppath = "${xwiki.webAppPath}";
 XWiki.servletpath = "${xwiki.servletPath}";
+XWiki.contextPath = "${request.contextPath}";
+XWiki.mainWiki = "${context.mainWikiName}";
+XWiki.currentWiki = "${context.database}";
+XWiki.currentSpace = "${doc.space}";
 XWiki.editor = "$!{editor}";
 XWiki.viewer = "$!{viewer}";
 XWiki.docisnew = $!doc.isNew();

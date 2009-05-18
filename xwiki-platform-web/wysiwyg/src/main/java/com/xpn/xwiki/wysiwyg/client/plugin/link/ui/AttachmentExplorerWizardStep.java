@@ -23,6 +23,8 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
@@ -102,7 +104,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     /**
      * {@inheritDoc}
      */
-    public void onSubmit(AsyncCallback<Boolean> async)
+    public void onSubmit(final AsyncCallback<Boolean> async)
     {
         // get selected file, get its URL and add it
         String attachment = getExplorer().getSelectedAttachment();
@@ -116,11 +118,28 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
             getData().setPage(getExplorer().getSelectedPage());
             async.onSuccess(true);
         } else {
-            String attachmentRef = "attach:" + getExplorer().getValue();
-            String attachmentURL = getExplorer().getSelectedResourceURL();
-            getData().setReference(attachmentRef);
-            getData().setUrl(attachmentURL);
-            async.onSuccess(true);
+            WysiwygService.Singleton.getInstance().getAttachment(getExplorer().getSelectedWiki(),
+                getExplorer().getSelectedSpace(), getExplorer().getSelectedPage(),
+                getExplorer().getSelectedAttachment(), new AsyncCallback<Attachment>()
+                {
+                    public void onSuccess(Attachment result)
+                    {
+                        if (result == null) {
+                            // there was a problem with getting the attachment, call it a failure.
+                            Window.alert(Strings.INSTANCE.fileUploadSubmitError());
+                            async.onSuccess(false);
+                        } else {
+                            getData().setReference("attach:" + result.getReference());
+                            getData().setUrl(result.getDownloadUrl());
+                            async.onSuccess(true);
+                        }
+                    }
+
+                    public void onFailure(Throwable caught)
+                    {
+                        async.onFailure(caught);
+                    }
+                });
         }
     }
 

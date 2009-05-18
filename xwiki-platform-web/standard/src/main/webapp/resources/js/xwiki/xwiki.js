@@ -15,20 +15,6 @@ if (typeof XWiki == "undefined") {
 Object.extend(XWiki, {
 
   constants: {
-    /**
-     * Current wiki.
-     */
-    currentWiki: "$context.getDatabase()",
-
-    /**
-     * Main wiki.
-     */
-    mainWiki: "$context.getMainWikiName()",
-
-    /**
-     * Context path.
-     */
-    contextPath: "$request.getContextPath()",
 
     /**
      * Character that separates wiki from space in a page fullName (example: xwiki:Main.WebHome).
@@ -53,101 +39,166 @@ Object.extend(XWiki, {
     /**
      * URL Anchor for page comments.
      */
-    docextraCommentsAnchor: "#Comments",
+    docextraCommentsAnchor: "Comments",
 
     /**
      * URL Anchor for page comments.
      */
-    docextraAttachmentsAnchor: "#Attachments",
+    docextraAttachmentsAnchor: "Attachments",
 
     /**
      * URL Anchor for page comments.
      */
-    docextraHistoryAnchor: "#History",
+    docextraHistoryAnchor: "History",
 
     /**
      * URL Anchor for page comments.
      */
-    docextraInformationAnchor: "#Information"
+    docextraInformationAnchor: "Information"
   },
-
+  
+  resource: {  
+    
+    /**
+     * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome", 
+     * returns null with "Main.WebHome".
+     */
+    getWikiFromResourceName: function(name) {
+      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
+        return name.substring(0, name.indexOf(XWiki.constants.wikiSpaceSeparator));
+      }
+      return null;    
+    },
+  
+    /**
+     * Extract the name of the space from a resource name. Examples: returns "Main" with "xwiki:Main.WebHome", 
+     * returns "Main" with "Main.WebHome", returns null with "WebHome".
+     */
+    getSpaceFromResourceName: function(name) {  
+      var originalName = name;
+      // Remove wiki if any.
+      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
+        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);        
+      }
+      // If the resource contains an attachment, make sure the dot is not part of the attachment name.
+      if (name.include(XWiki.constants.spacePageSeparator)) {        
+        if (name.include(XWiki.constants.pageAttachmentSeparator) && name.indexOf(XWiki.constants.spacePageSeparator) 
+              > name.indexOf(XWiki.constants.pageAttachmentSeparator)) {
+          return null;
+        }
+        return name.substring(0, name.indexOf(XWiki.constants.spacePageSeparator));
+      }             
+      // If the resource name looks like "xwiki:Main" we return "Main".
+      if (originalName.include(XWiki.constants.wikiSpaceSeparator) 
+            && !originalName.include(XWiki.constants.pageAttachmentSeparator)
+            && !originalName.include(XWiki.constants.anchorSeparator)) {        
+        return name;
+      }
+      return null;
+    },
+  
+    /**
+     * Extract the name of the page from a resource name. Examples: returns "WebHome" with "xwiki:Main.WebHome", 
+     * returns "WebHome" with "Main.WebHome", returns null with "xwiki:Main".
+     */
+    getNameFromResourceName: function(name) {
+      var originalName = name;
+      // Remove wiki if any.
+      if (name.include(XWiki.constants.wikiSpaceSeparator)) {        
+        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
+      }
+      // remove attachment if any.
+      if (name.include(XWiki.constants.pageAttachmentSeparator)) {
+        name = name.substring(0, name.indexOf(XWiki.constants.pageAttachmentSeparator));
+      }
+      // remove anchor if any.
+      if (name.include(XWiki.constants.anchorSeparator)) {
+        name = name.substring(0, name.indexOf(XWiki.constants.anchorSeparator));
+      }
+      if (name.include(XWiki.constants.spacePageSeparator)) {
+        return name.substring(name.indexOf(XWiki.constants.spacePageSeparator) + 1, name.length);
+      } else {
+        if (originalName.include(XWiki.constants.wikiSpaceSeparator)) {          
+          // If the resource name looks like "xwiki:Main" it does not contain page info.
+          return null;
+        } else {
+          return name;
+        }
+      }      
+    },
+      
+    /**
+     * Extract the name of the attachment from a resource name. Examples: returns "test.zip" with 
+     * "Main.WebHome@test.zip", returns null with "Main.WebHome".
+     */
+    getAttachmentFromResourceName: function(name) {
+      if (name.include(XWiki.constants.pageAttachmentSeparator)) {
+        return name.substring(name.indexOf(XWiki.constants.pageAttachmentSeparator) + 1, name.length);
+      }
+      return null;
+    },
+  
+    /**
+     * Extract the name of the anchor from a resource name. Examples: returns "Comments" with 
+     * "Main.WebHome#Comments", returns null with "Main.WebHome".
+     */
+    getAnchorFromResourceName: function(name) {
+      if (name.include(XWiki.constants.anchorSeparator)) {
+        return name.substring(name.indexOf(XWiki.constants.anchorSeparator) + 1, name.length);
+      }      
+      return null;
+    },
+    
+    /**
+     * Build a resource object from a wiki resource name (aka fullName). Example with "Main.WebHome":
+     * { 
+     *   wiki: "xwiki", 
+     *   space: "Main", 
+     *   prefixedSpace: "xwiki:Main",
+     *   fullName: "Main.WebHome", 
+     *   prefixedFullName: "xwiki:Main.WebHome",
+     *   name: "WebHome", 
+     *   attachment: "" 
+     *  }   
+     *
+     * @param name name of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
+     * @return the newly created resource object.
+     */
+    get: function(name) {
+      var wiki = this.getWikiFromResourceName(name);
+      var space = this.getSpaceFromResourceName(name);
+      var pageName = this.getNameFromResourceName(name);
+      var attachment = this.getAttachmentFromResourceName(name);
+      var anchor = this.getAnchorFromResourceName(name);
+      
+      if (!wiki) { wiki = XWiki.currentWiki; }
+      if (!space) { space = XWiki.currentSpace; }
+      if (!pageName) { pageName = "WebHome"; }
+      if (!attachment) { attachment = ""; }
+      if (!anchor) { anchor = ""; }
+            
+      var fullName = space + XWiki.constants.spacePageSeparator + pageName;
+      var prefixedSpace = wiki + XWiki.constants.wikiSpaceSeparator + space;      
+      var prefixedFullName = wiki + XWiki.constants.wikiSpaceSeparator + fullName;           
+      
+      return {
+          wiki: wiki,
+          space: space,
+          prefixedSpace: prefixedSpace,
+          fullName: fullName,
+          prefixedFullName: prefixedFullName,
+          name: pageName,
+          attachment: attachment,
+          anchor: anchor
+       };        
+    }    
+  },
+  
   /**
-   * Build a resource object from a wiki resource descriptor (aka fullName).
-   *
-   * Examples of resource objects:
-   * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main",
-   *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome",
-   *   name: "WebHome", attachment: "" }
-   * { wiki: "xwiki", space: "Main", prefixedSpace: "xwiki:Main",
-   *   fullName: "Main.WebHome", prefixedFullName: "xwiki:Main.WebHome",
-   *   name: "WebHome", attachment: "attach.zip" }
-   *
-   * @param fullName fullName of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
-   * @return the newly created resource object.
+   * Deprecated. See XWiki.resource.get(String).
    */
   getResource : function(fullName) {
-     var resource = {
-       wiki: "",
-       space: "",
-       prefixedSpace: "",
-       fullName: fullName,
-       prefixedFullName: "",
-       name: "",
-       attachment: "",
-       anchor: ""
-    };
-
-    // Extract wiki and set prefixedFullName.
-    if (fullName.include(this.constants.wikiSpaceSeparator)) {
-      resource.wiki = fullName.substring(0, fullName.indexOf(this.constants.wikiSpaceSeparator));
-      // Remove wiki from fullName.
-      resource.fullName = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.length);
-      resource.prefixedFullName = fullName;
-    }
-    else {
-      if (fullName.include(this.constants.spacePageSeparator)) {
-        // Fallback on current wiki.
-        resource.wiki = this.constants.currentWiki;
-        resource.prefixedFullName = resource.wiki + this.constants.wikiSpaceSeparator + fullName;
-      }
-      else {
-        resource.wiki = fullName;
-      }
-    }
-
-    // Extract attachment and remove it from fullName and prefixedFullName if any.
-    if (resource.fullName.include(this.constants.pageAttachmentSeparator)) {
-      // Attachment name.
-      resource.attachment = fullName.substring(fullName.indexOf(this.constants.pageAttachmentSeparator) + 1, fullName.length);
-      resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.pageAttachmentSeparator));
-      fullName = resource.fullName;
-      resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.pageAttachmentSeparator));
-    }
-
-    // Extract anchor and remove it from fullName and prefixedFullName if any.
-    if (resource.fullName.include(this.constants.anchorSeparator)) {
-      resource.anchor = resource.fullName.substring(resource.fullName.indexOf(this.constants.anchorSeparator) + 1, resource.fullName.length);
-      resource.fullName = resource.fullName.substring(0, resource.fullName.indexOf(this.constants.anchorSeparator));
-      fullName = resource.fullName;
-      resource.prefixedFullName = resource.prefixedFullName.substring(0, resource.prefixedFullName.indexOf(this.constants.anchorSeparator));
-    }
-
-    // Extract space and page name.
-    if (fullName.include(this.constants.spacePageSeparator)) {
-      // Space
-      resource.space = fullName.substring(fullName.indexOf(this.constants.wikiSpaceSeparator) + 1, fullName.indexOf(this.constants.spacePageSeparator));
-      resource.prefixedSpace = resource.wiki + this.constants.wikiSpaceSeparator + resource.space;
-      if (fullName.length - fullName.indexOf(this.constants.spacePageSeparator) > 0) {
-        // Page name.
-        resource.name = fullName.substring(fullName.indexOf(this.constants.spacePageSeparator) + 1, fullName.length);
-      }
-    }
-    else {
-      resource.space = resource.fullName;
-      resource.prefixedSpace = resource.prefixedFullName;
-    }
-
-    return resource;
+    return this.resource.get(fullName);
   },
 
   /**

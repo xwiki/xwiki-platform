@@ -155,7 +155,7 @@ a img {
     margin: 0;
 }
 
-tt {
+tt, tt * {
     font-family: monospace;
 }
 

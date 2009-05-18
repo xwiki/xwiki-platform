@@ -126,7 +126,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
                     {
                         if (result == null) {
                             // there was a problem with getting the attachment, call it a failure.
-                            Window.alert(Strings.INSTANCE.fileUploadSubmitError());
+                            Window.alert(Strings.INSTANCE.fileGetSubmitError());
                             async.onSuccess(false);
                         } else {
                             getData().setReference("attach:" + result.getReference());

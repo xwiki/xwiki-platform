@@ -32,7 +32,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
  * This filter will replace the {@code <img>} tag with corresponding xwiki xhtml syntax. This is required because
  * ordinary xhtml {@code <img>} tags does not render inside wiki pages correctly.
  * 
- * @version $Id: ImageTagFilter.java 13998 2008-11-06 06:29:46Z asiri $
+ * @version $Id$
  * @since 1.8M1
  */
 public class ImageFilter extends AbstractHTMLFilter

@@ -24,7 +24,7 @@ import org.xwiki.cache.CacheException;
 /**
  * Exception raised when failed to load OSCache configuration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCacheException extends CacheException
 {

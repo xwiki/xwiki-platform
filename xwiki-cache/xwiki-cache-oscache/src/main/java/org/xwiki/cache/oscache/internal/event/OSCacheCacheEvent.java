@@ -27,7 +27,7 @@ import org.xwiki.cache.oscache.internal.OSCacheCache;
  * Implements {@link CacheEvent} based on OSCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCacheEvent<T> implements CacheEvent<T>
 {

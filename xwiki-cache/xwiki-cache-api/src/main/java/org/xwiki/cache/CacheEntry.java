@@ -24,7 +24,7 @@ package org.xwiki.cache;
  * Represents a cache entry with it's key, value, etc.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public interface CacheEntry<T>
 {

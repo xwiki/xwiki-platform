@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultConfigurationManager implements ConfigurationManager

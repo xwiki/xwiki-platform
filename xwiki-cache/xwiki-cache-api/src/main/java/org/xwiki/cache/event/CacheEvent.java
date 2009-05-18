@@ -23,7 +23,7 @@ import org.xwiki.cache.Cache;
 
 /**
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public interface CacheEvent<T>
 {

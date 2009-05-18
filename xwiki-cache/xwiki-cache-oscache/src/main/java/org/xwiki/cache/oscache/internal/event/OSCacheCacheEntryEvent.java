@@ -29,7 +29,7 @@ import com.opensymphony.oscache.base.events.CacheEntryEvent;
  * Implements {@link org.xwiki.cache.event.CacheEntryEvent} based on OSCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCacheEntryEvent<T> extends OSCacheCacheEvent<T> implements org.xwiki.cache.event.CacheEntryEvent<T>
 {

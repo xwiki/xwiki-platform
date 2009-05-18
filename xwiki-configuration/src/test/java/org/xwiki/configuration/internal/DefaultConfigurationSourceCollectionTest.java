@@ -26,7 +26,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Unit tests for {@link org.xwiki.configuration.internal.DefaultConfigurationSourceCollection}.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class DefaultConfigurationSourceCollectionTest extends AbstractXWikiComponentTestCase

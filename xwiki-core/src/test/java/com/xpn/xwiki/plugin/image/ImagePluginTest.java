@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.image.ImagePlugin} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ImagePluginTest extends org.jmock.cglib.MockObjectTestCase
 {

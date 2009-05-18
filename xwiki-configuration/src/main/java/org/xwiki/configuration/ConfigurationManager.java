@@ -24,7 +24,7 @@ import java.util.List;
 import org.xwiki.component.phase.InitializationException;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public interface ConfigurationManager

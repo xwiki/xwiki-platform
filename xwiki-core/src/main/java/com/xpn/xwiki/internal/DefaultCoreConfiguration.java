@@ -34,7 +34,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Configuration for the Core module.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC2
  */
 @Component

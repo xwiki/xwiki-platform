@@ -45,7 +45,7 @@ import org.xwiki.cache.util.AbstractCache;
  * Implements {@link org.xwiki.cache.Cache} based on JBossCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 @CacheListener
 public class JBossCacheCache<T> extends AbstractCache<T>

@@ -22,7 +22,7 @@ package org.xwiki.configuration;
 import java.util.List;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public interface ConfigurationSource

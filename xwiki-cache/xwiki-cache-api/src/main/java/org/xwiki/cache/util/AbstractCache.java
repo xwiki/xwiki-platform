@@ -33,7 +33,7 @@ import org.xwiki.cache.event.CacheEntryListener;
  * Base class for {@link Cache} implementations. It provides events {@link DisposableCacheValue} management.
  * 
  * @param <T>
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractCache<T> implements Cache<T>
 {

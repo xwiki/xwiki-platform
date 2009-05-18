@@ -26,7 +26,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Unit tests for {@link DocumentNameSerializer}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class DefaultDocumentNameSerializerTest extends AbstractXWikiComponentTestCase

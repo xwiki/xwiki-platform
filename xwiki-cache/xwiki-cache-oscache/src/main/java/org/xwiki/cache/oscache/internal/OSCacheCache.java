@@ -36,7 +36,7 @@ import com.opensymphony.oscache.general.GeneralCacheAdministrator;
  * Implements {@link org.xwiki.cache.Cache} based on OSCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEventListener
 {

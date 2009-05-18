@@ -34,7 +34,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Base class for testing cache component implementation.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase implements ApplicationContext
 {

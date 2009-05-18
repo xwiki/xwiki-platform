@@ -28,7 +28,7 @@ import org.xwiki.cache.event.CacheEntryListener;
  * You can create a new cache using the {@link CacheFactory} component.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public interface Cache<T>
 {

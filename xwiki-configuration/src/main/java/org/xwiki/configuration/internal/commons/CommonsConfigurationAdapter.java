@@ -31,7 +31,7 @@ import java.util.Iterator;
  * Commons Configuration {@link org.apache.commons.configuration.CompositeConfiguration} isntance
  * to manager multiple source configurations.
  *  
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class CommonsConfigurationAdapter extends AbstractConfiguration

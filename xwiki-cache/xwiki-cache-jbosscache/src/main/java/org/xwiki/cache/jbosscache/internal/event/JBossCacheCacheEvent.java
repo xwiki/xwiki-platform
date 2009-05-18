@@ -27,7 +27,7 @@ import org.xwiki.cache.jbosscache.internal.JBossCacheCache;
  * Implements {@link CacheEvent} based on OSCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class JBossCacheCacheEvent<T> implements CacheEvent<T>
 {

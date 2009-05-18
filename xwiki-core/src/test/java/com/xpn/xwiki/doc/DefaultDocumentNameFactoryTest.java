@@ -27,7 +27,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 /**
  * Unit tests for {@link DocumentNameFactory}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.8.1
  */
 public class DefaultDocumentNameFactoryTest extends AbstractBridgedXWikiComponentTestCase

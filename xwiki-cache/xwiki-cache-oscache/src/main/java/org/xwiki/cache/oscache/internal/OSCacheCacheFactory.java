@@ -29,7 +29,7 @@ import org.xwiki.container.Container;
 /**
  * Implements {@link CacheFactory} based on OSCache.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCacheFactory implements CacheFactory
 {

@@ -7,7 +7,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 /**
  * Base class to load cache configuration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractCacheConfigurationLoader
 {

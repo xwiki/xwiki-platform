@@ -23,7 +23,7 @@ import java.util.EventListener;
 
 /**
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public interface CacheEntryListener<T> extends EventListener
 {

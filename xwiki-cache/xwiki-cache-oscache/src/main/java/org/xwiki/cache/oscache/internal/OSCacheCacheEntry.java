@@ -27,7 +27,7 @@ import com.opensymphony.oscache.base.CacheEntry;
  * Implements {@link org.xwiki.cache.CacheEntry} based on OSCache.
  * 
  * @param <T> the class of the data stored in the cache.
- * @version $Id: $
+ * @version $Id$
  */
 public class OSCacheCacheEntry<T> implements org.xwiki.cache.CacheEntry<T>
 {

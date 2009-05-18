@@ -27,7 +27,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 /**
  * Default implementation of {@link CacheFactory}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultCacheFactory implements CacheFactory
 {

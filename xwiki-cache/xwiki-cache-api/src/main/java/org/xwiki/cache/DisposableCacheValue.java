@@ -24,7 +24,7 @@ package org.xwiki.cache;
  * If the value inserted in the cache implement this interface, the {@link #dispose()} method will be called to release
  * all resource used by this data when it is removed from the cache.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface DisposableCacheValue
 {

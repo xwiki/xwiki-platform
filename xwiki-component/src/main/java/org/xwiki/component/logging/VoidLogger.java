@@ -26,7 +26,7 @@ package org.xwiki.component.logging;
  * Java Beans the logger needs to be set and this logger implementation can be used when the user doesn't
  * set explicitly a logger.
  *  
- * @version $Id: $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class VoidLogger implements Logger

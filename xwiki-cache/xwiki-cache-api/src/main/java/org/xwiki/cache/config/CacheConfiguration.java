@@ -30,7 +30,7 @@ import java.util.HashMap;
  * configuration it contains. This way any cache can be tunned in a particular installation with option specifics to
  * chosen cache implementation.
  * 
- * @version $Id: $
+ * @version $Id$
  * @see org.xwiki.cache.eviction.EntryEvictionConfiguration
  */
 public class CacheConfiguration extends HashMap<String, Object>

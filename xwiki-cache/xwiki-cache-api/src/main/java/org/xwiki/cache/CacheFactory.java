@@ -26,7 +26,7 @@ import org.xwiki.cache.config.CacheConfiguration;
  * This interface is implemented by a XWiki cache component implementation to provide cache creation. It's the entry
  * point of the cache component.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface CacheFactory
 {

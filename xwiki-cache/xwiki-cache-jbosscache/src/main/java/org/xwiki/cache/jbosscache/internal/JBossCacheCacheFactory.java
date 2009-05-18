@@ -29,7 +29,7 @@ import org.xwiki.container.Container;
 /**
  * Implements {@link CacheFactory} based on JBossCache.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class JBossCacheCacheFactory implements CacheFactory
 {

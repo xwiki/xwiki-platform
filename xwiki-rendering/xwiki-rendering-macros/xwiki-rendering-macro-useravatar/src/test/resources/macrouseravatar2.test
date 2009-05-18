@@ -5,7 +5,7 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:useravatar|-|username="XWiki.ExistingUserWithoutAvatar"|-|--><!--startimage:/xwiki/noavatar.png--><img src="/xwiki/noavatar.png" alt="Picture of ExistingUserWithoutAvatar" title="ExistingUserWithoutAvatar"/><!--stopimage--><!--stopmacro-->
+<!--startmacro:useravatar|-|username="XWiki.ExistingUserWithoutAvatar"--><!--startimage:/xwiki/noavatar.png--><img src="/xwiki/noavatar.png" alt="Picture of ExistingUserWithoutAvatar" title="ExistingUserWithoutAvatar"/><!--stopimage--><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

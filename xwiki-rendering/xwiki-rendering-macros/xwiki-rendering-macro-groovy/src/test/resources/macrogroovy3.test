@@ -2,11 +2,15 @@
 .input|xwiki/2.0
 .# Verify groovy macro does not fail with null content
 .#-----------------------------------------------------
-{{groovy/}}
+{{groovy/}}{{groovy}}{{/groovy}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [groovy] [] []
-endMacroMarkerStandalone [groovy] [] []
+beginParagraph
+beginMacroMarkerInline [groovy] []
+endMacroMarkerInline [groovy] []
+beginMacroMarkerInline [groovy] [] []
+endMacroMarkerInline [groovy] [] []
+endParagraph
 endDocument

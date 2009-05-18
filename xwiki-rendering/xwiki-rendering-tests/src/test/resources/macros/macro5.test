@@ -11,8 +11,8 @@ onWord [Two]
 onSpace
 onWord [inline]
 onSpace
-onMacroInline [macro] [] []
-onMacroInline [macro] [] []
+onMacroInline [macro] []
+onMacroInline [macro] []
 onSpace
 onWord [macros]
 endParagraph
@@ -20,7 +20,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Two inline <!--startmacro:macro|-||-|--><!--stopmacro--><!--startmacro:macro|-||-|--><!--stopmacro--> macros</p>
+<p>Two inline <!--startmacro:macro|-|--><!--stopmacro--><!--startmacro:macro|-|--><!--stopmacro--> macros</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -28,4 +28,4 @@ Two inline {{macro/}}{{macro/}} macros
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Two inline <!--startmacro:macro|-||-|--><!--stopmacro--><!--startmacro:macro|-||-|--><!--stopmacro--> macros</p></html>
+<p>Two inline <!--startmacro:macro|-|--><!--stopmacro--><!--startmacro:macro|-|--><!--stopmacro--> macros</p>

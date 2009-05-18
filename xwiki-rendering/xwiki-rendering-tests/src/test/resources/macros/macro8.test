@@ -12,14 +12,14 @@ onWord [Not]
 onSpace
 onWord [inline]
 onSpace
-beginMacroMarkerInline [testsimplemacro] [] []
+beginMacroMarkerInline [testsimplemacro] []
 beginFormat [NONE] [[class]=[xwikirenderingerror]]
 onWord [Not an inline macro]
 endFormat [NONE] [[class]=[xwikirenderingerror]]
 beginFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
 onVerbatim [This macro can only be used by itself on a new line] [true]
 endFormat [NONE] [[class]=[xwikirenderingerrordescription hidden]]
-endMacroMarkerInline [testsimplemacro] [] []
+endMacroMarkerInline [testsimplemacro] []
 onSpace
 onWord [macro]
 endParagraph
@@ -27,7 +27,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">This macro can only be used by itself on a new line</tt></span><!--stopmacro--> macro</p>
+<p>Not inline <!--startmacro:testsimplemacro|-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">This macro can only be used by itself on a new line</tt></span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -35,4 +35,4 @@ Not inline {{testsimplemacro/}} macro
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>Not inline <!--startmacro:testsimplemacro|-||-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">This macro can only be used by itself on a new line</tt></span><!--stopmacro--> macro</p></html>
+<p>Not inline <!--startmacro:testsimplemacro|-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">This macro can only be used by itself on a new line</tt></span><!--stopmacro--> macro</p>

@@ -10,7 +10,7 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [toc] [] []
+beginMacroMarkerStandalone [toc] []
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [Hh2]] [false]
@@ -18,7 +18,7 @@ onWord [h2]
 endLink [Anchor = [Hh2]] [false]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [toc] [] []
+endMacroMarkerStandalone [toc] []
 beginSection
 beginHeader [1, Hh1]
 onWord [h1]
@@ -33,8 +33,8 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2>
+<!--startmacro:toc|-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2>
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><!--startmacro:toc|-||-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2></html>
+<html><!--startmacro:toc|-|--><ul><li><!--startwikilink:#Hh2--><span class="wikilink"><a href="#Hh2">h2</a></span><!--stopwikilink--></li></ul><!--stopmacro--><h1 id="Hh1"><span>h1</span></h1><h2 id="Hh2"><span>h2</span></h2></html>

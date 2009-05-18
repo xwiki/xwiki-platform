@@ -7,8 +7,8 @@
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onMacroInline [macro] [] []
-onMacroInline [macro] [] []
+onMacroInline [macro] []
+onMacroInline [macro] []
 endParagraph
 endDocument
 .#-----------------------------------------------------

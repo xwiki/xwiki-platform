@@ -15,7 +15,7 @@ beginSection
 beginHeader [1, HTitle1]
 onWord [Title1]
 endHeader [1, HTitle1]
-beginMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=local] []
+beginMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=local]
 beginList [BULLETED]
 beginListItem
 beginList [BULLETED]
@@ -46,7 +46,7 @@ endListItem
 endList [BULLETED]
 endListItem
 endList [BULLETED]
-endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=local] []
+endMacroMarkerStandalone [toc] [start=1|depth=6|numbered=false|scope=local]
 beginSection
 beginHeader [2, HTitle11]
 onWord [Title1]

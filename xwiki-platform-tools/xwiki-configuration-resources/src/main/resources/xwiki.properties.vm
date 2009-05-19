@@ -9,7 +9,7 @@
 
 #-# [Since 1.8RC2]
 #-# Specifies the default syntax to use when creating new documents.
-#-# Default value is xwiki/1.0.
+#-# Default value is xwiki/2.0.
 # core.defaultDocumentSyntax = xwiki/1.0
 
 #-------------------------------------------------------------------------------------

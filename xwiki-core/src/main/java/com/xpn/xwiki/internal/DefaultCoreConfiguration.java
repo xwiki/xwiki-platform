@@ -43,7 +43,7 @@ public class DefaultCoreConfiguration implements Initializable, CoreConfiguratio
     /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      */
-    private String defaultDocumentSyntax = "xwiki/1.0";
+    private String defaultDocumentSyntax = "xwiki/2.0";
 
     /**
      * Injected by the Component Manager.

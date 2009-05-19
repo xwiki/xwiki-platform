@@ -55,9 +55,10 @@ public abstract class AbstractJob implements Job
         XWikiContext xwikiContext = (XWikiContext) data.get("context");
 
         // Init execution context
+        Execution execution;
         try {
             ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.ROLE);
-            Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+            execution = (Execution) Utils.getComponent(Execution.ROLE);
 
             ExecutionContext ec = new ExecutionContext();
             // Bridge with old XWiki Context, required for old code.
@@ -71,6 +72,10 @@ public abstract class AbstractJob implements Job
 
         // Execute the job
         executeJob(jobContext);
+
+        // We must ensure we clean the ThreadLocal variables located in the Execution
+        // component as otherwise we will have a potential memory leak.
+        execution.removeContext();
     }
 
     protected abstract void executeJob(JobExecutionContext jobContext) throws JobExecutionException;

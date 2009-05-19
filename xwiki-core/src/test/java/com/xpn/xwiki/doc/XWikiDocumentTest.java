@@ -508,8 +508,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setSyntaxId("xwiki/2.0");
 
-        assertEquals("{{html clean=\"false\" wiki=\"false\"}}string{{/html}}", this.document.display("string", "view",
-            getContext()));
+        assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
             "{{html clean=\"false\" wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
             this.document.display("string", "edit", getContext()));
@@ -540,8 +539,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         doc10.setSyntaxId("xwiki/2.0");
         getContext().setDoc(doc10);
 
-        assertEquals("{{html clean=\"false\" wiki=\"false\"}}string{{/html}}", this.document.display("string", "view",
-            getContext()));
+        assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
             "{{html clean=\"false\" wiki=\"false\"}}<pre><input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/></pre>{{/html}}",
             this.document.display("string", "edit", getContext()));
@@ -549,8 +547,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiRenderingEngine.expects(once()).method("renderText").with(eq("area"), ANYTHING, ANYTHING).will(
             returnValue("area"));
 
-        assertEquals("{{html clean=\"false\" wiki=\"false\"}}area{{/html}}", this.document.display("area", "view",
-            getContext()));
+        assertEquals("area", this.document.display("area", "view", getContext()));
     }
 
     public void testDisplayTemplate10()

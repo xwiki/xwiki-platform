@@ -19,14 +19,13 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Object;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -35,31 +34,32 @@ import org.joda.time.Days;
 import org.joda.time.Hours;
 import org.joda.time.Months;
 import org.joda.time.Weeks;
-import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.xwiki.context.Execution;
-import org.xwiki.container.servlet.ServletContainerInitializer;
-import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.context.Execution;
 
-import javax.servlet.ServletException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
+import com.xpn.xwiki.plugin.scheduler.AbstractJob;
+import com.xpn.xwiki.web.Utils;
 
 /**
- * WatchList implementation of Quartz's Job
- *
- * This class behaves as follow when the execute method is called: 1) it selects the persons who have requested a
- * notification matching the frequency of this Job and returns Set1 2) if Set1 is not void, then it selects the
- * documents that have changed during the last period and stores them in Set2 3) if Set2 is not void, then for each
- * person Pi in Set1, it intersects the following sets: Set2, matching criteria of Pi, documents that can be read by Pi
- * 4) it sends an email to Pi
+ * WatchList implementation of Quartz's Job This class behaves as follow when the execute method is called: 1) it
+ * selects the persons who have requested a notification matching the frequency of this Job and returns Set1 2) if Set1
+ * is not void, then it selects the documents that have changed during the last period and stores them in Set2 3) if
+ * Set2 is not void, then for each person Pi in Set1, it intersects the following sets: Set2, matching criteria of Pi,
+ * documents that can be read by Pi 4) it sends an email to Pi
  */
-public class WatchListJob implements Job
+public class WatchListJob extends AbstractJob
 {
     private static final Log LOG = LogFactory.getLog(WatchListPlugin.class);
 
@@ -79,7 +79,7 @@ public class WatchListJob implements Job
 
     /**
      * Sets objects required by the Job : XWiki, XWikiContext, WatchListPlugin, etc
-     *
+     * 
      * @param jobContext Context of the request
      */
     public void init(JobExecutionContext jobContext) throws Exception
@@ -108,10 +108,8 @@ public class WatchListJob implements Job
             (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class.getName());
 
         try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
-                context);
-            containerInitializer.initializeResponse(context.getResponse()
-                .getHttpServletResponse());
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
+            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize Request/Response or Session", e);
@@ -133,10 +131,11 @@ public class WatchListJob implements Job
 
     /**
      * Method called from the scheduler
-     *
+     * 
      * @param jobContext Context of the request
      */
-    public void execute(JobExecutionContext jobContext) throws JobExecutionException
+    @Override
+    public void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
         try {
             try {
@@ -158,32 +157,29 @@ public class WatchListJob implements Job
                 while (it.hasNext()) {
                     try {
                         // Retreive WatchList Object for each subscribers
-                        Document subscriber = new Document(
-                            context.getWiki().getDocument((String) it.next(), context), context);
-                        LOG.info(logprefix + "checkingDocumentsForUser " +
-                            subscriber.getFullName());
+                        Document subscriber =
+                            new Document(context.getWiki().getDocument((String) it.next(), context), context);
+                        LOG.info(logprefix + "checkingDocumentsForUser " + subscriber.getFullName());
                         Object userObj = subscriber.getObject("XWiki.XWikiUsers");
-                        Object notificationCriteria =
-                            subscriber.getObject(WatchListPlugin.WATCHLIST_CLASS);
+                        Object notificationCriteria = subscriber.getObject(WatchListPlugin.WATCHLIST_CLASS);
                         if (userObj == null || notificationCriteria == null) {
                             continue;
                         }
                         // Filter documents according to lists in the WatchList Object
                         List matchingDocuments =
-                            filter(updatedDocuments, notificationCriteria,
-                                subscriber.getFullName());
+                            filter(updatedDocuments, notificationCriteria, subscriber.getFullName());
 
                         // If there are matching documents, sends the notification
                         if (matchingDocuments.size() > 0) {
-                            LOG.info(logprefix + "matchingDocumentsForUser " +
-                                subscriber.getFullName() + ": [" + matchingDocuments.size() + "]");
+                            LOG.info(logprefix + "matchingDocumentsForUser " + subscriber.getFullName() + ": ["
+                                + matchingDocuments.size() + "]");
                             try {
                                 sendNotificationMessage(subscriber, matchingDocuments);
                             } catch (Exception e) {
                                 if (LOG.isErrorEnabled()) {
-                                    LOG.error(logprefix + "exception while sending email to " +
-                                        subscriber.getValue("email") + " with " +
-                                        matchingDocuments.size() + " matching documents", e);
+                                    LOG.error(logprefix + "exception while sending email to "
+                                        + subscriber.getValue("email") + " with " + matchingDocuments.size()
+                                        + " matching documents", e);
                                 }
                             }
                         }
@@ -213,14 +209,13 @@ public class WatchListJob implements Job
 
     /**
      * Filters updated documents against users' criteria
-     *
+     * 
      * @param updatedDocuments the list of updated documents
      * @param notificationCriteria the BaseObject representing the user notification criteria
      * @param subscriber the user to be notified
      * @return a filtered list of documents to be sent to the user
      */
-    private List filter(List updatedDocuments,
-        Object notificationCriteria, String subscriber) throws XWikiException
+    private List filter(List updatedDocuments, Object notificationCriteria, String subscriber) throws XWikiException
     {
         String spaceCriterion = "";
         // Since BaseObject.getProperty("foo") may return null we need those tests to avoid NPEs.
@@ -237,9 +232,7 @@ public class WatchListJob implements Job
         }
 
         List watchedDocuments = new ArrayList();
-        if (spaceCriterion.length() == 0 && documentCriterion.length() == 0
-            && query.length() == 0)
-        {
+        if (spaceCriterion.length() == 0 && documentCriterion.length() == 0 && query.length() == 0) {
             return new ArrayList();
         }
 
@@ -252,8 +245,7 @@ public class WatchListJob implements Job
         }
 
         if (query.length() > 0) {
-            List queryDocuments =
-                plugin.globalSearchDocuments(query, 0, 0, new ArrayList(), context);
+            List queryDocuments = plugin.globalSearchDocuments(query, 0, 0, new ArrayList(), context);
             watchedDocuments.addAll(queryDocuments);
         }
 
@@ -262,8 +254,7 @@ public class WatchListJob implements Job
             String updatedDocumentName = (String) updatedDocumentsIt.next();
             Document updatedDocument =
                 new Document(context.getWiki().getDocument(updatedDocumentName, context), context);
-            String updatedDocumentSpace =
-                updatedDocument.getWiki() + ":" + updatedDocument.getSpace();
+            String updatedDocumentSpace = updatedDocument.getWiki() + ":" + updatedDocument.getSpace();
             boolean documentAdded = false;
 
             if (watchedSpaces != null) {
@@ -272,16 +263,15 @@ public class WatchListJob implements Job
                         String origDatabase = context.getDatabase();
                         try {
                             context.setDatabase(updatedDocument.getWiki());
-                            if (context.getWiki().getRightService()
-                                .hasAccessLevel("view", subscriber, updatedDocumentName, context))
-                            {
+                            if (context.getWiki().getRightService().hasAccessLevel("view", subscriber,
+                                updatedDocumentName, context)) {
                                 filteredDocumentList.add(updatedDocumentName);
                                 documentAdded = true;
                                 break;
                             } else {
                                 if (LOG.isInfoEnabled()) {
-                                    LOG.info("Matching doc " + updatedDocumentName + " for subscriber " + subscriber +
-                                        " missing rights in context " + context.getDatabase());
+                                    LOG.info("Matching doc " + updatedDocumentName + " for subscriber " + subscriber
+                                        + " missing rights in context " + context.getDatabase());
                                 }
                             }
                         } finally {
@@ -301,16 +291,15 @@ public class WatchListJob implements Job
                         String origDatabase = context.getDatabase();
                         try {
                             context.setDatabase(updatedDocument.getWiki());
-                            if (context.getWiki().getRightService()
-                                .hasAccessLevel("view", subscriber, updatedDocumentName, context))
-                            {
+                            if (context.getWiki().getRightService().hasAccessLevel("view", subscriber,
+                                updatedDocumentName, context)) {
                                 filteredDocumentList.add(updatedDocumentName);
                                 documentAdded = true;
                                 break;
                             } else {
                                 if (LOG.isInfoEnabled()) {
-                                    LOG.info("Matching doc " + updatedDocumentName + " for subscriber " + subscriber +
-                                        " missing rights in context " + context.getDatabase());
+                                    LOG.info("Matching doc " + updatedDocumentName + " for subscriber " + subscriber
+                                        + " missing rights in context " + context.getDatabase());
                                 }
                             }
                         } finally {
@@ -327,23 +316,21 @@ public class WatchListJob implements Job
     /**
      * Retrieves all the XWiki.XWikiUsers who have requested to be notified by changes, i.e. who have an Object of class
      * WATCHLIST_CLASS attached AND who have choosen the current interval (ex:hourly).
-     *
+     * 
      * @return a collection of document names pointing to the XWikiUsers wishing to get notified.
      */
     protected List retrieveNotificationSubscribers() throws XWikiException
     {
         String request =
-            ", BaseObject as obj, StringProperty as prop where " +
-                "obj.name=doc.fullName and obj.className='"
-                + WatchListPlugin.WATCHLIST_CLASS +
-                "' and prop.id.id=obj.id and prop.name='interval' " +
-                "and prop.value='" + interval + "')";
+            ", BaseObject as obj, StringProperty as prop where " + "obj.name=doc.fullName and obj.className='"
+                + WatchListPlugin.WATCHLIST_CLASS + "' and prop.id.id=obj.id and prop.name='interval' "
+                + "and prop.value='" + interval + "')";
         return plugin.globalSearchDocuments(request, 0, 0, new ArrayList(), context);
     }
 
     /**
      * Retrieves the list of documents that have been updated or created in the interval.
-     *
+     * 
      * @return a list of updated or created documents in the interval
      */
     protected List retrieveUpdatedDocuments() throws XWikiException
@@ -377,12 +364,11 @@ public class WatchListJob implements Job
 
     /**
      * Sends the email notifying the subscriber that the updatedDocuments have been changed.
-     *
+     * 
      * @param subscriber person to notify
      * @param updatedDocuments list of updated documents
      */
-    protected void sendNotificationMessage(Document subscriber,
-        List updatedDocuments) throws XWikiException
+    protected void sendNotificationMessage(Document subscriber, List updatedDocuments) throws XWikiException
     {
         // Get user email
         Object userObj = subscriber.getObject("XWiki.XWikiUsers");
@@ -405,15 +391,13 @@ public class WatchListJob implements Job
         String language = context.getWiki().getXWikiPreference("default_language", "en", context);
 
         // Get mailsenderplugin
-        MailSenderPlugin emailService =
-            (MailSenderPlugin) context.getWiki().getPlugin(MailSenderPlugin.ID, context);
+        MailSenderPlugin emailService = (MailSenderPlugin) context.getWiki().getPlugin(MailSenderPlugin.ID, context);
         if (emailService == null) {
             return;
         }
 
         // Get wiki administrator email (default : mailer@xwiki.localdomain.com)
-        String sender = context.getWiki()
-            .getXWikiPreference("admin_email", "mailer@xwiki.localdomain.com", context);
+        String sender = context.getWiki().getXWikiPreference("admin_email", "mailer@xwiki.localdomain.com", context);
 
         // Set email template
         String mailTemplate = "";
@@ -422,12 +406,10 @@ public class WatchListJob implements Job
         } else if (context.getWiki().exists(WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE, context)) {
             mailTemplate = WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE;
         } else {
-            mailTemplate =
-                context.getMainXWiki() + ":" + WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE;
+            mailTemplate = context.getMainXWiki() + ":" + WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE;
         }
 
         // Send message from template
-        emailService.sendMailFromTemplate(mailTemplate, sender, emailAddr, null, null, language,
-            vcontext, context);
+        emailService.sendMailFromTemplate(mailTemplate, sender, emailAddr, null, null, language, vcontext, context);
     }
 }

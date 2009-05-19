@@ -23,8 +23,13 @@ package com.xpn.xwiki.plugin.feed;
 
 import java.util.Date;
 
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 
 public class UpdateThread implements Runnable
 {
@@ -93,17 +98,33 @@ public class UpdateThread implements Runnable
                 nbLoadedArticles = 0;
                 endDate = null;
                 startDate = new Date();
+                Execution execution = null;
                 try {
+                    // this should be refactored to implement the AbstractXWikiRunnable to handle this
+                    ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(
+                        ExecutionContextManager.ROLE);
+                    execution = (Execution) Utils.getComponent(Execution.ROLE);
+                    // clone the context to avoid multithreading issues
                     XWikiContext context = (XWikiContext) this.context.clone();
                     context.getWiki().getStore().cleanUp(context);
+                    ExecutionContext ec = new ExecutionContext();
+                    // Bridge with old XWiki Context, required for old code.
+                    ec.setProperty("xwikicontext", context);
+                    ecim.initialize(ec);
+                    execution.setContext(ec);
+                    // update the feeds
                     nbLoadedArticles = feedPlugin.updateFeedsInSpace(space, fullContent, true, false, context);
                 } catch (XWikiException e) {
+                    exception = e;
+                    e.printStackTrace();
+                } catch (ExecutionContextException e) {
                     exception = e;
                     e.printStackTrace();
                 } finally {
                     updateInProgress = false;
                     endDate = new Date();
                     context.getWiki().getStore().cleanUp(context);
+                    execution.removeContext();
                 }
                 // an update has been schedule..
                 if ((forceUpdate == true) && (stopUpdate == false)) {

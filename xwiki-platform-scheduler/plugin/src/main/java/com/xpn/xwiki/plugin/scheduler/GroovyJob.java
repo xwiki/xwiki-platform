@@ -34,21 +34,22 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * The task that will get executed by the Scheduler when the Job is triggered. This task in turn calls a Groovy script
- * to perform the execution. <p/>
+ * to perform the execution.
+ * <p/>
  * <p>
  * <b>Important:</b>: Note that the script will execute in the XWiki Context that was set at the time the Job was
- * scheduled for execution. For example calling <code>context.getDoc()</code> will return the current document that
- * was set at that time and not the current document that is set when the Groovy script executes...
+ * scheduled for execution. For example calling <code>context.getDoc()</code> will return the current document that was
+ * set at that time and not the current document that is set when the Groovy script executes...
  * 
  * @version $Id$
  */
-public class GroovyJob implements Job
+public class GroovyJob extends AbstractJob
 {
     /**
-     * Executes the Groovy script passed in the <code>script</code> property of the {@link
-     * com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS} object extracted from the XWiki context passed in
-     * the Quartz's Job execution context. The XWiki Task object is looked for in the current document that was set in
-     * the context at the time the Job was scheduled.
+     * Executes the Groovy script passed in the <code>script</code> property of the
+     * {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS} object extracted from the XWiki context
+     * passed in the Quartz's Job execution context. The XWiki Task object is looked for in the current document that
+     * was set in the context at the time the Job was scheduled.
      * 
      * @param jobContext the Quartz execution context containing the XWiki context from which the script to execute is
      *            retrieved
@@ -56,7 +57,8 @@ public class GroovyJob implements Job
      *             the Job was scheduled
      * @see Job#execute(org.quartz.JobExecutionContext)
      */
-    public void execute(JobExecutionContext jobContext) throws JobExecutionException
+    @Override
+    protected void executeJob(JobExecutionContext jobContext) throws JobExecutionException
     {
         try {
             JobDataMap data = jobContext.getJobDetail().getJobDataMap();

@@ -25,6 +25,7 @@ import java.util.List;
 import org.restlet.ext.jaxrs.InstantiateException;
 import org.restlet.ext.jaxrs.ObjectFactory;
 import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -65,6 +66,8 @@ public class ComponentsObjectFactory implements ObjectFactory
             XWikiRestComponent component =
                 (XWikiRestComponent) componentManager.lookup(XWikiRestComponent.class, clazz.getName());
             
+            ComponentDescriptor componentDescriptor = componentManager.getComponentDescriptor(XWikiRestComponent.class, clazz.getName());            
+            
             /*
              * Retrieve the releasable component list from the context. This is used to store component instances that
              * need to be released later.
@@ -79,11 +82,8 @@ public class ComponentsObjectFactory implements ObjectFactory
             }
 
             /* Only add components that have a per-lookup instantiation stategy. */
-            InstantiationStrategy is = component.getClass().getAnnotation(InstantiationStrategy.class);
-            if (is != null) {
-                if (is.value().equals(ComponentInstantiationStrategy.PER_LOOKUP)) {
-                    releasableComponentReferences.add(component);
-                }
+            if(componentDescriptor.getInstantiationStrategy().equals(ComponentInstantiationStrategy.PER_LOOKUP)) {                
+                releasableComponentReferences.add(component);
             }
                       
             /*

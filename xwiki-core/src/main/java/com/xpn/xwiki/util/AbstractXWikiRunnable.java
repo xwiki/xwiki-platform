@@ -89,16 +89,17 @@ public abstract class AbstractXWikiRunnable implements Runnable
         try {
             // initialize execution context
             initExecutionContext();
-
-            try {
-                // call run
-                runInternal();
-            } finally {
-                // cleanup execution context
-                cleanupExecutionContext();
-            }
         } catch (ExecutionContextException e) {
             LOG.error("Failed to initialize execution context", e);
+            return;
+        }
+
+        try {
+            // call run
+            runInternal();
+        } finally {
+            // cleanup execution context
+            cleanupExecutionContext();
         }
     }
 

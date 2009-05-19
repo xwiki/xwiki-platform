@@ -36,6 +36,7 @@ import com.xpn.xwiki.web.Utils;
  * <p>
  * A class extending {@link AbstractJob} should implements {@link #executeJob(JobExecutionContext)}.
  * 
+ * @since 1.8
  * @version $Id$
  */
 public abstract class AbstractJob implements Job

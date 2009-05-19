@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.representations.TextPlainReader;
@@ -37,6 +38,7 @@ import org.xwiki.rest.representations.TextPlainReader;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.comments.TextPlainCommentReader")
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
 public class TextPlainCommentReader extends TextPlainReader<Comment>

@@ -36,16 +36,19 @@ import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.resource.InputRepresentation;
 import org.restlet.resource.Representation;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
+import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.comments.FormUrlEncodedCommentReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>
+public class FormUrlEncodedCommentReader implements MessageBodyReader<Comment>, XWikiRestComponent
 {
     private static final String COMMENT_TEXT_FIELD_NAME = "text";
 

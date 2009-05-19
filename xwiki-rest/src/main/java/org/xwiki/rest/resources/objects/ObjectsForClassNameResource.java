@@ -30,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.XWikiResource;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.objects.ObjectsForClassNameResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}")
 public class ObjectsForClassNameResource extends XWikiResource
 {

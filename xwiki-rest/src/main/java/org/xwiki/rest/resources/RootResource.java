@@ -22,6 +22,7 @@ package org.xwiki.rest.resources;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Xwiki;
@@ -29,6 +30,7 @@ import org.xwiki.rest.model.jaxb.Xwiki;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.RootResource")
 @Path("/")
 public class RootResource extends XWikiResource
 {

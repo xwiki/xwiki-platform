@@ -37,7 +37,9 @@ import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.resource.InputRepresentation;
 import org.restlet.resource.Representation;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
+import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Property;
@@ -45,9 +47,10 @@ import org.xwiki.rest.model.jaxb.Property;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.objects.FormUrlEncodedObjectReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-public class FormUrlEncodedObjectReader implements MessageBodyReader<Object>
+public class FormUrlEncodedObjectReader implements MessageBodyReader<Object>, XWikiRestComponent
 {
     private static final String CLASSNAME_FIELD_NAME = "className";
 

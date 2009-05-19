@@ -150,7 +150,7 @@ public class DomainObjectFactory
             space.setHome(home.getPrefixedFullName());
             space.setXwikiRelativeUrl(home.getURL("view"));
             space.setXwikiAbsoluteUrl(home.getExternalURL("view"));
-        }        
+        }
 
         String pagesUri = UriBuilder.fromUri(baseUri).path(PagesResource.class).build(wikiName, spaceName).toString();
         Link pagesLink = objectFactory.createLink();

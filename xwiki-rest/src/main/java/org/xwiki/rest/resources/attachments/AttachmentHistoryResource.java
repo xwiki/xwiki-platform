@@ -31,6 +31,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.XWikiResource;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.attachments.AttachmentHistoryResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history")
 public class AttachmentHistoryResource extends XWikiResource
 {

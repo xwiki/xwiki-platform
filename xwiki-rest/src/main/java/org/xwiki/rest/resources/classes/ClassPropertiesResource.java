@@ -26,6 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.classes.ClassPropertiesResource")
 @Path("/wikis/{wikiName}/classes/{className}/properties")
 public class ClassPropertiesResource extends XWikiResource
 {

@@ -31,6 +31,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.XWikiResource;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.comments.CommentsResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments")
 public class CommentsResource extends XWikiResource
 {

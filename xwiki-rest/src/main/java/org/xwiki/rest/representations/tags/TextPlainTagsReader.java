@@ -30,6 +30,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Tag;
 import org.xwiki.rest.model.jaxb.Tags;
@@ -38,6 +39,7 @@ import org.xwiki.rest.representations.TextPlainReader;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.tags.TextPlainTagsReader")
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
 public class TextPlainTagsReader extends TextPlainReader<Tags>

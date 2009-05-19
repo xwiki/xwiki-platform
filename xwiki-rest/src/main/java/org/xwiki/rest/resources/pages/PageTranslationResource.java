@@ -26,6 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.model.jaxb.Page;
 
@@ -35,6 +36,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.pages.PageTranslationResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/translations/{language}")
 public class PageTranslationResource extends ModifiablePageResource
 {

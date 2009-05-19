@@ -24,16 +24,45 @@ import java.util.logging.LogManager;
 
 import javax.servlet.ServletException;
 
+import org.restlet.Application;
+import org.restlet.Context;
+import org.xwiki.component.manager.ComponentManager;
+
 import com.noelios.restlet.ext.servlet.ServerServlet;
 
 /**
- * $Id$
+ * @version $Id$
  */
 public class XWikiRestletServlet extends ServerServlet
 {
     private static final String JAVA_LOGGING_PROPERTY_FILE = "java-logging.properties";
 
     private static final long serialVersionUID = 9148448182654390153L;
+
+    @Override
+    protected Application createApplication(Context context)
+    {
+        Application application = super.createApplication(context);
+
+        /* Retrieve the application context in order to populate it with relevant variables. */
+        Context applicationContext = application.getContext();
+        
+        /* Retrieve the component manager and made it available in the application context. */
+        ComponentManager componentManager =
+            (ComponentManager) getServletContext().getAttribute("org.xwiki.component.manager.ComponentManager");
+        applicationContext.getAttributes().put(Constants.XWIKI_COMPONENT_MANAGER, componentManager);
+
+        /* Set the object factory for instantiating components. */ 
+        if (application instanceof XWikiRestletJaxRsApplication) {
+            XWikiRestletJaxRsApplication jaxrsApplication = (XWikiRestletJaxRsApplication) application;
+            jaxrsApplication.setObjectFactory(new ComponentsObjectFactory(componentManager));
+        }
+        else {
+            log("The Restlet application is not an instance of XWikiRestletJaxRsApplication. Please check your web.xml");
+        }
+
+        return application;
+    }
 
     @Override
     public void init() throws ServletException
@@ -44,16 +73,16 @@ public class XWikiRestletServlet extends ServerServlet
             /* Try first in WEB-INF */
             InputStream is =
                 getServletContext().getResourceAsStream(String.format("/WEB-INF/%s", JAVA_LOGGING_PROPERTY_FILE));
-            
+
             /* If nothing is there then try in the current jar */
-            if(is == null) {                
+            if (is == null) {
                 is = getClass().getClassLoader().getResourceAsStream(JAVA_LOGGING_PROPERTY_FILE);
             }
-            
-            if (is != null) {               
+
+            if (is != null) {
                 LogManager.getLogManager().readConfiguration(is);
                 is.close();
-            }            
+            }
         } catch (Exception e) {
             log("Unable to initialize Java logging framework. Using defaults", e);
         }

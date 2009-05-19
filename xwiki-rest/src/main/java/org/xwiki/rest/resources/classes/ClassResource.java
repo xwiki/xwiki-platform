@@ -25,6 +25,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Class;
@@ -34,6 +35,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.classes.ClassResource")
 @Path("/wikis/{wikiName}/classes/{className}")
 public class ClassResource extends XWikiResource
 {

@@ -36,7 +36,9 @@ import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.resource.InputRepresentation;
 import org.restlet.resource.Representation;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
+import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Tag;
 import org.xwiki.rest.model.jaxb.Tags;
@@ -44,9 +46,10 @@ import org.xwiki.rest.model.jaxb.Tags;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.tags.FormUrlEncodedTagsReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>
+public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiRestComponent
 {
     private static final String TAGS_FIELD_NAME = "tags";
 

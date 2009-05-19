@@ -36,16 +36,19 @@ import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.resource.InputRepresentation;
 import org.restlet.resource.Representation;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
+import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Page;
 
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.pages.FormUrlEncodedPageReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-public class FormUrlEncodedPageReader implements MessageBodyReader<Page>
+public class FormUrlEncodedPageReader implements MessageBodyReader<Page>, XWikiRestComponent
 {
     private static String TITLE_FIELD_NAME = "title";
 

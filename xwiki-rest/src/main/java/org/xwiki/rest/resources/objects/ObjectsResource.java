@@ -35,6 +35,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.XWikiResource;
@@ -51,6 +52,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.objects.ObjectsResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects")
 public class ObjectsResource extends XWikiResource
 {

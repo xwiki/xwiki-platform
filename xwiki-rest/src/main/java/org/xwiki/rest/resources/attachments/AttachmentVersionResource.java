@@ -26,6 +26,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiResource;
 
 import com.xpn.xwiki.XWikiException;
@@ -34,6 +35,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.attachments.AttachmentVersionResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/attachments/{attachmentName}/history/{attachmentVersion}")
 public class AttachmentVersionResource extends XWikiResource
 {

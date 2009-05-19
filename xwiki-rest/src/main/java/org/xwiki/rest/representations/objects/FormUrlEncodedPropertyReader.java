@@ -37,16 +37,19 @@ import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.resource.InputRepresentation;
 import org.restlet.resource.Representation;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Constants;
+import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Property;
 
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.representations.objects.FormUrlEncodedPropertyReader")
 @Provider
 @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>
+public class FormUrlEncodedPropertyReader implements MessageBodyReader<Property>, XWikiRestComponent
 {
     private static final String PROPERTY_PREFIX = "property#";
 

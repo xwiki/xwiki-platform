@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.model.jaxb.Link;
@@ -48,6 +49,7 @@ import com.xpn.xwiki.plugin.tag.TagPlugin;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.pages.PageTagsResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/tags")
 public class PageTagsResource extends ModifiablePageResource
 {

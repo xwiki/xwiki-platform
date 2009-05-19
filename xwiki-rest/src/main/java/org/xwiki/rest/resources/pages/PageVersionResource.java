@@ -23,6 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Page;
@@ -33,6 +34,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.pages.PageVersionResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}")
 public class PageVersionResource extends XWikiResource
 {

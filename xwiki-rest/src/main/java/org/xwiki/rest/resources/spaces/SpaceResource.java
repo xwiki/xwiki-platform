@@ -26,6 +26,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -37,6 +40,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.spaces.SpaceResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}")
 public class SpaceResource extends XWikiResource
 {

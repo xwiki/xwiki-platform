@@ -29,6 +29,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -43,6 +44,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.ModificationsResource")
 @Path("/wikis/{wikiName}/modifications")
 public class ModificationsResource extends XWikiResource
 {

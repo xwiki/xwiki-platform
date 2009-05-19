@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.BaseAttachmentsResource;
@@ -32,6 +33,7 @@ import org.xwiki.rest.resources.BaseAttachmentsResource;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.spaces.SpaceAttachmentsResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/attachments")
 public class SpaceAttachmentsResource extends BaseAttachmentsResource
 {

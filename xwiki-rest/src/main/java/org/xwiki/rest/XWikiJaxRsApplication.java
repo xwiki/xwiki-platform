@@ -20,65 +20,51 @@
 package org.xwiki.rest;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
 import javax.ws.rs.core.Application;
 
 import org.restlet.Context;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
 /**
- * This class is used to configure JAX-RS resources and providers. Currently it builds resources and providers lists
- * from servlet parameters. TODO: Write an automatic discovery mechanism as it is done in Jersey.
+ * This class is used to configure JAX-RS resources and providers. They are dynamically discovered using the component
+ * manager.
  * 
  * @version $Id$
  */
 public class XWikiJaxRsApplication extends Application
 {
-    private static final String RESOURCES_PARAMETER = "resources";
-
-    private static final String PROVIDERS_PARAMETER = "providers";
-
     private Set<Class< ? >> jaxRsClasses;
 
     public XWikiJaxRsApplication(Context context)
     {
         this.jaxRsClasses = new HashSet<Class< ? >>();
 
-        /* Retrieve resources list from servlet parameters */
-        String resourcesParameter = context.getParameters().getFirstValue(RESOURCES_PARAMETER);
-        if (resourcesParameter != null) {
-            String[] resourceClassNames = resourcesParameter.split(";");
-            for (String resourceClassName : resourceClassNames) {
-                try {
-                    resourceClassName = resourceClassName.trim();
-                    Class< ? > resourceClass = this.getClass().getClassLoader().loadClass(resourceClassName);
-                    jaxRsClasses.add(resourceClass);
+        ComponentManager componentManager =
+            (ComponentManager) context.getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        try {
+            List<XWikiRestComponent> components = componentManager.lookupList(XWikiRestComponent.class);
 
-                    context.getLogger().log(Level.FINE, String.format("Added resource %s", resourceClassName));
-                } catch (ClassNotFoundException e) {
-                    context.getLogger().log(Level.WARNING, String.format("Cannot load class %s", resourceClassName));
+            for (XWikiRestComponent component : components) {
+                jaxRsClasses.add(component.getClass());
+                context.getLogger().log(Level.FINE, String.format("%s registered.", component.getClass().getName()));
+
+                try {
+                    componentManager.release(component);
+                } catch (ComponentLifecycleException e) {
+                    context.getLogger().log(Level.WARNING,
+                        String.format("Unable to release component", component.getClass().getName()), e);
                 }
             }
+        } catch (ComponentLookupException e) {
+            context.getLogger().log(Level.WARNING, "Unable to lookup components", e);
         }
 
-        /* Retrieve providers list from servlet parameters */
-        String providersParameter = context.getParameters().getFirstValue(PROVIDERS_PARAMETER);
-        if (providersParameter != null) {
-            String[] providerClassNames = providersParameter.split(";");
-            for (String providerClassName : providerClassNames) {
-                try {
-                    providerClassName = providerClassName.trim();
-                    Class< ? > providerClass = this.getClass().getClassLoader().loadClass(providerClassName);
-                    jaxRsClasses.add(providerClass);
-
-                    context.getLogger().log(Level.FINE, String.format("Added provider %s", providerClassName));
-                } catch (ClassNotFoundException e) {
-                    context.getLogger().log(Level.WARNING, String.format("Cannot load class %s", providerClassName));
-                }
-            }
-        }
-        
         context.getLogger().log(Level.INFO, "RESTful API subsystem initialized.");
     }
 

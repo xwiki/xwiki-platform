@@ -27,10 +27,12 @@ import java.io.StringWriter;
 
 import javax.ws.rs.ext.MessageBodyReader;
 
+import org.xwiki.rest.XWikiRestComponent;
+
 /**
  * @version $Id$
  */
-public abstract class TextPlainReader<T> implements MessageBodyReader<T>
+public abstract class TextPlainReader<T> implements MessageBodyReader<T>, XWikiRestComponent
 {
     protected String getEntityAsString(InputStream entityStream) throws IOException
     {

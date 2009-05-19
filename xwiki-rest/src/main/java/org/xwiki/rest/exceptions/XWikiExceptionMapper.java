@@ -25,13 +25,17 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rest.XWikiRestComponent;
+
 import com.xpn.xwiki.XWikiException;
 
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.exceptions.XWikiExceptionMapper")
 @Provider
-public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>
+public class XWikiExceptionMapper implements ExceptionMapper<XWikiException>, XWikiRestComponent
 {
     public Response toResponse(XWikiException exception)
     {

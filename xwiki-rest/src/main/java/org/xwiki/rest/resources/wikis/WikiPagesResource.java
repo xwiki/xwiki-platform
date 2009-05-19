@@ -32,6 +32,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriBuilder;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -49,6 +52,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.wikis.WikiPagesResource")
 @Path("/wikis/{wikiName}/pages")
 public class WikiPagesResource extends XWikiResource
 {

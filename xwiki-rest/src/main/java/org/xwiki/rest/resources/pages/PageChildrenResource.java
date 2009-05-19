@@ -28,6 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
@@ -40,6 +41,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.pages.PageChildrenResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/children")
 public class PageChildrenResource extends XWikiResource
 {

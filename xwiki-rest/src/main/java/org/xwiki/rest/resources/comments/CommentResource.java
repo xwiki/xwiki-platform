@@ -29,6 +29,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Comment;
@@ -39,6 +40,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.comments.CommentResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/comments/{id}")
 public class CommentResource extends XWikiResource
 {

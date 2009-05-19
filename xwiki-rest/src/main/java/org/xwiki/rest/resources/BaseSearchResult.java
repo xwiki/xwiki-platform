@@ -39,11 +39,17 @@ import org.xwiki.rest.resources.pages.PageResource;
 
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * @version $Id$
+ */
 public class BaseSearchResult extends XWikiResource
 {
     protected static enum SearchScope
     {
-        NAME, CONTENT, TITLE, OBJECTS
+        NAME,
+        CONTENT,
+        TITLE,
+        OBJECTS
     }
 
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,

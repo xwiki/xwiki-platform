@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest;
 
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -30,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
@@ -50,6 +53,10 @@ import com.xpn.xwiki.web.XWikiServletResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
+ * The Setup cleanup filter is used to initialize the XWiki context before serving the request, and to clean it up after
+ * the request has been served. This filter also populates the Restlet context with XWiki-related variables so that they
+ * are available to resources.
+ * 
  * @version $Id$
  */
 public class XWikiSetupCleanupFilter extends Filter
@@ -96,7 +103,9 @@ public class XWikiSetupCleanupFilter extends Filter
             attributes.put(Constants.HTTP_REQUEST, getHttpRequest(request));
         } catch (Exception e) {
             if (xwikiContext != null) {
-                cleanupComponents();
+                Map<String, Object> attributes = getContext().getAttributes();
+                cleanupComponents((ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER),
+                    (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES));
             }
 
             getLogger().log(Level.SEVERE, "Cannot initialize XWiki context.", e);
@@ -112,17 +121,21 @@ public class XWikiSetupCleanupFilter extends Filter
     @Override
     protected void afterHandle(Request request, Response response)
     {
-        XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
+        Map<String, Object> attributes = getContext().getAttributes();
+
+        XWikiContext xwikiContext = (XWikiContext) attributes.get(Constants.XWIKI_CONTEXT);
         if (xwikiContext != null) {
+            cleanupComponents((ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER),
+                (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES));
             getLogger().log(Level.FINE, "XWiki context cleaned up.");
-            cleanupComponents();
         }
 
-        Map<String, Object> attributes = getContext().getAttributes();
+        /* Remove all the attributes from the current context */
         attributes.remove(Constants.XWIKI_CONTEXT);
         attributes.remove(Constants.XWIKI);
         attributes.remove(Constants.XWIKI_API);
         attributes.remove(Constants.XWIKI_USER);
+        attributes.remove(Constants.RELEASABLE_COMPONENT_REFERENCES);
         attributes.remove(Constants.HTTP_REQUEST);
 
         /* Avoid that empty entities make the engine forward the response creation to the XWiki servlet. */
@@ -147,8 +160,19 @@ public class XWikiSetupCleanupFilter extends Filter
         }
     }
 
-    private void cleanupComponents()
+    private void cleanupComponents(ComponentManager componentManager, List<XWikiRestComponent> releasableComponents)
     {
+        if (releasableComponents != null) {
+            /* Release all the releasable components. */
+            for (XWikiRestComponent component : releasableComponents) {
+                try {
+                    componentManager.release(component);
+                } catch (ComponentLifecycleException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
         Container container = (Container) com.xpn.xwiki.web.Utils.getComponent(Container.class);
         Execution execution = (Execution) com.xpn.xwiki.web.Utils.getComponent(Execution.class);
 

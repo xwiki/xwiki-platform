@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
@@ -42,6 +43,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.objects.ObjectPropertyAtPageVersionResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/objects/{className}/{objectNumber}/properties/{propertyName}")
 public class ObjectPropertyAtPageVersionResource extends XWikiResource
 {

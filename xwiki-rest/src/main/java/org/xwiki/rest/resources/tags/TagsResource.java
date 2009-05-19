@@ -7,6 +7,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.UriBuilder;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
@@ -16,6 +19,7 @@ import org.xwiki.rest.model.jaxb.Tags;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.tag.TagPlugin;
 
+@Component("org.xwiki.rest.resources.tags.TagsResource")
 @Path("/wikis/{wikiName}/tags")
 public class TagsResource extends XWikiResource
 {

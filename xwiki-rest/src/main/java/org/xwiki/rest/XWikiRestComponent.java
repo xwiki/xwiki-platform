@@ -17,29 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.exceptions;
+package org.xwiki.rest;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.query.QueryException;
-import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
+ * This interface is used to mark JAX-RS resources and providers that should be made available to the component manager
+ * for lookup.
+ * 
  * @version $Id$
  */
-@Component("org.xwiki.rest.exceptions.QueryExceptionMapper")
-@Provider
-public class QueryExceptionMapper implements ExceptionMapper<QueryException>, XWikiRestComponent
+@ComponentRole
+public interface XWikiRestComponent
 {
-    public Response toResponse(QueryException exception)
-    {
-        return Response.serverError().entity(
-            String.format("%s\n%s\n", exception.getMessage(), exception.getCause().getMessage())).type(
-            MediaType.TEXT_PLAIN).build();
-    }
-
 }

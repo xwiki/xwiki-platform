@@ -35,6 +35,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
 
+/**
+ * @version $Id$
+ */
 public class XWikiAuthentication extends Guard
 {
     public XWikiAuthentication(Context context) throws IllegalArgumentException

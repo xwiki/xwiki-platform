@@ -30,6 +30,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
 import com.xpn.xwiki.XWikiContext;
@@ -43,7 +47,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id$
  */
-public class XWikiResource
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class XWikiResource implements XWikiRestComponent, Initializable
 {
     protected XWikiContext xwikiContext;
 
@@ -87,22 +92,19 @@ public class XWikiResource
     }
 
     /**
-     * Constructor. This constructor is needed because UriInfo injection in super classes doesn't seem to work. So
-     * provide a constructor for initializing the UriInfo from subclasses where it can be automatically injected through
-     * a @Context annotation.
-     * 
-     * @param uriInfo A UriInfo instance typically injected through the @Context annotation in subclasses.
+     * Resource initialization.
      */
-    public XWikiResource()
+    public void initialize() throws InitializationException
     {
         xwikiContext = (XWikiContext) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_CONTEXT);
         xwiki = (com.xpn.xwiki.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI);
         xwikiApi = (com.xpn.xwiki.api.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_API);
         xwikiUser = (String) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_USER);
 
-        if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)) {
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        }
+        /*
+         * if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)) { throw new
+         * WebApplicationException(Status.INTERNAL_SERVER_ERROR); }
+         */
 
         logger = Logger.getLogger(this.getClass().getName());
 

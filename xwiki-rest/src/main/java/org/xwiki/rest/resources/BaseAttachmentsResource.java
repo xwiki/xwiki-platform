@@ -48,7 +48,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 /**
  * @version $Id$
  */
-@Path("/wikis/{wikiName}/attachments")
 public class BaseAttachmentsResource extends XWikiResource
 {
     /**

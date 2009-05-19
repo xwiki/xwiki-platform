@@ -24,6 +24,9 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Wikis;
@@ -33,6 +36,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * @version $Id$
  */
+@Component("org.xwiki.rest.resources.wikis.WikisResource")
 @Path("/wikis")
 public class WikisResource extends XWikiResource
 {

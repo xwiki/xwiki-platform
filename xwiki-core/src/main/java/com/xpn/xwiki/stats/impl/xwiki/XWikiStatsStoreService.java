@@ -24,13 +24,12 @@ package com.xpn.xwiki.stats.impl.xwiki;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.context.ExecutionContextException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -108,34 +107,23 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     /**
      * {@inheritDoc}
      * 
-     * @see java.lang.Runnable#run()
+     * @see com.xpn.xwiki.util.AbstractXWikiRunnable#runInternal()
      */
-    public void run()
+    @Override
+    public void runInternal()
     {
         try {
-            // Init execution context
-            initExecutionContext();
-
-            try {
-                try {
-                    while (true) {
-                        register();
-                    }
-                } catch (InterruptedException e) {
-                    if (LOG.isWarnEnabled()) {
-                        LOG.warn("Statistics storing thread has been interrupted.", e);
-                    }
-                } catch (StopStatsStoreException e) {
-                    if (LOG.isInfoEnabled()) {
-                        LOG.warn("Statistics storing thread received stop order.", e);
-                    }
-                }
-            } finally {
-                // Cleanup execution context
-                cleanupExecutionContext();
+            while (true) {
+                register();
             }
-        } catch (ExecutionContextException e) {
-            LOG.error("Failed to initialize execution context", e);
+        } catch (InterruptedException e) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Statistics storing thread has been interrupted.", e);
+            }
+        } catch (StopStatsStoreException e) {
+            if (LOG.isInfoEnabled()) {
+                LOG.warn("Statistics storing thread received stop order.", e);
+            }
         }
     }
 

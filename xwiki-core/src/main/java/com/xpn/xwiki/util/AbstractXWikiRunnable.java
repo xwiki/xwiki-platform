@@ -1,11 +1,15 @@
 package com.xpn.xwiki.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -16,6 +20,35 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class AbstractXWikiRunnable implements Runnable
 {
+    /**
+     * Logging tools.
+     */
+    private static final Log LOG = LogFactory.getLog(AbstractXWikiRunnable.class);
+
+    private Map<String, Object> properties = new HashMap<String, Object>();
+
+    protected AbstractXWikiRunnable()
+    {
+
+    }
+
+    /**
+     * @param propertyName the name of the property to put in the initialized context
+     * @param propertyValue the value of the property to put in the initialized context
+     */
+    protected AbstractXWikiRunnable(String propertyName, Object propertyValue)
+    {
+        this.properties.put(propertyName, propertyValue);
+    }
+
+    /**
+     * @param properties properties to put in the initialized context
+     */
+    protected AbstractXWikiRunnable(Map<String, Object> properties)
+    {
+        this.properties.putAll(properties);
+    }
+
     /**
      * Initialize execution context for the current thread.
      * 
@@ -30,24 +63,10 @@ public abstract class AbstractXWikiRunnable implements Runnable
         ExecutionContext ec = new ExecutionContext();
 
         ecim.initialize(ec);
+
+        ec.setProperties(this.properties);
+
         execution.setContext(ec);
-
-        return ec;
-    }
-
-    /**
-     * Initialize execution context for the current thread and put the XWikiContext in it.
-     * 
-     * @param context the old XWiki context
-     * @return the new execution context
-     * @throws ExecutionContextException error when try to initialize execution context
-     */
-    protected ExecutionContext initExecutionContext(XWikiContext context) throws ExecutionContextException
-    {
-        ExecutionContext ec = initExecutionContext();
-
-        // Bridge with old XWiki Context, required for old code.
-        ec.setProperty("xwikicontext", context);
 
         return ec;
     }
@@ -59,4 +78,29 @@ public abstract class AbstractXWikiRunnable implements Runnable
         // component as otherwise we will have a potential memory leak.
         ech.removeContext();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Runnable#run()
+     */
+    public final void run()
+    {
+        try {
+            // initialize execution context
+            initExecutionContext();
+
+            try {
+                // call run
+                runInternal();
+            } finally {
+                // cleanup execution context
+                cleanupExecutionContext();
+            }
+        } catch (ExecutionContextException e) {
+            LOG.error("Failed to initialize execution context", e);
+        }
+    }
+
+    protected abstract void runInternal();
 }

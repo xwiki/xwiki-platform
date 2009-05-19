@@ -41,14 +41,14 @@
   #if("$!{request.targetSpace}" == "")
     #error($msg.get("xe.officeimporter.results.missingspace", [$goBack]))
   #else
-    #set($targetSpace=$request.targetSpace)
+    #set($targetSpace=$util.clearName($request.targetSpace))
   #end
 
   ## Validate targetPage
   #if("$!{request.targetPage}" == "")
     #error($msg.get("xe.officeimporter.results.missingpage", [$goBack]))
   #else
-    #set($targetPage=$request.targetPage)
+    #set($targetPage=$util.clearName($request.targetPage))
   #end  
 
   ## Split Levels

@@ -24,9 +24,9 @@ package com.xpn.xwiki.stats.impl.xwiki;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.stats.impl.StatsUtil;
 import com.xpn.xwiki.stats.impl.VisitStats;
+import com.xpn.xwiki.util.AbstractXWikiRunnable;
 import com.xpn.xwiki.web.DownloadAction;
 import com.xpn.xwiki.web.SaveAction;
 import com.xpn.xwiki.web.ViewAction;
@@ -45,7 +46,7 @@ import com.xpn.xwiki.web.ViewAction;
  * @version $Id$
  * @since 1.4M2
  */
-public class XWikiStatsStoreService implements Runnable
+public class XWikiStatsStoreService extends AbstractXWikiRunnable
 {
     /**
      * Logging tools.
@@ -106,9 +107,10 @@ public class XWikiStatsStoreService implements Runnable
     /**
      * {@inheritDoc}
      * 
-     * @see java.lang.Runnable#run()
+     * @see com.xpn.xwiki.util.AbstractXWikiRunnable#runInternal()
      */
-    public void run()
+    @Override
+    public void runInternal()
     {
         try {
             while (true) {
@@ -136,8 +138,7 @@ public class XWikiStatsStoreService implements Runnable
         XWikiStatsStoreItem stat = queue.take();
 
         List<List<XWikiStatsStoreItem>> statsList = new ArrayList<List<XWikiStatsStoreItem>>();
-        Map<String, List<XWikiStatsStoreItem>> statsMap =
-            new HashMap<String, List<XWikiStatsStoreItem>>();
+        Map<String, List<XWikiStatsStoreItem>> statsMap = new HashMap<String, List<XWikiStatsStoreItem>>();
 
         do {
             if (stat instanceof StopStatsRegisterObject) {
@@ -164,11 +165,11 @@ public class XWikiStatsStoreService implements Runnable
             stats.get(0).store(stats);
         }
     }
-    
-    //////////////////////////////////////////////////////////////////////////////
+
+    // ////////////////////////////////////////////////////////////////////////////
     // Add stats to queue
-    //////////////////////////////////////////////////////////////////////////////
-    
+    // ////////////////////////////////////////////////////////////////////////////
+
     /**
      * Add new statistic to store.
      * 
@@ -182,7 +183,7 @@ public class XWikiStatsStoreService implements Runnable
             LOG.error("Statistics storage thread has been interrupted", e);
         }
     }
-    
+
     /**
      * Add all the statistics to the save queue.
      * 
@@ -207,8 +208,7 @@ public class XWikiStatsStoreService implements Runnable
 
             addVisitStats(vobject, context);
 
-            boolean isVisit =
-                (vobject.getPageViews() == 1) && (action.equals(ViewAction.VIEW_ACTION));
+            boolean isVisit = (vobject.getPageViews() == 1) && (action.equals(ViewAction.VIEW_ACTION));
 
             addDocumentStats(doc, action, isVisit, context);
         }
@@ -242,23 +242,19 @@ public class XWikiStatsStoreService implements Runnable
      * @param isVisit indicate if it's included in a visit.
      * @param context the XWiki context.
      */
-    private void addDocumentStats(XWikiDocument doc, String action, boolean isVisit,
-        XWikiContext context)
+    private void addDocumentStats(XWikiDocument doc, String action, boolean isVisit, XWikiContext context)
     {
         Date currentDate = new Date();
 
-        add(new DocumentStatsStoreItem(doc.getFullName(), currentDate,
-            StatsUtil.PeriodType.MONTH, action, isVisit, context));
-        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.MONTH,
-            action, isVisit, context));
-        add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.MONTH, action,
-            false, context));
-        add(new DocumentStatsStoreItem(doc.getFullName(), currentDate, StatsUtil.PeriodType.DAY,
-            action, isVisit, context));
-        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY,
-            action, isVisit, context));
-        add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.DAY, action, false,
+        add(new DocumentStatsStoreItem(doc.getFullName(), currentDate, StatsUtil.PeriodType.MONTH, action, isVisit,
             context));
+        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.MONTH, action, isVisit,
+            context));
+        add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.MONTH, action, false, context));
+        add(new DocumentStatsStoreItem(doc.getFullName(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit,
+            context));
+        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit, context));
+        add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.DAY, action, false, context));
     }
 
     /**
@@ -271,8 +267,7 @@ public class XWikiStatsStoreService implements Runnable
     {
         String referer = StatsUtil.getReferer(context);
         if ((referer != null) && (!referer.equals(""))) {
-            add(new RefererStatsStoreItem(doc.getFullName(), new Date(),
-                StatsUtil.PeriodType.MONTH, referer, context));
+            add(new RefererStatsStoreItem(doc.getFullName(), new Date(), StatsUtil.PeriodType.MONTH, referer, context));
         }
     }
 }

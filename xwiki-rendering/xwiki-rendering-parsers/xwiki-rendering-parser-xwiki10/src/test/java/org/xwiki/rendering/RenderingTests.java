@@ -105,6 +105,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("html/html10", false);
         suite.addTestsFromResource("html/html11", false);
         suite.addTestsFromResource("html/html12", false);
+        suite.addTestsFromResource("html/html13", false);
+        suite.addTestsFromResource("html/html14", false);
 
         // HTML elements
         suite.addTestsFromResource("macros/html/br1", false);

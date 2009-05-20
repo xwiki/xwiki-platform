@@ -2,7 +2,7 @@
   <parent>
     <artifactId>xwiki-core-parent</artifactId>
     <groupId>com.xpn.xwiki.platform</groupId>
-    <version>1.8.4</version>
+    <version>1.8-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.xwiki.platform</groupId>

@@ -178,9 +178,9 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             String beforeVelocityContent = beforeVelocityBuffer.toString();
             String velocityContent = velocityBuffer.toString();
             String afterVelocityContent = afterVelocityBuffer.toString();
-            
+
             boolean multilines = velocityBuffer.indexOf("\n") != -1;
-            
+
             // Make sure velocity macro does not start in a block and ends in another by "eating" them
             if (multilines && velocityContent.indexOf("\n\n") != -1) {
                 int beforeIndex = beforeVelocityContent.lastIndexOf("\n\n");
@@ -203,7 +203,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                     afterVelocityContent = afterVelocityContent.substring(afterIndex);
                 }
             }
-            
+
             // print before velocity content
             result.append(beforeVelocityContent);
 
@@ -265,7 +265,9 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             // #end
             context.popVelocityDepth();
             context.setVelocity(true);
-        } else if (!VELOCITY_NOPARAMBLOCK.contains(macroName.toString())) {
+        } else if (VELOCITY_NOPARAMBLOCK.contains(macroName.toString())) {
+            context.setVelocity(true);
+        } else {
             if (VELOCITY_BEGINBLOCK.contains(macroName.toString())) {
                 // #if, #foreach
                 context.pushVelocityDepth();

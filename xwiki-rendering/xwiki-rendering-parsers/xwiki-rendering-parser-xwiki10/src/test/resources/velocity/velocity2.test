@@ -7,4 +7,4 @@ some other text
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-some text {{velocity}}{{html wiki="true"}}## commented{{/html}}{{/velocity}} some other text
+some text {{velocity}}{{html clean="false" wiki="true"}}## commented{{/html}}{{/velocity}} some other text

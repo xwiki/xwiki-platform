@@ -13,7 +13,7 @@ paragraph
 .#-----------------------------------------------------
 paragraph
 
-{{html wiki="true"}}
+{{html clean="false" wiki="true"}}
 some text <element></element>
 
 <element></element> same paragraph

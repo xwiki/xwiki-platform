@@ -585,8 +585,8 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{html wiki=\"true\"}}" + (nl ? "\n" : ""), HTMLOPEN_SUFFIX,
-            false));
+        result.append(filterContext.addProtectedContent("{{html clean=\"false\" wiki=\"true\"}}" + (nl ? "\n" : ""),
+            HTMLOPEN_SUFFIX, false));
     }
 
     public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)

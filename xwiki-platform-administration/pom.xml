@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>20</version>
+    <version>21-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-administration</artifactId>
   <name>XWiki Platform - Applications - Administration</name>
-  <version>1.13-SNAPSHOT</version>
+  <version>1.12-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
   <!-- We must configure SCM in each module. For more information see:

@@ -1,15 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-<div param="value1 value2">some content</div>
-<div>some content</div>
-<div/>
+<element param="value" param2="value2">
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-(% param="value1 value2" %)
-(((some content)))
-
-(((some content)))
-
-((()))
+{{html wiki="true"}}<element param="value" param2="value2">{{/html}}

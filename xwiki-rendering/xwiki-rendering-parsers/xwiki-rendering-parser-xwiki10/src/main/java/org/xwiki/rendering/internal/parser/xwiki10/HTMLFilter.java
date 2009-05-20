@@ -165,7 +165,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             String beforeHtmlContent = beforeHtmlBuffer.toString();
             String htmlContent = htmlBuffer.toString();
             String afterHtmlContent = afterHtmlBuffer.toString();
-            
+
             boolean multilines = htmlContent.indexOf("\n") != -1;
 
             // Make sure html macro does not start in a block and ends in another by "eating" them
@@ -318,7 +318,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         if (convertedElement != null) {
             element.append(convertedElement);
         } else {
-            element.append(beginElement);
+            element.append(context.addProtectedContent(beginElement.toString(), false));
             if (elementContent != null) {
                 element.append(elementContent);
                 if (context.getType() == HTMLType.END) {
@@ -536,6 +536,8 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
         // Equal sign
         if (array[i] == '=') {
+            parameterBlock.append("=");
+
             ++i;
 
             // Skip white spaces
@@ -543,9 +545,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
             // Get value
             StringBuffer valueBlock = new StringBuffer();
-            for (; i < array.length && array[i] != '>' && !Character.isWhitespace(array[i]); ++i) {
-                valueBlock.append(array[i]);
-            }
+            i = getElementParameterValue(array, i, valueBlock, context);
             parameterBlock.append(valueBlock);
 
             parameterMap.put(keyBlock.toString(), valueBlock.toString());
@@ -554,10 +554,39 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         return i;
     }
 
+    public int getElementParameterValue(char[] array, int currentIndex, StringBuffer valueBlock,
+        HTMLFilterContext context)
+    {
+        int i = currentIndex;
+
+        char escaped = 0;
+
+        if (array[i] == '"' || array[i] == '\'') {
+            escaped = array[i];
+            valueBlock.append(array[i++]);
+        }
+
+        for (; i < array.length && array[i] != '>'; ++i) {
+            if (escaped == 0 && Character.isWhitespace(array[i])) {
+                break;
+            }
+
+            valueBlock.append(array[i]);
+
+            if (array[i] == escaped) {
+                ++i;
+                break;
+            }
+
+        }
+
+        return i;
+    }
+
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext
-            .addProtectedContent("{{html wiki=\"true\"}}" + (nl ? "\n" : ""), HTMLOPEN_SUFFIX, false));
+        result.append(filterContext.addProtectedContent("{{html wiki=\"true\"}}" + (nl ? "\n" : ""), HTMLOPEN_SUFFIX,
+            false));
     }
 
     public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)

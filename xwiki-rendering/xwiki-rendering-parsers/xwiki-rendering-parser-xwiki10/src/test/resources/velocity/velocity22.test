@@ -10,7 +10,7 @@
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 {{velocity}}
-{{html wiki="true"}}
+{{html clean="false" wiki="true"}}
 #if($var)
 #else
  #set($var = $something)

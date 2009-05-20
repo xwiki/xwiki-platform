@@ -55,7 +55,7 @@ some text
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 {{velocity}}
-{{html wiki="true"}}
+{{html clean="false" wiki="true"}}
 some text
 ## commented
 

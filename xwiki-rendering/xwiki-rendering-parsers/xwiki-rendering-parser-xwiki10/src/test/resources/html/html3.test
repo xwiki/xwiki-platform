@@ -25,4 +25,4 @@ AAA
 AAA
 
 
-{{html wiki="true"}}<BBB>{{/html}}
+{{html clean="false" wiki="true"}}<BBB>{{/html}}

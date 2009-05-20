@@ -245,7 +245,11 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public void setDoc(XWikiDocument doc)
     {
-        put("doc", doc);
+        if (doc == null) {
+            remove("doc");
+        } else {
+            put("doc", doc);
+        }
     }
 
     public void setUser(String user, boolean main)

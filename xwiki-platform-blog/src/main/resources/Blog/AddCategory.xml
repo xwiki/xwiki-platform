@@ -39,10 +39,12 @@
     #set($content = "${content}eForm('Blog.CategorySheet')")
     $newCategoryDoc.setContent($content)
     $newCategoryDoc.save()
-    #info("The category [$newCategoryDoc.name&gt;$newCategoryDoc.fullName] has been created.")
+    #set($catLink = "[${newCategoryDoc.name}&gt;${newCategoryDoc.fullName}]")
+    #info($msg.get("xe.blog.category.created", [$catLink]))
   #else
     $response.setStatus(409)
-    #warning("The category [$newCategoryDoc.name&gt;$newCategoryDoc.fullName] already exists.")
+    #set($catLink = "[${newCategoryDoc.name}&gt;${newCategoryDoc.fullName}]")
+    #warning($msg.get("xe.blog.category.exists", [$catLink]))
   #end
 #end
 &lt;form action="" method="post"&gt;
@@ -51,10 +53,10 @@
   &lt;input type="hidden" name="space" value="$space"/&gt;
 #end
 &lt;dl&gt;
-&lt;dt&gt;&lt;label for="name"&gt;Name:&lt;/label&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;label for="name"&gt;$msg.get("xe.blog.categories.name")&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;&lt;input type="text" name="name" id="name" style="width: 95%"/&gt;&lt;/dd&gt;
 #if("$!parentCategory" == "")
-&lt;dt&gt;&lt;label for="parent"&gt;Parent category:&lt;/label&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;label for="parent"&gt;$msg.get("xe.blog.categories.parentcategory")&lt;/label&gt;&lt;/dt&gt;
 #set($sql = ", BaseObject obj where ")
 #if($space != "")
   #set($sql = "${sql}doc.space = '${space}' and ")
@@ -69,10 +71,10 @@
 #else
 &lt;dt&gt;&lt;input type="hidden" name="parent" value="$parentCategory"/&gt;&lt;/dt&gt;
 #end
-&lt;dt&gt;&lt;label for="description"&gt;Description:&lt;/label&gt;&lt;/dt&gt;
+&lt;dt&gt;&lt;label for="description"&gt;$msg.get("xe.blog.categories.description")&lt;/label&gt;&lt;/dt&gt;
 &lt;dd&gt;&lt;textarea name="description" id="description" rows="2" cols="20" style="width: 95%"&gt;&lt;/textarea&gt;&lt;/dd&gt;
 &lt;/dl&gt;
-&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="Add" class="button"/&gt;&lt;/span&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get("xe.blog.categories.add")" class="button"/&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

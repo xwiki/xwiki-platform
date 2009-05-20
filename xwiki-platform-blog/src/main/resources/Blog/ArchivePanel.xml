@@ -145,7 +145,7 @@
       #end
     #end
   #else
-    #info("No articles yet...")
+    #info($msg.get("xe.blog.archive.noarticle"))
   #end
   #panelfooter()
 #end</content>

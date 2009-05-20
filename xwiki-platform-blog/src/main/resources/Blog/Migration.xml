@@ -39,18 +39,18 @@
       $!entryObj.set('hidden', 0)
       #set($discard = $articleDoc.removeObjects('XWiki.ArticleClass'))
       $articleDoc.setContent($newContent)
-      $!articleDoc.save("Migrated old blog article to the new blog application", true)
-      * Updated [$entryObj.title&gt;$article] (in space [$articleDoc.space>${articleDoc.space}.WebHome])
+      $!articleDoc.save($msg.get("xe.blog.migration.migrated"), true)
+      * $msg.get("xe.blog.migration.updated") [$entryObj.title&gt;$article] ($msg.get("xe.blog.migration.inspace") [$articleDoc.space&gt;${articleDoc.space}.WebHome])
     #else
-      * Skipping protected document [$article]
+      * $msg.get("xe.blog.migration.skipping") [$article]
     #end
   #end
-  Done. [Back to the blog&gt;Blog.WebHome]
+  $msg.get("xe.blog.migration.done") [$msg.get("xe.blog.migration.backtoblog")&gt;Blog.WebHome]
 #else
-  Please confirm that you want to migrate old articles to the new blog application:
+  $msg.get("xe.blog.migration.pleaseconfirm")
   &lt;form action="$doc.getURL()" method="post"&gt;
-    &lt;div&gt;&lt;input type="submit" name="migrate" value="Confirm"/&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;input type="submit" name="migrate" value="$msg.get("xe.blog.migration.confirm")"/&gt;&lt;/div&gt;
   &lt;/form&gt;
-  [Back to the blog&gt;Blog.WebHome]
+  [$msg.get("xe.blog.migration.backtoblog")&gt;Blog.WebHome]
 #end</content>
 </xwikidoc>

@@ -7,4 +7,4 @@ $var.method("$4novar")
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-$4novar ${4novar {{velocity}}{{html wiki="true"}}$var.method("$4novar"){{/html}}{{/velocity}}
+$4novar ${4novar {{velocity}}{{html clean="false" wiki="true"}}$var.method("$4novar"){{/html}}{{/velocity}}

@@ -5,4 +5,4 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html wiki="true"}}<element param="value value2">{{/html}}
+{{html clean="false" wiki="true"}}<element param="value value2">{{/html}}

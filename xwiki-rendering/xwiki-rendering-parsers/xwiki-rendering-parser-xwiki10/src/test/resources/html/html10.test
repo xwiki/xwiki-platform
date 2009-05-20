@@ -7,6 +7,6 @@ another paragraph
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-some text {{html wiki="true"}}<element></element>{{/html}}
+some text {{html clean="false" wiki="true"}}<element></element>{{/html}}
 
 another paragraph

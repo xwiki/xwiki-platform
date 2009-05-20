@@ -677,8 +677,8 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
     public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{velocity}}" + (nl ? "\n" : "") + "{{html wiki=\"true\"}}"
-            + (nl ? "\n" : ""), VELOCITYOPEN_SUFFIX, true));
+        result.append(filterContext.addProtectedContent("{{velocity}}" + (nl ? "\n" : "")
+            + "{{html clean=\"false\" wiki=\"true\"}}" + (nl ? "\n" : ""), VELOCITYOPEN_SUFFIX, true));
     }
 
     public static void appendVelocityClose(StringBuffer result, FilterContext filterContext, boolean nl)

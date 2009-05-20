@@ -33,13 +33,13 @@
   <artifactId>xwiki-application-officeimporter</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Applications - Office Importer</name>
-  <version>1.7</version>
+  <version>1.8-SNAPSHOT</version>
   <description>An XWiki application used to transform office documents into wiki pages.</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-officeimporter-1.7</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-officeimporter-1.7</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-officeimporter-1.7</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/officeimporter</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/officeimporter</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/officeimporter</url>
   </scm>
 </project>

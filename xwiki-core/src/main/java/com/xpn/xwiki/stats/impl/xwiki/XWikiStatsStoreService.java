@@ -253,7 +253,8 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
         add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.MONTH, action, false, context));
         add(new DocumentStatsStoreItem(doc.getFullName(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit,
             context));
-        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit, context));
+        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit,
+            context));
         add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.DAY, action, false, context));
     }
 

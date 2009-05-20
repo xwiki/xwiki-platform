@@ -70,12 +70,14 @@ public abstract class AbstractJob implements Job
             throw new JobExecutionException("Fail to initialize execution context", e);
         }
 
-        // Execute the job
-        executeJob(jobContext);
-
-        // We must ensure we clean the ThreadLocal variables located in the Execution
-        // component as otherwise we will have a potential memory leak.
-        execution.removeContext();
+        try {
+            // Execute the job
+            executeJob(jobContext);
+        } finally {
+            // We must ensure we clean the ThreadLocal variables located in the Execution
+            // component as otherwise we will have a potential memory leak.
+            execution.removeContext();
+        }
     }
 
     protected abstract void executeJob(JobExecutionContext jobContext) throws JobExecutionException;

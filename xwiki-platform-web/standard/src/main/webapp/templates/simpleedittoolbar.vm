@@ -47,7 +47,12 @@
 // <![CDATA[
 document.writeln("<div class='leftmenu2'>");
 #foreach($item in $syntaxElements)
-  addButton('$xwiki.getSkinFile("icons/silk/${item.get(3)}.gif")','$msg.get("core.edit.wikiToolbar.${item.get(0)}")','${item.get(1)}','${item.get(2)}','$msg.get("core.edit.wikiToolbar.${item.get(0)}text")');
+  #set($imageFile = $xwiki.getSkinFile("icons/silk/${item.get(3)}.gif"))
+  #set($speedTip = $msg.get("core.edit.wikiToolbar.${item.get(0)}").replaceAll("'", "\\'"))
+  #set($tagOpen = ${item.get(1)})
+  #set($tagClose = ${item.get(2)})
+  #set($sampleText = $msg.get("core.edit.wikiToolbar.${item.get(0)}text").replaceAll("'", "\\'"))
+  addButton('$imageFile', '$speedTip', '$tagOpen', '$tagClose', '$sampleText');
 #end
 document.writeln("<" + "/div>");
 // ]]>

@@ -36,12 +36,12 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #if($space == '')
     #set($space = $doc.space)
   #end
-  1.1 Create a new post
+  1.1 $msg.get("xe.blog.post.createpost")
   &lt;form action="${xwiki.getURL('Blog.CreatePost')}" id="newBlogPost" method="post"&gt;
   &lt;div&gt;
     &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
-    &lt;input type="text" name="entryTitle" value="Post title"/&gt;
-    &lt;input type="submit" value="Create"/&gt;
+    &lt;input type="text" name="entryTitle" value="$msg.get("xe.blog.post.title")"/&gt;
+    &lt;input type="submit" value="$msg.get("xe.blog.post.create")"/&gt;
   &lt;/div&gt;
   &lt;/form&gt;
 #else

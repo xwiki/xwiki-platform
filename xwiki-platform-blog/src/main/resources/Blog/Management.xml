@@ -31,7 +31,7 @@
 ## TODO: Display the number of articles in each blog
 ## TODO: Provide some management links: delete, edit title, configure...
 ##
-1 Existing blogs
+1 $msg.get("xe.blog.manage.existing")
 
 #foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
   #getBlogTitle($item $title)
@@ -45,13 +45,13 @@
 ##
 ## New blog
 ##
-1 Create a new blog
+1 $msg.get("xe.blog.manage.createnew")
 
 #set($title = "$!request.blogTitle")
 #if($title != '')
   #set($space = "$!request.blogSpace")
   #if($space == '')
-    #warning('No space provided. Please enter a valid space where the blog should be created.')
+    #warning($msg.get("xe.blog.manage.nospace"))
   #else
     #if("$!request.blogType" == 'main')
       #set($blogDocName = "${space}.WebHome")
@@ -68,17 +68,17 @@
 &lt;form action="${xwiki.getURL('Blog.Management')}" id="newBlog" method="post"&gt;
 &lt;div&gt;
 &lt;dl&gt;
-  &lt;dt&gt;&lt;label for="blogSpace"&gt;Space:&lt;/label&gt;&lt;/dt&gt;
+  &lt;dt&gt;&lt;label for="blogSpace"&gt;$msg.get("xe.blog.manage.space")&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;&lt;input type="text" name="blogSpace" id="blogSpace" value=""/&gt;&lt;/dd&gt;
-  &lt;dt&gt;&lt;label for="blogTitle"&gt;Title:&lt;/label&gt;&lt;/dt&gt;
-  &lt;dd&gt;&lt;input type="text" name="blogTitle" id="blogTitle" value="Blog title"/&gt;&lt;/dd&gt;
-  &lt;dt&gt;&lt;label for="blogType"&gt;Blog type:&lt;/label&gt;&lt;/dt&gt;
+  &lt;dt&gt;&lt;label for="blogTitle"&gt;$msg.get("xe.blog.manage.title")&lt;/label&gt;&lt;/dt&gt;
+  &lt;dd&gt;&lt;input type="text" name="blogTitle" id="blogTitle" value="$msg.get("xe.blog.manage.blogtitle")"/&gt;&lt;/dd&gt;
+  &lt;dt&gt;&lt;label for="blogType"&gt;$msg.get("xe.blog.manage.blogtype")&lt;/label&gt;&lt;/dt&gt;
   &lt;dd&gt;&lt;select name="blogType" id="blogType"&gt;
-    &lt;option value="inner" selected="selected"&gt;blog inside an existing space&lt;/option&gt;
-    &lt;option value="main"&gt;blog as the main content of a space&lt;/option&gt;
+    &lt;option value="inner" selected="selected"&gt;$msg.get("xe.blog.manage.inside")&lt;/option&gt;
+    &lt;option value="main"&gt;$msg.get("xe.blog.manage.main")&lt;/option&gt;
   &lt;/select&gt;&lt;/dd&gt;
 &lt;/dl&gt;
-  &lt;input type="submit" value="Create"/&gt;
+  &lt;input type="submit" value="$msg.get("xe.blog.manage.create")"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 #else ## !hasAdmin

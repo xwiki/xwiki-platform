@@ -276,8 +276,8 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
   &lt;form action="" method="post"&gt;
   &lt;div class='create-category'&gt;
     &lt;input type="hidden" name="xaction" value="create"/&gt;
-    &lt;label&gt;New category: &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
-    &lt;label&gt;Parent:
+    &lt;label&gt;$msg.get("xe.blog.categories.new") &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
+    &lt;label&gt;$msg.get("xe.blog.categories.parent")
       &lt;select name="newCategoryParent" id="blog_category_selectBox"&gt;
         &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt;
         $!processedCategories.clear()##
@@ -324,7 +324,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     #if($xwiki.hasAccessLevel('edit', $context.user, $item))
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
-      $blogEntryDoc.save('Remove deleted category')
+      $blogEntryDoc.save('$msg.get("xe.blog.categories.remove")')
     #end
   #end
   $categoryDoc.delete()

@@ -29,12 +29,12 @@
 #info("$doc.display('description')")
 
 #if($context.action != "inline")
-1.1.1 Subcategories
+1.1.1 $msg.get("xe.blog.categories.subcategories")
 #if($hasEdit)
   &lt;div style="float: right; width: 60%"&gt;
   &lt;div class="plainmessage"&gt;
   &lt;fieldset&gt;
-  &lt;legend&gt;Add new subcategory&lt;/legend&gt;
+  &lt;legend&gt;$msg.get("xe.blog.categories.addsubcategory")&lt;/legend&gt;
   #set($parentCategory = $doc.fullName)
   #includeTopic("Blog.AddCategory")
   &lt;/fieldset&gt;
@@ -45,7 +45,7 @@
 #displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'simple')
 &lt;div class="clearfloats"&gt;&lt;/div&gt;
 
-1.1.1 Articles from this category
+1.1.1 $msg.get("xe.blog.categories.articles")
 #getEntriesForCategory($doc.fullName $entries $total)
 #displayBlog($entries 'category' true)
 ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
@@ -53,9 +53,9 @@
 #displayNavigationLinks($doc)
 #end
 #elseif($doc.fullName == $blogCategorySheet)
-  1 Category sheet
-  This sheet should be used to display blog categories.
+  1 $msg.get("xe.blog.categories.sheet")
+  $msg.get("xe.blog.categories.sheetmessage")
 #else
-  #warning('This is not a blog category!')
+  #warning($msg.get("xe.blog.categories.notcategory"))
 #end</content>
 </xwikidoc>

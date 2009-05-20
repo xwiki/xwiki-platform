@@ -30,14 +30,14 @@
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.8.4</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-1.8</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-1.8</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-1.8</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.8.4</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.8.4</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-1.8.4</url>
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->

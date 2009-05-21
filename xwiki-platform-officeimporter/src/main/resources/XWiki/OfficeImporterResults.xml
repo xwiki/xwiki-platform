@@ -41,14 +41,14 @@
   #if("$!{request.targetSpace}" == "")
     #error($msg.get("xe.officeimporter.results.missingspace", [$goBack]))
   #else
-    #set($targetSpace=$request.targetSpace.replaceAll("[:]", "-"))
+    #set($targetSpace=$request.targetSpace.replaceAll("[:/]", "-"))
   #end
 
   ## Validate targetPage
   #if("$!{request.targetPage}" == "")
     #error($msg.get("xe.officeimporter.results.missingpage", [$goBack]))
   #else
-    #set($targetPage=$request.targetPage.replaceAll("[.:]", "-"))
+    #set($targetPage=$request.targetPage.replaceAll("[.:/]", "-"))
   #end  
 
   ## Split Levels

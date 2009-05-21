@@ -56,7 +56,9 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BlockFilter;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Listener;
@@ -143,12 +145,11 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         OfficeImporterFilter importerFilter = getImporterFilter(params);
         try {
             Map<String, InputStream> artifacts = ooConverter.convert(documentStream, storage);
-            docBridge.setDocumentSyntaxId(targetWikiDocument, XWIKI_20.toIdString());
             if (isPresentation(documentFormat)) {
                 byte[] archive = buildPresentationArchive(artifacts);
                 docBridge.setAttachmentContent(targetWikiDocument, PRESENTATION_ARCHIVE_NAME, archive);
                 String xwikiPresentationCode = buildPresentationFrameCode(PRESENTATION_ARCHIVE_NAME, "output.html");
-                saveDocument(targetWikiDocument, xwikiPresentationCode, isAppendRequest(params));
+                saveDocument(targetWikiDocument, null, xwikiPresentationCode, isAppendRequest(params));
             } else {
                 InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
                 HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
@@ -159,8 +160,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 XDOM xdom = xHtmlParser.parse(new StringReader(XMLUtils.toString(xhtmlDoc)));
                 importerFilter.filter(targetWikiDocument, xdom, false);
                 if (!isSplitRequest(params)) {
-                    saveDocument(targetWikiDocument, importerFilter.filter(targetWikiDocument, renderXdom(xdom,
-                        XWIKI_20), false), isAppendRequest(params));
+                    saveDocument(targetWikiDocument, extractTitle(xdom), importerFilter.filter(targetWikiDocument,
+                        renderXdom(xdom, XWIKI_20), false), isAppendRequest(params));
                     attachArtifacts(targetWikiDocument, artifacts);
                 } else {
                     splitImport(targetWikiDocument, xdom, artifacts, params, importerFilter);
@@ -268,23 +269,33 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     private String extractTitle(XDOM xdom)
     {
         String title = null;
-        if (xdom.getChildren().size() > 0) {
-            Block firstChild = xdom.getChildren().get(0);
-            if (firstChild instanceof HeaderBlock) {
-                // Clone the header block and remove any unwanted stuff
-                Block clonedHeaderBlock = firstChild.clone(new BlockFilter()
+        // Filter all top-level header blocks.
+        List<HeaderBlock> headerBlocks = xdom.getChildrenByType(HeaderBlock.class, false);
+        // Filter all top-level section blocks.
+        List<SectionBlock> sectionBlocks = xdom.getChildrenByType(SectionBlock.class, false);
+        // If no top-level header blocks are present, search inside top-level section blocks.
+        if (headerBlocks.isEmpty() && !sectionBlocks.isEmpty()) {
+            headerBlocks = sectionBlocks.get(0).getChildrenByType(HeaderBlock.class, true);
+        }
+        // If a suitable header block is found, filter it's content and generate the title.
+        if (!headerBlocks.isEmpty()) {
+            Block firstHeader = headerBlocks.get(0);
+            // Clone the header block and remove any unwanted stuff
+            Block clonedHeaderBlock = firstHeader.clone(new BlockFilter()
+            {
+                public List<Block> filter(Block block)
                 {
-                    public List<Block> filter(Block block)
-                    {
-                        List<Block> blocks = new ArrayList<Block>();
-                        if (block instanceof WordBlock || block instanceof SpaceBlock) {
-                            blocks.add(block);
-                        }
-                        return blocks;
+                    List<Block> blocks = new ArrayList<Block>();
+                    if (block instanceof WordBlock || block instanceof SpaceBlock
+                        || block instanceof SpecialSymbolBlock) {
+                        blocks.add(block);
                     }
-                });
-                title = renderXdom(new XDOM(clonedHeaderBlock.getChildren()), XWIKI_20);
-            }
+                    return blocks;
+                }
+            });
+            title = renderXdom(new XDOM(clonedHeaderBlock.getChildren()), XWIKI_20);
+            // Strip line-feed and new-line characters if present.
+            title = title.replaceAll("[\n\r]", "");
         }
         return title;
     }
@@ -311,11 +322,6 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 XDOM childXdom = doc.getXdom();
                 // Apply extended filtering.
                 importerFilter.filter(doc.getFullName(), childXdom, true);
-                // Extract document title (if possible).
-                String title = extractTitle(doc.getXdom());
-                if (null != title) {
-                    docBridge.getDocument(doc.getFullName()).setTitle(title);
-                }
                 // Set parent document (if possible).
                 if (doc.getParent() != null) {
                     DocumentName parentName = docBridge.getDocumentName(doc.getParent().getFullName());
@@ -324,15 +330,16 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 // Extract all image artifacts & attach them to the current document.
                 Map<String, InputStream> tempArtifacts = new HashMap<String, InputStream>();
                 List<ImageBlock> imageBlocks = childXdom.getChildrenByType(ImageBlock.class, true);
-                for (ImageBlock imageBlock : imageBlocks) {                    
-                    String imageName = imageBlock.getImage().getName(); 
+                for (ImageBlock imageBlock : imageBlocks) {
+                    String imageName = imageBlock.getImage().getName();
                     tempArtifacts.put(imageName, artifacts.remove(imageName));
                 }
                 attachArtifacts(doc.getFullName(), tempArtifacts);
-                // Render and save the document content.
                 String content = renderXdom(childXdom, XWIKI_20);
+                // Check if this is an append request (only root doc can be appended).
                 boolean append = doc.equals(rootDoc) ? isAppendRequest(params) : false;
-                saveDocument(doc.getFullName(), importerFilter.filter(doc.getFullName(), content, true), append);
+                saveDocument(doc.getFullName(), extractTitle(doc.getXdom()), importerFilter.filter(doc.getFullName(),
+                    content, true), append);
             }
         } catch (Exception ex) {
             throw new OfficeImporterException("Internal error while importing document.", ex);
@@ -419,11 +426,13 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * Utility method for saving xwiki/2.0 content generated from the import operation.
      * 
      * @param documentName name of the xwiki document where the content should be saved into.
+     * @param title title to be set for the document, should be null if not required.
      * @param content the string content (result of the import operation)
      * @param append if the content should be appended in case of an existing document.
      * @throws OfficeImporterException if an error occurs while saving the document.
      */
-    private void saveDocument(String documentName, String content, boolean append) throws OfficeImporterException
+    private void saveDocument(String documentName, String title, String content, boolean append)
+        throws OfficeImporterException
     {
         try {
             if (docBridge.exists(documentName) && append) {
@@ -438,6 +447,9 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 docBridge.setDocumentContent(documentName, oldContent + "\n" + content, "Updated by office importer",
                     false);
             } else {
+                if (null != title) {
+                    docBridge.getDocument(documentName).setTitle(title);
+                }
                 docBridge.setDocumentSyntaxId(documentName, XWIKI_20.toIdString());
                 docBridge.setDocumentContent(documentName, content, "Updated by office importer", false);
             }

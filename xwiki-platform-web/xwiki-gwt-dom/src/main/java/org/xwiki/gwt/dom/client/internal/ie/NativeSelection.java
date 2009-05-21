@@ -65,7 +65,12 @@ public final class NativeSelection extends JavaScriptObject
             // inner selection. For instance, by using the scroll bars we move the focus from the BODY element to the
             // HTML element but the BODY element keeps its inner selection. In consequence, we don't have to restore
             // the selection if the focus comes from the HTML element.
-            if (event.fromElement != document.documentElement) {
+            //
+            // Also, IE renders some elements as boxes (elements with fixed width or height, or with
+            // display:inline-block for instance) which can be edited by double clicking. Although this boxes are inside
+            // the edited document, the BODY element looses the focus when this elements are edited. There's no need to
+            // restore the selection when the focus comes from such an inner node.
+            if (!event.fromElement || event.fromElement.ownerDocument != document) {
                 var range = document.parentWindow.__savedRange;
                 // Clear the reference to the saved range.
                 document.parentWindow.__savedRange = undefined;
@@ -84,7 +89,12 @@ public final class NativeSelection extends JavaScriptObject
             // inner selection. For instance, by using the scroll bars we move the focus from the BODY element to the
             // HTML element but the BODY element keeps its inner selection. In consequence, we don't have to save the
             // selection if the focus goes to the HTML element.
-            if (event.toElement != document.documentElement) {
+            //
+            // Also, IE renders some elements as boxes (elements with fixed width or height, or with
+            // display:inline-block for instance) which can be edited by double clicking. Although this boxes are inside
+            // the edited document, the BODY element looses the focus when this elements are edited. There's no need to
+            // save the selection when the focus goes to such an inner node.
+            if (!event.toElement || event.toElement.ownerDocument != document) {
                 document.parentWindow.__savedRange = document.selection.createRange();
             }
         });

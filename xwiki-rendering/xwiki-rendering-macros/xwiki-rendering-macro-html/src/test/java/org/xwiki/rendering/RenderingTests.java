@@ -38,7 +38,6 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test the HTML Macro");
 
-        /*
         suite.addTestsFromResource("macrohtml1", true);
         suite.addTestsFromResource("macrohtml2", true);
         suite.addTestsFromResource("macrohtml3", true);
@@ -53,10 +52,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrohtml12", true);
         suite.addTestsFromResource("macrohtml13", true);
         suite.addTestsFromResource("macrohtml14", true);
-        suite.addTestsFromResource("macrohtml15", true);
-        */
-        
-        suite.addTestsFromResource("macrohtml15", true);
         
         return new PlexusTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
     }

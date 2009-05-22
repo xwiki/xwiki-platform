@@ -1,0 +1,2 @@
+org.xwiki.component.annotation.ComponentAnnotationLoaderTest$OverrideRole
+org.xwiki.component.annotation.ComponentAnnotationLoaderTest$SimpleRole

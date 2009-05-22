@@ -34,6 +34,14 @@
   <name>XWiki Platform - Core - Component</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Component</description>
+  <dependencies>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

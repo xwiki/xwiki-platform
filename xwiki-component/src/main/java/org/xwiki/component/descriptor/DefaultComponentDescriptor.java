@@ -93,4 +93,13 @@ public class DefaultComponentDescriptor extends DefaultComponentRole implements 
 
         this.componentDependencies.add(componentDependency);
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuffer buffer = new StringBuffer(super.toString());
+        buffer.append(" implementation = [").append(getImplementation()).append("]");
+        buffer.append(" instantiation = [").append(getInstantiationStrategy()).append("]");
+        return buffer.toString();
+    }
 }

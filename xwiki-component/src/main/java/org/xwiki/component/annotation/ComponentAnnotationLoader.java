@@ -45,31 +45,40 @@ import org.xwiki.component.manager.ComponentManager;
 public class ComponentAnnotationLoader
 {
     /**
-     * Location in the classloader of the file defining the list of component implementation class to parser for 
+     * Location in the classloader of the file defining the list of component implementation class to parser for
      * annotations.
      */
     private static final String COMPONENT_LIST = "META-INF/components.txt";
 
     /**
+     * Location in the classloader of the file specifying which component implementation to use when several with the
+     * same role/hint are found.
+     */
+    private static final String COMPONENT_OVERRIDE_LIST = "META-INF/component-overrides.txt";
+
+    /**
      * Factory to create a Component Descriptor from an annotated class.
      */
     private ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
-    
+
     /**
      * Loads all components defined using annotations.
      * 
      * @param manager the component manager to use to dynamically register components
-     * @param classLoader the classloader to use to look for the Component list declaration file 
-     *        ({@code META-INF/components.txt})
+     * @param classLoader the classloader to use to look for the Component list declaration file ({@code
+     *            META-INF/components.txt})
      */
     public void initialize(ComponentManager manager, ClassLoader classLoader)
     {
         try {
-            // 1) Find all components by retrieving the list defined in COMPONENT_LIST
-            List<String> componentClassNames = findAnnotatedComponentClasses(classLoader);
+            // 1) Find all components by retrieving the list defined in COMPONENT_LIST. Also find all component
+            // overrides (i.e. the list of components that should take precedence when several are registered
+            // with the same role/hint.
+            List<String> componentClassNames = getDeclaredComponents(classLoader, COMPONENT_LIST);
+            List<String> componentOverrideClassNames = getDeclaredComponents(classLoader, COMPONENT_OVERRIDE_LIST);
 
-            // 2) For each component class name found, load its class and use introspection to find the necessary 
-            //    annotations required to create a Component Descriptor.
+            // 2) For each component class name found, load its class and use introspection to find the necessary
+            // annotations required to create a Component Descriptor.
             Map<RoleHint, ComponentDescriptor> descriptorMap = new HashMap<RoleHint, ComponentDescriptor>();
             for (String componentClassName : componentClassNames) {
                 Class< ? > componentClass = classLoader.loadClass(componentClassName);
@@ -77,19 +86,18 @@ public class ComponentAnnotationLoader
                 // Look for ComponentRole annotations and register one component per ComponentRole found
                 for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
                     for (ComponentDescriptor descriptor : factory.createComponentDescriptors(componentClass,
-                        componentRoleClass))
-                    {
-                        // If there's already a existing role/hint in the list of descriptors then decide which one 
-                        // to keep.
-                        if (descriptorMap.containsKey(new RoleHint(componentRoleClass, descriptor.getRoleHint()))) {
-                            // For now the last override the first
-                            // TODO: Log a message in debug mode
-                            // SOP.println("WARNING: component [" + descriptor.getImplementation() + "] for role [" 
-                            //    + componentRoleClass.getName() + "] and hint [" + descriptor.getRoleHint() 
-                            //    + "] has already been registered with implementation [" + descriptors.get(
-                            //        new RoleHint(componentRoleClass, descriptor.getRoleHint())).getImplementation() 
-                            //        + "]. Ignoring it.");
-                            descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()), descriptor);
+                        componentRoleClass)) {
+                        // If there's already a existing role/hint in the list of descriptors then decide which one
+                        // to keep by looking at the override list. Use those in the override list in priority.
+                        // Otherwise use the last registered component.
+                        RoleHint roleHint = new RoleHint(componentRoleClass, descriptor.getRoleHint());
+                        if (descriptorMap.containsKey(roleHint)) {
+                            // Is the component in the override list?
+                            ComponentDescriptor existingDescriptor = descriptorMap.get(roleHint);
+                            if (!componentOverrideClassNames.contains(existingDescriptor.getImplementation())) {
+                                descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()),
+                                    descriptor);
+                            }
                         } else {
                             descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()), descriptor);
                         }
@@ -101,7 +109,7 @@ public class ComponentAnnotationLoader
             for (ComponentDescriptor descriptor : descriptorMap.values()) {
                 manager.registerComponent(descriptor);
             }
-            
+
         } catch (Exception e) {
             // Make sure we make the calling code fail in order to fail fast and prevent the application to start
             // if something is amiss.
@@ -110,17 +118,17 @@ public class ComponentAnnotationLoader
     }
 
     /**
-     * Finds the interfaces that implement component roles by looking recursively in all interfaces of
-     * the passed component implementation class. If the roles annotation value is specified then use 
-     * the specified list instead of doing auto-discovery.
+     * Finds the interfaces that implement component roles by looking recursively in all interfaces of the passed
+     * component implementation class. If the roles annotation value is specified then use the specified list instead of
+     * doing auto-discovery.
      * 
-     * @param componentClass the component implementation class for which to find the component roles it implements 
+     * @param componentClass the component implementation class for which to find the component roles it implements
      * @return the list of component role classes implemented
      */
     protected List<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
     {
         List<Class< ? >> classes = new ArrayList<Class< ? >>();
-       
+
         Component component = componentClass.getAnnotation(Component.class);
         if (component != null && component.roles().length > 0) {
             classes.addAll(Arrays.asList(component.roles()));
@@ -134,8 +142,8 @@ public class ComponentAnnotationLoader
                     }
                 }
             }
-            
-            // Note that we need to look into the superclass since the super class can itself implements an interface 
+
+            // Note that we need to look into the superclass since the super class can itself implements an interface
             // that has the @ComponentRole annotation.
             Class< ? > superClass = componentClass.getSuperclass();
             if (superClass != null && !superClass.getName().equals(Object.class.getName())) {
@@ -143,25 +151,25 @@ public class ComponentAnnotationLoader
             }
 
         }
-        
+
         return classes;
     }
 
     /**
-     * Find all components defined using Annotations. These components are looked for in
-     * {@link #COMPONENT_LIST} resources.
+     * Get all components listed in the passed resource files.
      * 
-     * @param classLoader the classloader to use to load the {@link #COMPONENT_LIST} resources
+     * @param classLoader the classloader to use to find the resources
+     * @param location the name of the resources to look for
      * @return the list of component implementation class names
      * @throws IOException in case of an error loading the component list resource
      */
-    private List<String> findAnnotatedComponentClasses(ClassLoader classLoader) throws IOException
+    private List<String> getDeclaredComponents(ClassLoader classLoader, String location) throws IOException
     {
         List<String> annotatedClassNames = new ArrayList<String>();
-        Enumeration<URL> urls = classLoader.getResources(COMPONENT_LIST);
+        Enumeration<URL> urls = classLoader.getResources(location);
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
-            
+
             // Read all components definition from the URL
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
             String inputLine;

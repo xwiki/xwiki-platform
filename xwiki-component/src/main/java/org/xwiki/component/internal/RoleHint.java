@@ -83,6 +83,6 @@ public class RoleHint
     @Override
     public String toString()
     {
-        return "role = [" + getRole().getName() + "] [ hint = [" + getHint() + "]";
+        return "role = [" + getRole().getName() + "] hint = [" + getHint() + "]";
     }
 }

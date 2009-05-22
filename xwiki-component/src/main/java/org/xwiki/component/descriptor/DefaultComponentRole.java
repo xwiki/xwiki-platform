@@ -25,4 +25,13 @@ public class DefaultComponentRole implements ComponentRole
     {
         return roleHint;
     }
+    
+    @Override
+    public String toString()
+    {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("role = [").append(getRole().getName()).append("]");
+        buffer.append(" hint = [").append(getRoleHint()).append("]");
+        return buffer.toString();
+    }
 }

@@ -5,6 +5,7 @@
   width: 100%;
   text-align: center;
   z-index: 1200;
+  display: block !important;
 }
 .xnotification-wrapper {
   padding-top: 1px;

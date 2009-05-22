@@ -632,6 +632,13 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-message</artifactId>
+      <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-useravatar</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->

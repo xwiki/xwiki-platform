@@ -83,6 +83,7 @@
     <module>xwiki-rendering-macro-code</module>
     <module>xwiki-rendering-macro-rss</module>
     <module>xwiki-rendering-macro-useravatar</module>
+    <module>xwiki-rendering-macro-message</module>
   </modules>
 </project>
        

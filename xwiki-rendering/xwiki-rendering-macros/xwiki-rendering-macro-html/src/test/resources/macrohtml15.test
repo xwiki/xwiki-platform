@@ -1,0 +1,20 @@
+.#---------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify clean=false is forced in inner html macros
+.#---------------------------------------------------------------
+{{html wiki="true"}}
+{{code language="xml"}}
+<import/>
+{{/code}}
+{{/html}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:html|-|wiki="true"|-|
+{{code language="xml"}}
+<import/>
+{{/code}}
+--><!--startmacro:code|-|language="xml"|-|
+<import/>
+--><div class="box code"><span style="font-weight: bold; color: #008000; ">import</span>
+</div><!--stopmacro--><!--stopmacro-->

@@ -1,0 +1,207 @@
+/*
+ * Search results list
+ */
+#searchResults {
+  clear: both;
+  display: table;
+  width: 100%;
+}
+.resultItem {
+  display: block;
+  clear: both;
+  padding-top: 1em;
+}
+.resultContainer {
+  clear: both;
+  width: 100%;
+}
+.itemDescription {
+  float: left;
+  display: inline-block;
+  width: 82%;
+  padding-left: 20px;
+  background: transparent url($xwiki.getSkinFile('icons/silk/page_white_text.gif')) no-repeat left top;
+}
+.resultItem .type-comment {
+  background-image: url($xwiki.getSkinFile('icons/silk/comment.gif'));
+}
+.resultItem .type-attachment {
+  background-image: url($xwiki.getSkinFile('icons/silk/attach.gif'));
+}
+.itemDescription a, .itemDescription a:hover {
+  color: #39397F;
+}
+.itemDescription a:focus {
+  outline: dotted 1px #000;
+}
+.itemTitle {
+  color: #4D4D4D;
+  font-weight: bold;
+  font-size: 1em;
+}
+.itemTitle span {
+  margin: 0;
+  border: none;
+}
+.itemTitle a, .itemTitle a:hover {
+  color: #4D4D4D;
+  font-weight: bold;
+  font-size: 130%;
+}
+.itemTitle a:focus, .itemAuthor:focus {
+  outline: dotted 1px #000;
+}
+.itemLocation, .itemModified {
+  color: #888;
+  font-size: 90%;
+}
+.itemContext em {
+  background-color: #FFFACD;
+  padding: 0;
+  margin: 0;
+}
+.itemOthers {
+  font-size: 80%;
+}
+.itemOthers .itemComments, .itemOthers .itemAttachments, .itemOthers .itemRating {
+  font-size: 80%;
+  display: inline;
+  clear: none;
+  float: left;
+  padding-right: 5px;
+}
+.itemOthers .itemComments a, .itemOthers .itemAttachments a {
+  background: transparent no-repeat right center;
+  display: inline-block;
+  padding-right: 16px;
+}
+.itemOthers .itemComments a {
+  background-image: url($xwiki.getSkinFile('icons/silk/comment.gif'));
+}
+.itemOthers .itemAttachments a {
+  background-image: url($xwiki.getSkinFile('icons/silk/attach.gif'));
+}
+.itemRating {
+  position: relative;
+  width: 55px;
+  height: 11px;
+  overflow: hidden;
+  margin: 1px 0 0 0!important;
+  padding: 0!important;
+  background-position: left top;
+  background-image: url($xwiki.getSkinFile("icons/xwiki/rating.png"));
+}
+.relevance .currentRelevance, .itemRating .currentRating {
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-indent: -1000em;
+  outline: none;
+  overflow: hidden;
+  border: none;
+  z-index: 1;
+}
+.itemRating .currentRating {
+  height: 11px;
+  line-height: 11px;
+  background-image: url($xwiki.getSkinFile("icons/xwiki/rating.png"));
+  background-position: left center;
+}
+.itemRelevance {
+  float: left;
+  display: inline-block;
+  width: 15%;
+  text-align: right;
+}
+.relevance {
+  position: relative;
+  width: 48px;
+  height: 8px;
+  overflow: hidden;
+  list-style: none;
+  margin: 5px 0 0 0!important;
+  padding: 0!important;
+  background-position: left bottom;
+  background-image: url($xwiki.getSkinFile("icons/xwiki/relevance.png"));
+  float: right;
+}
+.relevance .currentRelevance {
+  height: 8px;
+  line-height: 8px;
+  background-image: url($xwiki.getSkinFile("icons/xwiki/relevance.png"));
+  background-position: left top;
+}
+.relevanceText {
+  float: right;
+  margin-right: 5px;
+  font-size: 80%;
+}
+
+/*
+ * Item actions
+ */
+.itemActions {
+  color: #888;
+  font-size: 90%;
+  display: block;
+  clear: both;
+  padding-left: 20px;
+}
+.itemActions .tool {
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+  float: left;
+  text-indent: 1000em;
+  line-height: 40em;
+  overflow: hidden;
+  background: transparent no-repeat center center;
+}
+.itemActions .copy {
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_copy.gif'));
+}
+.itemActions .delete {
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+}
+.itemActions .rename {
+  background-image: url($xwiki.getSkinFile('icons/silk/textfield_rename.gif'));
+}
+.itemActions .rights {
+  background-image: url($xwiki.getSkinFile('icons/silk/lock_edit.gif'));
+}
+/*
+ * Search box
+ */
+#searchBar {
+  margin-bottom: 1em;
+  padding-left: 5px;
+  clear: both;
+}
+#searchBar select {
+  border: 2px solid #CCC;
+  color: #4D4D4D;
+  font-size: 1.1em;
+}
+.searchQuery {
+  background: transparent url($xwiki.getSkinFile('icons/xwiki/search.png')) left center no-repeat;
+  display: inline-block;
+  padding-left: 18px;
+  border: 2px solid #CCC;
+  color: #4D4D4D;
+  font-size: 1.1em;
+  width: 400px;
+}
+.searchButton {
+  background-color: #B3B3B3;
+  border: 2px solid #B3B3B3;
+  color: #FFF;
+  font-size: 90%;
+  font-variant: small-caps;
+  font-weight: bold;
+  height: 2em;
+  line-height: 1em;
+}
+.searchHelp {
+  font-size: 80%;
+  color: #808080;
+}

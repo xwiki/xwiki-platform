@@ -43,6 +43,9 @@
   font-family: Arial, Helvetica, sans-serif;
   line-height: 8px;
 }
+* html .xdialog-close {
+  width: 22px;
+}
 .xdialog-title {
   font-size: 80%;
   font-weight: bold;

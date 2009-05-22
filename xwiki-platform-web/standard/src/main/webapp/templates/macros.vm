@@ -1774,163 +1774,222 @@ function (row, i, table) {
 #end
 ##
 ##
-## Pagination 2.0
-##
-##
-#macro(pagination $url $totalItems $defaultItemsPerPage $position)
+#**
+ * Pagination 2.0
+ *
+ * Displays a generic pagination widget for browsing a collection of items.
+ * The macro is responsible for displaying browsing links, and does not involve the actual display of the browsed items.
+ *
+ * @param parameters A map of parameters:
+ * <dl>
+ *   <dt>url</dt>
+ *   <dd>The base url of the document displaying the collection.</dd>
+ *   <dd>Default: $doc.getURL('view'))</dd>
+ *   <dt>totalItems</dt>
+ *   <dd>The total number number of items in the collection.</dd>
+ *   <dd>Default: none, this parameter is mandatory.</dd>
+ *   <dt>defaultItemsPerPage</dt>
+ *   <dd>The number of items per page. This value is overwritten by the request parameter "perPage", if it exists and
+ *       has a valid positive integer value.</dd>
+ *   <dd>Default: 20</dd>
+ *   <dt>position</dt>
+ *   <dd>The placement of the pagination widget. Supported values: "top", "bottom". The bottom widget only displays
+ *       pages, while the top widget also provides a information about the item range on the current page.</dd>
+ *   <dd>Default: top</dd>
+ *   <dt>itemParamName</dt>
+ *   <dd>The name of the request parameter for the index of the first displayed item.</dd>
+ *   <dd>Default: firstIndex</dd>
+ *   <dt>itemsPerPageParamName</dt>
+ *   <dd>The name of the request parameter for the number of items displayed on a page.</dd>
+ *   <dd>Default: perPage</dd>
+ * </dl>
+ *#
+#macro(pagination $parameters)
   $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
-  #if("$!{url}" == '')
-    #set($url = $doc.getURL('view'))
+  #if("$!{parameters.url}" == '')
+    #set($parameters.url = $doc.getURL('view'))
   #end
-  #if(!$url.contains('?'))
-    #set($url = "${url}?")
+  #if(!$parameters.url.contains('?'))
+    #set($parameters.url = "${parameters.url}?")
   #end
-  #if($util.parseInt("$!{defaultItemsPerPage}") <= 0)
-    #set($defaultItemsPerPage = 20)
+  #if($util.parseInt("$!{parameters.defaultItemsPerPage}") <= 0)
+    #set($parameters.defaultItemsPerPage = 20)
   #end
-  #if($position != 'bottom')
-    #set($position = 'top')
+  #if($parameters.position != 'bottom')
+    #set($parameters.position = 'top')
   #end
-  #paginationPrepareParams($defaultItemsPerPage $itemParamName $itemsPerPageParamName)
-  #paginationDisplay($url $firstItem $totalItems $itemsPerPage $itemParamName $itemsPerPageParamName $position)
+  #paginationPrepareParams($parameters)
+  #paginationDisplay($parameters)
 #end
-##
-##
-##
-#macro(paginationPrepareParams $defaultItemsPerPage $itemParamName $itemsPerPageParamName)
+#**
+ * Pagination : request parameters preparation
+ *
+ * Used internally by the pagination macro. Retrieves pagination paramemer values from the request:
+ * "firstIndex" = the index of the first displayed item; "perPage" = number of items per page
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationPrepareParams $parameters)
   ## Setting some defaults
-  #if("$!{itemParamName}" == '')
-    #set($itemParamName = 'from')
+  #if("$!{parameters.itemParamName}" == '')
+    #set($parameters.itemParamName = 'firstIndex')
   #end
-  #if("$!{itemsPerPageParamName}" == '')
-    #set($itemsPerPageParamName = 'perPage')
+  #if("$!{parameters.itemsPerPageParamName}" == '')
+    #set($parameters.itemsPerPageParamName = 'perPage')
   #end
   ## Get starting item number from request
-  #set($firstItem = "$!{request.get($itemParamName)}")
+  #set($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
   ## If the value is missing or invalid, parseInt returns 0, which is the default first item.
-  #set($firstItem = $util.parseInt($firstItem))
+  #set($parameters.firstItem = $util.parseInt($parameters.firstItem))
   ## Get number of items per page from request
-  #set($itemsPerPage = "$!{request.get($itemsPerPageParamName)}")
-  #set($itemsPerPage = $util.parseInt($itemsPerPage))
-  #if($itemsPerPage <= 0)
-    #set($itemsPerPage = $defaultItemsPerPage)
+  #set($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
+  #set($parameters.itemsPerPage = $util.parseInt($parameters.itemsPerPage))
+  #if($parameters.itemsPerPage <= 0)
+    #set($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
   #end
 #end
-##
-##
-##
-#macro(paginationDisplay $url $firstItem $totalItems $itemsPerPage $itemParamName $itemsPerPageParamName $position)
-  #set($pageCount = ($totalItems + $itemsPerPage - 1) / $itemsPerPage)
-  #if($firstItem >= $totalItems)
-    #set($firstItem = ($pageCount - 1) * $itemsPerPage)
-  #elseif($firstItem < 0)
-    #set($firstItem = 0)
+#**
+ * Pagination : display the pagination widget after all parameters have been computed
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationDisplay $parameters)
+  #set($parameters.pageCount = ($parameters.totalItems + $parameters.itemsPerPage - 1) / $parameters.itemsPerPage)
+  #if($parameters.firstItem >= $parameters.totalItems)
+    #set($parameters.firstItem = ($parameters.pageCount - 1) * $parameters.itemsPerPage)
+  #elseif($parameters.firstItem < 0)
+    #set($parameters.firstItem = 0)
   #end
-  #set($crtPage = $firstItem / $itemsPerPage)
+  #set($parameters.crtPage = $parameters.firstItem / $parameters.itemsPerPage)
   ## Make firstItem a multiple of itemsPerPage
-  #set($firstItem = $crtPage * $itemsPerPage)
-  #set($lastPage = $pageCount - 1)
+  #set($parameters.firstItem = $parameters.crtPage * $parameters.itemsPerPage)
+  #set($parameters.lastPage = $parameters.pageCount - 1)
   <div class="paginationFilter">
-    #if($position == 'top')
-      #paginationResultsRange($firstItem $itemsPerPage $totalItems)
+    #if($parameters.position == 'top')
+      #paginationResultsRange($parameters)
     #end
-    #if($totalItems > 0)
-      #paginationControl($url $crtPage $itemsPerPage $lastPage $itemParamName $itemsPerPageParamName)
-      #paginationPages($url $crtPage $itemsPerPage $lastPage $pageCount $itemParamName $itemsPerPageParamName)
+    #if($parameters.totalItems > 0)
+      #paginationControl($parameters)
+      #paginationPages($parameters)
     #end
   </div>
 #end
-##
-##
-##
-#macro(paginationPages $url $crtPage $itemsPerPage $lastPage $pageCount $itemParamName $itemsPerPageParamName)
+#**
+ * Pagination : display links for browsing pages
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationPages $parameters)
+## $url $crtPage $itemsPerPage $lastPage $pageCount $itemParamName $itemsPerPageParamName)
   #set($contextLeft  = 4)
   #set($contextRight = 4)
   #set($contextWidth = $contextLeft + 1 + $contextRight)
-  #if($pageCount <= $contextWidth)
+  #if($parameters.pageCount <= $contextWidth)
     #set($contextFirstPage = 0)
-    #set($contextLastPage = $pageCount - 1)
+    #set($contextLastPage = $parameters.pageCount - 1)
   #else
-    #set($contextFirstPage = $crtPage - $contextLeft)
-    #set($contextLastPage = $crtPage + $contextRight)
+    #set($contextFirstPage = $parameters.crtPage - $contextLeft)
+    #set($contextLastPage = $parameters.crtPage + $contextRight)
     #if($contextFirstPage < 0)
       #set($contextFirstPage = 0)
     #end
-    #if($contextLastPage >= $pageCount)
-      #set($contextLastPage = $pageCount - 1)
+    #if($contextLastPage >= $parameters.pageCount)
+      #set($contextLastPage = $parameters.pageCount - 1)
     #end
     #if($contextLastPage < $contextWidth)
       #set($contextLastPage = $contextWidth - 1)
     #end
-    #if($contextFirstPage > $pageCount - $contextWidth)
-      #set($contextFirstPage = $pageCount - $contextWidth)
+    #if($contextFirstPage > $parameters.pageCount - $contextWidth)
+      #set($contextFirstPage = $parameters.pageCount - $contextWidth)
     #end
   #end
   <span class="pagination">$msg.get('xe.pagination.page')
   #if($contextFirstPage != 0)
-    #paginationPageLink($url 0 $crtPage $itemsPerPage $itemParamName $itemsPerPageParamName)
+    #paginationPageLink(0 $parameters)
   #end
   #if($contextFirstPage > 1) ... #end
   #foreach ($i in [$contextFirstPage .. $contextLastPage])
-    #paginationPageLink($url $i $crtPage $itemsPerPage $itemParamName $itemsPerPageParamName)
+    #paginationPageLink($i $parameters)
   #end
-  #if($lastPage - $contextLastPage > 1) ... #end
-  #if($contextLastPage != $lastPage)
-    #paginationPageLink($url $lastPage $crtPage $itemsPerPage $itemParamName $itemsPerPageParamName)
+  #if($parameters.lastPage - $contextLastPage > 1) ... #end
+  #if($contextLastPage != $parameters.lastPage)
+    #paginationPageLink($parameters.lastPage $parameters)
   #end
   </span>
 #end
-##
-##
-##
-#macro(paginationPageLink $url $pageNumber $crtPage $itemsPerPage $itemParamName $itemsPerPageParamName)
-  #set($firstItem = $pageNumber * $itemsPerPage)
+#**
+ * Pagination : display the link to a certain page (indicated by $pageNumber)
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationPageLink $pageNumber $parameters)
+  #set($firstItem = $pageNumber * $parameters.itemsPerPage)
   #set($displayedPageNumber = $pageNumber + 1)
-  #if($pageNumber == $crtPage)
+  #if($pageNumber == $parameters.crtPage)
   <span class="currentPage">$displayedPageNumber</span>
   #else
-    <a href="${url}&amp;${itemParamName}=${firstItem}#if($itemsPerPage != $defaultItemsPerPage)&amp;${itemsPerPageParamName}=${itemsPerPage}#end" title="$msg.get('xe.pagination.page.title', [$displayedPageNumber])">$displayedPageNumber</a>
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end" title="$msg.get('xe.pagination.page.title', [$displayedPageNumber])">$displayedPageNumber</a>
   #end
 #end
-##
-##
-##
-#macro(paginationResultsRange $firstItem $itemsPerPage $totalItems)
-  #set($from = $firstItem + 1)
-  #set($to =   $firstItem + $itemsPerPage)
-  #if ($to > $totalItems)
-    #set($to = $totalItems)
-  #end
-  <span class="resultsNo">
-  #if($totalItems == 0)
-    <span class='currentResultsNo'>$msg.get('xe.pagination.results.none')</span>
-  #elseif($totalItems == 1)
-    <span class='currentResultsNo'>$msg.get('xe.pagination.results.one')</span>
-  #elseif($from == $totalItems)
-    $msg.get('xe.pagination.results.single', [$from, $totalItems])
-  #else
-    $msg.get('xe.pagination.results.many', [$from, $to, $totalItems])
-  #end
-  </span>
-#end
-##
-##
-##
-#macro(paginationControl $url $crtPage $itemsPerPage $lastPage $itemParamName $itemsPerPageParamName)
+#**
+ * Pagination : display prev / next links
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationControl $parameters)
   <span class="controlPagination">
-  #if($crtPage > 0)
-    #set($prevPage = $crtPage - 1)
-    #set($firstItem = $prevPage * $itemsPerPage)
-    <a href="${url}&amp;${itemParamName}=${firstItem}#if($itemsPerPage != $defaultItemsPerPage)&amp;${itemsPerPageParamName}=${itemsPerPage}#end" title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination">$msg.get('xe.pagination.page.previous')</a>
+  #if($parameters.crtPage > 0)
+    #set($prevPage = $parameters.crtPage - 1)
+    #set($firstItem = $prevPage * $parameters.itemsPerPage)
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end" title="$msg.get('xe.pagination.page.prev.title')" class="prevPagination">$msg.get('xe.pagination.page.previous')</a>
   #else
     <span class="noPrevPagination"> </span>
   #end
-  #if($crtPage < $lastPage)
-    #set($nextPage = $crtPage + 1)
-    #set($firstItem = $nextPage * $itemsPerPage)
-    <a href="${url}&amp;${itemParamName}=${firstItem}#if($itemsPerPage != $defaultItemsPerPage)&amp;${itemsPerPageParamName}=${itemsPerPage}#end" title="$msg.get('xe.pagination.page.next.title')" class="nextPagination">$msg.get('xe.pagination.page.next')</a>
+  #if($parameters.crtPage < $parameters.lastPage)
+    #set($nextPage = $parameters.crtPage + 1)
+    #set($firstItem = $nextPage * $parameters.itemsPerPage)
+    <a href="${parameters.url}&amp;${parameters.itemParamName}=${firstItem}#if($parameters.itemsPerPage != $parameters.defaultItemsPerPage)&amp;${parameters.itemsPerPageParamName}=${parameters.itemsPerPage}#end" title="$msg.get('xe.pagination.page.next.title')" class="nextPagination">$msg.get('xe.pagination.page.next')</a>
   #else
     <span class="noNextPagination"> </span>
+  #end
+  </span>
+#end
+#**
+ * Pagination : message informing the user which items are being displayed on the current page (Results i - j of N)
+ *
+ * Used internally by the pagination macro.
+ *
+ * @see #pagination
+ * @internal
+ *#
+#macro(paginationResultsRange $parameters)
+  #set($from = $parameters.firstItem + 1)
+  #set($to =   $parameters.firstItem + $parameters.itemsPerPage)
+  #if ($to > $parameters.totalItems)
+    #set($to = $parameters.totalItems)
+  #end
+  <span class="resultsNo">
+  #if($parameters.totalItems == 0)
+    <span class='currentResultsNo'>$msg.get('xe.pagination.results.none')</span>
+  #elseif($parameters.totalItems == 1)
+    <span class='currentResultsNo'>$msg.get('xe.pagination.results.one')</span>
+  #elseif($from == $parameters.totalItems)
+    $msg.get('xe.pagination.results.single', [$from, $parameters.totalItems])
+  #else
+    $msg.get('xe.pagination.results.many', [$from, $to, $parameters.totalItems])
   #end
   </span>
 #end

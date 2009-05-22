@@ -1784,7 +1784,7 @@ function (row, i, table) {
  * <dl>
  *   <dt>url</dt>
  *   <dd>The base url of the document displaying the collection.</dd>
- *   <dd>Default: $doc.getURL('view'))</dd>
+ *   <dd>Default: $doc.getURL('view')</dd>
  *   <dt>totalItems</dt>
  *   <dd>The total number number of items in the collection.</dd>
  *   <dd>Default: none, this parameter is mandatory.</dd>

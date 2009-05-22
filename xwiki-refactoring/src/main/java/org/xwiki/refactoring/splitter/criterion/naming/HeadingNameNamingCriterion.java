@@ -20,9 +20,7 @@
 package org.xwiki.refactoring.splitter.criterion.naming;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
@@ -64,9 +62,9 @@ public class HeadingNameNamingCriterion implements NamingCriterion
     private NamingCriterion mainPageNameAndNumberingNamingCriterion;
 
     /**
-     * A map containing all the document names generated so far. This is used to avoid name clashes.
+     * A list containing all the document names generated so far. This is used to avoid name clashes.
      */
-    private Map<String, String> documentNames;
+    private List<String> documentNames;
 
     /**
      * Name of the base page name.
@@ -97,7 +95,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
         this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
         this.docBridge = docBridge;
         this.rendererFactory = rendererFactory;
-        this.documentNames = new HashMap<String, String>();
+        this.documentNames = new ArrayList<String>();
         int dot = baseDocumentName.lastIndexOf('.');
         this.spaceName = (dot != -1) ? baseDocumentName.substring(0, dot) : "Main";
         this.basePageName = baseDocumentName.substring(dot + 1);
@@ -144,16 +142,22 @@ public class HeadingNameNamingCriterion implements NamingCriterion
             documentName = prefix + documentName;
         }
 
+        // Truncate long document names.
+        int maxWidth = (documentNames.contains(documentName) || docBridge.exists(documentName)) ? 252 : 255;
+        if (documentName.length() > maxWidth) {
+            documentName = documentName.substring(0, maxWidth);
+        }
+
         // Resolve any name clashes.
         String newDocumentName = documentName;
         int localIndex = 0;
-        while (documentNames.containsKey(newDocumentName) || docBridge.exists(newDocumentName)) {
+        while (documentNames.contains(newDocumentName) || docBridge.exists(newDocumentName)) {
             // Append a trailing local index if the page already exists
             newDocumentName = documentName + INDEX_SEPERATOR + (++localIndex);
         }
 
         // Add the newly generated document name into the pool of generated document names.
-        documentNames.put(newDocumentName, newDocumentName);
+        documentNames.add(newDocumentName);
 
         return newDocumentName;
     }
@@ -166,6 +170,11 @@ public class HeadingNameNamingCriterion implements NamingCriterion
      */
     private String cleanPageName(String originalName)
     {
-        return originalName.trim().replaceAll("[\\.:]", "-");
+        // These characters are reserved for xwiki internal use.
+        String replaced = originalName.trim().replaceAll("[\\.:]", "-");
+        // Links to documents containing these characters are not rendered correctly at the moment.
+        replaced = replaced.replaceAll("[@?#~/]", "");
+        return replaced;
+
     }
 }

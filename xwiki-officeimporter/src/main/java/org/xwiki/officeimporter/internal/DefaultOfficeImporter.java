@@ -296,6 +296,10 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             title = renderXdom(new XDOM(clonedHeaderBlock.getChildren()), XWIKI_20);
             // Strip line-feed and new-line characters if present.
             title = title.replaceAll("[\n\r]", "");
+            // Truncate long titles.
+            if (title.length() > 255) {
+                title = title.substring(0, 255);
+            }
         }
         return title;
     }

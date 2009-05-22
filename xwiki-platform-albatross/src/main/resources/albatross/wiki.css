@@ -75,7 +75,7 @@ blockquote {
   font-size: inherit;
 }
 
-.box {
+.box, .code {
   margin-top: 4px;
   margin-bottom: 4px;
   padding: 5px 5px 5px 5px;
@@ -88,20 +88,8 @@ blockquote {
   width: 70%;
   overflow: auto;
 }
-
 .code {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  padding: 5px 5px 5px 5px;
-  color: inherit;
-  background-color: #eeeeee;
-  border: 1px dotted #003366;
   font-family: courier, courier new, monospace;
-  font-size: 12px;
-  line-height: 100%;
-  white-space: pre;
-  width: 70%;
-  overflow: auto;
 }
 
 .java-keyword {

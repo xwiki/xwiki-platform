@@ -232,7 +232,7 @@ Messages
   color: #c82;
 }
 
-div.errormessage, div.warningmessage, .infomessage, div.plainmessage{
+.errormessage, .warningmessage, .infomessage, .plainmessage{
   margin: 4px 0px 4px;
   border: 1px solid #DDD;
   padding: 8px 8px 8px 28px;
@@ -244,15 +244,15 @@ div.errormessage, div.warningmessage, .infomessage, div.plainmessage{
   background-image: url(icons/msginfo.png);
   color: #369;
 }
-div.plainmessage{
+.plainmessage{
   background-image: none;
   color: #369;
 }
-div.warningmessage{
+.warningmessage{
   background-image: url(icons/msgwarning.png);
   color: #c82;
 }
-div.errormessage{
+.errormessage{
   background-image: url(icons/msgerror.png);
   color: #F00;
 }

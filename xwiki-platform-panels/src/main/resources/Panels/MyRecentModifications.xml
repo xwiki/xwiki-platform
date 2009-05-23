@@ -146,7 +146,7 @@
 #else
 &lt;span class="pitemseparator"&gt; | &lt;/span&gt;
 #end
-&lt;span class="panelitem"&gt;&lt;a href="$rdoc.getURL("view")"&gt;$rdoc.displayTitle&lt;/a&gt;&lt;/span&gt;
+&lt;span class="panelitem"&gt;&lt;a href="$rdoc.getURL('view')"&gt;$xwiki.getXMLEncoded($rdoc.displayTitle)&lt;/a&gt;&lt;/span&gt;
 #end
 #panelfooter()
 #end</content>

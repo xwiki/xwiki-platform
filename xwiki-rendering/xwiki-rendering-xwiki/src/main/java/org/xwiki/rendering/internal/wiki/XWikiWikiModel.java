@@ -27,6 +27,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.wiki.WikiModel;
 
+/**
+ * Implementation using the Document Access Bridge ({@link DocumentAccessBridge}).
+ * 
+ * @version $Id$
+ * @since 2.0M1
+ */
 @Component
 public class XWikiWikiModel implements WikiModel
 {
@@ -36,21 +42,37 @@ public class XWikiWikiModel implements WikiModel
     @Requirement
     private DocumentNameSerializer documentNameSerializer;
     
+    /**
+     * {@inheritDoc}
+     * @see WikiModel#getAttachmentURL(String, String)
+     */
     public String getAttachmentURL(String documentName, String attachmentName)
     {
         return this.documentAccessBridge.getAttachmentURL(documentName, attachmentName);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see WikiModel#isDocumentAvailable(String)
+     */
     public boolean isDocumentAvailable(String documentName)
     {
         return this.documentAccessBridge.exists(documentName);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see WikiModel#getDocumentViewURL(String, String, String)
+     */
     public String getDocumentViewURL(String documentName, String anchor, String queryString)
     {
         return this.documentAccessBridge.getURL(documentName, "view", queryString, anchor);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see WikiModel#getDocumentEditURL(String, String, String)
+     */
     public String getDocumentEditURL(String documentName, String anchor, String queryString)
     {
         // Add the parent=<current document name> parameter to the query string of the edit URL so that

@@ -34,7 +34,7 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
  * (see {@link org.xwiki.rendering.configuration.RenderingConfiguration}).
  *
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M1
  */
 @Component
 public class XWikiLinkLabelGenerator implements LinkLabelGenerator

@@ -27,6 +27,12 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 
+/**
+ * Unit tests for {@link XWikiLinkLabelGenerator}.
+ * 
+ * @version $Id$
+ * @since 2.0M1
+ */
 public class XWikiLinkLabelGeneratorTest extends MockObjectTestCase
 {
     private XWikiLinkLabelGenerator generator;

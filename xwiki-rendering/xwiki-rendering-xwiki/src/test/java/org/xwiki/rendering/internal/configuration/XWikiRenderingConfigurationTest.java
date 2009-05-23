@@ -27,10 +27,10 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
  * 
  * @version $Id$
- * @since 1.6M2
+ * @since 2.0M1
  */
 @Component
-public class DefaultRenderingConfigurationTest extends AbstractXWikiRenderingTestCase
+public class XWikiRenderingConfigurationTest extends AbstractXWikiRenderingTestCase
 {
     public void testDefaultConfiguration() throws Exception
     {

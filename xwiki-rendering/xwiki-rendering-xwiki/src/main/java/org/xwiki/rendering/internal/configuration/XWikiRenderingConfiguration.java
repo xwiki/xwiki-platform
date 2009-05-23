@@ -31,7 +31,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
  * All configuration options for the rendering subsystem.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M1
  */
 @Component
 public class XWikiRenderingConfiguration implements Initializable, RenderingConfiguration

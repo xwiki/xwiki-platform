@@ -31,7 +31,7 @@ XWiki.viewers.Attachments = Class.create({
    * HTML element on succes. Display error message (alert) on failure.
    */
   addDeleteListener : function() {
-    $$('.attachment .xwikibuttonlinks a.deletelink').each(function(item) {
+    $$('.attachment a.deletelink').each(function(item) {
       item.observe('click', function(event) {
         item.blur();
         event.stop();

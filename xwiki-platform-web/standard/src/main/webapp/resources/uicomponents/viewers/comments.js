@@ -53,7 +53,10 @@ XWiki.viewers.Comments = Class.create({
    * HTML element on succes (replace it with a small notification message). Display error message (alert) on failure.
    */
   addDeleteListener : function() {
-    $$(this.xcommentSelector + ' a.delete').each(function(item) {
+    $$(this.xcommentSelector).each(function(item) {
+      // Prototype bug in Opera: $$(".comment a.delete") returns only the first result.
+      // Quick fix until Prototype 1.6.1 is integrated.
+      item = item.down('a.delete');
       item.observe('click', function(event) {
         item.blur();
         event.stop();
@@ -103,7 +106,10 @@ XWiki.viewers.Comments = Class.create({
    */
   addReplyListener : function() {
     if (this.form) {
-      $$(this.xcommentSelector + ' a.commentreply').each(function(item) {
+      $$(this.xcommentSelector).each(function(item) {
+        // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
+        // Quick fix until Prototype 1.6.1 is integrated.
+        item = item.down('a.commentreply');
         item.observe('click', function(event) {
           item.blur();
           event.stop();
@@ -186,7 +192,7 @@ XWiki.viewers.Comments = Class.create({
   addCancelListener : function() {
     if (this.form) {
       this.initialLocation = new Element("span", {className : "hidden"});
-      this.form.insert({before: this.initialLocation});
+      $('_comments').insert(this.initialLocation);
       // If the form is inside a thread, as a reply form, move it back to the bottom.
       this.form.down("input[name='action_cancel']").observe('click', this.resetForm.bindAsEventListener(this));
     }

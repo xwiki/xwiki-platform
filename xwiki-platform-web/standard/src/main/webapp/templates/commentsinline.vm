@@ -52,8 +52,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
       <span class="commenttools">
-      #if($xwiki.hasAccessLevel('comment') && "$!{request.replyto}" != "${comment.number}")
-        <span class="commenttool commentreply"><a class="commentreply" href="${request.getRequestURL()}?replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')">$msg.get('core.viewers.comments.reply')</a></span>
+      #if($xwiki.hasAccessLevel('comment'))
+        <span class="commenttool commentreply"><a class="commentreply" href="${request.getRequestURL()}?${request.getQueryString().replaceAll('&?replyto=\d++', '')}&amp;replyto=${comment.number}#xwikicomment_${comment.number}" title="$msg.get('core.viewers.comments.reply')"#if("$!{request.replyto}" == "${comment.number}") style="display: none;"#end>$msg.get('core.viewers.comments.reply')</a></span>
       #end
       #if($hasEdit) 
         <span class="commenttool commentdelete"><a class="delete" href="$doc.getURL('objectremove', "classname=${xCommentClass}&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")" title="$msg.get('core.viewers.comments.delete')">$msg.get('core.viewers.comments.delete')</a></span>

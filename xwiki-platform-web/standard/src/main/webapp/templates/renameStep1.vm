@@ -2,7 +2,7 @@
 ### Rename document template, step 1: choose new name + updated backlinks
 ###
 ## TODO: check if this information should be displayed?
-<h1><span>$msg.get('core.rename.title', [$xwiki.getXMLEncoded($doc.fullName]))</span></h1>
+<h1><span>$msg.get('core.rename.title', [$xwiki.getXMLEncoded($doc.fullName)])</span></h1>
 #set($newname = $msg.get("core.rename.inputPrompt"))
 <form action="?xpage=rename&amp;step=2" method="post"
     onsubmit="if(this.newPageName.value=='${newname}') this.newPageName.value=''">

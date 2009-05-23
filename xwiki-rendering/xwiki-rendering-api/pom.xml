@@ -78,6 +78,19 @@
       <artifactId>xwiki-core-shared-tests</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>
+      <!-- Exclude some deps drawn transitively and that we don't use.
+           We do this to prevent the Enforcer plugin configuration for
+           this module from failing. -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-core-bridge</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.xwiki.platform</groupId>
+          <artifactId>xwiki-core-configuration</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>
@@ -140,7 +153,7 @@
       </plugin>
       <!-- Ensure that some modules are not added as dependencies. We don't want them since we want this API
            module to be usable outside of XWiki in a standalone manner.  -->
-      <!--plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
@@ -161,7 +174,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin-->
+      </plugin>
     </plugins>
   </build>
 </project>

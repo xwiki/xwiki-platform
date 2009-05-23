@@ -244,7 +244,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 
     public boolean isInMacro()
     {
-        return getMacroDepth() < 0;
+        return getMacroDepth() > 0;
     }
 
     // Events

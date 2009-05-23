@@ -30,7 +30,7 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 /**
  * Renderer that generates XHTML from a XDOM resulting from the parsing of text containing HTML mixed with wiki syntax.
  * We override the default XHTML renderer since we want special behaviors, for example to not escape special symbols
- * (since we don't want to escape HTML tags for example). 
+ * (since we don't want to escape HTML tags for example).
  * 
  * @version $Id $
  * @since 1.8.3
@@ -39,18 +39,26 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
 {
     /**
      * @param printer the object to which to write the XHTML output to
-     * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because
-     *        link rendering depends on how the underlying system wants to handle it. For example for XWiki we
-     *        check if the document exists, we get the document URL, etc.
-     * @param imageRenderer the object to render image events into XHTML. This is done so that it's pluggable
-     *        because image rendering depends on how the underlying system wants to handle it. For example for XWiki
-     *        we check if the image exists as a document attachments, we get its URL, etc.
+     * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because link
+     *            rendering depends on how the underlying system wants to handle it. For example for XWiki we check if
+     *            the document exists, we get the document URL, etc.
+     * @param imageRenderer the object to render image events into XHTML. This is done so that it's pluggable because
+     *            image rendering depends on how the underlying system wants to handle it. For example for XWiki we
+     *            check if the image exists as a document attachments, we get its URL, etc.
      * @param listenerChain the chain of listener filters used to compute various states
      */
-    public HTMLMacroXHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, 
+    public HTMLMacroXHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer,
         XHTMLImageRenderer imageRenderer, ListenerChain listenerChain)
     {
         super(printer, linkRenderer, imageRenderer, listenerChain);
+    }
+
+    /**
+     * @return true if the current event is generated from a transformation.
+     */
+    private boolean isInGeneratedBlock()
+    {
+        return getBlockState().isInMacro();
     }
 
     /**
@@ -61,7 +69,11 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void onSpecialSymbol(char symbol)
     {
-        getPrinter().print("" + symbol);
+        if (!isInGeneratedBlock()) {
+            getPrinter().print("" + symbol);
+        } else {
+            super.onSpecialSymbol(symbol);
+        }
     }
 
     /**
@@ -72,7 +84,11 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void onWord(String word)
     {
-        getPrinter().print(word);
+        if (!isInGeneratedBlock()) {
+            getPrinter().print(word);
+        } else {
+            super.onWord(word);
+        }
     }
 
     /**
@@ -83,7 +99,11 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void onNewLine()
     {
-        getPrinter().print("\n");
+        if (!isInGeneratedBlock()) {
+            getPrinter().print("\n");
+        } else {
+            super.onNewLine();
+        }
     }
 
     /**
@@ -94,7 +114,11 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void onSpace()
     {
-        getPrinter().print(" ");
+        if (!isInGeneratedBlock()) {
+            getPrinter().print(" ");
+        } else {
+            super.onSpace();
+        }
     }
 
     /**
@@ -105,7 +129,11 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void onEmptyLines(int count)
     {
-        // Don't print anything.
+        if (!isInGeneratedBlock()) {
+            // Don't print anything.
+        } else {
+            super.onEmptyLines(count);
+        }
     }
 
     /**
@@ -116,7 +144,11 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
-        // Don't print anything.
+        if (!isInGeneratedBlock()) {
+            // Don't print anything.
+        } else {
+            super.beginParagraph(parameters);
+        }
     }
 
     /**
@@ -127,6 +159,10 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     @Override
     public void endParagraph(Map<String, String> parameters)
     {
-        // Don't print anything.
+        if (!isInGeneratedBlock()) {
+            // Don't print anything.
+        } else {
+            super.endParagraph(parameters);
+        }
     }
 }

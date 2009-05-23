@@ -80,7 +80,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
 
     // State
 
-    private BlockStateChainingListener getBlockState()
+    protected BlockStateChainingListener getBlockState()
     {
         return (BlockStateChainingListener) getListenerChain().getListener(BlockStateChainingListener.class);
     }

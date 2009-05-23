@@ -49,17 +49,4 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
         dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
-     */
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        getComponentManager().registerComponent(MockConfigurationSourceCollection.getComponentDescriptor());
-        getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
-    }
 }

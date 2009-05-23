@@ -19,17 +19,21 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
-import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.xhtml.WikiXHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.WikiXHTMLLinkRenderer;
+import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * Default implementation of {@link XHTMLRendererFactory} that uses component injection to
@@ -39,28 +43,45 @@ import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
  * @since 2.0M1
  */
 @Component
-public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory
+public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory, Composable
 {
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge;
-
     @Requirement
     private LinkLabelGenerator linkLabelGenerator;
 
     @Requirement
     private AttachmentParser attachmentParser;
 
-    @Requirement
-    private DocumentNameSerializer documentNameSerializer;
+    /**
+     * Used to find which implementation of XHTML Link and Image Renderers to use:
+     * If there's an implementation of {@link WikiModel} registered then use the 
+     * Wiki Renderers, otherwise use the Simple Renderers.
+     */
+    private ComponentManager componentManager;
     
+    /**
+     * {@inheritDoc}
+     * @see Composable#compose(ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
+
     /**
      * {@inheritDoc}
      * @see XHTMLRendererFactory#createXHTMLLinkRenderer()
      */
     public XHTMLLinkRenderer createXHTMLLinkRenderer()
     {
-        return new XWikiXHTMLLinkRenderer(this.documentAccessBridge,
-            this.linkLabelGenerator, this.attachmentParser, this.documentNameSerializer);        
+        XHTMLLinkRenderer renderer;
+        try {
+            WikiModel wikiModel = (WikiModel) this.componentManager.lookup(WikiModel.class);
+            renderer = new WikiXHTMLLinkRenderer(wikiModel, this.linkLabelGenerator, this.attachmentParser); 
+        } catch (ComponentLookupException e) {
+            // There's no WikiModel implementation available, fall back to the Simple Renderer
+            renderer = new SimpleXHTMLLinkRenderer(); 
+        }
+        return renderer; 
     }
     
     /**
@@ -69,6 +90,14 @@ public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory
      */
     public XHTMLImageRenderer createXHTMLImageRenderer()
     {
-        return new XWikiXHTMLImageRenderer(this.documentAccessBridge);
+        XHTMLImageRenderer renderer;
+        try {
+            WikiModel wikiModel = (WikiModel) this.componentManager.lookup(WikiModel.class);
+            renderer = new WikiXHTMLImageRenderer(wikiModel); 
+        } catch (ComponentLookupException e) {
+            // There's no WikiModel implementation available, fall back to the Simple Renderer
+            renderer = new SimpleXHTMLImageRenderer(); 
+        }
+        return renderer; 
     }
 }

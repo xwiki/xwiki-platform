@@ -49,16 +49,6 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-configuration</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xml</artifactId>
       <version>${pom.version}</version>
     </dependency>
@@ -148,6 +138,30 @@
           </excludes>
         </configuration>
       </plugin>
+      <!-- Ensure that some modules are not added as dependencies. We don't want them since we want this API
+           module to be usable outside of XWiki in a standalone manner.  -->
+      <!--plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.xwiki.platform:xwiki-core-bridge</exclude>
+                    <exclude>org.xwiki.platform:xwiki-core-configuration</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin-->
     </plugins>
   </build>
 </project>

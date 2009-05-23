@@ -25,7 +25,7 @@ import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.parser.AttachmentParser;
 
 /**
- * Parses XWiki attachment definitions, of the following format: <code>wiki:Space.Page@attachmentName</code> where
+ * Parses attachment definitions, of the following format: <code>reference@attachmentName</code> where
  * <code>attachmentName</code> is the name of the attachment (for example "my.txt").
  * 
  * @version $Id$

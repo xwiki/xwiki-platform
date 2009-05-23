@@ -23,9 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
@@ -33,14 +30,16 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
+import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Default XWiki implementation for rendering links as XHTML using XWiki Documents.
+ * Default implementation for rendering links as XHTML when inside a wiki (ie when
+ * an implementation of {@link WikiModel} is provided.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
+public class WikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 {
     /**
      * The XHTML element <code>class</code> parameter.
@@ -75,7 +74,7 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * Used to generate the link targeting a local document.
      */
-    private DocumentAccessBridge documentAccessBridge;
+    private WikiModel wikiModel;
 
     /**
      * Used to generate a link label.
@@ -93,24 +92,17 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
     /**
-     * Used to generate document String identifier.
-     */
-    private DocumentNameSerializer documentNameSerializer;
-
-    /**
-     * @param documentAccessBridge used to generate the link targeting a local document.
+     * @param wikiModel used to generate the link targeting a local document.
      * @param linkLabelGenerator used to generate a link label.
      * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
      *            attachment.
-     * @param documentNameSerializer used to generate document String identifier.
      */
-    public XWikiXHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, LinkLabelGenerator linkLabelGenerator,
-        AttachmentParser attachmentParser, DocumentNameSerializer documentNameSerializer)
+    public WikiXHTMLLinkRenderer(WikiModel wikiModel, LinkLabelGenerator linkLabelGenerator,
+        AttachmentParser attachmentParser)
     {
-        this.documentAccessBridge = documentAccessBridge;
+        this.wikiModel = wikiModel;
         this.linkLabelGenerator = linkLabelGenerator;
         this.attachmentParser = attachmentParser;
-        this.documentNameSerializer = documentNameSerializer;
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
     }
 
@@ -181,7 +173,7 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
             if ((link.getType() == LinkType.URI) && link.getReference().startsWith(ATTACH)) {
                 // use the default attachment syntax parser to extract document name and attachment name
                 Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
-                aAttributes.put(HREF, this.documentAccessBridge.getAttachmentURL(attachment.getDocumentName(),
+                aAttributes.put(HREF, this.wikiModel.getAttachmentURL(attachment.getDocumentName(),
                     attachment.getAttachmentName()));
             } else {
                 aAttributes.put(HREF, link.getReference());
@@ -210,26 +202,17 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
         if (StringUtils.isEmpty(link.getReference()) && link.getAnchor() != null) {            
             spanAttributes.put(CLASS, WIKILINK);
             aAttributes.put(HREF, "#" + link.getAnchor());
-        } else if (StringUtils.isEmpty(link.getReference()) || this.documentAccessBridge.exists(link.getReference())) {
+        } else if (StringUtils.isEmpty(link.getReference()) 
+            || this.wikiModel.isDocumentAvailable(link.getReference()))
+        {
             spanAttributes.put(CLASS, WIKILINK);                
-            aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "view", link
-                .getQueryString(), link.getAnchor()));
+            aAttributes.put(HREF, this.wikiModel.getDocumentViewURL(link.getReference(), link.getAnchor(),
+                link.getQueryString()));
         } else {
+            // The wiki document doesn't exist
             spanAttributes.put(CLASS, "wikicreatelink");
-
-            // Add the parent=<current document name> parameter to the query string of the generated URL so that
-            // the new document is created with the current page as its parent.
-            String queryString = link.getQueryString();
-            if (StringUtils.isBlank(queryString)) {
-                DocumentName documentName = this.documentAccessBridge.getCurrentDocumentName();
-                if (documentName != null) {
-                    queryString = "parent=" + this.documentNameSerializer.serialize(documentName);
-                }
-            }
-
-            aAttributes.put(HREF, this.documentAccessBridge.getURL(link.getReference(), "edit", queryString, link
-                .getAnchor()));
-
+            aAttributes.put(HREF, this.wikiModel.getDocumentEditURL(link.getReference(), link.getAnchor(),
+                link.getQueryString()));
         }
         
         this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);

@@ -17,23 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
+package org.xwiki.rendering.scaffolding;
 
 /**
- * Basic default implementation to be used when the XWiki Rendering is used standalone, outside of XWiki.
- *
+ * To be used when testing components that use {@link org.xwiki.rendering.wiki.WikiModel}. 
+ * 
  * @version $Id$
  * @since 2.0M1
  */
-@Component
-public class DefaultLinkLabelGenerator implements LinkLabelGenerator
+public abstract class AbstractXWikiRenderingTestCase extends AbstractRenderingTestCase
 {
-    public String generate(Link link)
+    public AbstractXWikiRenderingTestCase()
     {
-        return link.getReference();
+        super();
+    }
+
+    public AbstractXWikiRenderingTestCase(String testName)
+    {
+        super(testName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
+     */
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockConfigurationSourceCollection.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
     }
 }

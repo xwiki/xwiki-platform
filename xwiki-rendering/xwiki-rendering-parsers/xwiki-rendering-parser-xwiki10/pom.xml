@@ -57,12 +57,18 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-xwiki</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Seems like there's no transitive dependencies for test-jar types so we need
          to specify these dependencies even though they are in the xwiki-core-rendering-tests
          POM. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-api</artifactId>
+      <artifactId>xwiki-core-rendering-xwiki</artifactId>
       <version>${pom.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

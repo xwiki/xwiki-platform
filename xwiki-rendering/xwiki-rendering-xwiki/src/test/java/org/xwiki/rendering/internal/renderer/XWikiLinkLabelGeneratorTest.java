@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.xwiki.rendering.internal.renderer;
 
 import org.jmock.Mock;
@@ -8,9 +27,9 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 
-public class DefaultLinkLabelGeneratorTest extends MockObjectTestCase
+public class XWikiLinkLabelGeneratorTest extends MockObjectTestCase
 {
-    private DefaultLinkLabelGenerator generator;
+    private XWikiLinkLabelGenerator generator;
 
     private Mock mockModelBridge;
 
@@ -24,7 +43,7 @@ public class DefaultLinkLabelGeneratorTest extends MockObjectTestCase
     @Override
     protected void setUp()
     {
-        this.generator = new DefaultLinkLabelGenerator();
+        this.generator = new XWikiLinkLabelGenerator();
 
         Mock mockConfiguration = mock(RenderingConfiguration.class);
         mockConfiguration.stubs().method("getLinkLabelFormat").will(returnValue("[%w:%s.%p] %P (%t) [%w:%s.%p] %P (%t)"));

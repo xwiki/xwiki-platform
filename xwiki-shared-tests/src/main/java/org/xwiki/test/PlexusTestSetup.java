@@ -33,8 +33,9 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * JUnit Test Setup that initializes Plexus. Test suite that want to initialize the Plexus component manager only once
- * should use this class instead of {@link AbstractXWikiComponentTestCase}.
+ * JUnit Test Setup that initializes the Component Manager. 
+ * Test suite that want to initialize the Component manager only once should use this class instead of 
+ * {@link AbstractXWikiComponentTestCase}.
  * 
  * @version $Id$
  * @since 1.6M1

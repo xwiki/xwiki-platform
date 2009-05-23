@@ -19,14 +19,14 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractXWikiRenderingTestCase;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
 import java.util.List;
 
-public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
+public class DefaultSyntaxFactoryTest extends AbstractXWikiRenderingTestCase
 {
     public void testGetAvailableSyntaxes() throws Exception
     {

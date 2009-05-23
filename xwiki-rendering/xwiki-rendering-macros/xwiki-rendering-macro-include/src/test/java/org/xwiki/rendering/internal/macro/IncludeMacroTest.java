@@ -33,7 +33,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractXWikiRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.velocity.VelocityManager;
@@ -44,7 +44,7 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacroTest extends AbstractRenderingTestCase
+public class IncludeMacroTest extends AbstractXWikiRenderingTestCase
 {
     @Override
     protected void registerComponents() throws Exception

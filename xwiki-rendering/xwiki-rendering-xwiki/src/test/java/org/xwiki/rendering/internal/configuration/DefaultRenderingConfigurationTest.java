@@ -20,17 +20,17 @@
 package org.xwiki.rendering.internal.configuration;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractXWikiRenderingTestCase;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
- * Unit tests for {@link org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration}.
+ * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
  * 
  * @version $Id$
  * @since 1.6M2
  */
 @Component
-public class DefaultRenderingConfigurationTest extends AbstractRenderingTestCase
+public class DefaultRenderingConfigurationTest extends AbstractXWikiRenderingTestCase
 {
     public void testDefaultConfiguration() throws Exception
     {

@@ -22,21 +22,22 @@ package org.xwiki.rendering.renderer.xhtml;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
+import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Default XWiki implementation for rendering images as XHTML using XWiki Documents.
+ * Default implementation for rendering images as XHTML when inside a wiki (ie when
+ * an implementation of {@link WikiModel} is provided.
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
+public class WikiXHTMLImageRenderer implements XHTMLImageRenderer
 {
     /**
      * @see #setXHTMLWikiPrinter(XHTMLWikiPrinter)
@@ -46,7 +47,7 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
     /**
      * Use to resolve local image URL when the image is attached to a document.
      */
-    private DocumentAccessBridge documentAccessBridge;
+    private WikiModel wikiModel;
 
     /**
      * Used to get the original image reference syntax.
@@ -54,11 +55,11 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
     private XWikiSyntaxImageRenderer imageRenderer;
 
     /**
-     * @param documentAccessBridge the {@link DocumentAccessBridge}.
+     * @param wikiModel the {@link WikiModel}.
      */
-    public XWikiXHTMLImageRenderer(DocumentAccessBridge documentAccessBridge)
+    public WikiXHTMLImageRenderer(WikiModel wikiModel)
     {
-        this.documentAccessBridge = documentAccessBridge;
+        this.wikiModel = wikiModel;
         this.imageRenderer = new XWikiSyntaxImageRenderer();
     }
 
@@ -83,9 +84,8 @@ public class XWikiXHTMLImageRenderer implements XHTMLImageRenderer
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
-            imageURL =
-                this.documentAccessBridge.getAttachmentURL(documentImage.getDocumentName(), documentImage
-                    .getAttachmentName());
+            imageURL = this.wikiModel.getAttachmentURL(documentImage.getDocumentName(), 
+                documentImage.getAttachmentName());
         } else {
             URLImage urlImage = (URLImage) image;
             imageURL = urlImage.getURL();

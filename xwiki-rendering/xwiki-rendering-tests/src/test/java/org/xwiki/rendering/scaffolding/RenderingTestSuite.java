@@ -32,14 +32,15 @@ import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
 import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;
-import org.xwiki.rendering.internal.renderer.DefaultLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
+import org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator;
 import org.xwiki.rendering.internal.renderer.xhtml.DefaultXHTMLRendererFactory;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
+import org.xwiki.test.XWikiComponentInitializer;
 
 /**
  * @version $Id$
@@ -62,15 +63,19 @@ public class RenderingTestSuite extends TestSuite
     {
         super(name);
 
-        DefaultLinkLabelGenerator linkLabelGenerator = new DefaultLinkLabelGenerator();
+        XWikiLinkLabelGenerator linkLabelGenerator = new XWikiLinkLabelGenerator();
         linkLabelGenerator.setDocumentAccessBridge(new MockDocumentAccessBridge());
         linkLabelGenerator.setRenderingConfiguration(new DefaultRenderingConfiguration());
 
         XHTMLRendererFactory xhtmlRendererFactory = new DefaultXHTMLRendererFactory();
-        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "documentAccessBridge", new MockDocumentAccessBridge());
+        
+        XWikiComponentInitializer initializer = new XWikiComponentInitializer();
+        initializer.getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        initializer.getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
+        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "componentManager", initializer.getComponentManager());
+
         ReflectionUtils.setFieldValue(xhtmlRendererFactory, "linkLabelGenerator", linkLabelGenerator);
         ReflectionUtils.setFieldValue(xhtmlRendererFactory, "attachmentParser", new DefaultAttachmentParser());
-        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "documentNameSerializer", new MockDocumentNameSerializer());
         
         this.rendererFactory = new DefaultPrintRendererFactory();
         ReflectionUtils.setFieldValue(this.rendererFactory, "xhtmlRendererFactory", xhtmlRendererFactory);

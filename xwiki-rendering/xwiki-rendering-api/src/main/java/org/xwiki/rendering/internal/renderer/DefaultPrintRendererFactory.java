@@ -44,7 +44,7 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
 public class DefaultPrintRendererFactory implements PrintRendererFactory
 {
     /**
-     * Factory to easily create an XHTML Image and Link Renderer.
+     * Factory to easily create an XHTML Image and Link Renderers.
      */
     @Requirement
     private XHTMLRendererFactory xhtmlRendererFactory;
@@ -72,7 +72,7 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         } else if (targetSyntax.toIdString().equals("tex/1.0")) {
             result = new TexRenderer(printer);
         } else if (targetSyntax.toIdString().equals("plain/1.0")) {
-            result = new PlainTextRenderer(printer, linkLabelGenerator);
+            result = new PlainTextRenderer(printer, this.linkLabelGenerator);
         } else {
             throw new RuntimeException("No renderer found for target syntax [" + targetSyntax + "]");
         }

@@ -23,7 +23,6 @@ import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.html.HTMLMacroParameters;
-import org.xwiki.rendering.scaffolding.MockDocumentNameSerializer;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 

@@ -20,21 +20,49 @@
 package org.xwiki.rendering.internal.configuration;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationManager;
+import org.xwiki.configuration.ConfigurationSourceCollection;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
- * Basic default implementation to be used when using the XWiki Rendering system standalone.
+ * All configuration options for the rendering subsystem.
  * 
- * @version $Id$
- * @since 2.0M1
+ * @version $Id: DefaultRenderingConfiguration.java 19713 2009-05-11 21:36:01Z sdumitriu $
+ * @since 1.6M1
  */
 @Component
-public class DefaultRenderingConfiguration implements RenderingConfiguration
+public class XWikiRenderingConfiguration implements Initializable, RenderingConfiguration
 {
     /**
      * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
      */
     private String linkLabelFormat = "%p";
+
+    /**
+     * Allows reading the rendering configuration from where it's defined.
+     */
+    @Requirement
+    private ConfigurationManager configurationManager;
+
+    /**
+     * Defines from where to read the rendering configuration data. 
+     */
+    @Requirement
+    private ConfigurationSourceCollection sourceCollection;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
+            "rendering");
+    }
 
     /**
      * {@inheritDoc}

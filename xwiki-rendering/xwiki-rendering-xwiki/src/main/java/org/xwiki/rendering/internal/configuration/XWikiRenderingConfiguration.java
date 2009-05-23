@@ -30,7 +30,7 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 /**
  * All configuration options for the rendering subsystem.
  * 
- * @version $Id: DefaultRenderingConfiguration.java 19713 2009-05-11 21:36:01Z sdumitriu $
+ * @version $Id$
  * @since 1.6M1
  */
 @Component

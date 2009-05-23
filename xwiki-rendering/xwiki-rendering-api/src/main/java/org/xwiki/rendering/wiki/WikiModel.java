@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * generate the HTML (in order to display a question mark for non existing documents) and it also needs to get the
  * URL pointing the wiki document. 
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @ComponentRole

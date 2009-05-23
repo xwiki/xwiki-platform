@@ -5,6 +5,6 @@
 #if("$!request.xpage" == 'comments')
   $response.sendRedirect($doc.getURL('view', 'viewer=comments'))
 #else
-  <h1><span>$msg.get('core.viewers.comments.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
+  <h1><span>$msg.get('core.viewers.comments.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</span></h1>
   #template("commentsinline.vm")
 #end

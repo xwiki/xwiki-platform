@@ -13,8 +13,6 @@
 <input type="hidden" name="xcontinue" value="$xcontinue"/>
 <input type="hidden" name="xredirect" value="$!xredirect" />
 <input type="hidden" name="language" value="$!tdoc.realLanguage" />
-## <input type="hidden" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/>
-## <input type="hidden" id="xwikidocparentinput" name="parent" value="$!tdoc.parent"/>
 </div> ## hidden
 <div id="xwikitext">
 <div id="xwikieditcontent">

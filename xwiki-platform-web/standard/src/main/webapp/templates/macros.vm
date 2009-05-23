@@ -1360,7 +1360,7 @@ $html
           <li class="xitem space"><div class="xitemcontainer">$document.getSpace()<ul class="xlist"> ## Open new space item
           #set($previousSpace = $document.getSpace())
         #end
-        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">$document.getDisplayTitle()</a></div></li>        
+        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">$xwiki.getXMLEncoded($document.getDisplayTitle())</a></div></li>
       #end
       #if($displaySpaces)          
         </ul></div></li> ## Close last space item

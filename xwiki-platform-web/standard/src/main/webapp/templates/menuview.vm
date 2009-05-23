@@ -17,7 +17,7 @@
     #if ($adminapppresent)
       #xwikitopmenuentrystart($adminwikiaction $msg.get("core.menu.admin") "tmAdmin")
       #submenuitem($adminwikiaction $msg.get("core.menu.admin.wiki") "tmAdminwiki")
-      #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$doc.space]) "tmAdminspace")
+      #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$xwiki.getXMLEncoded($doc.space)]) "tmAdminspace")
       #xwikitopmenuentryend()
     #else
       #xwikitopmenuentry($importaction $msg.get("core.menu.admin") "tmAdmin")
@@ -171,23 +171,23 @@ function watchlist(action)
   #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
   #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())
   #if ($isDocWatched || $isSpaceWatched)
-    #xwikitopmenuentrystart("javascript:watchlist('removedocument')" $msg.get("core.menu.watch") "tmWatched")
+    #xwikitopmenuentrystart("javascript:watchlist('removedocument')" $msg.get('core.menu.watch') 'tmWatched')
   #else
-    #xwikitopmenuentrystart("javascript:watchlist('adddocument')" $msg.get("core.menu.watch") "tmWatch")
+    #xwikitopmenuentrystart("javascript:watchlist('adddocument')" $msg.get('core.menu.watch') 'tmWatch')
   #end
   #if (!$isDocWatched)
-    #submenuitem("javascript:watchlist('adddocument')" $msg.get("core.menu.watchlist.add.page") "tmWatchPage")
+    #submenuitem("javascript:watchlist('adddocument')" $msg.get('core.menu.watchlist.add.page') 'tmWatchPage')
   #else
-    #submenuitem("javascript:watchlist('removedocument')" $msg.get("core.menu.watchlist.remove.page") "tmUnwatchPage")
+    #submenuitem("javascript:watchlist('removedocument')" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchPage')
   #end
   #submenuseparator()
   #if (!$isSpaceWatched)
-    #submenuitem("javascript:watchlist('addspace')" $msg.get("core.menu.watchlist.add.space", [$doc.space]) "tmWatchSpace")
+    #submenuitem("javascript:watchlist('addspace')" $msg.get('core.menu.watchlist.add.space', [$xwiki.getXMLEncoded($doc.space)]) 'tmWatchSpace')
   #else
-    #submenuitem("javascript:watchlist('removespace')" $msg.get("core.menu.watchlist.remove.space") "tmUnwatchSpace")
+    #submenuitem("javascript:watchlist('removespace')" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace')
   #end
   #submenuseparator()
-  #submenuitem($xwiki.getURL("XWiki.WatchListManager", "view") $msg.get("core.menu.watchlist.management") "tmWatchlistManager")
+  #submenuitem($xwiki.getURL('XWiki.WatchListManager', 'view') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager')
   #xwikitopmenuentryend()
 #end
 </div>

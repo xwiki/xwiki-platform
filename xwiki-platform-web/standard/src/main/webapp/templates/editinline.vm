@@ -16,11 +16,11 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 <input type="hidden" name="xnotification" value="$!xnotification" />
 <input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="language" value="$!doc.language" />
-#if("$!request.parent" != "")
-  <input type="hidden" name="parent" value="$!request.parent" />
+#if("$!request.parent" != '')
+  <input type="hidden" name="parent" value="$xwiki.getXMLEncoded($!request.parent)" />
 #end
-#if("$!request.title" != "")
-  <input type="hidden" name="title" value="$!request.title" />
+#if("$!request.title" != '')
+  <input type="hidden" name="title" value="$xwiki.getXMLEncoded($!request.title)" />
 #end
 #set($force = $!request.get("force"))
 #if (($doc.getLocked()==true)&&(!$force))

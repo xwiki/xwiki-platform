@@ -25,11 +25,11 @@
 #else
   #set($isAdvancedUser = ($userObj.getProperty("usertype").value == "Advanced"))
 #end
-#set($parent ="<a href='$parentDoc.getURL()'>${parentDoc.displayTitle}</a>")
+#set($parent ="<a href='$parentDoc.getURL()'>$xwiki.getXMLEncoded(${parentDoc.displayTitle})</a>")
 #if($tdoc)
-#set($headertitle = "<a href='$viewUrl'>${tdoc.displayTitle.replaceAll('&(?!#)', '&#38;')}</a>")
+#set($headertitle = "<a href='$viewUrl'>$xwiki.getXMLEncoded(${tdoc.displayTitle})</a>")
 #else
-#set($headertitle = "<a href='$viewUrl'>${doc.displayTitle.replaceAll('&(?!#)', '&#38;')}</a>")
+#set($headertitle = "<a href='$viewUrl'>$xwiki.getXMLEncoded(${doc.displayTitle})</a>")
 #end
 #set($skin=$xwiki.getSkin())
 #set($copyright=$xwiki.getWebCopyright())

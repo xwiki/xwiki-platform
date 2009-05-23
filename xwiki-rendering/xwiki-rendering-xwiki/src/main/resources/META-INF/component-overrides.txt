@@ -1,0 +1,3 @@
+org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration
+org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator
+org.xwiki.rendering.internal.wiki.XWikiWikiModel

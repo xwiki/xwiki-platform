@@ -1,11 +1,11 @@
 <h1><span>$xwiki.parseMessage("viewattributestitle")</span></h1>
 
 <ul>
-<li>$msg.get("titlefield"): $doc.displayTitle</li>
-<li>$msg.get("fullName"): $doc.fullName</li>
-<li>$msg.get("creator"): $doc.creator</li>
+<li>$msg.get("titlefield"): $xwiki.getXMLEncoded($doc.displayTitle)</li>
+<li>$msg.get("fullName"): $xwiki.getXMLEncoded($doc.fullName)</li>
+<li>$msg.get("creator"): $xwiki.getXMLEncoded($doc.creator)</li>
 <li>$msg.get("creationdate"): $doc.creationDate</li>
-<li>$msg.get("lastmodifiedby"): $doc.author on $doc.date</li>
+<li>$msg.get("lastmodifiedby"): $xwiki.getXMLEncoded($doc.author) on $doc.date</li>
 <li>Comments: $doc.comments.size()</li>
 <li>Attachments: $doc.attachmentList.size()</li>
 #if($doc.backlinks.size()>0) <li>Links to this document:
@@ -35,7 +35,7 @@
 #if($doc.includedMacros.size()>0) <li>Included Pages:
 <ul>
 #foreach($item in $doc.includedMacros)
-<li>$item</li>
+<li>$xwiki.getXMLEncoded($item)</li>
 #end
 </ul>
 </li>
@@ -43,18 +43,18 @@
 #if($doc.includedPages.size()>0) <li>Included Pages:
 <ul>
 #foreach($item in $doc.includedPages)
-<li>$item</li>
+<li>$xwiki.getXMLEncoded($item)</li>
 #end
 </ul>
 </li>
 #end
 ##<li>$doc.locked (bool) by $doc.lockingDate on </li>
 ##<li>$doc.lockingUser</li>
-<li>Document name: $doc.name</li>
-<li>Document parent: $doc.parent</li>
-<li>Document revisions:$doc.revisions (vector)</li>
-<li>Document template:$doc.template</li>
-<li>Document title:$doc.title</li>
-<li>Document translation list:$doc.translationList (list)</li>
-<li>Document version:$doc.version</li>
+<li>Document name: $xwiki.getXMLEncoded($doc.name)</li>
+<li>Document parent: $xwiki.getXMLEncoded($doc.parent)</li>
+<li>Document revisions: $doc.revisions (vector)</li>
+<li>Document template: $doc.template</li>
+<li>Document title: $xwiki.getXMLEncoded($doc.title)</li>
+<li>Document translation list: $doc.translationList (list)</li>
+<li>Document version: $doc.version</li>
 </ul>

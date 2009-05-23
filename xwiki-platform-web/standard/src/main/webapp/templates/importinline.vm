@@ -44,7 +44,7 @@
   #set($attachments = $doc.attachmentList)
   <div id="attachments">
     #if($attachments.size()>0)
-      <table class="xwikidatatable" summary="$msg.get("document") ${doc.displayTitle} &mdash; $msg.get("attachments")">
+      <table class="xwikidatatable" summary="$msg.get("document") $xwiki.getXMLEncoded(${doc.displayTitle}) &mdash; $msg.get("attachments")">
         <col class="attachmentname"/>
         <col class="attachmentauthor"/>
         <col class="attachmentversion"/>

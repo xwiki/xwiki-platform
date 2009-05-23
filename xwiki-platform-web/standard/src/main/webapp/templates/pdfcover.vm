@@ -2,9 +2,9 @@
 <h1>
 #set($title = "$!pdfdoc.display('title', 'rendered')")
 #if($title == '')
-  $!doc.displayTitle
+  $xwiki.getXMLEncoded($!doc.displayTitle)
 #else
-  $title
+  $xwiki.getXMLEncoded($title)
 #end
 </h1>
 <br />

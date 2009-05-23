@@ -9,7 +9,7 @@
 #set($i = $context.user.indexOf(":")+1)
 #if($context.user.substring($i) == $doc.fullName || $hasAdmin)
   <form action="$doc.getURL("save")" method="post" onsubmit="if($('xwikipassword').value != $('xwikipassword2').value) {alert('$msg.get("platform.core.profile.passwd.passwordMissmatch")'); return false; } else if($('xwikipassword').value == '') {alert('$msg.get("platform.core.profile.passwd.passwordCannotBeEmpty")'); return false;}">
-<h1>$msg.get("platform.core.profile.passwd.title", [$xwiki.getUserName($doc.fullName, false)])</h1>
+<h1>$msg.get("platform.core.profile.passwd.title", [$xwiki.getXMLEncoded($xwiki.getUserName($doc.fullName, false))])</h1>
 <dl>
     <dt><label id="xwikipasswordlabel" for="xwikipassword">$msg.get("platform.core.profile.passwd.newPassword"):</label></dt>
     <dd><input id="xwikipassword" type="password" name="XWiki.XWikiUsers_0_password" value="" size="20"/></dd>

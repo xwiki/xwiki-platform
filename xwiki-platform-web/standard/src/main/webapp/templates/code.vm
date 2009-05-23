@@ -2,7 +2,7 @@
 ### Code page in the "view" mode
 ###
 ###
-<h1><span>$msg.get('core.viewers.code.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
+<h1><span>$msg.get('core.viewers.code.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</span></h1>
 #set($escapedcontent = $xwiki.getXMLEncoded($tdoc.translatedContent))
 #set($ln = "$!request.getParameter('showlinenumbers')")
 #if($ln != '0')

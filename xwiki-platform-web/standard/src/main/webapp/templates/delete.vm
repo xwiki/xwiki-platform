@@ -19,7 +19,7 @@
   #set($tmpmsg = "</p><ul style=${quote}text-align: left;${quote}>")
   #foreach($docname in $links)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>${rdoc.displayTitle}</a></li>")
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$xwiki.getXMLEncoded(${rdoc.displayTitle})</a></li>")
   #end
   #set($tmpmsg = "${tmpmsg}</ul><p class=${quote}xwikimessage${quote}>")
   #set($tmpmsg = $msg.get("core.delete.backlinksWarning", [$tmpmsg]))
@@ -30,7 +30,7 @@
   #set($tmpmsg ="</p><ul style=${quote}text-align: left;${quote}>")
   #foreach($docname in $orphans)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>${rdoc.displayTitle}</a></li>")
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>$xwiki.getXMLEncoded(${rdoc.displayTitle})</a></li>")
   #end
   #set($tmpmsg = "${tmpmsg}</ul><p class=${quote}xwikimessage${quote}>")
   #set($tmpmsg = $msg.get("core.delete.orphansWarning", [$tmpmsg]))

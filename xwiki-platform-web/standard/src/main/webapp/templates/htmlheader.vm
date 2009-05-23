@@ -13,12 +13,12 @@
     #if(!$title)
       #set( $title = $!xwiki.getWebPreference('title'))
       #if ( $title != "")
-        $xwiki.parseContent($title).replaceAll('&(?!#)', '&#38;')
+        $xwiki.getXMLEncoded($xwiki.parseContent($title))
       #else
-        XWiki - $!doc.space.replaceAll('&(?!#)', '&#38;') - $!tdoc.displayTitle.replaceAll('&(?!#)', '&#38;')
+        XWiki - $xwiki.getXMLEncoded($!doc.space) - $xwiki.getXMLEncoded($!tdoc.displayTitle)
       #end
     #else
-      $title
+      $xwiki.getXMLEncoded($title)
     #end
     </title>
     <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
@@ -31,11 +31,11 @@
     ## from the individual wiki/space/page names), so that it can be accessed from Javascript code.
     ## For example, to pass it to the server side using an Ajax query.
     ## Usage example: var name = $$("meta[name='page']")[0].content;
-    <meta name="document" content="$doc.fullName"/>
-    <meta name="space" content="$doc.space"/>
-    <meta name="page" content="$doc.name"/>
+    <meta name="document" content="$xwiki.getXMLEncoded($doc.fullName)"/>
+    <meta name="space" content="$xwiki.getXMLEncoded($doc.space)"/>
+    <meta name="page" content="$xwiki.getXMLEncoded($doc.name)"/>
     #if($xwiki.isVirtualMode())
-      <meta name="wiki" content="$doc.wiki"/>
+      <meta name="wiki" content="$xwiki.getXMLEncoded($doc.wiki)"/>
     #end
     $xwiki.parseContent($!xwiki.getWebPreference("meta"))
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.

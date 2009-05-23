@@ -2,5 +2,5 @@
 ### History page in the "view" mode
 ###
 ###
-<h1><span>$msg.get('core.viewers.history.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
+<h1><span>$msg.get('core.viewers.history.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</span></h1>
 #template("historyinline.vm")

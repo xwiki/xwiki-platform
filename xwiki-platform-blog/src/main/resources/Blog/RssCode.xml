@@ -170,7 +170,7 @@
   ## TODO: Replace hardcoded Main.WebHome with a setting once the core provides this information.
   #set($mainDoc = $xwiki.getDocument('Main.WebHome'))
   &lt;channel rdf:about="$mainDoc.getExternalURL()"&gt;
-    &lt;title&gt;$mainDoc.displayTitle&lt;/title&gt;
+    &lt;title&gt;$xwiki.getXMLEncoded($mainDoc.displayTitle)&lt;/title&gt;
     &lt;link&gt;$mainDoc.getExternalURL()&lt;/link&gt;
     ## TODO: Add a Description field in the blog class
     &lt;description&gt;Most recent blog posts in the wiki&lt;/description&gt;

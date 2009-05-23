@@ -2239,11 +2239,11 @@ Your account on $wikiname has been successfully activated. You can now login at 
 &lt;a href="$xwiki.getURL("Doc.WebHome","view")"&gt;Doc&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
 &lt;a href="$xwiki.getURL("XWiki.RegisterNewUser","view")"&gt;Register&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
 </menu></property><property><meta>&lt;meta name="revisit-after" content="7 days" /&gt;
-&lt;meta name="description" content="$!doc.getDisplayTitle().replaceAll('&amp;(?!#|amp;)', '&amp;#38;').replaceAll('"', '&amp;#34;')" /&gt;
-&lt;meta name="keywords" content="wiki $!doc.getTags().replaceAll("[|,]", " ")" /&gt;
+&lt;meta name="description" content="$xwiki.getXMLEncoded($!doc.getDisplayTitle())" /&gt;
+&lt;meta name="keywords" content="wiki $xwiki.getXMLEncoded($!doc.getTags().replaceAll('[|,]', ' '))" /&gt;
 &lt;meta name="distribution" content="GLOBAL" /&gt;
 &lt;meta name="rating" content="General" /&gt;
-&lt;meta name="author" content="$!xwiki.getLocalUserName($doc.getAuthor(), false)" /&gt;
+&lt;meta name="author" content="$xwiki.getXMLEncoded($!xwiki.getLocalUserName($doc.getAuthor(), false))" /&gt;
 &lt;meta http-equiv="reply-to" content="" /&gt;
 &lt;meta name="language" content="$!context.language" /&gt;
 &lt;meta http-equiv="Content-Type" content="text/html; charset=$!xwiki.encoding" /&gt;

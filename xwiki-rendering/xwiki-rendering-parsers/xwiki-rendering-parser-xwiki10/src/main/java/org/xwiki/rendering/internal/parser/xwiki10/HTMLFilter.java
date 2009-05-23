@@ -33,6 +33,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.HTMLElementConverter;
+import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
  * Add needed HTML open and close macro.
@@ -113,6 +114,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             context.setHTML(false);
             context.setVelocityOpen(false);
             context.setVelocityClose(false);
+            context.setInline(true);
 
             StringBuffer htmlBlock = new StringBuffer();
 
@@ -133,6 +135,12 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                         VelocityFilter.appendVelocityOpen(htmlBuffer, filterContext, false);
                     }
 
+                    if (!context.isInline()) {
+                        if (htmlBuffer.length() > 0) {
+                            CleanUtil.setTrailingNewLines(htmlBuffer, 2);
+                        }
+                    }
+
                     htmlBuffer.append(htmlBlock);
 
                     if (context.isVelocityClose()) {
@@ -147,6 +155,12 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 if (context.isConversion()) {
                     if (context.isVelocityOpen()) {
                         VelocityFilter.appendVelocityOpen(nonHtmlbuffer, filterContext, false);
+                    }
+
+                    if (!context.isInline()) {
+                        if (htmlBuffer.length() > 0 || nonHtmlbuffer.length() > 0) {
+                            CleanUtil.setTrailingNewLines(nonHtmlbuffer, 2);
+                        }
                     }
 
                     nonHtmlbuffer.append(htmlBlock);
@@ -347,6 +361,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             convertedElement = currentMacro.convert(name, parameters, content, context);
 
             context.setConversion(true);
+            context.setInline(currentMacro.isInline());
         } catch (ComponentLookupException e) {
             if (getLogger().isDebugEnabled()) {
                 getLogger().debug("Can't find macro converter [" + name + "]", e);
@@ -610,6 +625,8 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
         private boolean velocityClose;
 
+        private boolean inline;
+
         public HTMLFilterContext(FilterContext filterContext)
         {
             this.filterContext = filterContext;
@@ -678,6 +695,16 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         public void setVelocityClose(boolean velocityClose)
         {
             this.velocityClose = velocityClose;
+        }
+
+        public boolean isInline()
+        {
+            return this.inline;
+        }
+
+        public void setInline(boolean inline)
+        {
+            this.inline = inline;
         }
 
         public String cleanContent(String content)

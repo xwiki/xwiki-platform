@@ -24,6 +24,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
+
 /**
  * Base class for Velocity macros converters.
  * 
@@ -87,33 +90,57 @@ public abstract class AbstractVelocityMacroConverter implements VelocityMacroCon
         }
     }
 
-    protected String convertContent(List<String> parameters)
+    protected String convertContent(List<String> parameters, FilterContext context)
     {
         return null;
     }
 
-    public String convert(String name, List<String> parameters)
+    protected String cleanQuotes(String value)
     {
+        String cleaned = value;
+
+        if (!StringUtils.isEmpty(cleaned)) {
+            char firstChar = value.charAt(0);
+            char lastChar = value.charAt(value.length() - 1);
+
+            if ((firstChar == '"' || firstChar == '\'') && firstChar == lastChar) {
+                cleaned = cleaned.substring(1, cleaned.length() - 1);
+            }
+        }
+
+        return cleaned;
+    }
+
+    public String convert(String name, List<String> parameters, FilterContext context)
+    {
+        StringBuffer begin = new StringBuffer();
+        String content = convertContent(parameters, context);
+        StringBuffer end = new StringBuffer();
+
+        begin.append("{{");
+        begin.append(convertName(name));
+        if (parameters.size() > 0) {
+            begin.append(' ');
+            appendParameters(begin, convertParameters(parameters));
+        }
+
         StringBuffer result = new StringBuffer();
 
-        result.append("{{");
-        result.append(convertName(name));
-        if (parameters.size() > 0) {
-            result.append(' ');
-            appendParameters(result, convertParameters(parameters));
-        }
-
-        String content = convertContent(parameters);
         if (content != null) {
-            result.append("}}");
-            result.append(content);
-            result.append("{{/");
-            result.append(convertName(name));
-        } else {
-            result.append("/");
-        }
+            begin.append("}}");
+            end.append("{{/");
+            end.append(convertName(name));
+            end.append("}}");
 
-        result.append("}}");
+            result.append(!protectResult() ? context.addProtectedContent(begin.toString(), isInline()) : begin);
+            result.append(content);
+            result.append(!protectResult() ? context.addProtectedContent(end.toString(), isInline()) : end);
+        } else {
+            begin.append("/");
+            begin.append("}}");
+
+            result.append(!protectResult() ? context.addProtectedContent(begin.toString(), isInline()) : begin);
+        }
 
         return result.toString();
     }

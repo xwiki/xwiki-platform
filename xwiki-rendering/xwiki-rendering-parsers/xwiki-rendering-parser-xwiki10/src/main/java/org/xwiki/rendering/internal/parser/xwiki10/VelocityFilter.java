@@ -122,6 +122,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             context.setVelocity(false);
             context.setConversion(false);
             context.setInline(true);
+            context.setProtectedBlock(true);
 
             StringBuffer velocityBlock = new StringBuffer();
 
@@ -141,21 +142,26 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
                 if (context.isConversion()) {
                     if (!context.isInline()) {
-                        CleanUtil.setTrailingNewLines(velocityBuffer, 2);
+                        if (velocityBuffer.length() > 0) {
+                            CleanUtil.setTrailingNewLines(velocityBuffer, 2);
+                        }
                     }
                 }
 
-                velocityBuffer.append(filterContext.addProtectedContent(velocityBlock.toString(), context.isInline()));
+                velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(velocityBlock
+                    .toString(), context.isInline()) : velocityBlock);
             } else {
                 StringBuffer nonVelocityBuffer = inVelocityMacro ? afterVelocityBuffer : beforeVelocityBuffer;
 
                 if (context.isConversion()) {
                     if (!context.isInline()) {
-                        CleanUtil.setTrailingNewLines(nonVelocityBuffer, 2);
+                        if (nonVelocityBuffer.length() > 0 || velocityBuffer.length() > 0) {
+                            CleanUtil.setTrailingNewLines(nonVelocityBuffer, 2);
+                        }
                     }
 
-                    nonVelocityBuffer.append(filterContext.addProtectedContent(velocityBlock.toString(), context
-                        .isInline()));
+                    nonVelocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(
+                        velocityBlock.toString(), context.isInline()) : velocityBlock);
                 } else {
                     nonVelocityBuffer.append(c);
                     ++i;
@@ -319,9 +325,10 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
             VelocityMacroConverter currentMacro =
                 (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.class, name);
 
-            convertedMacro = currentMacro.convert(name, parameters);
+            convertedMacro = currentMacro.convert(name, parameters, context.getFilterContext());
 
             context.setInline(currentMacro.isInline());
+            context.setProtectedBlock(currentMacro.protectResult());
 
             context.setConversion(true);
         } catch (ComponentLookupException e) {
@@ -699,6 +706,8 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
         private FilterContext filterContext;
 
+        private boolean protectedBlock;
+
         public VelocityFilterContext(FilterContext filterContext)
         {
             this.filterContext = filterContext;
@@ -752,6 +761,16 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         public FilterContext getFilterContext()
         {
             return this.filterContext;
+        }
+
+        public boolean isProtectedBlock()
+        {
+            return this.protectedBlock;
+        }
+
+        public void setProtectedBlock(boolean protectedBlock)
+        {
+            this.protectedBlock = protectedBlock;
         }
     }
 }

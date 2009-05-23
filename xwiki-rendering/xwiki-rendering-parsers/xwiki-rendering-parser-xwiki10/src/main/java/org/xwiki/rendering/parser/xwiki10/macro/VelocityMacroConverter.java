@@ -22,6 +22,7 @@ package org.xwiki.rendering.parser.xwiki10.macro;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
  * Convert velocity macro to XWiki 2.0 syntax or macro.
@@ -36,5 +37,5 @@ public interface VelocityMacroConverter
 
     boolean isInline();
 
-    String convert(String name, List<String> parameters);
+    String convert(String name, List<String> parameters, FilterContext context);
 }

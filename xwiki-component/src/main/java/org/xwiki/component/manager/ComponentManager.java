@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.internal.RoleHint;
 
 public interface ComponentManager
 {

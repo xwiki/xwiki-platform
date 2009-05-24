@@ -37,6 +37,8 @@ $cdoc.getRenderedContent()
   #includeLinks($cdoc.fullName $withPageBreaks)
  #end
 #end
+#set($footnotes = "#putFootnotes()")
+$xwiki.renderText($footnotes, $doc)
 #if ($request.comments&&($request.comments=="1"))
 #template("comments2.vm")
 #end

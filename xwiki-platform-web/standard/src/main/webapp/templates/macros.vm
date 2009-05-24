@@ -778,21 +778,19 @@ $fn
 #set($discard = $page_footnotes.add($text))
 #set($processedText = $text.replaceAll('[*~<>_-]', ''))
 #set($footnote_id = $page_footnotes.size())
-<sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}"><a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get("core.footnotes.gotofootnote", [${footnote_id}]): {pre}$processedText{/pre}">\[$footnote_id\]</a></sup>#end
+<sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}"><a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get('core.footnotes.gotofootnote', [${footnote_id}]): {pre}$processedText{/pre}">$footnote_id</a></sup>#end
 ##
 ##
 ##
 #macro(putFootnotes)
 #if($page_footnotes && ($page_footnotes.size() > 0))
-<div class="footnotes">
-<ol>
+<ol class="footnotes">
 #foreach($footnote in $page_footnotes)
 <li id="footnote_${footnote_group_id}_${velocityCount}">
  <a class="footnoteBackRef" title="$msg.get("core.footnotes.backtoref")" href="#footnoteref_${footnote_group_id}_${velocityCount}">^</a>
   $footnote</li>
 #end
 </ol>
-</div>
 #set($discard = $page_footnotes.clear())
 #set($footnote_group_id = $footnote_group_id + 1)
 #end

@@ -724,40 +724,27 @@ span.wikicreatelink a {
     margin-bottom: 0.5em;
 }
 
-sup.footnoteRef a {
-    font-weight: bold;
-    text-decoration: none;
+/* Footnotes */
+.footnotes {
+  font-size: 80%;
+  margin: 10px 0;
+  border-top: 1px solid #888;
+  padding: 1em;
 }
-
-sup.footnoteRef:target a {
-    background-color: #E5F0FE;
-    color: #C82;
-}
-
-div.footnotes {
-    font-size: 70%;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-}
-
-.footnotes ol {
-    padding-left: 1em;
-}
-
 .footnotes li {
-    padding: 0 4px;
-    margin: 0;
+  padding: 0 4px;
+  margin: 0;
+  list-style-position: inside;
+}
+.footnoteRef a, .footnoteBackRef {
+  text-decoration: none;
+}
+.footnoteRef:target, .footnotes *:target {
+  border: 1px dotted #888;
+  background: #FFD;
 }
 
-.footnotes li:target {
-    background-color: #E5F0FE;
-}
-
-a.footnoteBackRef {
-    text-decoration: none;
-    font-weight: bold;
-}
-
+/* Pagination (deprecated) */
 .pagedNavigation {
     text-align: center;
     padding: 8px 0;

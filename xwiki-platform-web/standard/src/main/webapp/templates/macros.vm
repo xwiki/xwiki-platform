@@ -1467,6 +1467,8 @@ $html
  * @param options the livetable options.
  *#
 #macro(livetable $divid $collist $colprops $options)
+## Do not indent:
+#if($doc.syntaxId == "xwiki/2.0"){{html}}#end
   ##
   ## SX deps.
   ##
@@ -1513,9 +1515,6 @@ $html
   ##
   ## HTML Table
   ##
-  #if($doc.syntaxId == "xwiki/2.0")
-{{html}}
-  #end
   #if($tagcloud)
     #set($ok = $xwiki.ssx.use("XWiki.TagCloud"))
     <div id="${divid}-tagcloud" class="xwiki-livetable-tagcloud-tip hidden">
@@ -1631,9 +1630,7 @@ $html
   #end
    //]]>
   </script>
-  #if($doc.syntaxId == "xwiki/2.0")
-{{/html}} 
-  #end
+  #if($doc.syntaxId == "xwiki/2.0"){{/html}}#end
 #end
 
 #**

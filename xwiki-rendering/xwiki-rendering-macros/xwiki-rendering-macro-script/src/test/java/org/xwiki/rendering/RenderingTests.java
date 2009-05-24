@@ -29,7 +29,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.rendering.internal.macro.MockScriptContextManager;
 import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.PlexusTestSetup;
+import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -51,6 +51,6 @@ public class RenderingTests extends TestCase
             new ArrayList<ComponentDescriptor>(RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
         mocks.add(MockScriptContextManager.getComponentDescriptor());
         
-        return new PlexusTestSetup(suite, mocks);
+        return new ComponentManagerTestSetup(suite, mocks);
     }
 }

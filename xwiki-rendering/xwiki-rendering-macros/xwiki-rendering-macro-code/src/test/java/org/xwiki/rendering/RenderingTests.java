@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 
 import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.PlexusTestSetup;
+import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -48,6 +48,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrocode8", true);
         suite.addTestsFromResource("macrocode9", true);
 
-        return new PlexusTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+        return new ComponentManagerTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
     }
 }

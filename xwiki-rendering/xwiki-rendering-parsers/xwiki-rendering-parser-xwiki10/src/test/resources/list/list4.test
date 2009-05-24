@@ -1,10 +1,14 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-{pre}
-## some velocity
-{/pre}
+* list $var item1
+* list $var item2
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html clean="false" wiki="true"}}{{{## some velocity}}}{{/html}}{{/velocity}}
+{{velocity}}
+{{html clean="false" wiki="true"}}
+* list $var item1
+* list $var item2
+{{/html}}
+{{/velocity}}

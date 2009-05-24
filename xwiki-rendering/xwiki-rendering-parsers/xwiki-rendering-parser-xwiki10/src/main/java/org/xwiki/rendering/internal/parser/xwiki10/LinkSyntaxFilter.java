@@ -131,7 +131,7 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
 
             linkResult.append("]]");
 
-            result.append(filterContext.addProtectedContent(linkResult.toString(), true));
+            result.append(CleanUtil.extractVelocity(linkResult, filterContext, true, true));
         }
 
         if (current == 0) {

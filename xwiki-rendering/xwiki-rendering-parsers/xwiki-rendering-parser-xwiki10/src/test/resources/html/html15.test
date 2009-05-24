@@ -1,10 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-{pre}
-## some velocity
-{/pre}
+<element param="value value2"/>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html clean="false" wiki="true"}}{{{## some velocity}}}{{/html}}{{/velocity}}
+{{html clean="false" wiki="true"}}<element param="value value2"/>{{/html}}

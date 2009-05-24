@@ -130,24 +130,22 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                     afterHtmlBuffer.setLength(0);
                 }
 
-                if (context.isConversion()) {
-                    if (context.isVelocityOpen()) {
-                        VelocityFilter.appendVelocityOpen(htmlBuffer, filterContext, false);
-                    }
+                if (context.isVelocityOpen()) {
+                    VelocityFilter.appendVelocityOpen(htmlBuffer, filterContext, false);
+                }
 
+                if (context.isConversion()) {
                     if (!context.isInline()) {
                         if (htmlBuffer.length() > 0) {
                             CleanUtil.setTrailingNewLines(htmlBuffer, 2);
                         }
                     }
+                }
 
-                    htmlBuffer.append(htmlBlock);
+                htmlBuffer.append(htmlBlock);
 
-                    if (context.isVelocityClose()) {
-                        VelocityFilter.appendVelocityClose(htmlBuffer, filterContext, false);
-                    }
-                } else {
-                    htmlBuffer.append(htmlBlock);
+                if (context.isVelocityClose()) {
+                    VelocityFilter.appendVelocityClose(htmlBuffer, filterContext, false);
                 }
             } else {
                 StringBuffer nonHtmlbuffer = inHTMLMacro ? afterHtmlBuffer : beforeHtmlBuffer;
@@ -336,7 +334,8 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             if (elementContent != null) {
                 element.append(elementContent);
                 if (context.getType() == HTMLType.END) {
-                    element.append(context.getFilterContext().addProtectedContent("</" + elementName + '>', false));
+                    element.append(context.getFilterContext().addProtectedContent(
+                        "</" + context.getElementName() + '>', false));
                 }
             }
 
@@ -394,7 +393,9 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 i = getHTMLBlock(array, i, htmlBlock, context);
             }
 
-            if (context.getType() == HTMLType.END && currentElementName.equals(context.getElementName())) {
+            if (context.getType() == HTMLType.END
+                && (currentElementName.equals(context.getElementName()) || currentElementName.startsWith(context
+                    .getElementName()))) {
                 break;
             }
 
@@ -425,26 +426,22 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         // skip white spaces
         i = getWhiteSpaces(array, i, beginElement, context);
 
-        // 
-        if (array[i] == '/' && i + 1 < array.length && array[i + 1] == '>') {
-            context.setType(HTMLType.ELEMENT);
-            beginElement.append("/>");
-            return i + 2;
-        }
-
         // get parameters
         i = getElementParameters(array, i, beginElement, parameterMap, context);
 
         // skip white spaces
         i = getWhiteSpaces(array, i, beginElement, context);
 
-        beginElement.append(">");
-
-        if (array[i] == '>') {
-            ++i;
+        // 
+        if (array[i] == '/' && i + 1 < array.length && array[i + 1] == '>') {
+            context.setType(HTMLType.ELEMENT);
+            beginElement.append("/>");
+            i += 2;
+        } else {
+            context.setType(HTMLType.BEGIN);
+            beginElement.append(">");
+            i += 1;
         }
-
-        context.setType(HTMLType.BEGIN);
 
         return i;
     }
@@ -523,6 +520,8 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
             if (i < array.length) {
                 // If '>' it's the end of parameters
                 if (array[i] == '>') {
+                    break;
+                } else if (array[i] == '/' && i + 1 < array.length && array[i + 1] == '>') {
                     break;
                 }
 

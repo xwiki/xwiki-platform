@@ -67,7 +67,6 @@ public class RenderingTests extends TestCase
         // Velocity Macros
         suite.addTestsFromResource("macros/velocity/include1", false);
         suite.addTestsFromResource("macros/velocity/toc1", false);
-        suite.addTestsFromResource("macros/velocity/info1", false);
 
         // Radeox Macros
         suite.addTestsFromResource("macros/radeox/attach1", false);
@@ -86,8 +85,11 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("underline/underline1", false);
         suite.addTestsFromResource("strikeout/strikeout1", false);
         suite.addTestsFromResource("link/link1", false);
+        suite.addTestsFromResource("link/link2", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
+        suite.addTestsFromResource("list/list3", false);
+        suite.addTestsFromResource("list/list4", false);
         suite.addTestsFromResource("section/section1", false);
         suite.addTestsFromResource("section/section2", false);
         suite.addTestsFromResource("hr/hr1", false);
@@ -107,6 +109,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("html/html12", false);
         suite.addTestsFromResource("html/html13", false);
         suite.addTestsFromResource("html/html14", false);
+        suite.addTestsFromResource("html/html15", false);
+        suite.addTestsFromResource("html/html16", false);
 
         // HTML elements
         suite.addTestsFromResource("macros/html/br1", false);

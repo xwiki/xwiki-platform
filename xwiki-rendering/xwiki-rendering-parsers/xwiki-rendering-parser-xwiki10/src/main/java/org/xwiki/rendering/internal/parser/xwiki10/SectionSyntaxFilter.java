@@ -66,22 +66,49 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
             String before = content.substring(currentIndex, matcher.start());
 
             if (currentIndex > 0) {
-                // Section consume all following new lines
+                // In 1.0 section consume all following new lines
                 before = CleanUtil.removeLeadingNewLines(before);
                 before = "\n\n" + before;
             }
 
             result.append(before);
-            result.append(filterContext.addProtectedContent(StringUtils
-                .repeat("=", (matcher.group(1).length() + 1) / 2) + ' '));
-            result.append(matcher.group(3));
+
+            String headerSyntax =
+                filterContext.addProtectedContent(StringUtils.repeat("=", (matcher.group(1).length() + 1) / 2));
+
+            String headerContent = matcher.group(3);
+
+            // remove velocity macro marker from header content
+            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(headerContent);
+            boolean velocityOpen = velocityOpenMatcher.find();
+            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(headerContent);
+            boolean velocityClose = velocityCloseMatcher.find();
+
+            if (velocityOpen != velocityClose) {
+                headerContent = velocityOpenMatcher.replaceFirst("");
+                headerContent = velocityCloseMatcher.replaceFirst("");
+            } else {
+                velocityOpen = velocityClose = false;
+            }
+
+            if (velocityOpen) {
+                result.append(velocityOpenMatcher.group(0));
+            }
+
+            result.append(headerSyntax + ' ');
+            result.append(headerContent);
+            result.append(' ' + headerSyntax);
+
+            if (velocityClose) {
+                result.append(velocityCloseMatcher.group(0));
+            }
         }
 
         if (currentIndex == 0) {
             return content;
         }
 
-        result.append(CleanUtil.setLeadingNewLines(content.substring(currentIndex), 2));
+        result.append(content.substring(currentIndex));
 
         return result.toString();
     }

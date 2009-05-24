@@ -54,7 +54,7 @@ import org.xwiki.rendering.parser.SyntaxType;
 // Note that we force the Component annotation so that this component is only registered as a Highlight Parser
 // and not a Parser too since we don't want this parser to be visible to users as a valid standard input parser
 // component.
-@Component(roles = { HighlightParser.class })
+@Component(roles = {HighlightParser.class })
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
     /**
@@ -172,6 +172,10 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             code = IOUtils.toString(source);
         } catch (IOException e) {
             throw new ParseException("Failed to read source", e);
+        }
+
+        if (code.length() == 0) {
+            return Collections.emptyList();
         }
 
         interpreter.set(PY_LISTENER_VARNAME, listener);

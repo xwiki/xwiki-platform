@@ -37,7 +37,7 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Code Macro");
-        
+
         suite.addTestsFromResource("macrocode1", true);
         suite.addTestsFromResource("macrocode2", true);
         suite.addTestsFromResource("macrocode3", true);
@@ -46,7 +46,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrocode6", true);
         suite.addTestsFromResource("macrocode7", true);
         suite.addTestsFromResource("macrocode8", true);
-        
+        suite.addTestsFromResource("macrocode9", true);
+
         return new PlexusTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
     }
 }

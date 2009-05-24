@@ -1,0 +1,17 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{code}}{{/code}}
+
+{{code/}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [] []
+beginGroup [[class]=[box code]]
+endGroup [[class]=[box code]]
+endMacroMarkerStandalone [code] [] []
+beginMacroMarkerStandalone [code] []
+endMacroMarkerStandalone [code] []
+endDocument

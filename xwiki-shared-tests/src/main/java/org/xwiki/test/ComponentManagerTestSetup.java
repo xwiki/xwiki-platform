@@ -38,7 +38,7 @@ import org.xwiki.component.manager.ComponentManager;
  * {@link AbstractXWikiComponentTestCase}.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M1
  */
 public class ComponentManagerTestSetup extends TestSetup
 {

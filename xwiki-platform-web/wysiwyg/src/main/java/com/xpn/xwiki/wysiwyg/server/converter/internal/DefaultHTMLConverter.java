@@ -26,10 +26,10 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.XHTMLRenderer;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -42,22 +42,35 @@ import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
  * 
  * @version $Id$
  */
-@Component("xwiki/2.0")
-public class XWikiHTMLConverter implements HTMLConverter
+@Component
+public class DefaultHTMLConverter implements HTMLConverter
 {
+    /**
+     * XHTML 1.0 syntax.
+     */
+    public static final Syntax XHTML_SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
+
     /**
      * {@inheritDoc}
      * 
-     * @see HTMLConverter#fromHTML(String)
+     * @see HTMLConverter#fromHTML(String, String)
      */
-    public String fromHTML(String html)
+    public String fromHTML(String html, String syntaxId)
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.class, "xhtml/1.0");
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+
+            // Parse
+            Parser parser = (Parser) Utils.getComponent(Parser.class, XHTML_SYNTAX.toIdString());
             XDOM dom = parser.parse(new StringReader(html));
+
+            // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            XWikiSyntaxRenderer renderer = new XWikiSyntaxRenderer(printer);
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
+            PrintRenderer renderer = factory.createRenderer(syntax, printer);
             dom.traverse(renderer);
+
             return printer.toString();
         } catch (ParseException e) {
             throw new RuntimeException("Exception while parsing HTML", e);
@@ -67,26 +80,31 @@ public class XWikiHTMLConverter implements HTMLConverter
     /**
      * {@inheritDoc}
      * 
-     * @see HTMLConverter#toHTML(String)
+     * @see HTMLConverter#toHTML(String, String)
      */
-    public String toHTML(String source)
+    public String toHTML(String source, String syntaxId)
     {
         try {
-            Parser parser = (Parser) Utils.getComponent(Parser.class, "xwiki/2.0");
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+
+            // Parse
+            Parser parser = (Parser) Utils.getComponent(Parser.class, syntax.toIdString());
             XDOM dom = parser.parse(new StringReader(source));
 
+            // Execute transformations
             TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.class);
-            txManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
+            txManager.performTransformations(dom, syntax);
 
+            // Render
             WikiPrinter printer = new DefaultWikiPrinter();
             PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
-            XHTMLRenderer renderer =
-                (XHTMLRenderer) factory.createRenderer(new Syntax(SyntaxType.XHTML, "1.0"), printer);
+            PrintRenderer renderer = factory.createRenderer(XHTML_SYNTAX, printer);
             dom.traverse(renderer);
 
             return printer.toString();
         } catch (Throwable t) {
-            throw new RuntimeException("Exception while parsing XWiki", t);
+            throw new RuntimeException("Exception while rendering HTML", t);
         }
     }
 }

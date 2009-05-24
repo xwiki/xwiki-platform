@@ -84,8 +84,6 @@ public class RefreshExecutable extends AbstractExecutable
         // Prevent typing while waiting for the updated content.
         waiting.getElement().getStyle().setPropertyPx(Style.WIDTH, rta.getOffsetWidth());
         waiting.getElement().getStyle().setPropertyPx(Style.HEIGHT, rta.getOffsetHeight());
-        waiting.getElement().getStyle().setPropertyPx(Style.LEFT, rta.getElement().getOffsetLeft());
-        waiting.getElement().getStyle().setPropertyPx(Style.TOP, rta.getElement().getOffsetTop());
         rta.getElement().getParentNode().insertBefore(waiting.getElement(), rta.getElement());
         waiting.setFocus(true);
 

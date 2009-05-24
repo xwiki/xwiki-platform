@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.server.converter;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Converts HTML to/from a specific syntax.
+ * Converts HTML to/from a specified syntax.
  * 
  * @version $Id$
  */
@@ -30,19 +30,20 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface HTMLConverter
 {
     /**
-     * Converts to HTML the specified source text. The converter expects the source text to have a specific known
-     * syntax.
+     * Converts the given source text from the specified syntax to HTML.
      * 
-     * @param source The text to be converted. Its syntax is priorly known by the converter.
-     * @return The HTML result of the conversion.
+     * @param source the text to be converted
+     * @param syntaxId the syntax identifier
+     * @return the HTML result of the conversion
      */
-    String toHTML(String source);
+    String toHTML(String source, String syntaxId);
 
     /**
-     * Converts the specified HTML text to a specific syntax, priorly known by the converter.
+     * Converts the given HTML fragment to the specified syntax.
      * 
-     * @param html The HTML text to be converted.
-     * @return The result on the conversion.
+     * @param html the HTML text to be converted
+     * @param syntaxId the syntax identifier
+     * @return the result on the conversion
      */
-    String fromHTML(String html);
+    String fromHTML(String html, String syntaxId);
 }

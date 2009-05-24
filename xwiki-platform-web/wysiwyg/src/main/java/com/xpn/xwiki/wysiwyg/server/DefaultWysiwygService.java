@@ -125,7 +125,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private HTMLConverter getHTMLConverter(String syntax)
     {
-        return (HTMLConverter) Utils.getComponent(HTMLConverter.class, syntax);
+        return (HTMLConverter) Utils.getComponent(HTMLConverter.class);
     }
 
     /**
@@ -143,7 +143,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     public String fromHTML(String html, String syntax)
     {
-        return getHTMLConverter(syntax).fromHTML(cleanHTML(html));
+        return getHTMLConverter(syntax).fromHTML(cleanHTML(html), syntax);
     }
 
     /**
@@ -153,7 +153,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     public String toHTML(String source, String syntax)
     {
-        return getHTMLConverter(syntax).toHTML(source);
+        return getHTMLConverter(syntax).toHTML(source, syntax);
     }
 
     /**

@@ -1,5 +1,3 @@
-com.xpn.xwiki.wysiwyg.server.converter.internal.FakeHTMLConverter
-com.xpn.xwiki.wysiwyg.server.converter.internal.XWikiHTMLConverter
-com.xpn.xwiki.wysiwyg.server.converter.internal.EventsHTMLConverter
 com.xpn.xwiki.wysiwyg.server.cleaner.internal.DefaultHTMLCleaner
+com.xpn.xwiki.wysiwyg.server.converter.internal.DefaultHTMLConverter
 com.xpn.xwiki.wysiwyg.server.filter.internal.http.MutableHttpServletRequestFactory

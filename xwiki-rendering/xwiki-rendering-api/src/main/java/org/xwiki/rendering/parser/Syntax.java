@@ -29,6 +29,9 @@ package org.xwiki.rendering.parser;
  */
 public class Syntax
 {
+    public static final Syntax XHTML_1_0 = new Syntax(SyntaxType.XHTML, "1.0");
+    public static final Syntax XWIKI_2_0 = new Syntax(SyntaxType.XWIKI, "2.0");
+    
     private SyntaxType type;
 
     private String version;

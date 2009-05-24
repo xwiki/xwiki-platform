@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-core-rendering-parent</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-core-rendering-standalone</artifactId>
+  <name>XWiki Platform - Core - Rendering - Standalone Distribution</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Core - Rendering - Standalone Distribution</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <!-- We don't relocate the following packages since they cause runtime issues:
+                   - javax.xml
+                   - org.w3c
+                   - org.apache.xerces
+               -->
+              <relocations>
+                <relocation>
+                  <pattern>org.wikimodel</pattern>
+                  <shadedPattern>org.xwiki.shaded.wikimodel</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.htmlcleaner</pattern>
+                  <shadedPattern>org.xwiki.shaded.htmlcleaner</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.commons</pattern>
+                  <shadedPattern>org.xwiki.shaded.apache.commons</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.html</pattern>
+                  <shadedPattern>org.xwiki.shaded.apache.html</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.wml</pattern>
+                  <shadedPattern>org.xwiki.shaded.apache.wml</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache.xml</pattern>
+                  <shadedPattern>org.xwiki.shaded.apache.xml</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.javacc</pattern>
+                  <shadedPattern>org.xwiki.shaded.javacc</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.jdom</pattern>
+                  <shadedPattern>org.xwiki.shaded.jdom</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.dom4j</pattern>
+                  <shadedPattern>org.xwiki.shaded.dom4j</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.xml</pattern>
+                  <shadedPattern>org.xwiki.shaded.xml</shadedPattern>
+                </relocation>
+              </relocations>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/components.txt</resource>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <activation>
+        <property>
+          <name>integration-tests</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-invoker-plugin</artifactId>
+            <configuration>
+              <debug>true</debug>
+              <projectsDirectory>src/it</projectsDirectory>
+              <pomIncludes>
+                <pomInclude>**/example/pom.xml</pomInclude>
+              </pomIncludes>
+              <postBuildHookScript>verify.bsh</postBuildHookScript>
+            </configuration>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <phase>integration-test</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>      
+        </plugins>
+      </build>
+    </profile>
+  </profiles>  
+</project>

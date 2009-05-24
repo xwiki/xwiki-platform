@@ -1,10 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-{pre}
-## some velocity
-{/pre}
+<dd$var>content</dd>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity}}{{html clean="false" wiki="true"}}{{{## some velocity}}}{{/html}}{{/velocity}}
+{{velocity}}{{html clean="false" wiki="true"}}<dd$var>content</dd>{{/html}}{{/velocity}}

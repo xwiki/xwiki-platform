@@ -23,6 +23,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.internal.parser.xwiki10.VelocityFilter;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
  * Contains syntax cleaning helpers.
@@ -213,5 +215,43 @@ public final class CleanUtil
     public static String convertEscape(String content)
     {
         return ESCAPE_PATTERN.matcher(content).replaceAll("$1~");
+    }
+
+    public static String extractVelocity(CharSequence content, FilterContext filterContext)
+    {
+        return extractVelocity(content, filterContext, false, false);
+    }
+
+    public static String extractVelocity(CharSequence content, FilterContext filterContext, boolean protect,
+        boolean inline)
+    {
+        String cleanedContent = content.toString();
+
+        Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(cleanedContent);
+        boolean velocityOpen = velocityOpenMatcher.find();
+        cleanedContent = velocityOpenMatcher.replaceFirst("");
+        Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedContent);
+        boolean velocityClose = velocityCloseMatcher.find();
+        cleanedContent = velocityCloseMatcher.replaceFirst("");
+
+        StringBuffer buffer = new StringBuffer();
+
+        boolean multilines = cleanedContent.indexOf("\n") != -1;
+        
+        if (velocityOpen) {
+            VelocityFilter.appendVelocityOpen(buffer, filterContext, multilines);
+        }
+
+        if (protect) {
+            buffer.append(filterContext.addProtectedContent(cleanedContent, inline));
+        } else {
+            buffer.append(cleanedContent);
+        }
+
+        if (velocityClose) {
+            VelocityFilter.appendVelocityClose(buffer, filterContext, multilines);
+        }
+
+        return buffer.toString();
     }
 }

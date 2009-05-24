@@ -59,7 +59,8 @@ public class ListSyntaxFilter extends AbstractFilter implements Initializable
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String, org.xwiki.rendering.parser.xwiki10.FilterContext)
+     * @see org.xwiki.rendering.parser.xwiki10.Filter#filter(java.lang.String,
+     *      org.xwiki.rendering.parser.xwiki10.FilterContext)
      */
     public String filter(String content, FilterContext filterContext)
     {
@@ -104,7 +105,6 @@ public class ListSyntaxFilter extends AbstractFilter implements Initializable
             }
 
             StringBuffer listItemResult = new StringBuffer();
-            listItemResult.append(matcher.group(1));
 
             String listSigns = matcher.group(2);
             char listSign = listSigns.charAt(0);
@@ -170,7 +170,7 @@ public class ListSyntaxFilter extends AbstractFilter implements Initializable
                         "(% style=\"list-style-type: {0}\" %)\n", listStyle)));
                 }
             }
-            listItemResult.append(filterContext.addProtectedContent(listString));
+            listItemResult.append(filterContext.addProtectedContent(matcher.group(1) + listString));
 
             listItemResult.append(matcher.group(3));
 
@@ -186,6 +186,6 @@ public class ListSyntaxFilter extends AbstractFilter implements Initializable
 
         listResult.append(content.substring(currentIndex));
 
-        return listResult.toString();
+        return CleanUtil.extractVelocity(listResult, filterContext);
     }
 }

@@ -29,6 +29,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
+import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
 /**
  * @version $Id$
@@ -73,36 +74,17 @@ public class PreFilter extends AbstractFilter implements Initializable
 
             result.append(before);
 
-            String preContent = matcher.group(1);
-
-            // remove velocity macro marker from pre content
-            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(preContent);
-            boolean velocityOpen = velocityOpenMatcher.find();
-            preContent = velocityOpenMatcher.replaceAll("");
-            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(preContent);
-            boolean velocityClose = velocityCloseMatcher.find();
-            preContent = velocityCloseMatcher.replaceAll("");
-
             // print pre
-            boolean multilines = preContent.indexOf("\n") != -1;
-            
-            if (velocityOpen) {
-                VelocityFilter.appendVelocityOpen(result, filterContext, multilines);
-            }
-
             StringBuffer preBuffer = new StringBuffer();
 
             preBuffer.append("{{{");
+            String preContent = matcher.group(1);
             preContent = this.standaloneNewLineCleaningFilter.filter(preContent, filterContext);
             preContent = this.spacesCleaningFilter.filter(preContent, filterContext);
             preBuffer.append(preContent.trim());
             preBuffer.append("}}}");
 
-            result.append(filterContext.addProtectedContent(preBuffer.toString(), true));
-
-            if (velocityClose) {
-                VelocityFilter.appendVelocityClose(result, filterContext, multilines);
-            }
+            result.append(CleanUtil.extractVelocity(preBuffer, filterContext, true, true));
         }
 
         if (currentIndex == 0) {

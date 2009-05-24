@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -57,6 +58,17 @@ public class EmbeddableComponentManager implements ComponentManager
         this.classLoader = classLoader;
     }
 
+    /**
+     * Load all component annotations and register them as components.
+     * 
+     * @param classLoader the class loader to use to look for component definitions
+     */
+    public void initialize()
+    {
+        ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
+        loader.initialize(this, this.classLoader);
+    }
+    
     /**
      * {@inheritDoc}
      * @see ComponentManager#lookup(Class)

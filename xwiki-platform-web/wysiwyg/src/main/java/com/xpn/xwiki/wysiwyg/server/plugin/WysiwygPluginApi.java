@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.server.plugin;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.input;
+import org.xwiki.rendering.parser.Parser;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -80,7 +81,7 @@ public class WysiwygPluginApi extends Api
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
-            Utils.getComponent(HTMLConverter.class, syntaxId);
+            Utils.getComponent(Parser.class, syntaxId);
             return true;
         } catch (RuntimeException e) {
             return false;
@@ -98,7 +99,7 @@ public class WysiwygPluginApi extends Api
      */
     public String getInput(String id, String source, String syntax)
     {
-        String value = ((HTMLConverter) Utils.getComponent(HTMLConverter.class, syntax)).toHTML(source);
+        String value = ((HTMLConverter) Utils.getComponent(HTMLConverter.class)).toHTML(source, syntax);
 
         Filter filter = new CharacterFilter();
         filter.removeAttribute("'");

@@ -64,8 +64,6 @@ public class MacroCall
      */
     public MacroCall()
     {
-        name = "";
-        content = "";
     }
 
     /**

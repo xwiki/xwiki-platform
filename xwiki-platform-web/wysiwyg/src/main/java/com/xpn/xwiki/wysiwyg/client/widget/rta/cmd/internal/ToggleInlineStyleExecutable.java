@@ -156,7 +156,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
      * 
      * @param node the node to isolate
      */
-    private void isolate(Node node)
+    protected void isolate(Node node)
     {
         Node parent = node.getParentNode();
         if (parent == null) {

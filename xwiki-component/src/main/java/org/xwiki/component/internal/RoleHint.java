@@ -33,13 +33,16 @@ public class RoleHint
     
     public RoleHint(Class< ? > role)
     {
-        this(role, "default");
+        this(role, null);
     }
 
     public RoleHint(Class< ? > role, String hint)
     {
         this.role = role;
         this.hint = hint;
+        if (this.hint == null) {
+            this.hint = "default";
+        }
     }
     
     public Class< ? > getRole()

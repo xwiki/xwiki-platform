@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering;
 
-import org.jmock.Mock;
+import org.jmock.Mockery;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.embed.EmbeddableComponentManager;
@@ -28,7 +30,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.html.HTMLMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link HTMLMacro} that cannot be performed using the Rendering Test framework.
@@ -36,41 +38,37 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.8.3
  */
-public class HTMLMacroTest extends AbstractXWikiComponentTestCase 
+public class HTMLMacroTest extends AbstractComponentTestCase
 {
+    private Mockery context = new Mockery();
+
     /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         super.setUp();
-        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
-        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentAccessBridge.class,
-            mockDocumentAccessBridge.proxy());
-        Mock mockDocumentNameSerializer = mock(DocumentNameSerializer.class);
-        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentNameSerializer.class,
-            mockDocumentNameSerializer.proxy());
+
+        DocumentAccessBridge dab = this.context.mock(DocumentAccessBridge.class);
+        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentAccessBridge.class, dab);
+            
+        DocumentNameSerializer dns = this.context.mock(DocumentNameSerializer.class);
+        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentNameSerializer.class, dns);
     }
     
     /**
      * Verify that inline HTML macros with non inline content generate an exception.
      */
-    public void testHTMLMacroWhenNonInlineContentInInlineContext() throws Exception
+    @Test(expected = MacroExecutionException.class)
+    public void executeMacroWhenNonInlineContentInInlineContext() throws Exception
     {
         HTMLMacro macro = (HTMLMacro) getComponentManager().lookup(Macro.class, "html");
         HTMLMacroParameters parameters = new HTMLMacroParameters();
         MacroTransformationContext context = new MacroTransformationContext();
         context.setInline(true);
-        try {
-            macro.execute(parameters, "<ul><li>item</li></ul>", context);
-            fail("Should have thrown an exception here");
-        } catch (MacroExecutionException expected) {
-            assertEquals("When using the HTML macro inline, you can only use inline HTML content. Block HTML "
-                + "content (such as tables) cannot be displayed. Try leaving an empty line before and after the "
-                + "HTML macro.", expected.getMessage());
-        }
+        macro.execute(parameters, "<ul><li>item</li></ul>", context);
     }
 }

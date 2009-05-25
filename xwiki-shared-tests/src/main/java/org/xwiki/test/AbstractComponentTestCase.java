@@ -19,59 +19,33 @@
  */
 package org.xwiki.test;
 
-import org.jmock.cglib.MockObjectTestCase;
+import org.junit.After;
+import org.junit.Before;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
- * available. Use this class for JUnit 3.x tests. For Junit 4.x tests use {@link AbstractComponentTestCase— instead.
+ * available. Use this class for JUnit 4.x tests. For Junit 3.x tests use {@link AbstractComponentTestCase— instead.
  */
-public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
+public class AbstractComponentTestCase
 {
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
-    public AbstractXWikiComponentTestCase()
-    {
-        super();
-    }
-
-    public AbstractXWikiComponentTestCase(String testName)
-    {
-        super(testName);
-    }
-
     /**
      * Tests that require fine-grained initializations can override this method and not call super. 
-     * 
-     * @see junit.framework.TestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         this.initializer.initializeContainer();
-
-        // Put before execution context initialization because it could be needed for some executing context
-        // initializer
-        registerComponents();
-
         this.initializer.initializeExecution();
     }
 
     /**
-     * Register custom/mock components
+     * Clean up test states.
      */
-    protected void registerComponents() throws Exception
-    {
-        // Empty voluntarily. Extending classes can override to provide custom component registration.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception
+    @After
+    public void tearDown() throws Exception
     {
         this.initializer.shutdown();
     }

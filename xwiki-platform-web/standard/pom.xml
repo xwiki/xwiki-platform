@@ -401,6 +401,7 @@
                 <!-- Exclude files with Velocity inside -->
                 <exclude>**/actionButtons.js</exclude>
                 <exclude>**/notification.css</exclude>
+                <exclude>**/usersandgroups.js</exclude>
               </excludes>
             </configuration>
           </plugin>          

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-mailsender</artifactId>
   <name>XWiki Platform - Plugins - Mail Sender</name>
-  <version>1.9</version>
+  <version>1.10-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Mail Sender</description>
   <properties>
     <platform.core.version>1.8.4</platform.core.version>
@@ -98,8 +98,8 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.9</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.9</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-mailsender-1.9</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/mailsender</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/mailsender</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/mailsender</url>
   </scm>
 </project>

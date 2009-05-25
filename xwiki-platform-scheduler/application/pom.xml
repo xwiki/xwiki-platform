@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-scheduler</artifactId>
   <name>XWiki Platform - Applications - Scheduler</name>
-  <version>1.9-SNAPSHOT</version>
+  <version>1.9</version>
   <packaging>xar</packaging>
   <description>Manages Scheduler Jobs</description>
   <dependencies>
@@ -46,8 +46,8 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/scheduler</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/scheduler</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/scheduler</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.9</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.9</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-scheduler-1.9</url>
   </scm>
 </project>

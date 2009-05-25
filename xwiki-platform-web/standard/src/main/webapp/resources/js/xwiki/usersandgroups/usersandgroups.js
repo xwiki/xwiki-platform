@@ -14,14 +14,13 @@ MSCheckbox = Class.create({
   {
     this.table = table;
     this.idx = idx;
-    if(this.table && this.idx && this.table.fetchedRows[this.idx]) {
-       this.currentUorG = this.table.fetchedRows[this.idx].fullname;
-       this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
-    }
-    else {
-    	 // guest users
-       this.currentUorG = window.unregUser;
-       this.isUserInGroup = false;
+    if (this.table && this.idx && this.table.fetchedRows[this.idx]) {
+      this.currentUorG = this.table.fetchedRows[this.idx].fullname;
+      this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
+    } else {
+      // guest users
+      this.currentUorG = window.unregUser;
+      this.isUserInGroup = false;
     }
     this.domNode = $(domNode);
     this.right = right;
@@ -30,7 +29,11 @@ MSCheckbox = Class.create({
     this.state = defaultState;
     this.states = [0,1,2]; // 0 = inherit; 1 = allow, 2 == deny
     this.nrstates = this.states.length;
-    this.images = ["$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')","$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')","$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"];
+    this.images = [
+      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')",
+      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow.png')",
+      "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/deny1.png')"
+    ];
     this.labels = ['','',''];
 
     this.draw(this.state);
@@ -86,60 +89,59 @@ MSCheckbox = Class.create({
       var nxtst = (self.state + 1) % self.nrstates;
 
       // 1. The current user is clearing / denying himself any right.
-      if(self.currentUorG == window.currentUser) {
-	       if (nxtst == 2) {
-	       	 var denymessage = "$msg.get('rightsmanager.denyrightforcurrentuser')".replace('__right__', self.right);
-           if (!confirm(denymessage)) {
-           	  var clearmessage = "$msg.get('rightsmanager.clearrightforcurrentuserinstead')".replace('__right__', self.right);
-           	  if(confirm(clearmessage)) {
-           	  	action = "clear";
-           	  	self.state = 2;
-           	  	nxtst = 0;
-           	  }
-           	  else return;
-           }
-	       }
-	       else if (nxtst == 0) {
-	          var clearmessage = "$msg.get('rightsmanager.clearrightforcurrentuser')".replace('__right__', self.right);
-	          if (!confirm(clearmessage)) {
-	           return;
-	          }
-	       }
+      if (self.currentUorG == window.currentUser) {
+        if (nxtst == 2) {
+          var denymessage = "$msg.get('rightsmanager.denyrightforcurrentuser')".replace('__right__', self.right);
+          if (!confirm(denymessage)) {
+            var clearmessage = "$msg.get('rightsmanager.clearrightforcurrentuserinstead')".replace('__right__', self.right);
+            if (confirm(clearmessage)) {
+              action = "clear";
+              self.state = 2;
+              nxtst = 0;
+            } else {
+              return;
+            }
+          }
+        } else if (nxtst == 0) {
+          var clearmessage = "$msg.get('rightsmanager.clearrightforcurrentuser')".replace('__right__', self.right);
+          if (!confirm(clearmessage)) {
+            return;
+          }
+        }
       }
       // 2. The current user is clearing / denying any rights for a group he belongs to.
-      else if(self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
-      	if (nxtst == 2) {
-           var denymessage = "$msg.get('rightsmanager.denyrightforgroup')".replace(/__right__/g, self.right);
-           denymessage = denymessage.replace('__name__', self.currentUorG);
-           if (!confirm(denymessage)) {
-           	var clearmessage = "$msg.get('rightsmanager.clearrightforgroupinstead')".replace(/__right__/g, self.right);
-           	clearmessage = clearmessage.replace('__name__', self.currentUorG);
-           	if(confirm(clearmessage)) {
-           		action = "clear";
-           		self.state = 2;
-           		nxtst = 0;
-           	}
-           	else return;
-           }
-         }
-         else if (nxtst == 0) {
-            var clearmessage = "$msg.get('rightsmanager.clearrightforgroup')".replace(/__right__/g, self.right);
+      else if (self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
+        if (nxtst == 2) {
+          var denymessage = "$msg.get('rightsmanager.denyrightforgroup')".replace(/__right__/g, self.right);
+          denymessage = denymessage.replace('__name__', self.currentUorG);
+          if (!confirm(denymessage)) {
+            var clearmessage = "$msg.get('rightsmanager.clearrightforgroupinstead')".replace(/__right__/g, self.right);
             clearmessage = clearmessage.replace('__name__', self.currentUorG);
-            if (!confirm(clearmessage)) {
-             return;
+            if (confirm(clearmessage)) {
+              action = "clear";
+              self.state = 2;
+              nxtst = 0;
+            } else {
+              return;
             }
-         }
+          }
+        } else if (nxtst == 0) {
+          var clearmessage = "$msg.get('rightsmanager.clearrightforgroup')".replace(/__right__/g, self.right);
+          clearmessage = clearmessage.replace('__name__', self.currentUorG);
+          if (!confirm(clearmessage)) {
+            return;
+          }
+        }
       }
       // 3. The current user is is clearing / denying admin right for any user / group.
-      else if(self.right == "admin") {
-      	if (nxtst == 2) {
+      else if (self.right == "admin") {
+        if (nxtst == 2) {
           var denymessage = "$msg.get('rightsmanager.denyrightforuorg')".replace('__right__', self.right);
           denymessage = denymessage.replace('__name__', self.currentUorG);
           if (!confirm(denymessage)) {
             return;
           }
-        }
-        else if (nxtst == 0) {
+        } else if (nxtst == 0) {
           var clearmessage = "$msg.get('rightsmanager.clearrightforuorg')".replace('__right__', self.right);
           clearmessage = clearmessage.replace('__name__', self.currentUorG);
           if (!confirm(clearmessage)) {
@@ -148,7 +150,7 @@ MSCheckbox = Class.create({
         }
       }
 
-      if(action == "") {
+      if (action == "") {
         if (nxtst == 0) {
           action = "clear";
         } else if (nxtst == 1) {
@@ -161,16 +163,15 @@ MSCheckbox = Class.create({
       // Compose the complete URI
       var url = self.saveUrl + "&action=" + action + "&right=" + self.right;
 
-      self.req = new Ajax.Request(url,
-      {
+      self.req = new Ajax.Request(url, {
         method: 'get',
         onSuccess: function(transport) {
-        	if(transport.responseText.strip() == "SUCCESS")
+          if (transport.responseText.strip() == "SUCCESS") {
             self.next();
-          else {
-          	//if an error occurred while trying to save a right rule, display an alert
-          	// and refresh the page, since probably the user does not have the right to perform
-          	// that action
+          } else {
+            //if an error occurred while trying to save a right rule, display an alert
+            // and refresh the page, since probably the user does not have the right to perform
+            // that action
             alert("$msg.get('platform.core.rightsManagement.saveFailure')");
             var rURL = unescape(window.location.pathname);
             window.location.href = rURL;
@@ -240,7 +241,7 @@ function displayUsers(row, i, table)
     //delete group
     var del = document.createElement('img');
 
-    if(row.grayed == "true") {
+    if (row.grayed == "true") {
       del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clearg.png")';
       del.className = 'icon-manageg';
     } else {
@@ -318,7 +319,6 @@ function displayGroups(row, i, table)
 function displayMembers(row, i, table)
 {
   var tr = document.createElement('tr');
-
   var membername = document.createElement("td");
 
   var displayedName = document.createTextNode(row.prettyname);
@@ -334,20 +334,19 @@ function displayMembers(row, i, table)
   tr.appendChild(membername);
 
   /* do not allow to delete users from a group when not in inline mode */
-  if(table.action == "inline")
-  {
+  if (table.action == "inline") {
     var membermanage = document.createElement("td");
     membermanage.className = "manage";
 
     var del = document.createElement('img');
 
     if (row.grayed == "true") {
-       del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clearg.png")';
-       del.className = 'icon-manageg';
+      del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clearg.png")';
+      del.className = 'icon-manageg';
     } else {
-       del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clear.png")';
-       Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
-       del.className = 'icon-manage';
+      del.src = '$xwiki.getSkinFile("js/xwiki/usersandgroups/img/clear.png")';
+      Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
+      del.className = 'icon-manage';
     }
     del.title = "$msg.get('delete')";
     membermanage.appendChild(del);
@@ -373,7 +372,7 @@ function displayUsersAndGroups(row, i, table, idx)
   var tr = document.createElement('tr');
 
   var username = document.createElement('td');
-  if(row.wikiname == "local") {
+  if (row.wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
     a.appendChild( document.createTextNode( row.username ) );
@@ -385,18 +384,18 @@ function displayUsersAndGroups(row, i, table, idx)
   username.className = "username";
   tr.appendChild(username);
   activeRights.each(function(right) {
-    if(right)
+    if (right)
     {
-        var td = document.createElement('td');
-        td.className = "rights";
-        var r = 0;
-        if (allows.indexOf(right) >= 0) {
-           r = 1;
-        } else if (denys.indexOf(right) >= 0) {
-           r = 2;
-        }
-        var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
-        tr.appendChild(td);
+      var td = document.createElement('td');
+      td.className = "rights";
+      var r = 0;
+      if (allows.indexOf(right) >= 0) {
+        r = 1;
+      } else if (denys.indexOf(right) >= 0) {
+        r = 2;
+      }
+      var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
+      tr.appendChild(td);
     }
   });
 
@@ -418,23 +417,22 @@ function deleteUserOrGroup(i, table, docname, uorg)
 {
   return function() {
     var url = "?xpage=deleteuorg&docname=" + docname;
-    if(uorg == "user") {
+    if (uorg == "user") {
       if (confirm("$msg.get('rightsmanager.confirmdeleteuser')".replace('__name__', docname))) {
         new Ajax.Request(url, {
-            method: 'get',
-            onSuccess: function(transport) {
-              table.deleteRow(i);
-            }
+          method: 'get',
+          onSuccess: function(transport) {
+            table.deleteRow(i);
+          }
         });
       }
-    }
-    else {
+    } else {
       if (confirm("$msg.get('rightsmanager.confirmdeletegroup')".replace('__name__', docname))) {
         new Ajax.Request(url, {
-            method: 'get',
-            onSuccess: function(transport) {
-              table.deleteRow(i);
-            }
+          method: 'get',
+          onSuccess: function(transport) {
+            table.deleteRow(i);
+          }
         });
       }
     }
@@ -466,22 +464,45 @@ function makeAddHandler(url, saveurl, redirecturl)
 
 function setGuestExtendedRights(self)
 {
-  return function() { 
-      var url = '$xwiki.getURL("XWiki.XWikiPreferences", "save")';
-      var pivot = self;
-      if(self.getAttribute('alt') == "yes")
-      {
-        if(self.id.indexOf('view') > 0)
-           new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"}, onSuccess: function() { pivot.alt = "no"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')"; }  }); 
-        else
-           new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"}, onSuccess: function() { pivot.alt = "no"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')"; }  });
+  return function() {
+    var url = '$xwiki.getURL("XWiki.XWikiPreferences", "save")';
+    var pivot = self;
+    if (self.getAttribute('alt') == "yes") {
+      if (self.id.indexOf('view') > 0) {
+        new Ajax.Request(url, {
+          method: 'post',
+          parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"},
+          onSuccess: function() {
+            pivot.alt = "no";
+            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
+        }});
+      } else {
+        new Ajax.Request(url, {
+          method: 'post',
+          parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"},
+          onSuccess: function() {
+            pivot.alt = "no";
+            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/none.png')";
+        }});
       }
-      else {
-           if(self.id.indexOf('view') > 0)
-             new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"}, onSuccess: function() { pivot.alt = "yes"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')"; }  }); 
-           else
-             new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"}, onSuccess: function() { pivot.alt = "yes"; pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')"; }  });
-      }  	
+    } else {
+      if (self.id.indexOf('view') > 0) {
+        new Ajax.Request(url, {
+          method: 'post',
+          parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"},
+          onSuccess: function() {
+            pivot.alt = "yes";
+            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
+        }});
+      } else {
+        new Ajax.Request(url, {
+          method: 'post',
+          parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"},
+          onSuccess: function() {
+            pivot.alt = "yes";
+            pivot.src = "$xwiki.getSkinFile('js/xwiki/usersandgroups/img/allow-black.png')";
+        }});
+      }
+    }
   }
 }
-

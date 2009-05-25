@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.skins</groupId>
     <artifactId>xwiki-skins</artifactId>
-    <version>12</version>
+    <version>13-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-skin-toucan</artifactId>
   <name>XWiki Platform - Skins - Toucan</name>
@@ -42,7 +42,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-albatross</artifactId>
-      <version>1.20</version>
+      <version>1.21-SNAPSHOT</version>
       <scope>runtime</scope>
       <type>zip</type>
     </dependency>

@@ -25,15 +25,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.plexus.manager.PlexusComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
 
 public class XWikiComponentInitializer
 {
@@ -109,14 +107,10 @@ public class XWikiComponentInitializer
     public ComponentManager getComponentManager() throws Exception
     {
         if (this.componentManager == null) {
-
-            DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
-            configuration.setContainerConfiguration("/plexus.xml");
-            DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
-            this.componentManager = new PlexusComponentManager(container);
+            this.componentManager = new EmbeddableComponentManager(this.getClass().getClassLoader());
             
             // Initialize dynamically all components defined using annotations
-            this.componentAnnotationInitializer.initialize(componentManager, this.getClass().getClassLoader());
+            this.componentAnnotationInitializer.initialize(this.componentManager, this.getClass().getClassLoader());
 
         }
 

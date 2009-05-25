@@ -307,12 +307,27 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
         // this will also check for email error
         InternetAddress from = new InternetAddress(mail.getFrom());
-        InternetAddress[] to =
-            toInternetAddresses(mail.getTo() + "," + StringUtils.defaultString(mail.getHeader("To")));
-        InternetAddress[] cc =
-            toInternetAddresses(mail.getCc() + "," + StringUtils.defaultString(mail.getHeader("Cc")));
-        InternetAddress[] bcc =
-            toInternetAddresses(mail.getBcc() + "," + StringUtils.defaultString(mail.getHeader("Bcc")));
+        String recipients = mail.getHeader("To");
+        if (StringUtils.isBlank(recipients)) {
+            recipients = mail.getTo();
+        } else {
+            recipients = mail.getTo() + "," + recipients;
+        }
+        InternetAddress[] to = toInternetAddresses(recipients);
+        recipients = mail.getHeader("Cc");
+        if (StringUtils.isBlank(recipients)) {
+            recipients = mail.getCc();
+        } else {
+            recipients = mail.getCc() + "," + recipients;
+        }
+        InternetAddress[] cc = toInternetAddresses(recipients);
+        recipients = mail.getHeader("Bcc");
+        if (StringUtils.isBlank(recipients)) {
+            recipients = mail.getBcc();
+        } else {
+            recipients = mail.getBcc() + "," + recipients;
+        }
+        InternetAddress[] bcc = toInternetAddresses(recipients);
 
         if ((to == null) && (cc == null) && (bcc == null)) {
             LOG.info("No recipient -> skipping this email");

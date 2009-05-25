@@ -116,6 +116,22 @@ public class EmbeddableComponentManager implements ComponentManager
     }
 
     /**
+     * Add ability to register a component instance. Useful for unit testing.
+     */
+    public void registerComponent(Class< ? > role, String hint, Object component)
+    {
+        this.components.put(new RoleHint(role, hint), component);
+    }
+
+    /**
+     * Add ability to register a component instance. Useful for unit testing.
+     */
+    public void registerComponent(Class< ? > role, Object component)
+    {
+        this.components.put(new RoleHint(role), component);
+    }
+
+    /**
      * {@inheritDoc}
      * @see ComponentManager#getComponentDescriptor(Class, String)
      */

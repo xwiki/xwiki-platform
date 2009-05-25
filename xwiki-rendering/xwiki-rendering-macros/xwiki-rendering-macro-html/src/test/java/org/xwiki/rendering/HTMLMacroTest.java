@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering;
 
+import org.jmock.Mock;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -43,8 +47,12 @@ public class HTMLMacroTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
+        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentAccessBridge.class,
+            mockDocumentAccessBridge.proxy());
+        Mock mockDocumentNameSerializer = mock(DocumentNameSerializer.class);
+        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentNameSerializer.class,
+            mockDocumentNameSerializer.proxy());
     }
     
     /**

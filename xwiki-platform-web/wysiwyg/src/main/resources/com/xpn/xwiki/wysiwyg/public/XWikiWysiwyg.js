@@ -126,6 +126,27 @@ var Wysiwyg =
     }
 };
 
+/**
+ * The array of WYSIWYG configurations.
+ * Usage:
+ *   WysiwygConfigurations.push({
+ *     hookId: 'textAreaId',
+ *     displayTabs: true,
+ *     defaultEditor: 'wysiwyg',
+ *     inputURL: 'about:blank',
+ *     syntax: 'xwiki/2.0',
+ *     plugins: 'submit line separator text valign list indent history format symbol link image table macro importer',
+ *     menu: 'link image table macro',
+ *     toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
+ *     debug: false
+ *   });
+ *
+ * @type array
+ */
+if (typeof WysiwygConfigurations == 'undefined') {
+    var WysiwygConfigurations = [];
+}
+
 #if("$!request.lazy" != "true")
 Wysiwyg.load();
 #end

@@ -130,8 +130,8 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
     {
         LOG.error(errorMessage, e);
 
-        context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
-        context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+        this.context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
+        this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
     /**
      * Create a new wiki from template.
      * 
-     * @param wikiname the name of the new wiki.
+     * @param wikiName the name of the new wiki.
      * @param templateWiki the name of the wiki from where to copy document to the new wiki.
      * @param pkgName the name of the attached XAR file to import in the new wiki.
      * @param wikiXObjectDocument a wiki descriptor document from which the new wiki descriptor document will be
@@ -160,27 +160,27 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
-     *         failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
-    public int createNewWiki(String wikiname, String templateWiki, String pkgName, XWikiServer wikiXObjectDocument,
+    public int createNewWiki(String wikiName, String templateWiki, String pkgName, XWikiServer wikiXObjectDocument,
         boolean failOnExist) throws XWikiException
     {
-        if (!hasAdminRights()) {
-            return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
-        }
-
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            if (wikiname == null || wikiname.trim().equals("")) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN, messageTool.get(
-                    WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, wikiname));
+            if (!hasAdminRights()) {
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, this.messageTool.get(
+                    WikiManagerMessageTool.ERROR_RIGHTTOCREATEWIKI, wikiName));
             }
 
-            wikiXObjectDocument.setWikiName(wikiname);
+            if (wikiName == null || wikiName.trim().equals("")) {
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN, messageTool.get(
+                    WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, wikiName));
+            }
+
+            wikiXObjectDocument.setWikiName(wikiName);
 
             String realTemplateWikiName =
                 templateWiki == null || templateWiki.trim().length() == 0 ? null : templateWiki;
@@ -597,8 +597,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
-     *         failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */

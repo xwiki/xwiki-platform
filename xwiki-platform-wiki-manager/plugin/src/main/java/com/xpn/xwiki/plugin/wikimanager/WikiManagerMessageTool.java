@@ -114,7 +114,14 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_PACKAGEINSTALL = "wikimanager.plugin.error.packageinstall";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to delete wiki with not administrator user.
+     * Used as {@link WikiManagerException} message when trying to create wiki when it's not administrator user.
+     * 
+     * @since 1.1
+     */
+    public static final String ERROR_RIGHTTOCREATEWIKI = "wikimanager.plugin.error.righttocreatewiki";
+
+    /**
+     * Used as {@link WikiManagerException} message when trying to delete wiki when it's not administrator user.
      * 
      * @since 1.1
      */

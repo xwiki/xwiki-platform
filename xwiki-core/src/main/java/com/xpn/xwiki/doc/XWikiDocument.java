@@ -1617,8 +1617,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, context.getDoc() != null ? context.getDoc().getSyntaxId()
-            : getSyntaxId(), context);
+        return display(fieldname, type, "", obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
+            context);
     }
 
     /**

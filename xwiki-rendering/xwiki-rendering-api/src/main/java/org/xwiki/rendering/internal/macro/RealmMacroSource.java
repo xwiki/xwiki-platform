@@ -64,15 +64,14 @@ public class RealmMacroSource extends AbstractMacroSource implements Initializab
     }
 
     /**
-     * REgister all macros (macros for all syntaxes, macros for a given syntax).
+     * Register all macros (macros for all syntaxes, macros for a given syntax).
      * 
      * @throws InitializationException in case of an error when registering a macro
      */
-    @SuppressWarnings("unchecked")
     private void registerMacros() throws InitializationException
     {
         // Find all registered macros
-        Map<String, Macro< ? >> allMacros;
+        Map<String, Macro> allMacros;
         try {
             allMacros = this.componentManager.lookupMap(Macro.class);
         } catch (ComponentLookupException e) {
@@ -80,7 +79,7 @@ public class RealmMacroSource extends AbstractMacroSource implements Initializab
         }
 
         // Now sort through the ones that are registered for a given syntax and those registered for all syntaxes.
-        for (Map.Entry<String, Macro< ? >> entry : allMacros.entrySet()) {
+        for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
 
             // Verify if we have a syntax specified.
             String[] hintParts = entry.getKey().split("/");

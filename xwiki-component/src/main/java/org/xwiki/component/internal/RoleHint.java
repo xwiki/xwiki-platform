@@ -25,18 +25,18 @@ package org.xwiki.component.internal;
  * @version $Id$
  * @since 2.0M1
  */
-public class RoleHint
+public class RoleHint<T>
 {
-    private Class< ? > role;
+    private Class< T > role;
     
     private String hint;
     
-    public RoleHint(Class< ? > role)
+    public RoleHint(Class< T > role)
     {
         this(role, null);
     }
 
-    public RoleHint(Class< ? > role, String hint)
+    public RoleHint(Class< T > role, String hint)
     {
         this.role = role;
         this.hint = hint;
@@ -45,7 +45,7 @@ public class RoleHint
         }
     }
     
-    public Class< ? > getRole()
+    public Class< T > getRole()
     {
         return this.role;
     }
@@ -56,6 +56,7 @@ public class RoleHint
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public boolean equals(Object obj)
     {
         if (this == obj) {
@@ -66,7 +67,7 @@ public class RoleHint
             return false;
         }
         
-        RoleHint rolehint = (RoleHint) obj;
+        RoleHint<T> rolehint = (RoleHint<T>) obj;
         return (getRole() == rolehint.getRole() 
                 || (getRole() != null && getRole().getName().equals(rolehint.getRole().getName()))) 
             && (getHint() == rolehint.getHint() 

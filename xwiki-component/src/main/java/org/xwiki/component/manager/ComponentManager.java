@@ -35,7 +35,7 @@ public interface ComponentManager
      * @return the component instance
      * @throws ComponentLookupException in case the component cannot be found 
      */
-    Object lookup(Class< ? > role) throws ComponentLookupException;
+    <T> T lookup(Class< T > role) throws ComponentLookupException;
     
     /**
      * Find a component instance that implements that passed interface class. If the component has a singleton
@@ -47,13 +47,13 @@ public interface ComponentManager
      * @return the component instance
      * @throws ComponentLookupException in case the component cannot be found 
      */
-    Object lookup(Class< ? > role, String roleHint) throws ComponentLookupException;
+    <T> T lookup(Class< T > role, String roleHint) throws ComponentLookupException;
 
-    void release(Object component) throws ComponentLifecycleException;
+    <T> void release(T component) throws ComponentLifecycleException;
 
-    Map lookupMap(Class< ? > role) throws ComponentLookupException;
+    <T> Map<String, T> lookupMap(Class< T > role) throws ComponentLookupException;
 
-    List lookupList(Class< ? > role) throws ComponentLookupException;
+    <T> List< T > lookupList(Class< T > role) throws ComponentLookupException;
 
     /**
      * Add a component in the component repository programmaticaly.
@@ -65,7 +65,7 @@ public interface ComponentManager
      * @throws ComponentRepositoryException error when registering component descriptor.
      * @since 1.7M1
      */
-    void registerComponent(ComponentDescriptor componentDescriptor) throws ComponentRepositoryException;
+    <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException;
 
     /**
      * @param role the role identifying the component
@@ -73,5 +73,5 @@ public interface ComponentManager
      * @return the descriptor for the component matching the passed parameter or null if this component doesn't exist
      * @since 2.0M1
      */
-    ComponentDescriptor getComponentDescriptor(Class< ? > role, String roleHint);
+    <T> ComponentDescriptor<T> getComponentDescriptor(Class< T > role, String roleHint);
 }

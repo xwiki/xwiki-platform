@@ -30,15 +30,13 @@ import java.util.List;
  * @version $Id$
  * @since 1.7M1
  */
-public class DefaultComponentDescriptor extends DefaultComponentRole implements ComponentDescriptor
+public class DefaultComponentDescriptor<T> extends DefaultComponentRole<T> implements ComponentDescriptor<T>
 {
     private String implementation;
 
     private ComponentInstantiationStrategy instantiationStrategy = ComponentInstantiationStrategy.SINGLETON;
 
-    private List<ComponentProperty> componentConfiguration = new ArrayList<ComponentProperty>();
-
-    private List<ComponentDependency> componentDependencies = new ArrayList<ComponentDependency>();
+    private List<ComponentDependency<?>> componentDependencies = new ArrayList<ComponentDependency<?>>();
 
     public void setImplementation(String implementation)
     {
@@ -60,34 +58,19 @@ public class DefaultComponentDescriptor extends DefaultComponentRole implements 
         return this.instantiationStrategy;
     }
 
-    public Collection<ComponentProperty> getComponentConfiguration()
-    {
-        return this.componentConfiguration;
-    }
-
-    public Collection<ComponentDependency> getComponentDependencies()
+    public Collection<ComponentDependency<?>> getComponentDependencies()
     {
         return this.componentDependencies;
     }
 
-    public void addComponentProperty(ComponentProperty componentProperty)
-    {
-        this.componentConfiguration.add(componentProperty);
-    }
-
-    public void addComponentProperty(String name, String value)
-    {
-        this.componentConfiguration.add(new DefaultComponentProperty(name, value));
-    }
-
-    public void addComponentDependency(ComponentDependency componentDependency)
+    public void addComponentDependency(ComponentDependency<?> componentDependency)
     {
         this.componentDependencies.add(componentDependency);
     }
 
-    public void addComponentDependency(Class< ? > role, String roleHint)
+    public <TT> void addComponentDependency(Class< TT > role, String roleHint)
     {
-        DefaultComponentDependency componentDependency = new DefaultComponentDependency();
+        DefaultComponentDependency< TT > componentDependency = new DefaultComponentDependency< TT >();
         componentDependency.setRole(role);
         componentDependency.setRoleHint(roleHint);
 

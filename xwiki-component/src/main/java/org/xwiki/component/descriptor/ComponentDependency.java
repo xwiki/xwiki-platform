@@ -26,7 +26,7 @@ package org.xwiki.component.descriptor;
  * @version $Id$
  * @since 1.7M1
  */
-public interface ComponentDependency extends ComponentRole
+public interface ComponentDependency<T> extends ComponentRole<T>
 {
     /**
      * @return the name of the injection point (can be the name of the field for field injection or the name

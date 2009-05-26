@@ -26,7 +26,7 @@ package org.xwiki.component.descriptor;
  * @version $Id$
  * @since 1.7M1
  */
-public class DefaultComponentDependency extends DefaultComponentRole implements ComponentDependency
+public class DefaultComponentDependency< T > extends DefaultComponentRole< T > implements ComponentDependency< T >
 {
     private Class< ? > mappingType;
     

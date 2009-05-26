@@ -30,7 +30,6 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentProperty;
 import org.xwiki.component.descriptor.DefaultComponentDependency;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLifecycleException;
@@ -55,11 +54,11 @@ public class PlexusComponentManager implements ComponentManager
      * 
      * @see org.xwiki.component.manager.ComponentManager#lookup(Class)
      */
-    public Object lookup(Class< ? > role) throws ComponentLookupException
+    public <T> T lookup(Class< T > role) throws ComponentLookupException
     {
-        Object result;
+        T result;
         try {
-            result = this.plexusContainer.lookup(role.getName());
+            result = (T) this.plexusContainer.lookup(role.getName());
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup component role [" + role + "]", e);
         }
@@ -72,11 +71,11 @@ public class PlexusComponentManager implements ComponentManager
      * 
      * @see org.xwiki.component.manager.ComponentManager#lookup(Class, String)
      */
-    public Object lookup(Class< ? > role, String roleHint) throws ComponentLookupException
+    public <T> T lookup(Class< T > role, String roleHint) throws ComponentLookupException
     {
-        Object result;
+        T result;
         try {
-            result = this.plexusContainer.lookup(role.getName(), roleHint);
+            result = (T) this.plexusContainer.lookup(role.getName(), roleHint);
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup component role [" + role + "] for hint [" + roleHint
                 + "]", e);
@@ -90,9 +89,9 @@ public class PlexusComponentManager implements ComponentManager
      * 
      * @see org.xwiki.component.manager.ComponentManager#lookupMap(Class)
      */
-    public Map<String, Object> lookupMap(Class< ? > role) throws ComponentLookupException
+    public <T> Map<String, T> lookupMap(Class< T > role) throws ComponentLookupException
     {
-        Map<String, Object> result;
+        Map<String, T> result;
         try {
             result = this.plexusContainer.lookupMap(role.getName());
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
@@ -107,9 +106,9 @@ public class PlexusComponentManager implements ComponentManager
      * 
      * @see org.xwiki.component.manager.ComponentManager#lookupList(Class)
      */
-    public List<Object> lookupList(Class< ? > role) throws ComponentLookupException
+    public <T> List< T > lookupList(Class< T > role) throws ComponentLookupException
     {
-        List<Object> result;
+        List<T> result;
         try {
             result = this.plexusContainer.lookupList(role.getName());
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
@@ -124,7 +123,7 @@ public class PlexusComponentManager implements ComponentManager
      * 
      * @see org.xwiki.component.manager.ComponentManager#release(java.lang.Object)
      */
-    public void release(Object component) throws ComponentLifecycleException
+    public <T> void release(T component) throws ComponentLifecycleException
     {
         try {
             this.plexusContainer.release(component);
@@ -136,25 +135,64 @@ public class PlexusComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.component.manager.ComponentManager#hasComponent(Class)
+     * @see org.xwiki.component.manager.ComponentManager#registerComponent(org.xwiki.component.descriptor.ComponentDescriptor)
      */
-    public boolean hasComponent(Class< ? > role)
+    public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) 
+        throws ComponentRepositoryException
     {
-        return this.plexusContainer.hasComponent(role.getName());
+        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
+            createPlexusComponentDescriptor(componentDescriptor);
+
+        try {
+            this.plexusContainer.addComponentDescriptor(pcd);
+        } catch (org.codehaus.plexus.component.repository.exception.ComponentRepositoryException e) {
+            throw new ComponentRepositoryException("Failed add component descriptor [" + componentDescriptor + "]", e);
+        }
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.manager.ComponentManager#hasComponent(Class, String)
+     * @see ComponentManager#getComponentDescriptor(Class, String)
+     * @since 2.0M1
      */
-    public boolean hasComponent(Class< ? > role, String roleHint)
+    public <T> ComponentDescriptor<T> getComponentDescriptor(Class< T > role, String roleHint)
     {
-        return this.plexusContainer.hasComponent(role.getName(), roleHint);
-    }
+        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
+            this.plexusContainer.getComponentDescriptor(role.getName(), roleHint);
 
+        DefaultComponentDescriptor<T> descriptor = null;
+        
+        if (pcd != null) {
+            descriptor = new DefaultComponentDescriptor<T>();
+            descriptor.setImplementation(pcd.getImplementation());
+            descriptor.setRoleHint(pcd.getRoleHint());
+            descriptor.setRole((Class<T>) loadClass(pcd.getRole()));
+            
+            if ("per-lookup".equals(pcd.getInstantiationStrategy())) {
+                descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP);
+            } else {
+                descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+            }
+    
+            // Copy dependencies
+            for (ComponentRequirement requirement : (List<ComponentRequirement>) pcd.getRequirements()) {
+                DefaultComponentDependency dependency = new DefaultComponentDependency();
+                dependency.setRole(loadClass(requirement.getRole()));
+                dependency.setRoleHint(requirement.getRoleHint());
+                dependency.setMappingType(loadClass(requirement.getFieldMappingType()));
+                dependency.setName(requirement.getFieldName());
+                
+                // TODO: Handle specific hints when we move to a more recent Plexus version.
+                // See createPlexusComponentDescriptor
+                descriptor.addComponentDependency(dependency);
+            }
+        }
+        
+        return descriptor;
+    }
+    
     private org.codehaus.plexus.component.repository.ComponentDescriptor createPlexusComponentDescriptor(
-        ComponentDescriptor componentDescriptor)
+        ComponentDescriptor<?> componentDescriptor)
     {
         org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
             new org.codehaus.plexus.component.repository.ComponentDescriptor();
@@ -171,19 +209,8 @@ public class PlexusComponentManager implements ComponentManager
                 pcd.setInstantiationStrategy("singleton");
         }
 
-        Collection<ComponentProperty> componentConfiguration = componentDescriptor.getComponentConfiguration();
-        if (!componentConfiguration.isEmpty()) {
-            XmlPlexusConfiguration xpc = new XmlPlexusConfiguration("");
-            for (ComponentProperty property : componentConfiguration) {
-                XmlPlexusConfiguration pc = new XmlPlexusConfiguration(property.getName());
-                pc.setValue(property.getValue());
-                xpc.addChild(pc);
-            }
-            pcd.setConfiguration(xpc);
-        }
-
-        Collection<ComponentDependency> componentDependencies = componentDescriptor.getComponentDependencies();
-        for (ComponentDependency dependency : componentDependencies) {
+        Collection<ComponentDependency<?>> componentDependencies = componentDescriptor.getComponentDependencies();
+        for (ComponentDependency<?> dependency : componentDependencies) {
             ComponentRequirement requirement;
             
             // Handles several hints in case of lists (collections or maps)
@@ -214,68 +241,9 @@ public class PlexusComponentManager implements ComponentManager
         return pcd;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.manager.ComponentManager#registerComponent(org.xwiki.component.descriptor.ComponentDescriptor)
-     */
-    public void registerComponent(ComponentDescriptor componentDescriptor)
-        throws ComponentRepositoryException
-    {
-        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
-            createPlexusComponentDescriptor(componentDescriptor);
-
-        try {
-            this.plexusContainer.addComponentDescriptor(pcd);
-        } catch (org.codehaus.plexus.component.repository.exception.ComponentRepositoryException e) {
-            throw new ComponentRepositoryException("Failed add component descriptor [" + componentDescriptor + "]", e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see ComponentManager#getComponentDescriptor(Class, String)
-     * @since 2.0M1
-     */
-    public ComponentDescriptor getComponentDescriptor(Class< ? > role, String roleHint)
-    {
-        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
-            this.plexusContainer.getComponentDescriptor(role.getName(), roleHint);
-
-        DefaultComponentDescriptor descriptor = null;
-        
-        if (pcd != null) {
-            descriptor = new DefaultComponentDescriptor();
-            descriptor.setImplementation(pcd.getImplementation());
-            descriptor.setRoleHint(pcd.getRoleHint());
-            descriptor.setRole(loadClass(pcd.getRole()));
-            
-            if ("per-lookup".equals(pcd.getInstantiationStrategy())) {
-                descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP);
-            } else {
-                descriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
-            }
-    
-            // Copy dependencies
-            for (ComponentRequirement requirement : (List<ComponentRequirement>) pcd.getRequirements()) {
-                DefaultComponentDependency dependency = new DefaultComponentDependency();
-                dependency.setRole(loadClass(requirement.getRole()));
-                dependency.setRoleHint(requirement.getRoleHint());
-                dependency.setMappingType(loadClass(requirement.getFieldMappingType()));
-                dependency.setName(requirement.getFieldName());
-                
-                // TODO: Handle specific hints when we move to a more recent Plexus version.
-                // See createPlexusComponentDescriptor
-                descriptor.addComponentDependency(dependency);
-            }
-        }
-        
-        return descriptor;
-    }
-    
     private Class< ? > loadClass(String className)
     {
-        Class result;
+        Class< ? > result;
         try {
             result = this.getClass().getClassLoader().loadClass(className);
         } catch (Exception e) {

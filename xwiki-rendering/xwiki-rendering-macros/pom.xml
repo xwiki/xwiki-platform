@@ -36,11 +36,17 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-xwiki</artifactId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
     
     <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-xwiki</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-tests</artifactId>

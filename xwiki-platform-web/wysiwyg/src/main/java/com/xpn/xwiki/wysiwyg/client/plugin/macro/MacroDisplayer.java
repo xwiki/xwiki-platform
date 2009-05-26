@@ -181,19 +181,23 @@ public class MacroDisplayer implements InnerHTMLListener
         // The place holder is hidden when the macro is expanded.
         container.appendChild(createPlaceHolder(call));
 
-        // Extract macro output.
-        int startIndex = domUtils.getNodeIndex(start);
-        int endIndex = startIndex + siblingCount + 1;
-        // We need to put macro output inside a container to be able to hide it when the macro is collapsed.
-        Element output = (Element) textArea.getDocument().xCreateDivElement().cast();
-        output.setClassName("macro-output");
-        output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
+        // Extract the macro output, if there is any.
+        if (siblingCount > 0) {
+            int startIndex = domUtils.getNodeIndex(start);
+            int endIndex = startIndex + siblingCount + 1;
+            // We need to put macro output inside a container to be able to hide it when the macro is collapsed.
+            Element output = (Element) textArea.getDocument().xCreateDivElement().cast();
+            output.setClassName("macro-output");
+            output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
 
-        // Let's see if the macro should be displayed in-line or as a block.
-        container.addClassName(isInLine(output) ? INLINE_MACRO_STYLE_NAME : BLOCK_MACRO_STYLE_NAME);
+            // Let's see if the macro should be displayed in-line or as a block.
+            container.addClassName(isInLine(output) ? INLINE_MACRO_STYLE_NAME : BLOCK_MACRO_STYLE_NAME);
 
-        container.appendChild(output);
-        domUtils.insertAt(start.getParentNode(), container, startIndex);
+            container.appendChild(output);
+        }
+
+        // Insert the macro container before the start macro comment node, which will be removed.
+        start.getParentNode().insertBefore(container, start);
 
         return container;
     }
@@ -347,8 +351,11 @@ public class MacroDisplayer implements InnerHTMLListener
     public void setCollapsed(Element container, boolean collapsed)
     {
         Element output = getOutput(container);
-        boolean collapse = collapsed || !output.hasChildNodes();
-        output.getStyle().setProperty(Style.DISPLAY, collapse ? Display.NONE : Display.BLOCK);
+        boolean collapse = collapsed || output == null;
+        if (!collapse) {
+            // We know for sure the output is not null.
+            output.getStyle().setProperty(Style.DISPLAY, Display.BLOCK);
+        }
 
         Element placeHolder = getPlaceHolder(container);
         placeHolder.getStyle().setProperty(Style.DISPLAY, collapse ? Display.INLINE : Display.NONE);
@@ -360,7 +367,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     public boolean isCollapsed(Element container)
     {
-        return Display.NONE.equals(getOutput(container).getStyle().getProperty(Style.DISPLAY));
+        return !Display.NONE.equals(getPlaceHolder(container).getStyle().getProperty(Style.DISPLAY));
     }
 
     /**
@@ -369,7 +376,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     protected Element getOutput(Element container)
     {
-        return (Element) container.getLastChild();
+        return (Element) getPlaceHolder(container).getNextSibling();
     }
 
     /**

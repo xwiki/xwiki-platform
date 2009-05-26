@@ -71,7 +71,9 @@ public class MozillaMacroDisplayer extends MacroDisplayer
      */
     protected Element getOutput(Element container)
     {
-        return (Element) container.getLastChild().getPreviousSibling();
+        Node placeHolder = getPlaceHolder(container);
+        // If the macro place holder is followed only by a caret blocker then the macro has no output.
+        return placeHolder.getNextSibling().getNextSibling() == null ? null : (Element) placeHolder.getNextSibling();
     }
 
     /**

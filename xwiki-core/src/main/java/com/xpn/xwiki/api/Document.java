@@ -458,7 +458,7 @@ public class Document extends Api
     @Deprecated
     public String getRenderedContent(String text) throws XWikiException
     {
-        return this.doc.getRenderedContent(text, getXWikiContext());
+        return this.doc.getRenderedContent(text, XWikiDocument.XWIKI10_SYNTAXID, getXWikiContext());
     }
 
     /**
@@ -1108,7 +1108,7 @@ public class Document extends Api
 
     public List<String> getLinkedPages()
     {
-        return this.doc.getLinkedPages(getXWikiContext());
+        return new ArrayList<String>(this.doc.getUniqueLinkedPages(getXWikiContext()));
     }
 
     public Attachment getAttachment(String filename)
@@ -1511,7 +1511,7 @@ public class Document extends Api
 
     public List<XWikiLink> getLinks() throws XWikiException
     {
-        return this.doc.getWikiLinkedPages(getXWikiContext());
+        return new ArrayList<XWikiLink>(this.doc.getUniqueWikiLinkedPages(getXWikiContext()));
     }
 
     /**

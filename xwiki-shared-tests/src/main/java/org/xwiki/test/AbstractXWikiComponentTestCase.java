@@ -24,7 +24,7 @@ import org.xwiki.component.manager.ComponentManager;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
- * available. Use this class for JUnit 3.x tests. For Junit 4.x tests use {@link AbstractComponentTestCase— instead.
+ * available. Use this class for JUnit 3.x tests. For Junit 4.x tests use {@link AbstractComponentTestCase} instead.
  */
 public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 {

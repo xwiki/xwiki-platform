@@ -70,7 +70,7 @@ public class DefaultObservationManager implements ObservationManager
         @Override
         public String toString()
         {
-            return "{" + this.event + ", " + this.listener + "}";
+            return " event = [" + this.event + "], listener = [" + this.listener + "]";
         }
     }
 

@@ -37,7 +37,7 @@ public interface ObservationManager
      * Add a listener.
      * 
      * @param event the event to register the listener against; acts as a template that filters out only specific events
-     *            the istener is interested in
+     *            the listener is interested in
      * @param eventListener the listener to register
      */
     void addListener(Event event, EventListener eventListener);
@@ -51,8 +51,8 @@ public interface ObservationManager
     void removeListener(Event event, EventListener eventListener);
 
     /**
-     * Remove a listener from all events it is registered by. Convenient way of cleaning up an listener object being
-     * destroyed.
+     * Remove a listener from all events it is registered against. Convenient way of cleaning up a listener object 
+     * being destroyed.
      * 
      * @param eventListener the listener to remove.
      */

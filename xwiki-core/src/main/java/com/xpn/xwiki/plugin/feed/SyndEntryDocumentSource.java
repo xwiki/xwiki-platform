@@ -254,8 +254,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         // test access rights
         if (!doc.hasAccessLevel("view")) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access denied in view mode!");
         }
 
@@ -357,7 +356,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
             description = parseString(mapping, doc, context);
         } else {
             description = getStringValue(mapping, doc, context);
-            description = context.getDoc().getRenderedContent(description, context);
+            description = context.getDoc().getRenderedContent(description, XWikiDocument.XWIKI10_SYNTAXID, context);
         }
         String contentType = (String) params.get(CONTENT_TYPE);
         int contentLength = ((Number) params.get(CONTENT_LENGTH)).intValue();

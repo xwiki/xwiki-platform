@@ -1617,8 +1617,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, context.getDoc() != null ? context.getDoc().getSyntaxId()
-            : getSyntaxId(), context);
+        return display(fieldname, type, "", obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
+            context);
     }
 
     /**
@@ -1716,7 +1716,8 @@ public class XWikiDocument implements DocumentModelBridge
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(syntaxId) && (result.indexOf("<") != -1 || result.indexOf(">") != -1)) {
+            if (isInRenderingEngine && !is10Syntax(syntaxId)
+                && (result.indexOf("<") != -1 || result.indexOf(">") != -1)) {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");
             }

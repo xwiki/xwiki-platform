@@ -2732,7 +2732,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * properties to make the sheet feature work properly. If some properties are missing they are created and saved in
      * the database. SheetClass is used to a page as a sheet. When a page is tagged as a sheet and that page is included
      * in another page using the include macro then editing it triggers automatic inline edition (for XWiki Syntax 2.0
-     * only - for XWiki Syntax 1.0 automatic inline edition is triggered using #includeForm). 
+     * only - for XWiki Syntax 1.0 automatic inline edition is triggered using #includeForm).
      * 
      * @param context the XWiki Context
      * @return the SheetClass Base Class object containing the properties
@@ -2766,7 +2766,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
         return bclass;
     }
-    
+
     /**
      * Verify if the <code>XWiki.XWikiUsers</code> page exists and that it contains all the required configuration
      * properties to make the user feature work properly. If some properties are missing they are created and saved in
@@ -3435,8 +3435,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             mailSenderClass = Class.forName("com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi");
 
             // public int sendRawMessage(String from, String to, String rawMessage)
-            mailSenderSendRaw = mailSenderClass.getMethod("sendRawMessage",
-               new Class[]{String.class, String.class, String.class});
+            mailSenderSendRaw =
+                mailSenderClass.getMethod("sendRawMessage", new Class[] {String.class, String.class, String.class});
         } catch (Exception e) {
             LOG.error("Problem getting MailSender via Reflection. Using the old sendMessage mechanism.", e);
             sendMessageOld(sender, recipients, rawMessage, context);
@@ -3454,7 +3454,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
             if (cause instanceof XWikiException) {
-                throw (XWikiException)cause;
+                throw (XWikiException) cause;
             } else {
                 throw new RuntimeException(cause);
             }
@@ -6725,5 +6725,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             document.setContent("1 " + pageHeader);
             document.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
         }
+    }
+
+    /**
+     * Get the syntax of the document currently being executed.
+     * <p>
+     * The document currently being executed is not the same than the context document since when including a page with
+     * velocity #includeForm(), method for example the context doc is the includer document even if includeForm() fully
+     * execute and render the included document before insert it in the includer document.
+     * <p>
+     * If the current document can't be found, the method assume that the executed document is the context document
+     * (it's generally the case when a document is directly rendered with
+     * {@link XWikiDocument#getRenderedContent(XWikiContext)} for example).
+     * 
+     * @param def the default value to return if no document can be found
+     * @return the syntax identifier
+     */
+    public String getCurrentContentSyntaxId(String def, XWikiContext context)
+    {
+        String syntaxId = def;
+
+        if (context.get("sdoc") != null) {
+            // The content document
+            syntaxId = ((XWikiDocument) context.get("sdoc")).getSyntaxId();
+        } else if (context.getDoc() != null) {
+            // The context document
+            syntaxId = context.getDoc().getSyntaxId();
+        }
+
+        return syntaxId;
     }
 }

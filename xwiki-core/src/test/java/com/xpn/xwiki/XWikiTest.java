@@ -371,4 +371,23 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         });
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
     }
+    
+    public void testGetCurrentContentSyntaxId()
+    {
+        XWikiDocument doc1 = new XWikiDocument();
+        doc1.setSyntaxId("syntax1");
+        XWikiDocument doc2 = new XWikiDocument();
+        doc2.setSyntaxId("syntax2");
+        
+        assertEquals(null, this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+        assertEquals("syntax", this.xwiki.getCurrentContentSyntaxId("syntax", getContext()));
+        
+        getContext().setDoc(doc1);
+        
+        assertEquals("syntax1", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+        
+        getContext().put("sdoc", doc2);
+        
+        assertEquals("syntax2", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+    }
 }

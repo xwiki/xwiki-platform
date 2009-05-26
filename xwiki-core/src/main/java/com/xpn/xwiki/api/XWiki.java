@@ -1366,40 +1366,52 @@ public class XWiki extends Api
 
     /**
      * API to include a topic into another, optionnaly surrounding the content with {pre}{/pre} to avoid future wiki
-     * rendering The topic is rendered fully in the context of itself
+     * rendering The topic is rendered fully in the context of itself.
      * 
      * @param topic page name of the topic to include
-     * @param pre true to add {pre} {/pre}
+     * @param pre true to add {pre} {/pre} (only if includer document is 1.0 syntax)
      * @return the content of the included page
      * @throws XWikiException if the include failed
      */
     public String includeTopic(String topic, boolean pre) throws XWikiException
     {
+        String result = this.xwiki.include(topic, false, getXWikiContext());
+
         if (pre) {
-            return "{pre}" + this.xwiki.include(topic, false, getXWikiContext()) + "{/pre}";
+            String includerSyntax = this.xwiki.getCurrentContentSyntaxId(null, this.context);
+
+            if (includerSyntax != null && XWikiDocument.XWIKI10_SYNTAXID.equals(includerSyntax)) {
+                result = "{pre}" + result + "{/pre}";
+            }
         }
 
-        return this.xwiki.include(topic, false, getXWikiContext());
+        return result;
     }
 
     /**
      * API to execute a form in the context of an including topic, optionnaly surrounding the content with {pre}{/pre}
      * to avoid future wiki rendering The rendering is evaluated in the context of the including topic All velocity
      * variables are the one of the including topic This api is usually called using #includeForm in a page, which
-     * modifies the behavior of "Edit this page" button to direct for Form mode (inline)
+     * modifies the behavior of "Edit this page" button to direct for Form mode (inline).
      * 
      * @param topic page name of the form to execute
-     * @param pre true to add {pre} {/pre}
+     * @param pre true to add {pre} {/pre} (only if includer document is 1.0 syntax)
      * @return the content of the included page
      * @throws XWikiException if the include failed
      */
     public String includeForm(String topic, boolean pre) throws XWikiException
     {
+        String result = this.xwiki.include(topic, true, getXWikiContext());
+
         if (pre) {
-            return "{pre}" + this.xwiki.include(topic, true, getXWikiContext()) + "{/pre}";
+            String includerSyntax = this.xwiki.getCurrentContentSyntaxId(null, this.context);
+
+            if (includerSyntax != null && XWikiDocument.XWIKI10_SYNTAXID.equals(includerSyntax)) {
+                result = "{pre}" + result + "{/pre}";
+            }
         }
 
-        return this.xwiki.include(topic, true, getXWikiContext());
+        return result;
     }
 
     /**
@@ -1546,8 +1558,8 @@ public class XWiki extends Api
     /**
      * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment). It
-     * is important to always use the URL functions to generate URL and never hardcode URLs.
+     * XWikiURLFactory object For compatibility with any target environement (and especially the portlet environment).
+     * It is important to always use the URL functions to generate URL and never hardcode URLs.
      * 
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.
@@ -1580,9 +1592,9 @@ public class XWiki extends Api
     /**
      * API to retrieve the URL of an a Wiki Document in any mode, optionally adding an anchor. The URL is generated
      * differently depending on the environement (Servlet, Portlet, PDF, etc..) The URL generation can be modified by
-     * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the
-     * environment needs it. It is important to not add the anchor parameter manually after a URL. Some
-     * environments will not accept this (like the Portlet environement).
+     * implementing a new XWikiURLFactory object. The anchor will be modified to be added in the way the environment
+     * needs it. It is important to not add the anchor parameter manually after a URL. Some environments will not accept
+     * this (like the Portlet environement).
      * 
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible
@@ -1595,7 +1607,7 @@ public class XWiki extends Api
     {
         return this.xwiki.getURL(fullname, action, querystring, anchor, getXWikiContext());
     }
-    
+
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
      * 
@@ -2665,7 +2677,7 @@ public class XWiki extends Api
     {
         return this.xwiki.getWebAppPath(this.context);
     }
-    
+
     /**
      * @return the syntax id of the syntax to use when creating new documents.
      */

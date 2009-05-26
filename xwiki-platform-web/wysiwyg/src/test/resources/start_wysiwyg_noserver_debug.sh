@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XE_VERSION=1.9-SNAPSHOT;
+XE_VERSION=2.0-SNAPSHOT;
 GWT_VERSION=1.5.3;
 
 JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun/bin;

@@ -22,10 +22,10 @@ package com.xpn.xwiki.wysiwyg.client;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.Set;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.DOM;
@@ -88,24 +88,26 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     private void init()
     {
         createController(this);
-        loadConfigurations();
-        loadEditors();
+        loadEditors(loadConfigurations());
     }
 
     /**
-     * Load all the configuration objects stored in Wysiwyg.configurations in the main Window object. This way we are
-     * able to load them with Dictionary.get(String).
+     * Loads all the configuration objects from the {@code WysiwygConfigurations} JavaScript array in the main Window
+     * object. This way we are able to load them with Dictionary.get(String).
+     * 
+     * @return the array of editor identifiers for which we've found a configuration object
      */
-    private native void loadConfigurations()
+    private native JsArrayString loadConfigurations()
     /*-{
-        var configurations = $wnd.WysiwygConfigurations;
+        var editorIds = [];
+        var configurations = $wnd.WysiwygConfigurations || [];
         configurations.reverse();
         while (configurations.size() > 0) {
-            var config = configurations.pop();
-            var configId = "wysiwygConfiguration_" + config.hookId;
-            $wnd[configId] = config;
-            this.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::addEditor(Ljava/lang/String;)(config.hookId);            
+            var configuration = configurations.pop();
+            $wnd["wysiwygConfiguration_" + configuration.hookId] = configuration;
+            editorIds.push(configuration.hookId);
         }
+        return editorIds;
     }-*/;
 
     /**
@@ -119,6 +121,10 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private native void createController(Wysiwyg wysiwygEntryPoint)
     /*-{
+        if (!$wnd.Wysiwyg) {
+            // The controller hasn't been defined yet.
+            $wnd.Wysiwyg = {};
+        }
         $wnd.Wysiwyg.getPlainTextArea = function(id) {
             return 
               wysiwygEntryPoint.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::getPlainTextAreaElement(Ljava/lang/String;)(id);
@@ -130,16 +136,6 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     }-*/;
 
     /**
-     * Add an editor to the list of the editors to load.
-     * 
-     * @param id Id of the editor.
-     */
-    private void addEditor(String id)
-    {
-        editors.put(id, null);
-    }
-
-    /**
      * Load the WYSIWYG editor from a configuration object.
      * 
      * @param id Id of the editor.
@@ -147,11 +143,20 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private WysiwygEditor loadEditor(String id)
     {
+        // See if the editor is already loaded.
+        WysiwygEditor wysiwygEditor = editors.get(id);
+        if (wysiwygEditor != null) {
+            return wysiwygEditor;
+        }
+
         if (!isRichTextEditingSupported()) {
             return null;
         }
 
         Config config = getConfig(id);
+        if (config == null) {
+            return null;
+        }
 
         TextAreaElement hook = TextAreaElement.as(DOM.getElementById(id));
         if (hook == null) {
@@ -165,7 +170,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         hook.getParentElement().insertBefore(container, hook);
 
         // Create the WYSIWYG Editor
-        WysiwygEditor wysiwygEditor = WysiwygEditorFactory.getInstance().newEditor(config, this);
+        wysiwygEditor = WysiwygEditorFactory.getInstance().newEditor(config, this);
 
         // Insert the WYSIWYG Editor
         if (Boolean.TRUE.toString().equals(config.getParameter("debug", "false"))) {
@@ -182,12 +187,13 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
     /**
      * Load all the editors that have been found in the page.
+     * 
+     * @param editorIds the editors to load
      */
-    public void loadEditors()
+    private void loadEditors(JsArrayString editorIds)
     {
-        Set<String> ids = editors.keySet();
-        for (final String id : ids) {
-            loadEditor(id);
+        for (int i = 0; i < editorIds.length(); i++) {
+            loadEditor(editorIds.get(i));
         }
     }
 
@@ -203,25 +209,29 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     }
 
     /**
-     * Get the plain textarea element (textarea) for the editor with the given ID.
+     * Get the plain HTML text area element for the editor with the given ID.
      * 
-     * @param id ID of the editor.
-     * @return The plain textarea element for the editor with the given ID.
+     * @param id ID of the editor
+     * @return the plain HTML text area element for the editor with the given ID, or {@code null} is there's no editor
+     *         with the given ID
      */
     public Element getPlainTextAreaElement(String id)
     {
-        return getEditor(id).getPlainTextEditor().getTextArea().getElement();
+        WysiwygEditor editor = getEditor(id);
+        return editor == null ? null : editor.getPlainTextEditor().getTextArea().getElement();
     }
 
     /**
-     * Get the rich textarea element (iframe) for the editor with the given ID.
+     * Get the rich text area element, {@code iframe}, for the editor with the given ID.
      * 
-     * @param id ID of the editor.
-     * @return The rich textarea element for the editor with the given ID.
+     * @param id ID of the editor
+     * @return the rich text area element for the editor with the given ID, or {@code null} is there's no editor with
+     *         the given ID
      */
     public Element getRichTextAreaElement(String id)
     {
-        return getEditor(id).getRichTextEditor().getTextArea().getElement();
+        WysiwygEditor editor = getEditor(id);
+        return editor == null ? null : editor.getRichTextEditor().getTextArea().getElement();
     }
 
     /**

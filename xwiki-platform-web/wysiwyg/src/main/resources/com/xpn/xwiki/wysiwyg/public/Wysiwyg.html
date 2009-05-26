@@ -16,13 +16,13 @@
   <script type='text/javascript' src='/xwiki/resources/js/smartclient/modules/ISC_DataBinding.js'></script>
   <script type='text/javascript' src='/xwiki/resources/js/smartclient/skins/Enterprise/load_skin.js'></script>
   <script type='text/javascript' src='/xwiki/bin/skin/resources/js/xwiki/xwikiexplorer/xwikiexplorer.js'></script>
+  <script type="text/javascript" src="com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
 </head>
 <body>
-  <script language="javascript" src="com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
   <form id="edit" method="post" action="/xwiki/bin/view/Wysiwyg/Foo" >
     <input type="submit" name="submit" value="Preview" />
     <input type="button" value="Show HTML" onclick="alert(document.getElementById('content').value);"/>
-  	<textarea id="content" name="content" rows="25" cols="80">foo bar</textarea>
+    <textarea id="content" name="content" rows="25" cols="80">foo bar</textarea>
   </form>
   <!------- Code for creating a WYSIWYG instance ------->
   <script language="javascript">
@@ -32,10 +32,7 @@
       wysiwygServiceURL: '/xwiki/WysiwygService'
     };
     // Instance configuration.
-    var Wysiwyg0 = {
-      hookId: 'content',
-      debug: true
-    };
+    var WysiwygConfigurations = [{hookId: 'content', debug: true}];
   </script>
   <!---------------------------------------------------->
 </body>

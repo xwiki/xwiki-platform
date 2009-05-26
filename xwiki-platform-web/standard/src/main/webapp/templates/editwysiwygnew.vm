@@ -1,20 +1,6 @@
 ## Insert JS and CSS needed for the fullscreen edit feature
 $xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', {'forceSkinAction': true, 'language': ${context.language}})
 $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')
-## Smartclient
-$xwiki.jsfx.use("js/smartclient/initsc.js", true)
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js")
-## TODO: remove this line   
-## when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
-$xwiki.jsfx.use("js/smartclient/overwritesc.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js")
-$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
-## XWikiExplorer
-$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)
@@ -37,10 +23,22 @@ $xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
 <div id="xwikitext">
 <div id="xwikieditcontent">
 #if($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
-##
-## We should find a better way of including the JavaScript code of the editor!
-##
-<script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js")"></script>
+## Smartclient (required by XWikiExplorer)
+$xwiki.jsfx.use("js/smartclient/initsc.js", true)
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js")
+## TODO: remove this line
+## when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
+$xwiki.jsfx.use("js/smartclient/overwritesc.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js")
+$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
+## XWikiExplorer (required by link plugin)
+$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
+## WYSIWYG
+$xwiki.jsfx.use("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/XWikiWysiwyg.js", true)
 ##
 ## Get the WYSIWYG input map in order to add the the data for this request.
 ## This map is needed to keep user changes while switching editors and after server-side exceptions.
@@ -99,35 +97,27 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 ##
 <script type="text/javascript">
 //<![CDATA[
-    // Global configuration.
-    var Wysiwyg = {
-        xwikiservice: '${request.contextPath}/XWikiService',
-        wysiwygServiceURL: '${request.contextPath}/WysiwygService'        
-    };
-    var WysiwygConfigurations = new Array();
-
-    // Instance configuration.
-    WysiwygConfigurations.push({
-        hookId: "content",        
-        displayTabs: true,
-        defaultEditor: "wysiwyg",
-        inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
-        plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($request.sync) sync#end',
-        syntax: "$doc.syntaxId",
-        menu: 'link image table macro',
-        toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
-        wiki: '${doc.wiki.replace("'", "\'")}',
-        space: '${doc.space.replace("'", "\'")}',
-        page: '${doc.name.replace("'", "\'")}',
-        debug: #if($request.debug)'true'#else'false'#end        
+WysiwygConfigurations.push({
+    hookId: "content",
+    syntax: "$doc.syntaxId",
+    inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
+    displayTabs: true,
+    defaultEditor: "wysiwyg",
+    plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($request.sync) sync#end',
+    menu: 'link image table macro',
+    toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
+    wiki: '${doc.wiki.replace("'", "\'")}',
+    space: '${doc.space.replace("'", "\'")}',
+    page: '${doc.name.replace("'", "\'")}',
+    debug: #if($request.debug)'true'#else'false'#end
 #if($request.sync)
-        // Additional configuration for the real-time editing feature.
-        syncPage: '${doc.fullName.replace("'", "\'")}',       
+    // Additional configuration for the real-time editing feature.
+    syncPage: '${doc.fullName.replace("'", "\'")}',
 #if($request.reset=="1")
-        syncReset: 1
+    syncReset: 1
 #end
 #end
-    });
+});
 //]]>
 </script>
 ##

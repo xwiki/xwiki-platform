@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>OfficeImporterSuggest</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.OfficeImporter</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1243452224000</creationDate>
+<date>1243453835000</date>
+<contentUpdateDate>1243453835000</contentUpdateDate>
+<version>20.1</version>
+<title>Office Importer Suggest</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<content>
+#if("" == "$!{request.xpage}")
+  #warning("This page contains the office importer auto-suggest script")
+#end
+#set($ok = $response.setContentType("text/xml"))
+#set($typeParam = "$!{request.type}")
+#set($numberParam = "$!{request.number}")
+#set($inputParam = "$!{request.input}")
+&lt;results&gt;
+#if("spaces" == $typeParam)
+  #set($number = $util.parseInt($numberParam))
+  #if($number == 0)#set($number = 10)#end
+  #set($matchingSpaces = $xwiki.searchSpacesNames("where lower(doc.space) like '%$inputParam.toLowerCase()%'", $number, 0, []))
+  #foreach($space in $matchingSpaces)
+    &lt;rs id="$velocityCount" info=""&gt;$space&lt;/rs&gt;
+  #end
+#end
+&lt;/results&gt;
+</content>
+</xwikidoc>

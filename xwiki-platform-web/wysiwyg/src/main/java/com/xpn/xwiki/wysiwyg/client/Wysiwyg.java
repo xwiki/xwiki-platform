@@ -49,9 +49,10 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 {
     /**
-     * Wysiwyg editors.
+     * The map of WYSIWYG editors loaded on the current page. The key into the map is the editor identifier, which is
+     * usually the id of the plain text area wrapped by the WYSIWYG editor.
      */
-    private Map<String, WysiwygEditor> editors = new HashMap<String, WysiwygEditor>();
+    private static Map<String, WysiwygEditor> editors = new HashMap<String, WysiwygEditor>();
 
     /**
      * {@inheritDoc}
@@ -87,9 +88,22 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     private void init()
     {
-        createController(this);
+        createController();
         loadEditors(loadConfigurations());
     }
+
+    /**
+     * Creates the WYSIWYG controller JavaScript object.
+     */
+    private native void createController()
+    /*-{
+        if (typeof $wnd.Wysiwyg == 'undefined') {
+            // The controller hasn't been defined yet.
+            $wnd.Wysiwyg = {};
+        }
+        var obj = $wnd.Wysiwyg;
+        @com.xpn.xwiki.wysiwyg.client.WysiwygNativeController::extend(Lorg/xwiki/gwt/dom/client/JavaScriptObject;)(obj);
+    }-*/;
 
     /**
      * Loads all the configuration objects from the {@code WysiwygConfigurations} JavaScript array in the main Window
@@ -111,35 +125,22 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     }-*/;
 
     /**
-     * Creates the WYSIWYG controller JavaScript object. Stored in the window object, the controller provides the
-     * following methods:
-     * <ul>
-     * <li>Wysiwyg.getPlainTextArea(String): get the TextArea for the editor with the given ID.</li>
-     * </ul>
+     * Load all the editors that have been found in the page.
      * 
-     * @param wysiwygEntryPoint We pass the current object to the method. Using 'this' is supposed to work but does not.
+     * @param editorIds the editors to load
      */
-    private native void createController(Wysiwyg wysiwygEntryPoint)
-    /*-{
-        if (!$wnd.Wysiwyg) {
-            // The controller hasn't been defined yet.
-            $wnd.Wysiwyg = {};
+    private void loadEditors(JsArrayString editorIds)
+    {
+        for (int i = 0; i < editorIds.length(); i++) {
+            loadEditor(editorIds.get(i));
         }
-        $wnd.Wysiwyg.getPlainTextArea = function(id) {
-            return 
-              wysiwygEntryPoint.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::getPlainTextAreaElement(Ljava/lang/String;)(id);
-        };
-        $wnd.Wysiwyg.getRichTextArea = function(id) {
-            return 
-              wysiwygEntryPoint.@com.xpn.xwiki.wysiwyg.client.Wysiwyg::getRichTextAreaElement(Ljava/lang/String;)(id);
-        };
-    }-*/;
+    }
 
     /**
      * Load the WYSIWYG editor from a configuration object.
      * 
-     * @param id Id of the editor.
-     * @return The newly created editor.
+     * @param id the editor identifier, usually the id of the plain text area wrapped by the WYSIWYG editor
+     * @return the newly created editor
      */
     private WysiwygEditor loadEditor(String id)
     {
@@ -186,56 +187,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     }
 
     /**
-     * Load all the editors that have been found in the page.
-     * 
-     * @param editorIds the editors to load
-     */
-    private void loadEditors(JsArrayString editorIds)
-    {
-        for (int i = 0; i < editorIds.length(); i++) {
-            loadEditor(editorIds.get(i));
-        }
-    }
-
-    /**
-     * Get the WYSIWYG editor with the given ID. The id of an editor is the name of the TextArea that it wraps.
-     * 
-     * @param id ID of the editor to get.
-     * @return The editor corresponding to the given ID.
-     */
-    public WysiwygEditor getEditor(String id)
-    {
-        return editors.get(id);
-    }
-
-    /**
-     * Get the plain HTML text area element for the editor with the given ID.
-     * 
-     * @param id ID of the editor
-     * @return the plain HTML text area element for the editor with the given ID, or {@code null} is there's no editor
-     *         with the given ID
-     */
-    public Element getPlainTextAreaElement(String id)
-    {
-        WysiwygEditor editor = getEditor(id);
-        return editor == null ? null : editor.getPlainTextEditor().getTextArea().getElement();
-    }
-
-    /**
-     * Get the rich text area element, {@code iframe}, for the editor with the given ID.
-     * 
-     * @param id ID of the editor
-     * @return the rich text area element for the editor with the given ID, or {@code null} is there's no editor with
-     *         the given ID
-     */
-    public Element getRichTextAreaElement(String id)
-    {
-        WysiwygEditor editor = getEditor(id);
-        return editor == null ? null : editor.getRichTextEditor().getTextArea().getElement();
-    }
-
-    /**
-     * @return true if the current browser supports rich text editing.
+     * @return true if the current browser supports rich text editing
      */
     private boolean isRichTextEditingSupported()
     {
@@ -245,11 +197,11 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
 
     /**
      * Retrieves the configuration object associated with the WYSIWYG editor with the specified id. We can have more
-     * than one WYSIWYG editor in a host page and thus each editor is identified by the ID of the textarea is wraps. A
+     * than one WYSIWYG editor in a host page and thus each editor is identified by the id of the text area it wraps. A
      * configuration object is a JavaScript object that can be loaded with GWT's {@link Dictionary} mechanism.
      * 
-     * @param id Name of the editor to load.
-     * @return The configuration object for the specified editor.
+     * @param id the editor identifier, usually the id of the plain text area wrapped by the WYSIWYG editor
+     * @return the configuration object for the specified editor
      */
     private Config getConfig(String id)
     {
@@ -281,5 +233,17 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         } catch (MissingResourceException e) {
             return defaultValue;
         }
+    }
+
+    /**
+     * Get the WYSIWYG editor with the given id. The id of an editor is usually the id of the HTML text area element
+     * that it wraps.
+     * 
+     * @param id the editor identifier, usually the id of the plain text area wrapped by the WYSIWYG editor
+     * @return the editor corresponding to the given id
+     */
+    public static WysiwygEditor getEditor(String id)
+    {
+        return editors.get(id);
     }
 }

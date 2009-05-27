@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.test;
 
@@ -57,11 +56,11 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         Utils.setComponentManager(getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
-        Execution execution = (Execution) getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().lookup(Execution.class);
         execution.getContext().setProperty("xwikicontext", this.context);
 
         // Set a simple application context, as some components fail to start without one.
-        Container c = (Container) getComponentManager().lookup(Container.class);
+        Container c = getComponentManager().lookup(Container.class);
         c.setApplicationContext(new TestApplicationContext());
 
         getComponentManager().registerComponent(TestCoreConfiguration.getComponentDescriptor());

@@ -102,8 +102,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         // document, skin and possibly other parameters are put in the Execution Context by proper
         // initializers.
         try {
-            RequestInitializerManager manager = 
-                (RequestInitializerManager) this.componentManager.lookup(RequestInitializerManager.class);
+            RequestInitializerManager manager = this.componentManager.lookup(RequestInitializerManager.class);
             manager.initializeRequest(this.container.getRequest());
         } catch (Exception e) {
             throw new ServletContainerException("Failed to initialize request", e);
@@ -111,8 +110,7 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
 
         // 5) Call Execution Context initializers to perform further Execution Context initializations
         try {
-            ExecutionContextManager manager = 
-                (ExecutionContextManager) this.componentManager.lookup(ExecutionContextManager.class);
+            ExecutionContextManager manager = this.componentManager.lookup(ExecutionContextManager.class);
             manager.initialize(this.execution.getContext());
         } catch (Exception e) {
             throw new ServletContainerException("Failed to initialize Execution Context", e);

@@ -33,8 +33,7 @@ public class DefaultDocumentNameSerializerTest extends AbstractXWikiComponentTes
 {
     public void testSerialize() throws Exception
     {
-        DocumentNameSerializer serializer = 
-            (DocumentNameSerializer) getComponentManager().lookup(DocumentNameSerializer.class);
+        DocumentNameSerializer serializer = getComponentManager().lookup(DocumentNameSerializer.class);
         DocumentName name = new DocumentName("wiki", "space", "page");
         assertEquals("wiki:space.page", serializer.serialize(name));
     }

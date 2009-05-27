@@ -44,7 +44,7 @@ public class CompactDocumentNameSerializerTest extends AbstractBridgedXWikiCompo
     {
         super.setUp();
 
-        this.serializer = (DocumentNameSerializer) getComponentManager().lookup(DocumentNameSerializer.class, "compact");
+        this.serializer = getComponentManager().lookup(DocumentNameSerializer.class, "compact");
     }
 
     public void testSerialize() throws Exception

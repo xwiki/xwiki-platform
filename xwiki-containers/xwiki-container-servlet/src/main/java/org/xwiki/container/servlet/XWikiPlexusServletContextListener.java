@@ -59,7 +59,7 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // Initializes XWiki's Container with the Servlet Context.
         try {
             ServletContainerInitializer containerInitializer = 
-                (ServletContainerInitializer) this.componentManager.lookup(ServletContainerInitializer.class);
+                this.componentManager.lookup(ServletContainerInitializer.class);
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize application contextt", e);
@@ -83,10 +83,9 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
     public void contextDestroyed(ServletContextEvent sce)
     {
         try {
-            ApplicationContextListenerManager applicationContextListenerManager =
-                (ApplicationContextListenerManager) this.componentManager
-                    .lookup(ApplicationContextListenerManager.class);
-            Container container = (Container) this.componentManager.lookup(Container.class);
+            ApplicationContextListenerManager applicationContextListenerManager = 
+                this.componentManager.lookup(ApplicationContextListenerManager.class);
+            Container container = this.componentManager.lookup(Container.class);
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         } catch (ComponentLookupException ex) {
             // Nothing to do here.

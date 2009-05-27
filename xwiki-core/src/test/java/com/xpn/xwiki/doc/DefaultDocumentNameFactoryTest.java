@@ -37,7 +37,7 @@ public class DefaultDocumentNameFactoryTest extends AbstractBridgedXWikiComponen
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.factory = (DocumentNameFactory) getComponentManager().lookup(DocumentNameFactory.class);
+        this.factory = getComponentManager().lookup(DocumentNameFactory.class);
     }
     
     public void testCreateDocumentNameWhenCurrentDocSet() throws Exception

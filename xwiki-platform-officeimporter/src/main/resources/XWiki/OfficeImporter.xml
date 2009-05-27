@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261143000</creationDate>
-<date>1243420465000</date>
-<contentUpdateDate>1243420465000</contentUpdateDate>
-<version>21.1</version>
+<date>1243453721000</date>
+<contentUpdateDate>1243453721000</contentUpdateDate>
+<version>4.1</version>
 <title>Office Importer</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -22,39 +22,8 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<class>
-<name>XWiki.OfficeImporter</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<spacesList>
-<cache>0</cache>
-<classname></classname>
-<displayType>select</displayType>
-<idField></idField>
-<multiSelect>0</multiSelect>
-<name>spacesList</name>
-<number>1</number>
-<picker>0</picker>
-<prettyName>spacesList</prettyName>
-<relationalStorage>0</relationalStorage>
-<separator> </separator>
-<separators></separators>
-<size>1</size>
-<sort>none</sort>
-<sql>select distinct doc.space from XWikiDocument doc</sql>
-<unmodifiable>0</unmodifiable>
-<validationMessage></validationMessage>
-<validationRegExp></validationRegExp>
-<valueField></valueField>
-<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
-</spacesList>
-</class>
-<content>{pre}
+<content>
+{pre}
 &lt;script type="text/javascript"&gt;
 function populateTargetPageInputField(fileName) {
   var dot = fileName.lastIndexOf(".");
@@ -94,11 +63,13 @@ function populateTargetPageInputField(fileName) {
 {pre}
 &lt;script type="text/javascript"&gt;
   var field = document.getElementById("targetSpaceInputId");
+  #set($suggestDoc = $xwiki.getDocument("XWiki.OfficeImporterSuggest"))
   if (typeof(XWiki.widgets.Suggest) != "undefined") {
     new XWiki.widgets.Suggest(field, {
-        script: "$doc.URL?xpage=suggest&amp;classname=$doc.fullName&amp;fieldname=spacesList&amp;firCol=space&amp;secCol=-&amp;",
+        script: "$suggestDoc.URL?xpage=plain&amp;type=spaces&amp;number=5&amp;",
     });  
   }
 &lt;/script&gt;
-{/pre}</content>
+{/pre}
+</content>
 </xwikidoc>

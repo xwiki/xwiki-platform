@@ -102,6 +102,7 @@ public class ComponentAnnotationLoaderTest extends MockObjectTestCase
     {
     	ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
     	Mock managerMock = mock(ComponentManager.class);
+    	managerMock.stubs().method("registerComponent");
     	managerMock.expects(once()).method("registerComponent").with(new ComponentDescriptorConstraint(
     	    "org.xwiki.component.annotation.ComponentAnnotationLoaderTest$OverrideRole"));
     	

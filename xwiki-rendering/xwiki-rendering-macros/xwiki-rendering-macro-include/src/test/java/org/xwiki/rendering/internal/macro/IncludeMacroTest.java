@@ -46,16 +46,6 @@ import org.xwiki.velocity.VelocityManager;
  */
 public class IncludeMacroTest extends AbstractXWikiRenderingTestCase
 {
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-        
-        // Use a mock implementation for the Velocity Manager since we don't want to add a (cyclic)
-        // dependency on XWiki Core (where DefaultVelocityManager is currently located).
-        getComponentManager().registerComponent(MockVelocityManager.getComponentDescriptor());
-    }
-
     public void testIncludeMacroWithNewContext() throws Exception
     {
         String expected = "beginDocument\n"

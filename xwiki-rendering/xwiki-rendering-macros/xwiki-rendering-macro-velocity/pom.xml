@@ -72,7 +72,7 @@
             <configuration>
               <includes>
                 <include>**/MockVelocityManager.class</include>
-                <include>**/components.xml</include>
+                <include>**/component*.txt</include>
               </includes>
             </configuration>
           </execution>

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jmock.Mock;
+import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.internal.macro.RealmMacroSource;
@@ -100,7 +101,7 @@ public class RealmMacroSourceTest extends AbstractRenderingTestCase
         Macro< ? > macro = new TestSimpleMacro();
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/xwiki/2.0", macro)));
-        this.source.compose((ComponentManager) this.mockComponentManager.proxy());
+        ReflectionUtils.setFieldValue(this.source, "componentManager", this.mockComponentManager.proxy());
         this.source.initialize();
 
         assertFalse(this.source.exists("macro"));
@@ -119,7 +120,7 @@ public class RealmMacroSourceTest extends AbstractRenderingTestCase
         macroDefinitions.put("macro/xwiki/2.0", macro2);
 
         this.mockComponentManager.expects(once()).method("lookupMap").will(returnValue(macroDefinitions));
-        this.source.compose((ComponentManager) this.mockComponentManager.proxy());
+        ReflectionUtils.setFieldValue(this.source, "componentManager", this.mockComponentManager.proxy());
         this.source.initialize();
 
         assertTrue(this.source.exists("macro"));
@@ -139,7 +140,7 @@ public class RealmMacroSourceTest extends AbstractRenderingTestCase
     {
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/invalidsyntax", "dummy")));
-        this.source.compose((ComponentManager) this.mockComponentManager.proxy());
+        ReflectionUtils.setFieldValue(this.source, "componentManager", this.mockComponentManager.proxy());
 
         // Verify that when a Macro has an invalid hint it's logged as a warning.
         this.mockLogger.expects(once()).method("warn").with(

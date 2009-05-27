@@ -220,9 +220,13 @@ public class EmbeddableComponentManager implements ComponentManager
 
                 // Handle different field types
                 Object fieldValue;
-                if (List.class.isAssignableFrom(dependency.getMappingType())) {
+                if ((dependency.getMappingType() != null)
+                    && List.class.isAssignableFrom(dependency.getMappingType()))
+                {
                     fieldValue = lookupList(dependency.getRole());
-                } else if (Map.class.isAssignableFrom(dependency.getMappingType())) {
+                } else if ((dependency.getMappingType() != null)
+                    && Map.class.isAssignableFrom(dependency.getMappingType()))
+                {
                     fieldValue = lookupMap(dependency.getRole());
                 } else {
                     fieldValue = lookup(dependency.getRole(), dependency.getRoleHint());

@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLImageRenderer;
@@ -43,7 +42,7 @@ import org.xwiki.rendering.wiki.WikiModel;
  * @since 2.0M1
  */
 @Component
-public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory, Composable
+public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory
 {
     @Requirement
     private LinkLabelGenerator linkLabelGenerator;
@@ -56,17 +55,9 @@ public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory, Compos
      * If there's an implementation of {@link WikiModel} registered then use the 
      * Wiki Renderers, otherwise use the Simple Renderers.
      */
+    @Requirement
     private ComponentManager componentManager;
     
-    /**
-     * {@inheritDoc}
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
-
     /**
      * {@inheritDoc}
      * @see XHTMLRendererFactory#createXHTMLLinkRenderer()

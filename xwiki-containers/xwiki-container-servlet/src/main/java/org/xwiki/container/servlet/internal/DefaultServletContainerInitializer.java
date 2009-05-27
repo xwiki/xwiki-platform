@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
@@ -43,7 +42,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 
 @Component
-public class DefaultServletContainerInitializer implements ServletContainerInitializer, Composable
+public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
      // Implementation note: It's important that we don't use @Requirement annotations here
      // for RequestInitializerManager and ExecutionContextManager since we can have
@@ -61,17 +60,8 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
     @Requirement
     private Execution execution;
 
+    @Requirement
     private ComponentManager componentManager;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     public void initializeApplicationContext(ServletContext servletContext)
     {

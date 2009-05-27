@@ -25,10 +25,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.ParseException;
@@ -42,7 +42,7 @@ import org.xwiki.rendering.parser.SyntaxType;
  * @since 1.5M2
  */
 @Component
-public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFactory, Composable, Initializable
+public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFactory, Initializable
 {
     /**
      * Used to cut the syntax identifier into syntax name and syntax version.
@@ -52,22 +52,13 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
     /**
      * Used to lookup all the parsers.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
      * The list of available syntaxes.
      */
     private List<Syntax> syntaxes;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}

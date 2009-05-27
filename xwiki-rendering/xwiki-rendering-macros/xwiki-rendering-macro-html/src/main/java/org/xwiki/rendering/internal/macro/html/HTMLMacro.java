@@ -31,7 +31,6 @@ import org.w3c.dom.Node;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -64,7 +63,7 @@ import org.xwiki.xml.html.HTMLUtils;
  * @since 1.6M1
  */
 @Component("html")
-public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Composable
+public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
 {
     /**
      * The description of the macro.
@@ -90,6 +89,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
     /**
      * Used to find the parser from syntax identifier.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -105,16 +105,6 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
     {
         super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             HTMLMacroParameters.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

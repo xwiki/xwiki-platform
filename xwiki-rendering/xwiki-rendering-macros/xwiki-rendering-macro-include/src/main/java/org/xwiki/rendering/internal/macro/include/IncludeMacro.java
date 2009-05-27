@@ -28,7 +28,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
@@ -49,7 +48,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @since 1.5M2
  */
 @Component("include")
-public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implements Composable
+public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 {
     /**
      * The description of the macro.
@@ -59,6 +58,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
     /**
      * Used to find the parser from syntax identifier.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -93,16 +93,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
         // The include macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the included page before the other macros are executed.
         setPriority(10);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

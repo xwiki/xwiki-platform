@@ -25,9 +25,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
@@ -42,7 +42,7 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @since 1.8M1
  */
 @Component("htmlmacro")
-public class HTMLFilter extends AbstractFilter implements Initializable, Composable
+public class HTMLFilter extends AbstractFilter implements Initializable
 {
     public static final String HTML_SPATTERN = "(\\<!--)|(--\\>)|([\\<\\>])";
 
@@ -63,6 +63,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
     /**
      * Used to lookup macros converters.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -73,16 +74,6 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
     public void initialize() throws InitializationException
     {
         setPriority(3000);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

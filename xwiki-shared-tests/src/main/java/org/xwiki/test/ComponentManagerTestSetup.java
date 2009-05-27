@@ -95,7 +95,7 @@ public class ComponentManagerTestSetup extends TestSetup
 
         this.initializer.initializeExecution();
         
-        for (Enumeration tests = getTest().tests(); tests.hasMoreElements();) {
+        for (Enumeration<Test> tests = getTest().tests(); tests.hasMoreElements();) {
             Test test = (Test) tests.nextElement();
             try {
                 Method method = test.getClass().getMethod("setComponentManager", ComponentManager.class);

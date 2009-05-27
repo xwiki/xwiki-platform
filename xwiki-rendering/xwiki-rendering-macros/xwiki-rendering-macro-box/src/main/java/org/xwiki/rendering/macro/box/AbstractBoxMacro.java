@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
@@ -51,11 +51,12 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.7
  */
-public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends AbstractMacro<P> implements Composable
+public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends AbstractMacro<P>
 {
     /**
      * Used to get the current syntax parser.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -66,16 +67,6 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     protected AbstractBoxMacro(MacroDescriptor macroDescriptor)
     {
         super(macroDescriptor);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

@@ -23,9 +23,8 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.component.phase.Composable;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 
@@ -38,31 +37,13 @@ import java.util.Properties;
  * @version $Id$
  * @since 1.5M2
  */
-public class MockVelocityManager implements VelocityManager, Composable
+@Component
+public class MockVelocityManager implements VelocityManager
 {
+    @Requirement
     private ComponentManager componentManager;
 
     private VelocityContext velocityContext = new VelocityContext();
-
-    /**
-     * Create and return a descriptor for this component.
-     * 
-     * @return the descriptor of the component.
-     */
-    public static ComponentDescriptor getComponentDescriptor()
-    {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
-
-        componentDescriptor.setRole(VelocityManager.class);
-        componentDescriptor.setImplementation(MockVelocityManager.class.getName());
-
-        return componentDescriptor;
-    }
-
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     public VelocityContext getVelocityContext()
     {

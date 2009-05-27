@@ -24,9 +24,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -47,8 +47,7 @@ import org.xwiki.rendering.util.ParserUtils;
  * @version $Id$
  * @since 1.7M3
  */
-public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P> implements
-    Composable
+public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> extends AbstractMacro<P>
 {
     /**
      * The default description of the script macro content.
@@ -58,6 +57,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     /**
      * Used to get the current syntax parser.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -91,16 +91,6 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     public AbstractScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
     {
         super(new DefaultMacroDescriptor(macroDescription, contentDescriptor, ScriptMacroParameters.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

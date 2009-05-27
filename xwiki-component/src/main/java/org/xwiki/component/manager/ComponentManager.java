@@ -23,8 +23,10 @@ package org.xwiki.component.manager;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 
+@ComponentRole
 public interface ComponentManager
 {
     /**

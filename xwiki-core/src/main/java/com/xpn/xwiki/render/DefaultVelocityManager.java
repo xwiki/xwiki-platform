@@ -29,8 +29,6 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.velocity.VelocityEngine;
@@ -53,10 +51,8 @@ import com.xpn.xwiki.web.Utils;
  * @since 1.5M1
  */
 @Component
-public class DefaultVelocityManager implements VelocityManager, Composable
+public class DefaultVelocityManager implements VelocityManager
 {
-    private ComponentManager componentManager;
-
     /**
      * Store one VelocityEngine instance per skin since a skin is allowed to have a global velocimacro macros.vm file.
      */
@@ -64,16 +60,6 @@ public class DefaultVelocityManager implements VelocityManager, Composable
 
     @Requirement
     private Execution execution;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     public VelocityContext getVelocityContext()
     {

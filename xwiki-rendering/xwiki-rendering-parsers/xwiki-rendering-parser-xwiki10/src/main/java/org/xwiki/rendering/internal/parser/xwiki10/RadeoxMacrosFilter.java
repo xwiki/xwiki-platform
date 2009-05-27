@@ -23,9 +23,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
@@ -41,7 +41,7 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @since 1.8M1
  */
 @Component("radeoxmacros")
-public class RadeoxMacrosFilter extends AbstractFilter implements Composable, Initializable
+public class RadeoxMacrosFilter extends AbstractFilter implements Initializable
 {
     /**
      * Regex pattern for matching macros that are written on single line.
@@ -60,6 +60,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
 
     public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
 
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -70,16 +71,6 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
     public void initialize() throws InitializationException
     {
         setPriority(100);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

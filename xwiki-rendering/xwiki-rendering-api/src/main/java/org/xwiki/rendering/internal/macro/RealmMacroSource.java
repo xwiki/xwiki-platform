@@ -22,9 +22,9 @@ package org.xwiki.rendering.internal.macro;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.macro.AbstractMacroSource;
@@ -42,11 +42,12 @@ import org.xwiki.rendering.parser.Syntax;
  * @since 1.9M1
  */
 @Component
-public class RealmMacroSource extends AbstractMacroSource implements Initializable, Composable
+public class RealmMacroSource extends AbstractMacroSource implements Initializable
 {
     /**
      * The component manager we use to lookup macro implementations registered as components.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -111,15 +112,4 @@ public class RealmMacroSource extends AbstractMacroSource implements Initializab
             }
         }
     }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
-
 }

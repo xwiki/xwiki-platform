@@ -27,9 +27,9 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
@@ -45,7 +45,7 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
  * @since 1.8M1
  */
 @Component("velocity")
-public class VelocityFilter extends AbstractFilter implements Composable, Initializable
+public class VelocityFilter extends AbstractFilter implements Initializable
 {
     public static final String VELOCITYOPEN_SUFFIX = "velocityopen";
 
@@ -74,6 +74,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     /**
      * Used to lookup macros converters.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -84,16 +85,6 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     public void initialize() throws InitializationException
     {
         setPriority(20);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

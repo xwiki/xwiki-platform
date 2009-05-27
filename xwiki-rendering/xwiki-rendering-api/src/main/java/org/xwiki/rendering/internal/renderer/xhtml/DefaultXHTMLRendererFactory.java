@@ -75,7 +75,7 @@ public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory, Compos
     {
         XHTMLLinkRenderer renderer;
         try {
-            WikiModel wikiModel = (WikiModel) this.componentManager.lookup(WikiModel.class);
+            WikiModel wikiModel = this.componentManager.lookup(WikiModel.class);
             renderer = new WikiXHTMLLinkRenderer(wikiModel, this.linkLabelGenerator, this.attachmentParser); 
         } catch (ComponentLookupException e) {
             // There's no WikiModel implementation available, fall back to the Simple Renderer
@@ -92,7 +92,7 @@ public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory, Compos
     {
         XHTMLImageRenderer renderer;
         try {
-            WikiModel wikiModel = (WikiModel) this.componentManager.lookup(WikiModel.class);
+            WikiModel wikiModel = this.componentManager.lookup(WikiModel.class);
             renderer = new WikiXHTMLImageRenderer(wikiModel); 
         } catch (ComponentLookupException e) {
             // There's no WikiModel implementation available, fall back to the Simple Renderer

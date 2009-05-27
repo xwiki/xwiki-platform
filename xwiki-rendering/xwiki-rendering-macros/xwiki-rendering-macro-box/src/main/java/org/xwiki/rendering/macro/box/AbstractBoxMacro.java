@@ -206,7 +206,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
     {
         try {
-            return (Parser) getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
+            return getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to find source parser", e);
         }

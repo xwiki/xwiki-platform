@@ -71,12 +71,11 @@ public class RenderingTestCase extends MockObjectTestCase
     @Override
     protected void runTest() throws Throwable
     {
-        Parser parser = (Parser) getComponentManager().lookup(Parser.class, this.parserId);
+        Parser parser = getComponentManager().lookup(Parser.class, this.parserId);
         XDOM dom = parser.parse(new StringReader(this.input));
 
         if (this.runTransformations) {
-            TransformationManager transformationManager =
-                (TransformationManager) getComponentManager().lookup(TransformationManager.class);
+            TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
             // TODO: Decide if this is the best way. Right now we're forcing the usage of XWiki 2.0 macros.
             transformationManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
         }

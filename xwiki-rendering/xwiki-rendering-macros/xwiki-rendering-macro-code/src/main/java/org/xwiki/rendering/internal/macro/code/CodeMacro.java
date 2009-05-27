@@ -104,9 +104,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
 
         if (parameters.getLanguage() != null) {
             try {
-                parser = 
-                    (HighlightParser) getComponentManager().lookup(HighlightParser.class, parameters.getLanguage());
-
+                parser = getComponentManager().lookup(HighlightParser.class, parameters.getLanguage());
                 return parser.highlight(parameters.getLanguage(), new StringReader(content));
             } catch (ComponentLookupException e) {
                 if (getLogger().isDebugEnabled()) {
@@ -120,7 +118,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
             getLogger().debug("Trying the default highlighting parser");
         }
 
-        parser = (HighlightParser) getComponentManager().lookup(HighlightParser.class, "default");
+        parser = getComponentManager().lookup(HighlightParser.class, "default");
 
         return parser.highlight(parameters.getLanguage(), new StringReader(content));
     }

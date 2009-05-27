@@ -34,8 +34,7 @@ public class XWikiRenderingConfigurationTest extends AbstractXWikiRenderingTestC
 {
     public void testDefaultConfiguration() throws Exception
     {
-        RenderingConfiguration configuration =
-            (RenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
+        RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
         assertEquals("%p", configuration.getLinkLabelFormat());
     }
 }

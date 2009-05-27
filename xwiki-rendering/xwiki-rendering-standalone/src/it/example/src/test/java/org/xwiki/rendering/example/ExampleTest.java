@@ -23,16 +23,16 @@ public class ExampleTest extends TestCase
         ecm.initialize();
         
         // Parse XWiki 2.0 Syntax
-        Parser parser = (Parser) ecm.lookup(Parser.class, Syntax.XWIKI_2_0.toIdString());
+        Parser parser = ecm.lookup(Parser.class, Syntax.XWIKI_2_0.toIdString());
         XDOM xdom = parser.parse(new StringReader("This is **bold**"));
         
         // Run macros
-        TransformationManager txManager = (TransformationManager) ecm.lookup(TransformationManager.class);
+        TransformationManager txManager = ecm.lookup(TransformationManager.class);
         txManager.performTransformations(xdom, parser.getSyntax());
 
         // Generate HTML for example
         WikiPrinter printer = new DefaultWikiPrinter();
-        PrintRendererFactory rf = (PrintRendererFactory) ecm.lookup(PrintRendererFactory.class);
+        PrintRendererFactory rf = ecm.lookup(PrintRendererFactory.class);
         Renderer htmlRenderer = rf.createRenderer(Syntax.XHTML_1_0, printer);
         
         xdom.traverse(htmlRenderer);

@@ -45,7 +45,7 @@ public class XWikiComponentInitializer
      */
     public void initializeContainer() throws Exception
     {
-        Container container = (Container) getComponentManager().lookup(Container.class);
+        Container container = getComponentManager().lookup(Container.class);
 
         // We set up a default stubbed ApplicationContext implementation. Tests that need a more controlled
         // version can use Mocks and call setApplicationContext(), setRequest(), etc on the Container object.
@@ -74,9 +74,8 @@ public class XWikiComponentInitializer
     public void initializeExecution() throws Exception
     {
         // Initialize the Execution Context
-        ExecutionContextManager ecm =
-            (ExecutionContextManager) getComponentManager().lookup(ExecutionContextManager.class);
-        Execution execution = (Execution) getComponentManager().lookup(Execution.class);
+        ExecutionContextManager ecm = getComponentManager().lookup(ExecutionContextManager.class);
+        Execution execution = getComponentManager().lookup(Execution.class);
 
         ExecutionContext ec = new ExecutionContext();
 
@@ -91,7 +90,7 @@ public class XWikiComponentInitializer
 
     public void shutdown() throws Exception
     {
-        Execution execution = (Execution) getComponentManager().lookup(Execution.class);
+        Execution execution = getComponentManager().lookup(Execution.class);
         execution.removeContext();
 
         // Make sure we mark the component manager for garbage collection as otherwise each JUnit test will
@@ -111,7 +110,6 @@ public class XWikiComponentInitializer
             
             // Initialize dynamically all components defined using annotations
             this.componentAnnotationInitializer.initialize(this.componentManager, this.getClass().getClassLoader());
-
         }
 
         return this.componentManager;

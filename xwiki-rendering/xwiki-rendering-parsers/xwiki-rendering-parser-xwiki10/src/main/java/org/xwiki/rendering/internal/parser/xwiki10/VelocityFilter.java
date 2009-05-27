@@ -322,8 +322,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         String convertedMacro = null;
 
         try {
-            VelocityMacroConverter currentMacro =
-                (VelocityMacroConverter) this.componentManager.lookup(VelocityMacroConverter.class, name);
+            VelocityMacroConverter currentMacro = this.componentManager.lookup(VelocityMacroConverter.class, name);
 
             convertedMacro = currentMacro.convert(name, parameters, context.getFilterContext());
 

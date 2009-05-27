@@ -252,7 +252,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters> implemen
     {
         XDOM includedDom;
         try {
-            Parser parser = (Parser) this.componentManager.lookup(Parser.class, includedSyntax);
+            Parser parser = this.componentManager.lookup(Parser.class, includedSyntax);
             includedDom = parser.parse(new StringReader(includedContent));
 
             // Only run Macro transformation when the context is a new one as otherwise we need the macros in the

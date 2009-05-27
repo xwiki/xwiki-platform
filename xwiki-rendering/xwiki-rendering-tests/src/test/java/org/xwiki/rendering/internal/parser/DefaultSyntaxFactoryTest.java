@@ -30,7 +30,7 @@ public class DefaultSyntaxFactoryTest extends AbstractXWikiRenderingTestCase
 {
     public void testGetAvailableSyntaxes() throws Exception
     {
-        SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
         List<Syntax> syntaxes = syntaxFactory.getAvailableSyntaxes();
         assertTrue("XWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.XWIKI, "2.0")));
         assertTrue("Confluence syntax not found", syntaxes.contains(new Syntax(SyntaxType.CONFLUENCE, "1.0")));
@@ -44,7 +44,7 @@ public class DefaultSyntaxFactoryTest extends AbstractXWikiRenderingTestCase
 
     public void testCreateSyntaxFromSyntaxIdString() throws Exception
     {
-        SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.class);
+        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
 
         // Verify that we can use uppercase in the syntax type name
         Syntax syntax1 = new Syntax(SyntaxType.XWIKI, "1.0");

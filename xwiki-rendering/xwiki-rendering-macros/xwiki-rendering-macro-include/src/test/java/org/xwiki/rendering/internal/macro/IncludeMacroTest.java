@@ -68,7 +68,7 @@ public class IncludeMacroTest extends AbstractXWikiRenderingTestCase
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.
-        VelocityManager velocityManager = (VelocityManager) getComponentManager().lookup(VelocityManager.class);
+        VelocityManager velocityManager = getComponentManager().lookup(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer, "template",
             "#set ($myvar = 'hello')");

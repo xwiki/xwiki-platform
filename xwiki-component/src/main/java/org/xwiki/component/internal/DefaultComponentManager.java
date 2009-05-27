@@ -28,7 +28,6 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.component.phase.Composable;
 
 /**
  * Wraps the Component Manager in a component so that components requiring the component Manager can

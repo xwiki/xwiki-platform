@@ -26,27 +26,19 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryExecutor;
 import org.xwiki.query.QueryManager;
 
 @Component("xwql")
-public class XWQLQueryExecutor implements QueryExecutor, Composable
+public class XWQLQueryExecutor implements QueryExecutor
 {
     @Requirement("hql")
     private QueryTranslator translator;
 
+    @Requirement
     private ComponentManager componentManager;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     public QueryManager getQueryManager() throws ComponentLookupException
     {

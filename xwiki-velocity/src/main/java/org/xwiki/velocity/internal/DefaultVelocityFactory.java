@@ -25,10 +25,10 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -40,11 +40,12 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @version $Id$
  */
 @Component
-public class DefaultVelocityFactory extends AbstractLogEnabled implements VelocityFactory, Composable
+public class DefaultVelocityFactory extends AbstractLogEnabled implements VelocityFactory
 {
     /**
      * The Component manager we use to lookup (and thus create since it's a singleton) the VelocityEngine component.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -52,16 +53,6 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
      * this cache.
      */
     private Map<String, VelocityEngine> velocityEngines = new HashMap<String, VelocityEngine>();
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}

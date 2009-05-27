@@ -26,13 +26,13 @@ import org.xwiki.action.ActionManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.container.Container;
 import org.xwiki.url.XWikiURL;
 
 @Component
-public class DefaultActionManager implements ActionManager, Composable
+public class DefaultActionManager implements ActionManager
 {
+    @Requirement
     private ComponentManager componentManager;
 
     @Requirement
@@ -40,11 +40,6 @@ public class DefaultActionManager implements ActionManager, Composable
 
     @Requirement("error")
     private Action errorAction;
-
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     public void handleRequest() throws ActionException
     {

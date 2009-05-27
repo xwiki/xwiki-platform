@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.internal.Composable;
 import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.logging.VoidLogger;
@@ -35,7 +36,6 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.LogEnabled;
 
@@ -247,7 +247,11 @@ public class EmbeddableComponentManager implements ComponentManager
             }
             
             // Composable
-            if (Composable.class.isAssignableFrom(componentClass)) {
+            // Only support Composable for classes implementing ComponentManager since for all other components
+            // they should have ComponentManager injected.
+            if (ComponentManager.class.isAssignableFrom(componentClass) 
+                && Composable.class.isAssignableFrom(componentClass))
+            {
                 ((Composable) instance).compose(this);
             }
             

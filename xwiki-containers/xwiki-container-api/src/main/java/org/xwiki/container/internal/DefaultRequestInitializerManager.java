@@ -21,9 +21,9 @@
 package org.xwiki.container.internal;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
 import org.xwiki.container.RequestInitializerException;
@@ -34,22 +34,14 @@ import org.xwiki.container.RequestInitializerManager;
  * @see org.xwiki.container.RequestInitializerManager
  */
 @Component
-public class DefaultRequestInitializerManager implements RequestInitializerManager, Composable
+public class DefaultRequestInitializerManager implements RequestInitializerManager
 {
     /**
      * The component manager we used to find all components implementing the
      * {@link org.xwiki.container.RequestInitializer} role.
      */
+    @Requirement
     private ComponentManager componentManager;
-
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}

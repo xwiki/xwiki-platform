@@ -23,10 +23,10 @@ package org.xwiki.container.internal;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListener;
 import org.xwiki.container.ApplicationContextListenerManager;
@@ -38,21 +38,14 @@ import org.xwiki.container.ApplicationContextListenerManager;
  * @since 1.9M2
  */
 @Component
-public class DefaultApplicationContextListenerManager extends AbstractLogEnabled implements Composable,
-    ApplicationContextListenerManager
+public class DefaultApplicationContextListenerManager extends AbstractLogEnabled 
+    implements ApplicationContextListenerManager
 {
     /**
      * The {@link ComponentManager} used to lookup for all {@link ApplicationContextListener} components.
      */
+    @Requirement
     private ComponentManager componentManager;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.component.phase;
+package org.xwiki.component.internal;
 
 import org.xwiki.component.manager.ComponentManager;
 

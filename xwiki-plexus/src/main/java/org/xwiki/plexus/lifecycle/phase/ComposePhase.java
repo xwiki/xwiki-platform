@@ -24,7 +24,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.manager.ComponentManager;
 import org.codehaus.plexus.lifecycle.phase.AbstractPhase;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PhaseExecutionException;
-import org.xwiki.component.phase.Composable;
+import org.xwiki.component.internal.Composable;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 
 /**
@@ -42,7 +42,11 @@ public class ComposePhase extends AbstractPhase
     public void execute(Object object, ComponentManager componentManager, ClassRealm classRealm)
         throws PhaseExecutionException
     {
-        if (object instanceof Composable) {
+        // Only support Composable for classes implementing ComponentManager since for all other components
+        // they should have ComponentManager injected.
+        if (ComponentManager.class.isAssignableFrom(object.getClass()) 
+            && Composable.class.isAssignableFrom(object.getClass()))
+        {
             org.xwiki.component.manager.ComponentManager xwikiManager =
                 new PlexusComponentManager(componentManager.getContainer());
             ((Composable) object).compose(xwikiManager);

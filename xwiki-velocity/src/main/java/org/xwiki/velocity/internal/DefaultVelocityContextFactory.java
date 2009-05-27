@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.velocity.VelocityConfiguration;
@@ -44,13 +43,13 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @version $Id$
  */
 @Component
-public class DefaultVelocityContextFactory extends AbstractLogEnabled implements VelocityContextFactory, Initializable,
-    Composable
+public class DefaultVelocityContextFactory extends AbstractLogEnabled implements VelocityContextFactory, Initializable
 {
     /**
      * The component manager we used to find all components implementing the
      * {@link org.xwiki.velocity.VelocityContextInitializer} role.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
@@ -64,16 +63,6 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
      * them across Contexts for better performance.
      */
     private Context toolsContext;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}

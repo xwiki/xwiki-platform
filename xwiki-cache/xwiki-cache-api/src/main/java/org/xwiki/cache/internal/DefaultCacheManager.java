@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 
 /**
  * The default implementation of CacheManager. It uses ConfigurationManager to find the cache an local cache hints to
@@ -40,28 +39,19 @@ import org.xwiki.component.phase.Composable;
  * @since 1.7M1
  */
 @Component
-public class DefaultCacheManager implements CacheManager, Composable
+public class DefaultCacheManager implements CacheManager
 {
     /**
-     * The component manager to use to find cache components. Injected by component manager.
+     * The component manager to use to find cache components.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     /**
-     * The configuration component for {@link CacheManager}. Injected by component manager.
+     * The configuration component for {@link CacheManager}.
      */
     @Requirement
     private CacheManagerConfiguration configuration;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}

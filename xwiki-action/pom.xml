@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component</artifactId>
+      <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

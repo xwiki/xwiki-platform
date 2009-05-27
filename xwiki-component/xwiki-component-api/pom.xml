@@ -25,47 +25,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-core-component</artifactId>
     <version>2.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-xml</artifactId>
-  <name>XWiki Platform - Core - XML</name>
+  <artifactId>xwiki-core-component-api</artifactId>
+  <name>XWiki Platform - Core - Component - API</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - XML</description>
+  <description>XWiki Platform - Core - Component - API</description>
   <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.sourceforge.htmlcleaner</groupId>
-      <artifactId>htmlcleaner</artifactId>
-      <version>2.1</version>
-      <!-- HTML Cleaner uses JDOM 1.0 but we want to use JDOM 1.1 so we need to exclude it -->
-      <exclusions>
-        <exclusion>
-          <groupId>jdom</groupId>
-          <artifactId>jdom</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>jdom</groupId>
-      <artifactId>jdom</artifactId>
-      <version>1.1</version>
-    </dependency>    
     <!-- Testing dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-shared-tests</artifactId>
-      <version>${pom.version}</version>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.2.0</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -75,14 +49,13 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>com.xpn.xwiki.platform.tools</groupId>
-            <artifactId>xwiki-verification-resources</artifactId>
-            <version>${platform.tool.verification.version}</version>
-          </dependency>
-        </dependencies>
+        <configuration>
+          <includes>
+            **/annotation/*.java
+          </includes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
 </project>
+       

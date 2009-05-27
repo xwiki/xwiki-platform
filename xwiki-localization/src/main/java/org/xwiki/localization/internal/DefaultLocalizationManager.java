@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.phase.LogEnabled;
@@ -43,7 +42,7 @@ import org.xwiki.localization.WikiInformation;
  */
 @Component
 public class DefaultLocalizationManager extends AbstractLogEnabled implements LocalizationManager, Initializable,
-    LogEnabled, Composable
+    LogEnabled
 {
     /** 
      * Provides access to wiki localization information.
@@ -52,6 +51,7 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
     private WikiInformation wikiInfo;
 
     /** Provides access to different bundles based on their hint. Needed in {@link #use(String, String)} */
+    @Requirement
     private ComponentManager componentManager;
 
     /** 
@@ -134,15 +134,5 @@ public class DefaultLocalizationManager extends AbstractLogEnabled implements Lo
     public void initialize() throws InitializationException
     {
         Collections.sort(this.bundles);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Composable#compose(ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 }

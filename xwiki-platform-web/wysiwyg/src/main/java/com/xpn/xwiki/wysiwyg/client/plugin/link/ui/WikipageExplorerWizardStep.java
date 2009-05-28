@@ -114,13 +114,13 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
                 // if it's a new page to be created, set its parameters in the link config
                 getData().setType(LinkType.NEW_WIKIPAGE);
                 getData().setWiki(getExplorer().getSelectedWiki());
-                getData().setSpace(getExplorer().getSelectedSpace());
-                getData().setPage(getExplorer().getSelectedPage());
-                // if the selected page is not set in the tree, i.e. the "New page..." option was chosen, return
-                if (StringUtils.isEmpty(getExplorer().getSelectedPage())) {
+                getData().setSpace(getExplorer().getSelectedSpace());                
+                // if the user has clicked on a "New page..." node, return
+                if (getExplorer().isNewPageSelectedFromTreeNode()) {
                     async.onSuccess(true);
                     return;
                 }
+                getData().setPage(getExplorer().getSelectedPage());
             } else {
                 // it's an existing page
                 getData().setType(LinkType.WIKIPAGE);

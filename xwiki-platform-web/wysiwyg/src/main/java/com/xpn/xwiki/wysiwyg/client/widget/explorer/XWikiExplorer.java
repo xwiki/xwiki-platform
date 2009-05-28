@@ -278,6 +278,24 @@ public class XWikiExplorer extends TreeGrid
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
         return self.isNewPage();
     }-*/;
+    
+    /**
+     * @return true if the selected node is a new page, created by clicking on a "New Page" node, false otherwise.
+     */
+    public native boolean isNewPageSelectedFromTreeNode()
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return (self.isNewPage() && (self.getValue() == ""));
+    }-*/;
+    
+    /**
+     * @return true if the selected node is a new page, created by typing text in the suggest input, false otherwise.
+     */
+    public native boolean isNewPageSelectedFromTextInput()
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        return (self.isNewPage() && (self.getValue() != ""));
+    }-*/;
 
     /**
      * Is the selected resource a new attachment.

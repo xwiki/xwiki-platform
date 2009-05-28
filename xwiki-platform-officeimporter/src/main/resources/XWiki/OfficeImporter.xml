@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261143000</creationDate>
-<date>1243453721000</date>
-<contentUpdateDate>1243453721000</contentUpdateDate>
-<version>4.1</version>
+<date>1243492948000</date>
+<contentUpdateDate>1243492948000</contentUpdateDate>
+<version>14.1</version>
 <title>Office Importer</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -22,53 +22,52 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
-<content>
-{pre}
-&lt;script type="text/javascript"&gt;
-function populateTargetPageInputField(fileName) {
-  var dot = fileName.lastIndexOf(".");
-  if (-1 != dot) {
-    fileName = fileName.substring(0, dot);
-  }
-  fileName = fileName.replace(/[\.:]/g, "-");
-  document.officeImporterForm.targetPage.value = fileName;
-}
-&lt;/script&gt;
-{/pre}
-
-#if($isguest)
+<content>#if($isguest)
   #error($msg.get("xe.officeimporter.notallowed"))  
 #else
   #if($request.page)
     #set($targetdoc = $xwiki.getDocument($request.page))
   #end
   &lt;h1&gt;$msg.get("xe.officeimporter.import.title")&lt;/h1&gt;
-  &lt;form name="officeImporterForm" action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
+  &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
+  {table}&lt;p&gt;$msg.get("xe.officeimporter.import.document")&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40" onChange="javascript:XWiki.officeImporter.populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
+&lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input id="targetSpaceInputId" type="text" name="targetSpace" value="$!{targetdoc.space}"/&gt;&lt;/p&gt;
+&lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" onChange="javascript:validateUserInputs();"/&gt; &lt;input name="appendContent" type="checkbox" value="true"/&gt;$msg.get("xe.officeimporter.import.appendresult")&lt;/p&gt;
+&lt;p&gt;$msg.get("xe.officeimporter.import.styles")&lt;/p&gt;|&lt;p&gt;&lt;input name="filterStyles" type="checkbox" value="strict"/&gt;$msg.get("xe.officeimporter.import.filterstyles")&lt;/p&gt;
+&lt;p&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/p&gt;|&lt;p&gt;&lt;input name="splitDocument" type="checkbox" value="true"/&gt; $msg.get("xe.officeimporter.import.splitting.splitdocument")&lt;br/&gt;&lt;br/&gt;&amp;nbsp;$msg.get("xe.officeimporter.import.splitting.headinglevels"): &lt;br/&gt;&lt;br/&gt;&amp;nbsp;&lt;select size="5" multiple="multiple" name="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}"&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt;#end&lt;/select&gt;&lt;br/&gt;&lt;br/&gt;&amp;nbsp;$msg.get("xe.officeimporter.import.splitting.naming"): &lt;select name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndHeading"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandheading")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;&lt;/p&gt;
   {table}
-  &lt;p&gt;$msg.get("xe.officeimporter.import.document")&lt;/p&gt;|&lt;p&gt;&lt;input id="filepath" type="file" name="filePath" value="" size="40" onChange="javascript:populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
-
-  &lt;p&gt;$msg.get("xe.officeimporter.import.targetspace")&lt;/p&gt;|&lt;p&gt;&lt;input id="targetSpaceInputId" type="text" name="targetSpace" value="$!{targetdoc.space}"/&gt;&lt;/p&gt;
-
-  &lt;p&gt;$msg.get("xe.officeimporter.import.targetpage")&lt;/p&gt;|&lt;p&gt;&lt;input name="targetPage" type="text" value="$!{targetdoc.name}" onChange="javascript:validateUserInputs();"/&gt; &lt;input name="appendContent" type="checkbox" value="true"/&gt;$msg.get("xe.officeimporter.import.appendresult")&lt;/p&gt;  
-
-  &lt;p&gt;$msg.get("xe.officeimporter.import.styles")&lt;/p&gt;|&lt;p&gt;&lt;input name="filterStyles" type="checkbox" value="strict" $filter/&gt;$msg.get("xe.officeimporter.import.filterstyles")&lt;/p&gt;
-
-  &lt;p&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/p&gt;|&lt;p&gt;&lt;input name="splitDocument" type="checkbox" value="true"/&gt; $msg.get("xe.officeimporter.import.splitting.splitdocument")&lt;br/&gt;&lt;br/&gt;&amp;nbsp;$msg.get("xe.officeimporter.import.splitting.headinglevels"): &lt;br/&gt;&lt;br/&gt;&amp;nbsp;&lt;select size="5" multiple="multiple" name="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}"&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt;#end&lt;/select&gt;&lt;br/&gt;&lt;br/&gt;&amp;nbsp;$msg.get("xe.officeimporter.import.splitting.naming"): &lt;select name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndHeading"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandheading")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;&lt;/p&gt;
-  {table}
-  &lt;input type="hidden" name="groovyFilter" value="" /&gt;
+  &lt;p&gt;&lt;input type="hidden" name="groovyFilter" value="" /&gt;&lt;/p&gt;
   &lt;p&gt;&lt;input type="submit" value="$msg.get("xe.officeimporter.import.import")"/&gt;&lt;/p&gt;
   &lt;/form&gt;
 #end
 
 {pre}
 &lt;script type="text/javascript"&gt;
-  var field = document.getElementById("targetSpaceInputId");
-  #set($suggestDoc = $xwiki.getDocument("XWiki.OfficeImporterSuggest"))
-  if (typeof(XWiki.widgets.Suggest) != "undefined") {
-    new XWiki.widgets.Suggest(field, {
-        script: "$suggestDoc.URL?xpage=plain&amp;type=spaces&amp;number=5&amp;",
-    });  
+/* &lt;![CDATA[ */
+  if (typeof(XWiki) == "undefined") {
+    XWiki = new Object();
   }
+  if (typeof(XWiki.officeImporter) == 'undefined') {
+    XWiki.officeImporter = new Object();
+  }
+  XWiki.officeImporter.populateTargetPageInputField = function(fileName) {
+    var dot = fileName.lastIndexOf(".");
+    if (-1 != dot) {
+      fileName = fileName.substring(0, dot);
+    }
+    fileName = fileName.replace(/[\.:]/g, "-");
+    document.getElementById("targetPageInputId").value = fileName;
+  }
+  XWiki.officeImporter.addAutoSuggest = function(field, type, number) {
+    #set($suggestDoc = $xwiki.getDocument("XWiki.OfficeImporterSuggest"))
+    if (typeof(XWiki.widgets.Suggest) != "undefined") {
+      new XWiki.widgets.Suggest(field, {
+        script: "$suggestDoc.URL?xpage=plain&amp;type=" + type + "&amp;number=" + number + "&amp;",
+      });  
+    }
+  }
+  XWiki.officeImporter.addAutoSuggest(document.getElementById("targetSpaceInputId"), "spaces", 5);
+/* ]]&gt; */
 &lt;/script&gt;
 {/pre}
 </content>

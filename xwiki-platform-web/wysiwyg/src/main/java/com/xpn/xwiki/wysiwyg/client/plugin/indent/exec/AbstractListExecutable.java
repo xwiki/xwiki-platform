@@ -71,4 +71,81 @@ public abstract class AbstractListExecutable extends AbstractExecutable
             && (node.getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG) || node.getNodeName().equalsIgnoreCase(
                 UNORDERED_LIST_TAG));
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean execute(RichTextArea rta, String param)
+    {
+        boolean executionResult = false;
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        if (range.isCollapsed()) {
+            Element listItem = getListItem(rta);
+            if (canExecute(listItem)) {
+                execute(listItem);
+                executionResult = true;
+            }
+        } else {
+            executionResult = executeOnMultipleItems(range, true);
+        }
+        // try to restore selection, hope it all stays well
+        rta.getDocument().getSelection().removeAllRanges();
+        rta.getDocument().getSelection().addRange(range);
+
+        return executionResult;
+    }
+
+    /**
+     * Actually executes the operation on a single list item. This should be called only after
+     * {@link AbstractListExecutable#canExecute(Element)} on the same list item returns true.
+     * 
+     * @param listItem the list item to execute the operation on
+     */
+    protected abstract void execute(Element listItem);
+
+    /**
+     * Checks if this command can be executed on a single list item.
+     * 
+     * @param listItem the list item to check if the command can be executed on
+     * @return {@code true} if the command can be executed, {@code false} otherwise
+     */
+    protected boolean canExecute(Element listItem)
+    {
+        return listItem != null;
+    }
+
+    /**
+     * Executes this list operation on all items in the non-collapsed selection. The {@code perform} parameter specifies
+     * if the operation is actually performed or just checked to be possible (while this kind of parameters are not good
+     * practice, it's the best way right now to make sure we use the same detection algorithm in the
+     * {@link #execute(RichTextArea, String)} and {@link #isEnabled(RichTextArea)} functions).
+     * 
+     * @param range the current range to execute the operation on
+     * @param perform {@code true} if the operation is to be actually executed, {@code false} if it's only to be checked
+     * @return {@code true} if at least one of the items in the selection was affected, {@code false} otherwise.
+     */
+    protected abstract boolean executeOnMultipleItems(Range range, boolean perform);
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractListExecutable#isEnabled(RichTextArea)
+     */
+    public boolean isEnabled(RichTextArea rta)
+    {
+        if (!super.isEnabled(rta)) {
+            return false;
+        }
+
+        // get the range and check if execution is possible: if it's collapsed, it's the common list item ancestor to
+        // perform operation on, if it's expanded, it's each "touched" list item
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        if (range.isCollapsed()) {
+            Element listItem = getListItem(rta);
+            return canExecute(listItem);
+        } else {
+            // check the execution is possible on multiple items, without actually performing it
+            return executeOnMultipleItems(range, false);
+        }
+    }
 }

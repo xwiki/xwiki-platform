@@ -92,32 +92,26 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
     /**
      * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the selection is not inside a list item, when the indent button should be disabled. One of the
-     * cases when this happens is when selection is around all (or some) of the elements in a list on the first level.
-     * This behavior should be fixed in the future, to allow outdenting all impacted elements, in which situation this
-     * test will fail.
+     * for the case when the selection is around all items on a first level list, in which case they are both to be
+     * unindented.
      */
-    public void testOutdentDisabledWhenSelectionNotInListItem()
+    public void testOutdentEntireFirstLevelList()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestOutdentDisabledWhenSelectionNotInListItem();
+                doTestOutdentEntireFirstLevelList();
                 finishTest();
             }
         }).schedule(START_DELAY);
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the selection is not inside a list item, when the indent button should be disabled. One of the
-     * cases when this happens is when selection is around all (or some) of the elements in a list on the first level.
-     * This behavior should be fixed in the future, to allow outdenting all impacted elements, in which situation this
-     * test will fail.
+     * @see #testOutdentEntireFirstLevelList()
      */
-    private void doTestOutdentDisabledWhenSelectionNotInListItem()
+    private void doTestOutdentEntireFirstLevelList()
     {
         String rtaInnerHTML = "<ul><li>foo</li><li>bar</li></ul>";
         rta.setHTML(rtaInnerHTML);
@@ -128,12 +122,9 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
         range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 3);
         select(range);
 
-        // is not enabled
-        assertFalse(executable.isEnabled(rta));
-        // does not execute
-        assertFalse(executable.execute(rta, null));
-        // doesn't change HTML at all
-        assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+        assertEquals("foobar", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -291,6 +282,87 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
+     * for a simple sublist list item with a sublist, which is in the middle of its sublist and on outdent it needs to
+     * be split in two sublists, and the item to be outdented is fully selected.
+     */
+    public void testOutdentSplitWithSublistEntirelySelected()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestOutdentSplitWithSublistEntirelySelected();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testOutdentSplitWithSublistEntirelySelected()
+     */
+    private void doTestOutdentSplitWithSublistEntirelySelected()
+    {
+        rta.setHTML("<ol><li>one<ol><li>two</li><li>three<ol><li>four</li></ol></li>"
+            + "<li>three plus one</li></ol></li></ol>");
+
+        Range range = rta.getDocument().createRange();
+        // put the selection around three and four
+        range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1)
+            .getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1)
+            .getChildNodes().getItem(1).getFirstChild().getFirstChild(), 4);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+        assertEquals(
+            "<ol><li>one<ol><li>two</li></ol></li><li>three<ol><li>four</li><li>three plus one</li></ol></li></ol>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
+     * for the case when the outdented item is in a sublist and content is present in the parent list item after the
+     * sublist.
+     */
+    public void testOutdentSplitWithContentAfter()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestOutdentSplitWithContentAfter();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
+     * for the case when the outdented item is in a sublist and content is present in the parent list item after the
+     * sublist.
+     */
+    private void doTestOutdentSplitWithContentAfter()
+    {
+        rta.setHTML("<ul><li>one<br />before<ul><li>two</li><li>three</li><li>four</li></ul>after</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(3)
+            .getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
+        range.collapse(true);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals("<ul><li>one<br>before<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul>after</li></ul>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
      * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
      * case of a first level item, which is the first item in its list.
      */
@@ -392,7 +464,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo</li></ul>bar<ul><li>bar plus one</li></ul><ul><li>far</li></ul>",
+        assertEquals("<ul><li>foo</li></ul>bar<ul><li>bar plus one</li><li>far</li></ul>",
             removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
@@ -429,5 +501,126 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
         assertEquals("<ul><li>first</li><li>second</li></ul>third", removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
+     * for the case when a whole second level sublist is to be outdented.
+     */
+    public void testOutdentEntireSublist()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestOutdentEntireSublist();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testOutdentEntireSublist()
+     */
+    private void doTestOutdentEntireSublist()
+    {
+        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>one</li><li>two</li><li>three</li></ul></li><li>boo</li></ul>");
+
+        // set the selection around all the items of the sublist of "bar"
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
+            .getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
+        range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
+            .getChildNodes().getItem(2).getChildNodes().getItem(0), 5);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+        assertEquals("<ul><li>foo</li><li>bar</li><li>one</li><li>two</li><li>three</li><li>boo</li></ul>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
+     * for the case when a whole second level sublist is to be outdented.
+     */
+    public void testOutdentSublistFragmentWithFollowingListFragment()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestOutdentSublistFragmentWithFollowingListFragment();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testOutdentSublistFragmentWithFollowingListFragment()
+     */
+    private void doTestOutdentSublistFragmentWithFollowingListFragment()
+    {
+        rta.setHTML("<ul><li>foo<ul><li>one</li><li>two<ul><li>three</li></ul></li>"
+            + "<li>two plus one</li></ul></li><li>bar</li></ul>");
+
+        // place selection around three and two plus one
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1)
+            .getChildNodes().getItem(1).getFirstChild().getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(2)
+            .getFirstChild(), 12);
+
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+        assertEquals(
+            "<ul><li>foo<ul><li>one</li><li>two</li><li>three</li></ul></li><li>two plus one</li><li>bar</li></ul>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * outdenting a fragment of a sublist with some trailing text after it, together with the first level list under it.
+     * In this case, the sublist fragment should be outdented correctly to the first level (and grab the trailing text
+     * in itself), the first level item it makes part of should be outdented too (because of the trailing text) and the
+     * first level list under it pulled outside the list.
+     */
+    public void testIndentSublistFragmentWithTrailingTextAndListFragment()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentSublistFragmentWithTrailingTextAndListFragment();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentSublistFragmentAndListFragment()
+     */
+    private void doTestIndentSublistFragmentWithTrailingTextAndListFragment()
+    {
+        rta.setHTML("<ul><li>one one</li><li>one two<ul><li>two one</li><li>two two</li></ul>"
+            + "after</li><li>one three</li><li>one four</li><li>one five</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        // put the selection from two two until one three
+        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getChildNodes()
+            .getItem(1).getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 9);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals("<ul><li>one one</li></ul>one two<ul><li>two one</li><li>two twoafter</li></ul>one three<ul>"
+            + "<li>one four</li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 }

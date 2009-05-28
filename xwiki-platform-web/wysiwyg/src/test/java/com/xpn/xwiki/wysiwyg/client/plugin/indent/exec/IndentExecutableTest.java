@@ -180,32 +180,27 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
 
     /**
      * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is not inside a list item, when the indent button should be disabled. One of the
-     * cases when this happens is when selection is around all (or some) of the elements in a list on the first level.
-     * This behavior should be fixed in the future, to allow indenting all impacted elements, in which situation this
-     * test will fail.
+     * the case when the selection is around both the list items in a list, on the first level. The indent cannot be
+     * made because the rule is that if the selected items are part of the same list, either they should all be indented
+     * or none.
      */
-    public void testIndentDisabledWhenSelectionNotInListItem()
+    public void testIndentDisabledWhenEntireListIsSelected()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestIndentDisabledWhenSelectionNotInListItem();
+                doTestIndentDisabledWhenEntireListIsSelected();
                 finishTest();
             }
         }).schedule(START_DELAY);
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is not inside a list item, when the indent button should be disabled. One of the
-     * cases when this happens is when selection is around all (or some) of the elements in a list on the first level.
-     * This behavior should be fixed in the future, to allow indenting all impacted elements, in which situation this
-     * test will fail.
+     * @see #testIndentDisabledWhenEntireListIsSelected()
      */
-    private void doTestIndentDisabledWhenSelectionNotInListItem()
+    private void doTestIndentDisabledWhenEntireListIsSelected()
     {
         String rtaInnerHTML = "<ul><li>foo</li><li>bar</li></ul>";
         rta.setHTML(rtaInnerHTML);
@@ -226,43 +221,42 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
 
     /**
      * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is around a sublist: the indent button should be enabled and indenting should indent
-     * the whole list item which is the parent of the list sublist.
+     * the case when the selection is around an entire sublist: the indent button should be disabled because not all the
+     * items can be indented. The rule is that if the selected items are part of the same list, either they should all
+     * be indented or none.
      */
-    public void testIndentParentListItemWhenSelectedSublist()
+    public void testIndentDisabledWhenEntireSublistIsSelected()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
         {
             public void run()
             {
-                doTestIndentParentListItemWhenSelectedSublist();
+                doTestIndentDisabledWhenEntireSublistIsSelected();
                 finishTest();
             }
         }).schedule(START_DELAY);
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is around a sublist: the indent button should be enabled and indenting should indent
-     * the whole list item which is the parent of the list sublist.
+     * @see #testIndentDisabledWhenEntireSublistIsSelected()
      */
-    private void doTestIndentParentListItemWhenSelectedSublist()
+    private void doTestIndentDisabledWhenEntireSublistIsSelected()
     {
-        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>one</li><li>two</li><li>three</li></ul></li></ul>");
+        String rtaInnerHTML = "<ul><li>foo</li><li>bar<ul><li>one</li><li>two</li><li>three</li></ul></li></ul>";
+        rta.setHTML(rtaInnerHTML);
 
-        // set the selection around the first two list items in the sublist of "bar"
+        // set the selection around all the items of the sublist of "bar"
         Range range = rta.getDocument().createRange();
         range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
             .getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
         range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
-            .getChildNodes().getItem(1).getChildNodes().getItem(0), 3);
+            .getChildNodes().getItem(2).getChildNodes().getItem(0), 5);
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo<ul><li>bar<ul><li>one</li><li>two</li><li>three</li></ul></li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertFalse(executable.isEnabled(rta));
+        assertFalse(executable.execute(rta, null));
+        assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -303,6 +297,43 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
 
     /**
      * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * a list with sublists, entirely selected upon indenting.
+     */
+    public void testIndentEntirelySelectedItemWithSublist()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentEntirelySelectedItemWithSublist();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentEntirelySelectedItemWithSublist()
+     */
+    private void doTestIndentEntirelySelectedItemWithSublist()
+    {
+        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>foobar</li></ul></li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild()
+            .getFirstChild(), 5);
+        range.collapse(true);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+        assertEquals("<ul><li>foo<ul><li>bar<ul><li>foobar</li></ul></li></ul></li></ul>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
      * a simple list (with no sublists), under a list item with a sublist, when the indented item should become the last
      * child in its previous sibling's sublist.
      */
@@ -337,5 +368,204 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.execute(rta, null));
         assertEquals("<ul><li>one<ul><li>one plus one</li><li>two</li></ul></li></ul>",
             removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * indenting an entire fragment of a list as a sublist.
+     */
+    public void testIndentListFragment()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentListFragment();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentListFragment()
+     */
+    private void doTestIndentListFragment()
+    {
+        rta.setHTML("<ol><li>one</li><li>two</li><li>three</li><li>four</li></ol>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals("<ol><li>one<ol><li>two</li><li>three</li></ol></li><li>four</li></ol>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * indenting an entire fragment of a list as a sublist, under an existing second level list. In this case, the
+     * indented items should be added as next items in the list.
+     */
+    public void testIndentListUnderSublist()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentListUnderSublist();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentListUnderSublist()
+     */
+    private void doTestIndentListUnderSublist()
+    {
+        rta.setHTML("<ol><li>one<ul><li>under 1</li><li>under 2</li></ul></li><li>two</li><li>three</li><li>four</li>"
+            + "</ol>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals(
+            "<ol><li>one<ul><li>under 1</li><li>under 2</li><li>two</li><li>three</li></ul></li><li>four</li></ol>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * indenting a fragment of a list as a sublist, with the selection starting containing the whole sublist too. In
+     * this case, the indent should only work on the fragment of the first level list, and the result should be the
+     * alignment of the newly indented list items with the selected sublist.
+     */
+    public void testIndentAlignsSublists()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentAlignsSublists();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentListUnderSublist()
+     */
+    private void doTestIndentAlignsSublists()
+    {
+        rta.setHTML("<ol><li>one<ul><li>under</li></ul></li><li>two</li><li>three</li>" + "<li>four</li></ol>");
+
+        Range range = rta.getDocument().createRange();
+        // put the selection from under to the end of "two"
+        range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getFirstChild()
+            .getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 3);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals("<ol><li>one<ul><li>under</li><li>two</li></ul></li><li>three</li><li>four</li></ol>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * indenting a fragment of a sublist together with the first level list under it. In this case, the sublist fragment
+     * should be indented correctly relative to its parent, and the first level list under it as the next sibling of the
+     * original sublist.
+     */
+    public void testIndentSublistFragmentAndListFragment()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentSublistFragmentAndListFragment();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentSublistFragmentAndListFragment()
+     */
+    private void doTestIndentSublistFragmentAndListFragment()
+    {
+        rta.setHTML("<ul><li>one one</li><li>one two<ul><li>two one</li><li>two two</li></ul></li><li>one three</li>"
+            + "<li>one four</li><li>one five</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        // put the selection from two two until one four
+        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getChildNodes()
+            .getItem(1).getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(3).getFirstChild(), 8);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals("<ul><li>one one</li><li>one two<ul><li>two one<ul><li>two two</li></ul></li><li>one three</li>"
+            + "<li>one four</li></ul></li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * indenting a fragment of a sublist with some trailing text after it, together with the first level list under it.
+     * In this case, the sublist fragment should be indented correctly relative to its parent, the first level item it
+     * makes part of should be indented too (because of the trailing text) and the first level list under it as the next
+     * sibling of the new second level list.
+     */
+    public void testIndentSublistFragmentWithTrailingTextAndListFragment()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestIndentSublistFragmentWithTrailingTextAndListFragment();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testIndentSublistFragmentAndListFragment()
+     */
+    private void doTestIndentSublistFragmentWithTrailingTextAndListFragment()
+    {
+        rta.setHTML("<ul><li>one one</li><li>one two<ul><li>two one</li><li>two two</li></ul>after</li>"
+            + "<li>one three</li><li>one four</li><li>one five</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        // put the selection from two two until one four
+        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getChildNodes()
+            .getItem(1).getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(3).getFirstChild(), 8);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+
+        assertEquals("<ul><li>one one<ul><li>one two<ul><li>two one<ul><li>two two</li></ul></li></ul>after</li>"
+            + "<li>one three</li><li>one four</li></ul></li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta
+                .getHTML())));
     }
 }

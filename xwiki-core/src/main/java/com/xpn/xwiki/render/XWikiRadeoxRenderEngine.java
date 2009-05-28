@@ -20,9 +20,10 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,12 +33,12 @@ import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.BaseRenderEngine;
 import org.radeox.filter.FilterPipe;
-import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.context.BaseFilterContext;
+import org.radeox.filter.context.FilterContext;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine
 {
@@ -226,12 +227,13 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                     }
                 }
 
-                if ((db == null) || (database.equals(db)))
+                if ((db == null) || (database.equals(db))) {
                     addLinkToContext(newdoc.getFullName(), context);
+                }
 
                 URL url =
-                    context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(), "view", querystring,
-                        anchor, context);
+                    context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(), "view", querystring, anchor,
+                        context);
                 buffer.append(context.getURLFactory().getURL(url, context));
                 buffer.append("\">");
                 buffer.append(cleanText(view));
@@ -336,12 +338,14 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 querystring = "parent=" + currentdoc.getFullName();
             }
 
-            if ((db == null) || (database.equals(db)))
+            if ((db == null) || (database.equals(db))) {
                 addLinkToContext(newdoc.getFullName(), context);
+            }
 
             String editor = context.getWiki().getEditorPreference(context);
-            if ((!editor.equals("") && (!editor.equals("text"))) && (!editor.equals("---")))
+            if ((!editor.equals("") && (!editor.equals("text"))) && (!editor.equals("---"))) {
                 querystring += "&amp;editor=" + editor;
+            }
 
             URL url =
                 context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(), "edit", querystring, null,

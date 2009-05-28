@@ -25,8 +25,7 @@ import org.xwiki.localization.Bundle;
 import org.xwiki.localization.WikiInformation;
 
 /**
- * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>, filled in by
- * the component manager.
+ * Base class for {@link Bundle} implementations. Defines the bundle priority as an <code>integer</code>.
  * 
  * @version $Id$
  */

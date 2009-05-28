@@ -52,6 +52,13 @@
     <module>xwiki-rendering-tests</module>
     <module>xwiki-rendering-macros</module>
   </modules>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component-default</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+  </dependencies>
   <profiles>
     <profile>
       <id>ci</id>

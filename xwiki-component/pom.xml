@@ -36,6 +36,7 @@
   <description>XWiki Platform - Core - Component - Parent POM</description>
   <modules>
     <module>xwiki-component-api</module>
+    <module>xwiki-component-default</module>
   </modules>
 </project>
        

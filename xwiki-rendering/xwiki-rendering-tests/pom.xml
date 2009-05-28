@@ -36,12 +36,6 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-bridge</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>

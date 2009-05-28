@@ -37,7 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-api</artifactId>
+      <artifactId>xwiki-core-component-default</artifactId>
       <version>${pom.version}</version>
     </dependency>
   </dependencies>

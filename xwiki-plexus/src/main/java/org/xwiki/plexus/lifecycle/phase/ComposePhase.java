@@ -44,7 +44,7 @@ public class ComposePhase extends AbstractPhase
     {
         // Only support Composable for classes implementing ComponentManager since for all other components
         // they should have ComponentManager injected.
-        if (ComponentManager.class.isAssignableFrom(object.getClass()) 
+        if (org.xwiki.component.manager.ComponentManager.class.isAssignableFrom(object.getClass()) 
             && Composable.class.isAssignableFrom(object.getClass()))
         {
             org.xwiki.component.manager.ComponentManager xwikiManager =

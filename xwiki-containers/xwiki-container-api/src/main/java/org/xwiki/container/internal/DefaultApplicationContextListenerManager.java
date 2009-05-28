@@ -54,7 +54,7 @@ public class DefaultApplicationContextListenerManager extends AbstractLogEnabled
     {
         try {
             List<ApplicationContextListener> initializers =
-                componentManager.lookupList(ApplicationContextListener.class);
+                this.componentManager.lookupList(ApplicationContextListener.class);
             for (ApplicationContextListener initializer : initializers) {
                 initializer.initializeApplicationContext(applicationContext);
             }
@@ -70,7 +70,7 @@ public class DefaultApplicationContextListenerManager extends AbstractLogEnabled
     {
         try {
             List<ApplicationContextListener> initializers =
-                componentManager.lookupList(ApplicationContextListener.class);
+                this.componentManager.lookupList(ApplicationContextListener.class);
             for (ApplicationContextListener initializer : initializers) {
                 initializer.destroyApplicationContext(applicationContext);
             }

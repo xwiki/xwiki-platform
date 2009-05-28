@@ -124,7 +124,7 @@ isc.XWEResultTree.addMethods({
         // manage XWiki dynamic DS instantiation
         // it can't be managed with getChildDataSources since it needs the node to be created.
         var xwikiRecordsType = nodeDS.recordsType;
-        var resource = XWiki.getResource(node.id);
+        var resource = XWiki.resource.get(node.id);
         node["resource"] = resource;
         if (xwikiRecordsType != null && xwikiRecordsType != "") {
             if (xwikiRecordsType == "wiki") {
@@ -295,7 +295,7 @@ isc.XWEResultTree.addMethods({
             isNewPage: true,
             isNewAttachment: false,
             clickCallback: function(viewer, node, recordNum) {
-                node.resource = XWiki.getResource(node.resource.prefixedSpace);
+                node.resource = XWiki.resource.get(node.resource.prefixedSpace);
                 viewer.input.value = "";                
               }
         };
@@ -389,7 +389,7 @@ isc.XWEResultTree.addMethods({
                 xwikiRelativeURL: node.xwikiRelativeURL + XWiki.constants.anchorSeparator +
                                   XWiki.constants.docextraAttachmentsAnchor,
                 icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.gif')",
-                resource: XWiki.getResource(node.id + XWiki.constants.anchorSeparator +
+                resource: XWiki.resource.get(node.id + XWiki.constants.anchorSeparator +
                                             XWiki.constants.docextraAttachmentsAnchor),
                 isXWikiAttachment: true,
                 isNewPage: false,
@@ -791,7 +791,7 @@ isc.XWETreeGrid.addMethods({
      * This method is recalled until it founds a parent that exist in the tree.
      *
      * @param rt XWEResultTree.
-     * @param resource Object representing a XWiki resource (see XWiki.getResource()).
+     * @param resource Object representing a XWiki resource (see XWiki.resource.get()).
      */
     openParent : function(rt, resource) {
         if (resource.name != "") {
@@ -805,7 +805,7 @@ isc.XWETreeGrid.addMethods({
                 // it calls the openParent method again, this time with the parent of the resource.
                 var fetchCallback = function(xmlDoc, xmlText, rpcResponse, rpcRequest) {
                     if (xmlDoc.httpResponseCode == 200) {
-                        var parentRes = XWiki.getResource(xmlDoc.data[0].parent);
+                        var parentRes = XWiki.resource.get(xmlDoc.data[0].parent);
                         var parentNode = rt.findById(parentRes.fullName);
                         // Store the parent / child relationship in the cache to avoid the need of another request if this
                         // relationship is searched again.
@@ -845,7 +845,7 @@ isc.XWETreeGrid.addMethods({
     /**
      * Method called when "keyup" event is fired by the input (text input).
      * This method also calls itself back with a callback passed to smartClient (kind of recursively).
-     * It uses XWiki.getResource to parse the fullName within the input,
+     * It uses XWiki.resource.get to parse the fullName within the input,
      * then it checks if the nodes corresponding to resource parts (wiki, space, etc) are opened, one after another.
      * The first node not opened is opened and a callback is registered to call the method again if the resource part
      * as at least one child.
@@ -855,8 +855,8 @@ isc.XWETreeGrid.addMethods({
     openNodesFromInput : function() {
 
         // Build resource, selectedResource and get XWEResultTree.
-        var resource = XWiki.getResource(this.input.value);
-        var selectedRes = XWiki.getResource("");
+        var resource = XWiki.resource.get(this.input.value);
+        var selectedRes = XWiki.resource.get("");
         var rt = this.getData();
         
         // Get selectedResource from the selected node if any.
@@ -1048,7 +1048,7 @@ isc.XWETreeGrid.addMethods({
      * Get a property from the selected resource (ex: wiki, space, page, etc). 
      */
     getSelectedResourceProperty : function(propertyName) {
-    	return XWiki.getResource(this.getValue())[propertyName];
+    	return XWiki.resource.get(this.getValue())[propertyName];
     },   
 
     /**
@@ -1061,7 +1061,7 @@ isc.XWETreeGrid.addMethods({
           return true;
         }
         return this.getSelectedRecord().isNewPage;
-    },
+    },    
 
     /**
      * Is the selected resource a new attachment.

@@ -633,14 +633,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testConvertSyntax() throws XWikiException
     {
-        this.mockXWikiStoreInterface.stubs().method("getTranslationList").will(returnValue(Arrays.asList("en", "fr")));
-        this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(this.translatedDocument));
-
         this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
             + "1.1 header 2\nheader 2 content");
-        this.translatedDocument.setContent("content 2 not in section\n" + "1 header 1\nheader 1 content\n"
-            + "1.1 header 2\nheader 2 content");
-
         this.baseObject.setLargeStringValue("area", "object content not in section\n"
             + "1 object header 1\nobject header 1 content\n" + "1.1 object header 2\nobject header 2 content");
         this.baseObject.setLargeStringValue("puretextarea", "object content not in section\n"
@@ -650,9 +644,6 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         assertEquals("content not in section\n\n" + "= header 1 =\n\nheader 1 content\n\n"
             + "== header 2 ==\n\nheader 2 content", this.document.getContent());
-        assertEquals("content 2 not in section\n\n" + "= header 1 =\n\nheader 1 content\n\n"
-            + "== header 2 ==\n\nheader 2 content", this.translatedDocument.getContent());
-
         assertEquals("object content not in section\n\n" + "= object header 1 =\n\nobject header 1 content\n\n"
             + "== object header 2 ==\n\nobject header 2 content", this.baseObject.getStringValue("area"));
         assertEquals("object content not in section\n" + "1 object header 1\nobject header 1 content\n"

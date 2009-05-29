@@ -289,7 +289,6 @@ isc.XWEResultTree.addMethods({
             space: node.space,
             title: isc.XWEResultTree.constants.addPageTitle,
             parentId: node.id,
-            parent: node.fullName,
             icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
             resource: node.resource,
             isNewPage: true,
@@ -320,7 +319,6 @@ isc.XWEResultTree.addMethods({
             space: node.space,
             title: isc.XWEResultTree.constants.addAttachmentTitle,
             parentId: node.id,
-            parent: node.fullName,
             icon: "$xwiki.getSkinFile('icons/silk/bullet_add.gif')",
             resource: node.resource,
             isNewPage: false,
@@ -385,7 +383,6 @@ isc.XWEResultTree.addMethods({
                 title: title,
                 name: node.name,
                 parentId: node.id,
-                parent: node.fullName,
                 xwikiRelativeURL: node.xwikiRelativeURL + XWiki.constants.anchorSeparator +
                                   XWiki.constants.docextraAttachmentsAnchor,
                 icon: "$xwiki.getSkinFile('icons/silk/page_white_zip.gif')",
@@ -543,9 +540,10 @@ isc.XWESpaceDataSource.addProperties({
         { name:"space", required: true, type: "text" },
         { name:"name", required: true, type: "text" },
         { name:"title", required: true, type: "text" },
+        { name:"parentId", required: true, type: "text", foreignKey: "id" },
+        { name:"parent", required: true, type: "text" },
         { name:"xwikiRelativeUrl", type: "text" },
-        { name:"link", propertiesOnly: true },
-        { name:"parent", required: true, type: "text", foreignKey: "fullName" }
+        { name:"link", propertiesOnly: true }
     ],
     recordsType : "page",
     icon : "$xwiki.getSkinFile('icons/silk/page_white_text.gif')"
@@ -559,8 +557,9 @@ isc.XWESpaceDataSource.addMethods({
         // parent property is null. This fake initial parent is a regex that allow to retrieve only
         // pages without parent or with a parent outside of the current space.
         this.transformRequest = function (dsRequest) {
-            if (dsRequest.originalData.parent == null) {
-                dsRequest.originalData.parent = "^(?!" + this.space + "\.).*$";
+            var prefixedSpace = this.wiki + XWiki.constants.wikiSpaceSeparator + this.space;
+            if (dsRequest.originalData.parentId == prefixedSpace) {
+                dsRequest.originalData.parentId = "^(?!" + prefixedSpace + "\.).*$";
             }
             return this.Super("transformRequest", arguments);
         };
@@ -594,6 +593,7 @@ isc.XWEPageDataSource.addProperties({
         { name:"wiki", required: true, type: "text" },
         { name:"space", required: true, type: "text" },
         { name:"name", required: true, type: "text" },
+        { name:"parentId", required: true, type: "text" },
         { name:"parent", required: true, type: "text" },
         { name:"link", propertiesOnly: true }
     ],

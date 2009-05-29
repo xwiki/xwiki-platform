@@ -60,7 +60,7 @@ public class PagesForTagsResource extends XWikiResource
                 Document doc = xwikiApi.getDocument(documentName);
                 if (doc != null) {
                     pages.getPageSummaries().add(
-                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc));
+                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, xwikiApi));
                 }
             }
 

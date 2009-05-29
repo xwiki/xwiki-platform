@@ -48,6 +48,6 @@ public class PageTranslationVersionResource extends XWikiResource
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-            false);
+            false, xwikiApi);
     }
 }

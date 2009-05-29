@@ -60,7 +60,7 @@ public class ModifiablePageResource extends XWikiResource
 
             page =
                 DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-                    false);
+                    false, xwikiApi);
 
             if (documentInfo.isCreated()) {
                 return Response.created(uriInfo.getAbsolutePath()).entity(page).build();

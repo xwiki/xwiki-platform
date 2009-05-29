@@ -84,6 +84,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.PropertyClass;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -241,19 +242,27 @@ public class DomainObjectFactory
 
     /* This method is used to fill the "common part" of a Page and a PageSummary */
     private static void fillPageSummary(PageSummary pageSummary, ObjectFactory objectFactory, URI baseUri,
-        Document doc, boolean useVersion) throws XWikiException
+        Document doc, boolean useVersion, XWiki xwikiApi) throws XWikiException
     {
         pageSummary.setWiki(doc.getWiki());
         pageSummary.setFullName(doc.getFullName());
         pageSummary.setId(doc.getPrefixedFullName());
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getName());
-        pageSummary.setTitle(doc.getDisplayTitle());
-        pageSummary.setParent(doc.getParent());
+        pageSummary.setTitle(doc.getDisplayTitle());                
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
 
+        Document parent = Utils.getParentDocument(doc, xwikiApi);
+        if (parent != null) {
+            pageSummary.setParent(doc.getParent());
+            pageSummary.setParentId(parent.getPrefixedFullName());
+        } else {
+            pageSummary.setParent("");
+            pageSummary.setParentId("");
+        }
+        
         String spaceUri =
             UriBuilder.fromUri(baseUri).path(SpaceResource.class).build(doc.getWiki(), doc.getSpace()).toString();
         Link spaceLink = objectFactory.createLink();
@@ -261,23 +270,14 @@ public class DomainObjectFactory
         spaceLink.setRel(Relations.SPACE);
         pageSummary.getLinks().add(spaceLink);
 
-        if (doc.getParent() != null) {
-            /*
-             * This is ugly but the alternative would be to get the parent document and use the accessor methods for
-             * retrieving the information. But this could be expensive
-             */
-            String[] components = doc.getParent().split("\\.", 2);
-
-            /* We must obtain 2 components: spaceName.PageName */
-            if (components.length == 2) {
-                String parentUri =
-                    UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), components[0],
-                        components[1]).toString();
-                Link parentLink = objectFactory.createLink();
-                parentLink.setHref(parentUri);
-                parentLink.setRel(Relations.PARENT);
-                pageSummary.getLinks().add(parentLink);
-            }
+        if (parent != null) {
+            String parentUri =
+                UriBuilder.fromUri(baseUri).path(PageResource.class).build(parent.getWiki(), parent.getSpace(), 
+                    parent.getName()).toString();
+            Link parentLink = objectFactory.createLink();
+            parentLink.setHref(parentUri);
+            parentLink.setRel(Relations.PARENT);
+            pageSummary.getLinks().add(parentLink);
         }
 
         String historyUri =
@@ -367,11 +367,11 @@ public class DomainObjectFactory
 
     }
 
-    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc)
-        throws XWikiException
+    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, 
+        XWiki xwikiApi) throws XWikiException
     {
         PageSummary pageSummary = objectFactory.createPageSummary();
-        fillPageSummary(pageSummary, objectFactory, baseUri, doc, false);
+        fillPageSummary(pageSummary, objectFactory, baseUri, doc, false, xwikiApi);
 
         String pageUri =
             UriBuilder.fromUri(baseUri).path(PageResource.class).build(doc.getWiki(), doc.getSpace(), doc.getName())
@@ -384,11 +384,11 @@ public class DomainObjectFactory
         return pageSummary;
     }
 
-    public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion)
-        throws XWikiException
+    public static Page createPage(ObjectFactory objectFactory, URI baseUri, URI self, Document doc, boolean useVersion,
+        XWiki xwikiApi) throws XWikiException
     {
         Page page = objectFactory.createPage();
-        fillPageSummary(page, objectFactory, baseUri, doc, useVersion);
+        fillPageSummary(page, objectFactory, baseUri, doc, useVersion, xwikiApi);
 
         page.setVersion(doc.getVersion());
         page.setMajorVersion(doc.getRCSVersion().at(0));

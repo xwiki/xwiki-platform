@@ -73,7 +73,7 @@ public class PageChildrenResource extends XWikiResource
                 /* We only add pages we have the right to access */
                 if (childDoc != null) {
                     pages.getPageSummaries().add(
-                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), childDoc));
+                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), childDoc, xwikiApi));
                 }
             }
         }

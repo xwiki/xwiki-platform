@@ -47,7 +47,7 @@ public class PageVersionResource extends XWikiResource
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory
-            .createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, true);
+            .createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, true, xwikiApi);
     }
 
 }

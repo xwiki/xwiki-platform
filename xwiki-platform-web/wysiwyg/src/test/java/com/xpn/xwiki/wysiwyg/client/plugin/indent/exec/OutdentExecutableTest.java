@@ -124,7 +124,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals("foobar", removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<p>foo</p><p>bar</p>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -394,7 +394,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals("one<ul><li>two</li><li>three</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<p>one</p><ul><li>two</li><li>three</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -429,7 +429,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo</li></ul>bar<ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta
+            .getHTML())));
     }
 
     /**
@@ -464,7 +465,44 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo</li></ul>bar<ul><li>bar plus one</li><li>far</li></ul>",
+        assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li><li>far</li></ul>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
+     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
+     * for the case of a first level item with a sublist and content after, which is in the middle of its list and
+     * outdent needs to split it in two, and wrap the list text in a paragraph, as well as the text after, but leaving
+     * the inner sublist unwrapped.
+     */
+    public void testOutdentFirstLevelItemWithSublistAndContentAfter()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestOutdentFirstLevelItemWithSublistAndContentAfter();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testOutdentFirstLevelItemWithSublistAndContentAfter()
+     */
+    private void doTestOutdentFirstLevelItemWithSublistAndContentAfter()
+    {
+        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>bar plus one</li></ul>after</li><li>far</li></ul>");
+
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
+        range.collapse(true);
+        select(range);
+
+        assertTrue(executable.isEnabled(rta));
+        assertTrue(executable.execute(rta, null));
+        assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li></ul><p>after</p><ul><li>far</li></ul>",
             removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
@@ -500,7 +538,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>first</li><li>second</li></ul>third", removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<ul><li>first</li><li>second</li></ul><p>third</p>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -589,7 +628,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      * in itself), the first level item it makes part of should be outdented too (because of the trailing text) and the
      * first level list under it pulled outside the list.
      */
-    public void testIndentSublistFragmentWithTrailingTextAndListFragment()
+    public void testOutdentSublistFragmentWithTrailingTextAndListFragment()
     {
         delayTestFinish(FINISH_DELAY);
         (new Timer()
@@ -620,7 +659,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
 
-        assertEquals("<ul><li>one one</li></ul>one two<ul><li>two one</li><li>two twoafter</li></ul>one three<ul>"
-            + "<li>one four</li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<ul><li>one one</li></ul><p>one two</p><ul><li>two one</li><li>two twoafter</li></ul>"
+            + "<p>one three</p><ul><li>one four</li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta
+                .getHTML())));
     }
 }

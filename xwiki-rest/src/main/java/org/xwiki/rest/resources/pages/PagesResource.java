@@ -47,7 +47,7 @@ public class PagesResource extends XWikiResource
     @GET
     public Pages getPages(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parent") String parentFilterExpression)
+        @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parentId") String parentFilterExpression)
         throws XWikiException
     {
         String database = xwikiContext.getDatabase();
@@ -80,24 +80,26 @@ public class PagesResource extends XWikiResource
                         .format("[Page '%s' appears to be in space '%s' but no information is available.]", pageName,
                             spaceName));
                 } else {
-                    Document doc = xwikiApi.getDocument(pageFullName);
+                    Document doc = xwikiApi.getDocument(pageFullName);                    
 
                     /* We only add pages we have the right to access */
                     if (doc != null) {
                         boolean add = true;
-
-                        if (parentFilter != null) {
-                            String parent = doc.getParent();
-                            if (parent == null) {
-                                parent = "";
+                        
+                        Document parent = Utils.getParentDocument(doc, xwikiApi);
+                        
+                        if (parentFilter != null) {                           
+                            String parentId = "";
+                            if (parent != null) {
+                                parentId = parent.getPrefixedFullName();
                             }
-
-                            add = parentFilter.matcher(doc.getParent()).matches();
+                            add = parentFilter.matcher(parentId).matches();
                         }
 
                         if (add) {
                             pages.getPageSummaries().add(
-                                DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc));
+                                DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, 
+                                    xwikiApi));
                         }
                     }
                 }

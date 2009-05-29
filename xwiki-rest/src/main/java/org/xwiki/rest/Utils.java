@@ -19,7 +19,10 @@
  */
 package org.xwiki.rest;
 
+import org.apache.commons.lang.StringUtils;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -73,6 +76,30 @@ public class Utils
         Document document = new Document(xwikiDocument, null);
 
         return document.getPrefixedFullName();
+    }
+        
+    /**
+     * Get parent document for a given document.
+     * 
+     * @param doc document to get the parent from.
+     * @param xwikiApi the xwiki api.
+     * @return parent of the given document, null if none is specified.
+     * @throws XWikiException if getting the parent document has failed.
+     */
+    public static Document getParentDocument(Document doc, XWiki xwikiApi) throws XWikiException
+    {
+        if (StringUtils.isEmpty(doc.getParent())) {
+            return null;
+        }
+        /*
+         * This is ugly but we have to mimic the behavior of link generation: 
+         * if the parent does not specify its space, use the current document space.
+         */
+        String parentName = doc.getParent();
+        if (!parentName.contains(".")) {
+            parentName = doc.getSpace() + "." + parentName;
+        }
+        return xwikiApi.getDocument(parentName);
     }
 
 }

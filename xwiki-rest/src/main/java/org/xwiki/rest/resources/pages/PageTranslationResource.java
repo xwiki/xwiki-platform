@@ -47,7 +47,7 @@ public class PageTranslationResource extends ModifiablePageResource
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-            false);
+            false, xwikiApi);
     }
 
     @PUT

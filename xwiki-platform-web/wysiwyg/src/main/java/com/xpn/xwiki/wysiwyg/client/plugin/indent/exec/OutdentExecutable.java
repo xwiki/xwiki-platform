@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
@@ -91,7 +93,7 @@ public class OutdentExecutable extends AbstractListExecutable
         // iterate through the leafs in the range
         Node rangeLeaf = domUtils.getFirstLeaf(range);
         Node lastLeaf = domUtils.getLastLeaf(range);
-        // store the last li on which an outent was executed, regardless of the actual result
+        // store the last li on which an outdent was executed, regardless of the actual result
         Element lastProcessed = null;
         // check the ancestor li to indent for each leaf in the range
         while (rangeLeaf != null) {
@@ -196,9 +198,8 @@ public class OutdentExecutable extends AbstractListExecutable
         Element newList = (Element) domUtils.splitNode(parentList, domUtils.getNodeIndex(listItem));
         // remove the separator
         newList.removeChild(listItem);
-        // extract the list item and insert it after the parentList
-        DocumentFragment extractedListItem = listItem.extractContents();
-        domUtils.insertAfter(extractedListItem, parentList);
+        // insert the extracted Li in the document
+        domUtils.insertAfter(extractFirstLevelListItem(listItem), parentList);
         // remove the parentList and/or the newList if they are empty
         if (!parentList.hasChildNodes()) {
             parentList.getParentNode().removeChild(parentList);
@@ -218,5 +219,42 @@ public class OutdentExecutable extends AbstractListExecutable
                 newList.getParentNode().removeChild(newList);
             }
         }
+    }
+
+    /**
+     * Extracts the first level list item handling the inline elements which should all be grouped in paragraphs, while
+     * leaving the block elements as they are.
+     * 
+     * @param listItem the list item to extract the contents of
+     * @return the document fragment with the elements in the list item, extracted and wrapped, if necessary
+     */
+    private DocumentFragment extractFirstLevelListItem(Element listItem)
+    {
+        // extract the list item and insert it after the parentList
+        DocumentFragment extractedLi = ((Document) listItem.getOwnerDocument()).createDocumentFragment();
+        // all the children which are wrappable in a paragraph (non block items), should be wrapped in a paragraph
+        Element wrappingP = null;
+        while (listItem.hasChildNodes()) {
+            Node currentChild = listItem.getFirstChild();
+            if (!DOMUtils.getInstance().isBlock(currentChild)) {
+                if (wrappingP == null) {
+                    wrappingP = ((Document) listItem.getOwnerDocument()).xCreatePElement().cast();
+                }
+                wrappingP.appendChild(currentChild);
+            } else {
+                // dump current wrapping P in extractedLi, add the current element too, and reset the wrappingP
+                if (wrappingP != null) {
+                    extractedLi.appendChild(wrappingP);
+                }
+                extractedLi.appendChild(currentChild);
+                wrappingP = null;
+            }
+        }
+        // add the last wrappingP as well
+        if (wrappingP != null) {
+            extractedLi.appendChild(wrappingP);
+        }
+
+        return extractedLi;
     }
 }

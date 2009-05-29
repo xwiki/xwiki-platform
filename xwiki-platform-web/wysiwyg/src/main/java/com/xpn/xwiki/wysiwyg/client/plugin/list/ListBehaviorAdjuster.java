@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
@@ -103,9 +106,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
             // check the parent of this list Element
             if (listElement.getParentNode().getNodeName().equalsIgnoreCase(ORDERED_LIST_TAG)
                 || listElement.getParentNode().getNodeName().equalsIgnoreCase(UNORDERED_LIST_TAG)) {
-                // wrap this element in a list item
-                Element wrappingListItem = ((Document) listElement.getOwnerDocument()).xCreateLIElement().cast();
-                wrappingListItem.wrap(listElement);
+                wrapList(listElement);
             }
             // check if this element is the first element of a list item
             if (listElement.getParentNode().getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)
@@ -113,6 +114,24 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
                 // is first element
                 handleEmptyListItem((Element) listElement.getParentNode());
             }
+        }
+    }
+
+    /**
+     * Tries to reposition a list element that appears in another list element: if there is a previous sibling, it tries
+     * to add it as a sublist, else it wraps it in a new list item.
+     * 
+     * @param listElement the list node to wrap
+     */
+    protected void wrapList(Element listElement)
+    {
+        Element previousListItem = (Element) listElement.getPreviousSibling();
+        if (previousListItem != null && previousListItem.getNodeName().equalsIgnoreCase(LIST_ITEM_TAG)) {
+            previousListItem.appendChild(listElement);
+        } else {
+            // wrap this element in a list item
+            Element wrappingListItem = ((Document) listElement.getOwnerDocument()).xCreateLIElement().cast();
+            wrappingListItem.wrap(listElement);
         }
     }
 
@@ -450,9 +469,11 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
      */
     public void onCommand(CommandManager sender, Command command, String param)
     {
+        List<Command> needCleanup =
+            Arrays.asList(Command.DELETE, Command.INDENT, Command.OUTDENT, RESET_COMMAND, Command.INSERT_ORDERED_LIST,
+                Command.INSERT_UNORDERED_LIST);
         // clean up the lists in the document on delete, indent, outdent and reset
-        if (command == Command.DELETE || command == Command.INDENT || command == Command.OUTDENT
-            || command.equals(RESET_COMMAND)) {
+        if (needCleanup.contains(command)) {
             cleanUp(getTextArea().getDocument().getDocumentElement());
         }
     }

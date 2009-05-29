@@ -74,17 +74,17 @@
     <complexContent>
       <extension base="xwiki:LinkCollection">
         <sequence>
-        	<element name="id" type="string"></element>
-        	<element name="fullName" type="string"></element>
-        	<element name="wiki" type="string"></element>
-        	<element name="space" type="string"></element>
-        	<element name="name" type="string"></element>
-        	<element name="title" type="string"></element>
-        	<element name="parent" type="string"></element>
+            <element name="id" type="string"></element>
+            <element name="fullName" type="string"></element>
+            <element name="wiki" type="string"></element>
+            <element name="space" type="string"></element>
+            <element name="name" type="string"></element>
+            <element name="title" type="string"></element>
+            <element name="parent" type="string"></element>
             <element name="parentId" type="string"></element>
             <element name="xwikiRelativeUrl" type="string"></element>
-        	<element name="xwikiAbsoluteUrl" type="string"></element>
-        	<element name="translations" type="xwiki:Translations"></element>
+            <element name="xwikiAbsoluteUrl" type="string"></element>
+            <element name="translations" type="xwiki:Translations"></element>
         </sequence>
       </extension>
     </complexContent>

@@ -523,14 +523,12 @@ public class XWikiDocument implements DocumentModelBridge
             // Velocity for example).
             context.put("isInRenderingEngine", true);
 
-            XWikiDocument translatedDocument = getTranslatedDocument(context);
-            
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (translatedDocument.is10Syntax()) {
+            if (is10Syntax()) {
                 renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
             } else {
                 renderedContent =
-                    performSyntaxConversion(translatedDocument.getContent(), translatedDocument.getSyntaxId(), "xhtml/1.0", true);
+                    performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
             }
         } finally {
             if (isInRenderingEngine != null) {
@@ -5079,7 +5077,12 @@ public class XWikiDocument implements DocumentModelBridge
     public void convertSyntax(String targetSyntaxId, XWikiContext context) throws XWikiException
     {
         // convert content
-        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId, false));
+        List<String> languages = getTranslationList(context);
+        for (String language : languages) {
+            XWikiDocument translatedDoc = getTranslatedDocument(language, context);
+            translatedDoc.setContent(performSyntaxConversion(translatedDoc.getContent(), getSyntaxId(), targetSyntaxId,
+                false));
+        }
 
         // convert objects
         Map<String, Vector<BaseObject>> objectsByClass = getxWikiObjects();
@@ -5133,7 +5136,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId,
+    private static String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId,
         boolean transform) throws XWikiException
     {
         try {
@@ -5156,7 +5159,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId,
+    private static String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId,
         boolean transform) throws XWikiException
     {
         try {
@@ -5185,7 +5188,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the rendered content
      * @throws XWikiException if an exception occurred during the rendering process
      */
-    private String renderXDOM(XDOM content, String targetSyntaxId) throws XWikiException
+    private static String renderXDOM(XDOM content, String targetSyntaxId) throws XWikiException
     {
         try {
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
@@ -5208,7 +5211,7 @@ public class XWikiDocument implements DocumentModelBridge
         return parseContent(getSyntaxId(), content);
     }
 
-    private XDOM parseContent(String syntaxId, String content) throws XWikiException
+    private static XDOM parseContent(String syntaxId, String content) throws XWikiException
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.class, syntaxId);

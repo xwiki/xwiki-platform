@@ -5077,12 +5077,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void convertSyntax(String targetSyntaxId, XWikiContext context) throws XWikiException
     {
         // convert content
-        List<String> languages = getTranslationList(context);
-        for (String language : languages) {
-            XWikiDocument translatedDoc = getTranslatedDocument(language, context);
-            translatedDoc.setContent(performSyntaxConversion(translatedDoc.getContent(), getSyntaxId(), targetSyntaxId,
-                false));
-        }
+        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId, false));
 
         // convert objects
         Map<String, Vector<BaseObject>> objectsByClass = getxWikiObjects();

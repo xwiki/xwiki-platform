@@ -11,10 +11,10 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1154086661000</creationDate>
-<date>1239722759000</date>
-<contentUpdateDate>1239722759000</contentUpdateDate>
-<version>18.1</version>
+<creationDate>1154090261000</creationDate>
+<date>1243608949000</date>
+<contentUpdateDate>1243608949000</contentUpdateDate>
+<version>37.1</version>
 <title>Document Information</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -427,18 +427,53 @@ document.observe("dom:loaded", function() { new XWiki.SyntaxConverter(); });</co
 <use>onDemand</use>
 </property>
 </object>
-<content>#if("$!{request.action}" == "convertSyntax")
+<content>##
+#macro(convertDocument $translatedDoc $error $oldSyntax $newSyntaxId $content)
+  #if ($translatedDoc.realLanguage == $xwiki.languagePreference)
+    #set($theDoc = $translatedDoc)
+    #if ($request.content)
+      #set($void = $translatedDoc.setContent($request.content))
+    #end
+  #end
+  ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
+  #set($void = $translatedDoc.setSyntaxId($oldSyntax))
+  #if (!$translatedDoc.convertSyntax($newSyntaxId))
+    #set($error = true)
+  #else
+    #set($void = $translatedDoc.save("Document converted from syntax $oldSyntax to syntax $newSyntaxId"))
+  #end
+#end
+##
+#if("$!{request.action}" == "convertSyntax")
   #set($oldSyntax = $request.oldSyntaxId)
   #set($newSyntaxId = $request.newSyntaxId)
-  #set($theDoc = $xwiki.getDocument($request.documentName))
-  ## Use the syntax and content received from the client, as the user might have made some changes that are not on saved yet.
-  $theDoc.setSyntaxId($oldSyntax)##
-  #if ($request.content)
-    $theDoc.setContent($request.content)##
+  #set($mainDoc = $xwiki.getDocument($request.documentName))
+  #set($theDoc = $mainDoc)
+  #set($error = false)
+  ##
+  ## Convert current document
+  ##
+  #convertDocument($mainDoc $error $oldSyntax $newSyntaxId $theDoc)
+  ##
+  ## Convert document translations
+  ##
+  #set($languages = $theDoc.translationList)
+  #if (!$error)
+    #foreach ($language in $languages)
+      #if (!$error)
+        #set($translatedDoc = $mainDoc.getTranslatedDocument($language))
+        #if ($translatedDoc.language != $mainDoc.language)
+          #convertDocument($translatedDoc $error $oldSyntax $newSyntaxId $theDoc)
+        #end
+      #end
+    #end
   #end
-  #if($theDoc.convertSyntax($newSyntaxId))
+  ##
+  ## Error management
+  ##
+  #if (!$error)
     ## Conversion successful. The "ok:" prefix is needed, since otherwise an empty content will result in a "This template does not exist" exception.
-    ok:{pre}$theDoc.content{/pre}#set($void = $theDoc.save("Document converted from $oldSyntax syntax to $newSyntaxId syntax"))
+    ok:{pre}$theDoc.content{/pre}
   #else
     $response.setStatus(501)
     ## TODO: Find a way to put the exception in the context and send it to the client.

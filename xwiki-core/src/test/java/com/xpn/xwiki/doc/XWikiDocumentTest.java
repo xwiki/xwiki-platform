@@ -37,6 +37,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
@@ -65,6 +66,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockXWikiVersioningStore;
 
+    private Mock mockXWikiStoreInterface;
+
     private BaseClass baseClass;
 
     private BaseObject baseObject;
@@ -89,8 +92,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
 
+        this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
+
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
+        this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
 
@@ -634,5 +640,48 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("object content not in section\n" + "1 object header 1\nobject header 1 content\n"
             + "1.1 object header 2\nobject header 2 content", this.baseObject.getStringValue("puretextarea"));
         assertEquals("xwiki/2.0", this.document.getSyntaxId());
+    }
+
+    public void testGetRenderedContent10() throws XWikiException
+    {
+        this.document.setContent("*bold*");
+        this.document.setSyntaxId("xwiki/1.0");
+
+        this.mockXWikiRenderingEngine.expects(once()).method("renderDocument").will(returnValue("<b>bold</b>"));
+
+        assertEquals("<b>bold</b>", this.document.getRenderedContent(getContext()));
+
+        this.document.setSyntaxId("xwiki/2.0");
+
+        XWikiDocument translatedDoc = new XWikiDocument();
+        translatedDoc.setContent("~italic~");
+        translatedDoc.setSyntaxId("xwiki/1.0");
+        translatedDoc.setNew(false);
+
+        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
+        this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(translatedDoc));
+        this.mockXWikiRenderingEngine.expects(once()).method("renderDocument").will(returnValue("<i>italic</i>"));
+
+        assertEquals("<i>italic</i>", this.document.getRenderedContent(getContext()));
+    }
+
+    public void testGetRenderedContent() throws XWikiException
+    {
+        this.document.setContent("**bold**");
+        this.document.setSyntaxId("xwiki/2.0");
+
+        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(getContext()));
+
+        this.document.setSyntaxId("xwiki/1.0");
+
+        XWikiDocument translatedDoc = new XWikiDocument();
+        translatedDoc.setContent("//italic//");
+        translatedDoc.setSyntaxId("xwiki/2.0");
+        translatedDoc.setNew(false);
+
+        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("fr"));
+        this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(translatedDoc));
+
+        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
     }
 }

@@ -523,12 +523,14 @@ public class XWikiDocument implements DocumentModelBridge
             // Velocity for example).
             context.put("isInRenderingEngine", true);
 
+            XWikiDocument translatedDocument = getTranslatedDocument(context);
+            
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (is10Syntax()) {
+            if (translatedDocument.is10Syntax()) {
                 renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
             } else {
                 renderedContent =
-                    performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
+                    performSyntaxConversion(translatedDocument.getContent(), translatedDocument.getSyntaxId(), "xhtml/1.0", true);
             }
         } finally {
             if (isInRenderingEngine != null) {

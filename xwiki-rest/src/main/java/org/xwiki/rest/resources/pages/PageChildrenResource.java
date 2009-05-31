@@ -57,10 +57,11 @@ public class PageChildrenResource extends XWikiResource
         Pages pages = objectFactory.createPages();
 
         /* Use an explicit query to improve performance */
-        String queryString = "select distinct doc.fullName from XWikiDocument as doc where doc.parent = :parent order by doc.fullName asc";
+        String queryString =
+            "select distinct doc.fullName from XWikiDocument as doc where doc.parent = :parent order by doc.fullName asc";
         List<String> childPageFullNames =
             queryManager.createQuery(queryString, Query.XWQL).bindValue("parent", doc.getFullName()).setOffset(start)
-                .setLimit(number).execute();       
+                .setLimit(number).execute();
 
         for (String childPageFullName : childPageFullNames) {
             String pageId = Utils.getPageId(wikiName, childPageFullName);

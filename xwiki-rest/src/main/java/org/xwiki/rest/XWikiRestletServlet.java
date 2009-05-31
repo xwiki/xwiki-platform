@@ -46,18 +46,17 @@ public class XWikiRestletServlet extends ServerServlet
 
         /* Retrieve the application context in order to populate it with relevant variables. */
         Context applicationContext = application.getContext();
-        
+
         /* Retrieve the component manager and made it available in the application context. */
         ComponentManager componentManager =
             (ComponentManager) getServletContext().getAttribute("org.xwiki.component.manager.ComponentManager");
         applicationContext.getAttributes().put(Constants.XWIKI_COMPONENT_MANAGER, componentManager);
 
-        /* Set the object factory for instantiating components. */ 
+        /* Set the object factory for instantiating components. */
         if (application instanceof XWikiRestletJaxRsApplication) {
             XWikiRestletJaxRsApplication jaxrsApplication = (XWikiRestletJaxRsApplication) application;
             jaxrsApplication.setObjectFactory(new ComponentsObjectFactory(componentManager));
-        }
-        else {
+        } else {
             log("The Restlet application is not an instance of XWikiRestletJaxRsApplication. Please check your web.xml");
         }
 

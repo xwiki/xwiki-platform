@@ -30,8 +30,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.BaseSearchResult;

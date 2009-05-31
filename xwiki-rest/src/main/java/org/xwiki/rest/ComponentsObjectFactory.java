@@ -64,9 +64,10 @@ public class ComponentsObjectFactory implements ObjectFactory
             /* Use the component manager to lookup the class. This ensure that injections are properly executed */
             XWikiRestComponent component =
                 (XWikiRestComponent) componentManager.lookup(XWikiRestComponent.class, clazz.getName());
-            
-            ComponentDescriptor componentDescriptor = componentManager.getComponentDescriptor(XWikiRestComponent.class, clazz.getName());            
-            
+
+            ComponentDescriptor componentDescriptor =
+                componentManager.getComponentDescriptor(XWikiRestComponent.class, clazz.getName());
+
             /*
              * Retrieve the releasable component list from the context. This is used to store component instances that
              * need to be released later.
@@ -81,10 +82,10 @@ public class ComponentsObjectFactory implements ObjectFactory
             }
 
             /* Only add components that have a per-lookup instantiation stategy. */
-            if(componentDescriptor.getInstantiationStrategy() == ComponentInstantiationStrategy.PER_LOOKUP) {                
+            if (componentDescriptor.getInstantiationStrategy() == ComponentInstantiationStrategy.PER_LOOKUP) {
                 releasableComponentReferences.add(component);
             }
-                      
+
             /*
              * Return the instantiated component. This cast should never fail if the programmer has correctly set the
              * component hint to the actual fully qualified name of the Java class.

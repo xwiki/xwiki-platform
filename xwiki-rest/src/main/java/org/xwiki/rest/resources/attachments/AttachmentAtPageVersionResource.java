@@ -105,7 +105,7 @@ public class AttachmentAtPageVersionResource extends XWikiResource
 
         String attachmentXWikiRelativeUrl =
             xwikiDocument.getAttachmentURL(attachmentName, "download", xwikiContext).toString();
-        
+
         Attachment attachment =
             DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
                 doc, xwikiAttachment, xwikiContext), attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl);

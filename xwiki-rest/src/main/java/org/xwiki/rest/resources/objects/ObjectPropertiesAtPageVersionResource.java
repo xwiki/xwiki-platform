@@ -57,7 +57,7 @@ public class ObjectPropertiesAtPageVersionResource extends XWikiResource
 
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
         xwikiDocument = xwiki.getDocument(xwikiDocument, doc.getVersion(), xwikiContext);
-        
+
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
@@ -70,8 +70,8 @@ public class ObjectPropertiesAtPageVersionResource extends XWikiResource
         properties.getProperties().addAll(object.getProperties());
 
         String objectUri =
-            UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectAtPageVersionResource.class).build(doc.getWiki(), doc.getSpace(),
-                doc.getName(), version, object.getClassName(), object.getNumber()).toString();
+            UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectAtPageVersionResource.class).build(doc.getWiki(),
+                doc.getSpace(), doc.getName(), version, object.getClassName(), object.getNumber()).toString();
         Link objectLink = objectFactory.createLink();
         objectLink.setHref(objectUri);
         objectLink.setRel(Relations.OBJECT);

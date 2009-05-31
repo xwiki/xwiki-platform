@@ -134,14 +134,14 @@ public class AttachmentsResource extends XWikiResource
                 Header h = (Header) e.nextElement();
 
                 /* Parse header data. Normally headers are in the form form-data; key="value"; ... */
-                if (h.getValue().startsWith("form-data")) {                    
+                if (h.getValue().startsWith("form-data")) {
                     String[] fieldData = h.getValue().split(";");
                     for (String s : fieldData) {
                         String[] pair = s.split("=");
                         if (pair.length == 2) {
                             String key = pair[0].trim();
                             String value = pair[1].replace("\"", "").trim();
-                            
+
                             if ("name".equals(key)) {
                                 if (FORM_FILENAME_FIELD.equals(value)) {
                                     overriddenFileName = bodyPart.getContent().toString();
@@ -176,9 +176,9 @@ public class AttachmentsResource extends XWikiResource
             int read = inputStream.read(buffer);
             if (read != 4096) {
                 if (read != -1) {
-                    baos.write(buffer, 0, read);                    
+                    baos.write(buffer, 0, read);
                 }
-                
+
                 break;
             } else {
                 baos.write(buffer);
@@ -225,7 +225,9 @@ public class AttachmentsResource extends XWikiResource
         if (existed) {
             return Response.status(Status.ACCEPTED).entity(attachment).build();
         } else {
-            return Response.created(UriBuilder.fromUri(uriInfo.getBaseUri()).path(AttachmentResource.class).build(wikiName, spaceName, pageName, attachmentName)).entity(attachment).build();
+            return Response.created(
+                UriBuilder.fromUri(uriInfo.getBaseUri()).path(AttachmentResource.class).build(wikiName, spaceName,
+                    pageName, attachmentName)).entity(attachment).build();
         }
     }
 

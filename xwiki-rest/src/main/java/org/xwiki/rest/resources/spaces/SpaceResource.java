@@ -27,8 +27,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -56,7 +54,7 @@ public class SpaceResource extends XWikiResource
 
             List<String> spaceNames = xwikiApi.getSpaces();
             Collections.sort(spaceNames);
-            
+
             String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
             Document home = null;
 

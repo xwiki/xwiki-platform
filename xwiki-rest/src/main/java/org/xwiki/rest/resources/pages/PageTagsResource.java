@@ -43,8 +43,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.plugin.tag.TagPlugin;
 
 /**
  * @version $Id$
@@ -57,10 +57,8 @@ public class PageTagsResource extends ModifiablePageResource
     public Tags getPageTags(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName) throws XWikiException
     {
-        TagPlugin tagPlugin = (TagPlugin) xwiki.getPlugin("tag", xwikiContext);
-
         String pageId = Utils.getPageId(wikiName, spaceName, pageName);
-        List<String> tagNames = tagPlugin.getTagsFromDocument(pageId, xwikiContext);
+        List<String> tagNames = getTagsFromDocument(pageId);
 
         Tags tags = objectFactory.createTags();
         for (String tagName : tagNames) {
@@ -121,5 +119,19 @@ public class PageTagsResource extends ModifiablePageResource
         doc.save();
 
         return Response.status(Status.ACCEPTED).entity(tags).build();
+    }
+
+    private List<String> getTagsFromDocument(String documentId) throws XWikiException
+    {
+        XWikiDocument document = xwiki.getDocument(documentId, xwikiContext);
+        BaseObject object = document.getObject("XWiki.TagClass");
+        if (object != null) {
+            BaseProperty prop = (BaseProperty) object.safeget("tags");
+            if (prop != null) {
+                return (List<String>) prop.getValue();
+            }
+        }
+
+        return new ArrayList<String>();
     }
 }

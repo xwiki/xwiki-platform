@@ -50,10 +50,10 @@ public class ObjectAtPageVersionResource extends XWikiResource
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, version, true, false);
 
         Document doc = documentInfo.getDocument();
-        
+
         XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
         xwikiDocument = xwiki.getDocument(xwikiDocument, doc.getVersion(), xwikiContext);
-        
+
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);

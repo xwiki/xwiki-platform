@@ -26,8 +26,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.BaseAttachmentsResource;

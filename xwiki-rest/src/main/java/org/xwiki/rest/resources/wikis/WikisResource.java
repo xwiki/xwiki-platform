@@ -25,8 +25,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Wikis;

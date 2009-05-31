@@ -33,8 +33,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -67,7 +65,7 @@ public class WikiPagesResource extends XWikiResource
         Pages pages = objectFactory.createPages();
 
         /* This try is just needed for executing the finally clause. */
-        try {            
+        try {
             Map<String, String> filters = new HashMap<String, String>();
             if (!name.equals("")) {
                 filters.put("name", name);
@@ -75,7 +73,7 @@ public class WikiPagesResource extends XWikiResource
             if (!space.equals("")) {
                 filters.put("space", space);
             }
-            if(!author.equals("")) {
+            if (!author.equals("")) {
                 filters.put("author", author);
             }
 
@@ -95,7 +93,7 @@ public class WikiPagesResource extends XWikiResource
                     if (param.equals("space")) {
                         f.format(" upper(doc.space) like :space ");
                     }
-                    
+
                     if (param.equals("author")) {
                         f.format(" upper(doc.contentAuthor) like :author ");
                     }
@@ -128,7 +126,7 @@ public class WikiPagesResource extends XWikiResource
                 xwikiDocument.setDatabase(wikiName);
 
                 Document doc = new Document(xwikiDocument, xwikiContext);
-                
+
                 /*
                  * We manufacture page summaries in place because we don't have all the data for calling the
                  * DomainObjectFactory method (doing so would require to retrieve an actual Document)

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.spaces;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -59,7 +58,7 @@ public class SpacesResource extends XWikiResource
             xwikiContext.setDatabase(wikiName);
 
             List<String> spaceNames =
-                queryManager.getNamedQuery("getSpaces").setOffset(start).setLimit(number).execute();           
+                queryManager.getNamedQuery("getSpaces").setOffset(start).setLimit(number).execute();
 
             for (String spaceName : spaceNames) {
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");

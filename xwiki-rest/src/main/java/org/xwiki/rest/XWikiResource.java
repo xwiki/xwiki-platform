@@ -31,9 +31,13 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.query.QueryManager;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
 import com.xpn.xwiki.XWikiContext;
@@ -64,6 +68,11 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     protected Logger logger;
 
     protected ObjectFactory objectFactory;
+
+    @Requirement
+    protected ComponentManager componentManager;
+
+    protected QueryManager queryManager;
 
     /**
      * A wrapper class for returning an XWiki document enriched with information about its status.
@@ -100,6 +109,11 @@ public class XWikiResource implements XWikiRestComponent, Initializable
         xwiki = (com.xpn.xwiki.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI);
         xwikiApi = (com.xpn.xwiki.api.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_API);
         xwikiUser = (String) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_USER);
+        try {
+            queryManager = (QueryManager) componentManager.lookup(QueryManager.class);
+        } catch (ComponentLookupException e) {
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
 
         /*
          * if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)) { throw new

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.pages;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -29,8 +28,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Pages;
@@ -48,7 +48,7 @@ public class PageChildrenResource extends XWikiResource
     @GET
     public Pages getPageChildren(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @PathParam("pageName") String pageName, @QueryParam("start") @DefaultValue("0") Integer start,
-        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
+        @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException, QueryException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
 
@@ -56,12 +56,13 @@ public class PageChildrenResource extends XWikiResource
 
         Pages pages = objectFactory.createPages();
 
-        List<String> childPageFullNames = doc.getChildren();
-        Collections.sort(childPageFullNames);
+        /* Use an explicit query to improve performance */
+        String queryString = "select distinct doc.fullName from XWikiDocument as doc where doc.parent = :parent order by doc.fullName asc";
+        List<String> childPageFullNames =
+            queryManager.createQuery(queryString, Query.XWQL).bindValue("parent", doc.getFullName()).setOffset(start)
+                .setLimit(number).execute();       
 
-        RangeIterable<String> ri = new RangeIterable<String>(childPageFullNames, start, number);
-
-        for (String childPageFullName : ri) {
+        for (String childPageFullName : childPageFullNames) {
             String pageId = Utils.getPageId(wikiName, childPageFullName);
 
             if (!xwikiApi.exists(pageId)) {

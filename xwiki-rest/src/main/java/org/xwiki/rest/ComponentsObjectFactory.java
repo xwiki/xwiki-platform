@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.restlet.ext.jaxrs.InstantiateException;
 import org.restlet.ext.jaxrs.ObjectFactory;
-import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -82,13 +81,13 @@ public class ComponentsObjectFactory implements ObjectFactory
             }
 
             /* Only add components that have a per-lookup instantiation stategy. */
-            if(componentDescriptor.getInstantiationStrategy().equals(ComponentInstantiationStrategy.PER_LOOKUP)) {                
+            if(componentDescriptor.getInstantiationStrategy() == ComponentInstantiationStrategy.PER_LOOKUP) {                
                 releasableComponentReferences.add(component);
             }
                       
             /*
-             * Return the instantiated component. This cast should never fail is the programmer has correctly set the
-             * component hint to the actualy fully qualified name of the Java class.
+             * Return the instantiated component. This cast should never fail if the programmer has correctly set the
+             * component hint to the actual fully qualified name of the Java class.
              */
             return (T) component;
         } catch (ComponentLookupException e) {

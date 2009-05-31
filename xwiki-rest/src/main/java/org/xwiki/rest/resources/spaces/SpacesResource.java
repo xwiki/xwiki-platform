@@ -28,8 +28,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
+import org.xwiki.query.QueryException;
 import org.xwiki.rest.DomainObjectFactory;
-import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Spaces;
@@ -46,7 +46,7 @@ public class SpacesResource extends XWikiResource
     @GET
     public Spaces getSpaces(@PathParam("wikiName") String wikiName,
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
-        throws XWikiException
+        throws XWikiException, QueryException
     {
         String database = xwikiContext.getDatabase();
 
@@ -56,12 +56,11 @@ public class SpacesResource extends XWikiResource
         try {
             xwikiContext.setDatabase(wikiName);
 
-            List<String> spaceNames = xwikiApi.getSpaces();
+            List<String> spaceNames =
+                queryManager.getNamedQuery("getSpaces").setOffset(start).setLimit(number).execute();
             Collections.sort(spaceNames);
 
-            RangeIterable<String> ri = new RangeIterable<String>(spaceNames, start, number);
-
-            for (String spaceName : ri) {
+            for (String spaceName : spaceNames) {
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
                 Document home = null;
 

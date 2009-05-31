@@ -30,6 +30,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
 
+import org.xwiki.query.QueryManager;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
 import com.xpn.xwiki.XWikiContext;
@@ -59,6 +60,8 @@ public class XWikiResource
     protected Logger logger;
 
     protected ObjectFactory objectFactory;
+
+    protected QueryManager queryManager;
 
     /**
      * A wrapper class for returning an XWiki document enriched with information about its status.
@@ -99,8 +102,10 @@ public class XWikiResource
         xwiki = (com.xpn.xwiki.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI);
         xwikiApi = (com.xpn.xwiki.api.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_API);
         xwikiUser = (String) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_USER);
+        queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
-        if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)) {
+        if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)
+            || (queryManager == null)) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
 

@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.pages;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -61,7 +60,7 @@ public class PagesResource extends XWikiResource
             /* Use an explicit query to improve performance */
             List<String> pageNames =
                 queryManager.getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).setOffset(start).setLimit(
-                    number).execute();            
+                    number).execute();
 
             Pattern parentFilter = null;
             if (parentFilterExpression != null) {

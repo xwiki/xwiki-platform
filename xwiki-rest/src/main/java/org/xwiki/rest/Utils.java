@@ -20,6 +20,7 @@
 package org.xwiki.rest;
 
 import org.apache.commons.lang.StringUtils;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
@@ -77,7 +78,7 @@ public class Utils
 
         return document.getPrefixedFullName();
     }
-        
+
     /**
      * Get parent document for a given document.
      * 
@@ -92,8 +93,8 @@ public class Utils
             return null;
         }
         /*
-         * This is ugly but we have to mimic the behavior of link generation: 
-         * if the parent does not specify its space, use the current document space.
+         * This is ugly but we have to mimic the behavior of link generation: if the parent does not specify its space,
+         * use the current document space.
          */
         String parentName = doc.getParent();
         if (!parentName.contains(".")) {

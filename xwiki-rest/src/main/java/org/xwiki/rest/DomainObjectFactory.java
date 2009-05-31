@@ -151,7 +151,7 @@ public class DomainObjectFactory
             space.setHome(home.getPrefixedFullName());
             space.setXwikiRelativeUrl(home.getURL("view"));
             space.setXwikiAbsoluteUrl(home.getExternalURL("view"));
-        }        
+        }
 
         String pagesUri = UriBuilder.fromUri(baseUri).path(PagesResource.class).build(wikiName, spaceName).toString();
         Link pagesLink = objectFactory.createLink();
@@ -249,7 +249,7 @@ public class DomainObjectFactory
         pageSummary.setId(doc.getPrefixedFullName());
         pageSummary.setSpace(doc.getSpace());
         pageSummary.setName(doc.getName());
-        pageSummary.setTitle(doc.getDisplayTitle());                
+        pageSummary.setTitle(doc.getDisplayTitle());
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
@@ -262,7 +262,7 @@ public class DomainObjectFactory
             pageSummary.setParent("");
             pageSummary.setParentId("");
         }
-        
+
         String spaceUri =
             UriBuilder.fromUri(baseUri).path(SpaceResource.class).build(doc.getWiki(), doc.getSpace()).toString();
         Link spaceLink = objectFactory.createLink();
@@ -272,7 +272,7 @@ public class DomainObjectFactory
 
         if (parent != null) {
             String parentUri =
-                UriBuilder.fromUri(baseUri).path(PageResource.class).build(parent.getWiki(), parent.getSpace(), 
+                UriBuilder.fromUri(baseUri).path(PageResource.class).build(parent.getWiki(), parent.getSpace(),
                     parent.getName()).toString();
             Link parentLink = objectFactory.createLink();
             parentLink.setHref(parentUri);
@@ -367,8 +367,8 @@ public class DomainObjectFactory
 
     }
 
-    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, 
-        XWiki xwikiApi) throws XWikiException
+    public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi)
+        throws XWikiException
     {
         PageSummary pageSummary = objectFactory.createPageSummary();
         fillPageSummary(pageSummary, objectFactory, baseUri, doc, false, xwikiApi);

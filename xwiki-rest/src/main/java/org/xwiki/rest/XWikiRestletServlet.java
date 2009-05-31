@@ -44,16 +44,16 @@ public class XWikiRestletServlet extends ServerServlet
             /* Try first in WEB-INF */
             InputStream is =
                 getServletContext().getResourceAsStream(String.format("/WEB-INF/%s", JAVA_LOGGING_PROPERTY_FILE));
-            
+
             /* If nothing is there then try in the current jar */
-            if(is == null) {                
+            if (is == null) {
                 is = getClass().getClassLoader().getResourceAsStream(JAVA_LOGGING_PROPERTY_FILE);
             }
-            
-            if (is != null) {               
+
+            if (is != null) {
                 LogManager.getLogManager().readConfiguration(is);
                 is.close();
-            }            
+            }
         } catch (Exception e) {
             log("Unable to initialize Java logging framework. Using defaults", e);
         }

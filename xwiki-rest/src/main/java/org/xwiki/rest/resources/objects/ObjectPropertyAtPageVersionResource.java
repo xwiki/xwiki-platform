@@ -20,11 +20,9 @@
 package org.xwiki.rest.resources.objects;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Response.Status;
 
@@ -69,8 +67,9 @@ public class ObjectPropertyAtPageVersionResource extends XWikiResource
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
                 String objectUri =
-                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectAtPageVersionResource.class).build(doc.getWiki(),
-                        doc.getSpace(), doc.getName(), version, object.getClassName(), object.getNumber()).toString();
+                    UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectAtPageVersionResource.class).build(
+                        doc.getWiki(), doc.getSpace(), doc.getName(), version, object.getClassName(),
+                        object.getNumber()).toString();
                 Link objectLink = objectFactory.createLink();
                 objectLink.setHref(objectUri);
                 objectLink.setRel(Relations.OBJECT);

@@ -131,8 +131,8 @@ public class ObjectsResource extends XWikiResource
         return Response.created(
             UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName, spaceName, pageName,
                 object.getClassName(), objectNumber)).entity(
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, xwikiObject, false))
-            .build();
+            DomainObjectFactory
+                .createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, xwikiObject, false)).build();
     }
 
 }

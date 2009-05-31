@@ -78,7 +78,7 @@ public class XWikiJaxRsApplication extends Application
                 }
             }
         }
-        
+
         context.getLogger().log(Level.INFO, "RESTful API subsystem initialized.");
     }
 

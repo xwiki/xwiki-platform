@@ -52,7 +52,7 @@ public class SpaceResource extends XWikiResource
 
             List<String> spaceNames = xwikiApi.getSpaces();
             Collections.sort(spaceNames);
-            
+
             String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
             Document home = null;
 

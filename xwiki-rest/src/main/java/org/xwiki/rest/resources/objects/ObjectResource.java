@@ -59,7 +59,8 @@ public class ObjectResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject, false);
+        return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject,
+            false);
     }
 
     @PUT
@@ -91,9 +92,10 @@ public class ObjectResource extends XWikiResource
 
         baseObject = xwikiDocument.getObject(className, objectNumber);
 
-        return Response.status(Status.ACCEPTED).entity(
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject, false))
-            .build();
+        return Response.status(Status.ACCEPTED)
+            .entity(
+                DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject,
+                    false)).build();
     }
 
     @DELETE

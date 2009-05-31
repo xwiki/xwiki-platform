@@ -43,7 +43,10 @@ public class BaseSearchResult extends XWikiResource
 {
     protected static enum SearchScope
     {
-        NAME, CONTENT, TITLE, OBJECTS
+        NAME,
+        CONTENT,
+        TITLE,
+        OBJECTS
     }
 
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,

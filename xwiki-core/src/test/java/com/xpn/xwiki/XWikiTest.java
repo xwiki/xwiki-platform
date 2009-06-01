@@ -20,6 +20,7 @@
 package com.xpn.xwiki;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -32,6 +33,7 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.collections.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
+import org.jmock.core.constraint.IsSame;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
@@ -272,70 +274,49 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     }
 
     /**
-     * We only verify here that the saveDocument API calls the new Observation component.
+     * We only verify here that the saveDocument API calls the Observation component.
      */
     public void testSaveDocumentSendsObservationEvents() throws Exception
     {
-        TestSaveEventListener listener = new TestSaveEventListener();
+        Mock mockListener = mock(EventListener.class);
+        mockListener.stubs().method("getName").will(returnValue("testlistener"));
+        mockListener.expects(once()).method("getEvents").will(returnValue(Arrays.asList(new DocumentSaveEvent("xwikitest:Some.Document"))));
+
         ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
-        om.addListener(new DocumentSaveEvent("xwikitest:Some.Document"), listener);
+        om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument("xwikitest", "Some", "Document");
         document.setContent("the content");
 
+        // Ensure that the onEvent method has been called
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentSaveEvent.class), same(document), isA(XWikiContext.class));
+
         this.xwiki.saveDocument(document, getContext());
-        assertFalse(document.isNew());
-        assertTrue("Listener not called", listener.hasListenerBeenCalled);
     }
 
     /**
-     * We only verify here that the saveDocument API calls the new Observation component.
+     * We only verify here that the deleteDocument API calls the Observation component.
      */
     public void testDeleteDocumentSendsObservationEvents() throws Exception
     {
-        TestDeleteEventListener listener = new TestDeleteEventListener();
+        Mock mockListener = mock(EventListener.class);
+        mockListener.stubs().method("getName").will(returnValue("testlistener"));
+        mockListener.expects(once()).method("getEvents").will(returnValue(Arrays.asList(new DocumentDeleteEvent("xwikitest:Another.Document"))));
+
         ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
-        om.addListener(new DocumentDeleteEvent("xwikitest:Another.Document"), listener);
+        om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument("xwikitest", "Another", "Document");
         document.setContent("the content");
 
+        // Not expectation on mock Listener since we're not subscribed to Document save events
+
         this.xwiki.saveDocument(document, getContext());
-        assertFalse(document.isNew());
-        assertFalse("Listener called for wrong event", listener.hasListenerBeenCalled);
+
+        // Ensure that the onEvent method has been called
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentDeleteEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
 
         this.xwiki.deleteDocument(document, false, getContext());
-        assertTrue("Listener not called", listener.hasListenerBeenCalled);
-    }
-
-    private static class TestSaveEventListener implements EventListener
-    {
-        public boolean hasListenerBeenCalled = false;
-
-        public void onEvent(Event evt, Object source, Object data)
-        {
-            this.hasListenerBeenCalled = true;
-            assertTrue(source instanceof XWikiDocument);
-            XWikiDocument doc = (XWikiDocument) source;
-            assertTrue("originalDocument should have been new", doc.getOriginalDocument().isNew());
-            assertEquals("the content", doc.getContent());
-        }
-    }
-
-    private static class TestDeleteEventListener implements EventListener
-    {
-        public boolean hasListenerBeenCalled = false;
-
-        public void onEvent(Event evt, Object source, Object data)
-        {
-            this.hasListenerBeenCalled = true;
-            assertTrue(source instanceof XWikiDocument);
-            XWikiDocument doc = (XWikiDocument) source;
-            assertTrue("New document should have been new", doc.isNew());
-            assertFalse("originalDocument should not have been new", doc.getOriginalDocument().isNew());
-            assertEquals("the content", doc.getOriginalDocument().getContent());
-            assertEquals("\n", doc.getContent());
-        }
     }
 
     public void testLanguageSelection()

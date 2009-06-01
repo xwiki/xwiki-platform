@@ -32,12 +32,14 @@ import org.xwiki.component.internal.Composable;
 import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.logging.VoidLogger;
+import org.xwiki.component.manager.ComponentDescriptorAddedEvent;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.LogEnabled;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * Simple implementation of {@link ComponentManager} to be used when using some XWiki modules standalone.
@@ -197,6 +199,12 @@ public class EmbeddableComponentManager implements ComponentManager
                 } catch (Exception e) {
                     throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
                 }
+                
+                // Send an Observation event to listeners
+                ObservationManager om = lookup(ObservationManager.class);
+                ComponentDescriptor descriptor = this.descriptors.get(roleHint);
+                ComponentDescriptorAddedEvent event = new ComponentDescriptorAddedEvent(descriptor.getRole());
+                om.notify(event, this, descriptor);
             }
         }
         return instance;

@@ -16,24 +16,46 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package org.xwiki.observation;
+package org.xwiki.component.manager;
 
-import junit.framework.TestCase;
-
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 
-public class EventTest extends TestCase
+/**
+ * Event sent to tell that a new Component Descriptor has been registered.
+ * 
+ * @version $Id$
+ * @since 2.0M1
+ */
+public class ComponentDescriptorAddedEvent implements Event
 {
-    public void testActionExecutionEventEquals()
+    private Class< ? > role;
+    
+    public ComponentDescriptorAddedEvent(Class< ? > role)
     {
-        Event e1 = new ActionExecutionEvent("test");
-        Event e2 = new ActionExecutionEvent("test");
-        Event e3 = new ActionExecutionEvent("different");
-        assertTrue(e1.equals(e1));
-        assertTrue(e1.equals(e2));
-        assertFalse(e1.equals(e3));
+        this.role = role;
+    }
+    
+    public Class< ? > getRole()
+    {
+        return this.role;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see Event#matches(Object)
+     */
+    public boolean matches(Object otherEvent)
+    {
+        boolean result = false;
+        
+        if (ComponentDescriptorAddedEvent.class.isAssignableFrom(otherEvent.getClass())) {
+            ComponentDescriptorAddedEvent event = (ComponentDescriptorAddedEvent) otherEvent;
+            if (getRole().getName().equals(event.getRole())) {
+                result = true;
+            }
+        }
+        
+        return result; 
     }
 }

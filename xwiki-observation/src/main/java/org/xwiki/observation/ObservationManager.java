@@ -24,9 +24,10 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.observation.event.Event;
 
 /**
- * The main orchestrator for event notification. You register {@link EventListener}s against this manager, create
- * {@link Event}s and pass them to this manager, and it notifies the right event listeners of the events they registered
- * for.
+ * The main orchestrator for event notification. To receive events create a component implementing the
+ * {@link EventListener} interface. Your component will be automatically registered when this Observation
+ * Manager component is loaded. To send events to all registered listeners, call one of the 
+ * {@link #notify} methods.
  * 
  * @version $Id$
  */
@@ -34,33 +35,53 @@ import org.xwiki.observation.event.Event;
 public interface ObservationManager
 {
     /**
-     * Add a listener.
+     * Manually add a listener. Components implementing the {@link EventListener} interfaces are only loaded
+     * when the Observation Manager component is created. Thus if you need to add a new listener while the
+     * system is running you'll need to call this method.
      * 
-     * @param event the event to register the listener against; acts as a template that filters out only specific events
-     *            the listener is interested in
+     * Also note that contrary to other components it's not possible for the Observation Manager to watch
+     * Component Manager events since the Component Manager is itself using the Observation Manager to send
+     * its events (chicken and egg problem). Thus if any new Event Listener is created dynamically it needs to
+     * be added using this method manually.
+     * 
      * @param eventListener the listener to register
      */
-    void addListener(Event event, EventListener eventListener);
+    void addListener(EventListener eventListener);
 
     /**
-     * Remove a listener from a specific event.
+     * Remove a listener from the list of registered listeners. The removed listener will no longer receive events.
      * 
-     * @param event the event to remove the listener from.
-     * @param eventListener the listener to remove.
+     * @param listenerName the name of the listener to remove (must match {@link EventListener#getName()}
      */
-    void removeListener(Event event, EventListener eventListener);
+    void removeListener(String listenerName);
 
     /**
-     * Remove a listener from all events it is registered against. Convenient way of cleaning up a listener object 
-     * being destroyed.
+     * Adds an Event to an already registered listener.
      * 
-     * @param eventListener the listener to remove.
+     * @param listenerName the name of the listener to which the event must be added 
+     *        (must match {@link EventListener#getName()}
+     * @param event the event to add to the matching listener
      */
-    void removeListener(EventListener eventListener);
+    void addEvent(String listenerName, Event event);
 
     /**
-     * Call the registered listeners. The definition of <em>source</em> and <em>data</em> is purely up to the
-     * communicating classes.
+     * Removes an Event to an already registered listener.
+     * 
+     * @param listenerName the name of the listener to which the event must be removed 
+     *        (must match {@link EventListener#getName()}
+     * @param event the event to remove to the matching listener
+     */
+    void removeEvent(String listenerName, Event event);
+    
+    /**
+     * @param listenerName the name of the listener
+     * @return the registered listener's instance or null if no listener is registered under that name 
+     */
+    EventListener getListener(String listenerName);
+    
+    /**
+     * Call the registered listeners matching the passed Event. 
+     * The definition of <em>source</em> and <em>data</em> is purely up to the communicating classes.
      * 
      * @param event the event to pass to the registered listeners
      * @param source the source of the event (or <code>null</code>)

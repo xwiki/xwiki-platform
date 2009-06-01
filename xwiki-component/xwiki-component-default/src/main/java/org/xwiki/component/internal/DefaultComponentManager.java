@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Wraps the Component Manager in a component so that components requiring the component Manager can
@@ -46,12 +44,6 @@ public class DefaultComponentManager implements ComponentManager, Composable
      */
     private ComponentManager componentManager;
 
-    /**
-     * Used to send events when a new component descriptor is registered.
-     */
-    @Requirement
-    private ObservationManager observationManager;
-    
     /**
      * {@inheritDoc}
      * @see Composable#compose(ComponentManager)

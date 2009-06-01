@@ -20,20 +20,34 @@
  */
 package org.xwiki.observation;
 
+import java.util.List;
+
 import org.xwiki.observation.event.Event;
 
 /**
- * Any Java object wanting to receive {@link Event events} must implement this interface. For example, if you want to be
- * notified when a document is updated you'll implement this interface and you'll register the object implementing it
- * against the {@link ObservationManager}.
+ * Components wanting to receive Observation {@link Event events} must implement this interface.
  * 
  * @version $Id$
  */
 public interface EventListener
 {
     /**
-     * The {@link org.xwiki.observation.ObservationManager} calls this methods when an event matches the event passed
-     * when this object was registered against the Observation Manager.
+     * @return the listener's name. It's a free form text identifying this listener instance in a unique manner.
+     *         This name is used for some operations in {@link ObservationManager}.
+     */
+    String getName();
+    
+    /**
+     * @return the list of events this listener is configured to receive. This listener will be automatically
+     *         registered with this list of events against the {@link ObservationManager}. When an event occurs, 
+     *         for each matching event in this list, the {@link #onEvent(Event, Object, Object)} method will be
+     *         called. 
+     */
+    List<Event> getEvents();
+    
+    /**
+     * The {@link org.xwiki.observation.ObservationManager} calls this method when an event matches one of the events
+     * for which this listener is registered (see {@link #getEvents()}.
      * 
      * @param event the event triggered. Can be used to differentiate different events if your Object supports several
      *            events for example.

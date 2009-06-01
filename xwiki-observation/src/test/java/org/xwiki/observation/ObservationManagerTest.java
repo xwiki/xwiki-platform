@@ -20,88 +20,123 @@
  */
 package org.xwiki.observation;
 
-import junit.framework.TestCase;
+import java.util.Arrays;
 
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.xwiki.observation.event.Event;
-import org.xwiki.observation.event.filter.RegexEventFilter;
 import org.xwiki.observation.internal.DefaultObservationManager;
 
-public class ObservationManagerTest extends TestCase
+/**
+ * Unit tests for {@link ObservationManager}.
+ * 
+ * @version $Id$
+ */
+public class ObservationManagerTest
 {
     private ObservationManager manager;
 
-    private TestListener listener;
+    private Mockery context = new Mockery();
 
-    public class TestListener implements EventListener
-    {
-        public boolean hasListenerBeenCalled = false;
-
-        public int listenerCalls = 0;
-
-        public void onEvent(Event event, Object source, Object data)
-        {
-            assertEquals(DocumentSaveEvent.class.getName(), event.getClass().getName());
-            assertEquals("some source", (String) source);
-            assertEquals("some data", (String) data);
-            this.hasListenerBeenCalled = true;
-            this.listenerCalls++;
-        }
-    }
-
-    @Override
-    protected void setUp()
+    @Before
+    public void setUp()
     {
         this.manager = new DefaultObservationManager();
-        this.listener = new TestListener();
     }
 
-    public void testNotifyWhenUsingDocumentSaveEvent()
+    @After
+    public void tearDown()
     {
-        this.manager.addListener(new DocumentSaveEvent("SomeDocument"), this.listener);
-        this.manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
-        assertTrue("Listener has not been called", this.listener.hasListenerBeenCalled);
+        this.context.assertIsSatisfied();
+    }
+    
+    @Test
+    public void testNotifyWhenMatching()
+    {
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Event event = this.context.mock(Event.class);
+        
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
+            oneOf(listener).onEvent(event, "some source", "some data");
+            oneOf(event).matches(event); will(returnValue(true));
+        }});
+        
+        this.manager.addListener(listener);
+        Assert.assertSame(listener, this.manager.getListener("mylistener"));
+        this.manager.notify(event, "some source", "some data");
     }
 
-    public void testNotifyWhenUsingDocumentSaveEventWithRegexFilter()
+    @Test
+    public void testRemoveListener() 
     {
-        this.manager.addListener(new DocumentSaveEvent(new RegexEventFilter(".*Doc.*")), this.listener);
-
-        this.manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
-        assertTrue("Listener has not been called", this.listener.hasListenerBeenCalled);
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Event event = this.context.mock(Event.class);
+        
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
+            never(listener).onEvent(with(any(Event.class)), with(any(Object.class)), with(any(Object.class)));
+        }});
+        
+        this.manager.addListener(listener);
+        this.manager.removeListener("mylistener");
+        this.manager.notify(event, null);
     }
 
-    public void testRemoveListener()
+    @Test
+    public void testAddEvent() throws Exception
     {
-        this.manager.addListener(new DocumentUpdateEvent(), this.listener);
-        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
-        this.manager.addListener(new DocumentSaveEvent("Another.Document"), this.listener);
-        this.manager.removeListener(this.listener);
-        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
-        assertFalse("Listener was not removed", this.listener.hasListenerBeenCalled);
-        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
-        this.manager.removeListener(new DocumentSaveEvent("Another.Document"), this.listener);
-        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
-        assertTrue("Listener was wrongly removed", this.listener.hasListenerBeenCalled);
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Event initialEvent = this.context.mock(Event.class, "initial");
+        final Event afterEvent = this.context.mock(Event.class, "after");
+        final Event notifyEvent = this.context.mock(Event.class, "notify");
+
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(initialEvent)));
+            oneOf(listener).onEvent(with(any(Event.class)), with(any(Object.class)), with(any(Object.class)));
+            
+            // Since the observation returns the first matching event, return false from initialEvent so that 
+            // afterEvent is called.
+            oneOf(initialEvent).matches(with(same(notifyEvent))); will(returnValue(false));
+            oneOf(afterEvent).matches(with(same(notifyEvent))); will(returnValue(true));
+        }});
+        
+        this.manager.addListener(listener);
+        this.manager.addEvent("mylistener", afterEvent);
+        this.manager.notify(notifyEvent, null);
     }
 
-    public void testDoubleAdditionPrevented()
+    @Test
+    public void testRemoveEvent()
     {
-        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
-        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
-        this.manager.addListener(new DocumentSaveEvent(), this.listener);
-        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
-        assertTrue("Listener was not called", this.listener.hasListenerBeenCalled);
-        assertEquals("Listener was called too many times", 1, this.listener.listenerCalls);
-    }
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Event initialEvent = this.context.mock(Event.class, "initial");
+        final Event afterEvent = this.context.mock(Event.class, "after");
+        final Event notifyEvent = this.context.mock(Event.class, "notify");
 
-    public void testAlwaysMatchingEvents()
-    {
-        this.manager.addListener(new DocumentSaveEvent(), this.listener);
-        this.manager.notify(new DocumentUpdateEvent("Some.Document"), "some source", "some data");
-        assertFalse("Listener was wrongly called", this.listener.hasListenerBeenCalled);
-        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
-        assertTrue("Listener was not called", this.listener.hasListenerBeenCalled);
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(initialEvent)));
+            
+            // Since the observation returns the first matching event, return false from initialEvent so that 
+            // the second event can be called (if there's a second event - in our case it'll be removed but
+            // we still want the test to fail if that doesn't work).
+            oneOf(initialEvent).matches(with(same(notifyEvent))); will(returnValue(false));
+            
+            // Ensure that the afterEvent is never called since we're adding it and removing it
+            never(afterEvent);
+        }});
+        
+        this.manager.addListener(listener);
+        this.manager.addEvent("mylistener", afterEvent);
+        this.manager.removeEvent("mylistener", afterEvent);
+        this.manager.notify(notifyEvent, null);
     }
 }

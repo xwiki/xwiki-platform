@@ -25,12 +25,11 @@ import javax.servlet.ServletContextEvent;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.servlet.PlexusServletContextListener;
 import org.codehaus.plexus.servlet.PlexusServletUtils;
-import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
-import org.xwiki.plexus.manager.PlexusComponentManager;
+import org.xwiki.plexus.manager.PlexusComponentManagerFactory;
 
 public class XWikiPlexusServletContextListener extends PlexusServletContextListener
 {
@@ -47,32 +46,24 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
-        // Initializes Plexus
         super.contextInitialized(servletContextEvent);
 
-        // Register all components defined using annotations
+        // Initializes XWiki's Component Manager using Plexus
         PlexusContainer plexusContainer =
             PlexusServletUtils.getPlexusContainer(servletContextEvent.getServletContext());
-        this.componentManager = new PlexusComponentManager(plexusContainer);
-        new ComponentAnnotationLoader().initialize(this.componentManager, this.getClass().getClassLoader());
-
+        PlexusComponentManagerFactory plexusFactory = new PlexusComponentManagerFactory();
+        this.componentManager = plexusFactory.createComponentManager(plexusContainer);
+        
         // Initializes XWiki's Container with the Servlet Context.
         try {
             ServletContainerInitializer containerInitializer = 
                 this.componentManager.lookup(ServletContainerInitializer.class);
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
-            throw new RuntimeException("Failed to initialize application contextt", e);
+            throw new RuntimeException("Failed to initialize application context", e);
         }
 
         // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
-        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
-        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
-        // Class that need to lookup then just need to get it from the XWikiContext instance.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to define the Components they require as field members and configure the Plexus
-        // deployment descriptors (components.xml) so that they are automatically injected.
         servletContextEvent.getServletContext().setAttribute(
             org.xwiki.component.manager.ComponentManager.class.getName(), this.componentManager);
     }
@@ -87,8 +78,8 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
                 this.componentManager.lookup(ApplicationContextListenerManager.class);
             Container container = this.componentManager.lookup(Container.class);
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
-        } catch (ComponentLookupException ex) {
-            // Nothing to do here.
+        } catch (ComponentLookupException e) {
+            sce.getServletContext().log("Failed to clean up application context", e);
         }
         super.contextDestroyed(sce);
     }

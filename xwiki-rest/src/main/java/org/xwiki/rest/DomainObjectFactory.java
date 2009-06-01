@@ -46,6 +46,7 @@ import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Xwiki;
 import org.xwiki.rest.resources.ModificationsResource;
+import org.xwiki.rest.resources.SyntaxesResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
@@ -104,6 +105,12 @@ public class DomainObjectFactory
         wikisLink.setHref(wikisUri);
         wikisLink.setRel(Relations.WIKIS);
         xwiki.getLinks().add(wikisLink);
+        
+        String syntaxesUri = UriBuilder.fromUri(baseUri).path(SyntaxesResource.class).build().toString();
+        Link syntaxesLink = objectFactory.createLink();
+        syntaxesLink.setHref(syntaxesUri);
+        syntaxesLink.setRel(Relations.SYNTAXES);
+        xwiki.getLinks().add(syntaxesLink);
 
         return xwiki;
     }
@@ -253,6 +260,7 @@ public class DomainObjectFactory
         pageSummary.setXwikiRelativeUrl(doc.getURL("view"));
         pageSummary.setXwikiAbsoluteUrl(doc.getExternalURL("view"));
         pageSummary.setTranslations(createTranslations(objectFactory, baseUri, doc));
+        pageSummary.setSyntax(doc.getSyntaxId());
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
         if (parent != null) {
@@ -364,7 +372,12 @@ public class DomainObjectFactory
                 pageSummary.getLinks().add(tagsLink);
             }
         }
-
+        
+        String syntaxesUri = UriBuilder.fromUri(baseUri).path(SyntaxesResource.class).build().toString();
+        Link syntaxesLink = objectFactory.createLink();
+        syntaxesLink.setHref(syntaxesUri);
+        syntaxesLink.setRel(Relations.SYNTAXES);
+        pageSummary.getLinks().add(syntaxesLink);
     }
 
     public static PageSummary createPageSummary(ObjectFactory objectFactory, URI baseUri, Document doc, XWiki xwikiApi)

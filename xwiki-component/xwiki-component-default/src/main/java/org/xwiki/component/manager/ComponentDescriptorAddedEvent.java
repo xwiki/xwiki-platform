@@ -30,12 +30,26 @@ import org.xwiki.observation.event.Event;
 public class ComponentDescriptorAddedEvent implements Event
 {
     private Class< ? > role;
+
+    /**
+     * Watches all roles (whenever a component is added it'll trigger this event).
+     */
+    public ComponentDescriptorAddedEvent()
+    {
+        this.role = null;
+    }
     
+    /**
+     * @param role the component role to watch (all components matching this role will trigger this event)
+     */
     public ComponentDescriptorAddedEvent(Class< ? > role)
     {
         this.role = role;
     }
-    
+
+    /**
+     * @return the component's role being watched or null if all component registrations are watched
+     */
     public Class< ? > getRole()
     {
         return this.role;
@@ -50,9 +64,14 @@ public class ComponentDescriptorAddedEvent implements Event
         boolean result = false;
         
         if (ComponentDescriptorAddedEvent.class.isAssignableFrom(otherEvent.getClass())) {
-            ComponentDescriptorAddedEvent event = (ComponentDescriptorAddedEvent) otherEvent;
-            if (getRole().getName().equals(event.getRole())) {
+            // If we're watching all roles return a match
+            if (getRole() == null) {
                 result = true;
+            } else {
+                ComponentDescriptorAddedEvent event = (ComponentDescriptorAddedEvent) otherEvent;
+                if (getRole().getName().equals(event.getRole().getName())) {
+                    result = true;
+                }
             }
         }
         

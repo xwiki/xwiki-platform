@@ -22,10 +22,14 @@ package org.xwiki.component.annotation;
 
 import java.util.List;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
-import org.jmock.core.Constraint;
-import org.jmock.core.Formatting;
+import org.hamcrest.Description;
+import org.hamcrest.Factory;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 
@@ -35,7 +39,7 @@ import org.xwiki.component.manager.ComponentManager;
  * @version $Id$
  * @since 1.8.1
  */
-public class ComponentAnnotationLoaderTest extends MockObjectTestCase
+public class ComponentAnnotationLoaderTest
 {
     @ComponentRole
     public interface Role
@@ -67,51 +71,62 @@ public class ComponentAnnotationLoaderTest extends MockObjectTestCase
     {
     }
 
+    private Mockery context = new Mockery();
+
     public void testFindComponentRoleClasses()
     {
         assertComponentRoleClasses(RoleImpl.class);
     }
 
-    public class ComponentDescriptorConstraint implements Constraint
+    public static class ComponentDescriptorMatcher extends TypeSafeMatcher<ComponentDescriptor>
     {
         private String implementation;
         
-        public ComponentDescriptorConstraint(String implementation)
+        public ComponentDescriptorMatcher(String implementation)
         {
             this.implementation = implementation;
         }
 
-        public boolean eval(Object o)
+        @Override
+        public boolean matchesSafely(ComponentDescriptor item)
         {
-            return o instanceof ComponentDescriptor 
-                && ((ComponentDescriptor) o).getImplementation().equals(this.implementation);
+            return item.getImplementation().equals(this.implementation); 
         }
 
-        public StringBuffer describeTo(StringBuffer buffer)
+        public void describeTo(Description description)
         {
-            return buffer.append("a ComponentDescriptor with implementation ").append(
-                Formatting.toReadableString(this.implementation));
+            description.appendText("a ComponentDescriptor with implementation ").appendValue(this.implementation);
         }
+    }
+    
+    @Factory
+    public static Matcher<ComponentDescriptor> aComponentDescriptorWithImplementation(String implementation)
+    {
+        return new ComponentDescriptorMatcher(implementation);
     }
 
     /**
      * Verify that when there are several component implementations for the same role/hint then
      * component implementations defined in META-INF/component-overrides.txt are used in priority.
      */
-    public void testOverrides()
+    @Test
+    public void testOverrides() throws Exception
     {
     	ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-    	Mock managerMock = mock(ComponentManager.class);
-    	managerMock.stubs().method("registerComponent");
-    	managerMock.expects(once()).method("registerComponent").with(new ComponentDescriptorConstraint(
-    	    "org.xwiki.component.annotation.ComponentAnnotationLoaderTest$OverrideRole"));
-    	
-    	loader.initialize((ComponentManager) managerMock.proxy(), this.getClass().getClassLoader());
+    	final ComponentManager mockManager = this.context.mock(ComponentManager.class);
+
+    	this.context.checking(new Expectations() {{
+    	    allowing(mockManager).registerComponent(with(any(ComponentDescriptor.class)));
+    	    oneOf(mockManager).registerComponent(with(aComponentDescriptorWithImplementation(OverrideRole.class.getName())));
+        }});
+
+    	loader.initialize(mockManager, this.getClass().getClassLoader());
     }
 
     /**
      * Verify that we get the same result when we use a class that extends another class (i.e. inheritance works).
      */
+    @Test
     public void testFindComponentRoleClasseWhenClassExtension()
     {
         assertComponentRoleClasses(SuperRoleImpl.class);
@@ -121,8 +136,8 @@ public class ComponentAnnotationLoaderTest extends MockObjectTestCase
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
         List<Class< ? >> classes = loader.findComponentRoleClasses(componentClass);
-        assertEquals(2, classes.size());
-        assertEquals(Role.class.getName(), classes.get(0).getName());
-        assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
+        Assert.assertEquals(2, classes.size());
+        Assert.assertEquals(Role.class.getName(), classes.get(0).getName());
+        Assert.assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
     }
 }

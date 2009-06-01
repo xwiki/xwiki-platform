@@ -24,8 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -36,7 +36,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
  * @version $Id$
  * @since 1.8.1
  */
-public class ComponentDescriptorFactoryTest extends TestCase
+public class ComponentDescriptorFactoryTest
 {
     @ComponentRole
     public interface FieldRole
@@ -100,6 +100,7 @@ public class ComponentDescriptorFactoryTest extends TestCase
     {
     }
 
+    @Test
     public void testCreateComponentDescriptor()
     {
         assertComponentDescriptor(RoleImpl.class, "default");
@@ -109,20 +110,22 @@ public class ComponentDescriptorFactoryTest extends TestCase
      * Verify that we get the same result when we use a class that extends another class (i.e. inheritance
      * works).
      */
+    @Test
     public void testCreateComponentDescriptorWhenClassExtension()
     {
         assertComponentDescriptor(SuperRoleImpl.class, "other");
     }
-    
+
+    @Test
     public void testMultipleRolesForComponent()
     {
         ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
         List<ComponentDescriptor> descriptors = 
             factory.createComponentDescriptors(MultipleRolesImpl.class, Role.class);
                
-        assertEquals(2, descriptors.size());
-        assertEquals("hint1", descriptors.get(0).getRoleHint());
-        assertEquals("hint2", descriptors.get(1).getRoleHint());
+        Assert.assertEquals(2, descriptors.size());
+        Assert.assertEquals("hint1", descriptors.get(0).getRoleHint());
+        Assert.assertEquals("hint2", descriptors.get(1).getRoleHint());
     }
 
     private void assertComponentDescriptor(Class< ? > componentClass, String fieldRoleName)
@@ -130,40 +133,40 @@ public class ComponentDescriptorFactoryTest extends TestCase
         ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
         List<ComponentDescriptor> descriptors = factory.createComponentDescriptors(componentClass, ExtendedRole.class);
         
-        assertEquals(1, descriptors.size());
+        Assert.assertEquals(1, descriptors.size());
         ComponentDescriptor descriptor = descriptors.get(0);
         
-        assertEquals(componentClass.getName(), descriptor.getImplementation());
-        assertEquals(ExtendedRole.class.getName(), descriptor.getRole().getName());
-        assertEquals("default", descriptor.getRoleHint());
-        assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
+        Assert.assertEquals(componentClass.getName(), descriptor.getImplementation());
+        Assert.assertEquals(ExtendedRole.class.getName(), descriptor.getRole().getName());
+        Assert.assertEquals("default", descriptor.getRoleHint());
+        Assert.assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());
 
         Collection<ComponentDependency> deps = descriptor.getComponentDependencies(); 
-        assertEquals(4, deps.size());
+        Assert.assertEquals(4, deps.size());
         Iterator<ComponentDependency> it = deps.iterator();
 
         ComponentDependency dep = it.next(); 
-        assertEquals(FieldRole.class.getName(), dep.getRole().getName());
-        assertEquals(fieldRoleName, dep.getRoleHint());
-        assertEquals(FieldRole.class.getName(), dep.getMappingType().getName());
-        assertEquals("fieldRole", dep.getName());
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals(fieldRoleName, dep.getRoleHint());
+        Assert.assertEquals(FieldRole.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("fieldRole", dep.getName());
         
         dep = it.next();
-        assertEquals(FieldRole.class.getName(), dep.getRole().getName());
-        assertEquals("special", dep.getRoleHint());
-        assertEquals(FieldRole.class.getName(), dep.getMappingType().getName());
-        assertEquals("specialFieldRole", dep.getName());
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals("special", dep.getRoleHint());
+        Assert.assertEquals(FieldRole.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("specialFieldRole", dep.getName());
         
         dep = it.next();
-        assertEquals(FieldRole.class.getName(), dep.getRole().getName());
-        assertEquals("default", dep.getRoleHint());
-        assertEquals(List.class.getName(), dep.getMappingType().getName());
-        assertEquals("roles", dep.getName());
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals("default", dep.getRoleHint());
+        Assert.assertEquals(List.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("roles", dep.getName());
 
         dep = it.next();
-        assertEquals(FieldRole.class.getName(), dep.getRole().getName());
-        assertEquals("default", dep.getRoleHint());
-        assertEquals(List.class.getName(), dep.getMappingType().getName());
-        assertEquals("specialRoles", dep.getName());
+        Assert.assertEquals(FieldRole.class.getName(), dep.getRole().getName());
+        Assert.assertEquals("default", dep.getRoleHint());
+        Assert.assertEquals(List.class.getName(), dep.getMappingType().getName());
+        Assert.assertEquals("specialRoles", dep.getName());
     }
 }

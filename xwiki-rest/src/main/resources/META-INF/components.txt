@@ -1,4 +1,5 @@
 org.xwiki.rest.resources.RootResource
+org.xwiki.rest.resources.SyntaxesResource
 org.xwiki.rest.resources.wikis.WikisResource
 org.xwiki.rest.resources.wikis.WikiPagesResource
 org.xwiki.rest.resources.wikis.WikiAttachmentsResource

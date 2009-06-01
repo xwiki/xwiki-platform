@@ -74,4 +74,6 @@ public class Relations
 
     public static final String SEARCH = "http://www.xwiki.org/rel/search";
 
+    public static final String SYNTAXES = "http://www.xwiki.org/rel/syntaxes";
+
 }

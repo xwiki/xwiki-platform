@@ -55,6 +55,13 @@ public class ModifiablePageResource extends XWikiResource
             save = true;
         }
 
+        if (page.getSyntax() != null) {
+            if (xwiki.getConfiguredSyntaxes().contains(page.getSyntax())) {
+                doc.setSyntaxId(page.getSyntax());
+                save = true;
+            }
+        }
+
         if (save) {
             doc.save();
 

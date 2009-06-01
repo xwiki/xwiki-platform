@@ -19,16 +19,15 @@
  */
 package org.xwiki.configuration.internal;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
@@ -44,7 +43,8 @@ import org.xwiki.container.Container;
  * @since 1.6M1
  */
 @Component
-public class DefaultConfigurationSourceCollection implements ConfigurationSourceCollection, Initializable
+public class DefaultConfigurationSourceCollection extends AbstractLogEnabled 
+    implements ConfigurationSourceCollection, Initializable
 {
     private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
 
@@ -65,13 +65,12 @@ public class DefaultConfigurationSourceCollection implements ConfigurationSource
         URL xwikiPropertiesUrl = null;
         try {
             xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
-        } catch (MalformedURLException e) {
-            throw new InitializationException("Failed to locate property file [" + XWIKI_PROPERTIES_FILE + "]", e);
-        }
-        try {
             this.sources.add(new CommonsConfigurationSource(new PropertiesConfiguration(xwikiPropertiesUrl)));
-        } catch (ConfigurationException e) {
-            throw new InitializationException("Failed to load property file [" + XWIKI_PROPERTIES_FILE + "]", e);
+        } catch (Exception e) {
+            // Note: if we cannot read the configuration file we log a warning but continue since XWiki will use 
+            // default values for all configurable elements.
+            getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE + "]. Using default configuration. "
+                + " Internal error [" + e.getMessage() + "]");
         }
     }
 

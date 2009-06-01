@@ -201,6 +201,7 @@
       <param-name>resources</param-name>
       <param-value>
         org.xwiki.rest.resources.RootResource;
+        org.xwiki.rest.resources.SyntaxesResource;
         org.xwiki.rest.resources.wikis.WikisResource;
         org.xwiki.rest.resources.wikis.WikiSearchResource;
         org.xwiki.rest.resources.wikis.WikiPagesResource;

@@ -51,6 +51,14 @@ public interface ComponentManager
      */
     <T> T lookup(Class< T > role, String roleHint) throws ComponentLookupException;
 
+    /**
+     * Remove a component from the list of available components.
+     * 
+     * @param <T> the component class 
+     * @param component the component to release passed as a component instance. The component definition matching the
+     *        passed instance is removed
+     * @throws ComponentLifecycleException if the component's ending lifecycle raises an error 
+     */
     <T> void release(T component) throws ComponentLifecycleException;
 
     <T> Map<String, T> lookupMap(Class< T > role) throws ComponentLookupException;

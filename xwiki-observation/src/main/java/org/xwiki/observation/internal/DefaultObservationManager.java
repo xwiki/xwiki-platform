@@ -225,8 +225,7 @@ public class DefaultObservationManager implements ObservationManager, Initializa
             for (RegisteredListener regListener : regListeners.values()) {
                 // Verify that one of the events matches and send the first matching event
                 for (Event listenerEvent : regListener.events) {
-                    if (listenerEvent.getClass().getName().equals(event.getClass().getName())
-                        && listenerEvent.matches(event))
+                    if (listenerEvent.matches(event))
                     {
                         regListener.listener.onEvent(event, source, data);
                         

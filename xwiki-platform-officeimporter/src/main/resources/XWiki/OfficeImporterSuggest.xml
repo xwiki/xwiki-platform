@@ -25,20 +25,21 @@
 <content>
 #if("" == "$!{request.xpage}")
   #warning("This page contains the office importer auto-suggest script")
-#end
-#set($ok = $response.setContentType("text/xml"))
-#set($typeParam = "$!{request.type}")
-#set($numberParam = "$!{request.number}")
-#set($inputParam = "$!{request.input}")
-&lt;results&gt;
-#if("spaces" == $typeParam)
-  #set($number = $util.parseInt($numberParam))
-  #if($number == 0)#set($number = 10)#end
-  #set($matchingSpaces = $xwiki.searchSpacesNames("where lower(doc.space) like '%$inputParam.toLowerCase()%'", $number, 0, []))
-  #foreach($space in $matchingSpaces)
-    &lt;rs id="$velocityCount" info=""&gt;$space&lt;/rs&gt;
+#else
+  #set($ok = $response.setContentType("text/xml"))
+  #set($typeParam = "$!{request.type}")
+  #set($numberParam = "$!{request.number}")
+  #set($inputParam = "$!{request.input}")
+  &lt;results&gt;
+  #if("spaces" == $typeParam)
+    #set($number = $util.parseInt($numberParam))
+    #if($number == 0)#set($number = 10)#end
+    #set($matchingSpaces = $xwiki.searchSpacesNames("where lower(doc.space) like '%$inputParam.toLowerCase()%'", $number, 0, []))
+    #foreach($space in $matchingSpaces)
+      &lt;rs id="$velocityCount" info=""&gt;$space&lt;/rs&gt;
+    #end
   #end
+  &lt;/results&gt;
 #end
-&lt;/results&gt;
 </content>
 </xwikidoc>

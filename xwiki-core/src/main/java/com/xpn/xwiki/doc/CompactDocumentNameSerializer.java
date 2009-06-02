@@ -27,7 +27,8 @@ import org.xwiki.context.Execution;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Generate a compact document reference string depending of context database and space.
+ * Generate a compact document reference string that doesn't contain the wiki name if the document is in 
+ * the current wiki.
  * 
  * @version $Id$
  * @since 1.8.3

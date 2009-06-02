@@ -24,7 +24,7 @@
 ## We don't always have to render the content:
 ## * If this template is called after a conversion exception then the content is HTML.
 ## * If the WYSIWYG is in real time mode then the content must be empty.
-#if($request.render)
+#if("$!request.render" == "true")
 #set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntaxId()))
 #end
 <body id="body" class="main">$content</body>

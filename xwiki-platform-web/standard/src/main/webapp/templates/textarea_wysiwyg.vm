@@ -1,5 +1,6 @@
 #set($editors = $context.getEditorWysiwyg())
 #if($editors)
+#if($doc.syntaxId == "xwiki/1.0")
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/tiny_mce/tiny_mce.js")"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/wysiwyg/tinymce/wiki_editor/wiki_editor.js")"></script>
 <script type="text/javascript">
@@ -20,4 +21,10 @@
 	});
 //]]>
 </script>
+#elseif($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
+## Load the rich text object properties using a compact WYSIWYG editor.
+#wysiwyg_editProperties($tdoc $editors false)
+#else
+#warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntaxId</em>.")
+#end
 #end

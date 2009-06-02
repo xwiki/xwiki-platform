@@ -23,15 +23,28 @@ var Wysiwyg =
     wysiwygServiceURL: '${request.contextPath}/WysiwygService',
 
     /**
+     * Indicates the state of the WYSIWYG GWT module. Possible values are: 0 (uninitialized), 1 (loading), 2 (loaded).
+     */
+    readyState: 0,
+
+    /**
+     * The queue of functions to execute after the WYSIWYG module is loaded.
+     */
+    onModuleLoadQueue: [],
+
+    /**
      * Loads the WYSIWYG code on demand.
      */
     load : function()
     {
         // Test if the code has been already loaded.
         // GWT loads the WYSIWYG code in an in-line frame with the 'com.xpn.xwiki.wysiwyg.Wysiwyg' id.
-        if (document.getElementById('com.xpn.xwiki.wysiwyg.Wysiwyg')) {
+        if (document.getElementById('com.xpn.xwiki.wysiwyg.Wysiwyg') || this.readyState != 0) {
             return;
         }
+
+        // Start loading the WYSIWYG GWT module.
+        this.readyState = 1;
 
         // Create the script tag to be used for importing the GWT script loader.
         var script = document.createElement('script');
@@ -43,10 +56,13 @@ var Wysiwyg =
         // method before the GWT script loader is executed and restore it after.
         // NOTE: The GWT script loader uses document.write() to compute the URL from where it is loaded.
         var counter = 0;
+        var limit = 2;
         var oldWrite = document.write;
         var newWrite = function(html) {
-            if (counter < 2) {
+            if (counter < limit) {
                 counter++;
+                // Try to wrap onScriptLoad in order to be notified when the WYSIWYG script is loaded.
+                Wysiwyg.maybeHookOnScriptLoad();
                 // Fail silently if the script element hasn't been attached to the document.
                 if (!script.parentNode) {
                     return;
@@ -85,7 +101,8 @@ var Wysiwyg =
                         script.parentNode.appendChild(child);
                     }
                 }
-            } else {
+            }
+            if (counter >= limit) {
                 document.write = oldWrite;
                 oldWrite = undefined;
                 script = undefined;
@@ -102,50 +119,113 @@ var Wysiwyg =
     },
 
     /**
-     * Looks for WYSIWYG configurations and loads the corresponding editors.
-     * TODO: Move this method in the WYSIWYG code.
-     * NOTE: This method is unsafe right now!
+     * Schedules a function to be executed after the WYSIWYG module is loaded. A call to this method forces the WYSIWYG
+     * module to be loaded, unless the second parameter, {@code lazy}, is set to {@code true}.
+     *
+     * @param fCode a function
+     * @param lazy {@code true} to prevent loading the WYSIWYG module at this point, {@code false} otherwise
      */
-    reload : function()
-    {
-        var iframe = document.getElementById('com.xpn.xwiki.wysiwyg.Wysiwyg');
-        if (iframe) {
-            var wnd = iframe.contentWindow;
-            wnd.gwtOnLoad(Wysiwyg.onLoadError, wnd.$moduleName, wnd.$moduleBase);
+    onModuleLoad: function(fCode, lazy) {
+        if (typeof fCode != 'function') {
+            return;
+        }
+        switch (this.readyState) {
+            // uninitialized
+            case 0:
+                if (!lazy) {
+                    this.load();
+                }
+                // fall-through
+
+            // loading
+            case 1:
+                this.onModuleLoadQueue.push(fCode);
+                break;
+
+            // loaded
+            case 2:
+                fCode();
+                break; 
         }
     },
 
     /**
-     * Logs an error message to the console if the WYSIWYG editors couldn't be loaded.
+     * Executes all the functions scheduled from on module load.
      */
-    onLoadError : function()
-    {
-        if (console) {
-            console.error("Couldn't load the WYSIWYG editors!");
+    fireOnModuleLoad: function() {
+        // The WYSIWYG module has been loaded successfully.
+        this.readyState = 2;
+
+        // Execute all the scheduled functions.
+        for (var i = 0; i < this.onModuleLoadQueue.length; i++) {
+            this.onModuleLoadQueue[i]();
         }
+
+        // There's no need to schedule functions anymore. They will be execute immediately. 
+        this.onModuleLoadQueue = undefined;
+    },
+
+    /**
+     * Try to wrap onScriptLoad in order to be notified when the WYSIWYG script is loaded.
+     */
+    maybeHookOnScriptLoad: function() {
+        if (com_xpn_xwiki_wysiwyg_Wysiwyg && com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad) {
+            var onScriptLoad = com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad;
+            com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad = function() {
+                Wysiwyg.hookGwtOnLoad();
+                onScriptLoad();
+
+                // Restore the default onScriptLoad function.
+                if (com_xpn_xwiki_wysiwyg_Wysiwyg && com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad) {
+                    com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad = onScriptLoad;
+                }
+                onScriptLoad = undefined;
+            }
+
+            // Prevent further calls to this method.
+            this.maybeHookOnScriptLoad = function(){};
+        }
+    },
+
+    /**
+     * Wrap gwtOnLoad in order to be notified when the WYSIWYG module is loaded.
+     */
+    hookGwtOnLoad: function() {
+        var iframe = document.getElementById('com.xpn.xwiki.wysiwyg.Wysiwyg');
+        var gwtOnLoad = iframe.contentWindow.gwtOnLoad;
+        iframe.contentWindow.gwtOnLoad = function(errFn, modName, modBase) {
+            gwtOnLoad(function() {
+                Wysiwyg.fireOnModuleLoad = function(){};
+                if (typeof errFn == 'function') {
+                    errFn();
+                }
+            }, modName, modBase);
+            Wysiwyg.fireOnModuleLoad();
+
+            // Restore the default gwtOnLoad function.
+            iframe.contentWindow.gwtOnLoad = gwtOnLoad;
+            iframe = undefined;
+            gwtOnLoad = undefined;
+        }
+
+        // Prevent further calls to this method.
+        this.hookGwtOnLoad = function(){};
     }
 };
 
-/**
- * The array of WYSIWYG configurations.
- * Usage:
- *   WysiwygConfigurations.push({
- *     hookId: 'textAreaId',
- *     displayTabs: true,
- *     defaultEditor: 'wysiwyg',
- *     inputURL: 'about:blank',
- *     syntax: 'xwiki/2.0',
- *     plugins: 'submit line separator text valign list indent history format symbol link image table macro importer',
- *     menu: 'link image table macro',
- *     toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
- *     debug: false
- *   });
- *
- * @type array
- */
-if (typeof WysiwygConfigurations == 'undefined') {
-    var WysiwygConfigurations = [];
-}
+// Enhance the WysiwygEditor class with custom events.
+Wysiwyg.onModuleLoad(function() {
+    var WysiwygEditorAspect = function() {
+        WysiwygEditorAspect.base.constructor.apply(this, arguments);
+        if (this.getRichTextArea()) {
+            // If the editor was successfully created then fire a custom event.
+            document.fire('xwiki:wysiwyg:created', {'instance': this});
+        }
+    }
+    WysiwygEditorAspect.prototype = new WysiwygEditor;
+    WysiwygEditorAspect.base = WysiwygEditor.prototype;
+    WysiwygEditor = WysiwygEditorAspect;
+}, true);
 
 #if("$!request.lazy" != "true")
 Wysiwyg.load();

@@ -20,7 +20,11 @@
 package com.xpn.xwiki.wysiwyg.client.util.internal;
 
 import java.util.Collections;
+import java.util.MissingResourceException;
 import java.util.Set;
+
+import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.dom.client.Window;
 
 import com.google.gwt.i18n.client.Dictionary;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -49,6 +53,30 @@ public final class DefaultConfig implements Config
     private DefaultConfig()
     {
         params = null;
+    }
+
+    /**
+     * Creates a new configuration object based on the given {@link JavaScriptObject} by putting it in the global name
+     * space and then looking it up using GWT's {@link Dictionary} mechanism.
+     * 
+     * @param jso the source for the configuration object
+     */
+    public DefaultConfig(JavaScriptObject jso)
+    {
+        // Generate a random name for the JavaScript object because the Dictionary class uses a cache.
+        String name = DefaultConfig.class.getName() + "@" + Math.round(Math.random() * 1000);
+        // Place the JavaScript object in the global name space so that the Dictionary can look it up.
+        Window.get().set(name, jso);
+        // Create a dictionary based on the given JavaScript object.
+        Dictionary dictionary = null;
+        try {
+            dictionary = Dictionary.getDictionary(name);
+        } catch (MissingResourceException e) {
+            // empty configuration
+        }
+        params = dictionary;
+        // Remove the JavaScript object from the global name space once the dictionary has been created.
+        Window.get().remove(name);
     }
 
     /**

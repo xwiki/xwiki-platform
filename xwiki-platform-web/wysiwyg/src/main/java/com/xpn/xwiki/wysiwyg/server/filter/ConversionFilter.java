@@ -40,14 +40,8 @@ import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
- * This filter is used to convert the values of request parameters that hold WYSIWYG output from HTML to the storing
- * syntax (the syntax in which the content is stored, usually a wiki syntax). This is needed because the action
- * processing the request expects storing syntax and not HTML code in these request parameters. The conversion is done
- * using the new rendering module. It has to be done on the server and not on the client, like the old WYSIWYG editor
- * does. Doing the conversion on the client side by making an asynchronous request to the server is error-prone for the
- * following reason: the WYSIWYG behaves like a text area that can be put anywhere in an HTML page, inside or outside an
- * HTML form; because of this the editor is not aware of what submit buttons are present on the container page and what
- * submit logic these buttons might have associated with them.
+ * This filter is used to convert the values of request parameters that require HTML conversion before being processed.
+ * A HTML editor can use this filter to convert its output to a specific syntax before it is saved.
  * 
  * @version $Id$
  */
@@ -59,27 +53,27 @@ public class ConversionFilter implements Filter
     private static final Log LOG = LogFactory.getLog(ConversionFilter.class);
 
     /**
-     * The name of the request parameter holding the list of WYSIWYG editor names. Each WYSIWYG editor has its own name
-     * which is also a request parameter holding the content of that editor. The name of a WYSIWYG editor is also used
-     * as a prefix for other request parameters like syntax.
+     * The name of the request parameter whose multiple values indicate the request parameters that require HTML
+     * conversion. For instance, if this parameter's value is {@code [description, content]} then the request has two
+     * parameters, {@code description} and {@code content}, requiring HTML conversion. The syntax these parameters must
+     * be converted to is found also on the request, under {@code description_syntax} and {@code content_syntax}
+     * parameters.
      */
-    private static final String WYSIWYG_NAME = "wysiwyg";
+    private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
 
     /**
-     * The name of the session attribute holding the map with the data that is about to be displayed in different
-     * WYSIWYG editors. An editor gets the key to its data through configuration. A key is a random string. Each data
-     * should be removed from the map after it is displayed.<br/>
-     * This map is needed to keep user changes while switching editors and after server-side exceptions.
+     * The name of the session attribute holding the conversion output. The conversion output is stored in a {@link Map}
+     * of {@link Map}s. The first key identifies the request and the second key is the name of the request parameter
+     * that required HTML conversion.
      */
-    private static final String WYSIWYG_INPUT = "com.xpn.xwiki.wysiwyg.input";
+    private static final String CONVERSION_OUTPUT = "com.xpn.xwiki.wysiwyg.server.converter.output";
 
     /**
-     * The name of the session attribute holding the map with the recent server-side exceptions regarding the WYSIWYG
-     * editors. This filter uses this attribute to pass to the editors the exceptions caught during conversion. Each
-     * exception should be removed from the map after being displayed to the user. The key in this map is a random
-     * string and might match a key in the {@link #WYSIWYG_INPUT} map.
+     * The name of the session attribute holding the conversion exceptions. The conversion exceptions are stored in a
+     * {@link Map} of {@link Map}s. The first key identifies the request and the second key is the name of the request
+     * parameter that required HTML conversion.
      */
-    private static final String WYSIWYG_ERROR = "com.xpn.xwiki.wysiwyg.error";
+    private static final String CONVERSION_ERRORS = "com.xpn.xwiki.wysiwyg.server.converter.errors";
 
     /**
      * {@inheritDoc}
@@ -98,48 +92,62 @@ public class ConversionFilter implements Filter
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
         ServletException
     {
-        String[] wysiwygNames = req.getParameterValues(WYSIWYG_NAME);
-        if (wysiwygNames != null) {
+        // Take the list of request parameters that require HTML conversion.
+        String[] parametersRequiringHTMLConversion = req.getParameterValues(REQUIRES_HTML_CONVERSION);
+        if (parametersRequiringHTMLConversion != null) {
             MutableServletRequestFactory mreqFactory =
                 (MutableServletRequestFactory) Utils
                     .getComponent(MutableServletRequestFactory.class, req.getProtocol());
+            // Wrap the current request in order to be able to change request parameters.
             MutableServletRequest mreq = mreqFactory.newInstance(req);
-            // Remove the list of WYSIWYG names from this request to avoid recurrency.
-            mreq.removeParameter(WYSIWYG_NAME);
-            Throwable[] errors = new Throwable[wysiwygNames.length];
-            boolean sendBack = false;
-            for (int i = 0; i < wysiwygNames.length; i++) {
-                String wysiwygName = wysiwygNames[i];
-                if (StringUtils.isEmpty(wysiwygName)) {
+            // Remove the list of request parameters that require HTML conversion to avoid recurrency.
+            mreq.removeParameter(REQUIRES_HTML_CONVERSION);
+            // Try to convert each parameter from the list and save caught exceptions.
+            Map<String, Throwable> errors = new HashMap<String, Throwable>();
+            // Save also the output to prevent loosing data in case of conversion exceptions.
+            Map<String, String> output = new HashMap<String, String>();
+            for (int i = 0; i < parametersRequiringHTMLConversion.length; i++) {
+                String parameterName = parametersRequiringHTMLConversion[i];
+                if (StringUtils.isEmpty(parameterName)) {
                     continue;
                 }
-                // Remove the syntax parameter from this request to avoid interference with further request processing.
-                String syntax = mreq.removeParameter(wysiwygName + "_syntax");
+                // Remove the syntax parameter from the request to avoid interference with further request processing.
+                String syntax = mreq.removeParameter(parameterName + "_syntax");
                 try {
                     HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.class);
                     HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.class);
-                    mreq.setParameter(wysiwygName, converter.fromHTML(cleaner.clean(req.getParameter(wysiwygName)),
+                    mreq.setParameter(parameterName, converter.fromHTML(cleaner.clean(req.getParameter(parameterName)),
                         syntax));
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
-                    sendBack = true;
-                    errors[i] = t;
+                    errors.put(parameterName, t);
                 }
+                // If the conversion fails the output contains the value before the conversion.
+                output.put(parameterName, mreq.getParameter(parameterName));
             }
 
-            if (sendBack) {
-                String referer = StringUtils.substringBeforeLast(mreq.getReferer(), String.valueOf('?'));
-                String queryString = StringUtils.substringAfterLast(mreq.getReferer(), String.valueOf('?'));
-                // Remove previous keys from the query string. We have to do this since this might not be the first time
-                // the conversion fails for this referrer.
-                queryString = queryString.replaceAll("keys=.*&?", "");
+            if (!errors.isEmpty()) {
+                // In case of a conversion exception we have to redirect the request back and provide a key to access
+                // the exception and the value before the conversion from the session.
+                // Redirect to the error page specified on the request.
+                String redirectURL = mreq.getParameter("xerror");
+                if (redirectURL == null) {
+                    // Redirect to the referrer page.
+                    redirectURL = mreq.getReferer();
+                }
+                // Extract the query string.
+                String queryString = StringUtils.substringAfterLast(redirectURL, String.valueOf('?'));
+                // Remove the query string.
+                redirectURL = StringUtils.substringBeforeLast(redirectURL, String.valueOf('?'));
+                // Remove the previous key from the query string. We have to do this since this might not be the first
+                // time the conversion fails for this redirect URL.
+                queryString = queryString.replaceAll("key=.*&?", "");
                 if (queryString.length() > 0 && !queryString.endsWith(String.valueOf('&'))) {
                     queryString += '&';
                 }
-                // Save the current content so the user doesn't loose his changes and then redirect the request back to
-                // the requester, passing the keys to the WYSIWYG_INPUT and WYSIWYG_ERROR maps in the query string.
-                queryString += "keys=" + save(mreq, wysiwygNames, errors);
-                mreq.sendRedirect(res, referer + '?' + queryString);
+                // Save the output and the caught exceptions on the session.
+                queryString += "key=" + save(mreq, output, errors);
+                mreq.sendRedirect(res, redirectURL + '?' + queryString);
             } else {
                 chain.doFilter(mreq, res);
             }
@@ -158,37 +166,38 @@ public class ConversionFilter implements Filter
     }
 
     /**
-     * Saves the current content of the WYSIWYG editors after a conversion failure.
+     * Saves on the session the conversion output and the caught conversion exceptions, after a conversion failure.
      * 
-     * @param mreq The request holding the content to be saved.
-     * @param wysiwygNames The request parameters holding the content to be saved.
-     * @param errors The conversion exceptions.
-     * @return The comma-separated list of keys to {@link #WYSIWYG_INPUT} map.
+     * @param mreq the request used to access the session
+     * @param output the conversion output for the given request
+     * @param errors the conversion exceptions for the given request
+     * @return a key that can be used along with the name of the request parameters that required HTML conversion to
+     *         extract the conversion output and the conversion exceptions from the {@link #CONVERSION_OUTPUT} and
+     *         {@value #CONVERSION_ERRORS} session attributes
      */
-    private String save(MutableServletRequest mreq, String[] wysiwygNames, Throwable[] errors)
+    private String save(MutableServletRequest mreq, Map<String, String> output, Map<String, Throwable> errors)
     {
-        Map<String, String> wysiwygInput = (Map<String, String>) mreq.getSessionAttribute(WYSIWYG_INPUT);
-        if (wysiwygInput == null) {
-            wysiwygInput = new HashMap<String, String>();
-            mreq.setSessionAttribute(WYSIWYG_INPUT, wysiwygInput);
-        }
+        // Generate a random key to identify the request.
+        String key = RandomStringUtils.randomAlphanumeric(4);
 
-        Map<String, Throwable> wysiwygError = (Map<String, Throwable>) mreq.getSessionAttribute(WYSIWYG_ERROR);
-        if (wysiwygError == null) {
-            wysiwygError = new HashMap<String, Throwable>();
-            mreq.setSessionAttribute(WYSIWYG_ERROR, wysiwygError);
+        // Save the output on the session.
+        Map<String, Map<String, String>> conversionOutput =
+            (Map<String, Map<String, String>>) mreq.getSessionAttribute(CONVERSION_OUTPUT);
+        if (conversionOutput == null) {
+            conversionOutput = new HashMap<String, Map<String, String>>();
+            mreq.setSessionAttribute(CONVERSION_OUTPUT, conversionOutput);
         }
+        conversionOutput.put(key, output);
 
-        StringBuffer keys = new StringBuffer();
-        for (int i = 0; i < wysiwygNames.length; i++) {
-            String key = RandomStringUtils.randomAlphanumeric(4);
-            wysiwygInput.put(key, mreq.getRequest().getParameter(wysiwygNames[i]));
-            if (errors[i] != null) {
-                wysiwygError.put(key, errors[i]);
-            }
-            keys.append(key);
-            keys.append(i < wysiwygNames.length - 1 ? "," : "");
+        // Save the errors on the session.
+        Map<String, Map<String, Throwable>> conversionErrors =
+            (Map<String, Map<String, Throwable>>) mreq.getSessionAttribute(CONVERSION_ERRORS);
+        if (conversionErrors == null) {
+            conversionErrors = new HashMap<String, Map<String, Throwable>>();
+            mreq.setSessionAttribute(CONVERSION_ERRORS, conversionErrors);
         }
-        return keys.toString();
+        conversionErrors.put(key, errors);
+
+        return key;
     }
 }

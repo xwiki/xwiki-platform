@@ -83,8 +83,23 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
     }-*/;
 
     /**
+     * Removes a property from this JavaScript object.
+     * 
+     * @param key the name of the property to be removed
+     * @return the value of the removed property
+     */
+    public final native Object remove(String key)
+    /*-{
+        var value = this[key];
+        delete this[key];
+        return value;
+    }-*/;
+
+    /**
      * Returns all the keys set in this JavaScript object, to use with {@link JavaScriptObject#get(String)} to iterate
-     * over all properties, without knowing their names. TODO: refactor this to return a map of (key, value) pairs.
+     * over all properties, without knowing their names.
+     * <p>
+     * TODO: refactor this to return a map of (key, value) pairs.
      * 
      * @return the array of keys set in this JavaScript object
      */

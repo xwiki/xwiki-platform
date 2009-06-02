@@ -43,6 +43,7 @@ public class DOMTestSuite extends GWTTestSuite
     {
         TestSuite suite = new TestSuite("XWiki GWT-DOM Unit Tests");
 
+        suite.addTestSuite(JavaScriptObjectTest.class);
         suite.addTestSuite(DOMUtilsTest.class);
         suite.addTestSuite(DocumentTest.class);
         suite.addTestSuite(DocumentFragmentTest.class);

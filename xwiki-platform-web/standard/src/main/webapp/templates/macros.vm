@@ -1988,3 +1988,236 @@ function (row, i, table) {
   #end
   </span>
 #end
+
+#**
+  * Imports the JavaScript files required by the WYSIWYG editor.
+  *
+  * @param $lazy {@code true} to download the WYSIWYG code only when it is needed, {@code false} to download it when the page is loaded
+  *#
+#macro(wysiwyg_import $lazy)
+## SmartClient (used by the XWikiExplorer)
+$xwiki.jsfx.use("js/smartclient/initsc.js", true)
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js")
+## TODO: remove the following line when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
+$xwiki.jsfx.use("js/smartclient/overwritesc.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js")
+$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js")
+$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
+## XWikiExplorer (used by the link plug-in)
+$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
+## WYSIWYG
+$xwiki.jsfx.use("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/XWikiWysiwyg.js", {"forceSkinAction": true, "lazy": ${lazy}})
+#end
+
+#**
+  * Displays the ConversionFilter error for the specified field, if any. The ConversionFilter is executed before the
+  * SaveAction and converts the HTML output of all the WYSIWYG editors to the corresponding storage syntax. If the
+  * ConversionFilter catches any exception during the convesion then it redirects the request back preventing the user
+  * from loosing unsaved changes and allowing us to display the exception.
+  *
+  * @param $fieldId identifies the form field for which to display the conversion error
+  *#
+#macro(wysiwyg_displayConversionError $fieldId)
+#if("$!{request.key}" != "")
+#set($sessionErrors = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.errors"))
+#if($sessionErrors && $sessionErrors.containsKey($request.key))
+#set($requestErrors = $sessionErrors.get($request.key))
+#if($requestErrors && $requestErrors.containsKey($fieldId))
+#set($fieldError = $requestErrors.get($fieldId))
+#if($fieldError)
+#error("${fieldId}: ${fieldError.message}")
+#set($ok = $requestErrors.remove($fieldId))
+#if($requestErrors.isEmpty())
+#set($ok = $sessionErrors.remove($request.key))
+#end
+#end
+#end
+#end
+#end
+#end
+
+#**
+  * Sets the input of the WYSIWYG editor.
+  *
+  * @param $fieldId identifies the rich form field for which to set the WYSIWYG input
+  * @param $fieldValue the rich form field value to be set as the input for the WYSIWYG editor; if there is a conversion
+  *            error on the current session for the specified field then this value is discarded and the value provided
+  *            by the ConversionFilter is used instead
+  * @return $wysiwyg_inputURLQueryString the query string to be used with the input URL in order to have the given value
+  *            as the input for the WYSIWYG editor
+  *#
+#macro(wysiwyg_input $fieldId $fieldValue)
+##
+## In real-time mode the input value must be the empty string (this is a temporary limitation).
+##
+#if($request.sync)
+#set($fieldValue = "")
+#end
+##
+## Use the ConversionFilter output if present to prevent loosing changes after a conversion error.
+##
+#if("$!{request.key}" != "")
+#set($sessionOutput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.output"))
+#if($sessionOutput && $sessionOutput.containsKey($request.key))
+#set($requestOutput = $sessionOutput.get($request.key))
+#if($requestOutput && $requestOutput.containsKey($fieldId))
+#set($fieldConversionOutput = $requestOutput.get($fieldId))
+#if($fieldConversionOutput)
+#set($fieldValue = $fieldConversionOutput)
+#set($ok = $requestOutput.remove($fieldId))
+#if($requestOutput.isEmpty())
+#set($ok = $sessionOutput.remove($request.key))
+#end
+#end
+#end
+#end
+#end
+#set($renderFieldValue = true)
+##
+## If there is a conversion error for the specified field then its value is HTML and thus shouldn't be rendered.
+##
+#if("$!{request.key}" != "")
+#set($sessionErrors = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.server.converter.errors"))
+#if($sessionErrors && $sessionErrors.containsKey($request.key))
+#set($requestErrors = $sessionErrors.get($request.key))
+#if($requestErrors && $requestErrors.containsKey($fieldId))
+#set($renderFieldValue = false)
+#end
+#end
+#end
+##
+## Put the field value in the WYSIWYG input map.
+##
+#set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
+#if(!$wysiwygInput)
+#set($wysiwygInput = $util.getHashMap())
+$request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
+#end
+#set($wysiwygInputKey = $util.generateRandomString(4))
+#set($ok = $wysiwygInput.put($wysiwygInputKey, $fieldValue))
+##
+## Build the query string for the input URL.
+##
+#set($wysiwyg_inputURLQueryString = "xpage=wysiwyginput&key=${wysiwygInputKey}&render=${renderFieldValue}")
+#end
+
+#**
+  * Sets the input of the WYSIWYG editor based on a object property identifier. An example of a property identifier is
+  * "XWiki.ArticleClass_0_content". The special "content" property is also supported, which represents the content of
+  * the edited document.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyId identifies the rich text object property for which to set the WYSIWYG input
+  * @return $wysiwyg_inputURLQueryString the query string to be used with the input URL in order to have the property
+  *            value as the input for the WYSIWYG editor
+  *#
+#macro(wysiwyg_inputProperty $editedDocument $propertyId)
+#if("$!propertyId" == "content")
+#wysiwyg_input("content" $editedDocument.content)
+#else
+## Let's extract the class name, the object index and the property name from the property identifier.
+#set($propertyNamePos = $propertyId.lastIndexOf("_"))
+#set($propertyName = $propertyId.substring($util.add($propertyNamePos, 1)))
+#set($objectIndexPos = $propertyId.lastIndexOf("_", $util.add($propertyNamePos, -1)))
+#set($objectIndex = $util.parseInt($propertyId.substring($util.add($objectIndexPos, 1), $propertyNamePos)))
+#set($className = $propertyId.substring(0, $objectIndexPos))
+#set($propertyValue = $editedDocument.getObject($className, $objectIndex).getProperty($propertyName).getValue())
+#wysiwyg_input($propertyId $propertyValue)
+#end
+#end
+
+#**
+  * Stores the WYSIWYG configuration in a JavaScript variable.
+  *
+  * @param $jsVarName the name of the JavaScript variable to store the WYSIWYG configuration
+  * @param $editedDocument the document being edited
+  * @param $fieldId identifies the form field to be replaced by the WYSIWYG editor
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use the compact editor
+  *#
+#macro(wysiwyg_storeConfig $jsVarName $editedDocument $fieldId $full)
+<script type="text/javascript">
+//<![CDATA[
+var $jsVarName = {
+  hookId: '${fieldId}',
+  syntax: '${editedDocument.syntaxId}',
+#if("$!wysiwyg_inputURLQueryString" != "")
+  inputURL: '${editedDocument.getExternalURL("view", $wysiwyg_inputURLQueryString)}',
+#end
+#if($full)
+  displayTabs: true,
+  defaultEditor: "wysiwyg",
+#end
+  plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($full && $request.sync) sync#end',
+  menu: 'link image table macro',
+  toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
+  wiki: '${editedDocument.wiki.replace("'", "\'")}',
+  space: '${editedDocument.space.replace("'", "\'")}',
+  page: '${editedDocument.name.replace("'", "\'")}',
+#if($full && $request.sync)
+  // Additional configuration for the real-time editing feature.
+  syncPage: '${editedDocument.fullName.replace("'", "\'")}',
+#if($request.reset=="1")
+  syncReset: 1,
+#end
+#end
+  debug: #if($request.debug)'true'#else'false'#end
+};
+//]]>
+</script>
+#end
+
+#**
+  * Creates a new WYSIWYG editor instance to edit the specified field of the given document.
+  *
+  * @param $editedDocument the document being edited
+  * @param $fieldId identifies the form field to be replaced by the WYSIWYG editor
+  * @param $full {@code true} to create a fully-fledged editor, {@code false} to create a compact editor
+  *#
+#macro(wysiwyg_createEditor $editedDocument $fieldId $full)
+#set($jsVarName = "wysiwygConfig${util.generateRandomString(4)}")
+#wysiwyg_storeConfig($jsVarName $editedDocument $fieldId $full)
+<script type="text/javascript">
+//<![CDATA[
+Wysiwyg.onModuleLoad(function() {
+  new WysiwygEditor($jsVarName);
+  $jsVarName = undefined;
+});
+//]]>
+</script>
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object property. The special "content" document property is
+  * also supported.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
+  *#
+#macro(wysiwyg_editProperty $editedDocument $propertyId $full)
+## Import required JavaScript files (lazy=false).
+#wysiwyg_import(false)
+## Set the input value for the editor.
+#wysiwyg_inputProperty($editedDocument $propertyId)
+## Display conversion errors, if present.
+#wysiwyg_displayConversionError($propertyId)
+## Create the editor UI.
+#wysiwyg_createEditor($editedDocument $propertyId $full)
+#end
+
+#**
+  * Loads the GWT-based WYSIWYG editor for the specified object properties.
+  *
+  * @param $editedDocument the document whose objects are being edited
+  * @param $propertyIds A comma separated list of property identifiers. An example of a property identifier is "XWiki.ArticleClass_0_content".
+  * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
+  *#
+#macro(wysiwyg_editProperties $editedDocument $propertyIds $full)
+#set($propertyIds = "$!propertyIds")
+#foreach($propertyId in $propertyIds.split(","))
+#wysiwyg_editProperty($editedDocument $propertyId $full)
+#end
+#end

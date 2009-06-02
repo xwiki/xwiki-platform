@@ -23,107 +23,10 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')
 <div id="xwikitext">
 <div id="xwikieditcontent">
 #if($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
-## Smartclient (required by XWikiExplorer)
-$xwiki.jsfx.use("js/smartclient/initsc.js", true)
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Core.js")
-## TODO: remove this line
-## when http://forums.smartclient.com/showthread.php?t=3097 will be fixed
-$xwiki.jsfx.use("js/smartclient/overwritesc.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Foundation.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Containers.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Grids.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_Forms.js")
-$xwiki.jsfx.use("js/smartclient/modules/ISC_DataBinding.js")
-$xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
-## XWikiExplorer (required by link plugin)
-$xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
-## WYSIWYG
-$xwiki.jsfx.use("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/XWikiWysiwyg.js", true)
-##
-## Get the WYSIWYG input map in order to add the the data for this request.
-## This map is needed to keep user changes while switching editors and after server-side exceptions.
-##
-#set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
-#if(!$wysiwygInput)
-#set($wysiwygInput = $util.getHashMap())
-$request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
-#end
-##
-## Determine the key into the WYSIWYG input and error map.
-## We pass this key to the WYSIWYG editor in the query string of the input URL.
-## This key will be used in wysiwyginput.vm to get the content of the editor from the WYSIWYG input map.
-##
-#set($reuseKey = $request.keys && $wysiwygInput.containsKey($request.keys))
-#if(!$request.sync && $reuseKey)
-## If this template is called after a conversion exception then the content is already 
-## stored in the input map. We have to use the key provided by the ConversionFilter.
-#set($wysiwygKey = $request.keys)
-#else
-#set($wysiwygKey = $util.generateRandomString(4))
-#end
-##
-## Determine the query string of the input URL.
-## We pass the following arguments to the wysiwyginput.vm template:
-## * key: the key in the WYSIWYG input map.
-## * render: flag indicating if the content associated with the given key should be rendered or not.
-##
-#set($inputURLQueryString = "xpage=wysiwyginput&key=${wysiwygKey}")
-#if(!($request.sync || $reuseKey))
-#set($inputURLQueryString = $inputURLQueryString + "&render=true")
-#end
-##
-## Determine the initial content of the editor.
-## We can't use $tdoc.content when the user switches editors or when we encounter 
-## a conversion exception because we would loose unsaved changes.
-##
-#if($request.sync)
-#set($ok = $wysiwygInput.put($wysiwygKey, ""))
-#elseif(!$reuseKey)
-#set($ok = $wysiwygInput.put($wysiwygKey, $tdoc.content))
-#end
-##
-## Get the WYSIWYG error map in order to display the conversion exceptions.
-##
-#set($wysiwygError = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.error"))
-#if($wysiwygError)
-#set($error = $wysiwygError.get($wysiwygKey))
-#if($error)
-#error($error.message)
-#set($ok = $wysiwygError.remove($wysiwygKey))
-#end
-#end
-##
-## Configure the WYSIWYG editor.
-##
-<script type="text/javascript">
-//<![CDATA[
-WysiwygConfigurations.push({
-    hookId: "content",
-    syntax: "$doc.syntaxId",
-    inputURL: "${tdoc.getExternalURL("view", $inputURLQueryString)}",
-    displayTabs: true,
-    defaultEditor: "wysiwyg",
-    plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($request.sync) sync#end',
-    menu: 'link image table macro',
-    toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
-    wiki: '${doc.wiki.replace("'", "\'")}',
-    space: '${doc.space.replace("'", "\'")}',
-    page: '${doc.name.replace("'", "\'")}',
-    debug: #if($request.debug)'true'#else'false'#end
-#if($request.sync)
-    // Additional configuration for the real-time editing feature.
-    syncPage: '${doc.fullName.replace("'", "\'")}',
-#if($request.reset=="1")
-    syncReset: 1
-#end
-#end
-});
-//]]>
-</script>
-##
+## Edit the document content using a fully-fledged editor.
+#wysiwyg_editProperty($tdoc "content" true)
 ## The editor will replace the following text area with its own widget.
 ## If JavaScript is disabled the user will still be able to edit the document using this HTML text area.
-##
 $xwiki.getTextArea($tdoc.content)
 #else
 #warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntaxId</em>.")

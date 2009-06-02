@@ -74,9 +74,10 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     private static final Command ENABLE = new Command("enable");
 
     /**
-     * This flag is needed in order to detect that a server request contains rich text area data.
+     * This flag tells the server that it needs to convert the editor output from HTML to the storage syntax before
+     * processing it.
      */
-    private static final String WYSIWYG_FLAG = "wysiwyg";
+    private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
 
     /**
      * The JavaScript object that catches the submit event and calls {@link #onSubmit()}. We couldn't use a FormPanel
@@ -124,8 +125,8 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
                 hiddenConfig = new HiddenConfig();
                 // All the parameters of this hidden configuration will be prefixed with the name of the hook.
                 hiddenConfig.setNameSpace(hook.getAttribute(NAME_ATTRIBUTE));
-                // This flag is needed in order to detect that a server request contains rich text area data.
-                hiddenConfig.addFlag(WYSIWYG_FLAG);
+                // This flag tells the server that the editor output requires HTML conversion.
+                hiddenConfig.addFlag(REQUIRES_HTML_CONVERSION);
                 // The storage syntax for this rich text area.
                 hiddenConfig.setParameter(SYNTAX, config.getParameter(SYNTAX, DEFAULT_SYNTAX));
 
@@ -251,9 +252,9 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     {
         if (hiddenConfig != null && sender == getTextArea().getCommandManager() && ENABLE.equals(command)) {
             if (getTextArea().getCommandManager().isExecuted(ENABLE)) {
-                hiddenConfig.addFlag(WYSIWYG_FLAG);
+                hiddenConfig.addFlag(REQUIRES_HTML_CONVERSION);
             } else {
-                hiddenConfig.removeFlag(WYSIWYG_FLAG);
+                hiddenConfig.removeFlag(REQUIRES_HTML_CONVERSION);
             }
         }
     }

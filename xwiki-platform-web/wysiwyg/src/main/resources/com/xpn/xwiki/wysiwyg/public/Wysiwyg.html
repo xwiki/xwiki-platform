@@ -3,7 +3,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-  <title>Wysiwyg Application</title>
+  <title>WYSIWYG Editor - Hosted Mode Demo</title>
   <meta name="gwt:property" content="locale=en" />
   <script type="text/javascript" src="/xwiki/resources/js/prototype/prototype.js"></script>
   <script type="text/javascript" src="/xwiki/bin/skin/resources/js/xwiki/xwiki.js"></script>
@@ -18,22 +18,18 @@
   <script type='text/javascript' src='/xwiki/bin/skin/resources/js/xwiki/xwikiexplorer/xwikiexplorer.js'></script>
   <script type="text/javascript" src="com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
 </head>
-<body>
-  <form id="edit" method="post" action="/xwiki/bin/view/Wysiwyg/Foo" >
-    <input type="submit" name="submit" value="Preview" />
-    <input type="button" value="Show HTML" onclick="alert(document.getElementById('content').value);"/>
-    <textarea id="content" name="content" rows="25" cols="80">foo bar</textarea>
-  </form>
-  <!------- Code for creating a WYSIWYG instance ------->
-  <script language="javascript">
-    // Global configuration.
+<body onload="onLoad();">
+  <textarea id="demo" rows="25" cols="80"></textarea>
+  <script type="text/javascript">
+    // Configure the GWT module.
     var Wysiwyg = {
       xwikiservice: '/xwiki/XWikiService',
       wysiwygServiceURL: '/xwiki/WysiwygService'
     };
-    // Instance configuration.
-    var WysiwygConfigurations = [{hookId: 'content', debug: true}];
+    function onLoad() {
+        // Create a new editor instance.
+        new WysiwygEditor({hookId: 'demo', debug: true});
+    }
   </script>
-  <!---------------------------------------------------->
 </body>
 </html>

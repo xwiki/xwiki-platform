@@ -83,7 +83,7 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
 
         FlowPanel panel = new FlowPanel();
         panel.setWidth("100%");
-        panel.add(editor.getRichTextEditor());
+        panel.add(editor.getUI());
 
         String width = "400px";
         String height = "220px";
@@ -144,7 +144,7 @@ public class WysiwygEditorDebugger extends Composite implements TimerListener
             }
         });
 
-        String syntax = editor.getConfig().getParameter("syntax");
+        String syntax = editor.getConfig().getParameter("syntax", WysiwygEditor.DEFAULT_SYNTAX);
         WysiwygService.Singleton.getInstance().fromHTML(currentHTML, syntax, new AsyncCallback<String>()
         {
             public void onFailure(Throwable caught)

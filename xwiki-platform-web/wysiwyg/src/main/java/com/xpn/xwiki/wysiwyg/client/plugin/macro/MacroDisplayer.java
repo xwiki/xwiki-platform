@@ -352,9 +352,8 @@ public class MacroDisplayer implements InnerHTMLListener
     {
         Element output = getOutput(container);
         boolean collapse = collapsed || output == null;
-        if (!collapse) {
-            // We know for sure the output is not null.
-            output.getStyle().setProperty(Style.DISPLAY, Display.BLOCK);
+        if (output != null) {
+            output.getStyle().setProperty(Style.DISPLAY, collapse ? Display.NONE : Display.BLOCK);
         }
 
         Element placeHolder = getPlaceHolder(container);

@@ -605,7 +605,9 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setParent(DocumentName parentName)
     {
-        this.parent = parentName.toString();
+        DocumentNameSerializer serializer =
+            (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class, "compact");
+        this.parent = serializer.serialize(parentName);
     }
 
     public String getFullName()
@@ -3154,10 +3156,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
-        String[] whereParams = { this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(), 
-            this.getSpace() };
- 
-        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";        
+        String[] whereParams =
+            {this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(), this.getSpace()};
+
+        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
         return context.getWiki().getStore().searchDocumentsNames(whereStatement, Arrays.asList(whereParams), context);
     }
 
@@ -3953,10 +3955,7 @@ public class XWikiDocument implements DocumentModelBridge
      * renaming algorithm takes into account the fact that there are several ways to write a link to a given page and
      * all those forms need to be renamed. For example the following links all point to the same page:
      * <ul>
-     * <li>[Page]</li>
-     * <li>[Page?param=1]</li>
-     * <li>[currentwiki:Page]</li>
-     * <li>[CurrentSpace.Page]</li>
+     * <li>[Page]</li> <li>[Page?param=1]</li> <li>[currentwiki:Page]</li> <li>[CurrentSpace.Page]</li>
      * </ul>
      * <p>
      * Note: links without a space are renamed with the space added.

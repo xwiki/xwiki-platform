@@ -89,7 +89,7 @@ public class DocumentName
     @Override
     public String toString()
     {
-        return getWiki() + ":" + getSpace() + "." + getPage();
+        return "wiki = [" + getWiki() + "], space = [" + getSpace() + "], page = [" + getPage() + "]";
     }
 
     /**

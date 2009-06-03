@@ -107,11 +107,9 @@ public class DocumentName
         } else if (obj instanceof DocumentName) {
             DocumentName documentName = (DocumentName) obj;
 
-            equals =
-                (documentName.getWiki() == null ? getWiki() == null : documentName.getWiki().equals(getWiki()))
-                    && (documentName.getSpace() == null ? getSpace() == null : documentName.getSpace().equals(
-                        getSpace()))
-                    && (documentName.getPage() == null ? getPage() == null : documentName.getPage().equals(getPage()));
+            equals = (documentName.getWiki() == null ? getWiki() == null : documentName.getWiki().equals(getWiki()))
+                && (documentName.getSpace() == null ? getSpace() == null : documentName.getSpace().equals(getSpace()))
+                && (documentName.getPage() == null ? getPage() == null : documentName.getPage().equals(getPage()));
         }
 
         return equals;

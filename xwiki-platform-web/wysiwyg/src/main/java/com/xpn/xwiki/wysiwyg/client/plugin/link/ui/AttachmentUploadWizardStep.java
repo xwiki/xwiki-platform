@@ -23,6 +23,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
 
 /**
@@ -36,6 +37,22 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
      * The configuration data about the link handled by this wizard step.
      */
     private LinkConfig linkData;
+
+    /**
+     * The resource currently edited by this wizard step, i.e. the currently edited wiki document.
+     */
+    private ResourceName editedResource;
+
+    /**
+     * Builds an attachment upload wizard step for the currently edited resource.
+     * 
+     * @param editedResource the resource currently edited by this wizard step, i.e. the currently edited wiki document
+     */
+    public AttachmentUploadWizardStep(ResourceName editedResource)
+    {
+        super();
+        this.editedResource = editedResource;
+    }
 
     /**
      * {@inheritDoc}
@@ -64,7 +81,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
 
     /**
      * {@inheritDoc}
-     */    
+     */
     @Override
     public String getPage()
     {
@@ -73,7 +90,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
 
     /**
      * {@inheritDoc}
-     */    
+     */
     @Override
     public String getSpace()
     {
@@ -96,7 +113,10 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     protected void onAttachmentUploaded(Attachment attach)
     {
         // commit the attachment data in the link config
-        linkData.setReference("attach:" + attach.getReference());
+        // commit relative reference
+        ResourceName ref = new ResourceName(attach.getReference(), true);
+        // FIXME: move the reference setting logic in a controller        
+        linkData.setReference("attach:" + ref.getRelativeTo(editedResource).toString());
         linkData.setUrl(attach.getDownloadUrl());
     }
 }

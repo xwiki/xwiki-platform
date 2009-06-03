@@ -113,6 +113,9 @@ public class InsertImageExecutable extends InsertHTMLExecutable
      */
     private void parseImageAttributes(Element img, ImageConfig config)
     {
+        // get the url of the image
+        String srcAttribute = img.getAttribute("src");
+        config.setImageURL(srcAttribute);
         String widthName = "width";
         String heightName = "height";
         String widthValue = img.getStyle().getProperty(widthName);

@@ -23,6 +23,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
 
 /**
@@ -36,6 +37,22 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
      * The image to configure with this {@code WizardStep}.
      */
     private ImageConfig imageData;
+
+    /**
+     * The resource currently edited by this wizard step, i.e. the currently edited wiki document.
+     */
+    private ResourceName editedResource;
+
+    /**
+     * Builds an image upload wizard step for the currently edited resource.
+     * 
+     * @param editedResource the resource currently edited by this wizard step, i.e. the currently edited wiki document
+     */
+    public ImageUploadWizardStep(ResourceName editedResource)
+    {
+        super();
+        this.editedResource = editedResource;
+    }
 
     /**
      * {@inheritDoc}
@@ -72,7 +89,8 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
     {
         // upload is done successfully, commit the data in the image config
         imageData.setImageURL(attach.getDownloadUrl());
-        imageData.setReference(attach.getReference());
+        ResourceName ref = new ResourceName(attach.getReference(), true);
+        imageData.setReference(ref.getRelativeTo(editedResource).toString());
     }
 
     /**

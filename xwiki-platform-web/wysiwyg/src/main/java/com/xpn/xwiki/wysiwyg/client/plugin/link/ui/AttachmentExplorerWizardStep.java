@@ -21,9 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
@@ -35,6 +35,11 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
  */
 public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
 {
+    /**
+     * The attachment prefix to use for attached files.
+     */
+    private static final String ATTACH_PREFIX = "attach:";
+
     /**
      * The currently edited resource (currently edited page).
      */
@@ -61,10 +66,8 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     {
         String reference = getData().getReference();
         if (!StringUtils.isEmpty(reference)) {
-            // resolve the reference of the edited link, relative to the edited resource
-            ResourceName r = new ResourceName();
-            r.fromString(reference, true);
-            getExplorer().setValue(r.resolveRelativeTo(editedResource).toString());
+            ResourceName r = new ResourceName(reference, true);
+            getExplorer().setValue(r.toString());
         }
         // else leave the selection where it was the last time
     }
@@ -111,36 +114,43 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
         if (StringUtils.isEmpty(attachment) && !getExplorer().isNewAttachment()) {
             Window.alert(Strings.INSTANCE.linkNoAttachmentSelectedError());
             async.onSuccess(false);
-        } else if (getExplorer().isNewAttachment()) {
-            // prepare the link config for the upload attachment step
-            getData().setWiki(getExplorer().getSelectedWiki());
-            getData().setSpace(getExplorer().getSelectedSpace());
-            getData().setPage(getExplorer().getSelectedPage());
-            async.onSuccess(true);
-        } else {
-            WysiwygService.Singleton.getInstance().getAttachment(getExplorer().getSelectedWiki(),
-                getExplorer().getSelectedSpace(), getExplorer().getSelectedPage(),
-                getExplorer().getSelectedAttachment(), new AsyncCallback<Attachment>()
-                {
-                    public void onSuccess(Attachment result)
+        } else if (StringUtils.isEmpty(getData().getReference())
+            || !getData().getReference().equals(ATTACH_PREFIX + getExplorer().getValue())) {
+            // commit changes only if reference was changed
+            if (getExplorer().isNewAttachment()) {
+                // prepare the link config for the upload attachment step
+                getData().setWiki(getExplorer().getSelectedWiki());
+                getData().setSpace(getExplorer().getSelectedSpace());
+                getData().setPage(getExplorer().getSelectedPage());
+                async.onSuccess(true);
+            } else {
+                // FIXME: move the reference setting logic in a controller, along with the async fetching
+                WysiwygService.Singleton.getInstance().getAttachment(getExplorer().getSelectedWiki(),
+                    getExplorer().getSelectedSpace(), getExplorer().getSelectedPage(),
+                    getExplorer().getSelectedAttachment(), new AsyncCallback<Attachment>()
                     {
-                        if (result == null) {
-                            // there was a problem with getting the attachment, call it a failure.
-                            Window.alert(Strings.INSTANCE.fileGetSubmitError());
-                            async.onSuccess(false);
-                        } else {
-                            getData().setReference("attach:" + result.getReference());
-                            getData().setUrl(result.getDownloadUrl());
-                            async.onSuccess(true);
+                        public void onSuccess(Attachment result)
+                        {
+                            if (result == null) {
+                                // there was a problem with getting the attachment, call it a failure.
+                                Window.alert(Strings.INSTANCE.fileGetSubmitError());
+                                async.onSuccess(false);
+                            } else {
+                                ResourceName ref = new ResourceName(result.getReference(), true);
+                                getData().setReference(ATTACH_PREFIX + ref.getRelativeTo(editedResource).toString());
+                                getData().setUrl(result.getDownloadUrl());
+                                async.onSuccess(true);
+                            }
                         }
-                    }
 
-                    public void onFailure(Throwable caught)
-                    {
-                        async.onFailure(caught);
-                    }
-                });
+                        public void onFailure(Throwable caught)
+                        {
+                            async.onFailure(caught);
+                        }
+                    });
+            }
+        } else {
+            async.onSuccess(true);
         }
     }
-
 }

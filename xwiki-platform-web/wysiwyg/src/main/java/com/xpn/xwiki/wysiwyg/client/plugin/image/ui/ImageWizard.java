@@ -92,7 +92,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
                     step = new ImageConfigWizardStep();
                     break;
                 case IMAGEUPLOAD:
-                    step = new ImageUploadWizardStep();
+                    step = new ImageUploadWizardStep(getEditedResource());
                     break;
                 default:
                     // nothing here, leave it null

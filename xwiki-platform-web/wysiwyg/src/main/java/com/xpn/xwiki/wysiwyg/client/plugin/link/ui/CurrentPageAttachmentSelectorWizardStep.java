@@ -157,8 +157,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     {
         String oldSelection = null;
         if (!StringUtils.isEmpty(getData().getReference())) {
-            ResourceName r = new ResourceName();
-            r.fromString(getData().getReference(), true);
+            ResourceName r = new ResourceName(getData().getReference(), true);
             oldSelection = r.getFile();
         } else if (attachmentsList.getSelectedItem() != null
             && !(attachmentsList.getSelectedItem().getWidget(0) instanceof NewAttachmentOptionWidget)) {
@@ -246,11 +245,23 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
             getData().setPage(editedResource.getPage());
             async.onSuccess(true);
         } else {
-            // existing file option, set up the LinkConfig
-            String attachmentRef = "attach:" + selectedOption.getAttachment().getReference();
-            String attachmentURL = selectedOption.getAttachment().getDownloadUrl();
-            getData().setReference(attachmentRef);
-            getData().setUrl(attachmentURL);
+            // check if attachment changed
+            boolean changedAttachment = true;
+            ResourceName editedAttach = new ResourceName(getData().getReference(), true);
+            if (!StringUtils.isEmpty(getData().getReference())
+                && editedAttach.getFile().equals(selectedOption.getAttachment().getFilename())) {
+                changedAttachment = false;
+            }
+            if (changedAttachment) {
+                // existing file option, set up the LinkConfig
+                // attachment reference has to be relative to the currently edited page
+                // FIXME: move the reference setting logic in a controller
+                ResourceName ref = new ResourceName(selectedOption.getAttachment().getReference(), true);
+                String attachmentRef = "attach:" + ref.getRelativeTo(editedResource).toString();
+                String attachmentURL = selectedOption.getAttachment().getDownloadUrl();
+                getData().setReference(attachmentRef);
+                getData().setUrl(attachmentURL);
+            }
             async.onSuccess(true);
         }
     }

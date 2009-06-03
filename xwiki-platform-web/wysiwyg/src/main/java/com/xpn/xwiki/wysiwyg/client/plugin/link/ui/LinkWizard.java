@@ -91,13 +91,13 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                     step = new WikipageExplorerWizardStep(getEditedResource());
                     break;
                 case WIKIPAGECREATOR:
-                    step = new CreateNewPageWizardStep();
+                    step = new CreateNewPageWizardStep(getEditedResource());
                     break;
                 case ATTACHMENT:
                     step = dispatchAttachmentSelectorStep();
                     break;
                 case ATTACHUPLOAD:
-                    step = new AttachmentUploadWizardStep();
+                    step = new AttachmentUploadWizardStep(getEditedResource());
                     break;
                 case WIKIPAGECONFIG:
                     step = new LinkConfigWizardStep();

@@ -101,6 +101,19 @@ public class ResourceName
     }
 
     /**
+     * Builds a resource from the passed string representation, interpreted as a file or not, as specified by the
+     * {@code asFile} parameter.
+     * 
+     * @param serialized the serialized form of the resource reference
+     * @param asFile {@code true} if the serialized form should be interpreted as a file, {@code false} otherwise.
+     */
+    public ResourceName(String serialized, boolean asFile)
+    {
+        this();
+        fromString(serialized, asFile);
+    }
+
+    /**
      * @return the wiki
      */
     public String getWiki()
@@ -198,7 +211,7 @@ public class ResourceName
                 }
                 strippedRef = reference.substring(reference.indexOf(':') + 1);
                 // parse the file name
-                strippedRef = parseFileName(strippedRef);                
+                strippedRef = parseFileName(strippedRef);
             }
             parseReference(strippedRef);
         }
@@ -323,6 +336,67 @@ public class ResourceName
         }
 
         return resolved;
+    }
+
+    /**
+     * Returns minimal representation of the current resource relative to the passed resource. E.g. {@code
+     * xwiki:Main.RecentChanges} relative to {@code xwiki:Main.WebHome} will be {@code RecentChanges}; {@code
+     * xwiki:XWiki.ClassSheet} relative to {@code xwiki:Main.WebHome} will be {@code XWiki.ClassSheet}. This resource is
+     * considered to be either fully specified, either relative to {@code resource}, so that any missing components are
+     * considered to be the components from {@code resource}.
+     * 
+     * @param resource the resource to which the relative resource is to be built
+     * @return the resource which represents this resource relative to the passed resource
+     */
+    public ResourceName getRelativeTo(ResourceName resource)
+    {
+        ResourceName relative = new ResourceName();
+        // flag if we started to put things in the relative resource, since we'd need to put everything from then on, to
+        // have a consistent resource name
+        boolean started = false;
+        // if it's not the same or the wiki of this resource is the default one and the one in the reference is
+        // unspecified
+        if (!isSameAs(wiki, (StringUtils.isEmpty(resource.getWiki())) ? DEFAULT_WIKI : resource.getWiki())) {
+            // there is a wiki specified in this resource and it's not the one in resource => keep it
+            started = true;
+            relative.setWiki(wiki);
+        }
+        if (!isSameAs(space, resource.getSpace()) || started) {
+            // there is a space specified in this resource and it's not the one in resource => set the one in this
+            // resource.
+            started = true;
+            // note that started = true and space empty should never happen because if space is empty all components are
+            // empty before space in this resource
+            relative.setSpace(space);
+        }
+        // set the page if it's not the same, we have started or the page is the last component to set, because the
+        // relative should not be empty
+        if (StringUtils.isEmpty(file) || started || !isSameAs(page, resource.getPage())) {
+            // there is a page specified in this resource and it's not the one in resource => set the one in this
+            // resource
+            started = true;
+            // note that started = true and page empty should never happen because if page is empty all components are
+            // empty before page in this resource
+            relative.setPage(page);
+        }
+
+        // always set the file if it exists, because the relative resource should not be empty
+        if (!StringUtils.isEmpty(file)) {
+            relative.setFile(file);
+        }
+        return relative;
+    }
+
+    /**
+     * @param component the component of the resource name to check if it's the same as the reference component. The
+     *            passed component is considered to be the same as the reference component if either it's empty or it's
+     *            specified and it's the same as {@code referenceComponent}.
+     * @param referenceComponent the reference component
+     * @return {@code true} if the component is relative to the reference component, {@code false} otherwise.
+     */
+    private boolean isSameAs(String component, String referenceComponent)
+    {
+        return StringUtils.isEmpty(component) || component.equals(referenceComponent);
     }
 
     /**

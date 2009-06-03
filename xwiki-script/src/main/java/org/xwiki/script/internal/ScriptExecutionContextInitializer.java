@@ -19,16 +19,12 @@
  */
 package org.xwiki.script.internal;
 
-import java.util.List;
-
 import javax.script.SimpleScriptContext;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializer;
 import org.xwiki.context.ExecutionContextException;
-import org.xwiki.script.ScriptContextInitializer;
+import org.xwiki.context.ExecutionContextInitializer;
 
 /**
  * Allow registering the Script Context in the Execution Context object since it's shared during the whole execution of
@@ -45,39 +41,12 @@ public class ScriptExecutionContextInitializer implements ExecutionContextInitia
     public static final String SCRIPT_CONTEXT_ID = "scriptContext";
 
     /**
-     * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
-     */
-    @Requirement(role = ScriptContextInitializer.class)
-    private List<ScriptContextInitializer> scriptContextInitializerList;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
      */
     public void initialize(ExecutionContext executionContext) throws ExecutionContextException
     {
-        SimpleScriptContext context = new SimpleScriptContext()
-        {
-            /**
-             * {@inheritDoc}
-             * 
-             * @see javax.script.SimpleScriptContext#setAttribute(java.lang.String, java.lang.Object, int)
-             */
-            @Override
-            public void setAttribute(String name, Object value, int scope)
-            {
-                // Make sure the xwiki context is not replaced by script context
-                if (value != this) {
-                    super.setAttribute(name, value, scope);
-                }
-            }
-        };
-
-        executionContext.setProperty(SCRIPT_CONTEXT_ID, context);
-
-        for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitializerList) {
-            scriptContextInitializer.initialize(context);
-        }
+        executionContext.setProperty(SCRIPT_CONTEXT_ID, new SimpleScriptContext());
     }
 }

@@ -128,6 +128,16 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     }
 
     /**
+     * Get the current ScriptContext and refresh it.
+     * 
+     * @return the script context.
+     */
+    protected ScriptContext getScriptContext()
+    {
+        return this.scriptContextManager.getScriptContext();
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#evaluate(java.lang.Object, java.lang.String,
@@ -150,20 +160,14 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
                 ScriptEngineManager sem = new ScriptEngineManager();
                 ScriptEngine engine = sem.getEngineByName(engineName);
                 if (engine != null) {
-                    ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
+                    ScriptContext scriptContext = getScriptContext();
 
                     StringWriter stringWriter = new StringWriter();
 
                     // set writer in script context
                     scriptContext.setWriter(stringWriter);
 
-                    if (engine instanceof Compilable) {
-                        CompiledScript compiledScript = getCompiledScript(content, (Compilable) engine);
-
-                        compiledScript.eval(scriptContext);
-                    } else {
-                        engine.eval(content, scriptContext);
-                    }
+                    eval(content, engine, scriptContext);
 
                     // remove writer script from context
                     scriptContext.setWriter(null);
@@ -181,6 +185,22 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
         }
 
         return scriptResult;
+    }
+
+    /**
+     * Execute the script.
+     * 
+     * @param content the script to be executed by the script engine
+     * @param engine the script engine
+     * @param scriptContext the script context
+     * @return The value returned from the execution of the script.
+     * @throws ScriptException if an error occurrs in script. ScriptEngines should create and throw
+     *             <code>ScriptException</code> wrappers for checked Exceptions thrown by underlying scripting
+     *             implementations.
+     */
+    protected Object eval(String content, ScriptEngine engine, ScriptContext scriptContext) throws ScriptException
+    {
+        return engine.eval(content, scriptContext);
     }
 
     /**

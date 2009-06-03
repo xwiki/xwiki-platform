@@ -21,6 +21,8 @@ package com.xpn.xwiki.render;
 
 import javax.script.ScriptContext;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
@@ -37,8 +39,10 @@ import com.xpn.xwiki.web.Utils;
  * 
  * @version $Id$
  */
+@Component("xwiki")
 public class XWikiScriptContextInitializer implements ScriptContextInitializer
 {
+    @Requirement
     private Execution execution;
 
     /**
@@ -50,35 +54,43 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
     {
         XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
 
-        // Put the Util API in the Script context.
-        scriptContext.setAttribute("util", new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext),
-            ScriptContext.ENGINE_SCOPE);
+        if (scriptContext.getAttribute("util") == null) {
+            // Put the Util API in the Script context.
+            scriptContext.setAttribute("util", new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext),
+                ScriptContext.ENGINE_SCOPE);
 
-        // We put the com.xpn.xwiki.api.XWiki object into the context and not the com.xpn.xwiki.XWiki one which is
-        // for internal use only. In this manner we control what the user can access.
-        scriptContext.setAttribute("xwiki", new XWiki(xcontext.getWiki(), xcontext), ScriptContext.ENGINE_SCOPE);
+            // We put the com.xpn.xwiki.api.XWiki object into the context and not the com.xpn.xwiki.XWiki one which is
+            // for internal use only. In this manner we control what the user can access.
+            scriptContext.setAttribute("xwiki", new XWiki(xcontext.getWiki(), xcontext), ScriptContext.ENGINE_SCOPE);
 
-        scriptContext.setAttribute("request", xcontext.getRequest(), ScriptContext.ENGINE_SCOPE);
-        scriptContext.setAttribute("response", xcontext.getResponse(), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("request", xcontext.getRequest(), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("response", xcontext.getResponse(), ScriptContext.ENGINE_SCOPE);
 
-        // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
-        // which is for internal use only. In this manner we control what the user can access.
-        scriptContext.setAttribute("context", new Context(xcontext), ScriptContext.ENGINE_SCOPE);
+            // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
+            // which is for internal use only. In this manner we control what the user can access.
+            scriptContext.setAttribute("context", new Context(xcontext), ScriptContext.ENGINE_SCOPE);
 
-        // Make the Syntax Factory component available from Script.
-        // TODO: We need to decide how we want to expose components in general and how to protect users from
-        // "dangerous" apis.
-        scriptContext
-            .setAttribute("syntaxFactory", Utils.getComponent(SyntaxFactory.class), ScriptContext.ENGINE_SCOPE);
+            // Make the Syntax Factory component available from Script.
+            // TODO: We need to decide how we want to expose components in general and how to protect users from
+            // "dangerous" apis.
+            scriptContext.setAttribute("syntaxFactory", Utils.getComponent(SyntaxFactory.class),
+                ScriptContext.ENGINE_SCOPE);
 
-        // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
-        // Script context there. However if we create a new Script context we need to populate it with
-        // the message tool. This needs to be refactored to be made clean.
-        Object msg = xcontext.get("msg");
-        if (msg != null) {
-            if (scriptContext.getAttribute("msg") == null) {
-                scriptContext.setAttribute("msg", msg, ScriptContext.ENGINE_SCOPE);
+            // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
+            // Script context there. However if we create a new Script context we need to populate it with
+            // the message tool. This needs to be refactored to be made clean.
+            Object msg = xcontext.get("msg");
+            if (msg != null) {
+                if (scriptContext.getAttribute("msg") == null) {
+                    scriptContext.setAttribute("msg", msg, ScriptContext.ENGINE_SCOPE);
+                }
             }
+        }
+
+        if (xcontext.getDoc() != null) {
+            scriptContext.setAttribute("doc", xcontext.getDoc().newDocument(xcontext), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("cdoc", scriptContext.getAttribute("doc"), ScriptContext.ENGINE_SCOPE);
+            scriptContext.setAttribute("tdoc", scriptContext.getAttribute("doc"), ScriptContext.ENGINE_SCOPE);
         }
     }
 }

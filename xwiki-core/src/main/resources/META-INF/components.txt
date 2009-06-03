@@ -1,6 +1,7 @@
 com.xpn.xwiki.internal.DefaultCoreConfiguration
 com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
+com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
 com.xpn.xwiki.doc.DefaultDocumentNameFactory
 com.xpn.xwiki.doc.DefaultDocumentNameSerializer

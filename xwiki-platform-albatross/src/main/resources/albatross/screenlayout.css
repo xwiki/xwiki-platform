@@ -993,7 +993,7 @@ div.pagelayoutoptions td{
   overflow: hidden;
 }
 
-#xwikieditcontent{
+#xwikieditcontent, .xwikitabpanescontainer {
   border: 2px solid #3381CC;
   padding: 3px 8px 3px 3px;
   overflow: auto;

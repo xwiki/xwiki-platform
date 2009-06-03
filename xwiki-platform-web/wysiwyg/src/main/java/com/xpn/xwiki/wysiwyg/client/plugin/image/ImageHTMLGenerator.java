@@ -71,8 +71,7 @@ public final class ImageHTMLGenerator
         imageHTML.append("\" alt=\"");
         String altText = imageConfig.getAltText();
         if (StringUtils.isEmpty(altText)) {
-            ResourceName r = new ResourceName();
-            r.fromString(imageConfig.getReference(), true);
+            ResourceName r = new ResourceName(imageConfig.getReference(), true);
             altText = r.getFile();
         }
         imageHTML.append(altText + "\" ");

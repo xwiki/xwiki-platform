@@ -32,6 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
@@ -59,10 +60,18 @@ public class CreateNewPageWizardStep implements WizardStep
     private LinkConfig linkData;
 
     /**
-     * Default constructor.
+     * The resource edited by this wizard step, i.e. the wikipage being edited right now
      */
-    public CreateNewPageWizardStep()
+    private ResourceName editedResource;
+
+    /**
+     * Creates a new wizard step for the passed edited resource.
+     * 
+     * @param editedResource the resource being edited by this wizard step
+     */
+    public CreateNewPageWizardStep(ResourceName editedResource)
     {
+        this.editedResource = editedResource;
         Label pageNameLabel = new Label(Strings.INSTANCE.linkNewPageLabel());
         mainPanel.addStyleName("xLinkToNewPage");
         mainPanel.add(pageNameLabel);
@@ -151,13 +160,16 @@ public class CreateNewPageWizardStep implements WizardStep
             async.onSuccess(false);
         } else {
             // call the server to get the page URL and reference
-            WysiwygService.Singleton.getInstance().getPageLink(linkData.getWiki(), linkData.getSpace(),
-                newPageName, null, null, new AsyncCallback<LinkConfig>()
+            // FIXME: move the reference setting logic in a controller, along with the async fetching logic
+            WysiwygService.Singleton.getInstance().getPageLink(linkData.getWiki(), linkData.getSpace(), newPageName,
+                null, null, new AsyncCallback<LinkConfig>()
                 {
                     public void onSuccess(LinkConfig result)
                     {
                         linkData.setUrl(result.getUrl());
-                        linkData.setReference(result.getReference());
+                        // set relative reference
+                        ResourceName ref = new ResourceName(result.getReference(), false);
+                        linkData.setReference(ref.getRelativeTo(editedResource).toString());
                         async.onSuccess(true);
                     }
 

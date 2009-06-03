@@ -75,8 +75,7 @@ public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardSte
         }
 
         // check if the edited attachment is in the current page
-        ResourceName resource = new ResourceName();
-        resource.fromString(getData().getReference(), true);
+        ResourceName resource = new ResourceName(getData().getReference(), true);
         // check match on current page
         return !resource.matchesUpToPage(getEditedResource());
     }

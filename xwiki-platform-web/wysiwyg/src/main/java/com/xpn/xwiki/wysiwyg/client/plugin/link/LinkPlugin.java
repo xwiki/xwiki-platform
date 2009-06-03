@@ -266,8 +266,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     {
         ImageConfig imgConfig = new ImageConfig();
         imgConfig.fromJSON(imageParam);
-        ResourceName imageResource = new ResourceName();
-        imageResource.fromString(imgConfig.getReference(), true);
+        ResourceName imageResource = new ResourceName(imgConfig.getReference(), true);
         linkConfig.setLabelText(imageResource.getFile());
         linkConfig.setReadOnlyLabel(true);
     }

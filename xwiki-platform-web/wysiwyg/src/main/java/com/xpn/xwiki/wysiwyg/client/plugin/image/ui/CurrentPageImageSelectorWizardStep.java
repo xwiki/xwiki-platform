@@ -82,6 +82,11 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     private ResourceName editedResource;
 
     /**
+     * The currentPage for which to show the images selector.
+     */
+    private ResourceName currentPage;
+
+    /**
      * The list of images.
      */
     private ListBox imageList = new ListBox();
@@ -92,18 +97,30 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     private boolean newOptionOnTop;
 
     /**
-     * Builds a selector from the images of the specified page.
+     * Builds a selector from the images of the specified current page to edit the specified resource.
      * 
-     * @param editedResource the currently edited resource (page for which editing is done)
+     * @param currentPage the page to currently show images for
+     * @param editedResource the currently edited resource (currentPage for which editing is done)
      */
-    public CurrentPageImageSelectorWizardStep(ResourceName editedResource)
+    public CurrentPageImageSelectorWizardStep(ResourceName currentPage, ResourceName editedResource)
     {
         this.editedResource = editedResource;
+        this.currentPage = currentPage;
         mainPanel.addStyleName("xImagesSelector");
         // create an empty images list
         mainPanel.add(imageList);
         // put the new image option on top
         newOptionOnTop = true;
+    }
+
+    /**
+     * Builds a selector from the images of the specified current page.
+     * 
+     * @param currentPage the currently edited page
+     */
+    public CurrentPageImageSelectorWizardStep(ResourceName currentPage)
+    {
+        this(currentPage, currentPage);
     }
 
     /**
@@ -132,8 +149,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
      */
     private void refreshAttachmentsList(final AsyncCallback< ? > cb)
     {
-        WysiwygService.Singleton.getInstance().getImageAttachments(editedResource.getWiki(), editedResource.getSpace(),
-            editedResource.getPage(), new AsyncCallback<List<Attachment>>()
+        WysiwygService.Singleton.getInstance().getImageAttachments(currentPage.getWiki(), currentPage.getSpace(),
+            currentPage.getPage(), new AsyncCallback<List<Attachment>>()
             {
                 public void onSuccess(List<Attachment> result)
                 {
@@ -157,8 +174,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     {
         String oldSelection = null;
         if (!StringUtils.isEmpty(getData().getReference())) {
-            ResourceName r = new ResourceName();
-            r.fromString(getData().getReference(), true);
+            ResourceName r = new ResourceName(getData().getReference(), true);
             oldSelection = r.getFile();
         } else if (imageList.getSelectedItem() != null
             && !(imageList.getSelectedItem().getWidget(0) instanceof NewImageOptionWidget)) {
@@ -245,14 +261,26 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         }
         if (selectedOption instanceof NewImageOptionWidget) {
             // new image option, let's setup the image data accordingly, to be handled by the file upload step
-            getData().setWiki(editedResource.getWiki());
-            getData().setSpace(editedResource.getSpace());
-            getData().setPage(editedResource.getPage());
+            getData().setWiki(currentPage.getWiki());
+            getData().setSpace(currentPage.getSpace());
+            getData().setPage(currentPage.getPage());
             async.onSuccess(true);
         } else {
-            // existing file option, set up the ImageConfig
-            getData().setReference(selectedOption.getAttachment().getReference());
-            getData().setImageURL(selectedOption.getAttachment().getDownloadUrl());
+            // check if attachment changed
+            boolean changedFile = true;
+            ResourceName editedFile = new ResourceName(getData().getReference(), true);
+            if (!StringUtils.isEmpty(getData().getReference())
+                && editedFile.getFile().equals(selectedOption.getAttachment().getFilename())) {
+                changedFile = false;
+            }
+            if (changedFile) {
+                // existing file option, set up the ImageConfig
+                // image reference has to be relative to the currently edited currentPage
+                // FIXME: move the reference setting logic in a controller
+                ResourceName ref = new ResourceName(selectedOption.getAttachment().getReference(), true);
+                getData().setReference(ref.getRelativeTo(editedResource).toString());
+                getData().setImageURL(selectedOption.getAttachment().getDownloadUrl());
+            }
             async.onSuccess(true);
         }
     }

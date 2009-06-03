@@ -330,7 +330,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      */
     protected void initAndDisplayCurrentPage(ResourceName resource)
     {
-        pageWizardStep = new CurrentPageImageSelectorWizardStep(resource);
+        pageWizardStep = new CurrentPageImageSelectorWizardStep(resource, editedResource);
         if (mainPanel.getWidgetCount() > 1) {
             mainPanel.remove(1);
         }
@@ -386,8 +386,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         if (!StringUtils.isEmpty(getData().getReference()) || pageWizardStep == null) {
             // if it's the first display (i.e. no pageWizardStep) or an image needs to be edited, refresh selectors and
             // page list
-            ResourceName r = new ResourceName();
-            r.fromString(getData().getReference(), true);
+            ResourceName r = new ResourceName(getData().getReference(), true);
             ResourceName resolved = r.resolveRelativeTo(editedResource);
             setSelection(resolved.getWiki(), resolved.getSpace(), resolved.getPage(), resolved.getFile(), true);
         } else {

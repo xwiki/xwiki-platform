@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
@@ -31,6 +32,7 @@ import org.jmock.Mock;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -40,6 +42,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -69,6 +72,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiVersioningStore;
 
     private Mock mockXWikiStoreInterface;
+
+    private Mock mockXWikiMessageTool;
 
     private BaseClass baseClass;
 
@@ -103,6 +108,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
+        this.mockXWikiMessageTool =
+            mock(XWikiMessageTool.class, new Class[] {ResourceBundle.class, XWikiContext.class}, new Object[] {null,
+            getContext()});
+        this.mockXWikiMessageTool.stubs().method("get").will(returnValue("message"));
+
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
@@ -110,6 +120,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        getContext().put("msg", this.mockXWikiMessageTool.proxy());
 
         this.baseClass = this.document.getxWikiClass();
         this.baseClass.addTextField("string", "String", 30);
@@ -688,5 +699,34 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface.stubs().method("loadXWikiDoc").will(returnValue(this.translatedDocument));
 
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
+    }
+
+    public void testRename() throws XWikiException
+    {
+        XWikiDocument doc1 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page1");
+        doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[" + DOCSPACE + "." + DOCNAME + "]] [["
+            + DOCNAME + "]]");
+        doc1.setSyntaxId("xwiki/2.0");
+        XWikiDocument doc2 = new XWikiDocument("newwikiname", DOCSPACE, "Page2");
+        doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
+        doc2.setSyntaxId("xwiki/2.0");
+        XWikiDocument doc3 = new XWikiDocument("newwikiname", "newspace", "Page3");
+        doc3.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
+        doc3.setSyntaxId("xwiki/2.0");
+
+        this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
+        this.mockXWiki.stubs().method("getDocument").with(eq("1"), ANYTHING).will(returnValue(doc1));
+        this.mockXWiki.stubs().method("getDocument").with(eq("2"), ANYTHING).will(returnValue(doc2));
+        this.mockXWiki.stubs().method("getDocument").with(eq("3"), ANYTHING).will(returnValue(doc3));
+        this.mockXWiki.stubs().method("saveDocument").isVoid();
+        this.mockXWiki.stubs().method("deleteDocument").isVoid();
+
+        this.document.rename("newwikiname:newspace.newpage", Arrays.asList("1", "2", "3"), getContext());
+
+        assertEquals(
+            "[[newwikiname:newspace.newpage]] [[newwikiname:newspace.newpage]] [[newwikiname:newspace.newpage]]", doc1
+                .getContent());
+        assertEquals("[[newspace.newpage]]", doc2.getContent());
+        assertEquals("[[newspace.newpage]]", doc3.getContent());
     }
 }

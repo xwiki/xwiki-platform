@@ -605,9 +605,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setParent(DocumentName parentName)
     {
-    	DocumentNameSerializer serializer = 
-    		(DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class, "compact");
-        this.parent = serializer.serialize(parentName);
+    	this.parent = compactDocumentNameSerializer.serialize(parentName);
     }
 
     public String getFullName()

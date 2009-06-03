@@ -507,6 +507,11 @@ public class XWikiDocument implements DocumentModelBridge
         this.xdom = null;
     }
 
+    public void setContent(XDOM content) throws XWikiException
+    {
+        setContent(renderXDOM(content, getSyntaxId()));
+    }
+
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
         // Note: We are currently duplicating code from the other getRendered signature since there are
@@ -3154,10 +3159,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
-        String[] whereParams = { this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(), 
-            this.getSpace() };
- 
-        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";        
+        String[] whereParams =
+            {this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(), this.getSpace()};
+
+        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
         return context.getWiki().getStore().searchDocumentsNames(whereStatement, Arrays.asList(whereParams), context);
     }
 
@@ -3987,6 +3992,11 @@ public class XWikiDocument implements DocumentModelBridge
         Link oldLink = new LinkParser().parse(getFullName());
         Link newLink = new LinkParser().parse(newDocumentName);
 
+        // Get the full unique form of the ol and new document names to easily compare them with links references in
+        // XDOM
+        DocumentName oldDocName = getDocumentName();
+        DocumentName newDocName = this.documentNameFactory.createDocumentName(newDocumentName);
+
         // Verify if the user is trying to rename to the same name... In that case, simply exits
         // for efficiency.
         if (linkHandler.compare(newLink, oldLink)) {
@@ -4005,15 +4015,20 @@ public class XWikiDocument implements DocumentModelBridge
         for (String backlinkDocumentName : backlinkDocumentNames) {
             XWikiDocument backlinkDocument = context.getWiki().getDocument(backlinkDocumentName, context);
 
-            // Note: Here we cannot do a simple search/replace as there are several ways to point
-            // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
-            // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
-            // to recognize them and do the replace.
-            ReplacementResultCollection result =
-                documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
-                    getSpace());
+            if (backlinkDocument.is10Syntax()) {
+                // Note: Here we cannot do a simple search/replace as there are several ways to point
+                // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
+                // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
+                // to recognize them and do the replace.
+                ReplacementResultCollection result =
+                    documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
+                        getSpace());
 
-            backlinkDocument.setContent((String) result.getModifiedContent());
+                backlinkDocument.setContent((String) result.getModifiedContent());
+            } else {
+                backlinkDocument.refactorDocumentLinks(oldDocName, newDocName, context);
+            }
+
             context.getWiki().saveDocument(backlinkDocument,
                 context.getMessageTool().get("core.comment.renameLink", Arrays.asList(new String[] {newDocumentName})),
                 true, context);
@@ -4025,6 +4040,38 @@ public class XWikiDocument implements DocumentModelBridge
         // Step 4: The current document needs to point to the renamed document as otherwise it's
         // pointing to an invalid XWikiDocument object as it's been deleted...
         clone(context.getWiki().getDocument(newDocumentName, context));
+    }
+
+    private void refactorDocumentLinks(DocumentName oldDocumentName, DocumentName newDocumentName, XWikiContext context)
+        throws XWikiException
+    {
+        String contextWiki = context.getDatabase();
+        XWikiDocument contextDoc = context.getDoc();
+
+        try {
+            context.setDatabase(getDatabase());
+            context.setDoc(this);
+
+            XDOM xdom = getXDOM();
+
+            List<LinkBlock> linkBlockList = xdom.getChildrenByType(LinkBlock.class, true);
+
+            for (LinkBlock linkBlock : linkBlockList) {
+                org.xwiki.rendering.listener.Link link = linkBlock.getLink();
+                if (link.getType() == LinkType.DOCUMENT) {
+                    DocumentName documentName = this.documentNameFactory.createDocumentName(link.getReference());
+
+                    if (documentName.equals(oldDocumentName)) {
+                        link.setReference(this.compactDocumentNameSerializer.serialize(newDocumentName));
+                    }
+                }
+            }
+
+            setContent(xdom);
+        } finally {
+            context.setDatabase(contextWiki);
+            context.setDoc(contextDoc);
+        }
     }
 
     public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException

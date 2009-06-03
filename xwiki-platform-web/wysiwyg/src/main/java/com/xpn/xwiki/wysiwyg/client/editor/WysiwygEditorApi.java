@@ -41,6 +41,16 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 public class WysiwygEditorApi
 {
     /**
+     * The configuration parameter which identifies the hook element.
+     */
+    public static final String HOOK_ID = "hookId";
+
+    /**
+     * The attribute of the hook element where the editor saves its value.
+     */
+    public static final String VALUE = "value";
+
+    /**
      * The underlying {@link WysiwygEditor} which is exposed in native JavaScript code.
      */
     private WysiwygEditor editor;
@@ -59,7 +69,7 @@ public class WysiwygEditorApi
         Config config = new DefaultConfig(jsConfig);
 
         // Get the element that will be replaced by the WYSIWYG editor.
-        Element hook = DOM.getElementById(config.getParameter("hookId"));
+        Element hook = DOM.getElementById(config.getParameter(HOOK_ID));
         if (hook == null) {
             return;
         }
@@ -131,18 +141,19 @@ public class WysiwygEditorApi
      */
     public void getSourceText(JavaScriptObject onSuccess, JavaScriptObject onFailure)
     {
+        Element hook = DOM.getElementById(editor.getConfig().getParameter(HOOK_ID));
         NativeAsyncCallback<String> callback = new NativeAsyncCallback<String>(onSuccess, onFailure);
         if (editor.getRichTextEditor().getTextArea().isEnabled()) {
             // We have to convert the HTML of the rich text area to source text.
             // Notify the plug-ins that the content of the rich text area is about to be submitted.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(new Command("submit"));
-            // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
+            // At this point we should have the HTML, adjusted by plug-ins, in the value property of the hook element.
             // Make the request to convert the HTML to source text.
-            WysiwygService.Singleton.getInstance().fromHTML(editor.getPlainTextEditor().getTextArea().getText(),
+            WysiwygService.Singleton.getInstance().fromHTML(hook.getPropertyString(VALUE),
                 editor.getConfig().getParameter("syntax", WysiwygEditor.DEFAULT_SYNTAX), callback);
         } else {
-            // We take the source text from the plain text area.
-            callback.onSuccess(editor.getPlainTextEditor().getTextArea().getText());
+            // We take the source text from the value property of the hook element.
+            callback.onSuccess(hook.getPropertyString(VALUE));
         }
     }
 

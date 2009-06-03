@@ -1,4 +1,5 @@
-.gwt-TabBar {
+table.gwt-TabBar {
+  margin: 0;
 }
 
 .gwt-TabBar .gwt-TabBarFirst {

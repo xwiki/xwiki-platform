@@ -201,7 +201,8 @@
     </module>
 
     <module name="LineLength">
-      <property name="ignorePattern" value="(@version|@see|@link|^import)"/>
+      <!-- @(\w+\.)+\w+::\w+\( stands for JSNI method calls: @my.package.MyClass::myMethod() -->
+      <property name="ignorePattern" value="(@version|@see|@link|^import|@(\w+\.)+\w+::\w+\()"/>
       <property name="max" value="120"/>
     </module>
 

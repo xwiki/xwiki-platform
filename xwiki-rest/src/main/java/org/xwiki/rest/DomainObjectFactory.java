@@ -263,11 +263,11 @@ public class DomainObjectFactory
         pageSummary.setSyntax(doc.getSyntaxId());
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
-        if (parent != null) {
-            pageSummary.setParent(doc.getParent());
+        pageSummary.setParent(doc.getParent());        
+        // parentId must not be set if the parent document does not exist.
+        if (parent != null && !parent.isNew()) {
             pageSummary.setParentId(parent.getPrefixedFullName());
         } else {
-            pageSummary.setParent("");
             pageSummary.setParentId("");
         }
 

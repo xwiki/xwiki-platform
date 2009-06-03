@@ -91,7 +91,7 @@ public class PagesResource extends XWikiResource
 
                         if (parentFilter != null) {
                             String parentId = "";
-                            if (parent != null) {
+                            if (parent != null && !parent.isNew()) {
                                 parentId = parent.getPrefixedFullName();
                             }
                             add = parentFilter.matcher(parentId).matches();

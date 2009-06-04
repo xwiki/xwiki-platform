@@ -4740,7 +4740,8 @@ public class XWikiDocument implements DocumentModelBridge
             }
 
             // replace old current SectionBlock with new Blocks
-            header.getSection().getParent().replaceChild(blocks, header.getSection());
+            Block section = header.getSection();
+            section.getParent().replaceChild(blocks, section);
 
             // render back XDOM to document's content syntax
             content = renderXDOM(xdom, getSyntaxId());

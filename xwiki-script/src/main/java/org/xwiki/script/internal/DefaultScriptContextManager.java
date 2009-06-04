@@ -23,8 +23,6 @@ import java.util.List;
 
 import javax.script.ScriptContext;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.script.ScriptContextInitializer;
@@ -35,19 +33,16 @@ import org.xwiki.script.ScriptContextManager;
  * 
  * @version $Id$
  */
-@Component
 public class DefaultScriptContextManager extends AbstractLogEnabled implements ScriptContextManager
 {
     /**
      * Used to get and insert script context in current execution context.
      */
-    @Requirement
     private Execution execution;
 
     /**
      * The {@link ScriptContextInitializer} list used to initialize {@link ScriptContext}.
      */
-    @Requirement(role = ScriptContextInitializer.class)
     private List<ScriptContextInitializer> scriptContextInitializerList;
 
     /**

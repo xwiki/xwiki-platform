@@ -33,6 +33,10 @@
         <requirement>
           <role>org.xwiki.context.Execution</role>
         </requirement>
+        <requirement>
+          <role>org.xwiki.script.ScriptContextInitializer</role>
+          <field-name>scriptContextInitializerList</field-name>
+        </requirement>
       </requirements>
     </component>
     <component>
@@ -40,12 +44,6 @@
       <role-hint>scriptContext</role-hint>
       <implementation>org.xwiki.script.internal.ScriptExecutionContextInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.script.ScriptContextInitializer</role>
-          <field-name>scriptContextInitializerList</field-name>
-        </requirement>
-      </requirements>
     </component>
   </components>
 </component-set>

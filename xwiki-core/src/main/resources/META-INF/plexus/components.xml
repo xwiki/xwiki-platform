@@ -47,6 +47,17 @@
       </requirements>
     </component>
     <component>
+      <role>org.xwiki.script.ScriptContextInitializer</role>
+      <role-hint>xwiki</role-hint>
+      <implementation>com.xpn.xwiki.render.XWikiScriptContextInitializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.context.Execution</role>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
       <role>org.xwiki.bridge.DocumentAccessBridge</role>
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.doc.DefaultDocumentAccessBridge</implementation>

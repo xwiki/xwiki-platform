@@ -1,2 +1,1 @@
 com.xpn.xwiki.internal.DefaultCoreConfiguration
-com.xpn.xwiki.render.XWikiScriptContextInitializer

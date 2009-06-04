@@ -21,7 +21,6 @@ package org.xwiki.script.internal;
 
 import javax.script.SimpleScriptContext;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextInitializer;
@@ -32,7 +31,6 @@ import org.xwiki.context.ExecutionContextInitializer;
  * 
  * @version $Id$
  */
-@Component("scriptContext")
 public class ScriptExecutionContextInitializer implements ExecutionContextInitializer
 {
     /**

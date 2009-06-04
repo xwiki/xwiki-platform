@@ -53,7 +53,7 @@ public abstract class AbstractExecutable implements Executable
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return rta.getDocument().getSelection().getRangeCount() > 0;
+        return isSupported(rta) && rta.getDocument().getSelection().getRangeCount() > 0;
     }
 
     /**
@@ -73,6 +73,6 @@ public abstract class AbstractExecutable implements Executable
      */
     public boolean isSupported(RichTextArea rta)
     {
-        return rta.getDocument() != null;
+        return rta.isAttached() && rta.getDocument() != null;
     }
 }

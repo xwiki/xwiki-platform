@@ -9,7 +9,7 @@
 #set($viewUrl = $doc.getURL("view"))
 #set($userObj = $!crtUserDoc.getObject("XWiki.XWikiUsers",0))
 ## TODO : replace this list by a hidden space feature.
-#set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki"])
+#set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch"])
 ## =====================================================================================
 ## Advanced users are:
 ## - super admin

@@ -91,7 +91,14 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
     public final native Object remove(String key)
     /*-{
         var value = this[key];
-        delete this[key];
+        try {
+            delete this[key];
+        } catch (e) {
+            // In IE 6 and 7, removing any dynamic property from a DOM instance, interface objects, or interface
+            // prototype objects with the delete operator causes a script error; IE 8 properly removes the dynamic
+            // property.
+            this[key] = undefined;
+        }
         return value;
     }-*/;
 

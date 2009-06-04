@@ -87,4 +87,18 @@ public class JavaScriptObjectTest extends AbstractDOMTest
         assertSame(bob, object.remove(owner));
         assertEquals(0, object.getKeys().length());
     }
+
+    /**
+     * Unit test for {@link JavaScriptObject#remove(String)} when the target JavaScript object is the window.
+     */
+    public void testRemoveOnWindow()
+    {
+        Window window = Window.get();
+        String city = "city";
+        String paris = "Paris";
+        window.set(city, paris);
+        assertEquals(paris, window.get(city));
+        assertEquals(paris, window.remove(city));
+        assertNull(window.get(city));
+    }
 }

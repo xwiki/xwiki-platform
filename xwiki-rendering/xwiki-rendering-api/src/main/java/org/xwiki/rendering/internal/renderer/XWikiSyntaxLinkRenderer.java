@@ -33,7 +33,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class XWikiSyntaxLinkRenderer
 {
-    XWikiParametersPrinter parametersPrinter = new XWikiParametersPrinter();
+    ParametersPrinter parametersPrinter = new ParametersPrinter();
 
     public String renderLinkReference(Link link)
     {
@@ -82,7 +82,7 @@ public class XWikiSyntaxLinkRenderer
         // If there were parameters specified, output them separated by the "||" characters
         if (!parameters.isEmpty()) {
             printer.print("||");
-            printer.print(this.parametersPrinter.print(parameters));
+            printer.print(this.parametersPrinter.print(parameters, '~'));
         }
 
         if (!isFreeStandingURI || (isFreeStandingURI && !parameters.isEmpty())) {

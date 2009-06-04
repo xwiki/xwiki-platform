@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class XWikiMacroPrinter
 {
-    private XWikiParametersPrinter parametersPrinter = new XWikiParametersPrinter();
+    private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
     public String print(String name, Map<String, String> parameters, String content)
     {
@@ -59,6 +59,6 @@ public class XWikiMacroPrinter
 
     public String printParameters(Map<String, String> parameters)
     {
-        return this.parametersPrinter.print(parameters);
+        return this.parametersPrinter.print(parameters, '~');
     }
 }

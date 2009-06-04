@@ -99,8 +99,15 @@
 </property>
 <property>
 <code>ol.tagCloud { 
+  text-align: justify; 
+  text-justify: auto;
+  /* Overriding of toucan value */ 
+  margin: 0;
+}
+
+div#dashboardleft ol.tagCloud { 
+  /* We re-set this value here on purpose so that uses of the cloud outside of the dashboard are not affected */
   margin: 0.5em;
-  text-align: justify; text-justify: auto; 
 }
 
 ol.tagCloud li { 

@@ -82,6 +82,7 @@ public class ResourceName
      */
     public ResourceName()
     {
+        this(null, null, null, null);
     }
 
     /**
@@ -109,7 +110,6 @@ public class ResourceName
      */
     public ResourceName(String serialized, boolean asFile)
     {
-        this();
         fromString(serialized, asFile);
     }
 

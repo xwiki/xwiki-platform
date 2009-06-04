@@ -79,12 +79,23 @@ public interface Block extends Cloneable
     void insertChildAfter(Block blockToInsert, Block previousBlock);
 
     /**
-     * Replaces the current block with the list of passed blocks.
+     * Replaces an existing children block with the passed new block. 
+     * Also sets the new block's parent to be the current block.
      * 
-     * @param newBlocks the new blocks to replace the current block with
+     * @param newBlock the new block to replace the old block with
+     * @param oldBlock the block to replace with the new block
      */
-    void replace(List<Block> newBlocks);
+    void replaceChild(Block newBlock, Block oldBlock);
 
+    /**
+     * Replaces an existing children block with the passed new blocks. 
+     * Also sets the new block's parents to be the current block.
+     * 
+     * @param newBlocks the new blocks to replace the old block with
+     * @param oldBlock the block to replace with the new blocks
+     */
+    void replaceChild(List<Block> newBlocks, Block oldBlock);
+    
     /**
      * Get the parent block. All blocks have a parent and the top level parent is the {@link XDOM} object.
      * 

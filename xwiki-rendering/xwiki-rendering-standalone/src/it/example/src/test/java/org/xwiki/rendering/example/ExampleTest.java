@@ -86,10 +86,9 @@ public class ExampleTest
         
         // Find all links and make them italic
         for (LinkBlock block : xdom.getChildrenByType(LinkBlock.class, true)) {
-            // Note: in XWiki Core 2.0 the API has been improved and there's no need to clone the
-            // block anymore and the replace() API has been modified.
-            Block newBlock = new FormatBlock(Collections.<Block>singletonList(block.clone()), Format.ITALIC);
-            block.replace(Collections.<Block>singletonList(newBlock));
+            Block parentBlock = block.getParent();
+            Block newBlock = new FormatBlock(Collections.<Block>singletonList(block), Format.ITALIC);
+            parentBlock.replaceChild(newBlock, block);
         }
         
         // Generate XWiki 2.0 Syntax for example

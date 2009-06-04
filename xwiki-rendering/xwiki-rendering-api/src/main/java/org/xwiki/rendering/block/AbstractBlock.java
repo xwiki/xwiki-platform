@@ -130,17 +130,27 @@ public abstract class AbstractBlock implements Block
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.Block#replace(Block)
+     * @see org.xwiki.rendering.block.Block#replaceChild(Block, Block)
      */
-    public void replace(List<Block> newBlocks)
+    public void replaceChild(Block newBlock, Block oldBlock)
     {
-        List<Block> blocks = getParent().getChildren();
-        int pos = blocks.indexOf(this);
+        replaceChild(Collections.singletonList(newBlock), oldBlock);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#replaceChild(List, Block)
+     */
+    public void replaceChild(List<Block> newBlocks, Block oldBlock)
+    {
+        List<Block> blocks = getChildren();
+        int pos = blocks.indexOf(oldBlock);
         for (Block block : newBlocks) {
-            block.setParent(getParent());
+            block.setParent(this);
         }
         blocks.addAll(pos, newBlocks);
-        blocks.remove(pos + newBlocks.size());
+        blocks.remove(pos + 1);
     }
 
     /**

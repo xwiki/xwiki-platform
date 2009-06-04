@@ -4716,7 +4716,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Update a section content in document.
      * 
-     * @param sectionNumber the index (+1) of the section in the list of all sections in the document.
+     * @param sectionNumber the index (starting at 1) of the section in the list of all sections in the document.
      * @param newSectionContent the new section content.
      * @return the new document content.
      * @throws XWikiException error when updating content
@@ -4740,7 +4740,7 @@ public class XWikiDocument implements DocumentModelBridge
             }
 
             // replace old current SectionBlock with new Blocks
-            header.getSection().replace(blocks);
+            header.getSection().getParent().replaceChild(blocks, header.getSection());
 
             // render back XDOM to document's content syntax
             content = renderXDOM(xdom, getSyntaxId());

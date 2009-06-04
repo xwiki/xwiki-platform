@@ -21,7 +21,6 @@ package org.xwiki.rendering.block;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -101,13 +100,11 @@ public class BlockTest extends TestCase
         Block wb = new WordBlock("block");
         Block parentBlock = new ParagraphBlock(Arrays.asList(wb));
 
-        Block newBlock1 = new WordBlock("block1");
-        Block newBlock2 = new WordBlock("block2");
-        wb.replace(Arrays.asList(newBlock1, newBlock2));
+        Block newBlock = new WordBlock("newblock");
+        parentBlock.replaceChild(newBlock, wb);
 
-        assertEquals(2, parentBlock.getChildren().size());
-        assertSame(newBlock1, parentBlock.getChildren().get(0));
-        assertSame(newBlock2, parentBlock.getChildren().get(1));
+        assertEquals(1, parentBlock.getChildren().size());
+        assertSame(newBlock, parentBlock.getChildren().get(0));
     }
 
     public void testClone()

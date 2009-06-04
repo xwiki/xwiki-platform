@@ -558,7 +558,7 @@ isc.XWESpaceDataSource.addMethods({
         // pages without parent or with a parent outside of the current space.
         this.transformRequest = function (dsRequest) {
             var prefixedSpace = this.wiki + XWiki.constants.wikiSpaceSeparator + this.space;
-            if (dsRequest.originalData.parentId == prefixedSpace) {
+            if (dsRequest.originalData.parentId == prefixedSpace || dsRequest.originalData.parentId == null) {
                 dsRequest.originalData.parentId = "^(?!" + prefixedSpace + "\.).*$";
             }
             return this.Super("transformRequest", arguments);
@@ -872,15 +872,17 @@ isc.XWETreeGrid.addMethods({
             }
         }
 
-        // Unselect previously selected node if space differs.
-        if (resource.space != selectedRes.space) {
-            this.deselectRecord(this.getSelectedRecord());
-        }
+        if (this.getDataSource().recordsType == "wiki" || this.getDataSource().recordsType == "space") {
+            // Unselect previously selected node if space differs.
+            if (resource.space != selectedRes.space) {
+               this.deselectRecord(this.getSelectedRecord());
+            }
         
-        // Open space node.
-        var spaceNode = this.openNode(rt, resource.prefixedSpace, true);
-        if (spaceNode == null) {
-            return;
+            // Open space node.
+            var spaceNode = this.openNode(rt, resource.prefixedSpace, true);
+            if (spaceNode == null) {
+                return;
+            }
         }
         
 
@@ -993,7 +995,18 @@ isc.XWETreeGrid.addMethods({
             };
 
             this.getData().callbacks.dataArrived.push(daCallback);
-        }
+        }  else {
+          // If the suggest is not displayed, call openNodesFromInput once to take defaultValue into account
+          // by scrolling to the correct node in the tree.
+          var daCallback = {
+              treeId : this.getID(),
+              callback : function() {
+                  window[this.treeId].openNodesFromInput();
+              }
+          };
+
+          this.getData().callbacks.dataArrived.push(daCallback);
+      }
     },
 
     /**

@@ -200,7 +200,7 @@ isc.XWEResultTree.addMethods({
             }
 
             // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
-            if (parentDS.recordsType == "attachment" && this.displayAddAttachment == true) {
+            if (parentNode.isXWikiAttachment && this.displayAddAttachment == true) {
                 this.addAddAttachmentsNode(parentNode);
             }
         }

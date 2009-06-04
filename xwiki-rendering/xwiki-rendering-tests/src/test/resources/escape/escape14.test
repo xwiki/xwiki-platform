@@ -3,7 +3,7 @@
 .# Verify that quote characters in parameters values are escaped
 .# Verify that ending custom parameters syntax characters in parameters values are escaped
 .#---------------------------------------------------------------------------------------------------------
-(% style="font-(%weight: bold; ~%)font-family: \"monospace\"; font-size: 14pt;" %)
+(% style="font-(%weight: bold; ~%)font-family: ~"monospace~"; font-size: 14pt;" %)
 foobar
 .#-----------------------------------------------------
 .expect|event/1.0
@@ -20,7 +20,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-(% style="font-(%weight: bold; ~%)font-family: \"monospace\"; font-size: 14pt;" %)
+(% style="font-(%weight: bold; ~%)font-family: ~"monospace~"; font-size: 14pt;" %)
 foobar
 .#-----------------------------------------------------
 .input|xhtml/1.0

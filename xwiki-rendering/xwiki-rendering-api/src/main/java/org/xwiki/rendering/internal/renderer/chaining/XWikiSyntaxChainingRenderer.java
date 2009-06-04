@@ -775,9 +775,9 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
             if (key != null && value != null) {
                 // Escape quotes in value to not break parameter value syntax
-                value = value.replaceAll("[\\\\\"]", "\\\\$0");
+                value = value.replaceAll("[~\"]", "~$0");
                 // Escape ending custom parameters syntax
-                value = value.replaceAll("\\%\\)", "~%)");
+                value = value.replace("%)", "~%)");
                 parametersStr.append(' ').append(key).append('=').append('\"').append(value).append('\"');
             }
         }

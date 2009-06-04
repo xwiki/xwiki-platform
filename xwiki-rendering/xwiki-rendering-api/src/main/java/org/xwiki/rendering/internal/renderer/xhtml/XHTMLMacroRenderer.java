@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 
 import java.util.Map;
 
-import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
+import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
@@ -34,12 +34,7 @@ public class XHTMLMacroRenderer
 {
     private static final String SEPARATOR = "|-|";
 
-    private XWikiMacroPrinter macroPrinter;
-
-    public XHTMLMacroRenderer()
-    {
-        this.macroPrinter = new XWikiMacroPrinter();
-    }
+    private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
     public void render(XHTMLWikiPrinter printer, String name, Map<String, String> parameters, String content)
     {
@@ -57,7 +52,7 @@ public class XHTMLMacroRenderer
         // Print parameters
         buffer.append(SEPARATOR);
         if (!parameters.isEmpty()) {
-            buffer.append(this.macroPrinter.printParameters(parameters));
+            buffer.append(this.parametersPrinter.print(parameters, '\\'));
         }
 
         // Print content

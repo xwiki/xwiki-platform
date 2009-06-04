@@ -22,12 +22,12 @@ package org.xwiki.rendering.internal.renderer;
 import java.util.Map;
 
 /**
- * Generates XWiki Syntax for a parameters like macros and links.
+ * Generates syntax for a parameters group like macros and links.
  * 
  * @version $Id$
- * @since 1.9M2
+ * @since 1.9RC2
  */
-public class XWikiParametersPrinter
+public class ParametersPrinter
 {
     /**
      * Print parameters in a String.
@@ -35,7 +35,7 @@ public class XWikiParametersPrinter
      * @param parameters the parameters to print.
      * @return the printed parameters.
      */
-    public String print(Map<String, String> parameters)
+    public String print(Map<String, String> parameters, char escapeChar)
     {
         StringBuffer buffer = new StringBuffer();
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -47,8 +47,12 @@ public class XWikiParametersPrinter
                     buffer.append(' ');
                 }
 
-                buffer.append(entry.getKey()).append('=').append('\"').append(
-                    entry.getValue().replace("\\", "\\\\").replace("\"", "\\\"")).append('\"');
+                // escape the escaping character
+                value = value.replace(String.valueOf(escapeChar), String.valueOf(escapeChar) + escapeChar);
+                // escape quote
+                value = value.replace("\"", String.valueOf(escapeChar) + '"');
+
+                buffer.append(entry.getKey()).append('=').append('"').append(value).append('"');
             }
         }
 

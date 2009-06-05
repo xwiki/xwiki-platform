@@ -57,6 +57,7 @@ public class VelocityContextInitializerTest extends AbstractXWikiComponentTestCa
     {
         super.registerComponents();
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
     }
     
     /**

@@ -19,15 +19,12 @@
  */
 package org.xwiki.bridge;
 
-import org.xwiki.component.annotation.ComponentRole;
-
 /**
  * Represents a document name (wiki, space and page names).
  * 
  * @version $Id$
  * @since 1.8RC2
  */
-@ComponentRole
 public class DocumentName
 {
     /**

@@ -19,8 +19,6 @@
  */
 package org.xwiki.bridge;
 
-import org.xwiki.component.annotation.ComponentRole;
-
 /**
  * Exposes methods for accessing Documents. This is temporary until we remodel the Model classes and the Document
  * services. The implementation is actually the XWikiDocument class, so this is just a light interface that hides the
@@ -29,7 +27,6 @@ import org.xwiki.component.annotation.ComponentRole;
  * @version $Id$
  * @since 1.6M1
  */
-@ComponentRole
 public interface DocumentModelBridge
 {
     /**

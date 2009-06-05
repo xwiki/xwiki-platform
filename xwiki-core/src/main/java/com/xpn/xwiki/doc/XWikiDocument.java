@@ -146,6 +146,9 @@ public class XWikiDocument implements DocumentModelBridge
         Pattern.compile("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|"
             + "font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>");
 
+    /** Regex for finding the first level 1 or 2 heading in the document title, to be used as the document title. */
+    private static final Pattern HEADING_PATTERN_10 = Pattern.compile("^\\s*+1(?:\\.1)?\\s++(.++)$", Pattern.MULTILINE);
+
     public static final String XWIKI10_SYNTAXID = "xwiki/1.0";
 
     public static final String XWIKI20_SYNTAXID = "xwiki/2.0";
@@ -731,24 +734,9 @@ public class XWikiDocument implements DocumentModelBridge
     public String extractTitle10()
     {
         String content = getContent();
-        int i1 = 0;
-        int i2;
-
-        while (true) {
-            i2 = content.indexOf("\n", i1);
-            String title = "";
-            if (i2 != -1) {
-                title = content.substring(i1, i2).trim();
-            } else {
-                title = content.substring(i1).trim();
-            }
-            if ((!title.equals("")) && (title.matches("1(\\.1)?\\s+.+"))) {
-                return title.substring(title.indexOf(" ")).trim();
-            }
-            if (i2 == -1) {
-                break;
-            }
-            i1 = i2 + 1;
+        Matcher m = HEADING_PATTERN_10.matcher(content);
+        if (m.find()) {
+            return m.group(1).trim();
         }
 
         return "";
@@ -3958,10 +3946,10 @@ public class XWikiDocument implements DocumentModelBridge
      * renaming algorithm takes into account the fact that there are several ways to write a link to a given page and
      * all those forms need to be renamed. For example the following links all point to the same page:
      * <ul>
-     * <li>[Page]</li>
-     * <li>[Page?param=1]</li>
-     * <li>[currentwiki:Page]</li>
-     * <li>[CurrentSpace.Page]</li>
+     *   <li>[Page]</li>
+     *   <li>[Page?param=1]</li>
+     *   <li>[currentwiki:Page]</li>
+     *   <li>[CurrentSpace.Page]</li>
      * </ul>
      * <p>
      * Note: links without a space are renamed with the space added.

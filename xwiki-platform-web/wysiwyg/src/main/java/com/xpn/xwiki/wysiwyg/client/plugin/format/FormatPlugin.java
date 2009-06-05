@@ -33,6 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.FormatBlockExecutable;
+import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.RemoveFormatExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -73,6 +74,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeListen
 
         // Register custom executables.
         getTextArea().getCommandManager().registerCommand(Command.FORMAT_BLOCK, new FormatBlockExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.REMOVE_FORMAT, new RemoveFormatExecutable());
 
         addFeature("removeformat", Command.REMOVE_FORMAT, Images.INSTANCE.removeFormat().createImage(),
             Strings.INSTANCE.removeFormat());

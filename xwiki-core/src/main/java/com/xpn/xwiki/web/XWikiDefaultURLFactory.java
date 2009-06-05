@@ -63,7 +63,16 @@ public abstract class XWikiDefaultURLFactory implements XWikiURLFactory {
         return context.getURL();
     }
 
-    public String getURL(URL url, XWikiContext context) {
+    /**
+     * Converts a URL to a string representation. It's up to the implementation to decide whether to perform
+     * transformations or not on the URL. For example some implementations will convert the URL to a relative URL
+     * if the URL is an internal XWiki URL.
+     *  
+     * @param url the URL to convert
+     * @return the converted URL as a string 
+     */
+    public String getURL(URL url, XWikiContext context)
+    {
         return url.toString();
     }
 }

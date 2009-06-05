@@ -434,8 +434,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     }
 
     /**
-     * {@inheritDoc}
+     * Converts a URL to a relative URL if it's a XWiki URL (keeping only the path + query string + anchor) and leave
+     * the URL unchanged if it's an external URL.
      * 
+     * @param url the URL to convert
+     * @return the converted URL as a string 
      * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -448,8 +451,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
             String surl = url.toString();
             if (!surl.startsWith(this.serverURL.toString())) {
+                // External URL: leave it as is.
                 return surl;
             } else {
+                // Internal XWiki URL: convert to relative.
                 StringBuffer sbuf = new StringBuffer(url.getPath());
                 String querystring = url.getQuery();
                 if ((querystring != null) && (!querystring.equals(""))) {

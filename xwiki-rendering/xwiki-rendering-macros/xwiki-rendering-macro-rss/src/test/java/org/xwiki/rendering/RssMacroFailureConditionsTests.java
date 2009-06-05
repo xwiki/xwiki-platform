@@ -12,7 +12,7 @@ import org.xwiki.rendering.macro.rss.RssMacroParameters;
 /**
  * Unit tests for {@link RssMacro}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.9
  */
 public class RssMacroFailureConditionsTests extends TestCase

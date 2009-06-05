@@ -36,7 +36,7 @@ import com.sun.syndication.io.XmlReader;
 /**
  * Auxiliary class which takes care of extracting the data from a RSS feed and providing it to the Rss macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.9
  */
 public class FeedReader

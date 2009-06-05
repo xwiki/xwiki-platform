@@ -50,7 +50,6 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     public XWikiRadeoxRenderEngine(XWikiContext xwikiContext)
     {
-        // super();
         setXWikiContext(xwikiContext);
     }
 
@@ -99,7 +98,6 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
     public String noaccents(String name)
     {
-        // Util util = context.getUtil();
         return StringUtils.replace(Util.noaccents(name), " ", "");
     }
 
@@ -119,33 +117,25 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 getXWikiContext().setDatabase(db);
             }
 
-            XWikiDocument currentdoc = getXWikiContext().getDoc();
+            name = StringUtils.substringBefore(StringUtils.substringBefore(name, "?"), "#");
 
-            int qsIndex = name.indexOf("?");
-            if (qsIndex != -1) {
-                name = name.substring(0, qsIndex);
-            }
+            XWikiDocument doc = new XWikiDocument();
+            doc.setFullName(name);
 
-            // + is use for spaces
-            name = name.replaceAll("\\+", " ");
-            String newname = noaccents(name);
-            XWikiDocument doc = new XWikiDocument((currentdoc != null) ? currentdoc.getSpace() : "Main", newname);
-            boolean exists = getXWikiContext().getWiki().exists(doc.getFullName(), getXWikiContext());
-
-            // If the document exists with the spaces and accents converted then we use this one
-            if (exists) {
+            // If the document exists with the initial name, then we use this one
+            if (getXWikiContext().getWiki().exists(doc.getFullName(), getXWikiContext())) {
                 return true;
             }
 
-            // if the document does not exists then we check the one not converted
-            doc = new XWikiDocument((currentdoc != null) ? currentdoc.getSpace() : "Main", name);
-
+            // If the document does not exists then we check the one converted (no accents and no spaces)
+            doc.setFullName(noaccents(name));
             return getXWikiContext().getWiki().exists(doc.getFullName(), getXWikiContext());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to check if a document exists", e);
 
             return false;
         } finally {
+            // Reset the current wiki to the original one
             getXWikiContext().setDatabase(database);
         }
 
@@ -173,11 +163,6 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
      */
     public void appendLink(StringBuffer buffer, String name, String view, String anchor)
     {
-        // allow using spaces in links to anchors
-        if (anchor != null) {
-            anchor = anchor.replaceAll(" ", "+");
-        }
-
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor);
         } else {
@@ -202,29 +187,14 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
                 buffer.append("<span class=\"wikilink\"><a href=\"");
 
-                // + is use for spaces
-                // TODO: This causes problems with [C++ Examples]
-                name = name.replaceAll("\\+", " ");
-
                 // If the document exists with the conversion of spaces and accents
                 // then we use this one
                 XWikiDocument newdoc = new XWikiDocument();
-                String newname = noaccents(name);
-                if (name.indexOf(".") != -1) {
-                    newdoc.setFullName(name, context);
-                } else {
-                    newdoc.setSpace(context.getDoc().getSpace());
-                    newdoc.setName(name);
-                }
+                newdoc.setFullName(name, context);
 
-                // If the document does not exist, then we use the normal name as is
+                // If the document does not exist, then we use the cleaned name (no accents and no spaces)
                 if (!context.getWiki().exists(newdoc.getFullName(), context)) {
-                    if (newname.indexOf(".") != -1) {
-                        newdoc.setFullName(newname, context);
-                    } else {
-                        newdoc.setSpace(context.getDoc().getSpace());
-                        newdoc.setName(newname);
-                    }
+                    newdoc.setFullName(noaccents(name), context);
                 }
 
                 if ((db == null) || (database.equals(db))) {
@@ -253,12 +223,13 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     {
         // Add to backlinks in context object
         try {
+            @SuppressWarnings("unchecked")
             List<String> links = (List<String>) context.get("links");
             if (links == null) {
                 links = new ArrayList<String>();
                 context.put("links", links);
             }
-            // We restrict the number of bytes in the document name as:
+            // We restrict the number of bytes in the document name, since:
             // 1. It will throw an error on some DBMSs, as 255 is the column length
             // 2. Such a long document name is not likely to occur, since the same limit is
             // imposed on the document name length.
@@ -283,15 +254,15 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         appendLink(buffer, name, view, null);
     }
 
-    public void appendInternalLink(StringBuffer buffer, String view, String anchor)
+    public void appendInternalLink(StringBuffer buffer, String text, String anchor)
     {
         buffer.append("<span class=\"wikilink\"><a href=\"#");
-        buffer.append(anchor);
+        buffer.append(Util.encodeURI(anchor, getXWikiContext()));
         buffer.append("\">");
-        if (view.length() == 0) {
-            view = Util.decodeURI(anchor, getXWikiContext());
+        if (text.length() == 0) {
+            text = anchor;
         }
-        buffer.append(cleanText(view));
+        buffer.append(cleanText(text));
         buffer.append("</a></span>");
     }
 
@@ -315,41 +286,31 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                 context.setDatabase(db);
             }
 
+            StringBuilder querystring = new StringBuilder();
             int qsIndex = name.indexOf("?");
             if (qsIndex != -1) {
+                querystring.append(name.substring(qsIndex + 1));
                 name = name.substring(0, qsIndex);
             }
 
-            // + is used for spaces
-            name = name.replaceAll("\\+", " ");
-
             String newname = name;
             XWikiDocument newdoc = new XWikiDocument();
-            if (newname.indexOf(".") != -1) {
-                newdoc.setFullName(newname, context);
-            } else {
-                newdoc.setSpace(context.getDoc().getSpace());
-                newdoc.setName(newname);
-            }
+            newdoc.setFullName(newname, context);
 
-            String querystring = null;
             XWikiDocument currentdoc = context.getDoc();
             if (currentdoc != null) {
-                querystring = "parent=" + currentdoc.getFullName();
+                querystring.append(querystring.length() == 0 ? "" : "&amp;");
+                querystring.append("parent=").append(Util.encodeURI(currentdoc.getFullName(), context));
             }
 
             if ((db == null) || (database.equals(db))) {
+                // Backlinks computation
                 addLinkToContext(newdoc.getFullName(), context);
             }
 
-            String editor = context.getWiki().getEditorPreference(context);
-            if ((!editor.equals("") && (!editor.equals("text"))) && (!editor.equals("---"))) {
-                querystring += "&amp;editor=" + editor;
-            }
-
             URL url =
-                context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(), "edit", querystring, null,
-                    context);
+                context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(), "edit", querystring.toString(),
+                    null, context);
             String surl = context.getURLFactory().getURL(url, context);
             buffer.append("<a class=\"wikicreatelink\" href=\"");
             buffer.append(surl);

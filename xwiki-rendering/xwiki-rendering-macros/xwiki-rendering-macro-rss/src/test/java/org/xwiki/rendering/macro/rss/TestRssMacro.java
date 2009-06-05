@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.rss;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -36,7 +35,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.8RC1
  */
-@Component("testrssmacro")
+@Component("testrss")
 public class TestRssMacro extends RssMacro
 {
     /**
@@ -47,27 +46,13 @@ public class TestRssMacro extends RssMacro
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        RssMacroParameters rssParameters = new RssMacroParameters();
-        rssParameters.setContent(true);
-        rssParameters.setCount(2);
-        rssParameters.setImage(true);
-        
-        URL feedURL = getClass().getResource("/feed.xml");
-        try {
-            rssParameters.setFeed(feedURL.toString());
-        } catch (MalformedURLException e) {
-            throw new MacroExecutionException(e.getMessage());
-        }
-
-        return super.execute(rssParameters, content, context);
-    }
-
-    /** 
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
-     */
-    public boolean supportsInlineMode()
-    {
-        return false;
+        // Adjust the feedURL parameter as necessary.
+        String feedParam = parameters.getFeed();
+        if (feedParam != null && feedParam.startsWith("file://")) {
+            String localFile = feedParam.substring(feedParam.lastIndexOf("/"));
+            URL feedURL = getClass().getResource(localFile);
+            parameters.setFeed(feedURL.toString());
+        }        
+        return super.execute(parameters, content, context);        
     }
 }

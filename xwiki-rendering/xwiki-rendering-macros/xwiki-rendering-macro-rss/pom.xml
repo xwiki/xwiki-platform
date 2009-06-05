@@ -7,13 +7,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-rendering-macro-rss</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - RSS Reader</name>
+  <name>XWiki Platform - Core - Rendering - Macro - RSS</name>
   <version>2.0-SNAPSHOT</version>
-  <description>XWiki Platform - Core - Rendering - Macro - RSS Reader</description>
+  <description>XWiki Platform - Core - Rendering - Macro - RSS</description>
   <build>
     <plugins>
+	  <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->    	
       <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
@@ -23,6 +23,7 @@
         <configuration>
           <includes>
             <include>**/RenderingTests.java</include>
+            <include>**/RssMacroFailureConditionsTests.java</include>
           </includes>
         </configuration>
       </plugin>
@@ -49,6 +50,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-box</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-bridge</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

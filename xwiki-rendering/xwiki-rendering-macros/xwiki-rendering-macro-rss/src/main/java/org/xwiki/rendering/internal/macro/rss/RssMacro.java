@@ -20,25 +20,27 @@
 
 package org.xwiki.rendering.internal.macro.rss;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.URLImage;
+//import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -58,6 +60,21 @@ import org.xwiki.rendering.util.ParserUtils;
 public class RssMacro extends AbstractMacro<RssMacroParameters>
 {
     /**
+     * Predefined error message.
+     */
+    public static final String PARAMETER_MISSING_ERROR = "The required 'feed' parameter is missing.";
+
+    /**
+     * Predefined error message. It will be added the host's address when thrown.
+     */
+    public static final String CONNECTION_TIMEOUT_ERROR = "Connection timeout when trying to reach ";
+
+    /**
+     * Predefined error message. It will be added the host's address when thrown.
+     */
+    public static final String INVALID_DOCUMENT_ERROR = "No feed found at ";
+    
+    /**
      * The name of the CSS class attribute.
      */
     private static final String CLASS_ATTRIBUTE = "class";
@@ -72,9 +89,15 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     @Requirement("box")
     protected Macro<BoxMacroParameters> boxMacro;
-
+    
     /**
-     * Needed to parse the ordinary text.
+     * Used to get the RSS icon.
+     */
+    @Requirement
+    private SkinAccessBridge skinAccessBridge;
+    
+    /** 
+     * Needed to parse the ordinary text. 
      */
     private ParserUtils parserUtils = new ParserUtils();
 
@@ -94,9 +117,9 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      * @param parameters our parameter helper object
      * @param context the macro's transformation context
      * @throws MacroExecutionException if the content cannot be rendered
-     */
-    private void renderEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters,
-        MacroTransformationContext context) throws MacroExecutionException
+     */ 
+    private void renderEntries(Block parentBlock, FeedReader feed, RssMacroParameters parameters, 
+        MacroTransformationContext context) throws MacroExecutionException 
     {
         int maxElements = parameters.getCount();
         int count = 0;
@@ -151,22 +174,12 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        SyndFeedInput input = new SyndFeedInput();
-        SyndFeed feed = null;
-        try {
-            feed = input.build(new XmlReader(parameters.getFeedURL()));
-        } catch (Exception ex) {
-            throw new MacroExecutionException("Error processing " + parameters.getFeedURL() + ": " + ex.getMessage());
-        }
-        if (feed == null) {
-            throw new MacroExecutionException("No feed found at " + parameters.getFeedURL());
-        }
-
+        FeedReader feed = new FeedReader(parameters);
+        
         BoxMacroParameters boxParameters = new BoxMacroParameters();
-        boolean hasImage = parameters.isImage() && feed.getImage() != null;
-
+        boolean hasImage = parameters.isImage() && feed.hasImage();
         boxParameters.setCssClass("rssfeed");
-
+ 
         if (!StringUtils.isEmpty(parameters.getWidth())) {
             boxParameters.setWidth(parameters.getWidth());
         }
@@ -175,12 +188,9 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
         List<Block> result = null;
         if (hasImage) {
-            boxParameters.setImage(feed.getImage().getUrl());
-            result = boxMacro.execute(boxParameters, content == null ? "" : content, context);
-        } else {
-            result = boxMacro.execute(boxParameters, content == null ? "" : content, context);
-        }
-
+            boxParameters.setImage(feed.getImageURL());
+        } 
+        result = boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
         renderEntries(result.get(0), feed, parameters, context);
 
         return result;
@@ -201,11 +211,26 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         if (link == null) {
             titleBlocks = this.parserUtils.parsePlainText(title);
         } else {
+            // Title link.
             Link titleLink = new Link();
             titleLink.setReference(link);
             titleLink.setType(LinkType.URI);
-            Block linkBlock = new LinkBlock(this.parserUtils.parsePlainText(title), titleLink, true);
-            titleBlocks = Collections.singletonList(linkBlock);
+            
+            // Title text link.
+            Block titleTextLinkBlock = new LinkBlock(this.parserUtils.parsePlainText(title), titleLink, true);
+            
+            // Rss icon.
+            String imagePath = skinAccessBridge.getSkinFile("icons/black-rss.png");
+            ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
+            List<Block> imageBlockList = new ArrayList<Block>();
+            imageBlockList.add(imageBlock);
+            
+            // Title rss icon link.
+            Block titleImageLinkBlock = new LinkBlock(imageBlockList, titleLink, true);
+            
+            titleBlocks = new ArrayList<Block>();
+            titleBlocks.add(titleTextLinkBlock);
+            titleBlocks.add(titleImageLinkBlock);            
         }
         ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);
         titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);

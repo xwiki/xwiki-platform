@@ -20,11 +20,13 @@
 
 package org.xwiki.rendering.macro.rss;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.rendering.macro.parameter.MacroParameterException;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.rss.RssMacro} Macro.
@@ -74,14 +76,18 @@ public class RssMacroParameters
 
     /**
      * @param feed the RSS feed URL.
-     * @throws java.net.MalformedURLException if the URL is malformed.
+     * @throws MacroParameterException if the feed URL is malformed.
      */
     @ParameterMandatory
     @ParameterDescription("URL of the RSS feed")
-    public void setFeed(String feed) throws java.net.MalformedURLException
+    public void setFeed(String feed) throws MacroParameterException
     {
         this.feed = feed;
-        this.feedURL = new java.net.URL(feed);
+        try {
+            this.feedURL = new java.net.URL(feed);
+        } catch (MalformedURLException ex) {
+            throw new MacroParameterException("Malformed feed URL", ex);
+        }
     }
 
     /**

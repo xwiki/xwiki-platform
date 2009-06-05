@@ -2,12 +2,8 @@
 .input|xwiki/2.0
 .# Test feeds which have HTML content in them. 
 .#-----------------------------------------------------
-{{testrssmacro2 feed="http://some.feed.com"/}}
+{{testrss feed="file://feed2.xml" content="true" count="1" image="false"/}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testrssmacro2|-|feed="http://some.feed.com"--><div class="box rssfeed"><p class="rsschanneltitle"><!--startwikilink:http://localhost/feed.xml--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><!--stopwikilink--></p><p class="rssitemtitle"><!--startwikilink:http://localhost/blog/item1--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span><!--stopwikilink--></p><div class="rssitemdescription"><p>An item with<strong>HTML</strong>markup.</p></div></div><!--stopmacro-->
-.#-----------------------------------------------------
-.expect|xwiki/2.0
-.#-----------------------------------------------------
-{{testrssmacro2 feed="http://some.feed.com"/}}
+<!--startmacro:testrss|-|feed="file://feed2.xml" content="true" count="1" image="false"--><div class="box rssfeed"><p class="rsschanneltitle"><!--startwikilink:http://localhost/feed.xml--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><!--stopwikilink--><!--startwikilink:http://localhost/feed.xml--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml"><!--startimage:/xwiki/skins/albatross/icons/black-rss.png--><img src="/xwiki/skins/albatross/icons/black-rss.png" alt="/xwiki/skins/albatross/icons/black-rss.png"/><!--stopimage--></a></span><!--stopwikilink--></p><p class="rssitemtitle"><!--startwikilink:http://localhost/blog/item1--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span><!--stopwikilink--></p><div class="rssitemdescription"><p>An item with<strong>HTML</strong>markup.</p></div></div><!--stopmacro-->

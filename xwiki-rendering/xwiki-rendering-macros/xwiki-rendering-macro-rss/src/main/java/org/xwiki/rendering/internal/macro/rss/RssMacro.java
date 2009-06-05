@@ -58,22 +58,7 @@ import org.xwiki.rendering.util.ParserUtils;
  */
 @Component("rss")
 public class RssMacro extends AbstractMacro<RssMacroParameters>
-{
-    /**
-     * Predefined error message.
-     */
-    public static final String PARAMETER_MISSING_ERROR = "The required 'feed' parameter is missing.";
-
-    /**
-     * Predefined error message. It will be added the host's address when thrown.
-     */
-    public static final String CONNECTION_TIMEOUT_ERROR = "Connection timeout when trying to reach ";
-
-    /**
-     * Predefined error message. It will be added the host's address when thrown.
-     */
-    public static final String INVALID_DOCUMENT_ERROR = "No feed found at ";
-    
+{        
     /**
      * The name of the CSS class attribute.
      */

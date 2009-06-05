@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.rss;
 
 import java.net.SocketTimeoutException;
 import java.net.URLConnection;
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -46,16 +47,6 @@ public class FeedReader
     protected static final int TIMEOUT_SECONDS = 5;
 
     /**
-     * Parenthesis (Open) used for formatting error messages regarding macro parameter exceptions.
-     */
-    private static final String OPEN_PARAM = "[";
-
-    /**
-     * Parenthesis (Close) used for formatting error messages regarding macro parameter exceptions.
-     */
-    private static final String CLOSE_PARAM = "]";
-
-    /**
      * Unique ID for Class Serialization.
      */
     private static final long serialVersionUID = 1L;
@@ -72,7 +63,7 @@ public class FeedReader
     public FeedReader(RssMacroParameters parameters) throws MacroExecutionException
     {
         if (StringUtils.isEmpty(parameters.getFeed())) {
-            throw new MacroExecutionException(RssMacro.PARAMETER_MISSING_ERROR);
+            throw new MacroExecutionException("The required 'feed' parameter is missing");
         }
 
         SyndFeedInput input = new SyndFeedInput();
@@ -82,15 +73,15 @@ public class FeedReader
             connection.setConnectTimeout(TIMEOUT_SECONDS * 1000);
             feed = input.build(new XmlReader(connection));
         } catch (SocketTimeoutException ex) {
-            throw new MacroExecutionException(RssMacro.CONNECTION_TIMEOUT_ERROR + OPEN_PARAM + parameters.getFeedURL()
-                + CLOSE_PARAM);
+            throw new MacroExecutionException(MessageFormat.format("Connection timeout when trying to reach [{0}]",
+                parameters.getFeedURL()));
         } catch (Exception ex) {
-            throw new MacroExecutionException("Error processing " + OPEN_PARAM + parameters.getFeedURL() + CLOSE_PARAM
-                + " : " + ex.getMessage(), ex);
+            throw new MacroExecutionException(MessageFormat.format("Error processing [{0}] : {1}", parameters
+                .getFeedURL(), ex.getMessage()), ex);
         }
         if (feed == null) {
-            throw new MacroExecutionException(RssMacro.INVALID_DOCUMENT_ERROR + OPEN_PARAM + parameters.getFeedURL()
-                + CLOSE_PARAM);
+            throw new MacroExecutionException(MessageFormat.format("No feed found at [{0}]",
+                parameters.getFeedURL()));
         }
     }
 

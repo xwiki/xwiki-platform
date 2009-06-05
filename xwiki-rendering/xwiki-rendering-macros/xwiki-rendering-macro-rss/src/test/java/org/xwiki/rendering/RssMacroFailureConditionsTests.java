@@ -41,7 +41,7 @@ public class RssMacroFailureConditionsTests extends TestCase
         try {
             macro.execute(parameters, null, null);
         } catch (MacroExecutionException ex) {
-            assertTrue(RssMacro.PARAMETER_MISSING_ERROR.equals(ex.getMessage()));
+            assertTrue("The required 'feed' parameter is missing".equals(ex.getMessage()));
             return;
         }
         fail("No 'feed' parameter specified, the macro should throw an exception");
@@ -62,7 +62,7 @@ public class RssMacroFailureConditionsTests extends TestCase
             macro.execute(parameters, null, null);
         } catch (MacroExecutionException ex) {
             String errorMessage = ex.getMessage();
-            assertTrue(errorMessage.startsWith(RssMacro.CONNECTION_TIMEOUT_ERROR));
+            assertTrue(errorMessage.startsWith("Connection timeout when trying to reach"));
             return;
         }
         fail("The macro should throw a 'Connection timeout exception'");

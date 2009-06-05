@@ -25,11 +25,9 @@ import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
 
-import com.xpn.xwiki.XWikiException;
-
 /**
  * Maven 2 plugin to export a set of XWiki documents from an existing database to the file system.
- *
+ * 
  * @version $Id: ImportMojo.java 1632 2006-11-23 16:34:23Z vmassol $
  * @goal export
  */
@@ -55,6 +53,7 @@ public class ExportMojo extends AbstractMojo
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -66,7 +65,7 @@ public class ExportMojo extends AbstractMojo
 
         try {
             exporter.exportDocuments(this.exportDirectory, this.databaseName, this.hibernateConfig);
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("Failed to export XWiki documents", e);
         }
     }

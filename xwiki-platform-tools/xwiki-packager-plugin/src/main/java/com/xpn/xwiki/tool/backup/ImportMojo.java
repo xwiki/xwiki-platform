@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -54,6 +53,7 @@ public class ImportMojo extends AbstractMojo
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException
@@ -62,7 +62,7 @@ public class ImportMojo extends AbstractMojo
 
         try {
             importer.importDocuments(this.sourceDirectory, this.databaseName, this.hibernateConfig);
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("Failed to import XWiki documents", e);
         }
     }

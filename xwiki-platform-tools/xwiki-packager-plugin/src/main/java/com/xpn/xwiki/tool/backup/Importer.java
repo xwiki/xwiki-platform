@@ -42,23 +42,22 @@ import org.hibernate.dialect.HSQLDialect;
 public class Importer extends AbstractPackager
 {
     /**
-     * Import documents defined in an XML file located in the passed document definition directory
-     * into a database defined by its passed name and by an Hibernate configuration file.
-     *
-     * <p>Note: I would have liked to call this method "import" but it's a reserved keyword...
-     * Strange that it's not allowed for method names though.</p>
-     *
-     * @param sourceDirectory the directory where the package.xml file is located and where the
-     *        documents to import are located
+     * Import documents defined in an XML file located in the passed document definition directory into a database
+     * defined by its passed name and by an Hibernate configuration file.
+     * <p>
+     * Note: I would have liked to call this method "import" but it's a reserved keyword... Strange that it's not
+     * allowed for method names though.
+     * </p>
+     * 
+     * @param sourceDirectory the directory where the package.xml file is located and where the documents to import are
+     *            located
      * @param databaseName some database name (TODO: find out what this name is really)
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC
-     *        driver, username and password, etc)
-     * @throws XWikiException if the import failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the
-     *       importation
+     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
+     *            password, etc)
+     * @throws Exception if the import failed for any reason
+     * @todo Replace the Hibernate config file with a list of parameters required for the importation
      */
-    public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig)
-        throws XWikiException
+    public void importDocuments(File sourceDirectory, String databaseName, File hibernateConfig) throws Exception
     {
         XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
 
@@ -70,8 +69,8 @@ public class Importer extends AbstractPackager
         try {
             pack.readFromDir(sourceDirectory, context);
         } catch (IOException e) {
-            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
-                "Failed to import documents from [" + sourceDirectory + "]", e);
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to import documents from ["
+                + sourceDirectory + "]", e);
         }
 
         pack.install(context);
@@ -86,7 +85,7 @@ public class Importer extends AbstractPackager
 
     /**
      * Shutdowns HSQLDB.
-     *
+     * 
      * @param context the XWiki Context object from which we can retrieve the Store implementation
      * @throws XWikiException in case of shutdown error
      */
@@ -117,8 +116,7 @@ public class Importer extends AbstractPackager
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
-                    "Failed to shutdown database", e);
+                throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to shutdown database", e);
             } finally {
                 try {
                     if (bTransaction) {

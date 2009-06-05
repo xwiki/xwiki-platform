@@ -37,6 +37,9 @@
     A packager tool to import/export XWiki pages into/from a database. This tool can be used either
     as a Maven2 plugin or directly from the command line.
    </description>
+   <properties>
+    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -46,9 +49,13 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <!-- We're using a fixed version as otherwise we have a circular dependency on XWiki Core -->
-      <version>1.3.1</version>
+      <version>${platform.core.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component-default</artifactId>
+      <version>${platform.core.version}</version>
+     </dependency>
   </dependencies>
   <build>
     <plugins>

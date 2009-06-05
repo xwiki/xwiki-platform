@@ -188,7 +188,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if ((anchor != null) && (!anchor.equals(""))) {
             newpath.append("#");
-            newpath.append(anchor);
+            newpath.append(encode(anchor, context));
         }
 
         try {
@@ -235,8 +235,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
-            || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action))))
-        {
+            || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
             newpath.append(encode(name, context));
         }
     }
@@ -250,7 +249,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         newpath.append("/");
         if (encode) {
-            newpath.append(encode(filename, context).replaceAll("\\+", "%20"));
+            newpath.append(encode(filename, context).replace("+", "%20"));
         } else {
             newpath.append(filename);
         }
@@ -314,7 +313,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             return null;
         }
     }
-    
+
     public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
     {
         StringBuffer newpath = new StringBuffer(this.contextPath);
@@ -373,7 +372,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        StringBuffer newpath = new StringBuffer(contextPath);
+        StringBuffer newpath = new StringBuffer(this.contextPath);
         addServletPath(newpath, xwikidb, context);
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);

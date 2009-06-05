@@ -1926,8 +1926,11 @@ html > body .panels {
 }
 
 div.xwikipanelcontents div.warningmessage,
-    div.xwikipanelcontents table {
-    margin-top: 0;
+div.xwikipanelcontents div.infomessage,
+div.xwikipanelcontents div.errormessage,
+div.xwikipanelcontents div.plainmessage,
+div.xwikipanelcontents table {
+  margin-top: 0;
 }
 
 div.xwikipanelcontents ul.minus {

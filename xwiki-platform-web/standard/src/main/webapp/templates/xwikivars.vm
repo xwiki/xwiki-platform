@@ -8,8 +8,6 @@
 #set($spaceViewUrl = $spaceDoc.getURL("view"))
 #set($viewUrl = $doc.getURL("view"))
 #set($userObj = $!crtUserDoc.getObject("XWiki.XWikiUsers",0))
-## TODO : replace this list by a hidden space feature.
-#set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch"])
 ## =====================================================================================
 ## Advanced users are:
 ## - super admin
@@ -24,6 +22,15 @@
   #set($isAdvancedUser = false)
 #else
   #set($isAdvancedUser = ($userObj.getProperty("usertype").value == "Advanced"))
+#end
+## ======================================================================================
+## Compute list of spaces to blacklist so that simple users don't see them.
+## TODO : replace this list by a hidden space feature.
+## ======================================================================================
+#if($hasAdmin || $isAdvancedUser)
+  #set($blacklistedSpaces = [])
+#else
+  #set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch"])
 #end
 #set($parent ="<a href='$parentDoc.getURL()'>$xwiki.getXMLEncoded(${parentDoc.displayTitle})</a>")
 #if($tdoc)

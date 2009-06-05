@@ -205,7 +205,8 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
 
         if (needsDeleteAdjustment(nextLeafAncestorLi, li)) {
             // execute the delete
-            executeDelete(range.getEndContainer(), nextLeafAncestorLi, nextEmptyItemPlacehodlerLeaf, range);
+            executeDelete(getReferenceNode(endContainer, li, nextLeafAncestorLi), nextLeafAncestorLi,
+                nextEmptyItemPlacehodlerLeaf, range);
             getTextArea().getCurrentEvent().xPreventDefault();
         }
         // else browser default
@@ -267,7 +268,8 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
                 range.setEndAfter(previousLeaf);
             }
             // effectively execute the move
-            executeDelete(previousLeaf, li, previousEmptyItemPlacehodlerLeaf, range);
+            executeDelete(getReferenceNode(previousLeaf, previousLeafAncestorLi, li), li,
+                previousEmptyItemPlacehodlerLeaf, range);
             getTextArea().getCurrentEvent().xPreventDefault();
         }
         // else browser default
@@ -341,6 +343,26 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
         if (skippedEmptyPlaceHolder != null) {
             skippedEmptyPlaceHolder.getParentNode().removeChild(skippedEmptyPlaceHolder);
         }
+    }
+
+    /**
+     * @param descendant the descendant of parentListItem, whose ancestor is to be found as a reference node
+     * @param parentListItem the list item which is an ancestor of descendant, and under which the reference needs to be
+     *            found
+     * @param before the node before which the reference has to be found
+     * @return the topmost node which contains {@code descendant}, is under {@code parentListItem} and does not contain
+     *         {@code before}.
+     */
+    private Node getReferenceNode(Node descendant, Element parentListItem, Node before)
+    {
+        Node refNode = descendant;
+        // go up to parentListItem and find the node which does not contain before, on parent relation
+        while (refNode.getParentNode() != parentListItem
+            && !(refNode.getParentNode().getNodeType() == Node.ELEMENT_NODE && ((Element) refNode.getParentNode())
+                .isOrHasChild((Element) before))) {
+            refNode = refNode.getParentNode();
+        }
+        return refNode;
     }
 
     /**

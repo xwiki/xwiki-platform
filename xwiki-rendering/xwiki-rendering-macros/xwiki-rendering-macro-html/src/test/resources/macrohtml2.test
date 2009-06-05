@@ -39,7 +39,7 @@ onRawText [
 
 
 
-<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikicreatelink"><a href="/xwiki/bin/view/listitem?parent=xwiki:Space.Page"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
+<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikicreatelink"><a href="/xwiki/bin/view/listitem?parent=xwiki%3ASpace.Page"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>

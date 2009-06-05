@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.internal.wiki;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
@@ -81,7 +84,19 @@ public class XWikiWikiModel implements WikiModel
         if (StringUtils.isBlank(queryString)) {
             DocumentName name = this.documentAccessBridge.getCurrentDocumentName();
             if (name != null) {
-                modifiedQueryString = "parent=" + this.documentNameSerializer.serialize(name);
+                try {
+                    // Note: we encode using UTF8 since it's the W3C recommendation.
+                    // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+                    // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need to
+                    // perform explicit encoding here.
+                    modifiedQueryString = 
+                        "parent=" + URLEncoder.encode(this.documentNameSerializer.serialize(name), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
+                    // without that encoding.
+                    throw new RuntimeException("Failed to URL encode [" + this.documentNameSerializer.serialize(name) 
+                        + "] using UTF-8.", e);
+                }
             }
         }
         

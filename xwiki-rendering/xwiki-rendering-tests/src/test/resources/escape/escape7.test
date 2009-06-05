@@ -30,7 +30,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference?parent=xwiki:Space.Page">[[</a></span><!--stopwikilink--><br/>[[whatever</p>
+<p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference?parent=xwiki%3ASpace.Page">[[</a></span><!--stopwikilink--><br/>[[whatever</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -40,4 +40,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference?parent=xwiki:Space.Page">[[</a></span><!--stopwikilink--><br/>[[whatever</p>
+<p>[[nolink]]<br/><!--startwikilink:reference--><span class="wikicreatelink"><a href="/xwiki/bin/view/reference?parent=xwiki%3ASpace.Page">[[</a></span><!--stopwikilink--><br/>[[whatever</p>

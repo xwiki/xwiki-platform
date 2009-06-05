@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.renderer.xhtml;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -223,7 +225,19 @@ public class XWikiXHTMLLinkRenderer implements XHTMLLinkRenderer
             if (StringUtils.isBlank(queryString)) {
                 DocumentName documentName = this.documentAccessBridge.getCurrentDocumentName();
                 if (documentName != null) {
-                    queryString = "parent=" + this.documentNameSerializer.serialize(documentName);
+                    try {
+                        // Note: we encode using UTF8 since it's the W3C recommendation.
+                        // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+                        // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need
+                        //       to perform explicit encoding here.
+                        queryString = "parent=" 
+                            + URLEncoder.encode(this.documentNameSerializer.serialize(documentName), "UTF-8");
+                    } catch (UnsupportedEncodingException e) {
+                        // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
+                        // without that encoding.
+                        throw new RuntimeException("Failed to URL encode ["
+                            + this.documentNameSerializer.serialize(documentName) + "] using UTF-8.", e);
+                    }
                 }
             }
 

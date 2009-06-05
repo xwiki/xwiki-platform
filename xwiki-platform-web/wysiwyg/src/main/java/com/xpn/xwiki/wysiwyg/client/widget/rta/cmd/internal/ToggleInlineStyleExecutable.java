@@ -41,6 +41,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public class ToggleInlineStyleExecutable extends InlineStyleExecutable
 {
     /**
+     * The id attribute.
+     */
+    private static final String ID = "id";
+
+    /**
      * The value of the style property when the style is applied.
      */
     private final String value;
@@ -171,6 +176,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         // Isolate from previous siblings.
         if (node.getPreviousSibling() != null) {
             Node leftClone = parent.cloneNode(false);
+            ((Element) leftClone).removeAttribute(ID);
             Node leftSibling = node.getPreviousSibling();
             leftClone.appendChild(leftSibling);
             leftSibling = node.getPreviousSibling();
@@ -184,6 +190,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         // Isolate from next siblings.
         if (node.getNextSibling() != null) {
             Node rightClone = parent.cloneNode(false);
+            ((Element) rightClone).removeAttribute(ID);
             Node rightSibling = node.getNextSibling();
             while (rightSibling != null) {
                 rightClone.appendChild(rightSibling);

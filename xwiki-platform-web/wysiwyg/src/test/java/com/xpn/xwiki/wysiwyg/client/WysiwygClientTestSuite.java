@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
 import com.google.gwt.junit.tools.GWTTestSuite;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPickerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.FormatBlockExecutableTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.RemoveFormatExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.HistoryTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.IndentExecutableTest;
@@ -94,6 +95,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(FocusWidgetUIExtensionTest.class);
         suite.addTestSuite(HistoryTest.class);
         suite.addTestSuite(FormatBlockExecutableTest.class);
+        suite.addTestSuite(RemoveFormatExecutableTest.class);
         suite.addTestSuite(InsertHRExecutableTest.class);
         suite.addTestSuite(ImageMetaDataExtractorTest.class);
         suite.addTestSuite(LinkMetaDataExtractorTest.class);

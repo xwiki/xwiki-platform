@@ -33,18 +33,27 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 /**
- * Auxiliary class which takes care of extracting the data from a RSS feed and 
- * providing it to the Rss macro.
+ * Auxiliary class which takes care of extracting the data from a RSS feed and providing it to the Rss macro.
  * 
  * @version $Id: $
  * @since 1.9
  */
-public class FeedReader 
+public class FeedReader
 {
     /**
      * The maximum number of seconds to wait when inquiring the RSS feed provider.
      */
-    protected static final int TIMEOUT_SECONDS = 5; 
+    protected static final int TIMEOUT_SECONDS = 5;
+
+    /**
+     * Parenthesis (Open) used for formatting error messages regarding macro parameter exceptions.
+     */
+    private static final String OPEN_PARAM = "[";
+
+    /**
+     * Parenthesis (Close) used for formatting error messages regarding macro parameter exceptions.
+     */
+    private static final String CLOSE_PARAM = "]";
 
     /**
      * Unique ID for Class Serialization.
@@ -60,54 +69,60 @@ public class FeedReader
      * @param parameters the Rss macro's parameters needed for getting the data
      * @throws MacroExecutionException in case the feed cannot be read
      */
-    public FeedReader(RssMacroParameters parameters) throws MacroExecutionException 
+    public FeedReader(RssMacroParameters parameters) throws MacroExecutionException
     {
         if (StringUtils.isEmpty(parameters.getFeed())) {
             throw new MacroExecutionException(RssMacro.PARAMETER_MISSING_ERROR);
         }
-        
+
         SyndFeedInput input = new SyndFeedInput();
-        
+
         try {
             URLConnection connection = parameters.getFeedURL().openConnection();
             connection.setConnectTimeout(TIMEOUT_SECONDS * 1000);
             feed = input.build(new XmlReader(connection));
         } catch (SocketTimeoutException ex) {
-            throw new MacroExecutionException(RssMacro.CONNECTION_TIMEOUT_ERROR + parameters.getFeedURL());
+            throw new MacroExecutionException(RssMacro.CONNECTION_TIMEOUT_ERROR + OPEN_PARAM + parameters.getFeedURL()
+                + CLOSE_PARAM);
         } catch (Exception ex) {
-            throw new MacroExecutionException("Error processing " 
-                + parameters.getFeedURL() + ": " + ex.getMessage(), ex);
+            throw new MacroExecutionException("Error processing " + OPEN_PARAM + parameters.getFeedURL() + CLOSE_PARAM
+                + " : " + ex.getMessage(), ex);
         }
-        if (feed == null) { 
-            throw new MacroExecutionException(RssMacro.INVALID_DOCUMENT_ERROR + parameters.getFeedURL());
+        if (feed == null) {
+            throw new MacroExecutionException(RssMacro.INVALID_DOCUMENT_ERROR + OPEN_PARAM + parameters.getFeedURL()
+                + CLOSE_PARAM);
         }
     }
-    
+
     /**
      * @return the feed's image URL
      */
-    public String getImageURL() {
+    public String getImageURL()
+    {
         return feed.getImage().getUrl();
     }
 
     /**
      * @return whether the feed has an image or not
      */
-    public boolean hasImage() {
+    public boolean hasImage()
+    {
         return feed.getImage() != null;
     }
-    
+
     /**
      * @return the feed's link
      */
-    public String getLink() {
+    public String getLink()
+    {
         return feed.getLink();
     }
 
     /**
      * @return the feed's title
      */
-    public String getTitle() {
+    public String getTitle()
+    {
         return feed.getTitle();
     }
 

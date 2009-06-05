@@ -19,14 +19,11 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiException;
-
 import java.io.File;
 
 /**
- * Class to call from the command line to export XWiki documents found in a database to the file
- * system.
- *
+ * Class to call from the command line to export XWiki documents found in a database to the file system.
+ * 
  * @version $Id: $
  */
 public final class ExporterMain
@@ -40,14 +37,13 @@ public final class ExporterMain
 
     /**
      * Command line hook so that the exporter can be called directly on the command line.
-     *
-     * @param args the first argument is the directory where to export the documents, the second
-     *             argument is some database name (TODO: find out what this name is really) and the
-     *             third argument is the Hibernate config fill containing the database definition
-     *             (JDBC driver, username and password, etc)
-     * @throws com.xpn.xwiki.XWikiException in case of an error while exporting
+     * 
+     * @param args the first argument is the directory where to export the documents, the second argument is some
+     *            database name (TODO: find out what this name is really) and the third argument is the Hibernate config
+     *            fill containing the database definition (JDBC driver, username and password, etc)
+     * @throws Exception in case of an error while exporting
      */
-    public static void main(String[] args) throws XWikiException
+    public static void main(String[] args) throws Exception
     {
         File exportDirectory = new File(args[0]);
         String databaseName = args[1];

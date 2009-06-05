@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.packaging.Package;
 import com.xpn.xwiki.plugin.packaging.PackageException;
@@ -29,25 +28,23 @@ import java.io.IOException;
 
 /**
  * Export a set of XWiki documents from an existing database into the file system.
- *
+ * 
  * @version $Id: Importer.java 1632 2006-11-23 16:34:23Z vmassol $
  */
 public class Exporter extends AbstractPackager
 {
     /**
-     * Export documents from an existing loaded XWiki database. The database is defined by its
-     * passed name and by an Hibernate configuration file.
-     *
+     * Export documents from an existing loaded XWiki database. The database is defined by its passed name and by an
+     * Hibernate configuration file.
+     * 
      * @param exportDirectory the directory where to export the documents
      * @param databaseName some database name (TODO: find out what this name is really)
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC
-     *        driver, username and password, etc)
-     * @throws com.xpn.xwiki.XWikiException if the export failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the
-     *       exportation
+     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
+     *            password, etc)
+     * @throws Exception if the export failed for any reason
+     * @todo Replace the Hibernate config file with a list of parameters required for the exportation
      */
-    public void exportDocuments(File exportDirectory, String databaseName, File hibernateConfig)
-        throws XWikiException
+    public void exportDocuments(File exportDirectory, String databaseName, File hibernateConfig) throws Exception
     {
         XWikiContext context = createXWikiContext(databaseName, hibernateConfig);
 
@@ -60,8 +57,8 @@ public class Exporter extends AbstractPackager
         try {
             pack.exportToDir(exportDirectory, context);
         } catch (IOException e) {
-            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
-                "Failed to export documents to [" + exportDirectory + "]", e);
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, "Failed to export documents to ["
+                + exportDirectory + "]", e);
         }
     }
 }

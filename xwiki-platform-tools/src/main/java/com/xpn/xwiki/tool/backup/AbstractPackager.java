@@ -23,33 +23,63 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
+
 /**
  * Common code for importing and exporting.
- *
+ * 
  * @version $Id: Importer.java 1632 2006-11-23 16:34:23Z vmassol $
  */
 public class AbstractPackager
 {
     /**
      * @param databaseName some database name (TODO: find out what this name is really)
-     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC
-     *        driver, username and password, etc)
-     * @return a valid XWikiContext using the passed Hibernate configuration and passed database
-     *         name
-     * @throws com.xpn.xwiki.XWikiException if the packaging operation failed for any reason
-     * @todo Replace the Hibernate config file with a list of parameters required for the
-     *       packaging operation
+     * @param hibernateConfig the Hibernate config fill containing the database definition (JDBC driver, username and
+     *            password, etc)
+     * @return a valid XWikiContext using the passed Hibernate configuration and passed database name
+     * @throws Exception failed to initialize context.
+     * @todo Replace the Hibernate config file with a list of parameters required for the packaging operation
      */
-    protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig)
-        throws XWikiException
+    protected XWikiContext createXWikiContext(String databaseName, File hibernateConfig) throws Exception
     {
         XWikiContext context = new XWikiContext();
+
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
+        // Initialize dynamically all components defined using annotations
+        new ComponentAnnotationLoader().initialize(ecm, this.getClass().getClassLoader());
+        
+        // We need to initialize the Component Manager so that the components can be looked up
+        context.put(ComponentManager.class.getName(), ecm);
+        Utils.setComponentManager(ecm);
+
+        // Initialize the Container fields (request, response, session).
+        ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
+        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        try {
+            ExecutionContext ec = new ExecutionContext();
+
+            // Bridge with old XWiki Context, required for old code.
+            ec.setProperty("xwikicontext", context);
+
+            ecim.initialize(ec);
+            execution.setContext(ec);
+        } catch (ExecutionContextException e) {
+            throw new Exception("Failed to initialize Execution Context.", e);
+        }
+        
         context.setUser("XWiki.superadmin");
         context.setDatabase(databaseName);
         context.setMainXWiki(databaseName);
@@ -67,17 +97,15 @@ public class AbstractPackager
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");
 
-        XWiki xwiki = new XWiki(config, context);
-        context.setWiki(xwiki);
+        new XWiki(config, context);
 
         try {
-            context.setURLFactory(
-                new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
+            context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
         } catch (MalformedURLException e) {
             // TODO: Remove that way of creating exceptions in XWiki as it's a real plain and
             // doesn't work with external code.
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to set up URL Factory", e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to set up URL Factory", e);
         }
 
         return context;

@@ -19,13 +19,11 @@
  */
 package com.xpn.xwiki.tool.backup;
 
-import com.xpn.xwiki.XWikiException;
-
 import java.io.File;
 
 /**
  * Class to call from the command line to import XWiki documents into database.
- *
+ * 
  * @version $Id: $
  */
 public final class ImporterMain
@@ -39,15 +37,14 @@ public final class ImporterMain
 
     /**
      * Command line hook so that the importer can be called directly on the command line.
-     *
-     * @param args the first argument is the directory where the package.xml file is located and
-     *             where the documents to import are located, the second argument is some
-     *             database name (TODO: find out what this name is really) and the third argument
-                   is the Hibernate config fill containing the database definition (JDBC driver,
-                   username and password, etc)
-     * @throws com.xpn.xwiki.XWikiException in case of an error while importing
+     * 
+     * @param args the first argument is the directory where the package.xml file is located and where the documents to
+     *            import are located, the second argument is some database name (TODO: find out what this name is
+     *            really) and the third argument is the Hibernate config fill containing the database definition (JDBC
+     *            driver, username and password, etc)
+     * @throws Exception in case of an error while importing
      */
-    public static void main(String[] args) throws XWikiException
+    public static void main(String[] args) throws Exception
     {
         File sourceDirectory = new File(args[0]);
         String databaseName = args[1];

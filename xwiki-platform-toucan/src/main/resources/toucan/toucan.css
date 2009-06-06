@@ -3819,29 +3819,22 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 } 	
 
 .errormessage, .warningmessage, .infomessage, .plainmessage {
-    margin: 4px 0px 4px;
-    border: 1px solid #DDD;
-    padding: 8px 8px 8px 28px;
-    background: #F5F5F5 url( icons/msg.png ) 8px 8px no-repeat;
-    text-align: left;
+  margin: 4px 0;
+  border: 1px solid #DDD;
+  padding: 8px 28px;
+  background: #F5F5F5 6px 8px no-repeat;
+  text-align: justify;
+  color: #555;
 }
-
 .infomessage {
-    background-image: url( icons/msginfo.png );
-    color: #369;
+  background-image: url( $xwiki.getSkinFile('icons/silk/information.gif') );
+  color: #369;
 }
-
-.plainmessage {
-    background-image: none;
-    color: #369;
-}
-
 .warningmessage {
-    background-image: url( icons/msgwarning.png );
-    color: #c82;
+  background-image: url( $xwiki.getSkinFile('icons/silk/error.gif') );
+  color: #D5A13D;
 }
-
 .errormessage {
-    background-image: url( icons/msgerror.png );
-    color: #F00;
+  background-image: url( $xwiki.getSkinFile('icons/silk/exclamation.gif') );
+  color: #e14726;
 }

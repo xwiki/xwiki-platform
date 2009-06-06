@@ -15,7 +15,7 @@ XWiki.viewers.Comments = Class.create({
   xcommentSelector : ".xwikicomment",
   /** Constructor. Adds all the JS improvements of the Comments area. */
   initialize : function() {
-    if ($("commentform")) {
+    if ($("commentscontent")) {
       // If the comments area is already visible, enhance it.
       this.startup();
     }
@@ -31,7 +31,11 @@ XWiki.viewers.Comments = Class.create({
   },
   /** Enhance the Comments UI with JS behaviors. */
   startup : function() {
-    this.form = $("commentform").up("form");
+    if ($("commentform")) {
+      this.form = $("commentform").up("form");
+    } else {
+      this.form = undefined;
+    }
     this.loadIDs();
     this.addDeleteListener();
     this.addReplyListener();
@@ -57,6 +61,9 @@ XWiki.viewers.Comments = Class.create({
       // Prototype bug in Opera: $$(".comment a.delete") returns only the first result.
       // Quick fix until Prototype 1.6.1 is integrated.
       item = item.down('a.delete');
+      if (!item) {
+        return;
+      }
       item.observe('click', function(event) {
         item.blur();
         event.stop();
@@ -77,7 +84,7 @@ XWiki.viewers.Comments = Class.create({
                 // Remove the corresponding HTML element from the UI and update the comment count
                 var comment = item.up(this.xcommentSelector);
                 // If the form is inside this comment's reply thread, move it back to the bottom.
-                if (this.form.descendantOf(comment.next('.commentthread'))) {
+                if (this.form && this.form.descendantOf(comment.next('.commentthread'))) {
                   this.resetForm();
                 }
                 // Replace the comment with a "deleted comment" placeholder
@@ -110,6 +117,9 @@ XWiki.viewers.Comments = Class.create({
         // Prototype bug in Opera: $$(".comment a.commentreply") returns only the first result.
         // Quick fix until Prototype 1.6.1 is integrated.
         item = item.down('a.commentreply');
+        if (!item) {
+          return;
+        }
         item.observe('click', function(event) {
           item.blur();
           event.stop();

@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.tag;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -249,8 +250,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         commentArgs.add(tag);
         String comment = context.getMessageTool().get("plugin.tag.editcomment.added", commentArgs);
         XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-        if (!getTagsFromDocument(doc).contains(tag)) {
-            List<String> tags = getTagsFromDocument(doc);
+        List<String> tags = getTagsFromDocument(doc);
+        if (!tags.contains(tag)) {
             tags.add(tag);
             setDocumentTags(doc, tags, context);
             context.getWiki().saveDocument(doc, comment, true, context);
@@ -272,26 +273,21 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public boolean removeTagFromDocument(String tag, String fullName, XWikiContext context) throws XWikiException
     {
-        List<String> commentArgs = new ArrayList<String>();
-        commentArgs.add(tag);
-        String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
         XWikiDocument doc = context.getWiki().getDocument(fullName, context);
         List<String> tags = getTagsFromDocument(doc);
 
         if (tags.contains(tag)) {
-            int i = 0;
-            while (i < tags.size()) {
-                if (tags.get(i).equals(tag)) {
-                    tags.remove(i);
-                    if (i > 0) {
-                        i--;
-                    }
-                } else {
-                    i++;
+            ListIterator<String> it = tags.listIterator();
+            while (it.hasNext()) {
+                if (tag.equals(it.next())) {
+                    it.remove();
                 }
             }
             setDocumentTags(doc, tags, context);
 
+            List<String> commentArgs = new ArrayList<String>();
+            commentArgs.add(tag);
+            String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
             context.getWiki().saveDocument(doc, comment, true, context);
 
             return true;

@@ -93,8 +93,12 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     @SuppressWarnings("unchecked")
     private List<String> getTagsFromDocument(XWikiDocument document)
     {
-        BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS).safeget(TAG_PROPERTY);
-        return (List<String>) prop.getValue();
+        try {
+            BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS).safeget(TAG_PROPERTY);
+            return (List<String>) prop.getValue();
+        } catch (NullPointerException ex) {
+            return new ArrayList<String>();
+        }
     }
 
     /**
@@ -102,10 +106,11 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * 
      * @param document document to put the tags to.
      * @param tags list of tags.
+     * @param context XWiki context.
      */
-    private void setDocumentTags(XWikiDocument document, List<String> tags)
+    private void setDocumentTags(XWikiDocument document, List<String> tags, XWikiContext context)
     {
-        BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS).safeget(TAG_PROPERTY);
+        BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS, true, context).safeget(TAG_PROPERTY);
         prop.setValue(tags);
     }
 
@@ -247,7 +252,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (!getTagsFromDocument(doc).contains(tag)) {
             List<String> tags = getTagsFromDocument(doc);
             tags.add(tag);
-            setDocumentTags(doc, tags);
+            setDocumentTags(doc, tags, context);
             context.getWiki().saveDocument(doc, comment, true, context);
             return true;
         } else {
@@ -285,7 +290,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
                     i++;
                 }
             }
-            setDocumentTags(doc, tags);
+            setDocumentTags(doc, tags, context);
+
             context.getWiki().saveDocument(doc, comment, true, context);
 
             return true;
@@ -320,7 +326,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
                     tags.set(i, newTag);
                 }
             }
-            setDocumentTags(doc, tags);
+            setDocumentTags(doc, tags, context);
             context.getWiki().saveDocument(doc, comment, true, context);
         }
 

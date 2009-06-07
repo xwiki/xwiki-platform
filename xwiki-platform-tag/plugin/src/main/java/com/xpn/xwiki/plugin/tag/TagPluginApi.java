@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 
 /**
@@ -36,6 +37,9 @@ import com.xpn.xwiki.plugin.PluginApi;
  */
 public class TagPluginApi extends PluginApi<TagPlugin>
 {
+    /** The required access level for modifying document tags. */
+    private static final String TAG_ACCESS_RIGHT = "edit";
+
     /**
      * XWiki Plugin API constructor.
      * 
@@ -141,12 +145,22 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * 
      * @param tag tag to set.
      * @param fullName name of the document.
-     * @return true if the tag has been added, false if the tag was already present.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean addTagToDocument(String tag, String fullName) throws XWikiException
+    public TagOperationResult addTagToDocument(String tag, String fullName)
     {
-        return this.getProtectedPlugin().addTagToDocument(tag, fullName, this.context);
+        TagOperationResult result;
+        try {
+            XWikiDocument document = this.context.getWiki().getDocument(fullName, this.context);
+            if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                result = this.getProtectedPlugin().addTagToDocument(tag, document, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            result = TagOperationResult.FAILED;
+        }
+        return result;
     }
 
     /**
@@ -154,12 +168,22 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * 
      * @param tag tag to remove.
      * @param fullName name of the document.
-     * @return true if the tag has been removed, false if the tag was not present.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean removeTagFromDocument(String tag, String fullName) throws XWikiException
+    public TagOperationResult removeTagFromDocument(String tag, String fullName)
     {
-        return this.getProtectedPlugin().removeTagFromDocument(tag, fullName, this.context);
+        TagOperationResult result;
+        try {
+            XWikiDocument document = this.context.getWiki().getDocument(fullName, this.context);
+            if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                result = this.getProtectedPlugin().removeTagFromDocument(tag, fullName, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            result = TagOperationResult.FAILED;
+        }
+        return result;
     }
 
     /**
@@ -168,16 +192,21 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * 
      * @param tag tag to rename.
      * @param newTag new tag.
-     * @return true if the rename has succeeded.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean renameTag(String tag, String newTag) throws XWikiException
+    public TagOperationResult renameTag(String tag, String newTag)
     {
-        if (hasAdminRights()) {
-            return this.getProtectedPlugin().renameTag(tag, newTag, this.context);
-        } else {
-            return false;
+        TagOperationResult result;
+        try {
+            if (hasAdminRights()) {
+                result = this.getProtectedPlugin().renameTag(tag, newTag, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            result = TagOperationResult.FAILED;
         }
+        return result;
     }
 
     /**
@@ -185,15 +214,20 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * saved (minor edit) during this operation.
      * 
      * @param tag tag to delete.
-     * @return true if the delete has succeeded.
-     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     * @return the {@link TagOperationResult result} of the operation
      */
-    public boolean deleteTag(String tag) throws XWikiException
+    public TagOperationResult deleteTag(String tag)
     {
-        if (hasAdminRights()) {
-            return this.getProtectedPlugin().deleteTag(tag, this.context);
-        } else {
-            return false;
+        TagOperationResult result;
+        try {
+            if (hasAdminRights()) {
+                result = this.getProtectedPlugin().deleteTag(tag, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            result = TagOperationResult.FAILED;
         }
+        return result;
     }
 }

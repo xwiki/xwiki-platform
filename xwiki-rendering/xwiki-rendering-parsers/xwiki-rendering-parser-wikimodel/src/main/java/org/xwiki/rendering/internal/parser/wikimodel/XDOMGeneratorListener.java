@@ -108,6 +108,7 @@ public class XDOMGeneratorListener implements IWemListener
     {
         public void traverse(Listener listener)
         {
+            // Nothing to do since this block is only used as a marker.
         }
     }
 

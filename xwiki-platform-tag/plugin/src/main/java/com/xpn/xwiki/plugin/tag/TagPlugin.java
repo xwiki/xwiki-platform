@@ -231,7 +231,19 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public List<String> getTagsFromDocument(String fullName, XWikiContext context) throws XWikiException
     {
-        XWikiDocument document = context.getWiki().getDocument(fullName, context);
+        return getTagsFromDocument(context.getWiki().getDocument(fullName, context));
+    }
+
+    /**
+     * Get tags from a document.
+     * 
+     * @param document the document.
+     * @param context XWiki context.
+     * @return list of tags.
+     * @throws XWikiException if document read fails (possible failures: insufficient rights, DB access problems, etc).
+     */
+    public List<String> getTagsFromDocument(XWikiDocument document, XWikiContext context) throws XWikiException
+    {
         return getTagsFromDocument(document);
     }
 
@@ -241,24 +253,38 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @param tag tag to set.
      * @param fullName name of the document.
      * @param context XWiki context.
-     * @return true if the tag has been added, false if the tag was already present.
+     * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
      */
-    public boolean addTagToDocument(String tag, String fullName, XWikiContext context) throws XWikiException
+    public TagOperationResult addTagToDocument(String tag, String fullName, XWikiContext context) throws XWikiException
+    {
+        return addTagToDocument(tag, context.getWiki().getDocument(fullName, context), context);
+    }
+
+    /**
+     * Add a tag to a document. The document is saved (minor edit) after this operation.
+     * 
+     * @param tag tag to set.
+     * @param document the document.
+     * @param context XWiki context.
+     * @return the {@link TagOperationResult result} of the operation
+     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     */
+    public TagOperationResult addTagToDocument(String tag, XWikiDocument document, XWikiContext context)
+        throws XWikiException
     {
         List<String> commentArgs = new ArrayList<String>();
         commentArgs.add(tag);
         String comment = context.getMessageTool().get("plugin.tag.editcomment.added", commentArgs);
-        XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-        List<String> tags = getTagsFromDocument(doc);
+        List<String> tags = getTagsFromDocument(document);
         if (!tags.contains(tag)) {
             tags.add(tag);
-            setDocumentTags(doc, tags, context);
-            context.getWiki().saveDocument(doc, comment, true, context);
-            return true;
+            setDocumentTags(document, tags, context);
+            context.getWiki().saveDocument(document, comment, true, context);
+            return TagOperationResult.OK;
         } else {
             // Document already contains this tag.
-            return false;
+            return TagOperationResult.NO_EFFECT;
         }
     }
 
@@ -268,13 +294,28 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @param tag tag to remove.
      * @param fullName name of the document.
      * @param context XWiki context.
-     * @return true if the tag has been removed, false if the tag was not present.
+     * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
      */
-    public boolean removeTagFromDocument(String tag, String fullName, XWikiContext context) throws XWikiException
+    public TagOperationResult removeTagFromDocument(String tag, String fullName, XWikiContext context)
+        throws XWikiException
     {
-        XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-        List<String> tags = getTagsFromDocument(doc);
+        return removeTagFromDocument(tag, context.getWiki().getDocument(fullName, context), context);
+    }
+
+    /**
+     * Remove a tag from a document. The document is saved (minor edit) after this operation.
+     * 
+     * @param tag tag to remove.
+     * @param document the document.
+     * @param context XWiki context.
+     * @return the {@link TagOperationResult result} of the operation
+     * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
+     */
+    public TagOperationResult removeTagFromDocument(String tag, XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        List<String> tags = getTagsFromDocument(document);
 
         if (tags.contains(tag)) {
             ListIterator<String> it = tags.listIterator();
@@ -283,17 +324,17 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
                     it.remove();
                 }
             }
-            setDocumentTags(doc, tags, context);
+            setDocumentTags(document, tags, context);
 
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
             String comment = context.getMessageTool().get("plugin.tag.editcomment.removed", commentArgs);
-            context.getWiki().saveDocument(doc, comment, true, context);
+            context.getWiki().saveDocument(document, comment, true, context);
 
-            return true;
+            return TagOperationResult.OK;
         } else {
             // Document doesn't contain this tag.
-            return false;
+            return TagOperationResult.NO_EFFECT;
         }
     }
 
@@ -303,12 +344,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @param tag tag to rename.
      * @param newTag new tag.
      * @param context XWiki context.
-     * @return true if the rename has succeeded.
+     * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
      */
-    protected boolean renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
+    protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
         List<String> docNamesToProcess = getDocumentsWithTag(tag, context);
+        if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0) {
+            return TagOperationResult.NO_EFFECT;
+        }
         List<String> commentArgs = new ArrayList<String>();
         commentArgs.add(tag);
         commentArgs.add(newTag);
@@ -326,7 +370,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             context.getWiki().saveDocument(doc, comment, true, context);
         }
 
-        return true;
+        return TagOperationResult.OK;
     }
 
     /**
@@ -334,17 +378,20 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * 
      * @param tag tag to delete.
      * @param context XWiki context.
-     * @return true if the delete has succeeded.
+     * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
      */
-    protected boolean deleteTag(String tag, XWikiContext context) throws XWikiException
+    protected TagOperationResult deleteTag(String tag, XWikiContext context) throws XWikiException
     {
         List<String> docsToProcess = getDocumentsWithTag(tag, context);
 
+        if (docsToProcess.size() == 0) {
+            return TagOperationResult.NO_EFFECT;
+        }
         for (String docName : docsToProcess) {
             removeTagFromDocument(tag, docName, context);
         }
 
-        return true;
+        return TagOperationResult.OK;
     }
 }

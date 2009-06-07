@@ -293,7 +293,7 @@ $xwiki.ssx.use("Main.Tags")
   #if ($success == true)
     $response.sendRedirect($doc.getURL("view", "do=viewTag&amp;tag=${renameTo}&amp;renamedTag=${tag}"))
   #else
-    #error("$msg.get('xe.tag.renane.failure', [$tag, $renameTo])")
+    #error("$msg.get('xe.tag.rename.failure', [$tag, $renameTo])")
   #end
 #elseif($do == "prepareDelete")
   ##

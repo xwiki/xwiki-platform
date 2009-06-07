@@ -290,7 +290,7 @@ $xwiki.ssx.use("Main.Tags")
   #if ("$!renameTo" != "")
     #set($success = $xwiki.tag.renameTag($tag, $renameTo))
   #end
-  #if ($success == true)
+  #if ($success == true || $success == 'OK')
     $response.sendRedirect($doc.getURL("view", "do=viewTag&amp;tag=${renameTo}&amp;renamedTag=${tag}"))
   #else
     #error("$msg.get('xe.tag.rename.failure', [$tag, $renameTo])")
@@ -310,7 +310,7 @@ $xwiki.ssx.use("Main.Tags")
   ## Delete tag
   ##
   #set($success = $xwiki.tag.deleteTag($tag))
-  #if ($success == true)
+  #if ($success == true || $success == 'OK')
     $response.sendRedirect($doc.getURL("view", "deletedTag=${tag}"))
   #else
     #error("$msg.get('xe.tag.delete.failure', [$tag])")

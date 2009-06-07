@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  * @since 1.6M1
+ * @todo Refactor to use DocumentName and AttachmentName everywhere
  */
 @ComponentRole
 public interface DocumentAccessBridge

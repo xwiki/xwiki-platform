@@ -350,7 +350,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     protected TagOperationResult renameTag(String tag, String newTag, XWikiContext context) throws XWikiException
     {
         List<String> docNamesToProcess = getDocumentsWithTag(tag, context);
-        if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0) {
+        if (StringUtils.equals(tag, newTag) || docNamesToProcess.size() == 0 || StringUtils.isBlank(newTag)) {
             return TagOperationResult.NO_EFFECT;
         }
         List<String> commentArgs = new ArrayList<String>();

@@ -131,6 +131,10 @@ public class PdfExportImpl implements PdfExport
         baseConfiguration.setProperty("show-warnings", "false");
         baseConfiguration.setProperty("trim-empty-elements", "false");
         baseConfiguration.setProperty("numeric-entities", "true");
+        // Don't replace non-ASCII apostrophes/quotes/dashes with plain ASCII ones.
+        baseConfiguration.setProperty("ascii-chars", "false");
+        // Don't wrap, as it is not needed, and it triggers JTidy bugs when combined with non-ASCII chars.
+        baseConfiguration.setProperty("wrap", "0");
 
         // Allow Tidy to be configured in the tidy.properties file
         Properties configuration = new Properties(baseConfiguration);

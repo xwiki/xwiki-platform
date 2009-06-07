@@ -79,7 +79,7 @@ public class RssMacroFailureConditionsTest extends TestCase
         
         try {
             macro.execute(parameters, null, null);
-            fail("The macro should throw an 'Ivalid document exception'");
+            fail("The macro should throw an 'Invalid document exception'");
         } catch (MacroExecutionException expected) {
             assertTrue(expected.getCause() instanceof IllegalArgumentException); 
             assertEquals("Invalid document", expected.getCause().getMessage());

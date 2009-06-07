@@ -112,6 +112,7 @@ h1.xapp span span.highlight {
   -moz-border-radius: 10px;
   -webkit-border-radius: 10px;
   border-radius: 10px;
+  margin-bottom: -8px;
 }
 h1.xapp span span.tag{
 background: lemonChiffon url($xwiki.getSkinFile("icons/silk/tag_blue.gif")) no-repeat 5px 50%;
@@ -188,11 +189,9 @@ $xwiki.ssx.use('Main.Tags')##
       #if($do != '' &amp;&amp; $tag != '')
         /
       &lt;span class="highlight tag"&gt;
-
         &lt;a href="$doc.getURL('view', "do=viewTag&amp;amp;tag=${tag}")"&gt;$tag&lt;/a&gt;
         #if($xwiki.hasAdminRights() &amp;&amp; $displayButtons)
           &lt;a href="$doc.getURL('view', "do=prepareRename&amp;amp;tag=${tag}")" class="button rename" rel="nofollow"&gt;Rename&lt;/a&gt;&amp;nbsp;&lt;a href="$doc.getURL('view', "do=prepareDelete&amp;amp;tag=${tag}")" class="button delete" rel="nofollow"&gt;Delete&lt;/a&gt;
-
         #end
       &lt;/span&gt;
      #end

@@ -55,7 +55,7 @@ public interface Macro<P> extends Comparable<Macro< ? >>
     boolean supportsInlineMode();
 
     /**
-     * @param parameters the macro parameters in the forma of a bean defined by the {@link Macro} implementation
+     * @param parameters the macro parameters in the form of a bean defined by the {@link Macro} implementation
      * @param content the content of the macro
      * @param context the context of the macros transformation process
      * @return the result of the macro execution

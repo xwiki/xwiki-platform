@@ -42,8 +42,8 @@
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-servlet</artifactId>
-      <version>1.0-beta-9</version>
+      <artifactId>plexus-container-default</artifactId>
+      <version>1.0-alpha-31</version>
       <exclusions>
         <!-- We need to explicitely exclude JUnit since Plexus Servlet has an invalid transitive
              dependency on JUnit with a compile scope dependency -->

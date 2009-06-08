@@ -20,31 +20,46 @@
  */
 package org.xwiki.container.servlet;
 
-import org.codehaus.plexus.servlet.PlexusServlet;
 import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class XWikiPlexusServlet extends PlexusServlet
+public class XWikiPlexusServlet extends HttpServlet
 {
     protected void service(HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse) throws ServletException, IOException
     {
-        ActionManager manager = (ActionManager) lookup(ActionManager.class.getName());
+        // Get the Component Manager instance set up in XWikiPlexusServletContextListener from the ServletContext
+        ComponentManager componentManager = 
+            (ComponentManager) getServletContext().getAttribute(ComponentManager.class.getName());
+        if (componentManager == null) {
+            throw new ServletException("Plexus container is not initialized");
+        }
+        
+        ActionManager manager;
+        try {
+            manager = (ActionManager) componentManager.lookup(ActionManager.class);
+        } catch (ComponentLookupException e) {
+            // We cannot find the Action manager, not much we can do, abort...
+            throw new ServletException("Failed to locate Action Manager component.", e);
+        }
 
         // Initializes XWiki's Container with the Servlet request/response/session so that
         // components needing them can depend on the Container component to get them.
-        ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) lookup(ServletContainerInitializer.class.getName());
         try {
+            ServletContainerInitializer containerInitializer =
+                (ServletContainerInitializer) componentManager.lookup(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(httpServletRequest);
             containerInitializer.initializeResponse(httpServletResponse);
             containerInitializer.initializeSession(httpServletRequest);
-        } catch (ServletContainerException e) {
+        } catch (Exception e) {
             try {
                 // Call the error Action to handle the exception
                 manager.handleRequest("error", e);

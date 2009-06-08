@@ -43,6 +43,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrovelocity3", true);
         suite.addTestsFromResource("macrovelocity4", true);
         suite.addTestsFromResource("macrovelocity5", true);
+        suite.addTestsFromResource("macrovelocity6", true);
 
         return new ComponentManagerTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
     }

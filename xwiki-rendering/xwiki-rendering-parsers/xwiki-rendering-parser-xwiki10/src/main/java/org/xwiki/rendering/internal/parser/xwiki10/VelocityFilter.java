@@ -674,7 +674,7 @@ public class VelocityFilter extends AbstractFilter implements Initializable
 
     public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{velocity}}" + (nl ? "\n" : "")
+        result.append(filterContext.addProtectedContent("{{velocity filter=\"none\"}}" + (nl ? "\n" : "")
             + "{{html clean=\"false\" wiki=\"true\"}}" + (nl ? "\n" : ""), VELOCITYOPEN_SUFFIX, true));
     }
 

@@ -94,6 +94,14 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     }
 
     /**
+     * @return the component manager
+     */
+    protected ComponentManager getComponentManager()
+    {
+        return this.componentManager;
+    }
+    
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
@@ -144,7 +152,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
     {
         try {
-            return this.componentManager.lookup(Parser.class, context.getSyntax().toIdString());
+            return getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to find source parser", e);
         }

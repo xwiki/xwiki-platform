@@ -96,7 +96,7 @@ isc.XWEResultTree.addProperties({
     displayAttachmentsWhenEmpty: false, // Display attachments meta-node even if there's no attachments.
     displayAddAttachment: false, // Display a "Add Attachment" node in each Attachments meta-node.
     displayAddAttachmentOnTop: true, // Display the "Add Attachment" node on top.
-    blacklistedSpaces: "" // List of spaces that must be excluded from the tree.
+    displayBlacklistedSpaces: false // Force display of blacklisted spaces.
 });
 
 isc.XWEResultTree.addMethods({
@@ -156,6 +156,17 @@ isc.XWEResultTree.addMethods({
      * Implementation of the optional isc.ResultTree.dataArrived callback.
      */
     dataArrived : function(parentNode) {
+            
+        var parentDS = this.getNodeDataSource(parentNode);
+        // getNodeDataSource returns null when parentNode is the root node.
+        if (parentDS == null) {
+          parentDS = this.getDataSource();
+        }
+        
+        // Remove blacklisted spaces.
+        if (parentDS.recordsType == "space" && this.displayBlacklistedSpaces == false) {
+            this.filterNodesByName(this.getChildren(), XWiki.blacklistedSpaces);
+        }
 
         // Various transformations on children nodes.
         // Redo getChildren to avoid getting previously removed nodes (which have been nullified).
@@ -180,29 +191,19 @@ isc.XWEResultTree.addMethods({
             });
         }
 
-        // We don't try to make spaces/pages transformation on the root node.
-        if (!this.isRoot(parentNode)) {
-            var parentDS = this.getNodeDataSource(parentNode);
+        if (parentDS.recordsType == "space" && this.displayAddPage == true) {
+            this.addAddPageNode(parentNode);
+        }
 
-            // Remove blacklisted spaces.
-            if (parentDS.recordsType == "wiki") {
-                this.remove_blacklistedSpaces(children);
-            }
+        // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
+        if (parentDS.recordsType == "page" && this.displayAttachments == true
+               && !parentNode.isXWikiAttachment) {
+            this.addAttachmentsNode(parentNode);
+        }
 
-            if (parentDS.recordsType == "space" && this.displayAddPage == true) {
-                this.addAddPageNode(parentNode);
-            }
-
-            // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
-            if (parentDS.recordsType == "page" && this.displayAttachments == true
-                    && !parentNode.isXWikiAttachment) {
-                this.addAttachmentsNode(parentNode);
-            }
-
-            // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
-            if (parentNode.isXWikiAttachment && this.displayAddAttachment == true) {
-                this.addAddAttachmentsNode(parentNode);
-            }
+        // Add an attachments child to the parentNode if the parentNode is a page and showAttachments is activated.
+        if (parentNode.isXWikiAttachment && this.displayAddAttachment == true) {
+            this.addAddAttachmentsNode(parentNode);
         }
 
         // XWiki dataArrived callback handler.
@@ -268,16 +269,15 @@ isc.XWEResultTree.addMethods({
     },
 
     /**
-     * This method looks for space nodes in the list and remove blacklisted space from the ResultTree.
-     * See dataArrived() bellow.
+     * This method loops over nodes and removes those which titles match an entry of the list of titles to filter.
+     * 
+     * @param nodes Nodes to filter.
+     * @param namesToFilter Array of names to filter.
      */
-    remove_blacklistedSpaces : function(nodes) {
-        for (var i = 0; i < nodes.length; i++) {
-            var currentDS = this.getNodeDataSource(nodes[i]);
-            if (currentDS.recordsType == "space") {
-                if (this.blacklistedSpaces != "" && this.blacklistedSpaces[nodes[i].name] == true) {
-                    this.remove(nodes[i]);
-                }
+    filterNodesByName : function(nodes, namesToFilter) {
+        for (var i = 0; i < nodes.length; i++) {            
+            if (XWiki.blacklistedSpaces.indexOf(nodes[i].name) != -1) {                
+                this.remove(nodes[i]);
             }
         }
     },

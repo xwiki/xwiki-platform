@@ -33,6 +33,7 @@ XWiki.currentSpace = "${doc.space}";
 XWiki.editor = "$!{editor}";
 XWiki.viewer = "$!{viewer}";
 XWiki.docisnew = $!doc.isNew();
+XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
 window.docviewurl = "${doc.getURL('view')}";
 window.docsaveurl = "${doc.getURL('save')}";
 // ]]>

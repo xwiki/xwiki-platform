@@ -96,7 +96,7 @@ isc.XWEResultTree.addProperties({
     displayAttachmentsWhenEmpty: false, // Display attachments meta-node even if there's no attachments.
     displayAddAttachment: false, // Display a "Add Attachment" node in each Attachments meta-node.
     displayAddAttachmentOnTop: true, // Display the "Add Attachment" node on top.
-    displayBlacklistedSpaces: false // Force display of blacklisted spaces.
+    displayBlacklistedSpaces: false // Don't display blacklisted spaces.
 });
 
 isc.XWEResultTree.addMethods({

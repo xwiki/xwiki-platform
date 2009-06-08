@@ -50,11 +50,6 @@
       <version>${pom.version}</version>
       <type>war</type>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-plexus</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
     <!-- The WebDAV module -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>

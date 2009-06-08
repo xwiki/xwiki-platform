@@ -675,7 +675,14 @@ public class DomainObjectFactory
                 BaseProperty baseProperty = (BaseProperty) o;
                 Attribute attribute = objectFactory.createAttribute();
                 attribute.setName(baseProperty.getName());
-                attribute.setValue(baseProperty.getValue().toString());
+                
+                /* Check for null values in order to prevent NPEs */
+                if (baseProperty.getValue() != null) {
+                    attribute.setValue(baseProperty.getValue().toString());
+                } else {
+                    attribute.setValue("");
+                }
+                                
                 property.getAttributes().add(attribute);
             }
 

@@ -113,8 +113,10 @@ public class EmbeddableComponentManager implements ComponentManager
      */
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException
     {
-        this.descriptors.put(
-            new RoleHint<T>(componentDescriptor.getRole(), componentDescriptor.getRoleHint()), componentDescriptor);
+        synchronized(this) {
+            this.descriptors.put(new RoleHint<T>(componentDescriptor.getRole(), componentDescriptor.getRoleHint()), 
+                componentDescriptor);
+        }
     }
 
     /**
@@ -122,7 +124,9 @@ public class EmbeddableComponentManager implements ComponentManager
      */
     public <T> void registerComponent(Class< T > role, String hint, Object component)
     {
-        this.components.put(new RoleHint<T>(role, hint), component);
+        synchronized(this) {
+            this.components.put(new RoleHint<T>(role, hint), component);
+        }
     }
 
     /**
@@ -130,7 +134,9 @@ public class EmbeddableComponentManager implements ComponentManager
      */
     public <T> void registerComponent(Class< T > role, Object component)
     {
-        this.components.put(new RoleHint<T>(role), component);
+        synchronized(this) {
+            this.components.put(new RoleHint<T>(role), component);
+        }
     }
 
     /**
@@ -140,7 +146,9 @@ public class EmbeddableComponentManager implements ComponentManager
     @SuppressWarnings("unchecked")
     public <T> ComponentDescriptor<T> getComponentDescriptor(Class< T > role, String roleHint)
     {
-        return (ComponentDescriptor<T>) this.descriptors.get(new RoleHint<T>(role, roleHint));
+        synchronized(this) {
+            return (ComponentDescriptor<T>) this.descriptors.get(new RoleHint<T>(role, roleHint));
+        }
     }
 
     /**
@@ -149,20 +157,24 @@ public class EmbeddableComponentManager implements ComponentManager
      */
     public <T> void release(T component) throws ComponentLifecycleException
     {
-        for (Map.Entry<RoleHint<?>, Object> entry : this.components.entrySet()) {
-            if (entry.getValue() == component) {
-                this.components.remove(entry.getKey());
+        synchronized(this) {
+            for (Map.Entry<RoleHint<?>, Object> entry : this.components.entrySet()) {
+                if (entry.getValue() == component) {
+                    this.components.remove(entry.getKey());
+                }
             }
         }
     }
-
+    
     @SuppressWarnings("unchecked")
     private <T> List<T> initializeList(Class< T > role) throws ComponentLookupException
     {
         List<T> objects = new ArrayList<T>();
-        for (RoleHint<?> roleHint : this.descriptors.keySet()) {
-            if (roleHint.getRole().getName().equals(role.getName())) {
-                objects.add(initialize((RoleHint<T>)roleHint));
+        synchronized(this) {
+            for (RoleHint<?> roleHint : this.descriptors.keySet()) {
+                if (roleHint.getRole().getName().equals(role.getName())) {
+                    objects.add(initialize((RoleHint<T>)roleHint));
+                }
             }
         }
         return objects;
@@ -172,9 +184,11 @@ public class EmbeddableComponentManager implements ComponentManager
     private <T> Map<String, T> initializeMap(Class< ? > role) throws ComponentLookupException
     {
         Map<String, T> objects = new HashMap<String, T>();
-        for (RoleHint<?> roleHint : this.descriptors.keySet()) {
-            if (roleHint.getRole().getName().equals(role.getName())) {
-                objects.put(roleHint.getHint(), initialize((RoleHint<T>)roleHint));
+        synchronized(this) {
+            for (RoleHint<?> roleHint : this.descriptors.keySet()) {
+                if (roleHint.getRole().getName().equals(role.getName())) {
+                    objects.put(roleHint.getHint(), initialize((RoleHint<T>)roleHint));
+                }
             }
         }
         return objects;
@@ -188,7 +202,7 @@ public class EmbeddableComponentManager implements ComponentManager
             instance = (T) this.components.get(roleHint);
             if (instance == null) {
                 try {
-                    instance = getInstance(roleHint);
+                    instance = createInstance(roleHint);
                     if (instance == null) {
                         throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]");
                     } else if (this.descriptors.get(roleHint).getInstantiationStrategy() 
@@ -211,7 +225,7 @@ public class EmbeddableComponentManager implements ComponentManager
     }
     
     @SuppressWarnings("unchecked")
-    private <T> T getInstance(RoleHint<T> roleHint) throws Exception
+    private <T> T createInstance(RoleHint<T> roleHint) throws Exception
     {
         T instance = null;
 

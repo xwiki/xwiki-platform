@@ -24,11 +24,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
-import org.xwiki.plexus.container.PlexusContainerUtils;
 
 public class XWikiPlexusServletContextListener implements ServletContextListener
 {
@@ -46,15 +46,10 @@ public class XWikiPlexusServletContextListener implements ServletContextListener
      */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
-        // Initializes Plexus
-        try {
-            this.componentManager = PlexusContainerUtils.initializePlexus();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize Plexus container", e);
-        }
-
-        // Register all components defined using annotations
-        this.annotationLoader.initialize(this.componentManager, this.getClass().getClassLoader());
+        // Initializes the Embeddable Component Manager 
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
+        ecm.initialize();
+        this.componentManager = ecm;
 
         // Initializes XWiki's Container with the Servlet Context.
         try {

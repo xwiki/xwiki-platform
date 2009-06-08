@@ -106,10 +106,9 @@ public class XWikiComponentInitializer
     public ComponentManager getComponentManager() throws Exception
     {
         if (this.componentManager == null) {
-            this.componentManager = new EmbeddableComponentManager(this.getClass().getClassLoader());
-            
-            // Initialize dynamically all components defined using annotations
-            this.componentAnnotationInitializer.initialize(this.componentManager, this.getClass().getClassLoader());
+            EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
+            ecm.initialize();
+            this.componentManager = ecm;
         }
 
         return this.componentManager;

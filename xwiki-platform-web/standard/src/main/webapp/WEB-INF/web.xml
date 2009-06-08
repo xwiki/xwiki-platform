@@ -105,19 +105,10 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
-  <!-- Initializes Plexus and puts a reference to the Plexus Component Manager in the Servlet
-       Context. Also initializes the Container Manager component with the Servlet Context. -->
+  <!-- Initializes XWiki -->
   <listener>
-    <listener-class>org.xwiki.container.servlet.XWikiPlexusServletContextListener</listener-class>
+    <listener-class>org.xwiki.container.servlet.XWikiServletContextListener</listener-class>
   </listener>
-
-  <!-- Main Plexus Servlet receiving all requests. For now this is mapped to some unused URL
-       contex path since we're still using Struts but in the near future, Struts will go away
-       and be replaced by XWiki's own Action component. -->
-  <servlet>
-    <servlet-name>PlexusServlet</servlet-name>
-    <servlet-class>org.xwiki.container.servlet.XWikiPlexusServlet</servlet-class>
-  </servlet>
 
   <servlet>
     <servlet-name>action</servlet-name>
@@ -203,13 +194,6 @@
   <servlet-mapping>
     <servlet-name>RestletServlet</servlet-name>
     <url-pattern>/rest/*</url-pattern>
-  </servlet-mapping>
-  
-  <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet
-       will be decommissioned in favor of the XWiki Action component --> 
-  <servlet-mapping>
-    <servlet-name>PlexusServlet</servlet-name>
-    <url-pattern>/plexus/*</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>

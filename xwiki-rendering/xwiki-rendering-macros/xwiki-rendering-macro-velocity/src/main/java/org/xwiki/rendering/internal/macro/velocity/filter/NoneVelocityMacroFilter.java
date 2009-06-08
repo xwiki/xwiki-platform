@@ -17,33 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.internal.macro.velocity.filter;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.apache.velocity.VelocityContext;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Do nothing.
  * 
  * @version $Id$
- * @since 1.7M3
  */
-public class RenderingTests extends TestCase
+@Component("none")
+public class NoneVelocityMacroFilter implements VelocityMacroFilter
 {
-    public static Test suite() throws Exception
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#after(java.lang.String,
+     *      org.apache.velocity.VelocityContext)
+     */
+    public String after(String content, VelocityContext velocityContect)
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
-
-        suite.addTestsFromResource("macrovelocity1", true);
-        suite.addTestsFromResource("macrovelocity2", true);
-        suite.addTestsFromResource("macrovelocity3", true);
-        suite.addTestsFromResource("macrovelocity4", true);
-        suite.addTestsFromResource("macrovelocity5", true);
-        suite.addTestsFromResource("macrovelocity6", true);
-
-        return new RenderingPlexusTestSetup(suite);
+        return content;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter#before(java.lang.String,
+     *      org.apache.velocity.VelocityContext)
+     */
+    public String before(String content, VelocityContext velocityContect)
+    {
+        return content;
+    }
+
 }

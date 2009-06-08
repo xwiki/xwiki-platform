@@ -21,12 +21,18 @@ package org.xwiki.rendering.internal.macro.velocity;
 
 import java.io.StringWriter;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.script.AbstractScriptMacro;
-import org.xwiki.rendering.macro.script.ScriptMacroParameters;
+import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
+import org.xwiki.rendering.macro.velocity.VelocityMacroParameters;
+import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -36,7 +42,7 @@ import org.xwiki.velocity.XWikiVelocityException;
  * @since 1.5M2
  */
 @Component("velocity")
-public class VelocityMacro extends AbstractScriptMacro<ScriptMacroParameters>
+public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
 {
     /**
      * The description of the macro.
@@ -55,11 +61,18 @@ public class VelocityMacro extends AbstractScriptMacro<ScriptMacroParameters>
     private VelocityManager velocityManager;
 
     /**
+     * The velocity macro configuration.
+     */
+    @Requirement
+    private VelocityMacroConfiguration configuration;
+
+    /**
      * Default constructor.
      */
     public VelocityMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
+        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            VelocityMacroParameters.class));
     }
 
     /**
@@ -79,19 +92,64 @@ public class VelocityMacro extends AbstractScriptMacro<ScriptMacroParameters>
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     @Override
-    protected String evaluate(ScriptMacroParameters parameters, String content, MacroTransformationContext context)
+    protected String evaluate(VelocityMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        StringWriter writer = new StringWriter();
+        String result = "";
 
         try {
-            this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,
-                "velocity macro", content);
+            VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
+            VelocityMacroFilter filter = getFilter(parameters);
+
+            String cleanedContent = content;
+
+            if (filter != null) {
+                cleanedContent = filter.before(cleanedContent, velocityContext);
+            }
+
+            StringWriter writer = new StringWriter();
+            this.velocityManager.getVelocityEngine()
+                .evaluate(velocityContext, writer, "velocity macro", cleanedContent);
+            result = writer.toString();
+
+            if (filter != null) {
+                result = filter.after(result, velocityContext);
+            }
         } catch (XWikiVelocityException e) {
             throw new MacroExecutionException("Failed to evaluate Velocity Macro for content [" + content + "]", e);
         }
 
-        return writer.toString();
+        return result;
+    }
+
+    /**
+     * @param parameters the velocity macros parameters
+     * @return the velocity content filter
+     */
+    private VelocityMacroFilter getFilter(VelocityMacroParameters parameters)
+    {
+        String filterName = parameters.getFilter();
+
+        if (StringUtils.isEmpty(filterName)) {
+            filterName = this.configuration.getFilter();
+
+            if (StringUtils.isEmpty(filterName)) {
+                filterName = null;
+            }
+        }
+
+        VelocityMacroFilter filter = null;
+        if (filterName != null) {
+            try {
+                filter =
+                    (VelocityMacroFilter) getComponentManager().lookup(VelocityMacroFilter.class,
+                        this.configuration.getFilter());
+            } catch (ComponentLookupException e) {
+                getLogger().error("Can't find velocity maco cleaner", e);
+            }
+        }
+
+        return filter;
     }
 }

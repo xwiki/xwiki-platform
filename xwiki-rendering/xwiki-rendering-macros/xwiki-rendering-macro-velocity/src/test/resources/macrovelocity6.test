@@ -1,0 +1,73 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify identation is cleaned
+.#-----------------------------------------------------
+{{velocity}}
+some text
+  #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end
+{{/velocity}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [velocity] [] [
+some text
+  #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end
+]
+beginParagraph
+onWord [some]
+onSpace
+onWord [text]
+onSpace
+onWord [and]
+onSpace
+onWord [the]
+onSpace
+onWord [end]
+onSpace
+onWord [of]
+onSpace
+onWord [the]
+onSpace
+onWord [sentence]
+onSpace
+onWord [indented]
+onSpace
+onWord [to]
+onSpace
+onWord [be]
+onSpace
+onWord [more]
+onSpace
+onWord [readable]
+onSpecialSymbol [.]
+onSpace
+endParagraph
+endMacroMarkerStandalone [velocity] [] [
+some text
+  #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end
+]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:velocity|-||-|
+some text
+  #if (true)
+    #if (true)
+      and the end of the sentence indented to be more readable.
+    #end
+  #end
+--><p>some text and the end of the sentence indented to be more readable.&nbsp;</p><!--stopmacro-->

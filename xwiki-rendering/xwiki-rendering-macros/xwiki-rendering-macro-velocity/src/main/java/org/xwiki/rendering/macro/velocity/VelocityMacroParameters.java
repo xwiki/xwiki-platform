@@ -17,33 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.macro.velocity;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Parameters for the velocity macro.
  * 
  * @version $Id$
  * @since 1.7M3
  */
-public class RenderingTests extends TestCase
+public class VelocityMacroParameters extends ScriptMacroParameters
 {
-    public static Test suite() throws Exception
+    /**
+     * Indicate the output result has to be inserted back in the document.
+     */
+    private String filter;
+
+    /**
+     * @param filter indicate which filtering mode to use.
+     */
+    @ParameterDescription("indicate which filtering mode to use")
+    public void setFilter(String filter)
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
+        this.filter = filter;
+    }
 
-        suite.addTestsFromResource("macrovelocity1", true);
-        suite.addTestsFromResource("macrovelocity2", true);
-        suite.addTestsFromResource("macrovelocity3", true);
-        suite.addTestsFromResource("macrovelocity4", true);
-        suite.addTestsFromResource("macrovelocity5", true);
-        suite.addTestsFromResource("macrovelocity6", true);
-
-        return new RenderingPlexusTestSetup(suite);
+    /**
+     * @return indicate which filtering mode to use
+     */
+    public String getFilter()
+    {
+        return filter;
     }
 }

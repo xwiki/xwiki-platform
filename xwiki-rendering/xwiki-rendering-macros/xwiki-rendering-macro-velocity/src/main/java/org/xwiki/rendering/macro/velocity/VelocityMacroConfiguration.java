@@ -17,33 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
+package org.xwiki.rendering.macro.velocity;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingPlexusTestSetup;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Configuration properties for the Velocity macro.
+ * <p>
+ * You can override the default values for each of the configuration properties below by defining them in XWiki's global
+ * configuration file using a prefix of "macro.velocity" followed by the property name. For example:
+ * <code>macro.velocity.cleaner = none</code>
  * 
  * @version $Id$
- * @since 1.7M3
  */
-public class RenderingTests extends TestCase
+@ComponentRole
+public interface VelocityMacroConfiguration
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
-
-        suite.addTestsFromResource("macrovelocity1", true);
-        suite.addTestsFromResource("macrovelocity2", true);
-        suite.addTestsFromResource("macrovelocity3", true);
-        suite.addTestsFromResource("macrovelocity4", true);
-        suite.addTestsFromResource("macrovelocity5", true);
-        suite.addTestsFromResource("macrovelocity6", true);
-
-        return new RenderingPlexusTestSetup(suite);
-    }
+    /**
+     * @return the hint of the {@link org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter} component to use
+     *         to modify velocity content before or after script execution.
+     */
+    String getFilter();
 }

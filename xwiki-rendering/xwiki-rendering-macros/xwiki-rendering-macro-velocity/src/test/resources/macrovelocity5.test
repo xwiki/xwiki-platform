@@ -1,0 +1,61 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify Velocity variables are shared between different 2.0 macros of the same content
+.#-----------------------------------------------------
+{{velocity}}
+#macro(somemacro)
+"macro content"#end
+$nl
+#somemacro()
+{{/velocity}}
+
+{{velocity}}
+#somemacro()
+{{/velocity}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [velocity] [] [
+#macro(somemacro)
+"macro content"#end
+$nl
+#somemacro()
+]
+beginParagraph
+onSpecialSymbol ["]
+onWord [macro]
+onSpace
+onWord [content]
+onSpecialSymbol ["]
+endParagraph
+endMacroMarkerStandalone [velocity] [] [
+#macro(somemacro)
+"macro content"#end
+$nl
+#somemacro()
+]
+beginMacroMarkerStandalone [velocity] [] [
+#somemacro()
+]
+beginParagraph
+onSpecialSymbol [#]
+onWord [somemacro]
+onSpecialSymbol [(]
+onSpecialSymbol [)]
+endParagraph
+endMacroMarkerStandalone [velocity] [] [
+#somemacro()
+]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:velocity|-||-|
+#macro(somemacro)
+"macro content"#end
+$nl
+#somemacro()
+--><p>"macro content"</p><!--stopmacro--><!--startmacro:velocity|-||-|
+#somemacro()
+--><p>#somemacro()</p><!--stopmacro-->

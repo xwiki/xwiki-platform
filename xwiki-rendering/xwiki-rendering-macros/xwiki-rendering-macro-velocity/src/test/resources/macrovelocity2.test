@@ -5,6 +5,7 @@
 #set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item
+$nl
 #end
 {{/velocity}}
 .#-----------------------------------------------------
@@ -15,6 +16,7 @@ beginMacroMarkerStandalone [velocity] [] [
 #set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item
+$nl
 #end
 ]
 beginList [BULLETED]
@@ -29,6 +31,7 @@ endMacroMarkerStandalone [velocity] [] [
 #set ($list = ['one', 'two'])
 #foreach ($item in $list)
 * $item
+$nl
 #end
 ]
 endDocument

@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.url.InvalidURLException;
+import org.xwiki.url.XWikiDocumentURL;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
 
@@ -35,11 +36,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Transform a String representation of a URL into a XWiki URL.
+ * 
  * @todo how do we support removing the view/ part of the url for example?
  * @todo how do we support hierarchical spaces?
  */
 @Component
-public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
+public class RegexXWikiURLFactory implements XWikiURLFactory<String>, Initializable
 {
     // TODO: Move to a configuration parameter
     private String pattern = "(?:http[s]?://([a-zA-Z-]*)[a-zA-Z-.]*[:]?\\d*)?/\\w*/\\w*/(\\w*)/(\\w*)/?(\\w*)\\??(.*)";
@@ -64,9 +67,15 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
        this.regexMappings.put("queryString", "5");
     }
 
+    /**
+     * Transform a String representation of a URL into a XWiki URL.
+     * 
+     * {@inheritDoc}
+     * @see XWikiURLFactory#createURL(Object)
+     */
     public XWikiURL createURL(String urlAsString) throws InvalidURLException
     {
-        XWikiURL url = new XWikiURL();
+        XWikiDocumentURL url;
 
         // Use a regex to parse the URL into its discrete parts:
         // <protocol>://<server>:<port>/<context>/<action>/<space>/<document>
@@ -76,17 +85,17 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
             // Find the wiki part in the URL
             String wiki = matcher.group(Integer.parseInt((String) this.regexMappings.get("wiki")));
             
-            // Find the action part in the URL
-            String action = matcher.group(Integer.parseInt((String) this.regexMappings.get("action")));
-            url.setAction(action);
-
             // Find the space part in the URL
             String space = matcher.group(Integer.parseInt((String) this.regexMappings.get("space")));
 
             // Find the document part in the URL
             String page = matcher.group(Integer.parseInt((String) this.regexMappings.get("page")));
 
-            url.setDocumentName(new DocumentName(wiki, space, page));
+            url = new XWikiDocumentURL(new DocumentName(wiki, space, page));
+            
+            // Find the action part in the URL
+            String action = matcher.group(Integer.parseInt((String) this.regexMappings.get("action")));
+            url.setAction(action);
             
             // Find the query string if any and transform it into a parameter Map for easy access
             String queryString = matcher.group(Integer.parseInt((String) this.regexMappings.get("queryString")));

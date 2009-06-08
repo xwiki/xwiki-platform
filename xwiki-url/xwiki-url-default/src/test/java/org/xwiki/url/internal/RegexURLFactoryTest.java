@@ -21,6 +21,7 @@
 package org.xwiki.url.internal;
 
 import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.url.XWikiDocumentURL;
 import org.xwiki.url.XWikiURL;
 import org.xwiki.url.XWikiURLFactory;
 
@@ -32,17 +33,18 @@ import org.xwiki.url.XWikiURLFactory;
  */
 public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
 {
-    private XWikiURLFactory factory;
+    private XWikiURLFactory<String> factory;
 
     @Override
     protected void setUp() throws Exception
     {
-        this.factory = (XWikiURLFactory) getComponentManager().lookup(XWikiURLFactory.class);
+        this.factory = (XWikiURLFactory<String>) getComponentManager().lookup(XWikiURLFactory.class);
     }
 
     public void testCreateURL() throws Exception
     {
-        XWikiURL url = this.factory.createURL("http://wiki.domain.com:8080/xwiki/bin/view/Main/WebHome?language=fr");
+        XWikiDocumentURL url = (XWikiDocumentURL) this.factory.createURL(
+            "http://wiki.domain.com:8080/xwiki/bin/view/Main/WebHome?language=fr");
         assertEquals("view", url.getAction());
         assertEquals("WebHome", url.getDocumentName().getPage());
         assertEquals("Main", url.getDocumentName().getSpace());
@@ -52,7 +54,7 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
 
     public void testCreateURLFromPath() throws Exception
     {
-        XWikiURL url = this.factory.createURL("/xwiki/bin/view/Main/WebHome");
+        XWikiDocumentURL url = (XWikiDocumentURL) this.factory.createURL("/xwiki/bin/view/Main/WebHome");
         assertEquals("view", url.getAction());
         assertEquals("WebHome", url.getDocumentName().getPage());
         assertEquals("Main", url.getDocumentName().getSpace());

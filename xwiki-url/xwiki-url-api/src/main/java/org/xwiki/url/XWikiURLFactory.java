@@ -22,8 +22,21 @@ package org.xwiki.url;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+/**
+ * Transforms some representation of a XWiki URL into a {@link XWikiURL} instance.
+ * 
+ * @version $Id$
+ * @param <T> the object to transform into a XWiki URL
+ */
 @ComponentRole
-public interface XWikiURLFactory
+public interface XWikiURLFactory<T>
 {
-    XWikiURL createURL(String urlAsString) throws InvalidURLException;
+    /**
+     * Transforms some representation of a XWiki URL into a {@link XWikiURL} instance.
+     * 
+     * @param urlRepresentation the object to transform into a {@link XWikiURL} instance
+     * @return the {@link XWikiURL} instance
+     * @throws InvalidURLException if the input representation doesn't represent a valid XWiki URL
+     */
+    XWikiURL createURL(T urlRepresentation) throws InvalidURLException;
 }

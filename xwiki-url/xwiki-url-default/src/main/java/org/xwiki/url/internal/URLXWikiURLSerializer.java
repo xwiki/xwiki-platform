@@ -18,29 +18,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.url;
+package org.xwiki.url.internal;
 
-import java.util.List;
-import java.util.Map;
+import java.net.URL;
+
+import org.xwiki.url.XWikiURL;
+import org.xwiki.url.XWikiURLSerializer;
 
 /**
- * Represents a XWiki URL.
- *
+ * Transforms a XWikiURL instance into a URL object. Note that the serialization performs URL-encoding
+ * wherever necessary to generate a valid URL (see http://www.ietf.org/rfc/rfc2396.txt).
+ * 
  * @version $Id$
+ * @since 2.0M1
  */
-public interface XWikiURL
+public class URLXWikiURLSerializer implements XWikiURLSerializer<URL>
 {
-    XWikiURLType getType();
-    
-    void addParameter(String name, String value);
-
-    Map<String, List<String>> getParameters();
-
-    List<String> getParameterValues(String name);
-    
     /**
-     * @param name the parameter name for which to return the value
-     * @return the first parameter value matching the passed parameter name
+     * Transforms a XWikiURL instance into a URL object. Note that the serialization performs URL-encoding
+     * wherever necessary to generate a valid URL (see http://www.ietf.org/rfc/rfc2396.txt).
+     * 
+     * @param xwikiURL the XWiki URL to transform
+     * @return the standard URL instance 
      */
-    String getParameterValue(String name);
+    public <T> T serialize(XWikiURL xwikiURL)
+    {
+        throw new RuntimeException("Not implemented yet");
+    }
 }

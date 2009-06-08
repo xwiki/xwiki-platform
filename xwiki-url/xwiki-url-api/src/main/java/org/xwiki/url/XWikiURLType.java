@@ -20,27 +20,12 @@
  */
 package org.xwiki.url;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * Represents a XWiki URL.
- *
+ * 
  * @version $Id$
+ * @since 2.0M1
  */
-public interface XWikiURL
+public enum XWikiURLType
 {
-    XWikiURLType getType();
-    
-    void addParameter(String name, String value);
-
-    Map<String, List<String>> getParameters();
-
-    List<String> getParameterValues(String name);
-    
-    /**
-     * @param name the parameter name for which to return the value
-     * @return the first parameter value matching the passed parameter name
-     */
-    String getParameterValue(String name);
+    DOCUMENT, ATTACHMENT, SKIN, TEMPLATE, RESOURCE;
 }

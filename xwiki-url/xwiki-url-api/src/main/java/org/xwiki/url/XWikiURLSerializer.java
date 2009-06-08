@@ -20,27 +20,21 @@
  */
 package org.xwiki.url;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * Represents a XWiki URL.
- *
+ * Transforms a XWiki URL instance into some other representation.
+ * 
  * @version $Id$
+ * @since 2.0M1
+ * @param <T> the output type
  */
-public interface XWikiURL
+public interface XWikiURLSerializer<T>
 {
-    XWikiURLType getType();
-    
-    void addParameter(String name, String value);
-
-    Map<String, List<String>> getParameters();
-
-    List<String> getParameterValues(String name);
-    
     /**
-     * @param name the parameter name for which to return the value
-     * @return the first parameter value matching the passed parameter name
+     * Transforms a XWiki URL instance into some other representation.
+     * 
+     * @param <T> the output type
+     * @param xwikiURL the XWiki URL to transform
+     * @return the new representation
      */
-    String getParameterValue(String name);
+    <T> T serialize(XWikiURL xwikiURL);
 }

@@ -20,27 +20,31 @@
  */
 package org.xwiki.url;
 
-import java.util.List;
-import java.util.Map;
+import org.xwiki.bridge.AttachmentName;
 
 /**
- * Represents a XWiki URL.
- *
+ * 
  * @version $Id$
+ * @since 2.0M1
  */
-public interface XWikiURL
+public class XWikiAttachmentURL extends XWikiDocumentURL
 {
-    XWikiURLType getType();
+    private AttachmentName attachmentName;
     
-    void addParameter(String name, String value);
-
-    Map<String, List<String>> getParameters();
-
-    List<String> getParameterValues(String name);
+    public XWikiAttachmentURL(AttachmentName attachmentName)
+    {
+        super(attachmentName);
+        setType(XWikiURLType.ATTACHMENT);
+        setAttachmentName(attachmentName);
+    }
     
-    /**
-     * @param name the parameter name for which to return the value
-     * @return the first parameter value matching the passed parameter name
-     */
-    String getParameterValue(String name);
+    public void setAttachmentName(AttachmentName attachmentName)
+    {
+        this.attachmentName = attachmentName;
+    }
+    
+    public AttachmentName getAttachmentName()
+    {
+        return this.attachmentName;
+    }
 }

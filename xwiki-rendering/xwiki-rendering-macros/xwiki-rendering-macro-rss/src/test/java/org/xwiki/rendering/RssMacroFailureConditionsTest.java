@@ -44,27 +44,7 @@ public class RssMacroFailureConditionsTest extends TestCase
         } catch (MacroExecutionException expected) {
             assertTrue("The required 'feed' parameter is missing".equals(expected.getMessage()));
         }
-    }
-    
-    /**
-     * Tests the macro's behavior when the server hosting the feeds doesn't respond.
-     */
-    public void testConnectionTimeout() throws MacroParameterException
-    {
-        assertNotNull(macro);
-        assertNotNull(parameters);
-        
-        // We set the feed's URL to an unreachable address.
-        parameters.setFeed("http://22.22.22.22");
-        
-        try {
-            macro.execute(parameters, null, null);
-            fail("The macro should throw a 'Connection timeout exception'");
-        } catch (MacroExecutionException expected) {
-            String errorMessage = expected.getMessage();
-            assertTrue(errorMessage.startsWith("Connection timeout when trying to reach"));
-        }
-    }
+    }        
 
     /**
      * Tests the macro's behavior when the server hosting the feeds doesn't respond.

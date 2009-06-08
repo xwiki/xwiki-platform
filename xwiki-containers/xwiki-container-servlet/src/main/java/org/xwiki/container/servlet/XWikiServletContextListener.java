@@ -30,7 +30,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 
-public class XWikiPlexusServletContextListener implements ServletContextListener
+public class XWikiServletContextListener implements ServletContextListener
 {
     /**
      * The component manager used to lookup for other components.

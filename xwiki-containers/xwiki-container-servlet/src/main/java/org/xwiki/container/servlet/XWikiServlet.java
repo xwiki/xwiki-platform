@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class XWikiPlexusServlet extends HttpServlet
+public class XWikiServlet extends HttpServlet
 {
     protected void service(HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse) throws ServletException, IOException

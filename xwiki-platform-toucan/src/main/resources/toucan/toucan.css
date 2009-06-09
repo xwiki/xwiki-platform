@@ -292,12 +292,12 @@ span.edit_section {
     font-size: inherit;
 }
 
-#xwikimaincontainerinner .rssfeed {
+.rssfeed {
 	padding: 8px;
 	background-color:transparent;
 }
 
-#xwikimaincontainerinner .code {
+.code {
 	font-family: courier, courier new, monospace;
 	white-space: pre;
 	margin: 1em 0;
@@ -307,35 +307,35 @@ span.edit_section {
 	border: 1px dotted #555555;
 }
 
-#xwikimaincontainerinner .code pre {
+.code pre {
     font-family: courier, courier new, monospace;
 }
 
-#xwikimaincontainerinner .code .java-keyword {
+.code .java-keyword {
     color: #0000aa;
     background-color: inherit;
 }
 
-#xwikimaincontainerinner .code .java-object {
+.code .java-object {
     color: #000088;
     background-color: inherit;
 }
 
-#xwikimaincontainerinner .code .java-quote {
+.code .java-quote {
     color: #00aa00;
     background-color: inherit;
 }
 
-#xwikimaincontainerinner .code .xml-keyword {
+.code .xml-keyword {
     font-weight: bold;
 }
 
-#xwikimaincontainerinner .code .xml-tag {
+.code .xml-tag {
     color: #0000aa;
     background-color: inherit;
 }
 
-#xwikimaincontainerinner .code .sql-keyword {
+.code .sql-keyword {
     color: #0000aa;
     background-color: inherit;
 }
@@ -3792,7 +3792,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 	border: 1px dotted #555555;
 }
 
- .rssfeed {
+.rssfeed {
     clear: both;
     position: relative;
     width:30%;

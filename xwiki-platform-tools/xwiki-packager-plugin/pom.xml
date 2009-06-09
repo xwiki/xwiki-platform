@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>16</version>
   </parent>
   <artifactId>xwiki-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -38,7 +38,7 @@
     as a Maven2 plugin or directly from the command line.
    </description>
    <properties>
-    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
+    <platform.core.version>2.0-dev-20090609</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

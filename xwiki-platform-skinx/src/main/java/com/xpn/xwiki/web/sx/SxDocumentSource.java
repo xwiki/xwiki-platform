@@ -70,6 +70,9 @@ public class SxDocumentSource implements SxSource
 
         if (this.document.getObjects(this.extension.getClassName()) != null) {
             for (BaseObject sxObj : this.document.getObjects(this.extension.getClassName())) {
+                if (sxObj == null) {
+                    continue;
+                }
                 try {
                     CachePolicy cache =
                         CachePolicy.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
@@ -97,6 +100,9 @@ public class SxDocumentSource implements SxSource
 
         if (this.document.getObjects(this.extension.getClassName()) != null) {
             for (BaseObject sxObj : this.document.getObjects(this.extension.getClassName())) {
+                if (sxObj == null) {
+                    continue;
+                }
                 String sxContent = sxObj.getLargeStringValue("code");
                 int parse = sxObj.getIntValue("parse");
                 if (parse == 1) {

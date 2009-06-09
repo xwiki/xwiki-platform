@@ -274,7 +274,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         throws XWikiException
     {
         List<String> tags = getTagsFromDocument(document);
-        if (!tags.contains(tag)) {
+        if (!StringUtils.isBlank(tag) && !tags.contains(tag)) {
             tags.add(tag);
             setDocumentTags(document, tags, context);
 

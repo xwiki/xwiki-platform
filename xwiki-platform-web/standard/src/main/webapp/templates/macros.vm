@@ -1226,7 +1226,7 @@ $html
  * Displays a public google calendar with all buttons and displays
  * The size of the display is 800x600
  * 
- * This macro displays the public part of the calendar specified. However if the visiting user is logged in in Google Calendar and has rights to the private part of the calendar then the information will be displayed. 
+ * This macro displays the public part of the calendar specified. However if the visiting user is logged in in Google Calendar and has rights to the private part of the calendar then the information will be displayed.
  *
  * @param id ID of the google account to display the calendar for
  *#
@@ -1333,7 +1333,7 @@ $html
 #end
 #**
  * Displays a list of documents.
- * Only documents that the current user is allowed to view will be displayed.   
+ * Only documents that the current user is allowed to view will be displayed.
  * 
  * @param docNames list of document names.
  * @param displaySpaces true to group documents by space.
@@ -1344,15 +1344,15 @@ $html
   #foreach($docName in $docNames)
     #if($xwiki.hasAccessLevel("view", $context.user, $docName))
       #set($document = $xwiki.getDocument($docName).getTranslatedDocument())
-      #if(!$blacklistedSpaces.contains($document.getSpace()))    
+      #if(!$blacklistedSpaces.contains($document.getSpace()))
         #set($discard = $documentList.add($document))
       #end
     #end
   #end
   #if($documentList.size() > 0)
-    #set($previousSpace = "")      
+    #set($previousSpace = "")
     <ul class="xlist">
-      #foreach($document in $documentList)             
+      #foreach($document in $documentList)
         #if ($document.getSpace() != $previousSpace && $displaySpaces)
           #if($velocityCount > 1) </ul></div></li> #end ## Close previous space item if needed
           <li class="xitem space"><div class="xitemcontainer">$document.getSpace()<ul class="xlist"> ## Open new space item
@@ -1360,7 +1360,7 @@ $html
         #end
         <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">$xwiki.getXMLEncoded($document.getDisplayTitle())</a></div></li>
       #end
-      #if($displaySpaces)          
+      #if($displaySpaces)
         </ul></div></li> ## Close last space item
       #end
     </ul>
@@ -1380,16 +1380,16 @@ $html
  *#
 #macro(setVariableFromRequest $variable $variableName $defaultValue)
   #set($isList = false)
-  ## Try to get the variable value from HTTP request.    
+  ## Try to get the variable value from HTTP request.
   #if($defaultValue.class == "class java.util.ArrayList")
     #set($isList = true)
     #set($httpParam = $util.getArrayList())
     #set($rawHttpParam = $request.getParameterValues("${variableName}"))
-    #foreach($param in $rawHttpParam)      
+    #foreach($param in $rawHttpParam)
       #set($discard = $httpParam.add($param))
     #end
-    #set($rawHttpParam = "")    
-  #else    
+    #set($rawHttpParam = "")
+  #else
     #set($httpParam = $request.getParameter("${variableName}"))
     #if("$!httpParam" != "")
       #if($defaultValue.class == "class java.lang.Boolean")
@@ -1404,13 +1404,13 @@ $html
         #set($httpParam = $util.parseDouble($httpParam))
       #end
     #end
-  #end 
+  #end
   #if(!$isList && "$!httpParam" != "" || $isList && $httpParam.size() > 0)
     #set($variable = $httpParam)
     #set($httpParam = "")
   #end
-  ## If the variable has not been set from velocity, fallback on default.      
-  #if("$!variable" == "")      
+  ## If the variable has not been set from velocity, fallback on default.
+  #if("$!variable" == "")
     #set($variable = $defaultValue)
   #end
 #end
@@ -1428,9 +1428,9 @@ $html
 <span class="buttonwrapper"><input class="button" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/></span>
 #end
 #**
- * Dsiplays a submit button for the editor. This macro calls submitButton,
- * composing all its parameters based on the action's identifier and the 
- * the identifier of the corresponding localized resources.
+ * Displays a submit button for the editor. This macro calls submitButton,
+ * composing all its parameters based on the action's identifier and the
+ * identifier of the corresponding localized resources.
  * @param action The identifier of the button's action.
  * @param resourceIdentifier The key used to identify the localized resources.
  *#
@@ -1446,7 +1446,7 @@ $html
  * {{velocity}}
  * #set($columns = [ "_avatar", "first_name", "last_name", "email"])
  * #set($columnsProperties = {
- *                  "first_name" : { "type" : "text" , "size" : 10, "link" : "view"}, 
+ *                  "first_name" : { "type" : "text" , "size" : 10, "link" : "view"},
  *                  "last_name" : { "type" : "text" , "size" : 10, "link" : "view"},
  *                  "email" : { "type" : "text" , "size" : 20, "link" : "editor"},
  *                  "_avatar" : { "type" : "none" , "size" : 20, "link" : "none", "html" : "true", "sortable":false }
@@ -1574,7 +1574,7 @@ $html
                 #set($isFilterable = false)
               #end
               #if("$!colprop.type"=="list" && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"> 
+                <td class="xwiki-livetable-display-header-filter">
                 #if($colprop.get("class"))
                   #set($propClassName = $colprop.get("class"))
                 #else
@@ -1589,7 +1589,7 @@ $html
                   <option value="$listitem">$map.get($listitem).getValue()</option>
                 #end
                 </select>
-                </td>            
+                </td>
               #elseif( ("$!colprop.type"=="text"||"$!colprop.type"=="number") && $isFilterable)
                 <td class="xwiki-livetable-display-header-filter"><input name="${colname}" type="text" #if("!$colprop.size"!="") size="${colprop.size}" #end  title="$msg.get('xe.livetable.filters.title')" /></td>
               #elseif("$!colprop.type"=="hidden")
@@ -1620,9 +1620,9 @@ $html
     #info($msg.get("rightsmanager.documentrequireviewrights"))
   </div>
   <script type="text/javascript">
-  //<![CDATA[ 
+  //<![CDATA[
   #if($callback)
-    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});  
+    var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", $callback ,{"maxPages":$maxPages, "limit":$count});
   #else
     var ta = new XWiki.widgets.LiveTable("$dataurl", "${divid}", #livetablecallback($divid $collist $colprops $transprefix) ,{"maxPages":$maxPages, "limit":$count});
   #end
@@ -1644,7 +1644,7 @@ $html
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table) {
-  // This callback method code has been generated from velocity. 
+  // This callback method code has been generated from velocity.
   var tr = new Element("tr");
   if (row.doc_viewable) {
   #foreach($colname in $collist)
@@ -1663,9 +1663,9 @@ function (row, i, table) {
         var link = #if("$!colprop.link" != "editor") new Element("a"); #else new Element("span"); #end
         ## Automatic: the link url is in JSON results, with key column name + "_url"
         #if("$!colprop.link"=="auto")
-          link.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url; 
+          link.href = (row.${jscolname}_url=="") ? row.doc_url : row.${jscolname}_url;
         #elseif($colprop.link=="field")
-          if (row.${jscolname}_url != "") { 
+          if (row.${jscolname}_url != "") {
             link.href = row.${jscolname}_url;
           }
         ## Property editor
@@ -1702,7 +1702,7 @@ function (row, i, table) {
         if(row.doc_hasadmin) {
           var td = new Element("td", {'class':'actions'});
           #foreach($action in $colprop.get("actions"))
-            #if($velocityCount > 1) 
+            #if($velocityCount > 1)
             td.insert(" ");
             #end
             #if($transprefix != '' && $msg.get("${transprefix}_actions.${action}") != "${transprefix}_actions.${action}")

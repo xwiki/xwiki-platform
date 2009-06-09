@@ -27,18 +27,18 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>16</version>
+    <version>17-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
-  <version>1.12</version>
+  <version>1.12-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <description>
     A packager tool to import/export XWiki pages into/from a database. This tool can be used either
     as a Maven2 plugin or directly from the command line.
    </description>
    <properties>
-    <platform.core.version>2.0-dev-20090609</platform.core.version>
+    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -142,10 +142,4 @@
       </build>
     </profile>
   </profiles>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-packager-plugin-1.12</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-packager-plugin-1.12</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-packager-plugin-1.12</url>
-  </scm>
 </project>

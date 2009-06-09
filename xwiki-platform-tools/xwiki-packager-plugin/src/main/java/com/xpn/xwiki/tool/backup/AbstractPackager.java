@@ -30,7 +30,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -57,9 +56,8 @@ public class AbstractPackager
     {
         XWikiContext context = new XWikiContext();
 
-        EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
-        // Initialize dynamically all components defined using annotations
-        new ComponentAnnotationLoader().initialize(ecm, this.getClass().getClassLoader());
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.initialize(this.getClass().getClassLoader());
         
         // We need to initialize the Component Manager so that the components can be looked up
         context.put(ComponentManager.class.getName(), ecm);

@@ -158,10 +158,17 @@ public class EmbeddableComponentManager implements ComponentManager
     public <T> void release(T component) throws ComponentLifecycleException
     {
         synchronized(this) {
+            RoleHint< ? > key = null;
             for (Map.Entry<RoleHint<?>, Object> entry : this.components.entrySet()) {
                 if (entry.getValue() == component) {
-                    this.components.remove(entry.getKey());
+                    key = entry.getKey();
+                    break;
                 }
+            }
+            // Note that we're not removing inside the for loop above since it would cause a Concurrent
+            // exception since we'd modify the map accessed by the iterator.
+            if (key != null) {
+                this.components.remove(key);
             }
         }
     }

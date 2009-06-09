@@ -94,6 +94,13 @@
       <version>1.5.6</version>
     </dependency>
   </dependencies>
+  <!-- We must configure SCM in each module. For more information see:
+       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-xar-plugin</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-xar-plugin</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-xar-plugin</url>
+  </scm>
   <build>
     <plugins>
       <plugin>

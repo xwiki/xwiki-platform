@@ -55,10 +55,12 @@ public interface Macro<P> extends Comparable<Macro< ? >>
     boolean supportsInlineMode();
 
     /**
+     * Executes the macro.
+     * 
      * @param parameters the macro parameters in the form of a bean defined by the {@link Macro} implementation
      * @param content the content of the macro
      * @param context the context of the macros transformation process
-     * @return the result of the macro execution
+     * @return the result of the macro execution as a list of Block elements
      * @throws MacroExecutionException error when executing the macro
      */
     List<Block> execute(P parameters, String content, MacroTransformationContext context)

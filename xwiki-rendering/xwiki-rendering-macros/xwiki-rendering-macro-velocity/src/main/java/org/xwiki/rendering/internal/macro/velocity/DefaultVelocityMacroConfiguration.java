@@ -33,6 +33,7 @@ import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
  * All configuration options for the Velocity macro.
  * 
  * @version $Id$
+ * @since 2.0M1
  */
 @Component
 public class DefaultVelocityMacroConfiguration implements Initializable, VelocityMacroConfiguration

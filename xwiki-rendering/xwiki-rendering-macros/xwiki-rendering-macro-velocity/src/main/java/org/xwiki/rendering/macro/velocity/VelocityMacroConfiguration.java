@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * <code>macro.velocity.cleaner = none</code>
  * 
  * @version $Id$
+ * @since 2.0M1
  */
 @ComponentRole
 public interface VelocityMacroConfiguration

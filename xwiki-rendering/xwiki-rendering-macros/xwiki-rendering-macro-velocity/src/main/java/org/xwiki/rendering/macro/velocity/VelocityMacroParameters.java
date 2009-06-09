@@ -32,11 +32,13 @@ public class VelocityMacroParameters extends ScriptMacroParameters
 {
     /**
      * Indicate the output result has to be inserted back in the document.
+     * @since 2.0M1
      */
     private String filter;
 
     /**
      * @param filter indicate which filtering mode to use.
+     * @since 2.0M1
      */
     @ParameterDescription("indicate which filtering mode to use")
     public void setFilter(String filter)
@@ -46,6 +48,7 @@ public class VelocityMacroParameters extends ScriptMacroParameters
 
     /**
      * @return indicate which filtering mode to use
+     * @since 2.0M1
      */
     public String getFilter()
     {

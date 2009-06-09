@@ -126,6 +126,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     /**
      * @param parameters the velocity macros parameters
      * @return the velocity content filter
+     * @since 2.0M1
      */
     private VelocityMacroFilter getFilter(VelocityMacroParameters parameters)
     {

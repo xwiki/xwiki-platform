@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>20</version>
+    <version>21-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-application-tag</artifactId>
   <name>XWiki Platform - Applications - Tag</name>
@@ -39,7 +39,7 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-tag</artifactId>
       <!-- We want to release the tag plugin and application together. Hence they should have the same version -->
-      <version>1.3</version>
+      <version>1.4-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

@@ -221,6 +221,7 @@
               <filtering>false</filtering>
             </resource>            
           </webResources>
+          <warSourceExcludes>**/*.js,**/*.css</warSourceExcludes>
         </configuration>
       </plugin>
     </plugins>
@@ -245,12 +246,12 @@
             <version>0.6.2</version>
             <executions>
               <execution>
-                <phase>package</phase>
+                <id>minify</id>
                 <goals>
                   <goal>compress</goal>
                 </goals>
               </execution>
-            </executions>        
+            </executions>
             <!-- YUI compression configuration, it is duplicated in the CI profile, don't forget to modify it too.  -->
             <configuration>
               <!-- Overwrite existing files -->
@@ -258,6 +259,8 @@
               <includes>
                 <include>resources/js/**.js</include>
                 <include>resources/js/**.css</include>
+                <include>resources/uicompontents/**.js</include>
+                <include>resources/uicompontents/**.css</include>
               </includes>
               <excludes>
                 <!-- Exclude already minified files -->
@@ -375,7 +378,7 @@
             <version>0.6.2</version>
             <executions>
               <execution>
-                <phase>package</phase>
+                <id>minify</id>
                 <goals>
                   <goal>compress</goal>
                 </goals>
@@ -387,6 +390,8 @@
               <includes>
                 <include>resources/js/**.js</include>
                 <include>resources/js/**.css</include>
+                <include>resources/uicompontents/**.js</include>
+                <include>resources/uicompontents/**.css</include>
               </includes>
               <excludes>
                 <!-- Exclude already minified files -->

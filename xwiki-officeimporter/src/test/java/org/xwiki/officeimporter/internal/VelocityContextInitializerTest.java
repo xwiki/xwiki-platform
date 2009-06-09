@@ -28,7 +28,7 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * Test class for various {@link VelocityContextInitializer} implementations.
  * 
  * @version $Id$
- * @since 1.9RC2
+ * @since 1.9
  */
 public class VelocityContextInitializerTest extends AbstractXWikiComponentTestCase
 {

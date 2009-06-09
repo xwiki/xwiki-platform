@@ -25,7 +25,7 @@ import java.util.Map;
  * Generates syntax for a parameters group like macros and links.
  * 
  * @version $Id$
- * @since 1.9RC2
+ * @since 1.9
  */
 public class ParametersPrinter
 {

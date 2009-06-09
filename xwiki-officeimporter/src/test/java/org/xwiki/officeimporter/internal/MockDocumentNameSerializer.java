@@ -30,7 +30,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
  * Model/Skin/etc for the Rendering module's unit tests.
  * 
  * @version $Id$
- * @since 1.9RC2
+ * @since 1.9
  */
 public class MockDocumentNameSerializer implements DocumentNameSerializer
 {

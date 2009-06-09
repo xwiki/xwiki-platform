@@ -57,6 +57,13 @@
       <version>${platform.core.version}</version>
      </dependency>
   </dependencies>
+  <!-- We must configure SCM in each module. For more information see:
+       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-packager-plugin</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-packager-plugin</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-packager-plugin</url>
+  </scm>
   <build>
     <plugins>
       <plugin>

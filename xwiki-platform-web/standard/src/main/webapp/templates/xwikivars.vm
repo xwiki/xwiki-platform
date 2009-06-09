@@ -32,7 +32,13 @@
 #else
   #set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch"])
 #end
-## put the blacklisted spaces on the session to be able to access it from java code, e.g. the WysiwygService
+## ======================================================================================
+## Since the WysiwygService does not trigger the evaluation of the xwikivars.vm, we need a way to make this variable
+## visible to the GWT Service calls (and potentially other java code). We set it on the session so it's set when the 
+## page to be edited with the wysiwyg is displayed, and it's available on the session for the WysiwygService functions, 
+## such as getSpaceNames(). This hack is to be removed when the blacklistedSpaces will be set as a configuration 
+## preference and all public API will do the hidden spaces filtering by default. 
+## ======================================================================================
 #set($dump = $request.getSession().setAttribute("blacklistedSpaces", $blacklistedSpaces))
 #set($parent ="<a href='$parentDoc.getURL()'>$xwiki.getXMLEncoded(${parentDoc.displayTitle})</a>")
 #if($tdoc)

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-rendering-macros-parent</artifactId>
-    <version>1.9</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core-rendering-macro-box</artifactId>
   <name>XWiki Platform - Core - Rendering - Macro - Box</name>

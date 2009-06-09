@@ -273,19 +273,19 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public TagOperationResult addTagToDocument(String tag, XWikiDocument document, XWikiContext context)
         throws XWikiException
     {
-        List<String> commentArgs = new ArrayList<String>();
-        commentArgs.add(tag);
-        String comment = context.getMessageTool().get("plugin.tag.editcomment.added", commentArgs);
         List<String> tags = getTagsFromDocument(document);
         if (!tags.contains(tag)) {
             tags.add(tag);
             setDocumentTags(document, tags, context);
+
+            List<String> commentArgs = new ArrayList<String>();
+            commentArgs.add(tag);
+            String comment = context.getMessageTool().get("plugin.tag.editcomment.added", commentArgs);
             context.getWiki().saveDocument(document, comment, true, context);
+
             return TagOperationResult.OK;
-        } else {
-            // Document already contains this tag.
-            return TagOperationResult.NO_EFFECT;
         }
+        return TagOperationResult.NO_EFFECT;
     }
 
     /**

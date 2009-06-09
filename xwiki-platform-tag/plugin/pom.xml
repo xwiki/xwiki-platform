@@ -27,7 +27,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>16-SNAPSHOT</version>
+    <version>15</version>
   </parent>
   <artifactId>xwiki-plugin-tag</artifactId>
   <name>XWiki Platform - Plugins - Tag</name>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.7.1</version>
+      <version>1.8.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

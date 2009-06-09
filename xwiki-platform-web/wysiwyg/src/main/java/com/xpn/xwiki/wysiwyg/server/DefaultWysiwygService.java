@@ -347,6 +347,13 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                 getXWikiContext().setDatabase(wikiName);
             }
             spaceNamesList = getXWikiContext().getWiki().getSpaces(getXWikiContext());
+            // check the blacklisted spaces on the session and remove them from the returned list
+            // TODO: remove this when the public API will exclude them by default
+            List<String> blacklistedSpaces =
+                (ArrayList<String>) getThreadLocalRequest().getSession().getAttribute("blacklistedSpaces");
+            if (blacklistedSpaces != null && blacklistedSpaces.size() > 0) {
+                spaceNamesList.removeAll(blacklistedSpaces);
+            }
             Collections.sort(spaceNamesList);
         } catch (XWikiException e) {
             e.printStackTrace();

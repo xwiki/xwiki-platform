@@ -32,6 +32,8 @@
 #else
   #set($blacklistedSpaces = ["Import", "Panels", "Scheduler", "Stats", "XAppClasses", "XAppSheets", "XAppTemplates", "XWiki", "WatchCode", "WatchSheets", "XApp", "WatchAdmin", "Watch"])
 #end
+## put the blacklisted spaces on the session to be able to access it from java code, e.g. the WysiwygService
+#set($dump = $request.getSession().setAttribute("blacklistedSpaces", $blacklistedSpaces))
 #set($parent ="<a href='$parentDoc.getURL()'>$xwiki.getXMLEncoded(${parentDoc.displayTitle})</a>")
 #if($tdoc)
 #set($headertitle = "<a href='$viewUrl'>$xwiki.getXMLEncoded(${tdoc.displayTitle})</a>")

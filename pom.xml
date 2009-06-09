@@ -33,16 +33,16 @@
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
   <packaging>pom</packaging>
-  <version>2.0-SNAPSHOT</version>
+  <version>2.0-dev-20090609</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <platform.tag.version>1.2</platform.tag.version>
   </properties>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-2.0-dev-20090609</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-2.0-dev-20090609</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/tags/xwiki-core-2.0-dev-20090609</url>
   </scm>
   <dependencyManagement>
     <dependencies>

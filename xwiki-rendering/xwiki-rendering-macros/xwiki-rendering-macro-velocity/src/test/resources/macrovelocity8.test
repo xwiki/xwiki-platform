@@ -1,0 +1,40 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify filter option is taken into acount
+.#-----------------------------------------------------
+{{velocity}}
+## some comment
+#if (true)
+  text
+#end
+{{/velocity}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [velocity] [] [
+## some comment
+#if (true)
+  text
+#end
+]
+beginParagraph
+onWord [text]
+onSpace
+endParagraph
+endMacroMarkerStandalone [velocity] [] [
+## some comment
+#if (true)
+  text
+#end
+]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:velocity|-||-|
+## some comment
+#if (true)
+  text
+#end
+--><p>text&nbsp;</p><!--stopmacro-->

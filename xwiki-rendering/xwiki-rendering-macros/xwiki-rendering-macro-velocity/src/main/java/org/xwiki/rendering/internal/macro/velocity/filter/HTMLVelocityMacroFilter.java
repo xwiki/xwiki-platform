@@ -56,7 +56,7 @@ public class HTMLVelocityMacroFilter implements VelocityMacroFilter
     /**
      * Match velocity key works without parameters and consuming trailing new line.
      */
-    private static final String PATTERNS_KEYWORDSSIMPLE = "(?:(?:#else|#end)(?:\n|\r\n|\r))";
+    private static final String PATTERNS_KEYWORDSSIMPLE = "(?:(?:#else|#end|(?:##[^\n\r]*))(?:\n|\r\n|\r))";
 
     /**
      * Match expression to clean.

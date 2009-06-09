@@ -31,14 +31,14 @@
   </parent>
   <artifactId>xwiki-application-blog</artifactId>
   <name>XWiki Platform - Applications - Blog</name>
-  <version>1.5</version>
+  <version>1.6-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Blog application for XWiki</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-blog-1.5</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-blog-1.5</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-blog-1.5</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/blog</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/blog</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/blog</url>
   </scm>
 </project>

@@ -70,6 +70,10 @@
 .gwt-MenuBarPopup {
   z-index: 12;
 }
+/* This overrides the pre behavior when the buttons end up as children of such a field */
+#body .fullScreenWrapper .buttons .buttonwrapper {
+  white-space: normal;
+}
 /* This overrides a rule for the Object Editor that is supposed to resize text inputs. */
 #body .fullScreenWrapper .buttons .buttonwrapper input {
   width: auto;

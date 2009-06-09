@@ -21,11 +21,11 @@ package org.xwiki.test;
 
 import org.junit.After;
 import org.junit.Before;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
- * available. Use this class for JUnit 4.x tests. For Junit 3.x tests use {@link AbstractComponentTestCase— instead.
+ * available. Use this class for JUnit 4.x tests. For JUnit 3.x tests use {@link AbstractComponentTestCase— instead.
  */
 public class AbstractComponentTestCase
 {
@@ -54,7 +54,7 @@ public class AbstractComponentTestCase
      * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
      *         then be put in the XWiki Context for testing.
      */
-    public ComponentManager getComponentManager() throws Exception
+    public EmbeddableComponentManager getComponentManager() throws Exception
     {
         return this.initializer.getComponentManager();
     }

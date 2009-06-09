@@ -24,9 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
@@ -35,7 +33,7 @@ import org.xwiki.context.ExecutionContextManager;
 
 public class XWikiComponentInitializer
 {
-    private ComponentManager componentManager;
+    private EmbeddableComponentManager componentManager;
 
     /**
      * This method should be called before {@link #initializeExecution()} since some components will require the Container
@@ -98,10 +96,9 @@ public class XWikiComponentInitializer
     }
 
     /**
-     * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory)
-     *         which can then be put in the XWiki Context for testing.
+     * @return a configured Component Manager
      */
-    public ComponentManager getComponentManager() throws Exception
+    public EmbeddableComponentManager getComponentManager() throws Exception
     {
         if (this.componentManager == null) {
             EmbeddableComponentManager ecm = new EmbeddableComponentManager();

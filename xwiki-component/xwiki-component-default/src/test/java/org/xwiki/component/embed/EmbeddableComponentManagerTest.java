@@ -16,45 +16,47 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
-package org.xwiki.rendering.internal;
+package org.xwiki.component.embed;
 
-import org.xwiki.bridge.SkinAccessBridge;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 
 /**
- * Mock {@link SkinAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
- * Model/Skin/etc for the Rendering module's unit tests.
+ * Unit tests for {@link EmbeddableComponentManager}.
  * 
  * @version $Id$
- * @since 1.8RC2
+ * @since 2.0M1
  */
-public class MockSkinAccessBridge implements SkinAccessBridge
+public class EmbeddableComponentManagerTest
 {
-    /**
-     * Create and return a descriptor for this component.
-     * 
-     * @return the descriptor of the component.
-     */
-    public static ComponentDescriptor getComponentDescriptor()
+    public interface Role
     {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
-
-        componentDescriptor.setRole(SkinAccessBridge.class);
-        componentDescriptor.setImplementation(MockSkinAccessBridge.class);
-
-        return componentDescriptor;
     }
-
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.bridge.XWikiBridge#getSkinFile(String fileName)
-     */
-    public String getSkinFile(String fileName)
+    
+    @Test
+    public void testGetComponentDescriptorList() throws Exception
     {
-        return fileName.equals("noavatar.png") 
-            ? "/xwiki/noavatar.png"
-            : null;
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        
+        DefaultComponentDescriptor<Role> d1 = new DefaultComponentDescriptor<Role>();
+        d1.setRole(Role.class);
+        d1.setRoleHint("hint1");
+        ecm.registerComponent(d1);
+
+        DefaultComponentDescriptor<Role> d2 = new DefaultComponentDescriptor<Role>();
+        d2.setRole(Role.class);
+        d2.setRoleHint("hint2");
+        ecm.registerComponent(d2);
+        
+        List<ComponentDescriptor<Role>> cds = ecm.getComponentDescriptorList(Role.class);
+        Assert.assertEquals(2, cds.size());
+        Assert.assertTrue(cds.contains(d1));
+        Assert.assertTrue(cds.contains(d2));
     }
 }

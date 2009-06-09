@@ -36,7 +36,7 @@ public class TestCoreConfiguration implements CoreConfiguration
             new DefaultComponentDescriptor<CoreConfiguration>();
 
         componentDescriptor.setRole(CoreConfiguration.class);
-        componentDescriptor.setImplementation(TestCoreConfiguration.class.getName());
+        componentDescriptor.setImplementation(TestCoreConfiguration.class);
 
         return componentDescriptor;
     }

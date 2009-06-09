@@ -37,7 +37,7 @@ public interface ComponentManager
      * @return the component instance
      * @throws ComponentLookupException in case the component cannot be found 
      */
-    <T> T lookup(Class< T > role) throws ComponentLookupException;
+    < T > T lookup(Class< T > role) throws ComponentLookupException;
     
     /**
      * Find a component instance that implements that passed interface class. If the component has a singleton
@@ -49,7 +49,7 @@ public interface ComponentManager
      * @return the component instance
      * @throws ComponentLookupException in case the component cannot be found 
      */
-    <T> T lookup(Class< T > role, String roleHint) throws ComponentLookupException;
+    < T > T lookup(Class< T > role, String roleHint) throws ComponentLookupException;
 
     /**
      * Remove a component from the list of available components.
@@ -59,11 +59,11 @@ public interface ComponentManager
      *        passed instance is removed
      * @throws ComponentLifecycleException if the component's ending lifecycle raises an error 
      */
-    <T> void release(T component) throws ComponentLifecycleException;
+    < T > void release(T component) throws ComponentLifecycleException;
 
-    <T> Map<String, T> lookupMap(Class< T > role) throws ComponentLookupException;
+    < T > Map<String, T> lookupMap(Class< T > role) throws ComponentLookupException;
 
-    <T> List< T > lookupList(Class< T > role) throws ComponentLookupException;
+    < T > List< T > lookupList(Class< T > role) throws ComponentLookupException;
 
     /**
      * Add a component in the component repository programmaticaly.
@@ -75,7 +75,7 @@ public interface ComponentManager
      * @throws ComponentRepositoryException error when registering component descriptor.
      * @since 1.7M1
      */
-    <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException;
+    < T > void registerComponent(ComponentDescriptor< T > componentDescriptor) throws ComponentRepositoryException;
 
     /**
      * @param role the role identifying the component
@@ -83,5 +83,12 @@ public interface ComponentManager
      * @return the descriptor for the component matching the passed parameter or null if this component doesn't exist
      * @since 2.0M1
      */
-    <T> ComponentDescriptor<T> getComponentDescriptor(Class< T > role, String roleHint);
+    < T > ComponentDescriptor< T > getComponentDescriptor(Class< T > role, String roleHint);
+
+    /**
+     * @param <T> the role class for which to return all component implementations
+     * @param role the role class for which to return all component implementations  
+     * @return all component implementations for the passed role
+     */
+    < T > List<ComponentDescriptor<T>> getComponentDescriptorList(Class< T > role);
 }

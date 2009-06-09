@@ -90,7 +90,7 @@ public class ComponentDescriptorFactory
     {
         DefaultComponentDescriptor descriptor = new DefaultComponentDescriptor();
         descriptor.setRole(componentRoleClass);
-        descriptor.setImplementation(componentClass.getName());
+        descriptor.setImplementation(componentClass);
         descriptor.setRoleHint(hint);
 
         // Set the instantiation strategy

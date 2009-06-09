@@ -23,7 +23,6 @@ package org.xwiki.container.servlet;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -37,8 +36,6 @@ public class XWikiServletContextListener implements ServletContextListener
      */
     private ComponentManager componentManager;
 
-    private ComponentAnnotationLoader annotationLoader = new ComponentAnnotationLoader();
-    
     /**
      * {@inheritDoc}
      * 
@@ -47,8 +44,8 @@ public class XWikiServletContextListener implements ServletContextListener
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
         // Initializes the Embeddable Component Manager 
-        EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
-        ecm.initialize();
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
 
         // Initializes XWiki's Container with the Servlet Context.

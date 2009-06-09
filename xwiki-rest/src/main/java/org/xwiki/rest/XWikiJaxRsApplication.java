@@ -27,8 +27,7 @@ import java.util.logging.Level;
 import javax.ws.rs.core.Application;
 
 import org.restlet.Context;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -47,22 +46,12 @@ public class XWikiJaxRsApplication extends Application
 
         ComponentManager componentManager =
             (ComponentManager) context.getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
-        try {
-            List<XWikiRestComponent> components = componentManager.lookupList(XWikiRestComponent.class);
+        List<ComponentDescriptor<XWikiRestComponent>> cds = 
+            componentManager.getComponentDescriptorList(XWikiRestComponent.class);
 
-            for (XWikiRestComponent component : components) {
-                jaxRsClasses.add(component.getClass());
-                context.getLogger().log(Level.FINE, String.format("%s registered.", component.getClass().getName()));
-
-                try {
-                    componentManager.release(component);
-                } catch (ComponentLifecycleException e) {
-                    context.getLogger().log(Level.WARNING,
-                        String.format("Unable to release component", component.getClass().getName()), e);
-                }
-            }
-        } catch (ComponentLookupException e) {
-            context.getLogger().log(Level.WARNING, "Unable to lookup components", e);
+        for (ComponentDescriptor<XWikiRestComponent> cd : cds) {
+            this.jaxRsClasses.add(cd.getImplementation());
+            context.getLogger().log(Level.FINE, String.format("%s registered.", cd.getImplementation().getName()));
         }
 
         context.getLogger().log(Level.INFO, "RESTful API subsystem initialized.");

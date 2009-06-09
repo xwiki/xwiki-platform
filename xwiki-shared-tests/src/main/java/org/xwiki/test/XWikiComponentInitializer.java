@@ -37,8 +37,6 @@ public class XWikiComponentInitializer
 {
     private ComponentManager componentManager;
 
-    private ComponentAnnotationLoader componentAnnotationInitializer = new ComponentAnnotationLoader();
-    
     /**
      * This method should be called before {@link #initializeExecution()} since some components will require the Container
      * component to be set up (for example to access resource such as the XWikiconfiguration file).
@@ -106,8 +104,8 @@ public class XWikiComponentInitializer
     public ComponentManager getComponentManager() throws Exception
     {
         if (this.componentManager == null) {
-            EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
-            ecm.initialize();
+            EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+            ecm.initialize(this.getClass().getClassLoader());
             this.componentManager = ecm;
         }
 

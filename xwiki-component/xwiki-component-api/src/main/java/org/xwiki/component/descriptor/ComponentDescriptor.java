@@ -30,7 +30,7 @@ import java.util.Collection;
  */
 public interface ComponentDescriptor<T> extends ComponentRole<T>
 {
-    String getImplementation();
+    Class< ? > getImplementation();
 
     ComponentInstantiationStrategy getInstantiationStrategy();
 

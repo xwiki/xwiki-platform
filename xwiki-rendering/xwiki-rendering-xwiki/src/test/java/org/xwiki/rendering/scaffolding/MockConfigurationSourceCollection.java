@@ -46,7 +46,7 @@ public class MockConfigurationSourceCollection implements ConfigurationSourceCol
         DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
 
         componentDescriptor.setRole(ConfigurationSourceCollection.class);
-        componentDescriptor.setImplementation(MockConfigurationSourceCollection.class.getName());
+        componentDescriptor.setImplementation(MockConfigurationSourceCollection.class);
 
         return componentDescriptor;
     }

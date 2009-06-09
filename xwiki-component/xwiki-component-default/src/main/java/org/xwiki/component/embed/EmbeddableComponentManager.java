@@ -53,22 +53,15 @@ public class EmbeddableComponentManager implements ComponentManager
     
     private Map<RoleHint< ? >, Object> components = new HashMap<RoleHint< ? >, Object>();
     
-    private ClassLoader classLoader;
-    
-    public EmbeddableComponentManager(ClassLoader classLoader)
-    {
-        this.classLoader = classLoader;
-    }
-
     /**
      * Load all component annotations and register them as components.
      * 
      * @param classLoader the class loader to use to look for component definitions
      */
-    public void initialize()
+    public void initialize(ClassLoader classLoader)
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        loader.initialize(this, this.classLoader);
+        loader.initialize(this, classLoader);
     }
     
     /**
@@ -148,6 +141,24 @@ public class EmbeddableComponentManager implements ComponentManager
     {
         synchronized(this) {
             return (ComponentDescriptor<T>) this.descriptors.get(new RoleHint<T>(role, roleHint));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#getComponentDescriptorList(Class)
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<ComponentDescriptor<T>> getComponentDescriptorList(Class<T> role)
+    {
+        synchronized(this) {
+            List<ComponentDescriptor<T>> results = new ArrayList<ComponentDescriptor<T>>();
+            for (Map.Entry<RoleHint< ? >, ComponentDescriptor< ? >> entry : this.descriptors.entrySet()) {
+                if (entry.getKey().getRole().getName().equals(role.getName())) {
+                    results.add((ComponentDescriptor<T>) entry.getValue());
+                }
+            }
+            return results;
         }
     }
 
@@ -239,8 +250,7 @@ public class EmbeddableComponentManager implements ComponentManager
         // Instantiate component
         ComponentDescriptor<T> descriptor = (ComponentDescriptor<T>) this.descriptors.get(roleHint);
         if (descriptor != null) {
-            Class<T> componentClass = (Class<T>) this.classLoader.loadClass(descriptor.getImplementation());
-            instance = componentClass.newInstance();
+            instance = (T) descriptor.getImplementation().newInstance();
             
             // Set each dependency
             for (ComponentDependency<?> dependency : descriptor.getComponentDependencies()) {
@@ -270,7 +280,7 @@ public class EmbeddableComponentManager implements ComponentManager
             // Call Lifecycle
 
             // LogEnabled
-            if (LogEnabled.class.isAssignableFrom(componentClass)) {
+            if (LogEnabled.class.isAssignableFrom(descriptor.getImplementation())) {
                 // TODO: Use a proper logger
                 ((LogEnabled) instance).enableLogging(new VoidLogger());
             }
@@ -278,14 +288,14 @@ public class EmbeddableComponentManager implements ComponentManager
             // Composable
             // Only support Composable for classes implementing ComponentManager since for all other components
             // they should have ComponentManager injected.
-            if (ComponentManager.class.isAssignableFrom(componentClass) 
-                && Composable.class.isAssignableFrom(componentClass))
+            if (ComponentManager.class.isAssignableFrom(descriptor.getImplementation()) 
+                && Composable.class.isAssignableFrom(descriptor.getImplementation()))
             {
                 ((Composable) instance).compose(this);
             }
             
             // Initializable
-            if (Initializable.class.isAssignableFrom(componentClass)) {
+            if (Initializable.class.isAssignableFrom(descriptor.getImplementation())) {
                 ((Initializable) instance).initialize();
             }
         }

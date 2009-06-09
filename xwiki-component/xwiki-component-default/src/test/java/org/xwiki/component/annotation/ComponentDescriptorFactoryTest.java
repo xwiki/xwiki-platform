@@ -136,7 +136,7 @@ public class ComponentDescriptorFactoryTest
         Assert.assertEquals(1, descriptors.size());
         ComponentDescriptor descriptor = descriptors.get(0);
         
-        Assert.assertEquals(componentClass.getName(), descriptor.getImplementation());
+        Assert.assertEquals(componentClass.getName(), descriptor.getImplementation().getName());
         Assert.assertEquals(ExtendedRole.class.getName(), descriptor.getRole().getName());
         Assert.assertEquals("default", descriptor.getRoleHint());
         Assert.assertEquals(ComponentInstantiationStrategy.SINGLETON, descriptor.getInstantiationStrategy());

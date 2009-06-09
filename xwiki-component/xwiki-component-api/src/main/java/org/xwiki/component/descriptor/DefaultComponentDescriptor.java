@@ -32,18 +32,18 @@ import java.util.List;
  */
 public class DefaultComponentDescriptor<T> extends DefaultComponentRole<T> implements ComponentDescriptor<T>
 {
-    private String implementation;
+    private Class< ? > implementation;
 
     private ComponentInstantiationStrategy instantiationStrategy = ComponentInstantiationStrategy.SINGLETON;
 
     private List<ComponentDependency<?>> componentDependencies = new ArrayList<ComponentDependency<?>>();
 
-    public void setImplementation(String implementation)
+    public void setImplementation(Class< ? > implementation)
     {
         this.implementation = implementation;
     }
 
-    public String getImplementation()
+    public Class< ? > getImplementation()
     {
         return implementation;
     }
@@ -81,7 +81,7 @@ public class DefaultComponentDescriptor<T> extends DefaultComponentRole<T> imple
     public String toString()
     {
         StringBuffer buffer = new StringBuffer(super.toString());
-        buffer.append(" implementation = [").append(getImplementation()).append("]");
+        buffer.append(" implementation = [").append(getImplementation().getName()).append("]");
         buffer.append(" instantiation = [").append(getInstantiationStrategy()).append("]");
         return buffer.toString();
     }

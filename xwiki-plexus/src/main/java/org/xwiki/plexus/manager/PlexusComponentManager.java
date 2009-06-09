@@ -20,6 +20,7 @@
  */
 package org.xwiki.plexus.manager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -156,14 +157,35 @@ public class PlexusComponentManager implements ComponentManager
      */
     public <T> ComponentDescriptor<T> getComponentDescriptor(Class< T > role, String roleHint)
     {
-        org.codehaus.plexus.component.repository.ComponentDescriptor pcd =
-            this.plexusContainer.getComponentDescriptor(role.getName(), roleHint);
+        return createXWikiComponentDescriptor(
+            this.plexusContainer.getComponentDescriptor(role.getName(), roleHint));
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#getComponentDescriptorList(Class)
+     * @since 2.0M1
+     */
+    public <T> List<ComponentDescriptor<T>> getComponentDescriptorList(Class<T> role)
+    {
+        List<org.codehaus.plexus.component.repository.ComponentDescriptor> pcds =
+            this.plexusContainer.getComponentDescriptorList(role.getName());
 
+        List<ComponentDescriptor<T>> results = new ArrayList<ComponentDescriptor<T>>();
+        for (org.codehaus.plexus.component.repository.ComponentDescriptor pcd : pcds) {
+            results.add((ComponentDescriptor<T>) createXWikiComponentDescriptor(pcd));
+        }
+        return results;
+    }
+
+    private <T> ComponentDescriptor<T> createXWikiComponentDescriptor(
+        org.codehaus.plexus.component.repository.ComponentDescriptor pcd)
+    {
         DefaultComponentDescriptor<T> descriptor = null;
         
         if (pcd != null) {
             descriptor = new DefaultComponentDescriptor<T>();
-            descriptor.setImplementation(pcd.getImplementation());
+            descriptor.setImplementation(loadClass(pcd.getImplementation()));
             descriptor.setRoleHint(pcd.getRoleHint());
             descriptor.setRole((Class<T>) loadClass(pcd.getRole()));
             
@@ -187,7 +209,7 @@ public class PlexusComponentManager implements ComponentManager
             }
         }
         
-        return descriptor;
+        return descriptor;        
     }
     
     private org.codehaus.plexus.component.repository.ComponentDescriptor createPlexusComponentDescriptor(
@@ -198,7 +220,7 @@ public class PlexusComponentManager implements ComponentManager
 
         pcd.setRole(componentDescriptor.getRole().getName());
         pcd.setRoleHint(componentDescriptor.getRoleHint());
-        pcd.setImplementation(componentDescriptor.getImplementation());
+        pcd.setImplementation(componentDescriptor.getImplementation().getName());
         
         switch (componentDescriptor.getInstantiationStrategy()) {
             case PER_LOOKUP:

@@ -61,6 +61,15 @@ public class DefaultComponentManager implements ComponentManager, Composable
     {
         return this.componentManager.getComponentDescriptor(role, roleHint);
     }
+    
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#getComponentDescriptorList(Class)
+     */
+    public <T> List<ComponentDescriptor<T>> getComponentDescriptorList(Class<T> role)
+    {
+        return this.componentManager.getComponentDescriptorList(role);
+    }
 
     /**
      * {@inheritDoc}

@@ -52,8 +52,8 @@ public class ExampleTest
     public void renderXWiki20SyntaxAsXHTML() throws Exception
     {
         // Initialize Rendering components and allow getting instances
-        EmbeddableComponentManager ecm = new EmbeddableComponentManager(this.getClass().getClassLoader());
-        ecm.initialize();
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.initialize(this.getClass().getClassLoader());
         
         // Parse XWiki 2.0 Syntax
         Parser parser = ecm.lookup(Parser.class, Syntax.XWIKI_2_0.toIdString());

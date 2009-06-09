@@ -211,6 +211,7 @@ body#mceSpanFonts h1 span, body#mceSpanFonts h2 span,
 }
 
 h1 {
+    padding-top: 1px;
     margin-top: 5px;
     font-size: 2.3em;
     font-weight: normal;
@@ -219,6 +220,7 @@ h1 {
 }
 
 h2 {
+    padding-top: 1px;
     font-weight: normal;
     font-style: normal;
     font-size: 2em;
@@ -226,6 +228,7 @@ h2 {
 }
 
 h3 {
+    padding-top: 1px;
     font-weight: normal;
     font-size: 1.6em;
     line-height: 1.1em;
@@ -233,6 +236,7 @@ h3 {
 }
 
 h4 {
+    padding-top: 1px;
     font-weight: normal;
     color: #404040;
     left: 0;

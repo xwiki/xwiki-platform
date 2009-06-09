@@ -27,6 +27,7 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
  * Do nothing.
  * 
  * @version $Id$
+ * @since 1.9
  */
 @Component("none")
 public class NoneVelocityMacroFilter implements VelocityMacroFilter

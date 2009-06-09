@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * can be used for example to reformat the velocity content to take care of indentation etc.
  * 
  * @version $Id$
+ * @since 1.9
  */
 @ComponentRole
 public interface VelocityMacroFilter

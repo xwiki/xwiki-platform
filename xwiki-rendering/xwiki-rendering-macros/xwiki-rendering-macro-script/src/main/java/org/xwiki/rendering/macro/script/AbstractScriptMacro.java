@@ -105,6 +105,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
     /**
      * @return the component manager
+     * @since 1.9
      */
     protected ComponentManager getComponentManager()
     {

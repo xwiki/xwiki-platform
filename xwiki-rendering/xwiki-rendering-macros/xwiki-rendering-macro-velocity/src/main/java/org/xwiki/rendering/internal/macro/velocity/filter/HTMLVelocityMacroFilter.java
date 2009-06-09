@@ -32,6 +32,7 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
  * after script execution.
  * 
  * @version $Id$
+ * @since 1.9
  */
 @Component("html")
 public class HTMLVelocityMacroFilter implements VelocityMacroFilter

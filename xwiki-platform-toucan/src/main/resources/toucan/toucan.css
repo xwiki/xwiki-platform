@@ -3375,28 +3375,7 @@ div.changes-info-title {
 
 .xwikiuserblog {
     float: right;
-    width: 250px;
-    background-color: #FAFAFD;
-    padding: 1px;
-}
-
-#lb-content .xwikiuserblog,
-    .xwikiuserblog {
     clear: both;
-    position: relative;
-    float: right;
-    width: 250px;
-    background-color: white;
-}
-
-#lb-content .xwikiuserblog, .xwikiuserblog  {
-    padding: 5px;
-    text-align: center;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
-}
-
-#lb-content .xwikiuserblog, .xwikiuserblog {
     padding: 5px;
 }
 
@@ -3793,34 +3772,26 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .rssfeed {
-    clear: both;
-    position: relative;
-    width:30%;
-    border: 1px dotted #003366;
-    background-color: white;
+  clear: both;
+  position: relative;
+  width: 300px;
+  border: 1px solid #DDD;
+  background-color: white;
 }
 
-.rssfeed div.rsschanneltitle,
-    .rssfeed div.rsschanneltitle {
-    padding: 5px;
-    text-align: center;
-    font-weight: bold;
-    border-bottom: 1px solid #ddd;
+.rssfeed div.rsschanneltitle {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #DDD;
+  padding: 5px;
+  background-color: #F4F9FE;
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .rssfeed .rssitem {
-    padding: 5px;
+  padding: 5px;
 }
-
-
-.rsschanneltitle {
-	background-color:#F4F9FE;
-	font-size:14px;
-	font-weight:bold;
-	margin-bottom:10px;
-	padding:5px;
-	text-align:center;
-} 	
 
 .errormessage, .warningmessage, .infomessage, .plainmessage {
   margin: 4px 0;

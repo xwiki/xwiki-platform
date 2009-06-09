@@ -56,6 +56,8 @@ XWiki.editors.FullScreenEditing = Class.create({
     $$('.xRichTextEditor').each(function(item) {
       this.addBehavior(item);
     }.bind(this));
+    // WYSIWYGR sends events when a new editor is created.
+    this.addWysiwyg20Listener();
     // When comming back from preview, check if the user was in full screen before hitting preview, and if so restore
     // that full screen
     this.maximizedReference = $(document.body).down("input[name='x-maximized']");
@@ -74,11 +76,19 @@ XWiki.editors.FullScreenEditing = Class.create({
       this.addWysiwyg10ContentButton(item);
     } else if (this.isWikiContent(item)) {
       this.addWikiContentButton(item);
+    } else if (this.isWysiwyg20Field(item)) {
+      this.addWysiwyg20FieldButton(item);
     } else if (this.isWikiField(item)) {
       this.addWikiFieldButton(item);
     } else if (this.isWysiwyg10Field(item)) {
       this.addWysiwyg10FieldButton(item);
     }
+  },
+  addWysiwyg20Listener : function () {
+    document.observe('xwiki:wysiwyg:created', this.wysiwyg20Created.bindAsEventListener(this));
+  },
+  wysiwyg20Created : function(event, memo) {
+    // TODO: Implement me
   },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {
@@ -91,7 +101,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     return textarea.name == 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
   },
   isWysiwyg20Content : function (item) {
-    return item.hasClassName("xRichTextEditor") && item.up("#content_container");
+    return item.hasClassName("xRichTextEditor") && item.up("div[id^=content_container]");
   },
   isWikiField : function (textarea) {
     // If the textarea is not visible, then the WYSIWYG editor is active.
@@ -101,7 +111,7 @@ XWiki.editors.FullScreenEditing = Class.create({
     return !textarea.visible() && textarea.name != 'content' && (Prototype.Browser.IE ? textarea.previous(".mceEditorContainer") : textarea.next(".mceEditorContainer"));
   },
   isWysiwyg20Field : function (item) {
-    return item.hasClassName("xRichTextEditor") && !item.up("#content_container");
+    return item.hasClassName("xRichTextEditor") && !item.up("div[id^=content_container]");
   },
   /** Adds the fullscreen button in the Wiki editor toolbar. */
   addWikiContentButton : function (textarea) {
@@ -172,6 +182,9 @@ XWiki.editors.FullScreenEditing = Class.create({
   },
   addWysiwyg10FieldButton : function (textarea) {
     this.addWysiwyg10ContentButton(textarea);
+  },
+  addWysiwyg20FieldButton : function (textarea) {
+    this.addWysiwyg20ContentButton(textarea);
   },
   /** Creates a full screen activator button for the given element. */
   createOpenButton : function (targetElement) {

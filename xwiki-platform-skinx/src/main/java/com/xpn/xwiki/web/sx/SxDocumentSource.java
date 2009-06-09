@@ -68,8 +68,8 @@ public class SxDocumentSource implements SxSource
     {
         CachePolicy finalCache = CachePolicy.LONG;
 
-        if (document.getObjects(extension.getClassName()) != null) {
-            for (BaseObject sxObj : document.getObjects(extension.getClassName())) {
+        if (this.document.getObjects(this.extension.getClassName()) != null) {
+            for (BaseObject sxObj : this.document.getObjects(this.extension.getClassName())) {
                 try {
                     CachePolicy cache =
                         CachePolicy.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
@@ -78,7 +78,7 @@ public class SxDocumentSource implements SxSource
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOG.warn(String.format("SX object [%s#%s] has an invalid cache policy: [%s]", document
+                    LOG.warn(String.format("SX object [%s#%s] has an invalid cache policy: [%s]", this.document
                         .getFullName(), sxObj.getStringValue("name"), sxObj.getStringValue("cache")));
                 }
             }
@@ -95,12 +95,14 @@ public class SxDocumentSource implements SxSource
     {
         StringBuilder resultBuilder = new StringBuilder();
 
-        if (document.getObjects(extension.getClassName()) != null) {
-            for (BaseObject sxObj : document.getObjects(extension.getClassName())) {
+        if (this.document.getObjects(this.extension.getClassName()) != null) {
+            for (BaseObject sxObj : this.document.getObjects(this.extension.getClassName())) {
                 String sxContent = sxObj.getLargeStringValue("code");
                 int parse = sxObj.getIntValue("parse");
                 if (parse == 1) {
-                    sxContent = context.getWiki().getRenderingEngine().interpretText(sxContent, document, context);
+                    sxContent =
+                        this.context.getWiki().getRenderingEngine().interpretText(sxContent, this.document,
+                            this.context);
                 }
                 // Also add a newline, in case the different object contents don't end with a blank
                 // line, and could cause syntax errors when concatenated.
@@ -117,7 +119,7 @@ public class SxDocumentSource implements SxSource
      */
     public long getLastModifiedDate()
     {
-        return document.getDate().getTime();
+        return this.document.getDate().getTime();
     }
 
 }

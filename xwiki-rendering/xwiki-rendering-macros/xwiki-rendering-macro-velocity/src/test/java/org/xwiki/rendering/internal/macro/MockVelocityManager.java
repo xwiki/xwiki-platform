@@ -30,8 +30,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import java.util.Properties;
 
 /**
- * Mock VelocityManager implementation used for testing, since we don't want to pull any dependency
- * on the Model/Skin/etc for the Rendering module's unit tests.
+ * Mock VelocityManager implementation used for testing, since we don't want to pull any dependency on the
+ * Model/Skin/etc for the Rendering module's unit tests.
  * 
  * @version $Id$
  * @since 1.5M2
@@ -40,6 +40,8 @@ public class MockVelocityManager implements VelocityManager, Composable
 {
     private ComponentManager componentManager;
 
+    private VelocityContext velocityContext = new VelocityContext();
+
     public void compose(ComponentManager componentManager)
     {
         this.componentManager = componentManager;
@@ -47,7 +49,7 @@ public class MockVelocityManager implements VelocityManager, Composable
 
     public VelocityContext getVelocityContext()
     {
-        return new VelocityContext();
+        return this.velocityContext;
     }
 
     public VelocityEngine getVelocityEngine() throws XWikiVelocityException

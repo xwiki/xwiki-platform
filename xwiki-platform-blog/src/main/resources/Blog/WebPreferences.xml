@@ -1038,7 +1038,7 @@
 <ldap_validate_password></ldap_validate_password>
 </property>
 <property>
-<leftPanels>Blog.RecentPostsPanel,Blog.CategoriesPanel,Blog.ArchivePanel,Blog.UnpublishedPanel</leftPanels>
+<leftPanels>Blog.RecentPostsPanel,Blog.UnpublishedPanel,Blog.CategoriesPanel,Blog.ArchivePanel</leftPanels>
 </property>
 <property>
 <macros_groovy></macros_groovy>

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-wiki-manager</artifactId>
   <name>XWiki Platform - Plugins - Wiki Manager</name>
-  <version>1.10-SNAPSHOT</version>
+  <version>1.10</version>
   <description>XWiki Platform - Plugins - Wiki Manager</description>
   <properties>
     <platform.core.version>1.9</platform.core.version>
@@ -78,9 +78,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/wiki-manager</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/wiki-manager</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/wiki-manager</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.10</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.10</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.10</url>
   </scm>
   <build>
     <plugins>

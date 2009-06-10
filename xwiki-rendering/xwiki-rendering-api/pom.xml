@@ -170,6 +170,30 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>clirr-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <excludes>
+                <exclude>**/internal/**</exclude>
+                <!-- Excludes for the 2.0 M1 release. Once it's released remove them. -->
+                <exclude>org/xwiki/rendering/block/Block</exclude>
+                <exclude>org/xwiki/rendering/block/AbstractBlock</exclude>
+                <exclude>org/xwiki/rendering/parser/ParseException</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XWikiXHTMLImageRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XWikiXHTMLLinkRenderer</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

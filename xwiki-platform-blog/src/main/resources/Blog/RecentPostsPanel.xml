@@ -102,7 +102,7 @@
 <property>
 <content>#includeMacros("Blog.BlogCode")
 #getBlogEntriesBaseQuery($query)
-#set($query = "$!{query} and isPublished.value = 1")
+#set($query = "$!{query} and isPublished.value = 1 &amp;&amp; hidden.value &lt;&gt; 1")
 #set($recentEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 10, 0))
 #if($recentEntries.size() &gt; 0 || $showEmptyPanels)
   #panelheader('Recent Blog Posts')

@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>22-SNAPSHOT</version>
+    <version>21</version>
   </parent>
   <artifactId>xwiki-application-wiki-manager</artifactId>
   <name>XWiki Platform - Applications - Wiki Manager</name>
@@ -35,7 +35,7 @@
   <packaging>xar</packaging>
   <description>Manages creation and installation of children Wikis</description>
   <properties>
-    <platform.plugin.wikimanager.version>1.10-SNAPSHOT</platform.plugin.wikimanager.version>
+    <platform.plugin.wikimanager.version>1.10</platform.plugin.wikimanager.version>
   </properties>
   <dependencies>
     <dependency>

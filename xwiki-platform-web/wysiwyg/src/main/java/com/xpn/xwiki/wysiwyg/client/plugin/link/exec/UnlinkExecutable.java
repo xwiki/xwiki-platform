@@ -40,7 +40,6 @@ public class UnlinkExecutable extends AbstractExecutable
      */
     public boolean execute(RichTextArea rta, String param)
     {
-
         // Get the selected anchor
         Element selectedAnchor = LinkExecutableUtils.getSelectedAnchor(rta);
         if (selectedAnchor == null) {
@@ -61,23 +60,35 @@ public class UnlinkExecutable extends AbstractExecutable
                 LinkExecutableUtils.ANCHOR_TAG_NAME) != selectedAnchor) 
                 && range.getEndOffset() == domUtils.getLength(range.getEndContainer());
         }
-        if (moveSelection && (isEnd || isBeginning)) {
+        if (moveSelection && (isEnd || isBeginning) && selectedAnchor.getOffsetWidth() > 0) {
             // cursor it's at the beginning or at the end, move it out of the anchor
-            Range newRange = rta.getDocument().createRange();
-            if (isBeginning) {
-                newRange.setStartBefore(selectedAnchor);
-            }
-            if (isEnd) {
-                newRange.setStartAfter(selectedAnchor);
-            }
-            newRange.collapse(true);
-            // now set it on the document
-            rta.getDocument().getSelection().removeAllRanges();
-            rta.getDocument().getSelection().addRange(newRange);
+            moveCaretOuside(rta, selectedAnchor, isEnd);
         } else {
             selectedAnchor.unwrap();
         }
         return true;
+    }
+
+    /**
+     * Moves the caret outside the passed anchor.
+     * 
+     * @param rta the underlying rich text area
+     * @param selectedAnchor the anchor to move the caret out of
+     * @param atEnd {@code true} if the caret is at the end of the selected anchor, {@code false} if it's at the
+     *            beginning.
+     */
+    private void moveCaretOuside(RichTextArea rta, Element selectedAnchor, boolean atEnd)
+    {
+        Range newRange = rta.getDocument().createRange();
+        if (atEnd) {
+            newRange.setStartAfter(selectedAnchor);
+        } else {
+            newRange.setStartBefore(selectedAnchor);
+        }
+        newRange.collapse(true);
+        // now set it on the document
+        rta.getDocument().getSelection().removeAllRanges();
+        rta.getDocument().getSelection().addRange(newRange);
     }
 
     /**

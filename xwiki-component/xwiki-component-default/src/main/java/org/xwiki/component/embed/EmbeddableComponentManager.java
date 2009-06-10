@@ -107,8 +107,10 @@ public class EmbeddableComponentManager implements ComponentManager
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException
     {
         synchronized(this) {
-            this.descriptors.put(new RoleHint<T>(componentDescriptor.getRole(), componentDescriptor.getRoleHint()), 
-                componentDescriptor);
+            RoleHint< ? > roleHint = new RoleHint<T>(componentDescriptor.getRole(), componentDescriptor.getRoleHint());
+            this.descriptors.put(roleHint, componentDescriptor);
+            // Remove any existing instance since we're replacing it
+            this.components.remove(roleHint);
         }
     }
 
@@ -232,14 +234,23 @@ public class EmbeddableComponentManager implements ComponentManager
                     throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
                 }
                 
-                // Send an Observation event to listeners
-                ObservationManager om = lookup(ObservationManager.class);
-                ComponentDescriptor descriptor = this.descriptors.get(roleHint);
-                ComponentDescriptorAddedEvent event = new ComponentDescriptorAddedEvent(descriptor.getRole());
-                om.notify(event, this, descriptor);
+                sendObservationEvent(this.descriptors.get(roleHint));
             }
         }
         return instance;
+    }
+    
+    private void sendObservationEvent(ComponentDescriptor< ? > descriptor)
+    {
+        // Send an Observation event to listeners if an Observation Manager is present
+        try {
+            ObservationManager om = lookup(ObservationManager.class);
+            ComponentDescriptorAddedEvent event = new ComponentDescriptorAddedEvent(descriptor.getRole());
+            om.notify(event, this, descriptor);
+        } catch (ComponentLookupException e) {
+            // No Observation manager was found, do nothing
+            // TODO: Maybe log a warning in the future
+        }
     }
     
     @SuppressWarnings("unchecked")

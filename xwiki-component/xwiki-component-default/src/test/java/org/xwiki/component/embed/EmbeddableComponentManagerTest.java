@@ -35,7 +35,15 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
  */
 public class EmbeddableComponentManagerTest
 {
-    public interface Role
+    public static interface Role
+    {
+    }
+    
+    public static class RoleImpl implements Role
+    {
+    }
+    
+    public static class OtherRoleImpl implements Role
     {
     }
     
@@ -58,5 +66,27 @@ public class EmbeddableComponentManagerTest
         Assert.assertEquals(2, cds.size());
         Assert.assertTrue(cds.contains(d1));
         Assert.assertTrue(cds.contains(d2));
+    }
+    
+    @Test
+    public void testRegisterComponentOverExistingOne() throws Exception
+    {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+
+        DefaultComponentDescriptor<Role> d1 = new DefaultComponentDescriptor<Role>();
+        d1.setRole(Role.class);
+        d1.setImplementation(RoleImpl.class);
+        ecm.registerComponent(d1);
+
+        Object instance = ecm.lookup(Role.class);
+        Assert.assertEquals(RoleImpl.class.getName(), instance.getClass().getName());
+        
+        DefaultComponentDescriptor<Role> d2 = new DefaultComponentDescriptor<Role>();
+        d2.setRole(Role.class);
+        d2.setImplementation(OtherRoleImpl.class);
+        ecm.registerComponent(d2);
+
+        instance = ecm.lookup(Role.class);
+        Assert.assertEquals(OtherRoleImpl.class.getName(), instance.getClass().getName());
     }
 }

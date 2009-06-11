@@ -33,6 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.indent.exec.OutdentExecutableTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManagerTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtensionTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.EmptyLinkFilterTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkMetaDataExtractorTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjusterTest;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCallTest;
@@ -99,6 +100,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(InsertHRExecutableTest.class);
         suite.addTestSuite(ImageMetaDataExtractorTest.class);
         suite.addTestSuite(LinkMetaDataExtractorTest.class);
+        suite.addTestSuite(EmptyLinkFilterTest.class);
         suite.addTestSuite(MacroCallTest.class);
         suite.addTestSuite(IndentExecutableTest.class);
         suite.addTestSuite(OutdentExecutableTest.class);

@@ -19,7 +19,7 @@ XWiki.widgets.ConfirmationBox = Class.create(XWiki.widgets.ModalPopup, {
       this.createContent(this.interactionParameters),
       {
         "show"  : { method : this.showDialog,  keys : [] },
-        "yes"   : { method : this.onYes,       keys : ['Enter'] },
+        "yes"   : { method : this.onYes,       keys : ['Enter', 'Space'] },
         "no"    : { method : this.onNo,        keys : ['Esc'] },
         "close" : { method : this.closeDialog, keys : [] }
       },

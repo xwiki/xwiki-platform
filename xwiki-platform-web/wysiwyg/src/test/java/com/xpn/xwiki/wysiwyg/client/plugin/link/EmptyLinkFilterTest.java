@@ -121,6 +121,41 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
     }
 
     /**
+     * Tests the case of an anchor with an empty span inside which should be filtered.
+     */
+    public void testMultipleEmptyLinksAreRemoved()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestMultipleEmptyLinksAreRemoved();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * @see #testEmptyLinkWithSpanInsideIsFiltered()
+     */
+    public void doTestMultipleEmptyLinksAreRemoved()
+    {
+        rta.setHTML("Testing one link <a href=\"http://xwiki.org\" class=\"wikimodel-freestanding\" "
+            + "metadata='<!--startwikilink:http://xwiki.org--><span class=\"wikiexternallink\">"
+            + "org.xwiki.gwt.dom.client.Element#placeholder</span>"
+            + "<!--stopwikilink-->'><span class=\"wikigeneratedlinkcontent\"></span></a>and another "
+            + "<a metadata='<!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
+            + "org.xwiki.gwt.dom.client.Element#placeholder</span><!--stopwikilink-->' "
+            + "href=\"http://www.xwiki.org\"></a>link");
+
+        // simulate a submit command
+        linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+
+        assertEquals("testing one link and another link", removeNonBreakingSpaces(clean(rta.getHTML())));
+    }
+
+    /**
      * Test that non-empty links are not filtered away.
      */
     public void testNonEmptyLinkIsNotFiltered()

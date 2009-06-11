@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
@@ -55,16 +58,22 @@ public class EmptyLinkFilter implements CommandListener
      */
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
+        // store the empty anchors in a separate list, to remove at the end since NodeList is an iterator, actually
+        List<Element> emptyAnchors = new ArrayList<Element>();
         if (command.equals(new Command("submit"))) {
             NodeList<Element> anchorsList = rta.getDocument().getElementsByTagName("a");
             for (int i = 0; i < anchorsList.getLength(); i++) {
                 Element anchor = anchorsList.getItem(i);
                 // check if it has a href (not to remove named anchors by mistake) and it's void
                 if (!StringUtils.isEmpty(anchor.getAttribute("href")) && anchor.getOffsetWidth() == 0) {
-                    // remove it
-                    anchor.getParentElement().removeChild(anchor);
+                    // should be removed
+                    emptyAnchors.add(anchor);
                 }
             }
+        }
+        // now actually remove them from the DOM
+        for (Element anchor : emptyAnchors) {
+            anchor.getParentElement().removeChild(anchor);
         }
         return false;
     }

@@ -160,7 +160,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
         doc.setContent(content);
-        xcontext.getWiki().saveDocument(doc, editComment, isMinorEdit, xcontext);
+        saveDocument(doc, editComment, isMinorEdit);
     }
 
     /**
@@ -187,8 +187,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
         String oldSyntaxId = doc.getSyntaxId();
         doc.setSyntaxId(syntaxId);
-        xcontext.getWiki().saveDocument(doc,
-            String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), xcontext);
+        saveDocument(doc, String.format("Changed document syntax from [%s] to [%s].", oldSyntaxId, syntaxId), true);
     }
 
     /**
@@ -286,7 +285,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         BaseObject obj = doc.getObject(className, true, xcontext);
         if (obj != null) {
             obj.set(propertyName, propertyValue, xcontext);
-            xcontext.getWiki().saveDocument(doc, xcontext);
+            saveDocument(doc, String.format("Property [%s] set.", propertyName), true);
         }
     }
 
@@ -322,8 +321,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
         attachment.setContent(attachmentData);
         attachment.setFilename(attachmentName);
-        attachment.setAuthor(xcontext.getUser());
+        attachment.setAuthor(getCurrentUser());
         attachment.setDoc(doc);
+        doc.setAuthor(getCurrentUser());
+        if (doc.isNew()) {
+           doc.setCreator(getCurrentUser()); 
+        }
         doc.saveAttachmentContent(attachment, xcontext);
     }
 
@@ -419,26 +422,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
-     * Utility method for checking access rights of the current user on a target document.
-     * 
-     * @param documentName The name of the document.
-     * @param right Access right requested.
-     * @return True if the current user has the given access right, false otherwise.
-     */
-    private boolean hasRight(String documentName, String right)
-    {
-        boolean hasRight = false;
-        XWikiContext xcontext = getContext();
-        try {
-            hasRight =
-                xcontext.getWiki().getRightService().hasAccessLevel(right, xcontext.getUser(), documentName, xcontext);
-        } catch (XWikiException e) {
-            // Do nothing
-        }
-        return hasRight;
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#popDocumentFromContext(Map)
@@ -458,5 +441,43 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         XWikiDocument.backupContext(backupObjects, xcontext);
         xcontext.getWiki().getDocument(documentName, xcontext).setAsContextDoc(xcontext);
+    }
+    
+    /**
+     * Utility method for checking access rights of the current user on a target document.
+     * 
+     * @param documentName The name of the document.
+     * @param right Access right requested.
+     * @return True if the current user has the given access right, false otherwise.
+     */
+    private boolean hasRight(String documentName, String right)
+    {
+        boolean hasRight = false;
+        XWikiContext xcontext = getContext();
+        try {
+            hasRight =
+                xcontext.getWiki().getRightService().hasAccessLevel(right, xcontext.getUser(), documentName, xcontext);
+        } catch (XWikiException e) {
+            // Do nothing
+        }
+        return hasRight;
+    }
+    
+    /**
+     * Utility method for saving an {@link XWikiDocument}. This method takes care of setting authors and creators
+     * appropriately.
+     * 
+     * @param doc the {@link XWikiDocument} to be saved.
+     * @param comment the edit comment.
+     * @param isMinorEdit if the change in document is minor.
+     * @throws Exception if an error occurs while saving the document.
+     */
+    private void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit) throws Exception
+    {
+        doc.setAuthor(getCurrentUser()); 
+        if (doc.isNew()) {
+            doc.setCreator(getCurrentUser());
+        }           
+        getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     }
 }

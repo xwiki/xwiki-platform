@@ -63,6 +63,11 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      * The link metadata extractor, to handle the link metadata.
      */
     private LinkMetaDataExtractor metaDataExtractor;
+    
+    /**
+     * The empty link filter, to prevent the submission of empty links.
+     */
+    private EmptyLinkFilter linkFilter;
 
     /**
      * Map of the original link related executables, which will be replaced with custom executables by this plugin.
@@ -101,6 +106,10 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         // do the initial extracting on the loaded document
         metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
         getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
+        
+        // create an empty link handler and add it to the RTA command manager
+        linkFilter = new EmptyLinkFilter(getTextArea());
+        getTextArea().getCommandManager().addCommandListener(linkFilter);
     }
 
     /**
@@ -121,6 +130,9 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
             getTextArea().getDocument().removeInnerHTMLListener(metaDataExtractor);
             metaDataExtractor = null;
         }
+
+        // remove the empty link filter from the text area
+        getTextArea().getCommandManager().removeCommandListener(linkFilter);
 
         // destroy menu extension
         menuExtension.destroy();

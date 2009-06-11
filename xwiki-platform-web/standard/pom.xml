@@ -110,6 +110,7 @@
         <!-- Make sure the skins dir exists since Maven or its plugins doesn't always create it if
              doesn't exist. Note that it works fine without this in Maven 2.1.x for some reason
              but fails in Maven 2.0.x. -->
+        <!-- Also make sure the minimized dir exists, since it is created only in some profiles -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -124,6 +125,7 @@
             <configuration>
               <tasks>
                 <mkdir dir="${project.build.directory}/skin" />
+                <mkdir dir="${project.build.directory}/minimized" />
               </tasks>
             </configuration>
           </execution>
@@ -219,17 +221,55 @@
               <directory>${project.build.directory}/smartclient/com/smartclient/theme/enterprise/public/sc/skins</directory>
               <targetPath>resources/js/smartclient/skins</targetPath>
               <filtering>false</filtering>
-            </resource>            
+            </resource>
+            <resource>
+              <directory>${project.build.directory}/minimized</directory>
+              <targetPath>/</targetPath>
+              <filtering>false</filtering>
+            </resource>
           </webResources>
-          <warSourceExcludes>**/*.js,**/*.css</warSourceExcludes>
         </configuration>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!-- Javascript and CSS files compression -->
+        <plugin>
+          <groupId>net.sf.alchim</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>0.7.1</version>
+          <configuration>
+            <!-- Don't output in the default webapp location, since the war plugin will overwrite the files in there
+                 with the original, uncompressed ones. -->
+            <webappDirectory>${project.build.directory}/minimized</webappDirectory>
+            <jswarn>false</jswarn>
+            <!-- Overwrite existing files -->
+            <nosuffix>true</nosuffix>
+            <includes>
+              <include>resources/js/**.js</include>
+              <include>resources/js/**.css</include>
+              <include>resources/uicompontents/**.js</include>
+              <include>resources/uicompontents/**.css</include>
+            </includes>
+            <excludes>
+              <!-- Exclude already minified files -->
+              <exclude>**/*-min.js</exclude>
+              <exclude>**/*-debug.js</exclude>
+              <exclude>**/langs/*.js</exclude>
+              <!-- Exclude files with Velocity inside -->
+              <exclude>**/actionButtons.js</exclude>
+              <exclude>**/notification.css</exclude>
+              <exclude>**/usersandgroups.js</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   <profiles>
-    <profile>      
+    <profile>
       <id>debug</id>
-      <!-- The debug profile doesn't have any property, its goal is to avoid JS/CSS compression -->      
+      <!-- The debug profile doesn't have any property, its goal is to avoid JS/CSS compression -->
     </profile>
     <profile>
       <id>default</id>
@@ -242,8 +282,6 @@
           <plugin>
             <groupId>net.sf.alchim</groupId>
             <artifactId>yuicompressor-maven-plugin</artifactId>
-            <!-- force version 0.6.2 to avoid 'single var statement per scope' warning from YUI compressor 2.3.5 -->
-            <version>0.6.2</version>
             <executions>
               <execution>
                 <id>minify</id>
@@ -252,28 +290,6 @@
                 </goals>
               </execution>
             </executions>
-            <!-- YUI compression configuration, it is duplicated in the CI profile, don't forget to modify it too.  -->
-            <configuration>
-              <!-- Overwrite existing files -->
-              <nosuffix>true</nosuffix>
-              <includes>
-                <include>resources/js/**.js</include>
-                <include>resources/js/**.css</include>
-                <include>resources/uicompontents/**.js</include>
-                <include>resources/uicompontents/**.css</include>
-              </includes>
-              <excludes>
-                <!-- Exclude already minified files -->
-                <exclude>**/*-min.js</exclude>
-                <exclude>**/*-debug.js</exclude>
-                <exclude>**/langs/*.js</exclude>
-                <exclude>resources/js/smartclient/**</exclude>
-                <!-- Exclude files with Velocity inside -->
-                <exclude>**/actionButtons.js</exclude>
-                <exclude>**/notification.css</exclude>
-                <exclude>**/usersandgroups.js</exclude>
-              </excludes>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -374,8 +390,6 @@
           <plugin>
             <groupId>net.sf.alchim</groupId>
             <artifactId>yuicompressor-maven-plugin</artifactId>
-            <!-- force version 0.6.2 to avoid 'single var statement per scope' warning from YUI compressor 2.3.5 -->
-            <version>0.6.2</version>
             <executions>
               <execution>
                 <id>minify</id>
@@ -384,27 +398,6 @@
                 </goals>
               </execution>
             </executions>        
-            <configuration>
-              <!-- Overwrite existing files -->
-              <nosuffix>true</nosuffix>
-              <includes>
-                <include>resources/js/**.js</include>
-                <include>resources/js/**.css</include>
-                <include>resources/uicompontents/**.js</include>
-                <include>resources/uicompontents/**.css</include>
-              </includes>
-              <excludes>
-                <!-- Exclude already minified files -->
-                <exclude>**/*-min.js</exclude>
-                <exclude>**/*-debug.js</exclude>
-                <exclude>**/langs/*.js</exclude>
-                <exclude>resources/js/smartclient/**</exclude>
-                <!-- Exclude files with Velocity inside -->
-                <exclude>**/actionButtons.js</exclude>
-                <exclude>**/notification.css</exclude>
-                <exclude>**/usersandgroups.js</exclude>
-              </excludes>
-            </configuration>
           </plugin>          
         </plugins>
       </build>

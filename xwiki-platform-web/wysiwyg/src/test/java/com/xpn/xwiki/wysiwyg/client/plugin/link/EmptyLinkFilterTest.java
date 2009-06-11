@@ -43,11 +43,6 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
     private static final String ANCHOR_TAG = "a";
 
     /**
-     * The href attribute name.
-     */
-    private static final String HREF_ATTRIBUTE = "href";
-
-    /**
      * The link filter to test.
      */
     private EmptyLinkFilter linkFilter;

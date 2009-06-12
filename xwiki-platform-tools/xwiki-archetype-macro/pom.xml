@@ -25,33 +25,34 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki</artifactId>
-    <version>25-SNAPSHOT</version>
-    <relativePath>../pom</relativePath>
+    <groupId>com.xpn.xwiki.platform.tools</groupId>
+    <artifactId>xwiki-tools</artifactId>
+    <version>18-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform.tools</groupId>
-  <artifactId>xwiki-tools</artifactId>
-  <name>XWiki Platform - Tools - Parent POM</name>
-  <version>18-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <description>XWiki Tools</description>
+  <artifactId>xwiki-archetype-macro</artifactId>
+  <name>XWiki Platform - Tools - XWiki Macro Archetype</name>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>maven-archetype</packaging>
+  <description>
+    Make it easy to create a maven project for creating XWiki Macros.
+  </description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</url>
   </scm>
-  <modules>
-    <module>xwiki-license-resources</module>
-    <module>xwiki-verification-resources</module>
-    <module>xwiki-xar-plugin</module>
-    <module>xwiki-xar-handlers</module>
-    <module>xwiki-xmldoc-update-plugin</module>
-    <module>xwiki-packager-plugin</module>
-    <module>xwiki-configuration-resources</module>
-    <module>xwiki-jetty-resources</module>
-    <module>xwiki-rootwebapp</module>
-    <module>xwiki-archetype-macro</module>
-    <module>foxwiki</module>
-  </modules>
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+      </extension>
+    </extensions>
+    <plugins>
+      <plugin>
+        <artifactId>maven-archetype-plugin</artifactId>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

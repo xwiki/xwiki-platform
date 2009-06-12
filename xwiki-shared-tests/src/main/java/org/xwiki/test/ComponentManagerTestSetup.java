@@ -30,6 +30,7 @@ import java.util.List;
 import java.lang.reflect.Method;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -73,7 +74,7 @@ public class ComponentManagerTestSetup extends TestSetup
      *         then be put in the XWiki Context for testing.
      * @since 1.7M3
      */
-    public ComponentManager getComponentManager() throws Exception
+    public EmbeddableComponentManager getComponentManager() throws Exception
     {
         return this.initializer.getComponentManager();
     }
@@ -89,7 +90,7 @@ public class ComponentManagerTestSetup extends TestSetup
         this.initializer.initializeContainer();
 
         // Register defined component descriptors as components 
-        for (ComponentDescriptor descriptor : this.componentDescriptors) {
+        for (ComponentDescriptor< ? > descriptor : this.componentDescriptors) {
             getComponentManager().registerComponent(descriptor);
         }
 

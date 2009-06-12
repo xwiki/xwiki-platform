@@ -17,17 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering;
-
-import java.util.ArrayList;
-import java.util.List;
+package org.xwiki.rendering.macro.script;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.rendering.internal.macro.MockDocumentAccessBridge;
-import org.xwiki.rendering.internal.macro.MockScriptContextManager;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -35,7 +33,7 @@ import org.xwiki.test.ComponentManagerTestSetup;
  * All Rendering integration tests defined in text files using a special format.
  * 
  * @version $Id$
- * @since 1.7M3
+ * @since 2.0M1
  */
 public class RenderingTests extends TestCase
 {
@@ -47,10 +45,21 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroscript2", true);
         suite.addTestsFromResource("macroscript3", true);
         
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
-        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
-        mocks.add(MockScriptContextManager.getComponentDescriptor());
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
 
-        return new ComponentManagerTestSetup(suite, mocks);
+        return testSetup;
+    }
+    
+    public static void setUpMocks(EmbeddableComponentManager componentManager)
+    {
+        Mockery context = new Mockery();
+
+        // Document Access Bridge Mock setup
+        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        context.checking(new Expectations() {{
+            allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
+        }});
+        componentManager.registerComponent(DocumentAccessBridge.class, mockDocumentAccessBridge);
     }
 }

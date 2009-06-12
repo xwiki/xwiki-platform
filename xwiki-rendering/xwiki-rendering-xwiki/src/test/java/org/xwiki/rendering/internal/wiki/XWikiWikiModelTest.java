@@ -48,7 +48,7 @@ public class XWikiWikiModelTest extends MockObjectTestCase
 
         // The test is here: we verify that getURL is called with the query string already encoded since getURL()
         // doesn't encode it.
-        mockDocumentAccessBridge.expects(once()).method("getURL").with(eq("Space.Page\u20AC"), eq("view"),
+        mockDocumentAccessBridge.expects(once()).method("getURL").with(eq("Space.Page\u20AC"), eq("edit"),
             eq("parent=wiki%3ASpace.Page%E2%82%AC"), eq("anchor"));
         ReflectionUtils.setFieldValue(model, "documentAccessBridge", mockDocumentAccessBridge.proxy());
 

@@ -100,6 +100,6 @@ public class XWikiWikiModel implements WikiModel
             }
         }
         
-        return this.documentAccessBridge.getURL(documentName, "view", modifiedQueryString, anchor);
+        return this.documentAccessBridge.getURL(documentName, "edit", modifiedQueryString, anchor);
     }
 }

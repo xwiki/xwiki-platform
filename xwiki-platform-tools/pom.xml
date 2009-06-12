@@ -25,45 +25,33 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
+    <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <groupId>org.xwiki.platform.tools</groupId>
-    <version>21-SNAPSHOT</version>
+    <version>18-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-tool-standards-validator</artifactId>
-  <name>XWiki Platform - Tools - Web Standards Validator</name>
+  <artifactId>xwiki-archetype-macro</artifactId>
+  <name>XWiki Platform - Tools - XWiki Macro Archetype</name>
   <version>1.0-SNAPSHOT</version>
-  <description>XWiki Platform - Tools - Web Standard Validator</description>
-  <dependencies>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-    <dependency>    
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-  <!-- We must configure SCM in each module. For more information see:
-       http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
+  <packaging>maven-archetype</packaging>
+  <description>
+    Make it easy to create a maven project for creating XWiki Macros.
+  </description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-tool-standard-validator</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-standard-accessibility-validator</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-tool-standard-validator</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</url>
   </scm>
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <failsOnError>true</failsOnError>
-        </configuration>
+        <artifactId>maven-archetype-plugin</artifactId>
+        <extensions>true</extensions>
       </plugin>
     </plugins>
   </build>

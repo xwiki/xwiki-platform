@@ -47,10 +47,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroscript2", true);
         suite.addTestsFromResource("macroscript3", true);
         
-        List<ComponentDescriptor> mocks = new ArrayList<ComponentDescriptor>();
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
         mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
         mocks.add(MockScriptContextManager.getComponentDescriptor());
-        
+
         return new ComponentManagerTestSetup(suite, mocks);
     }
 }

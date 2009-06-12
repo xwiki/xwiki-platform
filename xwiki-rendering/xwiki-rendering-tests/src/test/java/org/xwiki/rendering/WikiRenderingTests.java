@@ -19,11 +19,14 @@
  */
 package org.xwiki.rendering;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.rendering.scaffolding.MockWikiModel;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.rendering.wiki.WikiModel;
@@ -71,6 +74,9 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
         
-        return new ComponentManagerTestSetup(suite, Arrays.asList(MockWikiModel.getComponentDescriptor()));
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
+        mocks.add(MockWikiModel.getComponentDescriptor());
+
+        return new ComponentManagerTestSetup(suite, mocks);
     }
 }

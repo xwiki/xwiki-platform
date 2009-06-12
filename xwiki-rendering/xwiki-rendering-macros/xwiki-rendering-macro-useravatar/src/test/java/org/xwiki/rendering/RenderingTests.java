@@ -48,8 +48,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrouseravatar2", true);
         suite.addTestsFromResource("macrouseravatar3", true);
         
-        List<ComponentDescriptor> mocks = 
-            new ArrayList<ComponentDescriptor>();
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
         mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
         mocks.add(MockSkinAccessBridge.getComponentDescriptor());
         mocks.add(MockWikiModel.getComponentDescriptor());

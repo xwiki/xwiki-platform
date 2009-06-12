@@ -37,10 +37,10 @@ public class MockSkinAccessBridge implements SkinAccessBridge
      * 
      * @return the descriptor of the component.
      */
-    @SuppressWarnings("unchecked")
-    public static ComponentDescriptor getComponentDescriptor()
+    public static ComponentDescriptor<SkinAccessBridge> getComponentDescriptor()
     {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+        DefaultComponentDescriptor<SkinAccessBridge> componentDescriptor = 
+            new DefaultComponentDescriptor<SkinAccessBridge>();
         componentDescriptor.setRole(SkinAccessBridge.class);
         componentDescriptor.setRoleHint("default");
         componentDescriptor.setImplementation(MockSkinAccessBridge.class);

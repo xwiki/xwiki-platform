@@ -21,14 +21,11 @@ package org.xwiki.rendering.internal.macro;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 
 /**
  * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
@@ -44,9 +41,10 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @return the descriptor of the component.
      */
-    public static ComponentDescriptor getComponentDescriptor()
+    public static ComponentDescriptor<DocumentAccessBridge> getComponentDescriptor()
     {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+        DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor = 
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
 
         componentDescriptor.setRole(DocumentAccessBridge.class);
         componentDescriptor.setImplementation(MockDocumentAccessBridge.class);

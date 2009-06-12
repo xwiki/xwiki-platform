@@ -38,7 +38,6 @@ import org.xwiki.test.ComponentManagerTestSetup;
  */
 public class RenderingTests extends TestCase
 {
-    @SuppressWarnings("unchecked")
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Rss Macro");
@@ -46,9 +45,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrorss1", true);
         suite.addTestsFromResource("macrorss2", true);
 
-        List<ComponentDescriptor> mocks = 
-            new ArrayList<ComponentDescriptor>();
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
         mocks.add(MockSkinAccessBridge.getComponentDescriptor());
+
         return new ComponentManagerTestSetup(suite, mocks);
     }
 }

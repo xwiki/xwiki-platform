@@ -37,9 +37,10 @@ public class MockWikiModel implements WikiModel
      * 
      * @return the descriptor of the component.
      */
-    public static ComponentDescriptor getComponentDescriptor()
+    public static ComponentDescriptor<WikiModel> getComponentDescriptor()
     {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+        DefaultComponentDescriptor<WikiModel> componentDescriptor = 
+            new DefaultComponentDescriptor<WikiModel>();
 
         componentDescriptor.setRole(WikiModel.class);
         componentDescriptor.setImplementation(MockWikiModel.class);

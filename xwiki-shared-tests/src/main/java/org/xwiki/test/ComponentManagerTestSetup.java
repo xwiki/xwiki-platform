@@ -44,14 +44,14 @@ public class ComponentManagerTestSetup extends TestSetup
 {
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
-    private List<ComponentDescriptor> componentDescriptors = new ArrayList<ComponentDescriptor>();
+    private List<ComponentDescriptor< ? >> componentDescriptors = new ArrayList<ComponentDescriptor< ? >>();
     
     public ComponentManagerTestSetup(TestSuite suite)
     {
         super(suite);
     }
 
-    public ComponentManagerTestSetup(TestSuite suite, List<ComponentDescriptor> componentDescriptors) throws Exception
+    public ComponentManagerTestSetup(TestSuite suite, List<ComponentDescriptor< ? >> componentDescriptors) throws Exception
     {
         super(suite);
         this.componentDescriptors.addAll(componentDescriptors);

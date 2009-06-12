@@ -47,8 +47,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrogroovy2", true);
         suite.addTestsFromResource("macrogroovy3", true);
 
-        List<ComponentDescriptor> mocks = 
-            new ArrayList<ComponentDescriptor>();
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
         mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
         mocks.add(MockScriptContextManager.getComponentDescriptor());
         

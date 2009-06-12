@@ -30,11 +30,11 @@
     <version>18-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-archetype-macro</artifactId>
-  <name>XWiki Platform - Tools - XWiki Macro Archetype</name>
+  <name>XWiki Platform - Tools - XWiki Rendering Macro Archetype</name>
   <version>1.0-SNAPSHOT</version>
   <packaging>maven-archetype</packaging>
   <description>
-    Make it easy to create a maven project for creating XWiki Macros.
+    Make it easy to create a maven project for creating XWiki Rendering Macros.
   </description>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-archetype-macro</connection>

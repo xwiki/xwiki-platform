@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.MockSkinAccessBridge;
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
+import org.xwiki.rendering.scaffolding.MockWikiModel;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -49,9 +49,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrouseravatar3", true);
         
         List<ComponentDescriptor> mocks = 
-            new ArrayList<ComponentDescriptor>(RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+            new ArrayList<ComponentDescriptor>();
         mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
         mocks.add(MockSkinAccessBridge.getComponentDescriptor());
+        mocks.add(MockWikiModel.getComponentDescriptor());
 
         return new ComponentManagerTestSetup(suite, mocks);
     }

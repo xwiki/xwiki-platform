@@ -31,13 +31,17 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Default implementation for rendering images as XHTML when inside a wiki (ie when
- * an implementation of {@link WikiModel} is provided.
+ * Default implementation for rendering images as XHTML. We handle both cases:
+ * <ul>
+ * <li>when inside a wiki (ie when an implementation of {@link WikiModel} is provided.</li>
+ * <li>when outside of a wiki. In this case we only handle external images and document images don't 
+ *     display anything.</li>
+ * </ul>
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 2.0M1
  */
-public class WikiXHTMLImageRenderer implements XHTMLImageRenderer
+public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer
 {
     /**
      * @see #setXHTMLWikiPrinter(XHTMLWikiPrinter)
@@ -55,9 +59,17 @@ public class WikiXHTMLImageRenderer implements XHTMLImageRenderer
     private XWikiSyntaxImageRenderer imageRenderer;
 
     /**
+     * Constructor to be used when outside of a wiki. 
+     */
+    public DefaultXHTMLImageRenderer()
+    {
+        this(null);
+    }
+
+    /**
      * @param wikiModel the {@link WikiModel}.
      */
-    public WikiXHTMLImageRenderer(WikiModel wikiModel)
+    public DefaultXHTMLImageRenderer(WikiModel wikiModel)
     {
         this.wikiModel = wikiModel;
         this.imageRenderer = new XWikiSyntaxImageRenderer();
@@ -80,8 +92,10 @@ public class WikiXHTMLImageRenderer implements XHTMLImageRenderer
      */
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        Map<String, String> attributes = new LinkedHashMap<String, String>();
+
         // First we need to compute the image URL.
-        String imageURL;
+        String imageURL = null;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
             imageURL = this.wikiModel.getAttachmentURL(documentImage.getDocumentName(), 
@@ -92,7 +106,6 @@ public class WikiXHTMLImageRenderer implements XHTMLImageRenderer
         }
 
         // Then add it as an attribute of the IMG element.
-        Map<String, String> attributes = new LinkedHashMap<String, String>();
         attributes.put(SRC, imageURL);
 
         // Add the class if we're on a freestanding uri

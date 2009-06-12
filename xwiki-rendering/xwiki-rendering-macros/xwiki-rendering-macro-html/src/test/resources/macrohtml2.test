@@ -34,12 +34,10 @@ beginMacroMarkerStandalone [html] [wiki=true] [
 </table>
 ]
 onRawText [
-.# TODO: Because of the following SF HTML Cleaner bug we have the new lines moved to the top:
-.# https://sourceforge.net/tracker/?func=detail&aid=2787208&group_id=183053&atid=903696 
 
 
 
-<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikicreatelink"><a href="/xwiki/bin/view/listitem?parent=xwiki%3ASpace.Page"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
+<table><tbody><tr><td><ul><li><!--startwikilink:listitem--><span class="wikiexternallink"><a href="listitem"><span class="wikigeneratedlinkcontent">listitem</span></a></span><!--stopwikilink--></li></ul></td></tr></tbody></table>] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [
 <table>
 <tr>

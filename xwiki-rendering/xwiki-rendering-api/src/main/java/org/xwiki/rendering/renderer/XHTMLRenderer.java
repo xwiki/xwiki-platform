@@ -24,8 +24,6 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
@@ -52,17 +50,5 @@ public class XHTMLRenderer extends AbstractChainingPrintRenderer
 
         new BlockStateChainingListener(getListenerChain());
         new XHTMLChainingRenderer(printer, linkRenderer, imageRenderer, getListenerChain());
-    }
-
-    /**
-     * Convenience constructor that uses default simple implementations for Link and Image Renderers. This is useful
-     * when using the XWiki Rendering system without the notion of XWiki Documents (for example when using it outside
-     * of XWiki).
-     * 
-     * @param printer the object to which to write the XHTML output to
-     */
-    public XHTMLRenderer(WikiPrinter printer)
-    {
-        this(printer, new SimpleXHTMLLinkRenderer(), new SimpleXHTMLImageRenderer());
     }
 }

@@ -22,21 +22,22 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Rendering tests not requiring a {@link WikiModel} implementation (ie tests that don't need the notion
+ * of Wiki to run).
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M1
  */
-public class RenderingTests extends TestCase
+public class SimpleRenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
+        RenderingTestSuite suite = new RenderingTestSuite("Rendering tests not requiring the wiki notion");
 
         // Embedded documents
         suite.addTestsFromResource("group/group1", false);
@@ -128,29 +129,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro14", true);
         suite.addTestsFromResource("macros/macro15", false);
 
-        // Links
-        suite.addTestsFromResource("link/links1", false);
-        suite.addTestsFromResource("link/links2", false);
-        suite.addTestsFromResource("link/links3", false);
-        suite.addTestsFromResource("link/links4", false);
-        suite.addTestsFromResource("link/links5", false);
-        suite.addTestsFromResource("link/links6", false);
-        suite.addTestsFromResource("link/links7", false);
-        suite.addTestsFromResource("link/links8", false);
-        suite.addTestsFromResource("link/links9", false);
-        suite.addTestsFromResource("link/links10", false);
-        suite.addTestsFromResource("link/links11", false);
-        suite.addTestsFromResource("link/links12", false);
-        suite.addTestsFromResource("link/links13", false);
-        suite.addTestsFromResource("link/links14", false);
-        suite.addTestsFromResource("link/links15", false);
-        suite.addTestsFromResource("link/links16", false);
-        suite.addTestsFromResource("link/links17", false);
-        suite.addTestsFromResource("link/links18", false);
-        suite.addTestsFromResource("link/links19", false);
-        suite.addTestsFromResource("link/links20", false);
-        suite.addTestsFromResource("link/links21", false);
-
         // Lists
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
@@ -223,11 +201,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("misc/misc6", false);
         suite.addTestsFromResource("misc/misc7", false);
         suite.addTestsFromResource("encoding/encoding1", false);
-        suite.addTestsFromResource("image/image1", false);
-        suite.addTestsFromResource("image/image2", false);
-        suite.addTestsFromResource("image/image3", false);
-        suite.addTestsFromResource("image/image4", false);
 
-        return new ComponentManagerTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+        return new ComponentManagerTestSetup(suite);
     }
 }

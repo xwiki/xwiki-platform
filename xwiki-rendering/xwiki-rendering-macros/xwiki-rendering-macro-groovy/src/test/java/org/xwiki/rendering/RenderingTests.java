@@ -26,8 +26,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.rendering.internal.macro.MockDocumentAccessBridge;
 import org.xwiki.rendering.internal.macro.MockScriptContextManager;
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -48,7 +48,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrogroovy3", true);
 
         List<ComponentDescriptor> mocks = 
-            new ArrayList<ComponentDescriptor>(RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+            new ArrayList<ComponentDescriptor>();
+        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
         mocks.add(MockScriptContextManager.getComponentDescriptor());
         
         return new ComponentManagerTestSetup(suite, mocks);

@@ -25,13 +25,11 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
-import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.SimpleXHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
-import org.xwiki.rendering.renderer.xhtml.WikiXHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.WikiXHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.xhtml.DefaultXHTMLImageRenderer;
+import org.xwiki.rendering.renderer.xhtml.DefaultXHTMLLinkRenderer;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
@@ -67,10 +65,10 @@ public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory
         XHTMLLinkRenderer renderer;
         try {
             WikiModel wikiModel = this.componentManager.lookup(WikiModel.class);
-            renderer = new WikiXHTMLLinkRenderer(wikiModel, this.linkLabelGenerator, this.attachmentParser); 
+            renderer = new DefaultXHTMLLinkRenderer(wikiModel, this.linkLabelGenerator, this.attachmentParser); 
         } catch (ComponentLookupException e) {
-            // There's no WikiModel implementation available, fall back to the Simple Renderer
-            renderer = new SimpleXHTMLLinkRenderer(); 
+            // There's no WikiModel implementation available, fall back to the Simple XHTML Link Renderer
+            renderer = new DefaultXHTMLLinkRenderer(this.linkLabelGenerator, this.attachmentParser); 
         }
         return renderer; 
     }
@@ -84,10 +82,10 @@ public class DefaultXHTMLRendererFactory implements XHTMLRendererFactory
         XHTMLImageRenderer renderer;
         try {
             WikiModel wikiModel = this.componentManager.lookup(WikiModel.class);
-            renderer = new WikiXHTMLImageRenderer(wikiModel); 
+            renderer = new DefaultXHTMLImageRenderer(wikiModel); 
         } catch (ComponentLookupException e) {
-            // There's no WikiModel implementation available, fall back to the Simple Renderer
-            renderer = new SimpleXHTMLImageRenderer(); 
+            // There's no WikiModel implementation available, fall back to the Simple XHTML Image Renderer
+            renderer = new DefaultXHTMLImageRenderer(); 
         }
         return renderer; 
     }

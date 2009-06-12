@@ -33,7 +33,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.scaffolding.AbstractXWikiRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.velocity.VelocityManager;
@@ -44,8 +44,17 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacroTest extends AbstractXWikiRenderingTestCase
+public class IncludeMacroTest extends AbstractRenderingTestCase
 {
+    private Mock mockDocumentAccessBridge;
+    
+    @Override
+    protected void registerComponents() throws Exception
+    {
+        this.mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        getComponentManager().registerComponent(DocumentAccessBridge.class, this.mockDocumentAccessBridge.proxy()); 
+    }
+
     public void testIncludeMacroWithNewContext() throws Exception
     {
         String expected = "beginDocument\n"
@@ -64,7 +73,6 @@ public class IncludeMacroTest extends AbstractXWikiRenderingTestCase
             "#set ($myvar = 'hello')");
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
             returnValue("{{velocity}}$myvar{{/velocity}}"));
@@ -97,7 +105,6 @@ public class IncludeMacroTest extends AbstractXWikiRenderingTestCase
             + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
         mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
         mockDocumentAccessBridge.expects(once()).method("getDocumentSyntaxId").will(

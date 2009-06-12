@@ -29,13 +29,10 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.jmock.cglib.MockObjectTestCase;
 
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @version $Id$
@@ -43,11 +40,6 @@ import java.util.List;
  */
 public class RenderingTestCase extends MockObjectTestCase
 {
-    public static final List<ComponentDescriptor> DEFAULT_MOCK_DESCRIPTORS =
-        Arrays.asList(MockDocumentAccessBridge.getComponentDescriptor(),
-            MockConfigurationSourceCollection.getComponentDescriptor(),
-            MockDocumentNameSerializer.getComponentDescriptor());
-
     private ComponentManager componentManager;
 
     private String input;

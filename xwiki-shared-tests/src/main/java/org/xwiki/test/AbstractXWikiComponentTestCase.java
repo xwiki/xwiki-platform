@@ -20,7 +20,7 @@
 package org.xwiki.test;
 
 import org.jmock.cglib.MockObjectTestCase;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
@@ -80,7 +80,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
      * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
      *         then be put in the XWiki Context for testing.
      */
-    public ComponentManager getComponentManager() throws Exception
+    public EmbeddableComponentManager getComponentManager() throws Exception
     {
         return this.initializer.getComponentManager();
     }

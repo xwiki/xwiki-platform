@@ -20,7 +20,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:refe~|~|rence--><span class="wikicreatelink"><a param="value" href="/xwiki/bin/view/refe||rence?parent=xwiki%3ASpace.Page">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:refe~|~|rence--><span class="wikiexternallink"><a param="value" href="refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -28,4 +28,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:refe~|~|rence--><span class="wikicreatelink"><a param="value" href="/xwiki/bin/view/refe||rence?parent=xwiki%3ASpace.Page">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:refe~|~|rence--><span class="wikiexternallink"><a param="value" href="refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>

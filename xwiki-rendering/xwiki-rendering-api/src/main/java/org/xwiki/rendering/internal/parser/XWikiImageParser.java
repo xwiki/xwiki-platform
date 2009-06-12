@@ -21,14 +21,11 @@ package org.xwiki.rendering.internal.parser;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.listener.DocumentImage;
-import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.parser.AttachmentParser;
-import org.xwiki.rendering.parser.ImageParser;
 
 /**
- * Parses XWiki image definitions, using either a URL (pointing to an imagep or the following format:
+ * Parses XWiki image definitions, using either a URL (pointing to an image or the following format:
  * <code>wiki:Space.Page@attachmentName</code> where <code>imageName</code> is the name of the image attachment (for
  * example "my.png").
  * 
@@ -36,7 +33,7 @@ import org.xwiki.rendering.parser.ImageParser;
  * @since 1.7M3
  */
 @Component("xwiki/2.0")
-public class XWikiImageParser implements ImageParser
+public class XWikiImageParser extends AbstractImageParser
 {
     /**
      * Used to parse the attachment syntax to extract document name and attachment name.
@@ -47,20 +44,11 @@ public class XWikiImageParser implements ImageParser
     /**
      * {@inheritDoc}
      * 
-     * @see ImageParser#parse(String)
+     * @see AbstractImageParser#parseAttachment(String)
      */
-    public Image parse(String imageLocation)
+    @Override
+    protected Attachment parseAttachment(String attachment)
     {
-        Image result;
-
-        // TODO: Shouldn't we store a DocumentIdentity object instead in Image and make sure that it's never null
-        // by using the current document when not specified?
-        if (imageLocation.startsWith("http://")) {
-            result = new URLImage(imageLocation);
-        } else {
-            result = new DocumentImage(this.attachmentParser.parse(imageLocation));
-        }
-
-        return result;
+        return this.attachmentParser.parse(attachment);
     }
 }

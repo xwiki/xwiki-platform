@@ -189,6 +189,9 @@
                 <exclude>org/xwiki/rendering/parser/ParseException</exclude>
                 <exclude>org/xwiki/rendering/renderer/xhtml/XWikiXHTMLImageRenderer</exclude>
                 <exclude>org/xwiki/rendering/renderer/xhtml/XWikiXHTMLLinkRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/SimpleXHTMLImageRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/SimpleXHTMLLinkRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/XHTMLRenderer</exclude>
               </excludes>
             </configuration>
           </execution>

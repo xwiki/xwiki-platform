@@ -33,13 +33,17 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
- * Default implementation for rendering links as XHTML when inside a wiki (ie when
- * an implementation of {@link WikiModel} is provided.
+ * Default implementation for rendering links as XHTML. We handle both cases:
+ * <ul>
+ * <li>when inside a wiki (ie when an implementation of {@link WikiModel} is provided.</li>
+ * <li>when outside of a wiki. In this case we only handle external links and document links don't 
+ *     display anything.</li>
+ * </ul>
  * 
  * @version $Id$
  * @since 1.8RC3
  */
-public class WikiXHTMLLinkRenderer implements XHTMLLinkRenderer
+public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
 {
     /**
      * The XHTML element <code>class</code> parameter.
@@ -92,12 +96,24 @@ public class WikiXHTMLLinkRenderer implements XHTMLLinkRenderer
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
     /**
+     * Constructor to be used when outside of a wiki. 
+     * 
+     * @param linkLabelGenerator used to generate a link label.
+     * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
+     *            attachment.
+     */
+    public DefaultXHTMLLinkRenderer(LinkLabelGenerator linkLabelGenerator, AttachmentParser attachmentParser)
+    {
+        this(null, linkLabelGenerator, attachmentParser);
+    }
+
+    /**
      * @param wikiModel used to generate the link targeting a local document.
      * @param linkLabelGenerator used to generate a link label.
      * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
      *            attachment.
      */
-    public WikiXHTMLLinkRenderer(WikiModel wikiModel, LinkLabelGenerator linkLabelGenerator,
+    public DefaultXHTMLLinkRenderer(WikiModel wikiModel, LinkLabelGenerator linkLabelGenerator,
         AttachmentParser attachmentParser)
     {
         this.wikiModel = wikiModel;
@@ -239,7 +255,7 @@ public class WikiXHTMLLinkRenderer implements XHTMLLinkRenderer
 
         this.xhtmlPrinter.printXMLEndElement(ANCHOR);
         this.xhtmlPrinter.printXMLEndElement(SPAN);
-
+        
         // Add a XML comment to signify the end of the link.
         this.xhtmlPrinter.printXMLComment("stopwikilink");
     }

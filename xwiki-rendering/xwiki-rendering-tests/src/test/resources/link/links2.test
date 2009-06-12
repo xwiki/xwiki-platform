@@ -14,7 +14,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></p>
+<p><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -22,4 +22,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Page</span></a></span><!--stopwikilink--></p></html>
+<html><p><!--startwikilink:Space.ExistingPage#anchor?param=value--><span class="wikilink"><a href="/xwiki/bin/view/Space/ExistingPage#anchor?param=value"><span class="wikigeneratedlinkcontent">Space.ExistingPage</span></a></span><!--stopwikilink--></p></html>

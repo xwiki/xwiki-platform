@@ -27,7 +27,6 @@ import junit.framework.TestCase;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.rendering.internal.MockSkinAccessBridge;
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -48,7 +47,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrorss2", true);
 
         List<ComponentDescriptor> mocks = 
-            new ArrayList<ComponentDescriptor>(RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+            new ArrayList<ComponentDescriptor>();
         mocks.add(MockSkinAccessBridge.getComponentDescriptor());
         return new ComponentManagerTestSetup(suite, mocks);
     }

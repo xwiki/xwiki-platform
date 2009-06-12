@@ -22,7 +22,6 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -54,6 +53,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrohtml14", true);
         suite.addTestsFromResource("macrohtml15", true);
 
-        return new ComponentManagerTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+        return new ComponentManagerTestSetup(suite);
     }
 }

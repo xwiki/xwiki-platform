@@ -19,10 +19,12 @@
  */
 package org.xwiki.rendering;
 
+import java.util.Arrays;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
+import org.xwiki.rendering.internal.macro.MockDocumentAccessBridge;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -47,6 +49,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrovelocity7", true);
         suite.addTestsFromResource("macrovelocity8", true);
 
-        return new ComponentManagerTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+        return new ComponentManagerTestSetup(suite, Arrays.asList(MockDocumentAccessBridge.getComponentDescriptor()));
     }
 }

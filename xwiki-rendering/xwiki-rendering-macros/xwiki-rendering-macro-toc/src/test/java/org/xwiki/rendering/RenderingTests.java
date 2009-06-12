@@ -22,7 +22,6 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.scaffolding.RenderingTestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -48,6 +47,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrotoc8", true);
         suite.addTestsFromResource("macrotoc9", true);
 
-        return new ComponentManagerTestSetup(suite, RenderingTestCase.DEFAULT_MOCK_DESCRIPTORS);
+        return new ComponentManagerTestSetup(suite);
     }
 }

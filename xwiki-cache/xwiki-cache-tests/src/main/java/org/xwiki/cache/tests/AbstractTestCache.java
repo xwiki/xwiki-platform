@@ -26,7 +26,7 @@ import java.net.URL;
 
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.configuration.ConfigurationManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -100,9 +100,9 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
      * @throws Exception error when initializing component manager.
      */
     @Override
-    public ComponentManager getComponentManager() throws Exception
+    public EmbeddableComponentManager getComponentManager() throws Exception
     {
-        ComponentManager cm = super.getComponentManager();
+        EmbeddableComponentManager cm = super.getComponentManager();
 
         if (this.container == null) {
             // Initialize the Container

@@ -36,32 +36,13 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-api</artifactId>
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-xwiki</artifactId>
-      <version>${pom.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-api</artifactId>
-      <version>${pom.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-xwiki</artifactId>
       <version>${pom.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
@@ -157,7 +138,7 @@
         <configuration>
           <includes>
             <include>**/*Test.java</include>
-            <include>**/RenderingTests.java</include>
+            <include>**/*RenderingTests.java</include>
           </includes>
           <excludes>
             <exclude>**/scaffolding/**.java</exclude>

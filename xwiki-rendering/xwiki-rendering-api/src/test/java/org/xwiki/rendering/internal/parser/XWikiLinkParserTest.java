@@ -19,20 +19,25 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import junit.framework.TestCase;
+import org.jmock.Mock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class XWikiLinkParserTest extends TestCase
+public class XWikiLinkParserTest extends AbstractRenderingTestCase
 {
-    public void testParseLinks()
+    public void testParseLinksWhenInWikiMode() throws Exception
     {
-        LinkParser parser = new XWikiLinkParser();
+        // Create a Mock WikiModel implementation so that the link parser works in wiki mode
+        Mock mockWikiModel = mock(WikiModel.class);
+        getComponentManager().registerComponent(WikiModel.class, mockWikiModel.proxy());
+        LinkParser parser = getComponentManager().lookup(LinkParser.class, "xwiki/2.0"); 
 
         Link link = parser.parse("");
         assertEquals("", link.getReference());

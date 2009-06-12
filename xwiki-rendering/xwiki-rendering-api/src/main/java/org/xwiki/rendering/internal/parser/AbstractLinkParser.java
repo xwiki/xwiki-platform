@@ -23,9 +23,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * Generic parsing of link content. This class is a helper class for classes implementing link partsers. 
@@ -74,6 +78,12 @@ public abstract class AbstractLinkParser  implements LinkParser
     private static final Pattern URL_SCHEME_PATTERN = Pattern.compile("[a-zA-Z0-9+.-]*://");
 
     /**
+     * Used to verify if we're in wiki mode or not by looking up an implementation of {@link WikiModel}.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
+    /**
      * @return the list of URI prefixes the link parser recognizes
      */
     protected abstract List<String> getAllowedURIPrefixes();
@@ -89,6 +99,13 @@ public abstract class AbstractLinkParser  implements LinkParser
 
         Link link = new Link();
 
+        // If we're not in wiki mode then all links are URI links.
+        if (!isInWikiMode()) {
+            link.setType(LinkType.URI);
+            link.setReference(rawLink);
+            return link;
+        }
+        
         // Let's default the link to be a document link. If instead it's a link to a URI or to
         // an interwiki location it'll be overriden.
         link.setType(LinkType.DOCUMENT);
@@ -178,5 +195,19 @@ public abstract class AbstractLinkParser  implements LinkParser
         }
 
         return element;
+    }
+    
+    /**
+     * @return true if we're in wiki mode (ie there's no implementing class for {@link WikiModel})
+     */
+    private boolean isInWikiMode()
+    {
+        boolean result = true;
+        try {
+            this.componentManager.lookup(WikiModel.class);
+        } catch (ComponentLookupException e) {
+            result = false;
+        }
+        return result;
     }
 }

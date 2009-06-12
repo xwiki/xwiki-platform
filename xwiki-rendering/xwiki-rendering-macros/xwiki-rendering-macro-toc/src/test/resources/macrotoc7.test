@@ -21,7 +21,9 @@ beginListItem
 beginList [NUMBERED]
 beginListItem
 beginLink [Anchor = [HTitle11]] [false]
-onWord [Page]
+onWord [Title1]
+onSpecialSymbol [.]
+onWord [1]
 endLink [Anchor = [HTitle11]] [false]
 beginList [NUMBERED]
 beginListItem

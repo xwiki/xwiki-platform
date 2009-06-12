@@ -1,22 +1,19 @@
 .#-----------------------------------------------------
 .input|xhtml/1.0
+.# Validate image Marker inside XHTML parser works (XHTML handler are stacked by group so this test validate that the handlers states are correctly itialized when stacked)
 .#-----------------------------------------------------
-<div><!--startimage:output_html_6c2059af.jpg--><img height="345" src="/xwiki/bin/download/Import/Test/output_html_6c2059af.jpg" width="501"></img><!--stopimage--></div>
+<div><!--startimage:http://host.com/image.jpg--><img src="http://host.com/image.jpg"></img><!--stopimage--></div>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginGroup
 beginParagraph
-onImage: [output_html_6c2059af.jpg] [false] [[height]=[345][width]=[501]]
+onImage: [http://host.com/image.jpg] [false]
 endParagraph
 endGroup
 endDocument
 .#-----------------------------------------------------
-.expect|xhtml/1.0
-.#-----------------------------------------------------
-<div><p><!--startimage:output_html_6c2059af.jpg--><img src="/xwiki/bin/download/currentdoc/output_html_6c2059af.jpg" height="345" width="501" alt="output_html_6c2059af.jpg"/><!--stopimage--></p></div>
-.#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-((([[image:output_html_6c2059af.jpg||height="345" width="501"]])))
+((([[image:http://host.com/image.jpg]])))

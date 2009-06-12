@@ -21,10 +21,14 @@ package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.Renderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 import org.jmock.cglib.MockObjectTestCase;
@@ -52,11 +56,11 @@ public class RenderingTestCase extends MockObjectTestCase
 
     private String parserId;
 
-    private PrintRenderer renderer;
+    private String targetSyntaxId;
 
     private boolean runTransformations;
 
-    public RenderingTestCase(String testName, String input, String expected, String parserId, PrintRenderer renderer,
+    public RenderingTestCase(String testName, String input, String expected, String parserId, String targetSyntaxId,
         boolean runTransformations)
     {
         super(testName);
@@ -64,7 +68,7 @@ public class RenderingTestCase extends MockObjectTestCase
         this.input = input;
         this.expected = expected;
         this.parserId = parserId;
-        this.renderer = renderer;
+        this.targetSyntaxId = targetSyntaxId;
         this.runTransformations = runTransformations;
     }
 
@@ -80,9 +84,15 @@ public class RenderingTestCase extends MockObjectTestCase
             transformationManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
         }
 
-        dom.traverse(this.renderer);
+        PrintRendererFactory rendererFactory = 
+            (PrintRendererFactory) getComponentManager().lookup(PrintRendererFactory.class);
+        SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.class);
+        WikiPrinter printer = new DefaultWikiPrinter();
+        Renderer renderer = rendererFactory.createRenderer(
+            syntaxFactory.createSyntaxFromIdString(this.targetSyntaxId), printer);
+        dom.traverse(renderer);
 
-        assertEquals(this.expected, this.renderer.getPrinter().toString());
+        assertEquals(this.expected, printer.toString());
     }
     
     public void setComponentManager(ComponentManager componentManager)

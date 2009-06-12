@@ -28,60 +28,22 @@ import java.util.StringTokenizer;
 
 import junit.framework.TestSuite;
 
-import org.xwiki.component.internal.ReflectionUtils;
-import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
-import org.xwiki.rendering.internal.parser.DefaultAttachmentParser;
-import org.xwiki.rendering.internal.parser.DefaultSyntaxFactory;
-import org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory;
-import org.xwiki.rendering.internal.renderer.XWikiLinkLabelGenerator;
-import org.xwiki.rendering.internal.renderer.xhtml.DefaultXHTMLRendererFactory;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
-import org.xwiki.test.XWikiComponentInitializer;
-
 /**
  * @version $Id$
  * @since 1.6M1
  */
 public class RenderingTestSuite extends TestSuite
 {
-    private DefaultPrintRendererFactory rendererFactory;
-
-    private SyntaxFactory syntaxFactory;
-
     private class Data
     {
         public Map<String, String> inputs = new HashMap<String, String>();
 
-        public Map<Syntax, String> expectations = new HashMap<Syntax, String>();
+        public Map<String, String> expectations = new HashMap<String, String>();
     }
 
     public RenderingTestSuite(String name) throws Exception
     {
         super(name);
-
-        XWikiLinkLabelGenerator linkLabelGenerator = new XWikiLinkLabelGenerator();
-        linkLabelGenerator.setDocumentAccessBridge(new MockDocumentAccessBridge());
-        linkLabelGenerator.setRenderingConfiguration(new DefaultRenderingConfiguration());
-
-        XHTMLRendererFactory xhtmlRendererFactory = new DefaultXHTMLRendererFactory();
-        
-        XWikiComponentInitializer initializer = new XWikiComponentInitializer();
-        initializer.getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        initializer.getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
-        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "componentManager", initializer.getComponentManager());
-
-        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "linkLabelGenerator", linkLabelGenerator);
-        ReflectionUtils.setFieldValue(xhtmlRendererFactory, "attachmentParser", new DefaultAttachmentParser());
-        
-        this.rendererFactory = new DefaultPrintRendererFactory();
-        ReflectionUtils.setFieldValue(this.rendererFactory, "xhtmlRendererFactory", xhtmlRendererFactory);
-        ReflectionUtils.setFieldValue(this.rendererFactory, "linkLabelGenerator", linkLabelGenerator);
-
-        this.syntaxFactory = new DefaultSyntaxFactory();
     }
 
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception
@@ -92,11 +54,9 @@ public class RenderingTestSuite extends TestSuite
         // Create a test case for each input and for each expectation so that each test is executed separately
         // and reported separately by the JUnit test runner.
         for (Map.Entry<String, String> entry : data.inputs.entrySet()) {
-            for (Syntax targetSyntax : data.expectations.keySet()) {
+            for (String targetSyntaxId : data.expectations.keySet()) {
                 String parserId = entry.getKey();
                 String input = entry.getValue();
-
-                PrintRenderer renderer = this.rendererFactory.createRenderer(targetSyntax, new DefaultWikiPrinter());
 
                 if (parserId.equals("xhtml/1.0") && !input.startsWith("<?xml") && !input.startsWith("<!DOCTYPE")) {
                     input =
@@ -105,8 +65,8 @@ public class RenderingTestSuite extends TestSuite
                 }
 
                 RenderingTestCase testCase =
-                    new RenderingTestCase(computeTestName(testResourceName, parserId, renderer), input,
-                        data.expectations.get(targetSyntax), parserId, renderer, runTransformations);
+                    new RenderingTestCase(computeTestName(testResourceName, parserId, targetSyntaxId), input,
+                        data.expectations.get(targetSyntaxId), parserId, targetSyntaxId, runTransformations);
                 addTest(testCase);
             }
         }
@@ -197,20 +157,13 @@ public class RenderingTestSuite extends TestSuite
         if (buffer.length() > 0 && buffer.charAt(buffer.length() - 1) == '\n') {
             buffer.setLength(buffer.length() - 1);
         }
-        if (map == inputs) {
-            map.put(keyName, buffer.toString());
-        } else {
-            map.put(this.syntaxFactory.createSyntaxFromIdString(keyName), buffer.toString());
-        }
+        map.put(keyName, buffer.toString());
     }
 
-    private String computeTestName(String prefix, String parserId, PrintRenderer renderer)
+    private String computeTestName(String prefix, String parserId, String targetSyntaxId)
     {
-        String rendererName = renderer.getClass().getName();
-        String rendererShortName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
-
         // Note: For some reason the Eclipse JUnit test runner strips the information found in parenthesis. Thus we use
         // square brackets instead.
-        return prefix + " [" + parserId + ", " + rendererShortName + "]";
+        return prefix + " [" + parserId + ", " + targetSyntaxId + "]";
     }
 }

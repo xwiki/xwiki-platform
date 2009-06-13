@@ -53,7 +53,8 @@ public class RenderingTests extends TestCase
         setUpMocks(testSetup.getComponentManager());
 
         // Note: We're using a static Mock for the VelocityManager since it leads to a cleaner code
-        // (the Include Macro needs is reusing it too).
+        // (the Include Macro needs is reusing it too). We register this mock as real component in
+        // components.txt.
 
         return testSetup;
     }

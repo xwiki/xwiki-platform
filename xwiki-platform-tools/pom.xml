@@ -30,7 +30,7 @@
     <version>25-SNAPSHOT</version>
     <relativePath>../pom</relativePath>
   </parent>
-  <groupId>com.xpn.xwiki.platform.tools</groupId>
+  <groupId>org.xwiki.platform.tools</groupId>
   <artifactId>xwiki-tools</artifactId>
   <name>XWiki Platform - Tools - Parent POM</name>
   <version>18-SNAPSHOT</version>

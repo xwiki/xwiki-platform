@@ -2,7 +2,7 @@
 <archetype-catalog>
   <archetypes>
     <archetype>
-      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <groupId>org.xwiki.platform.tools</groupId>
       <artifactId>xwiki-archetype-macro</artifactId>
       <version>1.0-SNAPSHOT</version>
       <description>Make it easy to create a maven project for creating XWiki Rendering Macros.</description>

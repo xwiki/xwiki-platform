@@ -77,7 +77,7 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <dependencies>
           <dependency>
-            <groupId>com.xpn.xwiki.platform.tools</groupId>
+            <groupId>org.xwiki.platform.tools</groupId>
             <artifactId>xwiki-verification-resources</artifactId>
             <version>${platform.tool.verification.version}</version>
           </dependency>

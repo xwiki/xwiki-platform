@@ -1,6 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify Velocity variables are shared between different 2.0 macros of the same content
+.# Verify Velocity macros are shared between different 2.0 macros of the same content
 .#-----------------------------------------------------
 {{velocity}}
 #macro(somemacro)
@@ -39,10 +39,11 @@ beginMacroMarkerStandalone [velocity] [] [
 #somemacro()
 ]
 beginParagraph
-onSpecialSymbol [#]
-onWord [somemacro]
-onSpecialSymbol [(]
-onSpecialSymbol [)]
+onSpecialSymbol ["]
+onWord [macro]
+onSpace
+onWord [content]
+onSpecialSymbol ["]
 endParagraph
 endMacroMarkerStandalone [velocity] [] [
 #somemacro()
@@ -58,4 +59,4 @@ $nl
 #somemacro()
 --><p>"macro content"</p><!--stopmacro--><!--startmacro:velocity|-||-|
 #somemacro()
---><p>#somemacro()</p><!--stopmacro-->
+--><p>"macro content"</p><!--stopmacro-->

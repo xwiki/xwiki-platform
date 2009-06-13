@@ -1,0 +1,97 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.rendering.macro.velocity;
+
+import java.util.Properties;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+
+import org.apache.velocity.VelocityContext;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.scaffolding.RenderingTestSuite;
+import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityManager;
+
+/**
+ * All Rendering integration tests defined in text files using a special format.
+ * 
+ * @version $Id$
+ * @since 1.7M3
+ */
+public class RenderingTests extends TestCase
+{
+    public static Test suite() throws Exception
+    {
+        RenderingTestSuite suite = new RenderingTestSuite("Test Velocity Macro");
+
+        suite.addTestsFromResource("macrovelocity1", true);
+        suite.addTestsFromResource("macrovelocity2", true);
+        suite.addTestsFromResource("macrovelocity3", true);
+        suite.addTestsFromResource("macrovelocity4", true);
+        suite.addTestsFromResource("macrovelocity5", true);
+        suite.addTestsFromResource("macrovelocity6", true);
+        suite.addTestsFromResource("macrovelocity7", true);
+        suite.addTestsFromResource("macrovelocity8", true);
+
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
+
+        return testSetup;
+    }
+
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
+        Mockery context = new Mockery();
+
+        // Document Access Bridge Mock
+        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        componentManager.registerComponent(DocumentAccessBridge.class, mockDocumentAccessBridge);
+        
+        // Velocity Manager Mock
+        final VelocityManager mockVelocityManager = context.mock(VelocityManager.class);
+        final VelocityContext velocityContext = new VelocityContext();
+        final VelocityEngine velocityEngine = createMockVelocityEngine(componentManager);
+        context.checking(new Expectations() {{
+            allowing(mockVelocityManager).getVelocityContext(); will(returnValue(velocityContext));
+            allowing(mockVelocityManager).getVelocityEngine(); will(returnValue(velocityEngine));
+        }});
+        componentManager.registerComponent(VelocityManager.class, mockVelocityManager);
+    }
+    
+    public static VelocityEngine createMockVelocityEngine(ComponentManager componentManager) throws Exception
+    {
+        VelocityEngine engine = componentManager.lookup(VelocityEngine.class);
+
+        // Configure the Velocity Engine not to use the Resource Webapp Loader since we don't
+        // need it and we would need to setup the Container component's ApplicationContext
+        // otherwise.
+        Properties properties = new Properties();
+        properties.setProperty("resource.loader", "file");
+        engine.initialize(properties);
+
+        return engine;
+    }
+}

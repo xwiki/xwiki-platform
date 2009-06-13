@@ -52,6 +52,9 @@ public class RenderingTests extends TestCase
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
 
+        // Note: We're using a static Mock for the VelocityManager since it leads to a cleaner code
+        // (the Include Macro needs is reusing it too).
+
         return testSetup;
     }
 

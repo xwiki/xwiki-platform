@@ -19,21 +19,14 @@
  */
 package org.xwiki.rendering.macro.velocity;
 
-import java.util.Properties;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.apache.velocity.VelocityContext;
-import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.VelocityManager;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -69,29 +62,5 @@ public class RenderingTests extends TestCase
         // Document Access Bridge Mock
         final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
         componentManager.registerComponent(DocumentAccessBridge.class, mockDocumentAccessBridge);
-        
-        // Velocity Manager Mock
-        final VelocityManager mockVelocityManager = context.mock(VelocityManager.class);
-        final VelocityContext velocityContext = new VelocityContext();
-        final VelocityEngine velocityEngine = createMockVelocityEngine(componentManager);
-        context.checking(new Expectations() {{
-            allowing(mockVelocityManager).getVelocityContext(); will(returnValue(velocityContext));
-            allowing(mockVelocityManager).getVelocityEngine(); will(returnValue(velocityEngine));
-        }});
-        componentManager.registerComponent(VelocityManager.class, mockVelocityManager);
-    }
-    
-    public static VelocityEngine createMockVelocityEngine(ComponentManager componentManager) throws Exception
-    {
-        VelocityEngine engine = componentManager.lookup(VelocityEngine.class);
-
-        // Configure the Velocity Engine not to use the Resource Webapp Loader since we don't
-        // need it and we would need to setup the Container component's ApplicationContext
-        // otherwise.
-        Properties properties = new Properties();
-        properties.setProperty("resource.loader", "file");
-        engine.initialize(properties);
-
-        return engine;
     }
 }

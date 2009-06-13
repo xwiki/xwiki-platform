@@ -1,6 +1,6 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Verify Velocity variables are shared between different 2.0 macros of the same content
+.# Verify Velocity macros are shared between different 2.0 macros of the same content
 .#-----------------------------------------------------
 {{velocity}}
 #set($somevar = "some var value")

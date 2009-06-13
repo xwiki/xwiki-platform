@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.parser.pygments;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
@@ -226,7 +227,17 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private String findPath(String fileToFind)
     {
         URL url = getClass().getResource(URL_SEPARATOR + fileToFind);
-        String urlString = URLDecoder.decode(url.toString());
+
+        // Note: we encode using UTF8 since it's the W3C recommendation.
+        // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
+        String urlString;
+        try {
+            urlString = URLDecoder.decode(url.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
+            // without that encoding.
+            throw new RuntimeException("Failed to URL decode [" + url.toString() + "] using UTF-8.", e);
+        }
 
         // we expect an URL like
         // jar:file:/jar_dir/jython-lib.jar!/Lib/pygments/lexer.py

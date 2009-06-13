@@ -25,11 +25,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform.tools</groupId>
+    <groupId>org.xwiki.platform.toolsoupId>
     <artifactId>xwiki-tools</artifactId>
     <version>16</version>
   </parent>
-  <groupId>com.xpn.xwiki.platform.tools</groupId>
+  <groupId>org.org.xwiki.platform.toolsd>
   <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
   <packaging>pom</packaging>
   <name>Maven XWiki Backup Plugin Basic Import/Export Sample</name>
@@ -48,7 +48,7 @@
             </goals>
             <configuration>
               <resourceBundles>
-                <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:1.10</resourceBundle>
+                <resourceBundle>org.xwikorg.xwiki.platform.toolsguration-resources:1.10</resourceBundle>
               </resourceBundles>
               <properties>
                 <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
@@ -58,8 +58,7 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.xpn.xwiki.platform.tools</groupId>
-        <artifactId>xwiki-packager-plugin</artifactId>
+        <groupId>org.xwiki.plorg.xwiki.platform.tools   <artifactId>xwiki-packager-plugin</artifactId>
         <version>1.12-SNAPSHOT</version>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>

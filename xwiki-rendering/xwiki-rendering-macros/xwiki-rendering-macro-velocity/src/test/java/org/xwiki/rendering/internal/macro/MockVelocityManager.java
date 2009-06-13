@@ -34,7 +34,7 @@ import java.util.Properties;
  * Mock VelocityManager implementation used for testing, since we don't want to pull any dependency on the
  * Model/Skin/etc for the Rendering module's unit tests.
  * 
- * @version $Id: MockVelocityManager.java 20552 2009-05-27 12:17:37Z vmassol $
+ * @version $Id$
  * @since 1.5M2
  */
 @Component

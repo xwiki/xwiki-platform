@@ -29,7 +29,7 @@ import org.xwiki.plexus.manager.PlexusComponentManager;
 /**
  * Utilities to manipulate Plexus Containers.
  * 
- * @version $Id:$
+ * @version $Id$
  * @since 2.0M1
  */
 public class PlexusContainerUtils

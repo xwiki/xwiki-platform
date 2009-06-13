@@ -7,6 +7,10 @@
 .#-----------------------------------------------------
 <!--startmacro:example|-|parameter="hello"-->hello<!--stopmacro-->
 .#-----------------------------------------------------
-.expect|xwiki/2.0
+.expect|event/1.0
 .#-----------------------------------------------------
-{{example parameter="hello"/}}
+beginDocument
+beginMacroMarkerStandalone [example] [parameter=hello]
+onWord [hello]
+endMacroMarkerStandalone [example] [parameter=hello]
+endDocument

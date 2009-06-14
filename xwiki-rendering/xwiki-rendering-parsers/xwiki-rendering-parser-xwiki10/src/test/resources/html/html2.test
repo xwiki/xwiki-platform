@@ -60,16 +60,18 @@ some text
 ## commented
 
 ### commented
-<table> <tr><td></td></tr> </table>
-
-\\## commented ## commented
+<table>
+<tr><td></td></tr>
+</table>
+<p/>
+<br/>## commented ## commented
 
 #* commented *#
 
 #if ($var > 0)
 #end
 
-#*commented*#
+#*commented*#<p/>
 
 #*commented
 
@@ -77,31 +79,16 @@ some text
 
 *# not commented
 
-
 #*commented
 
 
 
 \\\*#
 
-
-
-
-
-
-
-
-
-
-
 ## standalone comment
 
-
-
-<~!~-- html comment ~-->
-
-
-
+<p/>
+<!~-- html comment ~-->
 
 (% class="${variable}" %)(((**bold** some text)))
 {{/html}}

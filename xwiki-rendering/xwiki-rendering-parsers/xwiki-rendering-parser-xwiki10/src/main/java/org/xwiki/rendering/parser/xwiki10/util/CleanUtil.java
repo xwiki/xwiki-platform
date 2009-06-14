@@ -39,10 +39,16 @@ public final class CleanUtil
      */
     private static final Pattern STARTING_NL_GROUP_PATTERN = Pattern.compile("^\\n*");
 
+    private static final Pattern STARTING_NLCOMENT_GROUP_PATTERN =
+        Pattern.compile("^(?:\\n*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*)*");
+
     /**
      * Match all the last new lines.
      */
     private static final Pattern ENDING_NL_GROUP_PATTERN = Pattern.compile("\\n*$");
+
+    private static final Pattern ENDING_NLCOMENT_GROUP_PATTERN =
+        Pattern.compile("(?:\\n*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*)*$");
 
     /**
      * Match space, tab or new line.
@@ -136,9 +142,9 @@ public final class CleanUtil
     {
         String cleanedContent = content;
 
-        Matcher matcher = STARTING_NL_GROUP_PATTERN.matcher(content);
+        Matcher matcher = STARTING_NLCOMENT_GROUP_PATTERN.matcher(content);
 
-        int foundNb = matcher.find() ? matcher.end() - matcher.start() : 0;
+        int foundNb = matcher.find() ? StringUtils.countMatches(matcher.group(0), "\n") : 0;
 
         if (foundNb < nb) {
             cleanedContent = StringUtils.repeat("\n", nb - foundNb) + content;
@@ -158,9 +164,9 @@ public final class CleanUtil
     {
         String cleanedContent = content;
 
-        Matcher matcher = ENDING_NL_GROUP_PATTERN.matcher(content);
+        Matcher matcher = ENDING_NLCOMENT_GROUP_PATTERN.matcher(content);
 
-        int foundNb = matcher.find() ? matcher.end() - matcher.start() : 0;
+        int foundNb = matcher.find() ? StringUtils.countMatches(matcher.group(0), "\n") : 0;
 
         if (foundNb < nb) {
             cleanedContent = content + StringUtils.repeat("\n", nb - foundNb);
@@ -177,9 +183,9 @@ public final class CleanUtil
      */
     public static void setTrailingNewLines(StringBuffer content, int nb)
     {
-        Matcher matcher = ENDING_NL_GROUP_PATTERN.matcher(content);
+        Matcher matcher = ENDING_NLCOMENT_GROUP_PATTERN.matcher(content);
 
-        int foundNb = matcher.find() ? matcher.end() - matcher.start() : 0;
+        int foundNb = matcher.find() ? StringUtils.countMatches(matcher.group(0), "\n") : 0;
 
         if (foundNb < nb) {
             content.append(StringUtils.repeat("\n", nb - foundNb));
@@ -236,8 +242,8 @@ public final class CleanUtil
 
         StringBuffer buffer = new StringBuffer();
 
-        boolean multilines = cleanedContent.indexOf("\n") != -1;
-        
+        boolean multilines = filterContext.unProtect(cleanedContent).indexOf("\n") != -1;
+
         if (velocityOpen) {
             VelocityFilter.appendVelocityOpen(buffer, filterContext, multilines);
         }

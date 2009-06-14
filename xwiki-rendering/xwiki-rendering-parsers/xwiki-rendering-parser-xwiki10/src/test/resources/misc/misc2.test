@@ -15,7 +15,6 @@ System.out.println();
 |=A|=B|=C
 |X|Long[]|X
 
-
 {{code}}
 
 System.out.println();

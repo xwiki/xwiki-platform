@@ -7,4 +7,4 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-(% param="value" %)some content(%%) some content 
+(% param="value" %)some content(%%) some content

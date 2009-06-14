@@ -1,12 +1,28 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-<toto><span param="1">content
-some non html text
+##some comment
+1 header
+##some comment
+1 header
+##some comment
+1 header
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
+{{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
-<toto>(% param="1" %)content
-some non html text(%%)
+##some comment
+
+
+= header =
+
+##some comment
+= header =
+
+##some comment
+
 {{/html}}
+{{/velocity}}
+
+= header =

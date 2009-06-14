@@ -60,6 +60,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity20", false);
         suite.addTestsFromResource("velocity/velocity21", false);
         suite.addTestsFromResource("velocity/velocity22", false);
+        suite.addTestsFromResource("velocity/velocity23", false);
+        suite.addTestsFromResource("velocity/velocity24", false);
 
         // Groovy
         suite.addTestsFromResource("groovy/groovy1", false);
@@ -128,6 +130,7 @@ public class RenderingTests extends TestCase
         // Misc
         suite.addTestsFromResource("misc/misc1", false);
         suite.addTestsFromResource("misc/misc2", false);
+        suite.addTestsFromResource("misc/misc3", false);
 
         return new RenderingPlexusTestSetup(suite);
     }

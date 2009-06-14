@@ -15,7 +15,7 @@ paragraph
 
 {{html clean="false" wiki="true"}}
 some text <element></element>
-
+<p/>
 <element></element> same paragraph
 {{/html}}
 

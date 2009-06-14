@@ -56,10 +56,6 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
     public static final Pattern MULTI_LINE_MACRO_PATTERN =
         Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
 
-    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
-
-    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
-
     private ComponentManager componentManager;
 
     /**
@@ -121,20 +117,20 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Composable, In
 
             if (params != null) {
                 // Clean velocity open macro inside params
-                Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(params);
+                Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(params);
                 velocityOpen |= velocityOpenMatcher.find();
                 params = velocityOpenMatcher.replaceAll("");
-                Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(params);
+                Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(params);
                 velocityClose |= velocityCloseMatcher.find();
                 params = velocityCloseMatcher.replaceAll("");
             }
 
             if (macroContent != null) {
                 // Clean velocity close macro inside content
-                Matcher velocityOpenMatcher = VELOCITYOPEN_PATTERN.matcher(macroContent);
+                Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(macroContent);
                 velocityOpen |= velocityOpenMatcher.find();
                 macroContent = velocityOpenMatcher.replaceAll("");
-                Matcher velocityCloseMatcher = VELOCITYCLOSE_PATTERN.matcher(macroContent);
+                Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(macroContent);
                 velocityClose |= velocityCloseMatcher.find();
                 macroContent = velocityCloseMatcher.replaceAll("");
             }

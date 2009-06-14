@@ -6,4 +6,7 @@ some text <element></element>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-some text {{html clean="false" wiki="true"}}<element></element> <element></element>{{/html}} same paragraph
+some text {{html clean="false" wiki="true"}}
+<element></element>
+<element></element>
+{{/html}} same paragraph

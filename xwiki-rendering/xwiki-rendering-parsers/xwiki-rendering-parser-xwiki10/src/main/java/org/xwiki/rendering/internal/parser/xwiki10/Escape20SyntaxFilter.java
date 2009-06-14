@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
@@ -34,8 +35,26 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 @Component("escape20")
 public class Escape20SyntaxFilter extends AbstractFilter implements Initializable
 {
+    private static final String LISTSYNTAX_SPATTERN =
+        Pattern.quote("*") + "|" + Pattern.quote(":") + "|" + Pattern.quote(";") + "|" + Pattern.quote("1.");
+
+    private static final String CELLSYNTAX_SPATTERN =
+        Pattern.quote("|=") + "|" + Pattern.quote("!=") + "|" + Pattern.quote("!!") + "|" + Pattern.quote("|");
+
+    private static final String FORMATSYNTAX_SPATTERN =
+        Pattern.quote("//") + "|" + Pattern.quote("**") + "|" + Pattern.quote("__") + "|" + Pattern.quote("--") + "|"
+            + Pattern.quote("^^") + "|" + Pattern.quote(",,") + "|" + Pattern.quote("##");
+
+    private static final String NEWLINESYNTAX_CONTENT_SPATTERN = LISTSYNTAX_SPATTERN + "|" + Pattern.quote("=");
+
+    private static final String NEWLINESYNTAX_SPATTERN = "^( *)((?:" + NEWLINESYNTAX_CONTENT_SPATTERN + "))";
+
+    private static final String INLINESYNTAX_PATTERN =
+        FORMATSYNTAX_SPATTERN + "|" + CELLSYNTAX_SPATTERN + "|" + Pattern.quote("~") + "|" + Pattern.quote("{{") + "|"
+            + Pattern.quote("}}") + "|" + Pattern.quote("(((") + "|" + Pattern.quote(")))");
+
     private static final Pattern SYNTAX_PATTERN =
-        Pattern.compile("\\~|\\/\\/|\\_|\\*|\\--|\\#|\\^^|\\,,|1\\.|\\{|\\}|\\(|\\)|\\:|\\;|\\||\\=|\\!");
+        Pattern.compile("(" + NEWLINESYNTAX_SPATTERN + ")|(" + INLINESYNTAX_PATTERN + ")", Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}
@@ -55,6 +74,26 @@ public class Escape20SyntaxFilter extends AbstractFilter implements Initializabl
      */
     public String filter(String content, FilterContext filterContext)
     {
-        return SYNTAX_PATTERN.matcher(content).replaceAll("~$0");
+        StringBuffer result = new StringBuffer();
+
+        Matcher matcher = SYNTAX_PATTERN.matcher(content);
+        int currentIndex = 0;
+        for (; matcher.find(); currentIndex = matcher.end()) {
+            result.append(content.substring(currentIndex, matcher.start()));
+
+            if (matcher.group(1) != null) {
+                result.append(matcher.group(2) + "~" + matcher.group(3));
+            } else {
+                result.append("~" + matcher.group(4));
+            }
+        }
+
+        if (currentIndex == 0) {
+            return content;
+        }
+
+        result.append(content.substring(currentIndex));
+
+        return result.toString();
     }
 }

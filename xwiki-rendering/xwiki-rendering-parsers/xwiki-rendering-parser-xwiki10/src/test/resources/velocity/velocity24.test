@@ -1,12 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-<toto><span param="1">content
-some non html text
+#{set}($var = "value")
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html clean="false" wiki="true"}}
-<toto>(% param="1" %)content
-some non html text(%%)
-{{/html}}
+{{velocity filter="none"}}{{html clean="false" wiki="true"}}#{set}($var = "value"){{/html}}{{/velocity}}

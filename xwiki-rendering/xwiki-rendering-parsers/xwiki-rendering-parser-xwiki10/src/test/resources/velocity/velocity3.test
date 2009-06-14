@@ -22,14 +22,6 @@
 #set($var = "value")
 
 
-
-
-
-
-
-
-
-
 * $var 1
 * $var
 {{/html}}

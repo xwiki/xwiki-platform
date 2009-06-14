@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser.xwiki10;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
@@ -29,16 +28,15 @@ import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
- * XWiki 1.0 does not interpret standalone new line in paragraph. This is because it render in as is in XHTML (which
- * does not interpret them).
+ * Make sure that two new lines and more produce only one empty line.
  * 
  * @version $Id$
  * @since 1.8M1
  */
-@Component("standalonenewlinecleanning")
-public class StandaloneNewLineCleaningFilter extends AbstractFilter implements Initializable
+@Component("nl")
+public class EmptyLineFilter extends AbstractFilter implements Initializable
 {
-    private static final Pattern SANDALONENEWLINE_PATTERN = Pattern.compile("([^\\n])\\n([^\\n])", Pattern.MULTILINE);
+    public static final Pattern EMPTYLINE_PATTERN = Pattern.compile("\n\n+");
 
     /**
      * {@inheritDoc}
@@ -47,7 +45,7 @@ public class StandaloneNewLineCleaningFilter extends AbstractFilter implements I
      */
     public void initialize() throws InitializationException
     {
-        setPriority(4000);
+        setPriority(1000);
     }
 
     /**
@@ -58,19 +56,6 @@ public class StandaloneNewLineCleaningFilter extends AbstractFilter implements I
      */
     public String filter(String content, FilterContext filterContext)
     {
-        StringBuffer result = new StringBuffer();
-
-        Matcher matcher = FilterContext.XWIKI1020TOKENNI_PATTERN.matcher(content);
-        int current = 0;
-        for (; matcher.find(); current = matcher.end()) {
-            String before = content.substring(current, matcher.start());
-
-            result.append(SANDALONENEWLINE_PATTERN.matcher(before).replaceAll("$1 $2"));
-            result.append(matcher.group(0));
-        }
-
-        result.append(SANDALONENEWLINE_PATTERN.matcher(content.substring(current)).replaceAll("$1 $2"));
-
-        return result.toString();
+        return EMPTYLINE_PATTERN.matcher(content).replaceAll("\n\n");
     }
 }

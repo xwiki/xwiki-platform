@@ -5,8 +5,8 @@ some text
 ## commented
 
 ### commented
-
-\\## commented ## commented
+<p/>
+<br/>## commented ## commented
 
 #* commented *#
 
@@ -46,12 +46,12 @@ some text
 ## commented
 
 ### commented
-
-\\## commented ## commented
+<p/>
+<br/>## commented ## commented
 
 #* commented *#
 
-#*commented*#
+#*commented*#<p/>
 
 #*commented
 
@@ -59,22 +59,11 @@ some text
 
 *# not commented
 
-
 #*commented
 
 
 
-\\\*#
-
-
-
-
-
-
-
-
-
-
+\\\*#<p/>
 
 ## standalone comment
 

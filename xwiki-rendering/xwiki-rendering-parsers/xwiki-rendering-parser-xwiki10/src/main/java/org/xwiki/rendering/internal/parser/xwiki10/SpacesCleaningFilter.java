@@ -46,7 +46,7 @@ public class SpacesCleaningFilter extends AbstractFilter implements Initializabl
      */
     public void initialize() throws InitializationException
     {
-        setPriority(2000);
+        setPriority(4001);
     }
 
     /**

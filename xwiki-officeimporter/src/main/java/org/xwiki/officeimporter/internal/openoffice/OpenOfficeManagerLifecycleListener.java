@@ -19,24 +19,29 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.ApplicationContextListener;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.ApplicationStartedEvent;
+import org.xwiki.observation.event.ApplicationStoppedEvent;
+import org.xwiki.observation.event.Event;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 
 /**
- * {@link ApplicationContextListener} responsible for automatically starting openoffice server instance if required.
+ * Listens to application start and stop events in order to automatically start and stop an Open Office server instance
+ * (if auto start/auto stop is configured).
  * 
  * @version $Id$
- * @since 1.9M2
+ * @since 2.0M1
  */
 @Component("oomanager")
-public class OpenOfficeManagerApplicationContextListener extends AbstractLogEnabled implements
-    ApplicationContextListener
+public class OpenOfficeManagerLifecycleListener extends AbstractLogEnabled implements EventListener
 {
     /**
      * The {@link OpenOfficeConfiguration} component.
@@ -52,12 +57,43 @@ public class OpenOfficeManagerApplicationContextListener extends AbstractLogEnab
 
     /**
      * {@inheritDoc}
+     * @see EventListener#getEvents()
      */
-    public void initializeApplicationContext(ApplicationContext applicationContext)
+    public List<Event> getEvents()
     {
-        if (ooConfig.isAutoStart()) {
+        return Arrays.asList(new ApplicationStartedEvent(), new ApplicationStoppedEvent());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see EventListener#getName()
+     */
+    public String getName()
+    {
+        return "oomanager";
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see EventListener#onEvent(Event, Object, Object)
+     */
+    public void onEvent(Event event, Object source, Object data)
+    {
+        if (ApplicationStartedEvent.class.getName().equals(event.getClass().getName())) {
+            startOpenOffice();
+        } else if (ApplicationStoppedEvent.class.getName().equals(event.getClass().getName())) {
+            stopOpenOffice();
+        }
+    }
+
+    /**
+     * Start Open Office if the configuration says to start it automatically.
+     */
+    private void startOpenOffice()
+    {
+        if (this.ooConfig.isAutoStart()) {
             try {
-                ooManager.start();
+                this.ooManager.start();
             } catch (OpenOfficeManagerException ex) {
                 getLogger().error(ex.getMessage(), ex);
             }
@@ -65,12 +101,14 @@ public class OpenOfficeManagerApplicationContextListener extends AbstractLogEnab
     }
 
     /**
-     * {@inheritDoc}
+     * Stop Open Office.
      */
-    public void destroyApplicationContext(ApplicationContext applicationContext)
+    private void stopOpenOffice()
     {
+        // TODO: We shouldn't stop OO if it hasn't been started automatically or if the config doesn't
+        // say to stop it automatically.
         try {
-            ooManager.stop();
+            this.ooManager.stop();
         } catch (OpenOfficeManagerException ex) {
             getLogger().error(ex.getMessage(), ex);
         }

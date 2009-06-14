@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -123,5 +124,32 @@ public class DefaultComponentManager implements ComponentManager, Composable
     public <T> void release(T component) throws ComponentLifecycleException
     {
         this.componentManager.release(component);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#hasComponent(Class, String)
+     */
+    public <T> boolean hasComponent(Class<T> role, String roleHint)
+    {
+        return this.componentManager.hasComponent(role, roleHint);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#hasComponent(Class)
+     */
+    public <T> boolean hasComponent(Class<T> role)
+    {
+        return this.componentManager.hasComponent(role);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#setComponentEventManager(ComponentEventManager)
+     */
+    public void setComponentEventManager(ComponentEventManager eventManager)
+    {
+        this.componentManager.setComponentEventManager(eventManager);
     }
 }

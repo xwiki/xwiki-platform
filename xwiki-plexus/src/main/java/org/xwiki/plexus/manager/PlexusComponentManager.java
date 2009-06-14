@@ -32,6 +32,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDependency;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -47,6 +48,24 @@ public class PlexusComponentManager implements ComponentManager
     public PlexusComponentManager(PlexusContainer plexusContainer)
     {
         this.plexusContainer = plexusContainer;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#hasComponent(Class, String)
+     */
+    public <T> boolean hasComponent(Class<T> role, String roleHint)
+    {
+        return this.plexusContainer.hasComponent(role.getName(), roleHint);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#hasComponent(Class)
+     */
+    public <T> boolean hasComponent(Class<T> role)
+    {
+        return this.plexusContainer.hasComponent(role.getName());
     }
 
     /**
@@ -176,6 +195,15 @@ public class PlexusComponentManager implements ComponentManager
             results.add((ComponentDescriptor<T>) createXWikiComponentDescriptor(pcd));
         }
         return results;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#setComponentEventManager(ComponentEventManager)
+     */
+    public void setComponentEventManager(ComponentEventManager eventManager)
+    {
+        // Do nothing since there's no hook to get Plexus Events.
     }
 
     private <T> ComponentDescriptor<T> createXWikiComponentDescriptor(

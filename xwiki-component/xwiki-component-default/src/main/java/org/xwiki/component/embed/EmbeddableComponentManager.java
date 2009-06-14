@@ -32,14 +32,13 @@ import org.xwiki.component.internal.Composable;
 import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.logging.VoidLogger;
-import org.xwiki.component.manager.ComponentDescriptorAddedEvent;
+import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.LogEnabled;
-import org.xwiki.observation.ObservationManager;
 
 /**
  * Simple implementation of {@link ComponentManager} to be used when using some XWiki modules standalone.
@@ -49,6 +48,8 @@ import org.xwiki.observation.ObservationManager;
  */
 public class EmbeddableComponentManager implements ComponentManager
 {
+    private ComponentEventManager eventManager;
+    
     private Map<RoleHint< ? >, ComponentDescriptor< ? >> descriptors = new HashMap<RoleHint< ? >, ComponentDescriptor< ? >>();
     
     private Map<RoleHint< ? >, Object> components = new HashMap<RoleHint< ? >, Object>();
@@ -63,7 +64,26 @@ public class EmbeddableComponentManager implements ComponentManager
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
         loader.initialize(this, classLoader);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#hasComponent(Class, String)
+     */
+    public <T> boolean hasComponent(Class< T > role, String roleHint)
+    {
+        return this.components.containsKey(new RoleHint<T>(role, roleHint));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#hasComponent(Class)
+     */
+    public <T> boolean hasComponent(Class< T > role)
+    {
+        return this.components.containsKey(new RoleHint<T>(role));
+    }
+
+
     /**
      * {@inheritDoc}
      * @see ComponentManager#lookup(Class)
@@ -186,6 +206,15 @@ public class EmbeddableComponentManager implements ComponentManager
         }
     }
     
+    /**
+     * {@inheritDoc}
+     * @see ComponentManager#setComponentEventManager(ComponentEventManager)
+     */
+    public void setComponentEventManager(ComponentEventManager eventManager)
+    {
+        this.eventManager = eventManager;
+    }
+
     @SuppressWarnings("unchecked")
     private <T> List<T> initializeList(Class< T > role) throws ComponentLookupException
     {
@@ -234,23 +263,13 @@ public class EmbeddableComponentManager implements ComponentManager
                     throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
                 }
                 
-                sendObservationEvent(this.descriptors.get(roleHint));
+                // Send event about component instance creation
+                if (this.eventManager != null) {
+                    this.eventManager.notify(this.descriptors.get(roleHint));
+                }
             }
         }
         return instance;
-    }
-    
-    private void sendObservationEvent(ComponentDescriptor< ? > descriptor)
-    {
-        // Send an Observation event to listeners if an Observation Manager is present
-        try {
-            ObservationManager om = lookup(ObservationManager.class);
-            ComponentDescriptorAddedEvent event = new ComponentDescriptorAddedEvent(descriptor.getRole());
-            om.notify(event, this, descriptor);
-        } catch (ComponentLookupException e) {
-            // No Observation manager was found, do nothing
-            // TODO: Maybe log a warning in the future
-        }
     }
     
     @SuppressWarnings("unchecked")

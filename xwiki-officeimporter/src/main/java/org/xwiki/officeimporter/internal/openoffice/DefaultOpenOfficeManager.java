@@ -128,6 +128,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
             try {
                 officeManager.start();
                 currentState = ManagerState.CONNECTED;
+                getLogger().info("Open Office instance started.");
             } catch (OfficeException ex) {
                 currentState = ManagerState.ERROR;
                 throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", ex);
@@ -144,6 +145,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
             try {
                 officeManager.stop();
                 currentState = ManagerState.NOT_CONNECTED;
+                getLogger().info("Open Office instance stopped.");
             } catch (OfficeException ex) {
                 currentState = ManagerState.ERROR;
                 throw new OpenOfficeManagerException("Error while disconnecting / shutting down openoffice.", ex);

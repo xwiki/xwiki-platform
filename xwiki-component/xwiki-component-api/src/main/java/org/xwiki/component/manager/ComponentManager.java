@@ -30,6 +30,24 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 public interface ComponentManager
 {
     /**
+     * @param <T> the component role type
+     * @param role the class (aka role) that the component implements 
+     * @return true if the component has already been instantiated or not. Always return false for components with
+     *         a per-lookup instantiation strategy
+     */
+    <T> boolean hasComponent(Class< T > role);
+
+    /**
+     * @param <T> the component role type
+     * @param role the class (aka role) that the component implements
+     * @param roleHint the hint that differentiates a component implementation from another one (each component
+     *        is registered with a hint; the "default" hint being the default) 
+     * @return true if the component has already been instantiated or not. Always return false for components with
+     *         a per-lookup instantiation strategy
+     */
+    <T> boolean hasComponent(Class< T > role, String roleHint);
+    
+    /**
      * Find a component instance that implements that passed interface class. If the component has a singleton
      * lifecycle then this method always return the same instance.
      *  
@@ -91,4 +109,9 @@ public interface ComponentManager
      * @return all component implementations for the passed role
      */
     < T > List<ComponentDescriptor<T>> getComponentDescriptorList(Class< T > role);
+    
+    /**
+     * @param eventManager the manager to use to send events when a component is instantiated.
+     */
+    void setComponentEventManager(ComponentEventManager eventManager);
 }

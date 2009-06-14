@@ -39,8 +39,8 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 public class UnescapeHTMLFilter extends AbstractFilter implements Initializable
 {
     public static final Pattern HTMLVELOCITY_SPATTERN =
-        Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN + "|" + VelocityFilter.VELOCITYCLOSE_PATTERN + "|"
-            + HTMLFilter.HTMLOPEN_SPATTERN + "|" + HTMLFilter.HTMLCLOSE_SPATTERN);
+        Pattern.compile("(" + VelocityFilter.VELOCITYOPEN_SPATTERN + ")|(" + VelocityFilter.VELOCITYCLOSE_PATTERN
+            + ")|(" + HTMLFilter.HTMLOPEN_SPATTERN + ")|(" + HTMLFilter.HTMLCLOSE_SPATTERN + ")");
 
     /**
      * {@inheritDoc}
@@ -98,15 +98,5 @@ public class UnescapeHTMLFilter extends AbstractFilter implements Initializable
     private String unescapeNonHtmlContent(String content)
     {
         return StringEscapeUtils.unescapeHtml(content);
-    }
-
-    public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
-    {
-        result.append(filterContext.addProtectedContent("{{html wiki=true}}" + (nl ? "\n" : ""), false));
-    }
-
-    public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)
-    {
-        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}", false));
     }
 }

@@ -13,7 +13,7 @@
 {{html clean="false" wiki="true"}}
 #if($var)
 #else
- #set($var = $something)
+  #set($var = $something)
 #end
 {{/html}}
 {{/velocity}}

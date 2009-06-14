@@ -9,6 +9,7 @@ $!{var}
 .#-----------------------------------------------------
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
-$!var $!{var}
+$!var
+$!{var}
 {{/html}}
 {{/velocity}} #!macro()

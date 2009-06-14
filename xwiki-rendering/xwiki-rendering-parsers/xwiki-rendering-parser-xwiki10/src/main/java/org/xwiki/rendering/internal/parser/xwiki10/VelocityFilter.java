@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +31,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.internal.parser.xwiki10.velocity.InvalidVelocityException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.VelocityMacroConverter;
@@ -40,6 +40,8 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 /**
  * Register all Velocity comments in order to protect them from following filters. Protect velocity comments, convert
  * velocity macro into 2.0 macros/syntax and add needed 2.0 velocity macros and convert.
+ * <p>
+ * See http://velocity.apache.org/engine/releases/velocity-1.6.2/vtl-reference-guide.html
  * 
  * @version $Id$
  * @since 1.8M1
@@ -47,29 +49,94 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 @Component("velocity")
 public class VelocityFilter extends AbstractFilter implements Initializable
 {
-    public static final String VELOCITYOPEN_SUFFIX = "velocityopen";
+    public static final String VELOCITY_SUFFIX = "velocity";
 
-    public static final String VELOCITYCLOSE_SUFFIX = "velocityclose";
+    public static final String VELOCITYOPEN_SUFFIX = VELOCITY_SUFFIX + "open";
 
-    public static final Set<String> VELOCITY_BEGINBLOCK = new HashSet<String>(Arrays.asList("if", "foreach"));
+    public static final String VELOCITYCLOSE_SUFFIX = VELOCITY_SUFFIX + "close";
 
-    public static final Set<String> VELOCITY_PARAMBLOCK = new HashSet<String>(Arrays.asList("if", "foreach", "set"));
+    public static final String VELOCITYCOMMENT_SUFFIX = VELOCITY_SUFFIX + VelocityFilterContext.VelocityType.COMMENT;
 
-    public static final Set<String> VELOCITY_NOPARAMBLOCK = new HashSet<String>(Arrays.asList("else"));
+    /**
+     * The directives which start a new level which will have to be close by a #end.
+     */
+    public static final Set<String> VELOCITYDIRECTIVE_BEGIN = new HashSet<String>();
 
-    public static final Set<String> VELOCITY_ENDBLOCK = new HashSet<String>(Arrays.asList("end"));
+    /**
+     * Close an opened level.
+     */
+    public static final Set<String> VELOCITYDIRECTIVE_END = new HashSet<String>();
+
+    /**
+     * Reserved directive containing parameter(s) like #if.
+     */
+    public static final Set<String> VELOCITYDIRECTIVE_PARAM = new HashSet<String>();
+
+    /**
+     * Reserved directives without parameters like #else.
+     */
+    public static final Set<String> VELOCITYDIRECTIVE_NOPARAM = new HashSet<String>();
+
+    /**
+     * All the velocity reserved directives.
+     */
+    public static final Set<String> VELOCITYDIRECTIVE_ALL = new HashSet<String>();
+
+    public static final String VELOCITY_SPATTERN =
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VELOCITY_SUFFIX + "\\p{L}*\\d+"
+            + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String VELOCITYOPEN_SPATTERN =
-        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYOPEN_SUFFIX
-            + "[\\d]+" + FilterContext.XWIKI1020TOKEN_CP + ")";
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VELOCITYOPEN_SUFFIX + "[\\d]+"
+            + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String VELOCITYCLOSE_SPATTERN =
-        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VelocityFilter.VELOCITYCLOSE_SUFFIX
-            + "[\\d]+" + FilterContext.XWIKI1020TOKEN_CP + ")";
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VELOCITYCLOSE_SUFFIX + "[\\d]+"
+            + FilterContext.XWIKI1020TOKEN_CP + ")";
 
-    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VelocityFilter.VELOCITYOPEN_SPATTERN);
+    public static final String VELOCITYCONTENT_SPATTERN =
+        "(?:" + VELOCITYOPEN_SPATTERN + ".*" + VELOCITYCLOSE_SPATTERN + ")";
 
-    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VelocityFilter.VELOCITYCLOSE_SPATTERN);
+    public static final String VELOCITYCOMMENT_SPATTERN =
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + VELOCITYCOMMENT_SUFFIX + "[\\d]+"
+            + FilterContext.XWIKI1020TOKEN_CP + ")";
+
+    public static final String EMPTY_SPATTERN =
+        VelocityFilter.VELOCITYOPEN_SPATTERN + "?" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*"
+            + VelocityFilter.VELOCITYCLOSE_SPATTERN + "?";
+
+    public static final String EMPTYSPACE_SPATTERN =
+        "[ \\t]*" + VelocityFilter.VELOCITYOPEN_SPATTERN + "?(?:[ \\t]*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN
+            + "*)*" + VelocityFilter.VELOCITYCLOSE_SPATTERN + "?[ \\t]*";
+
+    public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VELOCITYOPEN_SPATTERN);
+
+    public static final Pattern VELOCITYCLOSE_PATTERN = Pattern.compile(VELOCITYCLOSE_SPATTERN);
+
+    public static final Pattern VELOCITYCONTENT_PATTERN = Pattern.compile(VELOCITYCONTENT_SPATTERN, Pattern.DOTALL);
+
+    static {
+        VELOCITYDIRECTIVE_BEGIN.add("if");
+        VELOCITYDIRECTIVE_BEGIN.add("foreach");
+        VELOCITYDIRECTIVE_BEGIN.add("literal");
+
+        VELOCITYDIRECTIVE_END.add("end");
+
+        VELOCITYDIRECTIVE_PARAM.add("if");
+        VELOCITYDIRECTIVE_PARAM.add("foreach");
+        VELOCITYDIRECTIVE_PARAM.add("set");
+        VELOCITYDIRECTIVE_PARAM.add("elseif");
+        VELOCITYDIRECTIVE_PARAM.add("define");
+        VELOCITYDIRECTIVE_PARAM.add("evaluate");
+
+        VELOCITYDIRECTIVE_NOPARAM.add("end");
+        VELOCITYDIRECTIVE_NOPARAM.add("else");
+        VELOCITYDIRECTIVE_NOPARAM.add("break");
+        VELOCITYDIRECTIVE_NOPARAM.add("stop");
+
+        VELOCITYDIRECTIVE_ALL.addAll(VELOCITYDIRECTIVE_PARAM);
+        VELOCITYDIRECTIVE_ALL.addAll(VELOCITYDIRECTIVE_NOPARAM);
+    }
 
     /**
      * Used to lookup macros converters.
@@ -114,13 +181,19 @@ public class VelocityFilter extends AbstractFilter implements Initializable
             context.setConversion(false);
             context.setInline(true);
             context.setProtectedBlock(true);
+            context.setType(null);
 
             StringBuffer velocityBlock = new StringBuffer();
 
-            if (c == '#') {
-                i = getKeyWord(array, i, velocityBlock, context);
-            } else if (c == '$') {
-                i = getVar(array, i, velocityBlock, context);
+            try {
+                if (c == '#') {
+                    i = getKeyWord(array, i, velocityBlock, context);
+                } else if (c == '$') {
+                    i = getVar(array, i, velocityBlock, context);
+                }
+            } catch (InvalidVelocityException e) {
+                getLogger().debug("Not a valid Velocity block at char [" + i + "]", e);
+                context.setVelocity(false);
             }
 
             if (context.isVelocity()) {
@@ -140,7 +213,7 @@ public class VelocityFilter extends AbstractFilter implements Initializable
                 }
 
                 velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(velocityBlock
-                    .toString(), context.isInline()) : velocityBlock);
+                    .toString(), VELOCITY_SUFFIX + context.getType(), context.isInline()) : velocityBlock);
             } else {
                 StringBuffer nonVelocityBuffer = inVelocityMacro ? afterVelocityBuffer : beforeVelocityBuffer;
 
@@ -174,32 +247,10 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         if (velocityBuffer.length() > 0) {
             String beforeVelocityContent = beforeVelocityBuffer.toString();
             String velocityContent = velocityBuffer.toString();
+            String unProtectedVelocityContent = filterContext.unProtect(velocityContent);
             String afterVelocityContent = afterVelocityBuffer.toString();
 
-            boolean multilines = velocityBuffer.indexOf("\n") != -1;
-
-            // Make sure velocity macro does not start in a block and ends in another by "eating" them
-            if (multilines && velocityContent.indexOf("\n\n") != -1) {
-                int beforeIndex = beforeVelocityContent.lastIndexOf("\n\n");
-
-                if (beforeIndex == -1) {
-                    velocityContent = beforeVelocityContent + velocityContent;
-                    beforeVelocityContent = "";
-                } else {
-                    velocityContent = beforeVelocityContent.substring(beforeIndex + 2) + velocityContent;
-                    beforeVelocityContent = beforeVelocityContent.substring(0, beforeIndex + 2);
-                }
-
-                int afterIndex = afterVelocityContent.lastIndexOf("\n\n");
-
-                if (afterIndex == -1) {
-                    velocityContent += afterVelocityContent;
-                    afterVelocityContent = "";
-                } else {
-                    velocityContent += afterVelocityContent.substring(0, afterIndex);
-                    afterVelocityContent = afterVelocityContent.substring(afterIndex);
-                }
-            }
+            boolean multilines = unProtectedVelocityContent.indexOf("\n") != -1;
 
             // print before velocity content
             result.append(beforeVelocityContent);
@@ -219,91 +270,162 @@ public class VelocityFilter extends AbstractFilter implements Initializable
     }
 
     private int getKeyWord(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+        throws InvalidVelocityException
     {
-        int i = currentIndex + 1;
+        int i = currentIndex;
 
-        if (i >= array.length) {
-            context.setVelocity(false);
-            return i;
+        if (i + 1 >= array.length) {
+            throw new InvalidVelocityException();
         }
 
-        context.setInline(false);
-
-        if (array[i] == '#') {
+        if (array[i + 1] == '#') {
             // A simple line comment
-            i = getSimpleComment(array, i, velocityBlock, context);
-        } else if (array[i] == '*') {
+            i = getSimpleComment(array, currentIndex, velocityBlock, context);
+        } else if (array[i + 1] == '*') {
             // A multi lines comment
-            i = getMultilinesComment(array, i, velocityBlock, context);
-        } else if (Character.isLetter(array[i])) {
-            // A macro
-            i = getMacro(array, i, velocityBlock, context);
-        } else {
-            i = currentIndex;
+            i = getMultilinesComment(array, currentIndex, velocityBlock, context);
+        } else if (array[i + 1] == '{' || Character.isLetter(array[i + 1])) {
+            // A directive
+            i = getDirective(array, currentIndex, velocityBlock, context);
         }
 
         return i;
     }
 
-    private int getMacro(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+    private int getDirective(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+        throws InvalidVelocityException
     {
-        StringBuffer macroBlock = new StringBuffer("#");
-
-        int i = currentIndex;
+        int i = currentIndex + 1;
 
         // Get macro name
-        StringBuffer macroName = new StringBuffer();
-        for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
-            macroName.append(array[i]);
-        }
-        macroBlock.append(macroName);
+        StringBuffer directiveNameBuffer = new StringBuffer();
+        i = getDirectiveName(array, i, directiveNameBuffer, null);
+        String directiveName = directiveNameBuffer.toString();
 
-        if (VELOCITY_ENDBLOCK.contains(macroName.toString())) {
-            // #end
-            context.popVelocityDepth();
+        StringBuffer directiveBuffer = new StringBuffer();
+        directiveBuffer.append(array, currentIndex, i - currentIndex);
+
+        if (VELOCITYDIRECTIVE_ALL.contains(directiveName)) {
             context.setVelocity(true);
-        } else if (VELOCITY_NOPARAMBLOCK.contains(macroName.toString())) {
-            context.setVelocity(true);
-        } else {
-            if (VELOCITY_BEGINBLOCK.contains(macroName.toString())) {
-                // #if, #foreach
+            context.setType(VelocityFilterContext.VelocityType.DIRECTIVE);
+
+            // get the velocity directive
+            if (VELOCITYDIRECTIVE_BEGIN.contains(directiveName)) {
                 context.pushVelocityDepth();
-                context.setVelocity(true);
+            } else if (VELOCITYDIRECTIVE_END.contains(directiveName)) {
+                context.popVelocityDepth();
             }
 
+            if (!VELOCITYDIRECTIVE_NOPARAM.contains(directiveName)) {
+                // Skip spaces
+                for (; i < array.length && array[i] == ' '; ++i) {
+                    directiveBuffer.append(array[i]);
+                }
+
+                if (i < array.length) {
+                    if (array[i] == '(') {
+                        // Skip condition
+                        i = getMethodParameters(array, i, directiveBuffer, context);
+                    }
+                }
+            }
+
+            // consume the end of the line
+            i = getDirectiveEndOfLine(array, i, directiveBuffer);
+        } else {
             // Skip spaces
             for (; i < array.length && array[i] == ' '; ++i) {
-                macroBlock.append(array[i]);
+                directiveBuffer.append(array[i]);
             }
 
             if (i < array.length) {
                 if (array[i] == '(') {
-                    if (VELOCITY_PARAMBLOCK.contains(macroName.toString())) {
-                        // Skip condition
-                        i = getMethodParameters(array, i, macroBlock, context);
+                    context.setInline(true);
 
-                        context.setVelocity(true);
+                    List<String> parameters = new ArrayList<String>();
+                    // Get condition
+                    i = getMacroParameters(array, i, directiveBuffer, parameters, context);
+                    String convertedMacro = convertMacro(directiveName, parameters, context);
+
+                    if (convertedMacro != null) {
+                        // Apply conversion
+                        directiveBuffer.setLength(0);
+                        directiveBuffer.append(convertedMacro);
                     } else {
-                        context.setInline(true);
-
-                        List<String> parameters = new ArrayList<String>();
-                        // Get condition
-                        i = getMacroParameters(array, i, macroBlock, parameters, context);
-                        String convertedMacro = convertMacro(macroName.toString(), parameters, context);
-
-                        if (convertedMacro != null) {
-                            // Apply conversion
-                            macroBlock.setLength(0);
-                            macroBlock.append(convertedMacro);
-                        } else {
-                            context.setVelocity(true);
-                        }
+                        context.setVelocity(true);
+                        context.setType(VelocityFilterContext.VelocityType.DIRECTIVE);
                     }
                 }
             }
         }
 
-        velocityBlock.append(macroBlock);
+        velocityBlock.append(directiveBuffer);
+
+        return i;
+    }
+
+    private int getVelocityIdentifier(char[] array, int currentIndex, StringBuffer velocityBlock)
+        throws InvalidVelocityException
+    {
+        if (!Character.isLetter(array[currentIndex])) {
+            throw new InvalidVelocityException();
+        }
+
+        int i = currentIndex + 1;
+
+        for (; i < array.length && array[i] != '}'
+            && (Character.isLetterOrDigit(array[i]) || array[i] == '_' || array[i] == '-'); ++i) {
+        }
+
+        if (velocityBlock != null) {
+            velocityBlock.append(array, currentIndex, i - currentIndex);
+        }
+
+        return i;
+    }
+
+    private int getDirectiveName(char[] array, int currentIndex, StringBuffer directiveName, StringBuffer velocityBlock)
+        throws InvalidVelocityException
+    {
+        int i = currentIndex;
+
+        if (i == array.length) {
+            throw new InvalidVelocityException();
+        }
+
+        if (array[i] == '{') {
+            ++i;
+        }
+
+        i = getVelocityIdentifier(array, i, directiveName);
+
+        if (i < array.length && array[i] == '}') {
+            ++i;
+        }
+
+        if (velocityBlock != null) {
+            velocityBlock.append(array, currentIndex, i - currentIndex);
+        }
+
+        return i;
+    }
+
+    private int getDirectiveEndOfLine(char[] array, int currentIndex, StringBuffer velocityBlock)
+    {
+        int i = currentIndex;
+
+        for (; i < array.length; ++i) {
+            if (array[i] == '\n') {
+                ++i;
+                break;
+            } else if (!Character.isWhitespace(array[i])) {
+                return currentIndex;
+            }
+        }
+
+        if (velocityBlock != null) {
+            velocityBlock.append(array, currentIndex, i - currentIndex);
+        }
 
         return i;
     }
@@ -344,7 +466,7 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         boolean isVelocity = false;
 
         for (; i < array.length;) {
-            i = getMacroParametersSeparator(array, i, velocityBlock, context);
+            i = getMacroParametersSeparator(array, i, velocityBlock);
 
             if (i < array.length) {
                 // If ')' it's the end of parameters
@@ -369,16 +491,19 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         return i;
     }
 
-    private int getMacroParametersSeparator(char[] array, int currentIndex, StringBuffer velocityBlock,
-        VelocityFilterContext context)
+    private int getMacroParametersSeparator(char[] array, int currentIndex, StringBuffer velocityBlock)
     {
         int i = currentIndex;
 
-        i = getWhiteSpaces(array, i, velocityBlock, context);
+        i = getWhiteSpaces(array, i, null);
         if (array[i] == ',') {
-            velocityBlock.append(array[i++]);
+            i++;
         }
-        i = getWhiteSpaces(array, i, velocityBlock, context);
+        i = getWhiteSpaces(array, i, null);
+
+        if (velocityBlock != null) {
+            velocityBlock.append(array, currentIndex, i - currentIndex);
+        }
 
         return i;
     }
@@ -390,9 +515,11 @@ public class VelocityFilter extends AbstractFilter implements Initializable
 
         for (; i < array.length; ++i) {
             if (array[i] == '$') {
-                i = getVar(array, i, parameterBlock, context);
-                if (context.isVelocity()) {
+                try {
+                    i = getVar(array, i, parameterBlock, context);
                     break;
+                } catch (InvalidVelocityException e) {
+                    getLogger().debug("Not a valid velocity variable at char [" + i + "]", e);
                 }
             } else if (array[i] == '"') {
                 i = getEscape(array, i, parameterBlock, '"', context);
@@ -416,18 +543,15 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         VelocityFilterContext context)
     {
         context.setVelocity(true);
+        context.setInline(false);
+        context.setType(VelocityFilterContext.VelocityType.COMMENT);
 
-        velocityBlock.append("##");
+        int i = currentIndex + 2;
 
-        int i = currentIndex + 1;
-
-        for (; i < array.length; ++i) {
-            if (array[i] == '\n') {
-                break;
-            }
-
-            velocityBlock.append(array[i]);
+        for (; i < array.length && array[i - 1] != '\n'; ++i) {
         }
+
+        velocityBlock.append(array, currentIndex, i - currentIndex);
 
         return i;
     }
@@ -436,86 +560,77 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         VelocityFilterContext context)
     {
         context.setVelocity(true);
+        context.setInline(false);
+        context.setType(VelocityFilterContext.VelocityType.COMMENT);
 
-        velocityBlock.append("#*");
+        int i = currentIndex + 2;
 
-        int i = currentIndex + 1;
-
-        for (; i < array.length; ++i) {
-            if (array[i] == '#' && array[i - 1] == '*') {
-                velocityBlock.append('#');
-                ++i;
-                break;
-            }
-
-            velocityBlock.append(array[i]);
+        for (; i < array.length && (array[i - 1] != '#' || array[i - 2] != '*'); ++i) {
         }
+
+        velocityBlock.append(array, currentIndex, i - currentIndex);
 
         return i;
     }
 
     private int getVar(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+        throws InvalidVelocityException
     {
-        StringBuffer varBlock = new StringBuffer("$");
-
         int i = currentIndex + 1;
 
-        if (i < array.length) {
-            if (array[i] == '!') {
-                varBlock.append('!');
+        if (i == array.length) {
+            throw new InvalidVelocityException();
+        }
+
+        if (array[i] == '!') {
+            ++i;
+        }
+
+        if (i == array.length) {
+            throw new InvalidVelocityException();
+        }
+
+        boolean fullSyntax = false;
+        if (array[i] == '{') {
+            ++i;
+            fullSyntax = true;
+        }
+
+        if (i == array.length) {
+            throw new InvalidVelocityException();
+        }
+
+        // get the variable name
+        i = getVelocityIdentifier(array, i, null);
+
+        StringBuffer varBlock = new StringBuffer();
+        varBlock.append(array, currentIndex, i - currentIndex);
+
+        // get the method
+        for (; i < array.length;) {
+            if (fullSyntax && array[i] == '}') {
+                varBlock.append('}');
                 ++i;
-            }
-
-            if (i < array.length) {
-                boolean fullSyntax = false;
-                if (array[i] == '{') {
-                    varBlock.append('{');
-                    ++i;
-                    fullSyntax = true;
+                break;
+            } else if (array[i] == '.') {
+                i = getMethod(array, i, varBlock, context);
+                if (!context.isVelocity()) {
+                    break;
                 }
-
-                if (i < array.length) {
-                    // A Velocity variable starts with [a-zA-Z]
-                    if (Character.isLetter(array[i])) {
-                        context.setVelocity(true);
-
-                        // Skip variable
-                        for (; i < array.length && Character.isLetterOrDigit(array[i]); ++i) {
-                            varBlock.append(array[i]);
-                        }
-
-                        // Skip method(s)
-                        for (; i < array.length;) {
-                            if (fullSyntax && array[i] == '}') {
-                                varBlock.append('}');
-                                ++i;
-                                break;
-                            } else if (array[i] == '.') {
-                                i = getMethod(array, i, varBlock, context);
-                                if (!context.isVelocity()) {
-                                    break;
-                                }
-                            } else if (array[i] == '[') {
-                                i = getTableElement(array, i, varBlock, context);
-                                break;
-                            } else {
-                                break;
-                            }
-                        }
-
-                        context.setVelocity(true);
-
-                        velocityBlock.append(varBlock);
-
-                        return i;
-                    }
-                }
+            } else if (array[i] == '[') {
+                i = getTableElement(array, i, varBlock, context);
+                break;
+            } else {
+                break;
             }
         }
 
-        context.setVelocity(false);
+        context.setVelocity(true);
+        context.setType(VelocityFilterContext.VelocityType.VAR);
 
-        return currentIndex;
+        velocityBlock.append(varBlock);
+
+        return i;
     }
 
     private int getMethod(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
@@ -638,10 +753,12 @@ public class VelocityFilter extends AbstractFilter implements Initializable
                 if (array[i] == '\\') {
                     escaped = true;
                 } else if (array[i] == '$') {
-                    i = getVar(array, i, velocityBlock, context);
-                    if (context.isVelocity()) {
+                    try {
+                        i = getVar(array, i, velocityBlock, context);
                         isVelocity = true;
                         continue;
+                    } catch (InvalidVelocityException e) {
+                        getLogger().debug("Not a valid variable at char [" + i + "]", e);
                     }
                 } else if (array[i] == escapeChar) {
                     velocityBlock.append(array[i]);
@@ -661,12 +778,15 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         return i;
     }
 
-    private int getWhiteSpaces(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityFilterContext context)
+    private int getWhiteSpaces(char[] array, int currentIndex, StringBuffer velocityBlock)
     {
         int i = currentIndex;
 
         for (; i < array.length && Character.isWhitespace(array[i]); ++i) {
-            velocityBlock.append(array[i]);
+        }
+
+        if (velocityBlock != null) {
+            velocityBlock.append(array, currentIndex, i - currentIndex);
         }
 
         return i;
@@ -674,18 +794,25 @@ public class VelocityFilter extends AbstractFilter implements Initializable
 
     public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent("{{velocity filter=\"none\"}}" + (nl ? "\n" : "")
-            + "{{html clean=\"false\" wiki=\"true\"}}" + (nl ? "\n" : ""), VELOCITYOPEN_SUFFIX, true));
+        result.append(filterContext.addProtectedContent("{{velocity filter=\"none\"}}" + (nl ? "\n" : ""),
+            VELOCITYOPEN_SUFFIX, true));
     }
 
     public static void appendVelocityClose(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}" + (nl ? "\n" : "")
-            + "{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
+        result
+            .append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
     }
 
     private static class VelocityFilterContext
     {
+        public enum VelocityType
+        {
+            COMMENT,
+            DIRECTIVE,
+            VAR
+        }
+
         private boolean velocity = false;
 
         private boolean inline = true;
@@ -697,6 +824,8 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         private FilterContext filterContext;
 
         private boolean protectedBlock;
+
+        private VelocityType type;
 
         public VelocityFilterContext(FilterContext filterContext)
         {
@@ -761,6 +890,16 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         public void setProtectedBlock(boolean protectedBlock)
         {
             this.protectedBlock = protectedBlock;
+        }
+
+        public void setType(VelocityType type)
+        {
+            this.type = type;
+        }
+
+        public VelocityType getType()
+        {
+            return this.type;
         }
     }
 }

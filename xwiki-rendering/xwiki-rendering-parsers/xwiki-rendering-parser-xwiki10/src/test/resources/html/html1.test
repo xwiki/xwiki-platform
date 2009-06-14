@@ -2,7 +2,9 @@
 .input|xwiki/1.0
 .#-----------------------------------------------------
 <table>
-<tr><td></td></tr>
+  <tr>
+    <td></td>
+  </tr>
 </table>
 
 
@@ -19,15 +21,15 @@
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html clean="false" wiki="true"}}<table> <tr><td></td></tr> </table>{{/html}}
-
-
-
+{{html clean="false" wiki="true"}}
+<table>
+  <tr>
+    <td></td>
+  </tr>
+</table>
+{{/html}}
 
 &
-
-
-
 
 (% class="customclass" %)
 (((**bold** & some text)))

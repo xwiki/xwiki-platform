@@ -38,7 +38,7 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 public class SectionSyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern SECTIONSYNTAX_PATTERN =
-        Pattern.compile("^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
+        Pattern.compile("^(" + VelocityFilter.EMPTYSPACE_SPATTERN + ")?(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}
@@ -65,6 +65,8 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = content.substring(currentIndex, matcher.start());
 
+            before += matcher.group(1);
+
             if (currentIndex > 0) {
                 // In 1.0 section consume all following new lines
                 before = CleanUtil.removeLeadingNewLines(before);
@@ -73,10 +75,12 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
 
             result.append(before);
 
-            String headerSyntax =
-                filterContext.addProtectedContent(StringUtils.repeat("=", (matcher.group(1).length() + 1) / 2));
+            CleanUtil.setTrailingNewLines(result, 2);
 
-            String headerContent = matcher.group(3);
+            String headerSyntax =
+                filterContext.addProtectedContent(StringUtils.repeat("=", (matcher.group(2).length() + 1) / 2));
+
+            String headerContent = matcher.group(4);
 
             // remove velocity macro marker from header content
             Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(headerContent);

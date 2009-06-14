@@ -9,6 +9,6 @@ some text <element></element>
 .#-----------------------------------------------------
 {{html clean="false" wiki="true"}}
 some text <element></element>
-
+<p/>
 <element></element> another paragraph
 {{/html}}

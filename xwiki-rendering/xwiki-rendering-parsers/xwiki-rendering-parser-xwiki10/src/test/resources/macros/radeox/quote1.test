@@ -22,8 +22,12 @@ another paragraph
 >
 >another paragraph
 
-{{velocity filter="none"}}{{html clean="false" wiki="true"}}>first line same line
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+>first line same line
 >
 >$var
 >
->another paragraph{{/html}}{{/velocity}}
+>another paragraph
+{{/html}}
+{{/velocity}}

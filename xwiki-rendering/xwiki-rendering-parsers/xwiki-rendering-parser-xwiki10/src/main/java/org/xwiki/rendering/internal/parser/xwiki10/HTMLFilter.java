@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,9 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.internal.parser.xwiki10.html.InvalidHtmlException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
+import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.HTMLElementConverter;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
@@ -44,27 +47,35 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 @Component("htmlmacro")
 public class HTMLFilter extends AbstractFilter implements Initializable
 {
-    public static final String HTML_SPATTERN = "(\\<!--)|(--\\>)|([\\<\\>])";
-
-    public static final Pattern HTML_PATTERN = Pattern.compile(HTML_SPATTERN);
-
     public static final String HTMLOPEN_SUFFIX = "htmlopen";
 
     public static final String HTMLCLOSE_SUFFIX = "htmlclose";
 
     public static final String HTMLOPEN_SPATTERN =
-        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLOPEN_SUFFIX + "[\\d]+"
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLOPEN_SUFFIX + "[\\d]+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String HTMLCLOSE_SPATTERN =
-        "(" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLCLOSE_SUFFIX + "[\\d]+"
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLCLOSE_SUFFIX + "[\\d]+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
+
+    public static final String EMPTYLINEVELOCITY_SPATTERN =
+        "((?:" + FilterContext.XWIKI1020TOKENIL_PATTERN + ")|[^" + FilterContext.XWIKI1020TOKEN_CP + "])\n((?:"
+            + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "?\n?)*)\n" + "(" + FilterContext.XWIKI1020TOKENIL_PATTERN
+            + "|[^" + FilterContext.XWIKI1020TOKEN_OP + "]|$)";
+
+    public static final Pattern EMPTYLINEVELOCITY_PATTERN = Pattern.compile(EMPTYLINEVELOCITY_SPATTERN);
+
+    public static final Pattern LINEBREAK_PATTERN = Pattern.compile(Pattern.quote("\\\\"));
 
     /**
      * Used to lookup macros converters.
      */
     @Requirement
     private ComponentManager componentManager;
+
+    @Requirement("escape20")
+    private Filter escape20SyntaxFilter;
 
     /**
      * {@inheritDoc}
@@ -100,76 +111,91 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             char c = array[i];
 
             context.setConversion(false);
-            context.setElementName(null);
-            context.setType(null);
+            context.pushType();
             context.setHTML(false);
             context.setVelocityOpen(false);
             context.setVelocityClose(false);
             context.setInline(true);
 
-            StringBuffer htmlBlock = new StringBuffer();
+            StringBuffer nonHtmlbuffer = inHTMLMacro ? afterHtmlBuffer : beforeHtmlBuffer;
 
             if (c == '<') {
-                i = getHTMLBlock(array, i, htmlBlock, context);
-            }
+                try {
+                    StringBuffer htmlBlock = new StringBuffer();
 
-            if (context.isHTML()) {
-                if (!inHTMLMacro) {
-                    inHTMLMacro = true;
-                } else {
-                    htmlBuffer.append(afterHtmlBuffer);
-                    afterHtmlBuffer.setLength(0);
-                }
+                    i = getHTMLBlock(array, i, null, htmlBlock, context);
 
-                if (context.isVelocityOpen()) {
-                    VelocityFilter.appendVelocityOpen(htmlBuffer, filterContext, false);
-                }
-
-                if (context.isConversion()) {
-                    if (!context.isInline()) {
-                        if (htmlBuffer.length() > 0) {
-                            CleanUtil.setTrailingNewLines(htmlBuffer, 2);
+                    StringBuffer buffer;
+                    if (context.isHTML()) {
+                        if (!inHTMLMacro) {
+                            inHTMLMacro = true;
+                        } else {
+                            htmlBuffer.append(afterHtmlBuffer);
+                            afterHtmlBuffer.setLength(0);
                         }
+
+                        buffer = htmlBuffer;
+                    } else {
+                        buffer = nonHtmlbuffer;
                     }
-                }
 
-                htmlBuffer.append(htmlBlock);
-
-                if (context.isVelocityClose()) {
-                    VelocityFilter.appendVelocityClose(htmlBuffer, filterContext, false);
-                }
-            } else {
-                StringBuffer nonHtmlbuffer = inHTMLMacro ? afterHtmlBuffer : beforeHtmlBuffer;
-
-                if (context.isConversion()) {
                     if (context.isVelocityOpen()) {
-                        VelocityFilter.appendVelocityOpen(nonHtmlbuffer, filterContext, false);
+                        VelocityFilter.appendVelocityOpen(buffer, filterContext, false);
                     }
 
-                    if (!context.isInline()) {
-                        if (htmlBuffer.length() > 0 || nonHtmlbuffer.length() > 0) {
-                            CleanUtil.setTrailingNewLines(nonHtmlbuffer, 2);
+                    if (context.isConversion()) {
+                        if (!context.isInline()) {
+                            if (htmlBuffer.length() > 0 || buffer.length() > 0) {
+                                CleanUtil.setTrailingNewLines(buffer, 2);
+                            }
                         }
                     }
 
-                    nonHtmlbuffer.append(htmlBlock);
+                    buffer.append(htmlBlock);
 
                     if (context.isVelocityClose()) {
-                        VelocityFilter.appendVelocityClose(nonHtmlbuffer, filterContext, false);
+                        VelocityFilter.appendVelocityClose(buffer, filterContext, false);
                     }
-                } else {
+                } catch (InvalidHtmlException e) {
+                    getLogger().debug("Invalid HTML block at char [" + i + "]", e);
+
                     nonHtmlbuffer.append(c);
                     ++i;
                 }
+            } else {
+                nonHtmlbuffer.append(c);
+                ++i;
             }
         }
 
-        if (htmlBuffer.length() > 0) {
-            String beforeHtmlContent = beforeHtmlBuffer.toString();
-            String htmlContent = htmlBuffer.toString();
-            String afterHtmlContent = afterHtmlBuffer.toString();
+        String beforeHtmlContent = beforeHtmlBuffer.toString();
+        String htmlContent = htmlBuffer.toString();
+        String afterHtmlContent = afterHtmlBuffer.toString();
 
-            boolean multilines = htmlContent.indexOf("\n") != -1;
+        // Include velocity content as HTML content since lot of velocity generates html
+        if (htmlContent.length() > 0) {
+            Matcher velocityBeforeMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(beforeHtmlBuffer);
+            if (velocityBeforeMatcher.find()) {
+                htmlContent = beforeHtmlContent.substring(velocityBeforeMatcher.start()) + htmlContent;
+                beforeHtmlContent = beforeHtmlContent.substring(0, velocityBeforeMatcher.start());
+            }
+            Matcher velocityAfterMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(afterHtmlContent);
+            if (velocityAfterMatcher.find()) {
+                htmlContent = htmlContent + afterHtmlContent.substring(0, velocityAfterMatcher.end());
+                afterHtmlContent = afterHtmlContent.substring(velocityAfterMatcher.end());
+            }
+        } else {
+            Matcher velocityContentMatcher = VelocityFilter.VELOCITYCONTENT_PATTERN.matcher(beforeHtmlBuffer);
+
+            if (velocityContentMatcher.find()) {
+                htmlContent = velocityContentMatcher.group(0);
+                afterHtmlContent = beforeHtmlContent.substring(velocityContentMatcher.end());
+                beforeHtmlContent = beforeHtmlContent.substring(0, velocityContentMatcher.start());
+            }
+        }
+
+        if (htmlContent.length() > 0) {
+            boolean multilines = filterContext.unProtect(htmlContent).indexOf("\n") != -1;
 
             // Make sure html macro does not start in a block and ends in another by "eating" them
             if (multilines && htmlContent.indexOf("\n\n") != -1) {
@@ -183,7 +209,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
                     beforeHtmlContent = beforeHtmlContent.substring(0, beforeIndex + 2);
                 }
 
-                int afterIndex = afterHtmlContent.lastIndexOf("\n\n");
+                int afterIndex = afterHtmlContent.indexOf("\n\n");
 
                 if (afterIndex == -1) {
                     htmlContent += afterHtmlContent;
@@ -195,47 +221,42 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             }
 
             // velocity open
-            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(beforeHtmlContent);
-            boolean velocityOpenBefore = velocityOpenMatcher.find();
-
-            boolean velocityOpen = false;
-            if (!velocityOpenBefore) {
-                velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(htmlContent);
-                velocityOpen = velocityOpenMatcher.find();
-                htmlContent = velocityOpenMatcher.replaceFirst("");
-            }
+            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(htmlContent);
+            boolean velocityOpen = velocityOpenMatcher.find();
+            htmlContent = velocityOpenMatcher.replaceFirst("");
 
             // velocity close
-            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(beforeHtmlContent);
-            boolean velocityCloseBefore = velocityCloseMatcher.find();
+            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(htmlContent);
+            boolean velocityClose = velocityCloseMatcher.find();
+            htmlContent = velocityCloseMatcher.replaceFirst("");
 
-            boolean velocityClose = false;
-            if (!velocityCloseBefore) {
-                velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(htmlContent);
-                velocityClose = velocityCloseMatcher.find();
-                htmlContent = velocityCloseMatcher.replaceFirst("");
-            }
+            // Make sure empty lines are taken into account
+            htmlContent = forceEmptyLines(htmlContent);
+            // Make sure \\ line breaks are taken into account
+            htmlContent = forceLineBreak(htmlContent);
 
             // Print
 
             // print before html
             result.append(beforeHtmlContent);
 
+            // print html
             // open html content
             if (velocityOpen) {
                 VelocityFilter.appendVelocityOpen(result, filterContext, multilines);
-            } else if (!velocityOpenBefore || velocityCloseBefore) {
-                appendHTMLOpen(result, filterContext, multilines);
             }
 
+            appendHTMLOpen(result, filterContext, multilines);
+
             // print html content
-            result.append(htmlContent);
+            result.append(filterContext.addProtectedContent(escape20SyntaxFilter.filter(htmlContent, filterContext),
+                false));
+
+            appendHTMLClose(result, filterContext, multilines);
 
             // close html content
             if (velocityClose) {
                 VelocityFilter.appendVelocityClose(result, filterContext, multilines);
-            } else if (!velocityOpenBefore || velocityCloseBefore) {
-                appendHTMLClose(result, filterContext, multilines);
             }
 
             // print after html
@@ -247,69 +268,82 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         return result.toString();
     }
 
-    public int getHTMLBlock(char[] array, int currentIndex, StringBuffer htmlBlock, HTMLFilterContext context)
+    private String forceEmptyLines(String htmlContent)
+    {
+        return EMPTYLINEVELOCITY_PATTERN.matcher(htmlContent).replaceAll("$1\n$4<p/>\n$5");
+    }
+
+    private String forceLineBreak(String htmlContent)
+    {
+        return LINEBREAK_PATTERN.matcher(htmlContent).replaceAll("<br/>");
+    }
+
+    private int getHTMLBlock(char[] array, int currentIndex, StringBuffer elementName, StringBuffer htmlBlock,
+        HTMLFilterContext context) throws InvalidHtmlException
     {
         int i = currentIndex + 1;
 
+        context.setType(null);
+
         if (i < array.length) {
             if (array[i] == '/') {
-                i = getEndElement(array, currentIndex, htmlBlock, context);
+                i = getEndElement(array, currentIndex, elementName, htmlBlock, context);
             } else if (array[i] == '!' && i + 2 < array.length && array[i + 1] == '-' && array[i + 2] == '-') {
                 i = getComment(array, currentIndex, htmlBlock, context);
             } else {
-                i = getElement(array, currentIndex, htmlBlock, context);
+                i = getElement(array, currentIndex, elementName, htmlBlock, context);
             }
         }
 
         return i;
     }
 
-    public int getComment(char[] array, int currentIndex, StringBuffer commentBlock, HTMLFilterContext context)
+    private int getComment(char[] array, int currentIndex, StringBuffer commentBlock, HTMLFilterContext context)
     {
         context.setType(HTMLType.COMMENT);
         context.setHTML(true);
 
-        commentBlock.append("<!--");
-
         int i = currentIndex + 4;
 
-        for (; i < array.length; ++i) {
-            if (array[i] == '-' && i + 2 < array.length && array[i + 1] == '-' && array[i + 2] == '>') {
-                commentBlock.append("-->");
-                i += 3;
-                break;
-            }
-            commentBlock.append(array[i]);
+        for (; i < array.length && (array[i - 1] == '>' || array[i - 2] != '-' || array[i - 2] != '-'); ++i) {
         }
+
+        commentBlock.append(array, currentIndex, i - currentIndex);
 
         return i;
     }
 
-    public int getElement(char[] array, int currentIndex, StringBuffer element, HTMLFilterContext context)
+    private int getElement(char[] array, int currentIndex, StringBuffer elementNameBuffer, StringBuffer element,
+        HTMLFilterContext context) throws InvalidHtmlException
     {
         // If white space it's not html
         if (Character.isWhitespace(array[currentIndex + 1])) {
-            context.setType(null);
-            return currentIndex;
+            throw new InvalidHtmlException();
         }
 
         // get begin element
         StringBuffer beginElement = new StringBuffer();
         Map<String, String> parameterMap = new LinkedHashMap<String, String>();
-        int i = getBeginElement(array, currentIndex, beginElement, parameterMap, context);
+        if (elementNameBuffer == null) {
+            elementNameBuffer = new StringBuffer();
+        }
+        int i = getBeginElement(array, currentIndex, elementNameBuffer, beginElement, parameterMap, context);
 
-        String elementName = context.getElementName();
+        String elementName = elementNameBuffer.toString();
 
         // force <br> as full element instead of just begin element
-        if (context.getType() == HTMLType.BEGIN && elementName.equals("br")) {
+        if (context.peekType() == HTMLType.BEGIN && elementName.equals("br")) {
             context.setType(HTMLType.ELEMENT);
         }
 
         // Get content
         StringBuffer elementContent = null;
-        if (context.getType() == HTMLType.BEGIN) {
+        StringBuffer endElement = new StringBuffer();
+        if (context.peekType() == HTMLType.BEGIN) {
             elementContent = new StringBuffer();
-            i = getElementContent(array, i, elementContent, context);
+            context.pushType();
+            i = getElementContent(array, i, elementName, elementContent, endElement, context);
+            context.popType();
         }
 
         // Convert
@@ -321,13 +355,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         if (convertedElement != null) {
             element.append(convertedElement);
         } else {
-            element.append(context.addProtectedContent(beginElement.toString(), false));
+            element.append(context.cleanContent(beginElement.toString()));
             if (elementContent != null) {
                 element.append(elementContent);
-                if (context.getType() == HTMLType.END) {
-                    element.append(context.getFilterContext().addProtectedContent(
-                        "</" + context.getElementName() + '>', false));
-                }
+                element.append(context.cleanContent(endElement.toString()));
             }
 
             context.setHTML(true);
@@ -364,33 +395,40 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         return convertedElement;
     }
 
-    public int getElementContent(char[] array, int currentIndex, StringBuffer elementContent, HTMLFilterContext context)
+    private int getElementContent(char[] array, int currentIndex, String currentElement, StringBuffer elementContent,
+        StringBuffer endElement, HTMLFilterContext context)
     {
         int i = currentIndex;
-
-        String currentElementName = context.getElementName();
 
         for (; i < array.length;) {
             char c = array[i];
 
             context.setConversion(false);
-            context.setElementName(null);
-            context.setType(null);
 
             StringBuffer htmlBlock = new StringBuffer();
 
+            String elementName;
             if (c == '<') {
-                i = getHTMLBlock(array, i, htmlBlock, context);
-            }
+                try {
+                    StringBuffer elementNameBuffer = new StringBuffer();
+                    i = getHTMLBlock(array, i, elementNameBuffer, htmlBlock, context);
+                    elementName = elementNameBuffer.toString();
 
-            if (context.getType() == HTMLType.END
-                && (currentElementName.equals(context.getElementName()) || currentElementName.startsWith(context
-                    .getElementName()))) {
-                break;
-            }
+                    if (context.peekType() == HTMLType.END
+                        && (currentElement.equals(elementName) || currentElement.startsWith(elementName))) {
+                        endElement.append(htmlBlock);
+                        break;
+                    }
 
-            if (context.getType() != null) {
-                elementContent.append(htmlBlock);
+                    if (context.peekType() != null) {
+                        elementContent.append(htmlBlock);
+                    } else {
+                        elementContent.append(c);
+                        ++i;
+                    }
+                } catch (InvalidHtmlException e) {
+                    getLogger().debug("Invalid HTML block at char [" + i + "]", e);
+                }
             } else {
                 elementContent.append(c);
                 ++i;
@@ -400,64 +438,57 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         return i;
     }
 
-    public int getBeginElement(char[] array, int currentIndex, StringBuffer beginElement,
-        Map<String, String> parameterMap, HTMLFilterContext context)
+    private int getBeginElement(char[] array, int currentIndex, StringBuffer elementName, StringBuffer beginElement,
+        Map<String, String> parameterMap, HTMLFilterContext context) throws InvalidHtmlException
     {
-        beginElement.append("<");
-
         int i = currentIndex + 1;
 
+        // If white space it's not html
+        if (i == array.length || Character.isWhitespace(array[i])) {
+            throw new InvalidHtmlException();
+        }
+
         // get element name
-        StringBuffer elementName = new StringBuffer();
         i = getElementName(array, i, elementName, context);
-        context.setElementName(elementName.toString());
-        beginElement.append(elementName);
 
         // skip white spaces
-        i = getWhiteSpaces(array, i, beginElement, context);
+        i = getWhiteSpaces(array, i, null, context);
 
         // get parameters
-        i = getElementParameters(array, i, beginElement, parameterMap, context);
+        i = getElementParameters(array, i, null, parameterMap, context);
 
         // skip white spaces
-        i = getWhiteSpaces(array, i, beginElement, context);
+        i = getWhiteSpaces(array, i, null, context);
 
         // 
         if (array[i] == '/' && i + 1 < array.length && array[i + 1] == '>') {
             context.setType(HTMLType.ELEMENT);
-            beginElement.append("/>");
             i += 2;
         } else {
             context.setType(HTMLType.BEGIN);
-            beginElement.append(">");
             i += 1;
         }
+
+        beginElement.append(array, currentIndex, i - currentIndex);
 
         return i;
     }
 
-    public int getEndElement(char[] array, int currentIndex, StringBuffer endElement, HTMLFilterContext context)
+    private int getEndElement(char[] array, int currentIndex, StringBuffer elementName, StringBuffer endElement,
+        HTMLFilterContext context) throws InvalidHtmlException
     {
-        endElement.append("</");
-
         int i = currentIndex + 2;
 
         // If white space it's not html
         if (i == array.length || Character.isWhitespace(array[i])) {
-            context.setType(null);
-            return currentIndex;
+            throw new InvalidHtmlException();
         }
 
         // get element name
-        StringBuffer elementName = new StringBuffer();
         i = getElementName(array, i, elementName, context);
-        context.setElementName(elementName.toString());
-        endElement.append(elementName);
 
         // skip white spaces
-        i = getWhiteSpaces(array, i, endElement, context);
-
-        endElement.append(">");
+        i = getWhiteSpaces(array, i, null, context);
 
         if (array[i] == '>') {
             ++i;
@@ -465,10 +496,14 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         context.setType(HTMLType.END);
 
+        if (endElement != null) {
+            endElement.append(array, currentIndex, i - currentIndex);
+        }
+
         return i;
     }
 
-    public int getElementName(char[] array, int currentIndex, StringBuffer elementName, HTMLFilterContext context)
+    private int getElementName(char[] array, int currentIndex, StringBuffer elementName, HTMLFilterContext context)
     {
         int i = currentIndex;
 
@@ -480,19 +515,24 @@ public class HTMLFilter extends AbstractFilter implements Initializable
                 context.setType(HTMLType.END);
                 break;
             }
+        }
 
-            elementName.append(array[i]);
+        if (elementName != null) {
+            elementName.append(array, currentIndex, i - currentIndex);
         }
 
         return i;
     }
 
-    public int getWhiteSpaces(char[] array, int currentIndex, StringBuffer result, HTMLFilterContext context)
+    private int getWhiteSpaces(char[] array, int currentIndex, StringBuffer htmlBlock, HTMLFilterContext context)
     {
         int i = currentIndex;
 
         for (; i < array.length && Character.isWhitespace(array[i]); ++i) {
-            result.append(array[i]);
+        }
+
+        if (htmlBlock != null) {
+            htmlBlock.append(array, currentIndex, i - currentIndex);
         }
 
         return i;
@@ -505,7 +545,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         for (; i < array.length;) {
             // Skip white spaces
-            i = getWhiteSpaces(array, i, parametersBlock, context);
+            i = getWhiteSpaces(array, i, null, context);
 
             if (i < array.length) {
                 // If '>' it's the end of parameters
@@ -516,8 +556,12 @@ public class HTMLFilter extends AbstractFilter implements Initializable
                 }
 
                 // Skip parameter
-                i = getElementParameter(array, i, parametersBlock, parameterMap, context);
+                i = getElementParameter(array, i, null, parameterMap, context);
             }
+        }
+
+        if (parametersBlock != null) {
+            parametersBlock.append(array, currentIndex, i - currentIndex);
         }
 
         return i;
@@ -533,32 +577,33 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         for (; i < array.length && array[i] != '>' && array[i] != '=' && !Character.isWhitespace(array[i]); ++i) {
             keyBlock.append(array[i]);
         }
-        parameterBlock.append(keyBlock);
 
         // Skip white spaces
-        i = getWhiteSpaces(array, i, parameterBlock, context);
+        i = getWhiteSpaces(array, i, null, context);
 
         // Equal sign
         if (array[i] == '=') {
-            parameterBlock.append("=");
-
             ++i;
 
             // Skip white spaces
-            i = getWhiteSpaces(array, i, parameterBlock, context);
+            i = getWhiteSpaces(array, i, null, context);
 
             // Get value
             StringBuffer valueBlock = new StringBuffer();
             i = getElementParameterValue(array, i, valueBlock, context);
-            parameterBlock.append(valueBlock);
 
+            // Add a new parameter to the list
             parameterMap.put(keyBlock.toString(), valueBlock.toString());
+        }
+
+        if (parameterBlock != null) {
+            parameterBlock.append(array, currentIndex, i - currentIndex);
         }
 
         return i;
     }
 
-    public int getElementParameterValue(char[] array, int currentIndex, StringBuffer valueBlock,
+    private int getElementParameterValue(char[] array, int currentIndex, StringBuffer valueBlock,
         HTMLFilterContext context)
     {
         int i = currentIndex;
@@ -567,22 +612,23 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
         if (array[i] == '"' || array[i] == '\'') {
             escaped = array[i];
-            valueBlock.append(array[i++]);
+            ++i;
         }
 
         for (; i < array.length && array[i] != '>'; ++i) {
-            if (escaped == 0 && Character.isWhitespace(array[i])) {
-                break;
+            if (escaped == 0) {
+                if (Character.isWhitespace(array[i])) {
+                    break;
+                }
+            } else {
+                if (array[i] == escaped) {
+                    ++i;
+                    break;
+                }
             }
-
-            valueBlock.append(array[i]);
-
-            if (array[i] == escaped) {
-                ++i;
-                break;
-            }
-
         }
+
+        valueBlock.append(array, currentIndex, i - currentIndex);
 
         return i;
     }
@@ -602,13 +648,11 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     {
         private boolean conversion = false;
 
-        private HTMLType type = null;
+        private Stack<HTMLType> type = new Stack<HTMLType>();
 
         private boolean html = false;
 
         private FilterContext filterContext;
-
-        private String elementName;
 
         private boolean velocityOpen;
 
@@ -636,14 +680,24 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             return this.filterContext;
         }
 
-        public HTMLType getType()
+        public HTMLType peekType()
         {
-            return type;
+            return type.peek();
+        }
+
+        public void pushType()
+        {
+            this.type.push(null);
+        }
+
+        public HTMLType popType()
+        {
+            return this.type.pop();
         }
 
         public void setType(HTMLType type)
         {
-            this.type = type;
+            this.type.set(this.type.size() - 1, type);
         }
 
         public boolean isHTML()
@@ -654,16 +708,6 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         public void setHTML(boolean isHTML)
         {
             this.html = isHTML;
-        }
-
-        public String getElementName()
-        {
-            return elementName;
-        }
-
-        public void setElementName(String elementName)
-        {
-            this.elementName = elementName;
         }
 
         public boolean isVelocityOpen()
@@ -712,11 +756,6 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             }
 
             return cleanedContent;
-        }
-
-        public String addProtectedContent(String content, boolean inline)
-        {
-            return getFilterContext().addProtectedContent(cleanContent(content), inline);
         }
     }
 

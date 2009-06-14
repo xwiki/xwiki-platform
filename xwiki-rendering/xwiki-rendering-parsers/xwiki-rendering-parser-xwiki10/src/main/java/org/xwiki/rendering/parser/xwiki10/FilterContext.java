@@ -21,7 +21,10 @@ package org.xwiki.rendering.parser.xwiki10;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * The XWiki 1.0 to 2.0 conversion context.
@@ -36,11 +39,11 @@ public class FilterContext
 {
     public static final String XWIKI1020TOKEN_O = "\255";
 
-    public static final String XWIKI1020TOKEN_OP = "\\0255";
+    public static final String XWIKI1020TOKEN_OP = Pattern.quote(XWIKI1020TOKEN_O);
 
     public static final String XWIKI1020TOKEN_C = "\255";
 
-    public static final String XWIKI1020TOKEN_CP = "\\0255";
+    public static final String XWIKI1020TOKEN_CP = Pattern.quote(XWIKI1020TOKEN_C);
 
     public static final String XWIKI1020TOKEN_INLINE = "inline";
 
@@ -52,6 +55,10 @@ public class FilterContext
 
     /**
      * Match registered inline content identifier.
+     * <ul>
+     * <li>$1: the suffix</li>
+     * <li>$2: the index</li>
+     * </ul>
      */
     public static final Pattern XWIKI1020TOKENIL_PATTERN =
         Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + "(\\p{Alpha}*)([\\d]+)"
@@ -59,6 +66,10 @@ public class FilterContext
 
     /**
      * Match registered content identifier.
+     * <ul>
+     * <li>$1: the suffix</li>
+     * <li>$2: the index</li>
+     * </ul>
      */
     public static final Pattern XWIKI1020TOKENNI_PATTERN =
         Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + "(\\p{Alpha}*)([\\d]+)"
@@ -66,6 +77,10 @@ public class FilterContext
 
     /**
      * Match registered content identifier.
+     * <ul>
+     * <li>$1: the suffix</li>
+     * <li>$2: the index</li>
+     * </ul>
      */
     public static final Pattern XWIKI1020TOKEN_PATTERN =
         Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN + "(?:IL|NI)" + "(\\p{Alpha}*)([\\d]+)"
@@ -100,6 +115,10 @@ public class FilterContext
 
     public String addProtectedContent(String content, String suffix, boolean inline)
     {
+        if (StringUtils.isEmpty(content)) {
+            return "";
+        }
+
         this.protectedContentList.add(content);
 
         StringBuffer str = new StringBuffer();
@@ -120,5 +139,37 @@ public class FilterContext
     public String getProtectedContent(int index)
     {
         return this.protectedContentList.get(index);
+    }
+
+    /**
+     * Re-insert all protected/registered strings in to the global content.
+     * 
+     * @param content the global content.
+     * @return the complete content.
+     */
+    public String unProtect(String content)
+    {
+        StringBuffer result = new StringBuffer();
+        Matcher matcher = FilterContext.XWIKI1020TOKEN_PATTERN.matcher(content);
+
+        int current = 0;
+        while (matcher.find()) {
+            result.append(content.substring(current, matcher.start()));
+            current = matcher.end();
+
+            int index = Integer.valueOf(matcher.group(2));
+
+            String storedContent = getProtectedContent(index);
+
+            result.append(storedContent);
+        }
+
+        if (current == 0) {
+            return content;
+        }
+
+        result.append(content.substring(current));
+
+        return unProtect(result.toString());
     }
 }

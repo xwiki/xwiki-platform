@@ -25,7 +25,6 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Matcher;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
@@ -131,44 +130,11 @@ public class XWikiParser extends AbstractLogEnabled implements Parser, Initializ
             content = filter.filter(content, filterContext);
         }
 
-        content = filterProtectedStrings(content, filterContext);
+        content = filterContext.unProtect(content);
 
         content = CleanUtil.removeLeadingNewLines(content);
         content = CleanUtil.removeTrailingNewLines(content);
 
         return content;
-    }
-
-    /**
-     * Re-insert all protected/registered strings in to the global content.
-     * 
-     * @param content the global content.
-     * @param filterContext the conversion context.
-     * @return the complete content.
-     */
-    private String filterProtectedStrings(String content, FilterContext filterContext)
-    {
-        StringBuffer result = new StringBuffer();
-        Matcher matcher = FilterContext.XWIKI1020TOKEN_PATTERN.matcher(content);
-
-        int current = 0;
-        while (matcher.find()) {
-            result.append(content.substring(current, matcher.start()));
-            current = matcher.end();
-
-            int index = Integer.valueOf(matcher.group(2));
-
-            String storedContent = filterContext.getProtectedContent(index);
-
-            result.append(storedContent);
-        }
-
-        if (current == 0) {
-            return content;
-        }
-
-        result.append(content.substring(current));
-
-        return filterProtectedStrings(result.toString(), filterContext);
     }
 }

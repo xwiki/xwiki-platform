@@ -96,7 +96,7 @@
             </goals>
             <configuration>
               <resourceBundles>
-                <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:${platform.tool.configuration.version}</resourceBundle>
+                <resourceBundle>org.xwiki.platform.tools:xwiki-configuration-resources:${platform.tool.configuration.version}</resourceBundle>
               </resourceBundles>
               <properties>
                 <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>

@@ -71,13 +71,6 @@
         -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>com.xpn.xwiki.platform.tools</groupId>
-            <artifactId>xwiki-verification-resources</artifactId>
-            <version>${platform.tool.verification.version}</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>

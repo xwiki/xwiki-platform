@@ -50,32 +50,38 @@
  
 #-# [Since 1.9M2]
 #-# Type of the openoffice server instance used by officeimporter plugin.
-#-# 0 - Internally managed server instance.
+#-# 0 - Internally managed server instance. (Default)
 #-# 1 - Externally managed (local) server instance.
 # openoffice.serverType=0
 
 #-# [Since 1.9M2]
-#-# Port number used for connecting to the openoffice server instance. 
+#-# Port number used for connecting to the openoffice server instance.
+#-# Default port is 8100 
 # openoffice.serverPort=8100
 
 #-# [Since 1.9M2]
 #-# If the openoffice server should be started / connected upon XE start.
+#-# Default value is false
 # openoffice.autoStart=false
 
 #-# [Since 1.8RC3]
 #-# Path to openoffice installation (serverType:0 only).
+#-# If no path is provided, a default value will be calculated based on the operating environment.
 # openoffice.homePath=/opt/openoffice.org3/
 
 #-# [Since 1.8RC3]
 #-# Path to openoffice execution profile (serverType:0 only).
+#-# If no path is provided, a default value will be calculated based on the operating environment.
 # openoffice.profilePath=/home/user/.openoffice.org/3
 
 #-# [Since 1.8RC3]
 #-# Maximum number of simultaneous conversion tasks to be handled by a single openoffice process (serverType:0 only).
+#-# Default value is 50
 # openoffice.maxTasksPerProcess=50
 
 #-# [Since 1.8RC3]
 #-# Timeout for conversion tasks (in miliseconds) (serverType:0 only).
+#-# Default value is 30 seconds
 # openoffice.taskExecutionTimeout=30000
 
 #-------------------------------------------------------------------------------------

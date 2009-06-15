@@ -37,7 +37,7 @@
   <description>XWiki Platform - Core - Parent POM</description>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tag.version>1.3-SNAPSHOT</platform.tag.version>
+    <platform.tag.version>1.4-SNAPSHOT</platform.tag.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>

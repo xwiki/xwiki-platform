@@ -21,6 +21,7 @@
 
 package com.xpn.xwiki.plugin.ldap;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -287,8 +288,9 @@ public class XWikiLDAPConnection
             cons.setTimeLimit(1000);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("LDAP search: baseDN=[" + baseDN + "] query=[" + query + "] attr=[" + Arrays.asList(attr)
-                    + "] ldapScope=[" + ldapScope + "]");
+                LOG.debug(
+                    MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", baseDN,
+                        query, attr != null ? Arrays.asList(attr) : null, ldapScope));
             }
 
             // filter return all attributes return attrs and values time out value

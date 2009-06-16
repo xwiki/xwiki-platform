@@ -1466,7 +1466,11 @@ $html
  *#
 #macro(livetable $divid $collist $colprops $options)
 ## Do not indent:
-#if($doc.syntaxId == "xwiki/2.0"){{html}}#end
+#if($doc.syntaxId == "xwiki/2.0")
+
+
+{{html}}
+#end
   ##
   ## SX deps.
   ##
@@ -1628,7 +1632,9 @@ $html
   #end
    //]]>
   </script>
-  #if($doc.syntaxId == "xwiki/2.0"){{/html}}#end
+  #if($doc.syntaxId == "xwiki/2.0"){{/html}}
+
+  #end
 #end
 
 #**

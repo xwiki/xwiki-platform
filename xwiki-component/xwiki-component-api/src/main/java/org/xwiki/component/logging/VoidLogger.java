@@ -87,21 +87,6 @@ public class VoidLogger implements Logger
         // Don't do anything voluntarily
     }
 
-    public Logger getChildLogger(String name)
-    {
-        return null;
-    }
-
-    public String getName()
-    {
-        return "Void Logger";
-    }
-
-    public int getThreshold()
-    {
-        return 0;
-    }
-
     public void info(String message)
     {
         // Don't do anything voluntarily
@@ -140,11 +125,6 @@ public class VoidLogger implements Logger
     public boolean isWarnEnabled()
     {
         return false;
-    }
-
-    public void setThreshold(int threshold)
-    {
-        // Don't do anything voluntarily
     }
 
     public void warn(String message)

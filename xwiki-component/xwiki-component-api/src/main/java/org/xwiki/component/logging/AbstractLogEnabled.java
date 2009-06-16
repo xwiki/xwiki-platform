@@ -47,27 +47,4 @@ public class AbstractLogEnabled implements LogEnabled
         }
         return logger;
     }
-
-    protected void setupLogger(Object component)
-    {
-        setupLogger(component, logger);
-    }
-
-    protected void setupLogger(Object component, String subCategory)
-    {
-        if (subCategory == null) {
-            throw new IllegalStateException("The logging category must be defined.");
-        }
-
-        Logger logger = this.logger.getChildLogger(subCategory);
-
-        setupLogger(component, logger);
-    }
-
-    protected void setupLogger(Object component, Logger logger)
-    {
-        if (component instanceof LogEnabled) {
-            ((LogEnabled) component).enableLogging(logger);
-        }
-    }
 }

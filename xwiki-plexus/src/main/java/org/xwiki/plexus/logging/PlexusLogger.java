@@ -20,8 +20,7 @@
  */
 package org.xwiki.plexus.logging;
 
-import java.text.MessageFormat;
-
+import org.xwiki.component.logging.AbstractLogger;
 import org.xwiki.component.logging.Logger;
 
 /**
@@ -32,7 +31,7 @@ import org.xwiki.component.logging.Logger;
  * @see Logger
  * @version $Id$
  */
-public class PlexusLogger implements Logger
+public class PlexusLogger extends AbstractLogger
 {
     /** Wrapped Plexus logger object. This communicates with the underlying logging framework. */
     private org.codehaus.plexus.logging.Logger logger;
@@ -45,40 +44,6 @@ public class PlexusLogger implements Logger
     public PlexusLogger(org.codehaus.plexus.logging.Logger logger)
     {
         this.logger = logger;
-    }
-
-    /**
-     * Formats the message like {@code MessageFormat.format(String, Object...)} but also checks for Exceptions and
-     * catches them as logging should be robust and not interfere with normal program flow. The Exception caught will be
-     * passed to the loggers debug output.
-     * 
-     * @param message message in Formatter format syntax
-     * @param objects Objects to fill in
-     * @return the formatted String if possible, else the message and all objects concatenated.
-     * @see MessageFormat
-     */
-    private String formatMessage(String message, Object... objects)
-    {
-        try {
-            return MessageFormat.format(message, objects);
-        } catch (IllegalArgumentException e) {
-            this.logger.debug("Caught exception while formatting logging message: " + message, e);
-
-            // Try to save the message for logging output and just append the passed objects instead
-            if (objects != null) {
-                StringBuffer sb = new StringBuffer(message);
-                for (Object object : objects) {
-                    if (object != null) {
-                        sb.append(object);
-                    } else {
-                        sb.append("(null)");
-                    }
-                    sb.append(" ");
-                }
-                return sb.toString();
-            }
-            return message;
-        }
     }
 
     /**
@@ -295,45 +260,5 @@ public class PlexusLogger implements Logger
     public boolean isErrorEnabled()
     {
         return this.logger.isErrorEnabled();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Logger#getChildLogger(String)
-     */
-    public Logger getChildLogger(String name)
-    {
-        return new PlexusLogger(this.logger.getChildLogger(name));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Logger#getThreshold()
-     */
-    public int getThreshold()
-    {
-        return this.logger.getThreshold();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Logger#setThreshold(int)
-     */
-    public void setThreshold(int threshold)
-    {
-        this.logger.setThreshold(threshold);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Logger#getName()
-     */
-    public String getName()
-    {
-        return this.logger.getName();
     }
 }

@@ -31,7 +31,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.internal.Composable;
 import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.internal.RoleHint;
-import org.xwiki.component.logging.VoidLogger;
+import org.xwiki.component.logging.CommonsLoggingLogger;
 import org.xwiki.component.manager.ComponentEventManager;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -311,8 +311,7 @@ public class EmbeddableComponentManager implements ComponentManager
 
             // LogEnabled
             if (LogEnabled.class.isAssignableFrom(descriptor.getImplementation())) {
-                // TODO: Use a proper logger
-                ((LogEnabled) instance).enableLogging(new VoidLogger());
+                ((LogEnabled) instance).enableLogging(new CommonsLoggingLogger(instance.getClass()));
             }
             
             // Composable

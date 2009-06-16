@@ -29,21 +29,6 @@ package org.xwiki.component.logging;
  */
 public interface Logger
 {
-    /** Typecode for debugging messages. */
-    int LEVEL_DEBUG = 0;
-
-    /** Typecode for informational messages. */
-    int LEVEL_INFO = 1;
-
-    /** Typecode for warning messages. */
-    int LEVEL_WARN = 2;
-
-    /** Typecode for error messages. */
-    int LEVEL_ERROR = 3;
-
-    /** Typecode for disabled log levels. */
-    int LEVEL_DISABLED = 5;
-
     /**
      * Log a message with the <code>debug</code> priority.
      * 
@@ -311,35 +296,4 @@ public interface Logger
      *         otherwise
      */
     boolean isErrorEnabled();
-
-    /**
-     * Create and return a child logger, which will inherit the parent's settings.
-     * 
-     * @param name The name of the new logger.
-     * @return A child {@link Logger} object.
-     */
-    Logger getChildLogger(String name);
-
-    /**
-     * Returns the current priority threshold. Messages with the priority lower than the threshold will not be logged.
-     * 
-     * @return The value of the current threshold, one of {@link #LEVEL_DEBUG}, {@link #LEVEL_INFO}, {@link #LEVEL_WARN}
-     *         , {@link #LEVEL_ERROR}, {@link #LEVEL_FATAL}, {@link #LEVEL_DISABLED}.
-     */
-    int getThreshold();
-
-    /**
-     * Sets the current priority threshold. Messages with the priority lower than the threshold will not be logged.
-     * 
-     * @param threshold The new priority threshold, one of {@link #LEVEL_DEBUG}, {@link #LEVEL_INFO},
-     *            {@link #LEVEL_WARN} , {@link #LEVEL_ERROR}, {@link #LEVEL_FATAL}, {@link #LEVEL_DISABLED}.
-     */
-    void setThreshold(int threshold);
-
-    /**
-     * The name of the logger.
-     * 
-     * @return
-     */
-    String getName();
 }

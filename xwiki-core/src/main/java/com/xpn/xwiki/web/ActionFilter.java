@@ -27,6 +27,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -70,6 +71,8 @@ public class ActionFilter implements Filter
     /** URL path separator. */
     private static final String PATH_SEPARATOR = "/";
 
+    private ServletContext servletContext;
+
     /**
      * {@inheritDoc}
      * 
@@ -77,7 +80,7 @@ public class ActionFilter implements Filter
      */
     public void init(FilterConfig filterConfig) throws ServletException
     {
-        // No initialization needed.
+        this.servletContext = filterConfig.getServletContext();
     }
 
     /**
@@ -135,18 +138,32 @@ public class ActionFilter implements Filter
     private String getTargetURL(HttpServletRequest request, String action)
     {
         String newAction = PATH_SEPARATOR + action.substring(ACTION_PREFIX.length());
+
         // Extract the document name from the requested path. We don't use getPathInfo() since it is decoded
         // by the container, thus it will not work when XWiki uses a non-UTF-8 encoding.
         // First step, remove the context path, if any.
         String document = StringUtils.substringAfter(request.getRequestURI(), request.getContextPath());
+
         // Second step, remove the servlet path, if any.
         document = StringUtils.substringAfter(document, request.getServletPath());
+        String servletPath = request.getServletPath();
+
         // Third step, remove the struts mapping. This step is mandatory, so this filter will fail if the
         // requested action was a hidden (default) 'view', like in '/bin/Main/'. This is OK, since forms
         // don't use 'view' as a target.
-        document = PATH_SEPARATOR + StringUtils.substringAfter(document.substring(1), PATH_SEPARATOR);
+        int index = document.indexOf(PATH_SEPARATOR, 1);
+        if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "0", this.servletContext))) {
+            if (servletPath.equals(PATH_SEPARATOR
+                + XWikiConfigurationService.getProperty("xwiki.virtual.usepath.servletpath", "wiki",
+                    this.servletContext))) {
+                servletPath += document.substring(0, index);
+                index = document.indexOf(PATH_SEPARATOR, index + 1);
+            }
+        }
+
+        document = document.substring(index);
 
         // Compose the target URL starting with the servlet path.
-        return request.getServletPath() + newAction + document;
+        return servletPath + newAction + document;
     }
 }

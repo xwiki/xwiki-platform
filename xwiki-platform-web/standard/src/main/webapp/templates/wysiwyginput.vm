@@ -5,10 +5,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$context.language" xml:lang="$context.language">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
-## List here the stylesheets that affect the content in view mode.
-<link type="text/css" rel="stylesheet" href="$xwiki.getSkinFile("style.css")"/>
+## Include the stylesheets that affect the content in view mode.
+#template("stylesheets.vm")
 ## RichTextArea.css overwrites those CSS rules defined in the previous stylesheets that are improper in edit mode.
 <link type="text/css" rel="stylesheet" href="$xwiki.getSkinFile("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/stylesheets/RichTextArea.css")"/>
+## Include the scripts that affect the content in view mode.
+#template("javascript.vm")
 </head>
 ## We don't use directly $tdoc.content because we could loose changes made by the 
 ## user before switching from wiki editor to wysiwyg or before saving when a 

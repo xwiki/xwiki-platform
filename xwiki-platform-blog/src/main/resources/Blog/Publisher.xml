@@ -30,7 +30,7 @@
 #end
 #set($entryName = "$!{request.entryName}")
 #if($entryName != '')
-  #if($xwiki.hasAccessLevel('edit', $context.user, $entryDoc.fullName))
+  #if($xwiki.hasAccessLevel('edit', $context.user, $entryName))
     #set($entryDoc = $xwiki.getDocument($entryName))
     #if ($entryDoc)
       #getEntryObject($entryDoc $entryObj)

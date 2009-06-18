@@ -30,9 +30,14 @@ import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 public class ScriptMacroParameters
 {
     /**
-     * Indicate the output result has to be inserted back in the document.
+     * @see #setOutput(boolean)
      */
     private boolean output = true;
+
+    /**
+     * @see #setWiki(boolean)
+     */
+    private boolean wiki = true;
 
     /**
      * @param output indicate the output result has to be inserted back in the document.
@@ -49,5 +54,26 @@ public class ScriptMacroParameters
     public boolean isOutput()
     {
         return this.output;
+    }
+
+    /**
+     * @param wiki indicate if the result of the script execution has to be parsed by the current wiki parser. If not
+     *            it's put in a verbatim block.
+     * @since 2.0M1
+     */
+    @ParameterDescription("indicate if the result of the script execution has to be parsed by the current wiki parser."
+        + " If not it's put in a verbatim block")
+    public void setWiki(boolean wiki)
+    {
+        this.wiki = wiki;
+    }
+
+    /**
+     * @return indicate if the result of the script execution has to be parsed by the current wiki parser.
+     * @since 2.0M1
+     */
+    public boolean isWiki()
+    {
+        return this.wiki;
     }
 }

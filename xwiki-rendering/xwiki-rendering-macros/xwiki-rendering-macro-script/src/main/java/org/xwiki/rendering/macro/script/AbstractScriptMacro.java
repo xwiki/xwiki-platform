@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -101,7 +102,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     {
         return this.componentManager;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -118,13 +119,41 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
             if (parameters.isOutput()) {
                 // 2) Run the wiki syntax parser on the script-rendered content
-                XDOM parsedDom = parseSourceSyntax(scriptResult, context);
+                result = parseScriptResult(scriptResult, parameters, context);
+            }
+        }
 
-                // 3) If in inline mode remove any top level paragraph
-                result = parsedDom.getChildren();
-                if (context.isInline()) {
-                    this.parserUtils.removeTopLevelParagraph(result);
-                }
+        return result;
+    }
+
+    /**
+     * Convert script result as a {@link Block} list.
+     * 
+     * @param content the script result to parse.
+     * @param parameters the macro parameters.
+     * @param context the context of the macro transformation.
+     * @return the {@link Block}s.
+     * @throws MacroExecutionException Failed to find source parser.
+     * @since 2.1M1
+     */
+    protected List<Block> parseScriptResult(String content, P parameters, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        List<Block> result;
+
+        if (parameters.isWiki()) {
+            XDOM parsedDom = parseSourceSyntax(content, context);
+
+            // 3) If in inline mode remove any top level paragraph
+            result = parsedDom.getChildren();
+            if (context.isInline()) {
+                this.parserUtils.removeTopLevelParagraph(result);
+            }
+        } else {
+            result = this.parserUtils.parsePlainText(content);
+
+            if (!context.isInline()) {
+                result = Collections.<Block> singletonList(new ParagraphBlock(result));
             }
         }
 

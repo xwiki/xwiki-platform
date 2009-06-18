@@ -1,0 +1,58 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validate wiki=false option
+.#-----------------------------------------------------
+{{script}}
+**bold**
+{{/script}}
+{{script wiki=false}}
+**not bold**
+{{/script}}
+{{script}}**bold**{{/script}}{{script wiki=false}}**not bold**{{/script}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [script] [] [
+**bold**
+]
+beginParagraph
+beginFormat [BOLD]
+onWord [bold]
+endFormat [BOLD]
+endParagraph
+endMacroMarkerStandalone [script] [] [
+**bold**
+]
+beginMacroMarkerStandalone [script] [wiki=false] [
+**not bold**
+]
+beginParagraph
+onSpecialSymbol [*]
+onSpecialSymbol [*]
+onWord [not]
+onSpace
+onWord [bold]
+onSpecialSymbol [*]
+onSpecialSymbol [*]
+endParagraph
+endMacroMarkerStandalone [script] [wiki=false] [
+**not bold**
+]
+beginParagraph
+beginMacroMarkerInline [script] [] [**bold**]
+beginFormat [BOLD]
+onWord [bold]
+endFormat [BOLD]
+endMacroMarkerInline [script] [] [**bold**]
+beginMacroMarkerInline [script] [wiki=false] [**not bold**]
+onSpecialSymbol [*]
+onSpecialSymbol [*]
+onWord [not]
+onSpace
+onWord [bold]
+onSpecialSymbol [*]
+onSpecialSymbol [*]
+endMacroMarkerInline [script] [wiki=false] [**not bold**]
+endParagraph
+endDocument

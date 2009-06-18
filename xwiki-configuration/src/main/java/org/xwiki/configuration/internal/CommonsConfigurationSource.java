@@ -50,6 +50,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
      * {@inheritDoc}
      * @see ConfigurationSource#getProperty(String, Object)
      */
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, T defaultValue)
     {
         return getProperty(key, defaultValue, (Class<T>) defaultValue.getClass());
@@ -59,6 +60,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
      * {@inheritDoc}
      * @see ConfigurationSource#getProperty(String)
      */
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key)
     {
         return (T) this.configuration.getProperty(key);
@@ -68,6 +70,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
      * {@inheritDoc}
      * @see ConfigurationSource#getProperty(String, Class)
      */
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, Class<T> valueClass)
     {
         T result;
@@ -94,6 +97,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
      * {@inheritDoc}
      * @see ConfigurationSource#getKeys()
      */
+    @SuppressWarnings("unchecked")
     public List<String> getKeys()
     {
         List<String> keysList = new ArrayList<String>();

@@ -83,6 +83,7 @@ public class CompositeConfigurationSource implements ConfigurationSource
      * {@inheritDoc}
      * @see ConfigurationSource#getProperty(String, Class)
      */
+    @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, Class<T> valueClass)
     {
         T result = null;

@@ -114,7 +114,8 @@ public class XWikiContext extends Hashtable<Object, Object>
     private Map<String, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
     // Used to avoid reloading archives in the same request
-    private Map<String, XWikiDocumentArchive> archiveCache = Collections.synchronizedMap(new LRUMap(this.archiveCacheSize));
+    private Map<String, XWikiDocumentArchive> archiveCache =
+        Collections.synchronizedMap(new LRUMap(this.archiveCacheSize));
 
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
 

@@ -71,6 +71,9 @@ public class ActionFilter implements Filter
     /** URL path separator. */
     private static final String PATH_SEPARATOR = "/";
 
+    /**
+     * Use to access resources.
+     */
     private ServletContext servletContext;
 
     /**

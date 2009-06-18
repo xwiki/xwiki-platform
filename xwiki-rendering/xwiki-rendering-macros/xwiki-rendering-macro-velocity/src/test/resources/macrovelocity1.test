@@ -42,18 +42,18 @@ beginMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
 </div>
 {{/html}}]
 beginMacroMarkerStandalone [html] [wiki=true] [ <div> <h1>Hello John</h1> <table> <tr> <td>
-* item 
+* item
 
 </td> </tr> <tr> <td>
-* item 
+* item
 
 </td> </tr> </table> </div> ]
-onRawText [ <div> <h1>Hello John</h1>        <table><tbody><tr><td><ul><li>item </li></ul></td></tr><tr><td><ul><li>item </li></ul></td></tr></tbody></table> </div> ] [xhtml/1.0]
+onRawText [ <div> <h1>Hello John</h1>        <table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table> </div> ] [xhtml/1.0]
 endMacroMarkerStandalone [html] [wiki=true] [ <div> <h1>Hello John</h1> <table> <tr> <td>
-* item 
+* item
 
 </td> </tr> <tr> <td>
-* item 
+* item
 
 </td> </tr> </table> </div> ]
 endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
@@ -95,4 +95,4 @@ endDocument
     #end
   </table>
 </div>
-{{/html}}--> <div> <h1>Hello John</h1>        <table><tbody><tr><td><ul><li>item </li></ul></td></tr><tr><td><ul><li>item </li></ul></td></tr></tbody></table> </div> <!--stopmacro-->
+{{/html}}--> <div> <h1>Hello John</h1>        <table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table> </div> <!--stopmacro-->

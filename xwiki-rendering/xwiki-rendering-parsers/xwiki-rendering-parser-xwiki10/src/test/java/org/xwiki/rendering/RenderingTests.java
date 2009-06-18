@@ -62,6 +62,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity22", false);
         suite.addTestsFromResource("velocity/velocity23", false);
         suite.addTestsFromResource("velocity/velocity24", false);
+        suite.addTestsFromResource("velocity/velocity25", false);
 
         // Groovy
         suite.addTestsFromResource("groovy/groovy1", false);
@@ -69,6 +70,9 @@ public class RenderingTests extends TestCase
         // Velocity Macros
         suite.addTestsFromResource("macros/velocity/include1", false);
         suite.addTestsFromResource("macros/velocity/toc1", false);
+        suite.addTestsFromResource("macros/velocity/info1", false);
+        suite.addTestsFromResource("macros/velocity/warning1", false);
+        suite.addTestsFromResource("macros/velocity/error1", false);
 
         // Radeox Macros
         suite.addTestsFromResource("macros/radeox/attach1", false);

@@ -32,18 +32,18 @@ import java.util.List;
  */
 public class DefaultComponentDescriptor<T> extends DefaultComponentRole<T> implements ComponentDescriptor<T>
 {
-    private Class< ? > implementation;
+    private Class< ? extends T> implementation;
 
     private ComponentInstantiationStrategy instantiationStrategy = ComponentInstantiationStrategy.SINGLETON;
 
     private List<ComponentDependency<?>> componentDependencies = new ArrayList<ComponentDependency<?>>();
 
-    public void setImplementation(Class< ? > implementation)
+    public void setImplementation(Class< ? extends T> implementation)
     {
         this.implementation = implementation;
     }
 
-    public Class< ? > getImplementation()
+    public Class<  ? extends T> getImplementation()
     {
         return implementation;
     }

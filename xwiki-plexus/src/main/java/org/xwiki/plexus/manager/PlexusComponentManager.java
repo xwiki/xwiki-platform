@@ -213,7 +213,7 @@ public class PlexusComponentManager implements ComponentManager
         
         if (pcd != null) {
             descriptor = new DefaultComponentDescriptor<T>();
-            descriptor.setImplementation(loadClass(pcd.getImplementation()));
+            descriptor.setImplementation((Class< ? extends T>) loadClass(pcd.getImplementation()));
             descriptor.setRoleHint(pcd.getRoleHint());
             descriptor.setRole((Class<T>) loadClass(pcd.getRole()));
             

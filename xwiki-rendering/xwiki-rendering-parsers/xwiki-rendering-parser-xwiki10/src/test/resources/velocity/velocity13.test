@@ -1,8 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-#macro()
+#somemacro()
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{velocity filter="none"}}{{html clean="false" wiki="true"}}#macro(){{/html}}{{/velocity}}
+{{velocity filter="none"}}{{html clean="false" wiki="true"}}#somemacro(){{/html}}{{/velocity}}

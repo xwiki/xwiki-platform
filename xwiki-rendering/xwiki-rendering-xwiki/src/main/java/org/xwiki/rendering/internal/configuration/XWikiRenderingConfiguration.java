@@ -21,10 +21,7 @@ package org.xwiki.rendering.internal.configuration;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationManager;
-import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
@@ -34,35 +31,23 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
  * @since 2.0M1
  */
 @Component
-public class XWikiRenderingConfiguration implements Initializable, RenderingConfiguration
+public class XWikiRenderingConfiguration implements RenderingConfiguration
 {
+    /**
+     * Prefix for configuration keys for the Rendering module.
+     */
+    private static final String PREFIX = "rendering.";
+
     /**
      * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
      */
-    private String linkLabelFormat = "%p";
-
-    /**
-     * Allows reading the rendering configuration from where it's defined.
-     */
-    @Requirement
-    private ConfigurationManager configurationManager;
+    private static final String DEFAULT_LINK_LABEL_FORMAT = "%p";
 
     /**
      * Defines from where to read the rendering configuration data. 
      */
     @Requirement
-    private ConfigurationSourceCollection sourceCollection;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
-            "rendering");
-    }
+    private ConfigurationSource configuration;
 
     /**
      * {@inheritDoc}
@@ -71,14 +56,6 @@ public class XWikiRenderingConfiguration implements Initializable, RenderingConf
      */
     public String getLinkLabelFormat()
     {
-        return this.linkLabelFormat;
-    }
-
-    /**
-     * @param linkLabelFormat the format used to decide how to display links that have no label
-     */
-    public void setLinkLabelFormat(String linkLabelFormat)
-    {
-        this.linkLabelFormat = linkLabelFormat;
+      return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
     }
 }

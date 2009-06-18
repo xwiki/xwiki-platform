@@ -20,31 +20,23 @@
 package org.xwiki.configuration.internal;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
+import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.configuration.ConfigurationSourceCollection;
-import org.xwiki.configuration.internal.commons.CommonsConfigurationSource;
 import org.xwiki.container.Container;
 
 /**
- * Default list of {@link org.xwiki.configuration.ConfigurationSource}s that contain the default global XWiki
- * configuration file (xwiki.properties).
+ * Looks for configuration data in {@code /WEB-INF/xwiki.properties}.
  * 
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M1
  */
-@Component
-public class DefaultConfigurationSourceCollection extends AbstractLogEnabled 
-    implements ConfigurationSourceCollection, Initializable
+@Component("xwikiproperties")
+public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSource implements Initializable
 {
     private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
 
@@ -53,29 +45,27 @@ public class DefaultConfigurationSourceCollection extends AbstractLogEnabled
      */
     @Requirement
     private Container container;
-
-    private List<ConfigurationSource> sources;
-
+    
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
     public void initialize() throws InitializationException
     {
-        this.sources = new ArrayList<ConfigurationSource>();
-
         // Register the Commons Properties Configuration, looking for a xwiki.properties file
         // in the XWiki path somewhere.
         URL xwikiPropertiesUrl = null;
         try {
             xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
-            this.sources.add(new CommonsConfigurationSource(new PropertiesConfiguration(xwikiPropertiesUrl)));
+            setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
         } catch (Exception e) {
             // Note: if we cannot read the configuration file we log a warning but continue since XWiki will use 
             // default values for all configurable elements.
-            getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE + "]. Using default configuration. "
-                + " Internal error [" + e.getMessage() + "]");
+            getLogger().warn("Failed to load configuration file [" + XWIKI_PROPERTIES_FILE 
+                + "]. Using default configuration. " + " Internal error [" + e.getMessage() + "]");
+            
+            // Use a default Commons Configuration implementation since we couldn't use a Properties configuration.
+            setConfiguration(new BaseConfiguration());
         }
-    }
-
-    public List<ConfigurationSource> getConfigurationSources()
-    {
-        return Collections.unmodifiableList(this.sources);
     }
 }

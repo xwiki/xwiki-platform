@@ -23,10 +23,7 @@ import net.sf.jodconverter.office.OfficeUtils;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationManager;
-import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 
 /**
@@ -36,174 +33,114 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
  * @since 1.8RC3
  */
 @Component
-public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration, Initializable
+public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
 {
+    /**
+     * Prefix for configuration keys for the OpenOffice module.
+     */
+    private static final String PREFIX = "openoffice.";
+
+    /**
+     * Defines from where to read the rendering configuration data. 
+     */
+    @Requirement
+    private ConfigurationSource configuration;
+
     /**
      * @see OpenOfficeConfiguration#getServerType()
      */
-    private int serverType = SERVER_TYPE_INTERNAL;
+    private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
      * @see OpenOfficeServerConfiguration#getServerPort();
      */
-    private int serverPort = 8100;
+    private static final int DEFAULT_SERVER_PORT = 8100;
 
     /**
      * @see OpenOfficeConfiguration#getHomePath()
      */
-    private String homePath = OfficeUtils.getDefaultOfficeHome().getAbsolutePath();
+    private static final String DEFAULT_HOME_PATH = OfficeUtils.getDefaultOfficeHome().getAbsolutePath();
 
     /**
      * @see OpenOfficeConfiguration#getProfilePath()
      */
-    private String profilePath = OfficeUtils.getDefaultProfileDir().getAbsolutePath();
+    private static final String DEFAULT_PROFILE_PATH = OfficeUtils.getDefaultProfileDir().getAbsolutePath();
 
     /**
      * @see OpenOfficeConfiguration#isAutoStart()
      */
-    private boolean autoStart = false;
+    private static final boolean DEFAULT_AUTO_START = false;
 
     /**
      * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
      */
-    private int maxTasksPerProcess = 50;
+    private static final int DEFAULT_MAX_TASKS_PER_PROCESS = 50;
 
     /**
      * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
-    private long taskExecutionTimeout = 30000;
-
-    /**
-     * The {@link ConfigurationManager} component.
-     */
-    @Requirement
-    private ConfigurationManager configurationManager;
-
-    /**
-     * The {@link ConfigurationSourceCollection} component.
-     */
-    @Requirement
-    private ConfigurationSourceCollection sourceCollection;
+    private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
 
     /**
      * {@inheritDoc}
-     */
-    public void initialize() throws InitializationException
-    {
-        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
-            "openoffice");
-    }
-
-    /**
-     * {@inheritDoc}
+     * @see OpenOfficeConfiguration#getServerType()
      */
     public int getServerType()
     {
-        return serverType;
-    }
-
-    /**
-     * @param serverType the type of the openoffice server instance consumed by officeimporter.
-     */
-    public void setServerType(int serverType)
-    {
-        this.serverType = serverType;
+        return this.configuration.getProperty(PREFIX + "serverType", DEFAULT_SERVER_TYPE);
     }
 
     /**
      * {@inheritDoc}
+     * @see OpenOfficeConfiguration#getServerPort()
      */
     public int getServerPort()
     {
-        return serverPort;
-    }
-
-    /**
-     * @param serverPort port number used for connecting to the openoffice server instance.
-     */
-    public void setServerPort(int serverPort)
-    {
-        this.serverPort = serverPort;
+        return this.configuration.getProperty(PREFIX + "serverPort", DEFAULT_SERVER_PORT);
     }
 
     /**
      * {@inheritDoc}
+     * @see OpenOfficeConfiguration#isAutoStart()
      */
     public boolean isAutoStart()
     {
-        return this.autoStart;
-    }
-
-    /**
-     * @param autoStart if openoffice server should start automatically with XE.
-     */
-    public void setAutoStart(boolean autoStart)
-    {
-        this.autoStart = autoStart;
+        return this.configuration.getProperty(PREFIX + "autoStart", DEFAULT_AUTO_START);
     }
 
     /**
      * {@inheritDoc}
+     * @see OpenOfficeConfiguration#getHomePath()
      */
     public String getHomePath()
     {
-        return homePath;
-    }
-
-    /**
-     * @param homePath path to openoffice server installation.
-     */
-    public void setHomePath(String homePath)
-    {
-        this.homePath = homePath;
+        return this.configuration.getProperty(PREFIX + "homePath", DEFAULT_HOME_PATH);
     }
 
     /**
      * {@inheritDoc}
+     * @see OpenOfficeConfiguration#getProfilePath()
      */
     public String getProfilePath()
     {
-        return profilePath;
-    }
-
-    /**
-     * @param profilePath path to openoffice execution profile.
-     */
-    public void setProfilePath(String profilePath)
-    {
-        this.profilePath = profilePath;
+        return this.configuration.getProperty(PREFIX + "profilePath", DEFAULT_PROFILE_PATH);
     }
 
     /**
      * {@inheritDoc}
+     * @see OpenOfficeConfiguration#getMaxTasksPerProcess()
      */
     public int getMaxTasksPerProcess()
     {
-        return maxTasksPerProcess;
-    }
-
-    /**
-     * @param maxTasksPerProcess maximum number of simultaneous conversion tasks to be handled by a single oo process
-     *            instance.
-     */
-    public void setMaxTasksPerProcess(int maxTasksPerProcess)
-    {
-        this.maxTasksPerProcess = maxTasksPerProcess;
+        return this.configuration.getProperty(PREFIX + "maxTasksPerProcess", DEFAULT_MAX_TASKS_PER_PROCESS);
     }
 
     /**
      * {@inheritDoc}
+     * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
     public long getTaskExecutionTimeout()
     {
-        return taskExecutionTimeout;
-    }
-
-    /**
-     * @param taskExecutionTimeout timeout for document conversion tasks.
-     */
-    public void setTaskExecutionTimeout(long taskExecutionTimeout)
-    {
-        this.taskExecutionTimeout = taskExecutionTimeout;
+        return this.configuration.getProperty(PREFIX + "taskExecutionTimeout", DEFAULT_TASK_EXECUTION_TIMEOUT);
     }
 }

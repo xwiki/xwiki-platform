@@ -19,11 +19,13 @@
  */
 package com.xpn.xwiki.test;
 
+import org.jmock.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
+import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -63,7 +65,9 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         Container c = getComponentManager().lookup(Container.class);
         c.setApplicationContext(new TestApplicationContext());
 
-        getComponentManager().registerComponent(TestCoreConfiguration.getComponentDescriptor());
+        Mock mockCoreConfiguration = mock(CoreConfiguration.class);
+        mockCoreConfiguration.stubs().method("getDefaultDocumentSyntax").will(returnValue("xwiki/1.0"));
+        getComponentManager().registerComponent(CoreConfiguration.class, mockCoreConfiguration.proxy());
     }
 
     @Override

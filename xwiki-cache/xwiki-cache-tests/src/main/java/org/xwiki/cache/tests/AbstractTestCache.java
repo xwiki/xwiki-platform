@@ -21,15 +21,11 @@ package org.xwiki.cache.tests;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 
+import org.jmock.Mock;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
-import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.configuration.ConfigurationManager;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Container;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
@@ -37,7 +33,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * 
  * @version $Id$
  */
-public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase implements ApplicationContext
+public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
 {
     /**
      * The first key.
@@ -65,11 +61,6 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     protected String roleHint;
 
     /**
-     * The container.
-     */
-    private Container container;
-
-    /**
      * @param roleHint the role hint of the cache component implementation to test.
      */
     protected AbstractTestCache(String roleHint)
@@ -87,30 +78,11 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     {
         super.setUp();
 
-        getComponentManager().registerComponent(ConfigurationManagerMock.getComponentDescriptor());
-        getComponentManager().registerComponent(ConfigurationSourceCollectionMock.getComponentDescriptor());
-        
-        ConfigurationManagerMock configurationMock = 
-            (ConfigurationManagerMock) getComponentManager().lookup(ConfigurationManager.class);
-        configurationMock.setCacheHint(this.roleHint);
-    }
-
-    /**
-     * @return the component manager to get a cache component.
-     * @throws Exception error when initializing component manager.
-     */
-    @Override
-    public EmbeddableComponentManager getComponentManager() throws Exception
-    {
-        EmbeddableComponentManager cm = super.getComponentManager();
-
-        if (this.container == null) {
-            // Initialize the Container
-            Container c = (Container) cm.lookup(Container.class);
-            c.setApplicationContext(this);
-        }
-
-        return cm;
+        Mock mockConfigurationSource = mock(ConfigurationSource.class);
+        mockConfigurationSource.stubs().method("getProperty").with(eq("cache.defaultCache"), ANYTHING).will(
+            returnValue(this.roleHint));
+//        mockConfigurationSource.stubs().method("getProperty").will(returnValue(this.roleHint));
+        getComponentManager().registerComponent(ConfigurationSource.class, mockConfigurationSource.proxy());
     }
 
     /**
@@ -121,16 +93,6 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     public InputStream getResourceAsStream(String resourceName)
     {
         return getClass().getResourceAsStream(resourceName);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResource(java.lang.String)
-     */
-    public URL getResource(String resourceName) throws MalformedURLException
-    {
-        return getClass().getResource(resourceName);
     }
 
     /**
@@ -149,7 +111,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheManager cacheManager = (CacheManager) getComponentManager().lookup(CacheManager.class, "default");
+        CacheManager cacheManager = (CacheManager) getComponentManager().lookup(CacheManager.class);
 
         CacheFactory factory = cacheManager.getCacheFactory();
 

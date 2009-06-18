@@ -17,20 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration;
+package org.xwiki.configuration.internal;
 
-import java.util.List;
-
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
+ * Default composite Configuration Source that should be used by components requiring configuration data.
+ * It defines the default sources to use.
+ * 
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M1
+ * @todo Add other sources later on: XWiki Preferences, Space Preferences, User Preferences.
  */
-@ComponentRole
-public interface ConfigurationManager
+@Component
+public class DefaultConfigurationSource extends CompositeConfigurationSource implements Initializable
 {
-    void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources, String namespace)
-        throws InitializationException;
+    @Requirement("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesSource;
+    
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+        addConfigurationSource(this.xwikiPropertiesSource);
+    }
 }

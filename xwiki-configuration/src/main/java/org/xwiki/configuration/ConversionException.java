@@ -17,29 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
-
-import org.xwiki.configuration.ConfigurationSourceCollection;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
-
+package org.xwiki.configuration;
 
 /**
- * Unit tests for {@link org.xwiki.configuration.internal.DefaultConfigurationSourceCollection}.
- *
+ * Raised when a property of a given type is retrieved as a property of another type
+ * (eg trying to get a String property as a Boolean).
+ * 
  * @version $Id$
- * @since 1.6M2
+ * @since 2.0M1
  */
-public class DefaultConfigurationSourceCollectionTest extends AbstractXWikiComponentTestCase
+public class ConversionException extends RuntimeException
 {
     /**
-     * Verify initialization of component.
+     * Class ID for serialization.
      */
-    public void testInitialization() throws Exception
-    {
-        // Verify that initialization works here.
-        ConfigurationSourceCollection sources =
-            (ConfigurationSourceCollection) getComponentManager().lookup(ConfigurationSourceCollection.class);
+    private static final long serialVersionUID = -5505430198503987611L;
 
-        assertEquals(1, sources.getConfigurationSources().size());
+    public ConversionException(String message)
+    {
+        super(message);
+    }
+
+    public ConversionException(String message, Throwable cause)
+    {
+        super(message, cause);
     }
 }

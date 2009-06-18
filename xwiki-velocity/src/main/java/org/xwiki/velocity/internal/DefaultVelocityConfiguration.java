@@ -19,15 +19,13 @@
  */
 package org.xwiki.velocity.internal;
 
-import java.util.Map;
 import java.util.Properties;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationManager;
-import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.velocity.VelocityConfiguration;
 
 /**
@@ -40,16 +38,15 @@ import org.xwiki.velocity.VelocityConfiguration;
 public class DefaultVelocityConfiguration implements Initializable, VelocityConfiguration
 {
     /**
-     * Allows reading the rendering configuration from where it's defined.
+     * Prefix for configuration keys for the Velocity module.
      */
-    @Requirement
-    private ConfigurationManager configurationManager;
+    private static final String PREFIX = "velocity.";
 
     /**
      * Defines from where to read the rendering configuration data. 
      */
     @Requirement
-    private ConfigurationSourceCollection sourceCollection;
+    private ConfigurationSource configuration;
 
     /**
      * Default Tools.
@@ -57,19 +54,9 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
     private Properties defaultTools = new Properties(); 
     
     /**
-     * @see VelocityConfiguration#getTools()
-     */
-    private Properties tools;
-
-    /**
      * Default properties.
      */
     private Properties defaultProperties = new Properties();
-    
-    /**
-     * @see VelocityConfiguration#getProperties()
-     */
-    private Properties properties;
     
     /**
      * {@inheritDoc}
@@ -99,12 +86,6 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
         this.defaultProperties.setProperty("runtime.introspector.uberspect.chainClasses", 
             "org.apache.velocity.util.introspection.SecureUberspector,"
             + "org.xwiki.velocity.introspection.DeprecatedCheckUberspector");
-        
-        this.tools = this.defaultTools;
-        this.properties = this.defaultProperties;
-        
-        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
-            "velocity");
     }
 
     /**
@@ -114,18 +95,11 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
      */
     public Properties getProperties()
     {
-        return this.properties;
-    }
-
-    /**
-     * @param properties the list of Velocity properties to configure
-     */
-    public void setProperties(Properties properties)
-    {
-        this.properties = new Properties(this.defaultProperties);
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-            this.properties.setProperty((String) entry.getKey(), (String) entry.getValue());
-        }
+        // Merge default properties and properties defined in the configuration
+        Properties props = new Properties();
+        props.putAll(this.defaultProperties);
+        props.putAll(this.configuration.getProperty(PREFIX + "properties", Properties.class));
+        return props;
     }
 
     /**
@@ -135,17 +109,10 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
      */
     public Properties getTools()
     {
-        return this.tools;
-    }
-    
-    /**
-     * @param tools the list of Velocity tools to configure
-     */
-    public void setTools(Properties tools)
-    {
-        this.tools = new Properties(this.defaultTools);
-        for (Map.Entry<Object, Object> entry : tools.entrySet()) {
-            this.tools.setProperty((String) entry.getKey(), (String) entry.getValue());
-        }
+        // Merge default tools and tools defined in the configuration
+        Properties props = new Properties();
+        props.putAll(this.defaultTools);
+        props.putAll(this.configuration.getProperty(PREFIX + "tools", Properties.class));
+        return props;
     }
 }

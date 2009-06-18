@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.cache.tests;
+package org.xwiki.rendering.scaffolding;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,36 +25,59 @@ import java.util.List;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.configuration.ConfigurationSourceCollection;
 
 /**
+ * Mock {@link org.xwiki.configuration.ConfigurationSourceCollection} that returns an empty list of configuration
+ * sources.
+ * 
  * @version $Id$
- * @since 1.7M1
+ * @since 1.6M2
  */
-public class ConfigurationSourceCollectionMock implements ConfigurationSourceCollection
+public class MockConfigurationSource implements ConfigurationSource
 {
     /**
      * Create and return a descriptor for this component.
      * 
      * @return the descriptor of the component.
      */
-    public static ComponentDescriptor getComponentDescriptor()
+    public static ComponentDescriptor<ConfigurationSource> getComponentDescriptor()
     {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+        DefaultComponentDescriptor<ConfigurationSource> componentDescriptor = 
+            new DefaultComponentDescriptor<ConfigurationSource>();
 
-        componentDescriptor.setRole(ConfigurationSourceCollection.class);
-        componentDescriptor.setImplementation(ConfigurationSourceCollectionMock.class);
+        componentDescriptor.setRole(ConfigurationSource.class);
+        componentDescriptor.setImplementation(MockConfigurationSource.class);
 
         return componentDescriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.configuration.ConfigurationSourceCollection#getConfigurationSources()
-     */
-    public List<ConfigurationSource> getConfigurationSources()
+    public boolean containsKey(String key)
+    {
+        return false;
+    }
+
+    public List<String> getKeys()
     {
         return Collections.emptyList();
+    }
+
+    public <T> T getProperty(String key, Class<T> valueClass)
+    {
+        return null;
+    }
+
+    public <T> T getProperty(String key, T defaultValue)
+    {
+        return defaultValue;
+    }
+
+    public <T> T getProperty(String key)
+    {
+        return null;
+    }
+
+    public boolean isEmpty()
+    {
+        return true;
     }
 }

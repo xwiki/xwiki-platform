@@ -22,10 +22,7 @@ package org.xwiki.cache.internal;
 import org.xwiki.cache.CacheManagerConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationManager;
-import org.xwiki.configuration.ConfigurationSourceCollection;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
  * Default implementation of {@link CacheManagerConfiguration}.
@@ -33,8 +30,13 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
  * @version $Id$
  */
 @Component
-public class DefaultCacheManagerConfiguration implements CacheManagerConfiguration, Initializable
+public class DefaultCacheManagerConfiguration implements CacheManagerConfiguration
 {
+    /**
+     * Prefix for configuration keys for the Cache module.
+     */
+    private static final String PREFIX = "cache.";
+
     /**
      * The default cache implementation.
      */
@@ -46,37 +48,10 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
     private static final String DEFAULT_LOCALCACHE_HINT = "jbosscache/local";
 
     /**
-     * Injected by the Component Manager.
+     * Defines from where to read the rendering configuration data. 
      */
     @Requirement
-    private ConfigurationManager configurationManager;
-
-    /**
-     * Injected by the Component Manager.
-     */
-    @Requirement
-    private ConfigurationSourceCollection sourceCollection;
-
-    /**
-     * The role hint of configured default cache component.
-     */
-    private String defaultCache = DEFAULT_CACHE_HINT;
-
-    /**
-     * The role hint of configured default local cache component.
-     */
-    private String defaultLocalCache = DEFAULT_LOCALCACHE_HINT;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        this.configurationManager.initializeConfiguration(this, this.sourceCollection.getConfigurationSources(),
-            "cache");
-    }
+    private ConfigurationSource configuration;
 
     /**
      * {@inheritDoc}
@@ -85,7 +60,7 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
      */
     public String getDefaultCache()
     {
-        return this.defaultCache;
+        return this.configuration.getProperty(PREFIX + "defaultCache", DEFAULT_CACHE_HINT);
     }
 
     /**
@@ -95,22 +70,6 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
      */
     public String getDefaultLocalCache()
     {
-        return this.defaultLocalCache;
-    }
-
-    /**
-     * @param cacheHint the role hint of configured default cache component.
-     */
-    public void setDefaultCache(String cacheHint)
-    {
-        this.defaultCache = cacheHint;
-    }
-
-    /**
-     * @param localCacheHint the role hint of configured default local cache component.
-     */
-    public void setLocalDefaultCache(String localCacheHint)
-    {
-        this.defaultLocalCache = localCacheHint;
+        return this.configuration.getProperty(PREFIX + "defaultLocalCache", DEFAULT_LOCALCACHE_HINT);
     }
 }

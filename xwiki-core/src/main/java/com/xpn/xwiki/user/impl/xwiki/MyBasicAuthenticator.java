@@ -37,14 +37,14 @@ import com.xpn.xwiki.XWikiException;
 
 public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAuthenticator
 {
-    public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response)
-        throws Exception
+    @Override
+    public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
         return processLogin(request, response, null);
     }
 
-    public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response,
-        XWikiContext context) throws Exception
+    public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
+        throws Exception
     {
         Principal principal = checkLogin(request, response, context);
 
@@ -58,9 +58,8 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         return false;
     }
 
-    public boolean processLogin(String username, String password, String rememberme,
-        SecurityRequestWrapper request, HttpServletResponse response, XWikiContext context)
-        throws Exception
+    public boolean processLogin(String username, String password, String rememberme, SecurityRequestWrapper request,
+        HttpServletResponse response, XWikiContext context) throws Exception
     {
         Principal principal = authenticate(username, password, context);
         if (principal != null) {
@@ -81,8 +80,8 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         return context.getWiki().convertUsername(username, context);
     }
 
-    public static Principal checkLogin(SecurityRequestWrapper request,
-        HttpServletResponse response, XWikiContext context) throws Exception
+    public static Principal checkLogin(SecurityRequestWrapper request, HttpServletResponse response,
+        XWikiContext context) throws Exception
     {
         // Always verify authentication
         String authorizationHeader = request.getHeader("Authorization");
@@ -160,14 +159,13 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         }
     }
 
-    public static Principal authenticate(String username, String password, XWikiContext context)
-        throws XWikiException
+    public static Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
     {
         return context.getWiki().getAuthService().authenticate(username, password, context);
     }
 
-    public static void showLogin(HttpServletRequest request, HttpServletResponse response,
-        String realmName) throws IOException
+    public static void showLogin(HttpServletRequest request, HttpServletResponse response, String realmName)
+        throws IOException
     {
         // save this request
         SecurityFilter.saveRequestInformation(request);
@@ -175,8 +173,7 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         // determine the number of login attempts
         int loginAttempts;
         if (request.getSession().getAttribute(LOGIN_ATTEMPTS) != null) {
-            loginAttempts =
-                ((Integer) request.getSession().getAttribute(LOGIN_ATTEMPTS)).intValue();
+            loginAttempts = ((Integer) request.getSession().getAttribute(LOGIN_ATTEMPTS)).intValue();
             loginAttempts += 1;
         } else {
             loginAttempts = 1;
@@ -192,8 +189,8 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         }
     }
 
-    public void showLogin(HttpServletRequest request, HttpServletResponse response,
-        XWikiContext context) throws IOException
+    public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context)
+        throws IOException
     {
         showLogin(request, response, realmName);
     }

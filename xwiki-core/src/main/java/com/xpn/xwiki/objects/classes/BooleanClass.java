@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,7 +39,6 @@ import java.util.Map;
 
 public class BooleanClass extends PropertyClass
 {
-
     public BooleanClass(PropertyMetaClass wclass)
     {
         super("boolean", "Boolean", wclass);
@@ -90,6 +88,7 @@ public class BooleanClass extends PropertyClass
         return getIntValue("defaultValue", -1);
     }
 
+    @Override
     public BaseProperty fromString(String value)
     {
         BaseProperty property = newProperty();
@@ -100,6 +99,7 @@ public class BooleanClass extends PropertyClass
         return property;
     }
 
+    @Override
     public BaseProperty newProperty()
     {
         BaseProperty property = new IntegerProperty();
@@ -107,8 +107,8 @@ public class BooleanClass extends PropertyClass
         return property;
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         IntegerProperty prop = (IntegerProperty) object.safeget(name);
         if (prop == null)
@@ -121,8 +121,8 @@ public class BooleanClass extends PropertyClass
         }
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    @Override
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         String displayFormType = getDisplayFormType();
 
@@ -139,8 +139,8 @@ public class BooleanClass extends PropertyClass
         }
     }
 
-    public void displaySelectEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displaySelectEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         String String0 = getDisplayValue(context, 0);
@@ -151,9 +151,7 @@ public class BooleanClass extends PropertyClass
         option[] options;
 
         if (getDefaultValue() == -1) {
-            options =
-                new option[] {new option("---", ""), new option(String1, "1"),
-                new option(String0, "0")};
+            options = new option[] {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
             options[0].addElement("---");
             options[1].addElement(String1);
             options[2].addElement(String0);
@@ -192,8 +190,8 @@ public class BooleanClass extends PropertyClass
         buffer.append(select.toString());
     }
 
-    public void displayRadioEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayRadioEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         String StringNone = getDisplayValue(context, 2);
         String StringTrue = getDisplayValue(context, 1);
@@ -255,8 +253,8 @@ public class BooleanClass extends PropertyClass
         }
     }
 
-    public void displayCheckboxEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayCheckboxEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
@@ -305,8 +303,8 @@ public class BooleanClass extends PropertyClass
         }
     }
 
-    public String displaySearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    @Override
+    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         if (getDisplayType().equals("input")) {
             return super.displaySearch(name, prefix, criteria, context);
@@ -317,8 +315,7 @@ public class BooleanClass extends PropertyClass
         }
     }
 
-    public String displaySelectSearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    public String displaySelectSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         select select = new select(prefix + name, 1);
         select.setMultiple(true);
@@ -326,38 +323,34 @@ public class BooleanClass extends PropertyClass
         String String0 = getDisplayValue(context, 0);
         String String1 = getDisplayValue(context, 1);
 
-        option[] options =
-            {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
+        option[] options = {new option("---", ""), new option(String1, "1"), new option(String0, "0")};
         options[0].addElement("---");
         options[1].addElement(String1);
         options[2].addElement(String0);
 
         /*
-         * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) {
-         * Integer ivalue = (Integer)prop.getValue(); if (ivalue!=null) { int value =
-         * ivalue.intValue(); if (value==1) options[1].setSelected(true); else if (value==0)
-         * options[2].setSelected(true); } else { int value = getDefaultValue(); if (value==1)
-         * options[1].setSelected(true); else if (value==0) options[2].setSelected(true); } } }
-         * catch (Exception e) { // This should not happen e.printStackTrace(); }
+         * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) { Integer ivalue =
+         * (Integer)prop.getValue(); if (ivalue!=null) { int value = ivalue.intValue(); if (value==1)
+         * options[1].setSelected(true); else if (value==0) options[2].setSelected(true); } else { int value =
+         * getDefaultValue(); if (value==1) options[1].setSelected(true); else if (value==0)
+         * options[2].setSelected(true); } } } catch (Exception e) { // This should not happen e.printStackTrace(); }
          */
         select.addElement(options);
         return select.toString();
     }
 
-    public String displayCheckboxSearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    public String displayCheckboxSearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         org.apache.ecs.xhtml.input check = new input(input.checkbox, prefix + name, 1);
         org.apache.ecs.xhtml.input checkNo = new input(input.hidden, prefix + name, 0);
 
         /*
-         * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) {
-         * Integer ivalue = (Integer)prop.getValue(); if (ivalue!=null) { int value =
-         * ivalue.intValue(); if (value==1) check.setChecked(true); else if (value==0)
-         * check.setChecked(false); } else { int value = getDefaultValue(); if (value==1)
-         * check.setChecked(true); else check.setChecked(false); } }} catch (Exception e) { // This
-         * should not happen e.printStackTrace(); }
+         * try { IntegerProperty prop = (IntegerProperty) object.safeget(name); if (prop!=null) { Integer ivalue =
+         * (Integer)prop.getValue(); if (ivalue!=null) { int value = ivalue.intValue(); if (value==1)
+         * check.setChecked(true); else if (value==0) check.setChecked(false); } else { int value = getDefaultValue();
+         * if (value==1) check.setChecked(true); else check.setChecked(false); } }} catch (Exception e) { // This should
+         * not happen e.printStackTrace(); }
          */
         buffer.append(check.toString());
         buffer.append(checkNo.toString());

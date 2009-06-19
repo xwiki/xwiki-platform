@@ -49,7 +49,12 @@ public class RenderingTestSuite extends TestSuite
     public void addTestsFromResource(String testResourceName, boolean runTransformations) throws Exception
     {
         String resourceName = "/" + testResourceName + ".test";
-        Data data = readTestData(getClass().getResourceAsStream(resourceName), resourceName);
+        Data data;
+        try {
+            data = readTestData(getClass().getResourceAsStream(resourceName), resourceName);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to find load test data [" + testResourceName + "]");
+        }
 
         // Create a test case for each input and for each expectation so that each test is executed separately
         // and reported separately by the JUnit test runner.

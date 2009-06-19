@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -46,21 +47,6 @@
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
       <version>${gwt.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwt.version}</version>
-      <classifier>${platform}-libs</classifier>
-      <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-dev</artifactId>
-      <version>${gwt.version}</version>
-      <classifier>${platform}</classifier>
       <scope>provided</scope>
     </dependency>
     <!-- GWT libraries -->
@@ -135,53 +121,19 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Download and unpack the GWT libs -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unzip-gwt-libs</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.google.gwt</groupId>
-                  <artifactId>gwt-dev</artifactId>
-                  <version>${gwt.version}</version>
-                  <classifier>${platform}-libs</classifier>
-                  <type>zip</type>
-                  <overWrite>false</overWrite>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${settings.localRepository}/com/google/gwt/gwt-dev/${gwt.version}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.totsp.gwt</groupId>
-        <artifactId>maven-googlewebtoolkit2-plugin</artifactId>
-        <version>2.0-beta24</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>1.1</version>
         <configuration>
-          <compileTargets>
-            <value>com.xpn.xwiki.wysiwyg.Wysiwyg</value>
-          </compileTargets>
-          <runTarget>com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.html</runTarget>
-          <output>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg/gwt</output>
-          <logLevel>WARN</logLevel><!-- ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL -->
-          <style>${gwt.js.style}</style><!-- OBF[USCATED], PRETTY, DETAILED -->
-          <noServer>false</noServer>
+          <webappDirectory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg/gwt</webappDirectory>
+          <style>${gwt.js.style}</style>
           <!--
             In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
             value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.
             See http://code.google.com/support/bin/answer.py?hl=en&answer=71442
           -->
-          <extraJvmArgs>-Xmx1024m -Djava.awt.headless=true</extraJvmArgs>
-          <gwtVersion>${gwt.version}</gwtVersion>
+          <extraJvmArgs>-Xmx1024m -Xss1024k -Djava.awt.headless=true</extraJvmArgs>
         </configuration>
         <executions>
           <execution>
@@ -201,7 +153,7 @@
             We exclude the temporary files used during GWT compiling and the SmartClient JavaScript files which are
             provided by the web-standard war
           -->
-          <warSourceExcludes>**/.gwt-tmp/**,**/sc/**</warSourceExcludes>
+          <packagingExcludes>**/.gwt-tmp/**,**/sc/**</packagingExcludes>
         </configuration>
       </plugin>
       <plugin>

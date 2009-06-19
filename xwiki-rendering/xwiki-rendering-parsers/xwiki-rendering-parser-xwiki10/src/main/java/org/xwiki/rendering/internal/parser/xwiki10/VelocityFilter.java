@@ -22,8 +22,8 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.internal.parser.xwiki10.velocity.ExtendedVelocityParser;
@@ -43,7 +43,7 @@ import org.xwiki.velocity.internal.util.InvalidVelocityException;
  * @since 1.8M1
  */
 @Component("velocity")
-public class VelocityFilter extends AbstractFilter implements Initializable
+public class VelocityFilter extends AbstractFilter implements Composable, Initializable
 {
     public static final String VELOCITY_SUFFIX = "velocity";
 
@@ -92,7 +92,6 @@ public class VelocityFilter extends AbstractFilter implements Initializable
     /**
      * Used to lookup macros converters.
      */
-    @Requirement
     private ComponentManager componentManager;
 
     private ExtendedVelocityParser velocityParser;
@@ -107,6 +106,16 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         setPriority(20);
 
         this.velocityParser = new ExtendedVelocityParser(componentManager, getLogger());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
     }
 
     /**

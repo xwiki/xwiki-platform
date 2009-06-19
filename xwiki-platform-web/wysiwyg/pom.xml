@@ -163,9 +163,9 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>com.totsp.gwt</groupId>
-        <artifactId>maven-googlewebtoolkit2-plugin</artifactId>
-        <version>2.0-beta24</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>1.1</version>
         <configuration>
           <compileTargets>
             <value>com.xpn.xwiki.wysiwyg.Wysiwyg</value>

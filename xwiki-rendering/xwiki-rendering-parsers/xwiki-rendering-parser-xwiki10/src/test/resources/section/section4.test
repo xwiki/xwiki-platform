@@ -1,15 +1,20 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-1 header $var
-not in $var list item
+#if($doc.space != "Main")
+  #set($isSpaceDashboard = true)
+#end
+1.1 $msg.get("xe.dashboard.wiki")
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
-= header $var =
+#if($doc.space != "Main")
+  #set($isSpaceDashboard = true)
+#end
 
-not in $var list item
+
+== $msg.get("xe.dashboard.wiki") ==
 {{/html}}
 {{/velocity}}

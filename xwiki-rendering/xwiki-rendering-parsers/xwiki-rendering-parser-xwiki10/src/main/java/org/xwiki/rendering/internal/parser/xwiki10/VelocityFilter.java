@@ -45,40 +45,42 @@ import org.xwiki.velocity.internal.util.InvalidVelocityException;
 @Component("velocity")
 public class VelocityFilter extends AbstractFilter implements Composable, Initializable
 {
-    public static final String VELOCITY_SUFFIX = "velocity";
+    public static final String VELOCITY_SF = "velocity";
 
-    public static final String VELOCITYOPEN_SUFFIX = VELOCITY_SUFFIX + "open";
+    public static final String VELOCITYNOOUTPUT_SF = VELOCITY_SF + "nooutput";
 
-    public static final String VELOCITYCLOSE_SUFFIX = VELOCITY_SUFFIX + "close";
+    public static final String VELOCITYOPEN_SF = VELOCITY_SF + "open";
 
-    public static final String VELOCITYCOMMENT_SUFFIX =
-        VELOCITY_SUFFIX + ExtendedVelocityParserContext.VelocityType.COMMENT;
+    public static final String VELOCITYCLOSE_SF = VELOCITY_SF + "close";
+
+    public static final String VELOCITYCOMMENT_SF =
+        VELOCITYNOOUTPUT_SF + ExtendedVelocityParserContext.VelocityType.COMMENT;
 
     public static final String VELOCITY_SPATTERN =
-        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VELOCITY_SUFFIX + "\\p{L}*\\d+"
-            + FilterContext.XWIKI1020TOKEN_CP + ")";
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN_SF_SPATTERN + VELOCITY_SF
+            + "\\p{L}*\\d+" + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String VELOCITYOPEN_SPATTERN =
-        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VELOCITYOPEN_SUFFIX + "[\\d]+"
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENI_SF_SPATTERN + VELOCITYOPEN_SF + "\\d+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String VELOCITYCLOSE_SPATTERN =
-        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + VELOCITYCLOSE_SUFFIX + "[\\d]+"
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENI_SF_SPATTERN + VELOCITYCLOSE_SF + "\\d+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
+
+    public static final String VELOCITYNOOUTPUT_SPATTERN =
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN_SF_SPATTERN + VELOCITYNOOUTPUT_SF
+            + "\\p{L}*\\d+" + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String VELOCITYCONTENT_SPATTERN =
         "(?:" + VELOCITYOPEN_SPATTERN + ".*" + VELOCITYCLOSE_SPATTERN + ")";
 
-    public static final String VELOCITYCOMMENT_SPATTERN =
-        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + VELOCITYCOMMENT_SUFFIX + "[\\d]+"
-            + FilterContext.XWIKI1020TOKEN_CP + ")";
+    public static final String NLGROUP_SPATTERN = "(?:(?:\n|" + VELOCITYNOOUTPUT_SPATTERN + ")*)";
 
-    public static final String NLGROUP_SPATTERN = "(?:(?:\n|" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + ")*)";
-
-    public static final String SPACEGROUP_SPATTERN = "(?:(?:[ \\t]|" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + ")*)";
+    public static final String SPACEGROUP_SPATTERN = "(?:(?:[ \\t]|" + VELOCITYNOOUTPUT_SPATTERN + ")*)";
 
     public static final String EMPTY_OC_SPATTERN =
-        VELOCITYOPEN_SPATTERN + "?" + VELOCITYCOMMENT_SPATTERN + "*" + VELOCITYCLOSE_SPATTERN + "?";
+        VELOCITYOPEN_SPATTERN + "?" + VELOCITYNOOUTPUT_SPATTERN + "*" + VELOCITYCLOSE_SPATTERN + "?";
 
     public static final String SPACEGROUP_OC_SPATTERN =
         "[ \\t]*" + VELOCITYOPEN_SPATTERN + "?" + SPACEGROUP_SPATTERN + VELOCITYCLOSE_SPATTERN + "?" + "[ \\t]*";
@@ -177,7 +179,9 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
                 }
 
                 velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(velocityBlock
-                    .toString(), VELOCITY_SUFFIX + context.getType(), context.isInline()) : velocityBlock);
+                    .toString(), (velocityBlock.charAt(velocityBlock.length() - 1) == '\n' ? VELOCITYNOOUTPUT_SF
+                    : VELOCITY_SF)
+                    + context.getType(), context.isInline()) : velocityBlock);
             } else {
                 StringBuffer nonVelocityBuffer = inVelocityMacro ? afterVelocityBuffer : beforeVelocityBuffer;
 
@@ -204,7 +208,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
 
             // fix unclosed velocity blocks
             for (; context.getVelocityDepth() > 0; context.popVelocityDepth()) {
-                velocityBuffer.append(filterContext.addProtectedContent("#end"));
+                velocityBuffer.append(filterContext.addProtectedContent("#end\n", VELOCITYNOOUTPUT_SF, true));
             }
         }
 
@@ -236,12 +240,11 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     public static void appendVelocityOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
         result.append(filterContext.addProtectedContent("{{velocity filter=\"none\"}}" + (nl ? "\n" : ""),
-            VELOCITYOPEN_SUFFIX, true));
+            VELOCITYOPEN_SF, true));
     }
 
     public static void appendVelocityClose(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result
-            .append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/velocity}}", VELOCITYCLOSE_SUFFIX, true));
+        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/velocity}}", VELOCITYCLOSE_SF, true));
     }
 }

@@ -58,7 +58,7 @@ some text
 {{html clean="false" wiki="true"}}
 some text
 ## commented
-
+<p/>
 ### commented
 <table>
 <tr><td></td></tr>
@@ -70,15 +70,15 @@ some text
 
 #if ($var > 0)
 #end
-
-#*commented*#<p/>
+<p/>
+#*commented*#
 
 #*commented
 
 
 
 *# not commented
-
+<p/>
 #*commented
 
 

@@ -198,7 +198,7 @@ public class ExtendedVelocityParser extends VelocityParser
         VelocityParserContext context)
     {
         ((ExtendedVelocityParserContext) context).setVelocity(true);
-        ((ExtendedVelocityParserContext) context).setInline(false);
+        ((ExtendedVelocityParserContext) context).setInline(true);
 
         return super.getSimpleComment(array, currentIndex, velocityBlock, context);
     }
@@ -214,7 +214,7 @@ public class ExtendedVelocityParser extends VelocityParser
         VelocityParserContext context)
     {
         ((ExtendedVelocityParserContext) context).setVelocity(true);
-        ((ExtendedVelocityParserContext) context).setInline(false);
+        ((ExtendedVelocityParserContext) context).setInline(true);
 
         return super.getMultilinesComment(array, currentIndex, velocityBlock, context);
     }

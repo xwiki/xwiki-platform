@@ -73,13 +73,15 @@ public class VelocityFilter extends AbstractFilter implements Initializable
         "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + VELOCITYCOMMENT_SUFFIX + "[\\d]+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
-    public static final String EMPTY_SPATTERN =
-        VelocityFilter.VELOCITYOPEN_SPATTERN + "?" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*"
-            + VelocityFilter.VELOCITYCLOSE_SPATTERN + "?";
+    public static final String NLGROUP_SPATTERN = "(?:(?:\n|" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + ")*)";
 
-    public static final String EMPTYSPACE_SPATTERN =
-        "[ \\t]*" + VelocityFilter.VELOCITYOPEN_SPATTERN + "?(?:[ \\t]*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN
-            + "*)*" + VelocityFilter.VELOCITYCLOSE_SPATTERN + "?[ \\t]*";
+    public static final String SPACEGROUP_SPATTERN = "(?:(?:[ \\t]|" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + ")*)";
+
+    public static final String EMPTY_OC_SPATTERN =
+        VELOCITYOPEN_SPATTERN + "?" + VELOCITYCOMMENT_SPATTERN + "*" + VELOCITYCLOSE_SPATTERN + "?";
+
+    public static final String SPACEGROUP_OC_SPATTERN =
+        "[ \\t]*" + VELOCITYOPEN_SPATTERN + "?" + SPACEGROUP_SPATTERN + VELOCITYCLOSE_SPATTERN + "?" + "[ \\t]*";
 
     public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VELOCITYOPEN_SPATTERN);
 

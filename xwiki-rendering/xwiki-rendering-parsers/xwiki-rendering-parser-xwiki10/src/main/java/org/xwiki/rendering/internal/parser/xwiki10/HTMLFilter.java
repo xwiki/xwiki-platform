@@ -60,9 +60,9 @@ public class HTMLFilter extends AbstractFilter implements Initializable
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String EMPTYLINEVELOCITY_SPATTERN =
-        "((?:" + FilterContext.XWIKI1020TOKENIL_PATTERN + ")|[^" + FilterContext.XWIKI1020TOKEN_CP + "])\n((?:"
-            + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "?\n?)*)\n" + "(" + FilterContext.XWIKI1020TOKENIL_PATTERN
-            + "|[^" + FilterContext.XWIKI1020TOKEN_OP + "]|$)";
+        "((?:" + FilterContext.XWIKI1020TOKENIL_PATTERN + ")|[^" + FilterContext.XWIKI1020TOKEN_CP + "])\n("
+            + VelocityFilter.NLGROUP_SPATTERN + ")\n" + "(" + FilterContext.XWIKI1020TOKENIL_PATTERN + "|[^"
+            + FilterContext.XWIKI1020TOKEN_OP + "]|$)";
 
     public static final Pattern EMPTYLINEVELOCITY_PATTERN = Pattern.compile(EMPTYLINEVELOCITY_SPATTERN);
 

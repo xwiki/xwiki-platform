@@ -40,15 +40,14 @@ public final class CleanUtil
     private static final Pattern STARTING_NL_GROUP_PATTERN = Pattern.compile("^\\n*");
 
     private static final Pattern STARTING_NLCOMENT_GROUP_PATTERN =
-        Pattern.compile("^(?:\\n*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*)*");
+        Pattern.compile("^" + VelocityFilter.NLGROUP_SPATTERN);
 
     /**
      * Match all the last new lines.
      */
     private static final Pattern ENDING_NL_GROUP_PATTERN = Pattern.compile("\\n*$");
 
-    private static final Pattern ENDING_NLCOMENT_GROUP_PATTERN =
-        Pattern.compile("(?:\\n*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*)*$");
+    private static final Pattern ENDING_NLCOMENT_GROUP_PATTERN = Pattern.compile(VelocityFilter.NLGROUP_SPATTERN + "$");
 
     /**
      * Match space, tab or new line.

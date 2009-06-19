@@ -24,7 +24,6 @@ import java.io.StringReader;
 
 import org.w3c.dom.Document;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
-import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.internal.html.DefaultHTMLCleanerTest;
 
 /**
@@ -54,8 +53,8 @@ public class HTMLUtilsTest extends AbstractXWikiComponentTestCase
         Document document =
             cleaner.clean(new StringReader("<html><head><body><p>test1</p><p>test2</p></body></html>"));
         HTMLUtils.stripHTMLEnvelope(document);
-        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", XMLUtils
-            .toString(document));
+        assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><p>test1</p><p>test2</p></html>\n", 
+            HTMLUtils.toString(document));
     }
     
     public void testStripTopLevelParagraph() throws Exception
@@ -63,6 +62,6 @@ public class HTMLUtilsTest extends AbstractXWikiComponentTestCase
         Document document = cleaner.clean(new StringReader("<html><head /><body><p>test</p></body></html>"));
         HTMLUtils.stripFirstElementInside(document, "body", "p");
         assertEquals(DefaultHTMLCleanerTest.HEADER + "<html><head></head><body>test</body></html>\n", 
-            XMLUtils.toString(document));
+            HTMLUtils.toString(document));
     }
 }

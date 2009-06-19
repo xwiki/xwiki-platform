@@ -28,8 +28,8 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.html.HTMLUtils;
 
 /**
  * Parses HTML and generate a {@link XDOM} object.
@@ -70,6 +70,6 @@ public class WikiModelHTMLParser extends WikiModelXHTMLParser
     @Override
     public XDOM parse(Reader source) throws ParseException
     {
-        return super.parse(new StringReader(XMLUtils.toString(this.htmlCleaner.clean(source))));
+        return super.parse(new StringReader(HTMLUtils.toString(this.htmlCleaner.clean(source))));
     }
 }

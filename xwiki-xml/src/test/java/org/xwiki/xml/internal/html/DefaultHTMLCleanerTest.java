@@ -24,11 +24,10 @@ import java.io.StringReader;
 import java.util.Collections;
 
 import org.xwiki.test.AbstractXWikiComponentTestCase;
-import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.HTMLUtils;
 import org.xwiki.xml.html.filter.HTMLFilter;
-
 
 /**
  * Unit tests for {@link org.xwiki.xml.internal.html.DefaultHTMLCleaner}.
@@ -54,6 +53,15 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         cleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "default");
     }
 
+    public void testElementExpansion()
+    {
+        assertHTML("<p><textarea></textarea></p>", "<textarea/>");
+
+        // Verify exceptions (by default elements are expanded).
+        assertHTML("<p><br/></p>", "<p><br></p>");
+        assertHTML("<hr/>", "<hr>");
+    }
+
     public void testSpecialCharacters()
     {
         // TODO: We still have a problem I think in that if there are characters such as "&" or quote in the source
@@ -65,13 +73,13 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
         assertHTML("<p><img src=\"http://host.com/a.gif?a=foo&amp;b=bar\"></img></p>", "<img src=\"http://host.com/a.gif?a=foo&b=bar\" />");
         assertHTML("<p>&#xA;</p>", "<p>&#xA;</p>");
         
-        // Verify that double quotes are escaped in attibute values
+        // Verify that double quotes are escaped in attribute values
         assertHTML("<p value=\"script:&quot;&quot;\"></p>", "<p value='script:\"\"'");
 }
 
     public void testCloseUnbalancedTags()
     {
-        assertHTML("<hr></hr><p>hello</p>", "<hr><p>hello");
+        assertHTML("<hr/><p>hello</p>", "<hr><p>hello");
     }
 
     public void testConversionsFromHTML()
@@ -90,7 +98,7 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
 
     public void testConvertImplicitParagraphs()
     {
-        assertHTML("<p>word1</p><p>word2</p><p>word3</p><hr></hr><p>word4</p>", "word1<p>word2</p>word3<hr />word4");
+        assertHTML("<p>word1</p><p>word2</p><p>word3</p><hr/><p>word4</p>", "word1<p>word2</p>word3<hr />word4");
         
         // Don't convert when there are only spaces or new lines
         assertHTML("<p>word1</p>  \n  <p>word2</p>", "<p>word1</p>  \n  <p>word2</p>");
@@ -161,7 +169,7 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
     {
         HTMLCleanerConfiguration configuration = this.cleaner.getDefaultConfiguration();
         configuration.setFilters(Collections.<HTMLFilter>emptyList());
-        String result = XMLUtils.toString(this.cleaner.clean(new StringReader("something"), configuration));
+        String result = HTMLUtils.toString(this.cleaner.clean(new StringReader("something"), configuration));
         // Note that if the default Body filter had been executed the result would have been:
         // <p>something</p>.
         assertEquals(HEADER_FULL + "something" + FOOTER, result);
@@ -169,6 +177,6 @@ public class DefaultHTMLCleanerTest extends AbstractXWikiComponentTestCase
     
     private void assertHTML(String expected, String actual)
     {
-        assertEquals(HEADER_FULL + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(new StringReader(actual))));
+        assertEquals(HEADER_FULL + expected + FOOTER, HTMLUtils.toString(this.cleaner.clean(new StringReader(actual))));
     }
 }

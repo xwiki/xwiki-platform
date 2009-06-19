@@ -38,8 +38,8 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
 public class UnescapeFilter extends AbstractFilter implements Initializable
 {
     public static final Pattern ESCAPE_SPATTERN =
-        Pattern.compile(FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + EscapeFilter.ESCAPE_SUFFIX
-            + "([\\d]+)" + FilterContext.XWIKI1020TOKEN_CP);
+        Pattern.compile(FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENI_SF_SPATTERN
+            + EscapeFilter.ESCAPE_SUFFIX + "(\\d+)" + FilterContext.XWIKI1020TOKEN_CP);
 
     /**
      * {@inheritDoc}

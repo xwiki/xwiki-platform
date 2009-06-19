@@ -69,7 +69,7 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
             before += matcher.group(1);
 
             if (currentIndex > 0) {
-                // In 1.0 section consume all following new lines
+                // 1.0 syntax section consume all following new lines
                 before = CleanUtil.removeLeadingNewLines(before);
                 before = "\n\n" + before;
             }
@@ -81,39 +81,24 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
             String headerSyntax =
                 filterContext.addProtectedContent(StringUtils.repeat("=", (matcher.group(2).length() + 1) / 2));
 
-            String headerContent = matcher.group(4);
+            String headerContent = headerSyntax + ' ' + matcher.group(4) + ' ' + headerSyntax;
 
-            // remove velocity macro marker from header content
-            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(headerContent);
-            boolean velocityOpen = velocityOpenMatcher.find();
-            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(headerContent);
-            boolean velocityClose = velocityCloseMatcher.find();
-
-            if (velocityOpen != velocityClose) {
-                headerContent = velocityOpenMatcher.replaceFirst("");
-                headerContent = velocityCloseMatcher.replaceFirst("");
-            } else {
-                velocityOpen = velocityClose = false;
-            }
-
-            if (velocityOpen) {
-                result.append(velocityOpenMatcher.group(0));
-            }
-
-            result.append(headerSyntax + ' ');
-            result.append(headerContent);
-            result.append(' ' + headerSyntax);
-
-            if (velocityClose) {
-                result.append(velocityCloseMatcher.group(0));
-            }
+            result.append(CleanUtil.extractVelocity(headerContent, filterContext));
         }
 
         if (currentIndex == 0) {
             return content;
         }
 
-        result.append(content.substring(currentIndex));
+        String end = content.substring(currentIndex);
+
+        if (currentIndex > 0) {
+            // 1.0 syntax section consume all following new lines
+            end = CleanUtil.removeLeadingNewLines(end);
+            end = "\n\n" + end;
+        }
+
+        result.append(end);
 
         return result.toString();
     }

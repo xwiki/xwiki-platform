@@ -45,13 +45,17 @@ public class FilterContext
 
     public static final String XWIKI1020TOKEN_CP = Pattern.quote(XWIKI1020TOKEN_C);
 
-    public static final String XWIKI1020TOKEN_INLINE = "inline";
+    private static final String XWIKI1020TOKEN_SF = "XWIKI1020TOKEN";
 
-    public static final String XWIKI1020TOKEN = "XWIKI1020TOKEN";
+    private static final String XWIKI1020TOKENS_SF = XWIKI1020TOKEN_SF + "S";
 
-    public static final String XWIKI1020TOKENNI = XWIKI1020TOKEN + "NI";
+    private static final String XWIKI1020TOKENI_SF = XWIKI1020TOKEN_SF + "I";
 
-    public static final String XWIKI1020TOKENIL = XWIKI1020TOKEN + "IL";
+    public static final String XWIKI1020TOKEN_SF_SPATTERN = "(?:" + XWIKI1020TOKEN_SF + "[IS])";
+
+    public static final String XWIKI1020TOKENS_SF_SPATTERN = "(?:" + XWIKI1020TOKEN_SF + "S)";
+
+    public static final String XWIKI1020TOKENI_SF_SPATTERN = "(?:" + XWIKI1020TOKEN_SF + "I)";
 
     /**
      * Match registered inline content identifier.
@@ -60,8 +64,8 @@ public class FilterContext
      * <li>$2: the index</li>
      * </ul>
      */
-    public static final Pattern XWIKI1020TOKENIL_PATTERN =
-        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENIL + "(\\p{Alpha}*)([\\d]+)"
+    public static final Pattern XWIKI1020TOKENI_PATTERN =
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENI_SF_SPATTERN + "(\\p{Alpha}*)(\\d+)"
             + XWIKI1020TOKEN_CP);
 
     /**
@@ -71,8 +75,8 @@ public class FilterContext
      * <li>$2: the index</li>
      * </ul>
      */
-    public static final Pattern XWIKI1020TOKENNI_PATTERN =
-        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + "(\\p{Alpha}*)([\\d]+)"
+    public static final Pattern XWIKI1020TOKENS_PATTERN =
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENS_SF_SPATTERN + "(\\p{Alpha}*)(\\d+)"
             + XWIKI1020TOKEN_CP);
 
     /**
@@ -83,7 +87,7 @@ public class FilterContext
      * </ul>
      */
     public static final Pattern XWIKI1020TOKEN_PATTERN =
-        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN + "(?:IL|NI)" + "(\\p{Alpha}*)([\\d]+)"
+        Pattern.compile(XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN_SF_SPATTERN + "(\\p{Alpha}*)(\\d+)"
             + XWIKI1020TOKEN_CP);
 
     private List<String> protectedContentList = new LinkedList<String>();
@@ -124,7 +128,7 @@ public class FilterContext
         StringBuffer str = new StringBuffer();
 
         str.append(XWIKI1020TOKEN_O);
-        str.append(inline ? XWIKI1020TOKENIL : XWIKI1020TOKENNI);
+        str.append(inline ? XWIKI1020TOKENI_SF : XWIKI1020TOKENS_SF);
         str.append(suffix);
         str.append(this.protectedContentList.size() - 1);
         str.append(XWIKI1020TOKEN_C);

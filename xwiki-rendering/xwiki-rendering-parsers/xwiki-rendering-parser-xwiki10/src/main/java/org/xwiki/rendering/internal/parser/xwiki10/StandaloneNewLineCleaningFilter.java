@@ -60,7 +60,7 @@ public class StandaloneNewLineCleaningFilter extends AbstractFilter implements I
     {
         StringBuffer result = new StringBuffer();
 
-        Matcher matcher = FilterContext.XWIKI1020TOKENNI_PATTERN.matcher(content);
+        Matcher matcher = FilterContext.XWIKI1020TOKENS_PATTERN.matcher(content);
         int current = 0;
         for (; matcher.find(); current = matcher.end()) {
             String before = content.substring(current, matcher.start());

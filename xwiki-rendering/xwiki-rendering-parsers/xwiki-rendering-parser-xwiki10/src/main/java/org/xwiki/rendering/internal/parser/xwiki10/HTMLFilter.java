@@ -52,16 +52,16 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     public static final String HTMLCLOSE_SUFFIX = "htmlclose";
 
     public static final String HTMLOPEN_SPATTERN =
-        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLOPEN_SUFFIX + "[\\d]+"
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENS_SF_SPATTERN + HTMLOPEN_SUFFIX + "\\d+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String HTMLCLOSE_SPATTERN =
-        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + HTMLCLOSE_SUFFIX + "[\\d]+"
+        "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENS_SF_SPATTERN + HTMLCLOSE_SUFFIX + "\\d+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
     public static final String EMPTYLINEVELOCITY_SPATTERN =
-        "((?:" + FilterContext.XWIKI1020TOKENIL_PATTERN + ")|[^" + FilterContext.XWIKI1020TOKEN_CP + "])\n("
-            + VelocityFilter.NLGROUP_SPATTERN + ")\n" + "(" + FilterContext.XWIKI1020TOKENIL_PATTERN + "|[^"
+        "((?:" + FilterContext.XWIKI1020TOKENI_PATTERN + ")|[^" + FilterContext.XWIKI1020TOKEN_CP + "])\n("
+            + VelocityFilter.NLGROUP_SPATTERN + ")\n" + "(" + FilterContext.XWIKI1020TOKENI_PATTERN + "|[^"
             + FilterContext.XWIKI1020TOKEN_OP + "]|$)";
 
     public static final Pattern EMPTYLINEVELOCITY_PATTERN = Pattern.compile(EMPTYLINEVELOCITY_SPATTERN);

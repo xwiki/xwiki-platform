@@ -44,26 +44,26 @@ some text
 {{html clean="false" wiki="true"}}
 some text
 ## commented
-
+<p/>
 ### commented
 <p/>
 <br/>## commented ## commented
 
 #* commented *#
-
-#*commented*#<p/>
+<p/>
+#*commented*#
 
 #*commented
 
 &nbsp;
 
 *# not commented
-
+<p/>
 #*commented
 
 
 
-\\\*#<p/>
+\\\*#
 
 ## standalone comment
 

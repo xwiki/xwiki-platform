@@ -39,7 +39,7 @@ public final class CleanUtil
      */
     private static final Pattern STARTING_NL_GROUP_PATTERN = Pattern.compile("^\\n*");
 
-    private static final Pattern STARTING_NLCOMENT_GROUP_PATTERN =
+    private static final Pattern STARTING_NLNOOUTPUT_GROUP_PATTERN =
         Pattern.compile("^" + VelocityFilter.NLGROUP_SPATTERN);
 
     /**
@@ -47,7 +47,8 @@ public final class CleanUtil
      */
     private static final Pattern ENDING_NL_GROUP_PATTERN = Pattern.compile("\\n*$");
 
-    private static final Pattern ENDING_NLCOMENT_GROUP_PATTERN = Pattern.compile(VelocityFilter.NLGROUP_SPATTERN + "$");
+    private static final Pattern ENDING_NLNOOUTPUT_GROUP_PATTERN =
+        Pattern.compile(VelocityFilter.NLGROUP_SPATTERN + "$");
 
     /**
      * Match space, tab or new line.
@@ -141,7 +142,7 @@ public final class CleanUtil
     {
         String cleanedContent = content;
 
-        Matcher matcher = STARTING_NLCOMENT_GROUP_PATTERN.matcher(content);
+        Matcher matcher = STARTING_NLNOOUTPUT_GROUP_PATTERN.matcher(content);
 
         int foundNb = matcher.find() ? StringUtils.countMatches(matcher.group(0), "\n") : 0;
 
@@ -163,7 +164,7 @@ public final class CleanUtil
     {
         String cleanedContent = content;
 
-        Matcher matcher = ENDING_NLCOMENT_GROUP_PATTERN.matcher(content);
+        Matcher matcher = ENDING_NLNOOUTPUT_GROUP_PATTERN.matcher(content);
 
         int foundNb = matcher.find() ? StringUtils.countMatches(matcher.group(0), "\n") : 0;
 
@@ -182,7 +183,7 @@ public final class CleanUtil
      */
     public static void setTrailingNewLines(StringBuffer content, int nb)
     {
-        Matcher matcher = ENDING_NLCOMENT_GROUP_PATTERN.matcher(content);
+        Matcher matcher = ENDING_NLNOOUTPUT_GROUP_PATTERN.matcher(content);
 
         int foundNb = matcher.find() ? StringUtils.countMatches(matcher.group(0), "\n") : 0;
 

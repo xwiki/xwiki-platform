@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Document;
-import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.xml.html.HTMLUtils;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
 import com.xpn.xwiki.web.Utils;
@@ -64,6 +64,6 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         config.setFilters(filters);
 
         Document document = cleaner.clean(new StringReader(dirtyHTML), config);
-        return XMLUtils.toString(document);
+        return HTMLUtils.toString(document);
     }
 }

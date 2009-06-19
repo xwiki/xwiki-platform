@@ -38,7 +38,8 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 public class SectionSyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern SECTIONSYNTAX_PATTERN =
-        Pattern.compile("^(" + VelocityFilter.EMPTYSPACE_SPATTERN + ")?(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
+        Pattern.compile("^(" + VelocityFilter.SPACEGROUP_OC_SPATTERN + ")?(1(\\.1){0,5}+)[ \\t]++(.++)$",
+            Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}

@@ -22,8 +22,8 @@ package org.xwiki.rendering.internal.parser.xwiki10;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.internal.parser.xwiki10.velocity.ExtendedVelocityParser;
@@ -43,7 +43,7 @@ import org.xwiki.velocity.internal.util.InvalidVelocityException;
  * @since 1.8M1
  */
 @Component("velocity")
-public class VelocityFilter extends AbstractFilter implements Composable, Initializable
+public class VelocityFilter extends AbstractFilter implements Initializable
 {
     public static final String VELOCITY_SUFFIX = "velocity";
 
@@ -73,13 +73,15 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKENNI + VELOCITYCOMMENT_SUFFIX + "[\\d]+"
             + FilterContext.XWIKI1020TOKEN_CP + ")";
 
-    public static final String EMPTY_SPATTERN =
-        VelocityFilter.VELOCITYOPEN_SPATTERN + "?" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + "*"
-            + VelocityFilter.VELOCITYCLOSE_SPATTERN + "?";
+    public static final String NLGROUP_SPATTERN = "(?:(?:\n|" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + ")*)";
 
-    public static final String EMPTYSPACE_SPATTERN =
-        "[ \\t]*" + VelocityFilter.VELOCITYOPEN_SPATTERN + "?(?:[ \\t]*" + VelocityFilter.VELOCITYCOMMENT_SPATTERN
-            + "*)*" + VelocityFilter.VELOCITYCLOSE_SPATTERN + "?[ \\t]*";
+    public static final String SPACEGROUP_SPATTERN = "(?:(?:[ \\t]|" + VelocityFilter.VELOCITYCOMMENT_SPATTERN + ")*)";
+
+    public static final String EMPTY_OC_SPATTERN =
+        VELOCITYOPEN_SPATTERN + "?" + VELOCITYCOMMENT_SPATTERN + "*" + VELOCITYCLOSE_SPATTERN + "?";
+
+    public static final String SPACEGROUP_OC_SPATTERN =
+        "[ \\t]*" + VELOCITYOPEN_SPATTERN + "?" + SPACEGROUP_SPATTERN + VELOCITYCLOSE_SPATTERN + "?" + "[ \\t]*";
 
     public static final Pattern VELOCITYOPEN_PATTERN = Pattern.compile(VELOCITYOPEN_SPATTERN);
 
@@ -90,6 +92,7 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
     /**
      * Used to lookup macros converters.
      */
+    @Requirement
     private ComponentManager componentManager;
 
     private ExtendedVelocityParser velocityParser;
@@ -104,16 +107,6 @@ public class VelocityFilter extends AbstractFilter implements Composable, Initia
         setPriority(20);
 
         this.velocityParser = new ExtendedVelocityParser(componentManager, getLogger());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
     }
 
     /**

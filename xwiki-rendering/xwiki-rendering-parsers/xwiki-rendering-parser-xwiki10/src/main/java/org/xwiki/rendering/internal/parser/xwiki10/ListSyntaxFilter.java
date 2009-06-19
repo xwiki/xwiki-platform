@@ -39,12 +39,12 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 public class ListSyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern LISTYNTAX_PATTERN =
-        Pattern.compile("(^" + VelocityFilter.EMPTYSPACE_SPATTERN
-            + "?([-#*]++|[-#*iIaA1ghHkKj]++\\.)[\\p{Blank}]++[^\r\n]++([ \t]*+[\r\n]++)*+)++", Pattern.MULTILINE);
+        Pattern.compile("(?:^" + VelocityFilter.SPACEGROUP_OC_SPATTERN
+            + "([-#*]++|[-#*iIaA1ghHkKj]++\\.)[\\p{Blank}]++[^\r\n]++([ \t]*+[\r\n]++)*+)++", Pattern.MULTILINE);
 
     private static final Pattern LISTITEMSYNTAX_PATTERN =
-        Pattern.compile("^(" + VelocityFilter.EMPTYSPACE_SPATTERN
-            + ")?([-#*]++|[-#*iIaA1ghHkKj]++\\.)([\\p{Blank}]++[^\r\n]++)([ \t]*+[\r\n]++)*+", Pattern.MULTILINE);
+        Pattern.compile("^(" + VelocityFilter.SPACEGROUP_OC_SPATTERN
+            + ")([-#*]++|[-#*iIaA1ghHkKj]++\\.)([\\p{Blank}]++[^\r\n]++)([ \t]*+[\r\n]++)*+", Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}

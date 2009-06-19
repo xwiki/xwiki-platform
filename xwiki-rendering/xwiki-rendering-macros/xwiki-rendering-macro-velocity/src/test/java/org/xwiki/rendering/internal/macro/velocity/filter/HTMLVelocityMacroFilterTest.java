@@ -119,4 +119,10 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("#somemacro() ", "#somemacro()\n");
         assertFilter("#somemacro() #set()\n", "#somemacro()\n#set()\n");
     }
+
+    public void testFilterWithMSNL()
+    {
+        assertFilter("#set()\n", "#set()\r\n");
+        assertFilter("#set()\n", "#set()\r");
+    }
 }

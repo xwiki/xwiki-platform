@@ -49,14 +49,29 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
     private static final String BINDING_NEWLINE = "nl";
 
     /**
+     * The value of the $nl binding.
+     */
+    private static final String NEWLINE = "\n";
+
+    /**
      * The name of the space binding.
      */
     private static final String BINDING_SPACE = "sp";
 
     /**
+     * The value of the $sp binding.
+     */
+    private static final String SPACE = " ";
+
+    /**
      * A white spaces group.
      */
     private static final Pattern WHITESPACES_PATTERN = Pattern.compile("\\s+", Pattern.MULTILINE);
+
+    /**
+     * Match not UNIX new lines to replace them.
+     */
+    private static final Pattern MSNEWLINE_PATTERN = Pattern.compile("\\r\\n|\\r");
 
     /**
      * Used to parser content to clean and match system directives and $nl variables.
@@ -82,8 +97,8 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
     public String before(String content, VelocityContext velocityContext)
     {
         // Add bindings
-        velocityContext.put(BINDING_NEWLINE, "\n");
-        velocityContext.put(BINDING_SPACE, " ");
+        velocityContext.put(BINDING_NEWLINE, NEWLINE);
+        velocityContext.put(BINDING_SPACE, SPACE);
 
         return clean(content);
     }
@@ -96,7 +111,7 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
     {
         StringBuffer contentBuffer = new StringBuffer();
 
-        char[] array = content.toCharArray();
+        char[] array = MSNEWLINE_PATTERN.matcher(content).replaceAll(NEWLINE).toCharArray();
 
         VelocityParserContext context = new VelocityParserContext();
 

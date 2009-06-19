@@ -70,9 +70,6 @@ public class RenderingTests extends TestCase
         // Velocity Macros
         suite.addTestsFromResource("macros/velocity/include1", false);
         suite.addTestsFromResource("macros/velocity/toc1", false);
-        suite.addTestsFromResource("macros/velocity/info1", false);
-        suite.addTestsFromResource("macros/velocity/warning1", false);
-        suite.addTestsFromResource("macros/velocity/error1", false);
 
         // Radeox Macros
         suite.addTestsFromResource("macros/radeox/attach1", false);

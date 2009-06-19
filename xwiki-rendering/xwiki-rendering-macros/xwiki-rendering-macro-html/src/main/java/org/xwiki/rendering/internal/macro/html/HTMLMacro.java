@@ -55,7 +55,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLConstants;
 import org.xwiki.xml.html.HTMLUtils;
@@ -236,7 +235,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters> implements Com
         }
 
         // Don't print the XML declaration nor the XHTML DocType.
-        cleanedContent = XMLUtils.toString(document, true, true);
+        cleanedContent = HTMLUtils.toString(document, true, true);
 
         // Don't print the top level html element (which is always present and at the same location
         // since it's been normalized by the HTML cleaner)

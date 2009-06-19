@@ -67,7 +67,6 @@ import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
@@ -157,7 +156,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
                 importerFilter.filter(targetWikiDocument, xhtmlDoc);
                 HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
-                XDOM xdom = xHtmlParser.parse(new StringReader(XMLUtils.toString(xhtmlDoc)));
+                XDOM xdom = xHtmlParser.parse(new StringReader(HTMLUtils.toString(xhtmlDoc)));
                 importerFilter.filter(targetWikiDocument, xdom, false);
                 if (!isSplitRequest(params)) {
                     saveDocument(targetWikiDocument, extractTitle(xdom), importerFilter.filter(targetWikiDocument,
@@ -200,7 +199,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 configuration.setParameters(params);
                 Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
                 HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
-                return XMLUtils.toString(xhtmlDoc);
+                return HTMLUtils.toString(xhtmlDoc);
             }
         } catch (Exception ex) {
             throw new OfficeImporterException(ex.getMessage(), ex);

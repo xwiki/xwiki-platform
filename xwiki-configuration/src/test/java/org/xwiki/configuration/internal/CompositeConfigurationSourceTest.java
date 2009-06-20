@@ -121,11 +121,9 @@ public class CompositeConfigurationSourceTest
     public void testGetKeys()
     {
         config1.setProperty("key1", "value1");
-        config1.setProperty("key3", "value3");
         config2.setProperty("key2", "value2");
-        config2.setProperty("key3", "value3");
 
-        List<String> expected = Arrays.asList("key1", "key3", "key2");
+        List<String> expected = Arrays.asList("key1", "key2");
         Assert.assertEquals(expected, composite.getKeys());
     }
     

@@ -21,7 +21,7 @@ package org.xwiki.configuration.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -130,7 +130,8 @@ public class CompositeConfigurationSource implements ConfigurationSource
      */
     public List<String> getKeys()
     {
-        Set<String> keys = new HashSet<String>();
+        // We use a linked hash set in order to keep the keys in the order in which they were defined in the sources.
+        Set<String> keys = new LinkedHashSet<String>();
         for (ConfigurationSource source : this.sources) {
             keys.addAll(source.getKeys());
         }

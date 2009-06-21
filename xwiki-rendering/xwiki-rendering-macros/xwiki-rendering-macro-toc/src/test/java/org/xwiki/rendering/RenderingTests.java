@@ -46,6 +46,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrotoc7", true);
         suite.addTestsFromResource("macrotoc8", true);
         suite.addTestsFromResource("macrotoc9", true);
+        suite.addTestsFromResource("macrotoc10", true);
 
         return new ComponentManagerTestSetup(suite);
     }

@@ -308,6 +308,23 @@ public abstract class AbstractBlock implements Block
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.block.Block#getParentBlockByType(java.lang.Class)
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends Block> T getParentBlockByType(Class<T> blockClass)
+    {
+        Block parent = getParent();
+
+        if (parent == null || blockClass.isAssignableFrom(parent.getClass())) {
+            return (T) parent;
+        }
+
+        return parent.getParentBlockByType(blockClass);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see EqualsBuilder#reflectionEquals(Object, Object)
      */
     @Override

@@ -148,6 +148,16 @@ public interface Block extends Cloneable
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
 
     /**
+     * Look forward to find a block which inherit or is provided type.
+     * 
+     * @param <T> the class of the Blocks to return
+     * @param blockClass the block class to look for
+     * @return the found block, null if nothing is found
+     * @since 1.9.1
+     */
+    <T extends Block> T getParentBlockByType(Class<T> blockClass);
+
+    /**
      * Return a copy of the block with filtered children.
      * 
      * @param blockFilter the Block filter.

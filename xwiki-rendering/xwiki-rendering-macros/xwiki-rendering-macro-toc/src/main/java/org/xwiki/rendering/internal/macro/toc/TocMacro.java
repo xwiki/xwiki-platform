@@ -78,7 +78,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
         super(new DefaultMacroDescriptor(DESCRIPTION, null, TocMacroParameters.class));
 
         registerConverter(new EnumConverter(Scope.class), Scope.class);
-        
+
         // Make sure this macro is executed as one of the last macros to be executed since
         // other macros can generate headers which need to be taken into account by the TOC
         // macro.
@@ -135,10 +135,20 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
 
         // Get the root block from scope parameter
 
+        int start = parameters.getStart();
+        int depth = parameters.getDepth();
+
         Block root;
 
         if (parameters.getScope() == Scope.LOCAL) {
             root = context.getCurrentMacroBlock().getParent();
+            if (!parameters.isStartSet()) {
+                SectionBlock rootSection = context.getCurrentMacroBlock().getParentBlockByType(SectionBlock.class);
+                HeaderBlock header = rootSection.getHeaderBlock();
+                if (header != null) {
+                    start = header.getLevel().getAsInt() + 1;
+                }
+            }
         } else {
             root = context.getXDOM();
         }
@@ -157,7 +167,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
         }
 
         // Construct table of content from sections list
-        Block tocBlock = generateTree(headers, parameters.getStart(), parameters.getDepth(), parameters.isNumbered());
+        Block tocBlock = generateTree(headers, start, depth, parameters.isNumbered());
         if (tocBlock != null) {
             result = Arrays.asList(tocBlock);
         } else {

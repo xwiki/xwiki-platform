@@ -52,6 +52,11 @@ public class TocMacroParameters
     private int start = 2;
 
     /**
+     * Indicate if the start has been set or if it has the default value.
+     */
+    private boolean startSet;
+
+    /**
      * The maximum section level. For example if 3 then all section levels from 4 will not be listed.
      */
     private int depth = 6;
@@ -79,6 +84,7 @@ public class TocMacroParameters
         }
 
         this.start = start;
+        this.startSet = true;
     }
 
     /**
@@ -87,6 +93,14 @@ public class TocMacroParameters
     public int getStart()
     {
         return this.start;
+    }
+
+    /**
+     * @return indicate if the start has been set or if it has the default value.
+     */
+    public boolean isStartSet()
+    {
+        return this.startSet;
     }
 
     /**

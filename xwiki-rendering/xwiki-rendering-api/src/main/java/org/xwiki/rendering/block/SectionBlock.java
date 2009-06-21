@@ -66,4 +66,23 @@ public class SectionBlock extends AbstractFatherBlock
     {
         listener.endSection(getParameters());
     }
+
+    /**
+     * @return the title block of the section.
+     */
+    public HeaderBlock getHeaderBlock()
+    {
+        HeaderBlock headerBlock = null;
+
+        List<Block> children = getChildren();
+
+        if (children.size() > 0) {
+            Block firstChild = children.get(0);
+            if (firstChild instanceof HeaderBlock) {
+                headerBlock = (HeaderBlock) firstChild;
+            }
+        }
+
+        return headerBlock;
+    }
 }

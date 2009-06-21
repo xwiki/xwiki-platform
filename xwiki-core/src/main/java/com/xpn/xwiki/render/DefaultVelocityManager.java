@@ -85,7 +85,9 @@ public class DefaultVelocityManager implements VelocityManager
 
             // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
             // which is for internal use only. In this manner we control what the user can access.
+            // "context" binding is deprecated since 1.9.1
             vcontext.put("context", new Context(xcontext));
+            vcontext.put("xcontext", new Context(xcontext));
 
             // Make the Syntax Factory component available from Velocity.
             // TODO: We need to decide how we want to expose components in general and how to protect users from

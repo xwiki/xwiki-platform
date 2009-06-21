@@ -155,7 +155,7 @@
 #set ($WSTEPID_SUMMARY = 5)  ## Summary be fore create
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
-#set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").externalURL)
+#set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiOrDatabaseAvailableService").URL)
 #set ($MSG_ERROR_WIKIALREADYEXISTS = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.wikialreadyexists')&lt;/div&gt;")
 #set ($MSG_WARNING_DATABASEALREADYEXISTS = "&lt;div class=\"warningmessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('warning'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/div&gt;")
 #set ($MSG_ERROR_DATABASEALREADYEXISTS = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.databasealreadyexists')&lt;/div&gt;")

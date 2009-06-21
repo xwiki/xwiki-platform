@@ -68,7 +68,8 @@ public class XWikiScriptContextInitializer implements ScriptContextInitializer
 
             // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
             // which is for internal use only. In this manner we control what the user can access.
-            scriptContext.setAttribute("context", new Context(xcontext), ScriptContext.ENGINE_SCOPE);
+            // We use "xcontext" because "context" is a reserved binding in JSR-223 specifications
+            scriptContext.setAttribute("xcontext", new Context(xcontext), ScriptContext.ENGINE_SCOPE);
 
             // Make the Syntax Factory component available from Script.
             // TODO: We need to decide how we want to expose components in general and how to protect users from

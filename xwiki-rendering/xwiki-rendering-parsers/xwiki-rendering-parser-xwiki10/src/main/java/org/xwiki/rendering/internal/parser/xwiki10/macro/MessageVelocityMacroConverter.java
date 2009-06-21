@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.internal.parser.xwiki10.VelocityFilter;
 import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractVelocityMacroConverter;
@@ -41,6 +42,11 @@ public class MessageVelocityMacroConverter extends AbstractVelocityMacroConverte
     protected String convertContent(List<String> parameters, FilterContext context)
     {
         String content = cleanQuotes(parameters.get(0));
+
+        content = this.velocityFilter.filter(content, context);
+
+        content = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(content).replaceFirst("");
+        content = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(content).replaceFirst("");
 
         return this.velocityFilter.filter(content, context);
     }

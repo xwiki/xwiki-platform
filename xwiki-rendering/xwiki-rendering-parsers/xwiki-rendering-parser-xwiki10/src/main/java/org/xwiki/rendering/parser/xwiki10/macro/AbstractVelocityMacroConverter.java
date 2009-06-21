@@ -115,25 +115,27 @@ public abstract class AbstractVelocityMacroConverter implements VelocityMacroCon
     {
         StringBuffer begin = new StringBuffer();
         String content = convertContent(parameters, context);
-        StringBuffer end = new StringBuffer();
+        Map<String, String> params = convertParameters(parameters);
 
         begin.append("{{");
         begin.append(convertName(name));
-        if (parameters.size() > 0) {
+        if (params.size() > 0) {
             begin.append(' ');
-            appendParameters(begin, convertParameters(parameters));
+            appendParameters(begin, params);
         }
 
         StringBuffer result = new StringBuffer();
 
         if (content != null) {
             begin.append("}}");
+            result.append(!protectResult() ? context.addProtectedContent(begin.toString(), isInline()) : begin);
+
+            result.append(content);
+
+            StringBuffer end = new StringBuffer();
             end.append("{{/");
             end.append(convertName(name));
             end.append("}}");
-
-            result.append(!protectResult() ? context.addProtectedContent(begin.toString(), isInline()) : begin);
-            result.append(content);
             result.append(!protectResult() ? context.addProtectedContent(end.toString(), isInline()) : end);
         } else {
             begin.append("/");

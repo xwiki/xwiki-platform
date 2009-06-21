@@ -85,6 +85,8 @@ public class ExtendedVelocityParser extends VelocityParser
                 if (i < array.length && array[i] == '(') {
                     // Skip condition
                     i = getMethodParameters(array, i, directiveBuffer, context);
+                } else {
+                    throw new InvalidVelocityException();
                 }
             }
 
@@ -99,24 +101,24 @@ public class ExtendedVelocityParser extends VelocityParser
                 directiveBuffer.append(array[i]);
             }
 
-            if (i < array.length) {
-                if (array[i] == '(') {
-                    ((ExtendedVelocityParserContext) context).setInline(true);
+            if (i < array.length && array[i] == '(') {
+                ((ExtendedVelocityParserContext) context).setInline(true);
 
-                    List<String> parameters = new ArrayList<String>();
-                    // Get condition
-                    i = getMacroParameters(array, i, directiveBuffer, parameters, econtext);
-                    String convertedMacro = convertMacro(directiveName, parameters, econtext);
+                List<String> parameters = new ArrayList<String>();
+                // Get condition
+                i = getMacroParameters(array, i, directiveBuffer, parameters, econtext);
+                String convertedMacro = convertMacro(directiveName, parameters, econtext);
 
-                    if (convertedMacro != null) {
-                        // Apply conversion
-                        directiveBuffer.setLength(0);
-                        directiveBuffer.append(convertedMacro);
-                    } else {
-                        econtext.setVelocity(true);
-                        context.setType(ExtendedVelocityParserContext.VelocityType.DIRECTIVE);
-                    }
+                if (convertedMacro != null) {
+                    // Apply conversion
+                    directiveBuffer.setLength(0);
+                    directiveBuffer.append(convertedMacro);
+                } else {
+                    econtext.setVelocity(true);
+                    context.setType(ExtendedVelocityParserContext.VelocityType.DIRECTIVE);
                 }
+            } else {
+                throw new InvalidVelocityException();
             }
         }
 

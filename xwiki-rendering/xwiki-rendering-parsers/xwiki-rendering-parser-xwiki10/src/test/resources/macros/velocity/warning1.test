@@ -9,6 +9,8 @@
 message")
 
 #warning("#toc(2 6 false)")
+
+#warning("$var")
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -19,3 +21,5 @@ message")
 {{warning}}multilines message{{/warning}}
 
 {{warning}}{{toc start=2 depth=6 numbered=false/}}{{/warning}}
+
+{{velocity filter="none"}}{{html clean="false" wiki="true"}}{{warning}}$var{{/warning}}{{/html}}{{/velocity}}

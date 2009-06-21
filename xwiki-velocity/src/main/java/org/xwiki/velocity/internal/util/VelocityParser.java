@@ -540,7 +540,7 @@ public class VelocityParser extends AbstractLogEnabled
     public int getParameters(char[] array, int currentIndex, StringBuffer velocityBlock, char endingChar,
         VelocityParserContext context)
     {
-        char beginChar = array[0];
+        char beginChar = array[currentIndex];
 
         int i = currentIndex + 1;
 

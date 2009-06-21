@@ -133,9 +133,11 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                 try {
                     StringBuffer htmlBlock = new StringBuffer();
 
+                    int start = i;
                     i = getHTMLBlock(array, i, null, htmlBlock, context);
 
                     StringBuffer buffer;
+                    String str;
                     if (context.isHTML()) {
                         if (!inHTMLMacro) {
                             inHTMLMacro = true;
@@ -145,8 +147,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                         }
 
                         buffer = htmlBuffer;
+                        str = context.cleanContent(new String(array, start, i - start));
                     } else {
                         buffer = nonHtmlbuffer;
+                        str = htmlBlock.toString();
                     }
 
                     if (context.isVelocityOpen()) {
@@ -161,7 +165,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
                         }
                     }
 
-                    buffer.append(htmlBlock);
+                    buffer.append(str);
 
                     if (context.isVelocityClose()) {
                         VelocityFilter.appendVelocityClose(buffer, filterContext, false);
@@ -315,7 +319,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
         int i = currentIndex + 4;
 
-        for (; i < array.length && (array[i - 1] == '>' || array[i - 2] != '-' || array[i - 2] != '-'); ++i) {
+        for (; i < array.length && (array[i - 1] != '>' || array[i - 2] != '-' || array[i - 3] != '-'); ++i) {
         }
 
         commentBlock.append(array, currentIndex, i - currentIndex);
@@ -348,11 +352,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
         // Get content
         StringBuffer elementContent = null;
-        StringBuffer endElement = new StringBuffer();
         if (context.peekType() == HTMLType.BEGIN) {
             elementContent = new StringBuffer();
             context.pushType();
-            i = getElementContent(array, i, elementName, elementContent, endElement, context);
+            i = getElementContent(array, i, elementName, elementContent, null, context);
             context.popType();
         }
 
@@ -365,12 +368,6 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         if (convertedElement != null) {
             element.append(convertedElement);
         } else {
-            element.append(context.cleanContent(beginElement.toString()));
-            if (elementContent != null) {
-                element.append(elementContent);
-                element.append(context.cleanContent(endElement.toString()));
-            }
-
             context.setHTML(true);
         }
 
@@ -427,7 +424,9 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
 
                     if (context.peekType() == HTMLType.END
                         && (currentElement.equals(elementName) || currentElement.startsWith(elementName))) {
-                        endElement.append(htmlBlock);
+                        if (endElement != null) {
+                            endElement.append(htmlBlock);
+                        }
                         break;
                     }
 
@@ -754,17 +753,14 @@ public class HTMLFilter extends AbstractFilter implements Initializable, Composa
         public String cleanContent(String content)
         {
             String cleanedContent = content;
-            if (!isVelocityOpen()) {
-                Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(content);
-                setVelocityOpen(isVelocityOpen() | velocityOpenMatcher.find());
-                cleanedContent = velocityOpenMatcher.replaceFirst("");
-            }
 
-            if (!isVelocityClose()) {
-                Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedContent);
-                setVelocityClose(isVelocityClose() | velocityCloseMatcher.find());
-                cleanedContent = velocityCloseMatcher.replaceFirst("");
-            }
+            Matcher velocityOpenMatcher = VelocityFilter.VELOCITYOPEN_PATTERN.matcher(content);
+            setVelocityOpen(isVelocityOpen() | velocityOpenMatcher.find());
+            cleanedContent = velocityOpenMatcher.replaceFirst("");
+
+            Matcher velocityCloseMatcher = VelocityFilter.VELOCITYCLOSE_PATTERN.matcher(cleanedContent);
+            setVelocityClose(isVelocityClose() | velocityCloseMatcher.find());
+            cleanedContent = velocityCloseMatcher.replaceFirst("");
 
             return cleanedContent;
         }

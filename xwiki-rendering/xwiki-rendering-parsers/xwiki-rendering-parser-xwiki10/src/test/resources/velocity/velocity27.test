@@ -1,18 +1,8 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-<div param="1">
-content
-<toto/>
-some non html text
-</div>
+#notvelocity
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-{{html clean="false" wiki="true"}}
-<div param="1">
-content
-<toto/>
-some non html text
-</div>
-{{/html}}
+#notvelocity

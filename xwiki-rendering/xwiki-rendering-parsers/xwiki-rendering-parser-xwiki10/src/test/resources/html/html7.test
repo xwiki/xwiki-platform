@@ -5,8 +5,7 @@
 some non html text
 .#-----------------------------------------------------
 .expect|xwiki/2.0
-.#-----------------------------------------------------
 {{html clean="false" wiki="true"}}
-<toto>(% param="1" %)content
-some non html text(%%)
+<toto><span param="1">content
+some non html text
 {{/html}}

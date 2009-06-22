@@ -730,7 +730,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     {
         // Directly inject the HTML content in the wiki printer (bypassing the XHTML printer)
         if ((syntax.getType() == SyntaxType.XHTML) || (syntax.getType() == SyntaxType.HTML)) {
-            getPrinter().print(text);
+            getXHTMLWikiPrinter().printRaw(text);
         }
     }
 }

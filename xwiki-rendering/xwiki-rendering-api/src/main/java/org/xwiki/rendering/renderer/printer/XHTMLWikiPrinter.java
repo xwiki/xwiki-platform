@@ -220,6 +220,18 @@ public class XHTMLWikiPrinter extends XMLWikiPrinter
         this.spaceCount++;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.XMLWikiPrinter#printRaw(java.lang.String)
+     */
+    @Override
+    public void printRaw(String raw)
+    {
+        handleSpaceWhenStartElement();
+        super.printRaw(raw);
+    }
+
     private void handleSpaceWhenInText()
     {
         if (this.elementEnded || this.hasTextBeenPrinted) {

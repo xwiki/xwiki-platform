@@ -52,6 +52,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrohtml13", true);
         suite.addTestsFromResource("macrohtml14", true);
         suite.addTestsFromResource("macrohtml15", true);
+        suite.addTestsFromResource("macrohtml16", true);
 
         return new ComponentManagerTestSetup(suite);
     }

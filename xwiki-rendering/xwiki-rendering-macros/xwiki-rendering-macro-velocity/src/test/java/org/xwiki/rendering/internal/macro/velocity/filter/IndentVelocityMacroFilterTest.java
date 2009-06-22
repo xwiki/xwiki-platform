@@ -59,5 +59,6 @@ public class IndentVelocityMacroFilterTest extends TestCase
         assertFilter("", " ");
         assertFilter("\n", "  \n  ");
         assertFilter("", " \t");
+        assertFilter("#if (true)\nsome text\n#end", "#if (true)\n  some text\n#end");
     }
 }

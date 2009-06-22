@@ -64,11 +64,6 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
     private static final String SPACE = " ";
 
     /**
-     * A white spaces group.
-     */
-    private static final Pattern WHITESPACES_PATTERN = Pattern.compile("\\s+", Pattern.MULTILINE);
-
-    /**
      * Match not UNIX new lines to replace them.
      */
     private static final Pattern MSNEWLINE_PATTERN = Pattern.compile("\\r\\n|\\r");
@@ -104,6 +99,18 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
     }
 
     /**
+     * Clean whites spaces in the velocity macro content.
+     * <p>
+     * Here a the rules:
+     * <ul>
+     * <li>any group of white spaces is replaced by a space</li>
+     * <li>all white spaces after a velocity directive consuming following newline (#if, #set, etc.) are removed (no
+     * replacement)</li>
+     * <li>all white spaces before or after $nl are removed (no replacement)</li>
+     * <li>all white spaces at the beginning and at the end of the content are removed (no replacement)</li>
+     * <li>all velocity comments are removed</li>
+     * </ul>
+     * 
      * @param content the content to clean
      * @return the cleaned content
      */
@@ -114,154 +121,131 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
         char[] array = MSNEWLINE_PATTERN.matcher(content).replaceAll(NEWLINE).toCharArray();
 
         VelocityParserContext context = new VelocityParserContext();
+        FilterContext filterContext = new FilterContext();
 
         int i = 0;
-        int beginIndex = 0;
         while (i < array.length) {
-            if (array[i] == '#') {
-                try {
-                    int endIndex = i;
-
-                    i = this.velocityParser.getKeyWord(array, i, null, context);
-
-                    if (array[i - 1] == '\n') {
-                        // append before velocity
-                        contentBuffer.append(cleanText(contentBuffer, new String(array, beginIndex, endIndex
-                            - beginIndex), context.getType() == VelocityType.DIRECTIVE));
-
-                        // append velocity
-                        contentBuffer.append(array, endIndex, i - endIndex);
-
-                        beginIndex = i;
-                    }
+            try {
+                if (array[i] == '#') {
+                    i = cleanKeyWord(contentBuffer, array, i, context, filterContext);
 
                     continue;
-                } catch (InvalidVelocityException e) {
-                    getLogger().debug("Not a valid velocity keyword at char [" + i + "]", e);
+                } else if (array[i] == '$') {
+                    i = cleanVar(contentBuffer, array, i, context, filterContext);
+
+                    continue;
+                } else if (Character.isWhitespace(array[i])) {
+                    if (!filterContext.removeWhiteSpaces && contentBuffer.length() > 0) {
+                        filterContext.foundWhiteSpace = true;
+                    }
+
+                    ++i;
+
+                    continue;
                 }
+            } catch (InvalidVelocityException e) {
+                getLogger().debug("Not a valid velocity keyword at char [" + i + "]", e);
             }
+
+            flushWhiteSpaces(contentBuffer, filterContext, false);
+
+            contentBuffer.append(array[i]);
 
             ++i;
         }
 
-        contentBuffer.append(cleanText(contentBuffer, new String(array, beginIndex, i - beginIndex),
-            context.getType() == VelocityType.DIRECTIVE));
+        flushWhiteSpaces(contentBuffer, filterContext, true);
 
         return contentBuffer.toString();
     }
 
     /**
-     * Clean between Velocity directives.
+     * Handle velocity comments and directive.
      * 
-     * @param buffer the previous buffer
-     * @param content the content to clean
-     * @param indented indicate if the indentation white space has to be remove
-     * @return the cleaned text
+     * @param contentBuffer the final result buffer
+     * @param array the source
+     * @param currentIndex the current index in the source
+     * @param context the velocity parser context
+     * @param filterContext the filter context
+     * @return the index after the comment or directive
+     * @throws InvalidVelocityException not velocity
      */
-    private String cleanText(StringBuffer buffer, String content, boolean indented)
+    private int cleanKeyWord(StringBuffer contentBuffer, char[] array, int currentIndex, VelocityParserContext context,
+        FilterContext filterContext) throws InvalidVelocityException
     {
-        // clean groups of white spaces
-        String cleanedContent = cleanWhiteSpaces(content);
+        int i = this.velocityParser.getKeyWord(array, currentIndex, null, context);
 
-        // remove first white spaces when it's before a velocity directive consuming newline (for nice
-        // indentation)
-        if (cleanedContent.length() > 0 && cleanedContent.charAt(0) == ' ' && indented
-            && buffer.charAt(buffer.length() - 1) == '\n') {
-            cleanedContent = cleanedContent.substring(1);
-        }
-
-        return cleanedContent;
-    }
-
-    /**
-     * Clean white spaces groups and around $nl variable.
-     * 
-     * @param content the content to clean
-     * @return the cleaned content
-     */
-    public String cleanWhiteSpaces(String content)
-    {
-        StringBuffer contentBuffer = new StringBuffer();
-
-        char[] array = content.toCharArray();
-
-        VelocityParserContext context = new VelocityParserContext();
-
-        int i = 0;
-        int beginIndex = 0;
-        while (i < array.length) {
-            if (array[i] == '$') {
-                try {
-                    int endIndex = i;
-
-                    StringBuffer varName = new StringBuffer();
-                    i = this.velocityParser.getVar(array, i, varName, null, context);
-
-                    if (varName.toString().equals(BINDING_NEWLINE)) {
-                        beginIndex += getLeadingNewLines(array, endIndex - 1, beginIndex);
-                        // append before velocity
-                        contentBuffer.append(WHITESPACES_PATTERN.matcher(
-                            new String(array, beginIndex, endIndex - beginIndex
-                                - getTrailingWhiteSpaces(array, beginIndex, endIndex - 1))).replaceAll(" "));
-
-                        // append velocity
-                        contentBuffer.append("${" + BINDING_NEWLINE + "}");
-
-                        beginIndex = i;
-                    }
-
-                    continue;
-                } catch (InvalidVelocityException e) {
-                    getLogger().debug("Not a valid velocity variable at char [" + i + "]", e);
+        if (context.getType() != VelocityType.COMMENT) {
+            if (array[i - 1] == '\n') {
+                if (filterContext.wsGroup.length() == 0) {
+                    flushWhiteSpaces(contentBuffer, filterContext, false);
                 }
+
+                filterContext.wsGroup.append(array, currentIndex, i - currentIndex);
+
+                filterContext.removeWhiteSpaces = true;
+            } else {
+                flushWhiteSpaces(contentBuffer, filterContext, false);
+
+                contentBuffer.append(array, currentIndex, i - currentIndex);
             }
-
-            ++i;
         }
 
-        if (contentBuffer.length() > 0) {
-            beginIndex += getLeadingNewLines(array, i - 1, beginIndex);
-        }
-
-        contentBuffer
-            .append(WHITESPACES_PATTERN.matcher(new String(array, beginIndex, i - beginIndex)).replaceAll(" "));
-
-        return contentBuffer.toString();
-
+        return i;
     }
 
     /**
-     * @param array the source to parse
-     * @param endIndex the end index of the source to parse
-     * @param currentIndex the current index in the <code>array</code>
-     * @return the number of leading new lines
+     * Handle velocity variables.
+     * 
+     * @param contentBuffer the final result buffer
+     * @param array the source
+     * @param currentIndex the current index in the source
+     * @param context the velocity parser context
+     * @param filterContext the filter context
+     * @return the index after the variable
+     * @throws InvalidVelocityException not velocity
      */
-    private int getLeadingNewLines(char[] array, int endIndex, int currentIndex)
+    private int cleanVar(StringBuffer contentBuffer, char[] array, int currentIndex, VelocityParserContext context,
+        FilterContext filterContext) throws InvalidVelocityException
     {
-        int beginIndex = currentIndex;
+        StringBuffer varName = new StringBuffer();
+        int i = this.velocityParser.getVar(array, currentIndex, varName, null, context);
 
-        while (beginIndex <= endIndex && Character.isWhitespace(array[beginIndex])) {
-            ++beginIndex;
+        if (varName.toString().equals(BINDING_NEWLINE)) {
+            flushWhiteSpaces(contentBuffer, filterContext, true);
+
+            contentBuffer.append("${nl}");
+            filterContext.removeWhiteSpaces = true;
+        } else {
+            flushWhiteSpaces(contentBuffer, filterContext, false);
+
+            contentBuffer.append(array, currentIndex, i - currentIndex);
         }
 
-        return beginIndex - currentIndex;
+        return i;
     }
 
     /**
-     * @param array the source to parse
-     * @param beginIndex the begin index of the source to parse
-     * @param currentIndex the current index in the <code>array</code>
-     * @return the number of trailing white spaces
+     * Flush stored velocity directive which does not produce output (like #if, set, etc.). I also append a space if
+     * there was a space in the group source. This is not make sure the whole no output velocity content is taken into
+     * account when cleaning white spaces to be sure to have only one space at the end between two really generated
+     * text.
+     * 
+     * @param contentBuffer the final result buffer
+     * @param filterContext the filter context
+     * @param forceNoSpace if true no space is printed (only {@link FilterContext#wsGroup})
      */
-    private int getTrailingWhiteSpaces(char[] array, int beginIndex, int currentIndex)
+    private void flushWhiteSpaces(StringBuffer contentBuffer, FilterContext filterContext, boolean forceNoSpace)
     {
-        int endIndex = currentIndex;
+        contentBuffer.append(filterContext.wsGroup);
+        filterContext.wsGroup.setLength(0);
 
-        while (endIndex >= beginIndex && Character.isWhitespace(array[endIndex])) {
-            --endIndex;
+        if (filterContext.foundWhiteSpace && !forceNoSpace) {
+            contentBuffer.append(' ');
         }
 
-        return currentIndex - endIndex;
+        filterContext.foundWhiteSpace = false;
+        filterContext.removeWhiteSpaces = false;
     }
 
     /**
@@ -276,5 +260,69 @@ public class HTMLVelocityMacroFilter extends AbstractLogEnabled implements Veloc
         velocityContect.remove(BINDING_SPACE);
 
         return content;
+    }
+
+    /**
+     * Used to return store and retrieve some information during the filtering process.
+     * 
+     * @version $Id$
+     */
+    static class FilterContext
+    {
+        /**
+         * Indicate if at least one white space has been found.
+         */
+        private boolean foundWhiteSpace;
+
+        /**
+         * Indicate if whites space has to be removed instead of replaced by a unique space.
+         */
+        private boolean removeWhiteSpaces;
+
+        /**
+         * @see #getWsGroup()
+         */
+        private StringBuffer wsGroup = new StringBuffer();
+
+        /**
+         * @return Indicate if at least one white space has been found.
+         */
+        public boolean isFoundWhiteSpace()
+        {
+            return this.foundWhiteSpace;
+        }
+
+        /**
+         * @param foundWhiteSpace Indicate if at least one white space has been found.
+         */
+        public void setFoundWhiteSpace(boolean foundWhiteSpace)
+        {
+            this.foundWhiteSpace = foundWhiteSpace;
+        }
+
+        /**
+         * @return Indicate if whites space has to be removed instead of replaced by a unique space.
+         */
+        public boolean isRemoveWhiteSpaces()
+        {
+            return this.removeWhiteSpaces;
+        }
+
+        /**
+         * @param removeWhiteSpaces Indicate if whites space has to be removed instead of replaced by a unique space.
+         */
+        public void setRemoveWhiteSpaces(boolean removeWhiteSpaces)
+        {
+            this.removeWhiteSpaces = removeWhiteSpaces;
+        }
+
+        /**
+         * @return Used to store velocity directive chish does not generate output until something else is found. It's
+         *         used to match a whole group of white space including no output velocity code.
+         */
+        public StringBuffer getWsGroup()
+        {
+            return this.wsGroup;
+        }
     }
 }

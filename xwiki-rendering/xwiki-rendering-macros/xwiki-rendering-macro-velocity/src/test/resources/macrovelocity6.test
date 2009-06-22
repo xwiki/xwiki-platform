@@ -49,7 +49,6 @@ onWord [more]
 onSpace
 onWord [readable]
 onSpecialSymbol [.]
-onSpace
 endParagraph
 endMacroMarkerStandalone [velocity] [] [
 some text
@@ -70,4 +69,4 @@ some text
       and the end of the sentence indented to be more readable.
     #end
   #end
---><p>some text and the end of the sentence indented to be more readable.&nbsp;</p><!--stopmacro-->
+--><p>some text and the end of the sentence indented to be more readable.</p><!--stopmacro-->

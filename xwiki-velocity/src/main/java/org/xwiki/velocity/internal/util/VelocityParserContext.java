@@ -39,9 +39,14 @@ public class VelocityParserContext
         COMMENT,
 
         /**
-         * A Velocity directive (anything starting with a # except comments).
+         * A Velocity directive (except macros).
          */
         DIRECTIVE,
+
+        /**
+         * A Velocity macro.
+         */
+        MACRO,
 
         /**
          * Anything starting with a $.

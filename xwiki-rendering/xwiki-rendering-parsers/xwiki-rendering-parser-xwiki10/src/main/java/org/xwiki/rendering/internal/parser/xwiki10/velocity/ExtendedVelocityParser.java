@@ -115,7 +115,7 @@ public class ExtendedVelocityParser extends VelocityParser
                     directiveBuffer.append(convertedMacro);
                 } else {
                     econtext.setVelocity(true);
-                    context.setType(ExtendedVelocityParserContext.VelocityType.DIRECTIVE);
+                    context.setType(ExtendedVelocityParserContext.VelocityType.MACRO);
                 }
             } else {
                 throw new InvalidVelocityException();

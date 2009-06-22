@@ -180,10 +180,9 @@ public class XMLWikiPrinter
     }
 
     /**
-     * Print a XML comment. Note that the content that you pass must be valid XML comment, ie not have 
-     * <code>--</code> characters (or <code>-</code> if it's the last character). 
-     * If you're not sure what the comment content will be use
-     * {@link #printXMLComment(String, boolean)} instead, passing true for the second parameter.
+     * Print a XML comment. Note that the content that you pass must be valid XML comment, ie not have <code>--</code>
+     * characters (or <code>-</code> if it's the last character). If you're not sure what the comment content will be
+     * use {@link #printXMLComment(String, boolean)} instead, passing true for the second parameter.
      * 
      * @param content the comment content
      */
@@ -239,6 +238,21 @@ public class XMLWikiPrinter
     {
         try {
             this.xmlWriter.write(new DefaultEntity(entity, entity));
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+    }
+
+    /**
+     * Print some text without escaping anything, it's supposed to be XML or at least contains only valid characters in
+     * XML text node.
+     * 
+     * @param row the content
+     */
+    public void printRaw(String row)
+    {
+        try {
+            this.wikiWriter.write(row);
         } catch (Exception e) {
             // TODO: handle exception
         }

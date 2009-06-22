@@ -157,13 +157,15 @@ public class VelocityParser extends AbstractLogEnabled
         if (VELOCITYDIRECTIVE_ALL.contains(directiveNameBuffer.toString())) {
             // consume the end of the line
             i = getDirectiveEndOfLine(array, i, null, context);
+
+            context.setType(VelocityParserContext.VelocityType.DIRECTIVE);
+        } else {
+            context.setType(VelocityParserContext.VelocityType.MACRO);
         }
 
         if (velocityBlock != null) {
             velocityBlock.append(array, currentIndex, i - currentIndex);
         }
-
-        context.setType(VelocityParserContext.VelocityType.DIRECTIVE);
 
         return i;
     }

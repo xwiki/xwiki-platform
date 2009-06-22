@@ -20,7 +20,6 @@ beginMacroMarkerStandalone [velocity] [] [
 ]
 beginParagraph
 onWord [text]
-onSpace
 endParagraph
 endMacroMarkerStandalone [velocity] [] [
 ## some comment
@@ -37,4 +36,4 @@ endDocument
 #if (true)
   text
 #end
---><p>text&nbsp;</p><!--stopmacro-->
+--><p>text</p><!--stopmacro-->

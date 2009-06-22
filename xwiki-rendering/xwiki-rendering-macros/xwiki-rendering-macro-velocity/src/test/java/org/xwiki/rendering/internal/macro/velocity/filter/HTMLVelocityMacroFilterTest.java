@@ -123,12 +123,15 @@ public class HTMLVelocityMacroFilterTest extends TestCase
 
         assertFilter("#set()\nT", "#set()\n\n \tT");
         assertFilter("T #set()\nT", "T #set()\n\n \tT");
+        
+        assertFilter("#if()\ntext#end", "#if()\ntext\n#end");
     }
 
     public void testFilterDirectiveMacro()
     {
         assertFilter("#somemacro() T", "#somemacro()\nT");
-        assertFilter("#somemacro() #set()\n", "#somemacro()\n#set()\n");
+        assertFilter("#somemacro() #set()\nT", "#somemacro()\n#set()\nT");
+        assertFilter("#somemacro()#set()\n", "#somemacro()\n#set()\n");
     }
 
     public void testFilterWithMSNL()

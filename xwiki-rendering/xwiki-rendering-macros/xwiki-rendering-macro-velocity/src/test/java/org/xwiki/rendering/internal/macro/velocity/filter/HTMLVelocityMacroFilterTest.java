@@ -57,38 +57,41 @@ public class HTMLVelocityMacroFilterTest extends TestCase
 
     public void testFilter()
     {
-        assertFilter(" ", " ");
-        assertFilter(" ", "  ");
-        assertFilter(" ", "\n");
-        assertFilter(" ", "\n\n");
-        assertFilter(" ", "\t");
-        assertFilter(" ", "\t\t");
-        assertFilter(" ", " \n\t");
+        assertFilter("T T", "T T");
+        assertFilter("T T", "T  T");
+        assertFilter("T T", "T\nT");
+        assertFilter("T T", "T\n\nT");
+        assertFilter("T T", "T\tT");
+        assertFilter("T T", "T\t\tT");
+        assertFilter("T T", "T \n\tT");
+
+        assertFilter("T", "T  ");
+        assertFilter("T", "  T");
     }
 
     public void testFilterSP()
     {
-        assertFilter("$sp", "$sp");
-        assertFilter(" $sp", "  $sp");
-        assertFilter("$sp ", "$sp  ");
-        assertFilter(" $sp ", "  $sp  ");
+        assertFilter("T$spT", "T$spT");
+        assertFilter("T $spT", "T  $spT");
+        assertFilter("T$sp T", "T$sp  T");
+        assertFilter("T $sp T", "T  $sp  T");
     }
 
     public void testFilterNL()
     {
         assertFilter("${nl}", "$nl");
-        assertFilter("${nl}", "  $nl");
-        assertFilter("${nl}", "$nl  ");
-        assertFilter("${nl}", "  $nl  ");
-        assertFilter("${nl}", "\n$nl");
-        assertFilter("${nl}", "$nl\n\n");
-        assertFilter("${nl}", "\n\n$nl\n\n");
-        assertFilter("${nl}", "\n \n $nl \n \n");
+        assertFilter("T${nl}", "T  $nl");
+        assertFilter("${nl}T", "$nl  T");
+        assertFilter("T${nl}T", "T  $nl  T");
+        assertFilter("T${nl}", "T\n$nl");
+        assertFilter("${nl}T", "$nl\n\nT");
+        assertFilter("T${nl}T", "T\n\n$nl\n\nT");
+        assertFilter("T${nl}T", "T\n \n $nl \n \nT");
 
-        assertFilter(" \\$nl", "\n\\$nl");
-        assertFilter("\\$nl ", "\\$nl\n\n");
-        assertFilter(" \\$nl ", "\n\n\\$nl\n\n");
-        assertFilter(" \\$nl ", "\n \n \\$nl \n \n");
+        assertFilter("T \\$nl", "T\n\\$nl");
+        assertFilter("\\$nl T", "\\$nl\n\nT");
+        assertFilter("T \\$nl T", "T\n\n\\$nl\n\nT");
+        assertFilter("T \\$nl T", "T\n \n \\$nl \n \nT");
     }
 
     public void testFilterIndent()
@@ -100,10 +103,15 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("#if (true)\n#if (true)\ntext#end#end", "#if (true)\n  #if (true)\n    text#end#end");
     }
 
+    public void testFilterComment()
+    {
+        assertFilter("", "##comment\n#*comment*#");
+    }
+
     public void testFilterDirective()
     {
-        assertFilter("##comment\n#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro() ",
-            "##comment\n#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro()\n");
+        assertFilter("#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro() T",
+            "##comment\n#set()\n#if()\n#foreach()\n#end\n#elseif()\n#else\n#macro()\n#somemacro()\nT");
     }
 
     public void testFilterDirectiveSet()
@@ -112,11 +120,14 @@ public class HTMLVelocityMacroFilterTest extends TestCase
         assertFilter("#set() ", "#set() ");
         assertFilter("#set()\n", "#set()\n \n ");
         assertFilter("#set(\n)\n", "#set(\n)\n");
+
+        assertFilter("#set()\nT", "#set()\n\n \tT");
+        assertFilter("T #set()\nT", "T #set()\n\n \tT");
     }
 
     public void testFilterDirectiveMacro()
     {
-        assertFilter("#somemacro() ", "#somemacro()\n");
+        assertFilter("#somemacro() T", "#somemacro()\nT");
         assertFilter("#somemacro() #set()\n", "#somemacro()\n#set()\n");
     }
 

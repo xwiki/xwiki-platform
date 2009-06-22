@@ -1,0 +1,8 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{testchart type="line"}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:testchart|-|type="line"|-|--><!--startwikilink:http://localhost/charts/chart.png--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><!--startimage:http://localhost/charts/chart.png--><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding"/><!--stopimage--></a></span><!--stopwikilink--><!--stopmacro-->

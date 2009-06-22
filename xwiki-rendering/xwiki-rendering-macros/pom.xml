@@ -96,6 +96,7 @@
     <module>xwiki-rendering-macro-rss</module>
     <module>xwiki-rendering-macro-useravatar</module>
     <module>xwiki-rendering-macro-message</module>
+    <module>xwiki-rendering-macro-chart</module>
   </modules>
 </project>
        

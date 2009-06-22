@@ -1,0 +1,167 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.rendering.internal.macro.chart;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.chart.ChartGenerator;
+import org.xwiki.chart.ChartGeneratorException;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ImageBlock;
+import org.xwiki.rendering.block.LinkBlock;
+import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
+import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.chart.ChartDataSource;
+import org.xwiki.rendering.macro.chart.ChartMacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+
+/**
+ * A macro for rendering charts.
+ * 
+ * @version $Id: $
+ * @since 2.0M1
+ */
+
+@Component("chart")
+public class ChartMacro extends AbstractMacro<ChartMacroParameters>
+{
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Displays a chart generated from miscelaneous data sources.";
+
+    /**
+     * Used for building the actual chart.
+     */
+    @Requirement
+    protected ChartGenerator chartGenerator;
+
+    /**
+     * Used for getting web URLs from specific filenames.
+     */
+    @Requirement
+    protected DocumentAccessBridge documentAccessBridge;
+
+    /**
+     * The component manager needed for instantiating the datasource factory.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
+    /**
+     * The web container of the current module.
+     */
+    @Requirement
+    private Container container;
+
+    /**
+     * Create and initialize the descriptor of the macro.
+     */
+    public ChartMacro()
+    {
+        super(new DefaultMacroDescriptor(DESCRIPTION, ChartMacroParameters.class));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean supportsInlineMode()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<Block> execute(ChartMacroParameters macroParams, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        String imageLocation =
+            documentAccessBridge.getURL(null, "charting", null, null) + "/" + generateChart(macroParams, content);
+        String title = macroParams.getTitle();
+        Link link = new Link();
+        link.setReference(imageLocation);
+        link.setType(LinkType.URI);
+        ImageBlock imageBlock = new ImageBlock(new URLImage(imageLocation), true);
+        imageBlock.setParameter("alt", title);
+        LinkBlock linkBlock = new LinkBlock(Collections.singletonList((Block) imageBlock), link, true);
+        linkBlock.setParameter("title", title);
+        return Collections.singletonList((Block) linkBlock);
+    }
+
+    /**
+     * Builds the chart according to the specifications passed in.
+     * 
+     * @param parameters macro parameters.
+     * @param content macro content.
+     * @return name of the image file generated.
+     * @throws MacroExecutionException if an error occurs while generating / saving the chart image.
+     */
+    private String generateChart(ChartMacroParameters parameters, String content)
+        throws MacroExecutionException
+    {
+        Map<String, String> paramsMap = parameters.getParametersMap();
+        String source = paramsMap.get("source");
+        File chartFile = null;
+        try {
+            ChartDataSource dataSource = componentManager.lookup(ChartDataSource.class, source);
+            byte[] chart =
+                chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
+            chartFile = getChartImageFile(parameters, content);
+            FileOutputStream fos = new FileOutputStream(getChartImageFile(parameters, content));
+            fos.write(chart);
+            fos.close();
+        } catch (ComponentLookupException ex) {
+            throw new MacroExecutionException("Invalid source parameter.", ex);
+        } catch (ChartGeneratorException ex) {
+            throw new MacroExecutionException("Error while rendering chart.", ex);
+        } catch (Exception ex) {
+            throw new MacroExecutionException("Error while saving chart image.", ex);
+        }
+        return chartFile.getName();
+    }
+
+    /**
+     * Returns the temporary directory into which chart image files will be saved.
+     * 
+     * @param parameters macro parameters.
+     * @param content macro content.
+     * @return the chart image file directory.
+     */
+    protected File getChartImageFile(ChartMacroParameters parameters, String content)
+    {
+        File chartsDir = new File(container.getApplicationContext().getTemporaryDirectory(), "charts");
+        return new File(chartsDir, Math.abs(parameters.hashCode()) + ".png");
+    }
+}

@@ -51,6 +51,8 @@ public class RenderingTests extends TestCase
 
         suite.addTestsFromResource("macrochart1", true);        
         suite.addTestsFromResource("macrochart2", true);
+        suite.addTestsFromResource("macrochart3", true);
+        suite.addTestsFromResource("macrochart4", true);
 
         List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
         mocks.add(MockDocumentAccessBridge.getComponentDescriptor());

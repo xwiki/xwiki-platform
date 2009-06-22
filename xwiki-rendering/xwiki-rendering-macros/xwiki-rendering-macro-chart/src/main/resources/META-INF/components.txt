@@ -1,2 +1,3 @@
 org.xwiki.rendering.internal.macro.chart.ChartMacro
 org.xwiki.chart.internal.source.DocumentTableBlockDataSource
+org.xwiki.chart.internal.source.MacroContentTableBlockDataSource

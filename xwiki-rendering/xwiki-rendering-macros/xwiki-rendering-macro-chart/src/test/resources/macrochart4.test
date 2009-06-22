@@ -1,0 +1,18 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{testchart type="line" source="inline" params="range:A2-D4;series:columns;" title="Chart Test" width="630" height="480"}}
+|CL1|CL2|CL3|CL4
+|2.3|3.4|5.6|1.2
+|3.4|1.2|1.2|6.4
+|6.0|4.5|0.2|3.4
+{{/testchart}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:testchart|-|type="line" source="inline" params="range:A2-D4;series:columns;" title="Chart Test" width="630" height="480"|-|
+|CL1|CL2|CL3|CL4
+|2.3|3.4|5.6|1.2
+|3.4|1.2|1.2|6.4
+|6.0|4.5|0.2|3.4
+--><!--startwikilink:http://localhost/charts/chart.png--><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><!--startimage:http://localhost/charts/chart.png--><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/><!--stopimage--></a></span><!--stopwikilink--><!--stopmacro-->

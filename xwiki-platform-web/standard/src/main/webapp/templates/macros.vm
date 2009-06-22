@@ -1470,7 +1470,7 @@ $html
 
 
 {{html}}
-#end
+#else {pre} #end
   ##
   ## SX deps.
   ##
@@ -1634,7 +1634,7 @@ $html
   </script>
   #if($doc.syntaxId == "xwiki/2.0"){{/html}}
 
-  #end
+  #else {/pre} #end
 #end
 
 #**

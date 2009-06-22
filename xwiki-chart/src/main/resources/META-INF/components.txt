@@ -1,0 +1,1 @@
+org.xwiki.chart.internal.DefaultChartGenerator

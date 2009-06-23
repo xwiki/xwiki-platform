@@ -30,7 +30,6 @@ $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)
 $xwiki.ssfx.use("js/xwiki/usersandgroups/usersandgroups.css")
 $xwiki.jsfx.use("js/xwiki/table/livetable.js", true)
 $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
-{pre}
 #set($columnOptions = {
   "member" : {'link': 'auto', 'type': 'text'},
   "_actions" : {
@@ -81,6 +80,7 @@ $xwiki.ssfx.use("js/xwiki/table/livetable.css", true)
       &lt;tr&gt;&lt;td colspan="3" id="errMsg"&gt;&lt;/td&gt;&lt;/tr&gt;
     &lt;/table&gt;
   &lt;/div&gt;
+{pre}
 &lt;script type="text/javascript"&gt;
 // &lt;![CDATA[
 window.addNewMember = function(uorg, name)
@@ -126,11 +126,11 @@ window.addNewMember = function(uorg, name)
 }
 // ]]&gt;
 &lt;/script&gt;
+{/pre}
 #end
 ##
 ##
 ##
-{/pre}
 #else ## stable interface
 1 $doc.name
 

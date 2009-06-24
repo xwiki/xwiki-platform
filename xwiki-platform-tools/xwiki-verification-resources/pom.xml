@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-verification-resources</artifactId>
   <name>XWiki Platform - Tools - Shared Verification Resources</name>
-  <version>1.14</version>
+  <version>1.14-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>XWiki Platform - Tools - Shared Verification Resources (Checkstyle files, etc)</description>
   <!-- We must configure SCM in each module. For more information see:

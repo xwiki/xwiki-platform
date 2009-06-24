@@ -27,11 +27,11 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>17</version>
+    <version>18-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-verification-resources</artifactId>
   <name>XWiki Platform - Tools - Shared Verification Resources</name>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.14</version>
   <packaging>jar</packaging>
   <description>XWiki Platform - Tools - Shared Verification Resources (Checkstyle files, etc)</description>
   <!-- We must configure SCM in each module. For more information see:

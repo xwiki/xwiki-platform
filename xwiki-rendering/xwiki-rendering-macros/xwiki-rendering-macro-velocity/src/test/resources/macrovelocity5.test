@@ -4,8 +4,9 @@
 .#-----------------------------------------------------
 {{velocity}}
 #macro(somemacro)
-"macro content"#end
-$nl
+"macro content"
+#end
+
 #somemacro()
 {{/velocity}}
 
@@ -18,8 +19,9 @@ $nl
 beginDocument
 beginMacroMarkerStandalone [velocity] [] [
 #macro(somemacro)
-"macro content"#end
-$nl
+"macro content"
+#end
+
 #somemacro()
 ]
 beginParagraph
@@ -31,8 +33,9 @@ onSpecialSymbol ["]
 endParagraph
 endMacroMarkerStandalone [velocity] [] [
 #macro(somemacro)
-"macro content"#end
-$nl
+"macro content"
+#end
+
 #somemacro()
 ]
 beginMacroMarkerStandalone [velocity] [] [
@@ -53,8 +56,9 @@ endDocument
 .#-----------------------------------------------------
 <!--startmacro:velocity|-||-|
 #macro(somemacro)
-"macro content"#end
-$nl
+"macro content"
+#end
+
 #somemacro()
 --><p>"macro content"</p><!--stopmacro--><!--startmacro:velocity|-||-|
 #somemacro()

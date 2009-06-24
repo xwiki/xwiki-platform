@@ -53,7 +53,7 @@ public class DefaultVelocityMacroConfiguration implements Initializable, Velocit
     /**
      * @see #getFilter()
      */
-    private String filter = "html";
+    private String filter = "indent";
 
     /**
      * {@inheritDoc}

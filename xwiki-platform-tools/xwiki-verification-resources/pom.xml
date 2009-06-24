@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>17</version>
   </parent>
   <artifactId>xwiki-verification-resources</artifactId>
   <name>XWiki Platform - Tools - Shared Verification Resources</name>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>26-SNAPSHOT</version>
+    <version>25</version>
     <relativePath>../pom</relativePath>
   </parent>
   <groupId>org.xwiki.platform.tools</groupId>

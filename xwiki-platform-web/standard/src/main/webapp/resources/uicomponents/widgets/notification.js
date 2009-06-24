@@ -110,8 +110,8 @@ XWiki.widgets.Notification = Class.create({
   },
   /** Display the notification and schedule an automatic hide after the configured period of time, if any. */
   show : function() {
-    if (!this.element.descendantOf(XWiki.widgets.Notification.container)) {
-      XWiki.widgets.Notification.container.insert({top: this.element});
+    if (!this.element.descendantOf(XWiki.widgets.Notification.getContainer())) {
+      XWiki.widgets.Notification.getContainer().insert({top: this.element});
     }
     this.element.show();
     if (this.options.timeout) {
@@ -143,18 +143,23 @@ XWiki.widgets.Notification = Class.create({
 });
 
 /** The container for all the notifications. */
-XWiki.widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
+XWiki.widgets.Notification.container = null;
 
-// On startup, insert the container in the document body, and register a scroll listener to reposition the notifications
-// at the bottom of the screen in IE.
-document.observe("xwiki:dom:loaded", function() {
-  document.body.insert(XWiki.widgets.Notification.container);
-  if (Prototype.Browser.IE) {
-    XWiki.widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});
-    Event.observe(window, "scroll", function() {
-      var span = new Element("div");
-      XWiki.widgets.Notification.container.insert({top: span});
-      setTimeout(span.remove.bind(span), 1);
-    });
+/** Returns the container for all the notifications. The container is created the first time this function is called. */
+XWiki.widgets.Notification.getContainer = function() {
+  if (!XWiki.widgets.Notification.container) {
+    XWiki.widgets.Notification.container = new Element('div', {"class" : "xnotification-container"});
+    // Insert the container in the document body.
+    document.body.insert(XWiki.widgets.Notification.container);
+    // Register a scroll listener to reposition the notifications at the bottom of the screen in IE.
+    if (Prototype.Browser.IE) {
+      XWiki.widgets.Notification.container.setStyle({position : 'absolute', 'bottom': '0px'});
+      Event.observe(window, "scroll", function() {
+        var span = new Element("div");
+        XWiki.widgets.Notification.container.insert({top: span});
+        setTimeout(span.remove.bind(span), 1);
+      });
+    }
   }
-});
+  return XWiki.widgets.Notification.container;
+};

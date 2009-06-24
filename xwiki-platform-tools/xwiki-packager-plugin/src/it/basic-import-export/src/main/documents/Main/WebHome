@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712018000</creationDate>
+<date>1107721256000</date>
+<version>1.3</version>
+<content>1 Welcome to your Wiki
+
+This is your wiki. You should modify this text to present what your wiki is about !
+
+1.1 News
+
+#set($nbstart = $request.nbstart)
+#set($category = "")
+#set($nbitems = "10")
+#includeMacros("Blog.Macros")
+</content>
+</xwikidoc>

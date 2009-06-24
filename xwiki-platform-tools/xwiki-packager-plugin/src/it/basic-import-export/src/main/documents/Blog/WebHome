@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Blog</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712020000</creationDate>
+<date>1107712020000</date>
+<version>1.2</version>
+<content>1 Latest Articles
+
+
+#set($nbstart = $request.nbstart)
+#set($category = "")
+#set($nbitems = "10")
+#includeMacros("Blog.Macros")
+</content>
+</xwikidoc>

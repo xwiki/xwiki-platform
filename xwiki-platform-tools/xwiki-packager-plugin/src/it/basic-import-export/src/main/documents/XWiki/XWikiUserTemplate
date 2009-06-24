@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiUserTemplate</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiUsers</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712020000</creationDate>
+<date>1107712020000</date>
+<version>1.2</version>
+<content>#includeForm("XWiki.XWikiUserSheet")</content>
+</xwikidoc>

@@ -1,0 +1,31 @@
+// ------------------------------------------------------------------
+// NOTICE file containing copyrights,
+// in this case for #if ($projectName)$projectName#else${project.name}#end
+
+// ------------------------------------------------------------------
+
+#if ($projectName)$projectName#else${project.name}#end
+
+Copyright ${projectTimespan}#if($project.organization.name) $project.organization.name#else XWiki#end
+
+#if($preProjectText)
+$preProjectText
+#end
+
+#foreach ( $organizationName in $projectsSortedByOrganization.keySet() )
+This product includes/uses software developed by '$organizationName.name'#if($organizationName.url) ($organizationName.url)#end
+
+#foreach ( $project in $projectsSortedByOrganization.get( $organizationName ) )
+  - $project.name#if ($addVersion) (version $project.version)#end#if ($addArtifact) ($project.artifact)#end#if($project.url) ($project.url)#end
+#if ($addLicense)#foreach ( $license in $project.licenses)
+
+      License: $license.name #if ($license.url) ($license.url)#end
+#end#end
+
+#end
+
+#end
+
+#if($postProjectText)
+$postProjectText
+#end

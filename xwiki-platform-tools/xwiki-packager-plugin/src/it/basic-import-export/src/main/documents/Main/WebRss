@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>WebRss</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712019000</creationDate>
+<date>1107712019000</date>
+<version>1.2</version>
+<content>$response.setContentType("text/xml")
+#set ($sql = "where 1=1 order by doc.date desc")
+#set ($list = $xwiki.searchDocuments($sql , 20 , 0))
+#set ($baseurl =  "http://${request.serverName}")
+#includeForm("XWiki.WebRssCode")</content>
+</xwikidoc>

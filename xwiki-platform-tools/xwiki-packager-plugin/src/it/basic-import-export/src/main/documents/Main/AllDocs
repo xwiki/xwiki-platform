@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>AllDocs</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712019000</creationDate>
+<date>1107712019000</date>
+<version>1.2</version>
+<content>1 All Documents of this Wiki
+
+#set ($sql = "")
+#foreach ($item in $xwiki.searchDocuments($sql))
+#set($bentrydoc = $xwiki.getDocument($item))
+   * [${bentrydoc.web}.$bentrydoc.name] by [$bentrydoc.author] on 
+#end</content>
+</xwikidoc>

@@ -1,0 +1,16 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{example parameter="hello"/}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:example|-|parameter="hello"-->hello<!--stopmacro-->
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [example] [parameter=hello]
+onWord [hello]
+endMacroMarkerStandalone [example] [parameter=hello]
+endDocument

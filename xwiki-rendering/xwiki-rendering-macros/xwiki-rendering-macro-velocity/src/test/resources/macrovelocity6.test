@@ -3,8 +3,7 @@
 .# Verify identation is cleaned
 .#-----------------------------------------------------
 {{velocity}}
-some text
-  #if (true)
+some text #if (true)
     #if (true)
       and the end of the sentence indented to be more readable.
     #end
@@ -15,8 +14,7 @@ some text
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [velocity] [] [
-some text
-  #if (true)
+some text #if (true)
     #if (true)
       and the end of the sentence indented to be more readable.
     #end
@@ -51,8 +49,7 @@ onWord [readable]
 onSpecialSymbol [.]
 endParagraph
 endMacroMarkerStandalone [velocity] [] [
-some text
-  #if (true)
+some text #if (true)
     #if (true)
       and the end of the sentence indented to be more readable.
     #end
@@ -63,8 +60,7 @@ endDocument
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <!--startmacro:velocity|-||-|
-some text
-  #if (true)
+some text #if (true)
     #if (true)
       and the end of the sentence indented to be more readable.
     #end

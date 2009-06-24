@@ -3,18 +3,18 @@
 .# Verify filter option is taken into acount
 .#-----------------------------------------------------
 {{velocity}}
-Some  text
+  Some text
 {{/velocity}}
 
 {{velocity filter="none"}}
-Some  text
+  Some text
 {{/velocity}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [velocity] [] [
-Some  text
+  Some text
 ]
 beginParagraph
 onWord [Some]
@@ -22,26 +22,27 @@ onSpace
 onWord [text]
 endParagraph
 endMacroMarkerStandalone [velocity] [] [
-Some  text
+  Some text
 ]
 beginMacroMarkerStandalone [velocity] [filter=none] [
-Some  text
+  Some text
 ]
 beginParagraph
-onWord [Some]
 onSpace
+onSpace
+onWord [Some]
 onSpace
 onWord [text]
 endParagraph
 endMacroMarkerStandalone [velocity] [filter=none] [
-Some  text
+  Some text
 ]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
 <!--startmacro:velocity|-||-|
-Some  text
+  Some text
 --><p>Some text</p><!--stopmacro--><!--startmacro:velocity|-|filter="none"|-|
-Some  text
---><p>Some &nbsp;text</p><!--stopmacro-->
+  Some text
+--><p>&nbsp;&nbsp;Some text</p><!--stopmacro-->

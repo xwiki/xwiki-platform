@@ -10,9 +10,8 @@
     #foreach ($item in $list)
       <tr>
         <td>
-          $nl
           * item
-          $nl$nl
+
         </td>
       </tr>
     #end
@@ -32,30 +31,63 @@ beginMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
     #foreach ($item in $list)
       <tr>
         <td>
-          $nl
           * item
-          $nl$nl
+
         </td>
       </tr>
     #end
   </table>
 </div>
 {{/html}}]
-beginMacroMarkerStandalone [html] [wiki=true] [ <div> <h1>Hello John</h1> <table> <tr> <td>
+beginMacroMarkerStandalone [html] [wiki=true] [
+<div>
+<h1>Hello John</h1>
+<table>
+<tr>
+<td>
 * item
 
-</td> </tr> <tr> <td>
+</td>
+</tr>
+<tr>
+<td>
 * item
 
-</td> </tr> </table> </div> ]
-onRawText [ <div> <h1>Hello John</h1>        <table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table> </div> ] [xhtml/1.0]
-endMacroMarkerStandalone [html] [wiki=true] [ <div> <h1>Hello John</h1> <table> <tr> <td>
+</td>
+</tr>
+</table>
+</div>
+]
+onRawText [<div>
+<h1>Hello John</h1>
+
+
+
+
+
+
+
+<table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table>
+</div>] [xhtml/1.0]
+endMacroMarkerStandalone [html] [wiki=true] [
+<div>
+<h1>Hello John</h1>
+<table>
+<tr>
+<td>
 * item
 
-</td> </tr> <tr> <td>
+</td>
+</tr>
+<tr>
+<td>
 * item
 
-</td> </tr> </table> </div> ]
+</td>
+</tr>
+</table>
+</div>
+]
 endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
 <div>
   #set ($name = "John")
@@ -65,9 +97,8 @@ endMacroMarkerStandalone [velocity] [] [{{html wiki="true"}}
     #foreach ($item in $list)
       <tr>
         <td>
-          $nl
           * item
-          $nl$nl
+
         </td>
       </tr>
     #end
@@ -87,12 +118,21 @@ endDocument
     #foreach ($item in $list)
       <tr>
         <td>
-          $nl
           * item
-          $nl$nl
+
         </td>
       </tr>
     #end
   </table>
 </div>
-{{/html}}--> <div> <h1>Hello John</h1>        <table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table> </div> <!--stopmacro-->
+{{/html}}--><div>
+<h1>Hello John</h1>
+
+
+
+
+
+
+
+<table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table>
+</div><!--stopmacro-->

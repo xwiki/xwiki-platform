@@ -41,7 +41,7 @@ public class DefaultVelocityMacroConfiguration implements VelocityMacroConfigura
     /**
      * @see #getFilter()
      */
-    private static final String DEFAULT_FILTER = "html";
+    private static final String DEFAULT_FILTER = "indent";
 
     /**
      * Defines from where to read the rendering configuration data. 

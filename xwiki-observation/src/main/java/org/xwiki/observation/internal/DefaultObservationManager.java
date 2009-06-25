@@ -149,13 +149,9 @@ public class DefaultObservationManager implements ObservationManager, Initializa
             if (eventListeners == null) {
                 // No listener registered for this event yet. Create a map to store listeners for this event.
                 eventListeners = new HashMap<String, RegisteredListener>();
-                eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event));
                 this.listenersByEvent.put(event.getClass(), eventListeners);
-            } else {
-                // Add the event to the existing registered listener
-                RegisteredListener regListener = eventListeners.get(eventListener.getName());
-                regListener.addEvent(event);
-            }            
+            }
+            eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event));
         }
     }
 

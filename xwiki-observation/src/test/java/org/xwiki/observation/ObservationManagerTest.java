@@ -139,4 +139,31 @@ public class ObservationManagerTest
         this.manager.removeEvent("mylistener", afterEvent);
         this.manager.notify(notifyEvent, null);
     }
+    
+    /**
+     * Verify that we can register two listeners on the same event and they'll both receive the event.
+     */
+    @Test
+    public void testRegisterSeveralListenersForSameEvent()
+    {
+        final EventListener listener1 = this.context.mock(EventListener.class, "listener1");
+        final EventListener listener2 = this.context.mock(EventListener.class, "listener2");
+        final Event event = this.context.mock(Event.class, "event");
+        final Event notifyEvent = this.context.mock(Event.class, "notify");
+
+        this.context.checking(new Expectations() {{
+            allowing(listener1).getName(); will(returnValue("listener 1"));
+            allowing(listener2).getName(); will(returnValue("listener 2"));
+            allowing(listener1).getEvents(); will(returnValue(Arrays.asList(event)));
+            allowing(listener2).getEvents(); will(returnValue(Arrays.asList(event)));
+
+            allowing(event).matches(with(same(notifyEvent))); will(returnValue(true));
+            oneOf(listener1).onEvent(with(any(Event.class)), with(any(Object.class)), with(any(Object.class)));
+            oneOf(listener2).onEvent(with(any(Event.class)), with(any(Object.class)), with(any(Object.class)));
+        }});
+
+        this.manager.addListener(listener1);
+        this.manager.addListener(listener2);
+        this.manager.notify(notifyEvent, null);
+    }
 }

@@ -172,6 +172,11 @@ xwiki.virtual.redirect=http://127.0.0.1:9080/xwiki/bin/Main/ThisWikiDoesNotExist
 #-# The name of the default URL factory that should be used.
 # xwiki.urlfactory.serviceclass=com.xpn.xwiki.web.XWikiURLFactoryServiceImpl
 
+#-# Force the protocol to use in the generated URLs. The right value is taken from the request URL, so setting this
+#-# is not recommended in most cases.
+#-# For example:
+#-# xwiki.url.protocol=https
+# xwiki.url.protocol=
 #-# The name of the webapp to use in the generated URLs. The right value is taken from the request URL, so setting this
 #-# is not recommended in most cases. If set, the value should contain a trailing /, but not a leading one. For example:
 #-# xwiki.webapppath=xwiki/

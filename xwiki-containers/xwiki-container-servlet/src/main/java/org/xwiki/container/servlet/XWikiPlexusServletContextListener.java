@@ -20,6 +20,8 @@
  */
 package org.xwiki.container.servlet;
 
+import java.lang.reflect.Method;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 
@@ -77,6 +79,18 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // deployment descriptors (components.xml) so that they are automatically injected.
         servletContextEvent.getServletContext().setAttribute(
             org.xwiki.component.manager.ComponentManager.class.getName(), componentManager);
+
+        // This is also a temporary bridge to allow non components to call Utils.getComponent() and
+        // get a component instance without having to pass around a XWiki Context (in order to 
+        // retrieve the Servlet Context to get the component manager from an attribute).
+        // We're using introspection in order to not have to depend on the XWiki Core module
+        try {
+            Class utilsClass = Thread.currentThread().getContextClassLoader().loadClass("com.xpn.xwiki.web.Utils");
+            Method method = utilsClass.getMethod("setComponentManager", ComponentManager.class);
+            method.invoke(null, this.componentManager);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set up Component Manager", e);
+        }
     }
 
     /**

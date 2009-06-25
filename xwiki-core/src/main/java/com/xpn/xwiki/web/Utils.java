@@ -278,22 +278,6 @@ public class Utils
         }
         context.setMode(mode);
 
-        // This is a temporary bridge so that non XWiki component classes can lookup XWiki
-        // components. A ComponentManager instance has been set up in the Servlet Context and
-        // we now populate the XWiki Context with it so that code can then use it to look up
-        // components.
-        // This is of course not necessary for XWiki components since they just need to implement
-        // the Composable interface to get access to the Component Manager or better they simply
-        // need to define the Components they require as field members and configure the Plexus
-        // deployment descriptors (components.xml) so that they are automatically injected.
-        ComponentManager componentManager =
-            (ComponentManager) engine_context.getAttribute(ComponentManager.class.getName());
-        context.put(ComponentManager.class.getName(), componentManager);
-
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        setComponentManager(componentManager);
-
         return context;
     }
 

@@ -4474,20 +4474,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 if (serverobject != null) {
                     String server = serverobject.getStringValue("server");
                     if (server != null) {
-                        int mode = serverobject.getIntValue("secure");
-                        int port = context.getURL().getPort();
-                        if (mode == 1) {
-                            if (port != -1 && port != 443) {
-                                serverurl = "https://" + server + ":" + port + "/";
-                            } else {
-                                serverurl = "https://" + server + "/";
-                            }
+                        String protocol = context.getWiki().Param("xwiki.url.protocol", null);
+                        if (protocol == null) {
+                            protocol = serverobject.getIntValue("secure") == 1 ? "https" : "http";
+                        }
+                        long port = context.getURL().getPort();
+                        if (port == 80 || port == 443) {
+                            port = -1;
+                        }
+                        if (port != -1) {
+                            serverurl = protocol + "://" + server + ":" + port + "/";
                         } else {
-                            if (port != -1 && port != 80) {
-                                serverurl = "http://" + server + ":" + port + "/";
-                            } else {
-                                serverurl = "http://" + server + "/";
-                            }
+                            serverurl = protocol + "://" + server + "/";
                         }
                     }
                 }

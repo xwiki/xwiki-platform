@@ -79,6 +79,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         this.contextPath = context.getWiki().getWebAppPath(context);
 
         try {
+            // if we force the protocol in xwiki.cfg then we need to change what we received from the context
+            String protocol = context.getWiki().Param("xwiki.url.protocol");
+            if (protocol != null && !protocol.equalsIgnoreCase(url.getProtocol())) {
+                url = new URL(protocol + "://" + url.getHost() + (url.getPort() != 1 ? ":" + url.getPort() : ""));
+            }
             this.serverURL = new URL(url, "/");
         } catch (MalformedURLException e) {
             // This can't happen
@@ -115,7 +120,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 int comaind = host.indexOf(',');
                 final String host1 = comaind > 0 ? host.substring(0, comaind) : host;
                 if (!host1.equals("")) {
-                    serverURL = new URL(context.getRequest().getScheme() + "://" + host1);
+                    String protocol = context.getWiki().Param("xwiki.url.protocol", context.getRequest().getScheme());
+                    serverURL = new URL(protocol + "://" + host1);
                 }
             }
         }

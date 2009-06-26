@@ -31,11 +31,9 @@ import org.xwiki.rendering.parser.Syntax;
  * 
  * @version $Id$
  * @since 1.9M1
- * @see also {@link MacroSource}, a tag interface that extends MacroManager for specific macro managers that can be
- *      aggregated.
  */
 @ComponentRole
-public interface MacroManager extends Comparable<MacroManager>
+public interface MacroManager
 {
     /**
      * @param syntax the desired syntax
@@ -73,9 +71,4 @@ public interface MacroManager extends Comparable<MacroManager>
      * @return true if the manager can return a macro with given name for all syntaxes, false otherwise
      */
     boolean exists(String macroName);
-
-    /**
-     * @return the priority of this manager. Used to sort manager when macros are defined in several.
-     */
-    int getPriority();
 }

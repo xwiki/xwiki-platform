@@ -185,6 +185,9 @@
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- Excludes for the 2.0 M2 release. Once it's released remove them. -->
+                <exclude>org/xwiki/rendering/macro/MacroManager</exclude>
+                <exclude>org/xwiki/rendering/macro/MacroSource</exclude>
+                <exclude>org/xwiki/rendering/macro/AbstractMacroSource</exclude>                
               </excludes>
             </configuration>
           </execution>

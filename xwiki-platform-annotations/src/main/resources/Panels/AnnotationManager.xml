@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>AnnotationManager</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.lpereira</author>
+<customClass></customClass>
+<contentAuthor>XWiki.lpereira</contentAuthor>
+<creationDate>1240502446000</creationDate>
+<date>1245754166000</date>
+<contentUpdateDate>1245754166000</contentUpdateDate>
+<version>251.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<category>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<content>
+<editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>Panels.AnnotationManager</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<guid>ae1cdc01-922e-4cc2-8e0b-239e49b62360</guid>
+<property>
+<category></category>
+</property>
+<property>
+<content>## Active/Desactive annotations
+#set ($active="false")
+#set ($hql = ", BaseObject as obj where doc.fullName='XWiki.AnnotationConfig' and obj.className='XWiki.AnnotationConfig'")
+#set ($configs= $xwiki.searchDocuments($hql))
+#foreach ($config in $configs)
+  #set ($confDoc = $xwiki.getDocument($config))
+  #set ($confObj = $confDoc.getObject('XWiki.AnnotationConfig'))
+  #if ($confObj.activated == 'Yes')
+    &lt;script type="text/javascript"&gt;
+    var annotationFeatureEnabled = true;
+    &lt;/script&gt;
+    #set ($active="true")
+  #else
+    &lt;script type="text/javascript"&gt;
+    var annotationFeatureEnabled = false;
+    &lt;/script&gt;
+  #end
+#end
+
+#if($active=="true")
+&lt;div id="annotationPanel" style="display:none"&gt;
+#panelheader('Annotation editor')
+&lt;label for="annotationInput"&gt;Annotation :&amp;nbsp;&lt;/label&gt;
+&lt;textarea cols="10" rows="5" id="annotationInput" name="annotationInput" value="test"/&gt;&lt;/textarea&gt;
+&lt;input type="submit" id="annotationRequest" name="annotationRequest" value="Annotate !"/&gt;
+&lt;input type="submit" id="cancelRequest" name="cancelRequest" value="Cancel"/&gt;
+#if ($xwiki.hasAdminRights())
+&lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
+#end
+#panelfooter()
+&lt;/div&gt;
+
+&lt;div id="annotationResume" style="display:block"&gt;
+#panelheader('Annotations')
+#set ($annotations = $doc.getObjects('XWiki.AnnotationClass'))
+#set ($str="[")
+#foreach ($annotation in $annotations)
+ #set ($hql = " where doc.fullName='"+$annotation.get('author')+"'")
+ #set ($docs= $xwiki.searchDocuments($hql))
+ #foreach ($doc in $docs)
+  #set ($doc = $xwiki.getDocument($doc))
+  #set ($user = $doc.getObject('XWiki.XWikiUsers'))
+  #set ($color = $user.annotationColor)
+  #break
+ #end
+ &lt;div onClick="annotation.toggleMode($annotation.get('annotationID'))" onMouseOut="annotation.hideAnnotation($annotation.get('annotationID'), '$color')" onMouseOver="annotation.showAnnotation($annotation.get('annotationID'), '$color')"&gt;
+  *$annotation.get('annotation')*
+  by &lt;span style="background: $color"&gt;[$annotation.get('author')]&lt;/span&gt;
+  &lt;img src="/xwiki/resources/icons/silk/delete.gif" onClick="annotation.removeAnnotation($annotation.get('annotationID'))"/&gt;
+ &lt;/div&gt;
+ #if($str != "[")
+  #set ($str = $str + ",{\'id\' : \'"+$annotation.get('annotationID')+"\', \'color\' : \'"+$color+"\'}")
+ #else
+  #set ($str = $str + "{\'id\' : \'"+$annotation.get('annotationID')+"\', \'color\' : \'"+$color+"\'}")
+ #end
+#end
+#set ($str = $str + "]")
+&lt;input type="submit" onClick="annotation.showAllAnnotation('{pre}$str{/pre}')" name="showAllRequest" value="Show all"/&gt;
+&lt;input type="submit" onClick="annotation.hideAllAnnotation('{pre}$str{/pre}')" name="hideAllRequest" value="Hide all"/&gt;
+
+#if ($xwiki.hasAdminRights())
+&lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
+#end
+#panelfooter()
+&lt;/div&gt;
+#end</content>
+</property>
+<property>
+<description>This panel allow user to edit annotation.</description>
+</property>
+<property>
+<name>Annotation editor</name>
+</property>
+<property>
+<type>view</type>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.JavaScriptExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Panels.AnnotationManager</name>
+<number>0</number>
+<className>XWiki.JavaScriptExtension</className>
+<guid>d0e57234-f945-4900-8ac4-977156e27729</guid>
+<property>
+<cache>default</cache>
+</property>
+<property>
+<code>/*
+ * annotationFeatureEnabled boolean variable must be
+ * true in order to activate annotation feature.
+ */
+if(typeof(XWiki) != 'undefined')
+{
+  XWiki = new Object();
+}
+
+var annotation = null;
+
+XWiki.Annotation = function()
+{
+    this.display = [];
+    this.annotationsArg = [];
+    
+    this.annotatedDocumentFlag = 0;
+    this.onAnnotationFlag = 0;
+    
+    this.step = 5;
+    this.intraOffset = 0;
+    this.context= '';
+    this.selection = '';
+    this.annotationText = '';
+    
+    document.observe('keydown', this.onKeyDown);
+    document.observe('keyup', this.onKeyUp);
+    document.observe('mouseup', this.onMouseUp);
+    Element.observe($('annotationRequest'), 'click', this.onAddAnnotationRequest);
+    Element.observe($('cancelRequest'), 'click', this.onCancelAnnotationRequest);
+};
+
+XWiki.Annotation.prototype =
+{
+/* Utils */
+    getDocumentInfos : function()
+    {
+        var space = '';
+        var page = '';
+        window.location.pathname.toString().scan(/\/[^\/]+/, function(match)
+        {
+            space = page;
+            page = match[0];
+        });
+        if(space == '' || page == '')
+        {
+            return '';
+        }
+        // WebHome special case
+        if(space == '/view')
+        {
+            space = page;
+            page = '/WebHome';
+        }
+        space = space.replace('/', '');
+        page = page.replace('/', '');
+        return { host : location.host, 'space' : space, 'page' : page };
+    },
+    
+    getXMLData : function()
+    {
+        return "&lt;?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?&gt;" +
+        "&lt;annotationRequest xmlns=\"http://www.xwiki.org\"&gt;" +
+        "&lt;initialSelection&gt;"+annotation.selection+"&lt;/initialSelection&gt;" +
+        "&lt;selectionContext&gt;"+annotation.context+"&lt;/selectionContext&gt;" +
+        "&lt;contextOffset&gt;"+annotation.intraOffset+"&lt;/contextOffset&gt;" +
+        "&lt;annotation&gt;"+annotation.annotationText+"&lt;/annotation&gt;" +
+        "&lt;/annotationRequest&gt;";
+    },
+
+/* Annotation Input Panel */
+    showAnnotationInputPanel : function(x, y)
+    {
+        $('annotationInput').value = '';
+        $('annotationPanel').style.display = 'block';
+        $('annotationPanel').style.position = 'fixed';
+        $('annotationPanel').style.top = (y-Element.getHeight($('annotationPanel')))+'px';
+        $('annotationPanel').style.left = x+'px';
+        $('annotationPanel').style.padding = '0px 0px';
+        $('annotationPanel').style.padding = '0px 0px';
+        $('annotationPanel').style.margin = '0px 0px';
+    },
+    
+    hideAnnotationInputPanel : function()
+    {
+        $('annotationInput').value = '';
+        $('annotationPanel').style.display = 'none';
+    },
+
+/* Context computation */
+    getRightDocument : function(node)
+    {
+        var text = '';
+        if(node == $('xwikicontent'))
+        {
+            text = annotation.getRightDocument(node.parentNode);
+        }
+        for(var current=node.nextSibling; current!=null; current=current.nextSibling)
+        {
+            text += annotation.getText(current);
+        }
+        return text;
+    },
+    
+    getLeftDocument : function(node)
+    {
+        var text = '';
+        if(node == $('xwikicontent'))
+        {
+            text = annotation.getLeftDocument(node.parentNode);
+        }
+        parent = node.parentNode;
+        for(var i=0; i&lt;parent.childNodes.length &amp;&amp; parent.childNodes[i] != node; ++i)
+        {
+            text += annotation.getText(parent.childNodes[i]);
+        }
+        return text;
+    },
+    
+    getText : function(root)
+    {
+        var text = '';
+        if(root.nodeType == root.TEXT_NODE)
+        {
+            text = root.textContent;
+        } else
+        {
+            for(var i = 0; i &lt; root.childNodes.length; i++)
+            {
+                text += annotation.getText(root.childNodes[i]);
+            }
+        }
+        return text;
+    },
+    
+    getContextInfos : function(initialRange)
+    {
+        var left = annotation.getLeftDocument(initialRange.startContainer) + initialRange.startContainer.textContent.substring(0, initialRange.startOffset);
+        var subLeft = '';
+        var right = initialRange.endContainer.textContent.substring(initialRange.endOffset, initialRange.endContainer.textContent.length) + annotation.getRightDocument(initialRange.endContainer);
+        var subRight = '';
+        var offset = 0;
+        var context = initialRange.toString();
+        var leftExpansion = 0;
+        var rightExpansion = 0;
+        while(subRight != right || subLeft != left)
+        {
+            var k = $('xwikicontent').textContent.indexOf(context);
+            var l = $('xwikicontent').textContent.indexOf(context, k+1);
+            if(l == -1)
+            {
+                break;
+            }
+            leftExpansion = Math.min(left.length, leftExpansion+annotation.step);
+            rightExpansion = Math.min(right.length, rightExpansion+annotation.step);
+            subRight = right.substring(0, rightExpansion);
+            subLeft = left.substring(left.length-leftExpansion, left.length);
+            context =  subLeft + annotation.selection + subRight;
+            offset = Math.max(subLeft.length,0);
+        }
+        return {co : context, off : offset};
+    },
+
+/* Annotation Management Panel */
+    addAnnotationEntry : function(anno, color, total)
+    {
+        var div = new Element('div', { 'onClick' : 'annotation.toggleMode(\''+anno.annotationId+'\')', 'onMouseOut' : 'annotation.hideAnnotation(\''+anno.annotationId+'\', \''+color+'\')', 'onMouseOver' : 'annotation.showAnnotation(\''+anno.annotationId+'\', \''+color+'\')'});
+        div.update(new Element('b').update(anno.annotation));
+        div.insert({'bottom': ' by '});
+        var author = anno.author.substring(anno.author.indexOf('.')+1, anno.author.length);
+        var link = '/xwiki/bin/view/'+anno.author.replace('.', '/');
+        var span = new Element('span', {'style' : 'background: '+color}).update(new Element('a', {'href' : link}).update(author));
+        div.insert({'bottom' : span });
+        var img = new Element( 'img', {'src' : '/xwiki/resources/icons/silk/delete.gif', 'onClick' : 'annotation.removeAnnotation(\''+anno.annotationId+'\')' } );
+        div.insert({'bottom' : img});
+        $('annotationResume').select('[class="xwikipanelcontents"]')[0].insert({'bottom': div });
+        annotation.annotationsArg.push({ 'id' : anno.annotationId, 'color' : color});
+        annotation.addGlobalActionButtons(total);
+    },
+    
+    updateAnnotationResume : function(response)
+    {
+        $('annotationResume').select('[class="xwikipanelcontents"]')[0].update();
+        annotation.annotationsArg = [];
+        for(var i=0; i&lt;response.annotations.length; ++i)
+        {
+            var space = response.annotations[i].author.split('.')[0];
+            var page = response.annotations[i].author.split('.')[1];
+            var url = 'http://'+location.host+'/xwiki/rest/wikis/xwiki/spaces/'+space+'/pages/'+page+'/objects/XWiki.XWikiUsers/0/properties/annotationColor?media=json';
+            var a = response.annotations[i];
+            new Ajax.Request(url,
+            {
+                method: 'GET',
+                onSuccess: function(transport)
+                {
+                    annotation.addAnnotationEntry(a, transport.responseText.evalJSON().value, response.annotations.length);
+                },
+                onFailure: function()
+                {
+                    window.alert('failure');
+                }
+            });
+        }
+        annotation.addGlobalActionButtons(response.annotations.length);
+    },
+    
+    addGlobalActionButtons : function(nb)
+    {
+        if(nb == annotation.annotationsArg.length)
+        {
+            var show = new Element('input', {'type' : 'submit', 'onClick' : 'annotation.showAllAnnotation(\''+Object.toJSON(annotation.annotationsArg)+'\')', 'value' : 'Show all'});
+            var hide = new Element('input', {'type' : 'submit', 'onClick' : 'annotation.hideAllAnnotation(\''+Object.toJSON(annotation.annotationsArg)+'\')', 'value' : 'Hide all'});
+            $('annotationResume').select('[class="xwikipanelcontents"]')[0].insert({'bottom': show});
+            $('annotationResume').select('[class="xwikipanelcontents"]')[0].insert({'bottom': hide});
+            annotation.annotationsArg = [];
+        }
+    },
+
+/* Annotation */
+    /*
+     * request for annotated document
+     */
+    getAnnotations : function(force)
+    {
+        if(annotation.annotatedDocumentFlag == 1 || force == 1)
+        {
+            annotation.refreshDisplay();
+            return;
+        }
+        annotation.annotatedDocumentFlag = 1;
+        var infos = annotation.getDocumentInfos();
+        var url = 'http://'+infos.host+'/xwiki/rest/wikis/xwiki/spaces/'+infos.space+'/pages/'+infos.page+'/annotation?media=json';
+        new Ajax.Request(url,
+        {
+            method: 'GET',
+            onSuccess: annotation.getAnnotationsCallback,
+            onFailure: annotation.failureCallback
+        });
+    },
+    
+    removeAnnotation : function(id)
+    {
+        var infos = annotation.getDocumentInfos();
+        var url = 'http://'+infos.host+'/xwiki/rest/wikis/xwiki/spaces/'+infos.space+'/pages/'+infos.page+'/annotation/'+id+'?method=DELETE&amp;media=json';
+        new Ajax.Request(url,
+        {
+            method: 'POST',
+            onSuccess: annotation.genericCallback,
+            onFailure: annotation.failureCallback
+        });
+    },
+    
+    addAnnotation : function()
+    {
+        var infos = annotation.getDocumentInfos();
+        var url = 'http://'+infos.host+'/xwiki/rest/wikis/xwiki/spaces/'+infos.space+'/pages/'+infos.page+'/annotation?method=PUT&amp;media=json';
+        new Ajax.Request(url,
+        {
+            method : 'POST',
+            contentType : 'text/xml',
+            postBody : annotation.getXMLData(),
+            onSuccess : annotation.genericCallback,
+            onFailure : annotation.failureCallback
+        });
+    },
+    
+    getAnnotationsCallback : function(transport)
+    {
+        var response = transport.responseText || "no response text";
+        response = response.evalJSON();
+        $('xwikicontent').replace('&lt;div id="xwikicontent"&gt;'+response.source+'&lt;/div&gt;');
+        annotation.refreshDisplay();
+    },
+    
+    genericCallback : function(transport)
+    {
+        var response = transport.responseText || "no response text";
+        response = response.evalJSON();
+        if(response.responseCode != 0) window.alert(response.responseCode);
+        else
+        {
+            $('xwikicontent').replace('&lt;div id="xwikicontent"&gt;'+response.source+'&lt;/div&gt;');
+            annotation.refreshDisplay();
+            annotation.updateAnnotationResume(response);
+        }
+    },
+    
+    failureCallback : function()
+    {
+        window.alert('Failure callback.');
+    },
+
+/* Display */
+    toggleMode : function(id)
+    {
+        var tmp = annotation.display['ID'+id];
+        tmp.mode = (tmp.mode != 'false')?'false':'true';
+        annotation.display['ID'+id] = tmp;
+        if(annotation.annotatedDocumentFlag == 0)
+        {
+            annotation.requestAnnotatedDocument();
+        } else
+        {
+            annotation.refreshDisplay();
+        }
+    },
+    
+    refreshDisplay : function()
+    {
+        for(var id in annotation.display)
+        {
+            var tmp = annotation.display[id];
+            if(tmp.mode != 'false')
+            {
+                annotation.highlightAnnotation(id, tmp.color);
+                if(tmp.mode == 'volatile')
+                {
+                    tmp.mode = 'false';
+                    annotation.display[id] = tmp;
+                }
+            } else
+            {
+                annotation.unlightAnnotation(id);
+            }
+        }
+    },
+    
+    unlightAnnotation : function(id)
+    {
+        var results = new Array();
+        var iterator = document.evaluate("//span[contains(@class, '"+id+"')]", document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var item = iterator.iterateNext();
+        while(item)
+        {
+            results.push(item);
+            item = iterator.iterateNext();
+        }
+        for(var i=0;i&lt;results.length; ++i)
+        {
+            results[i].style.background = 'none';
+        }
+    },
+    
+    highlightAnnotation : function(id, color)
+    {
+        var results = new Array();
+        var iterator = document.evaluate("//span[contains(@class, '"+id+"')]", document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        var item = iterator.iterateNext();
+        
+        while(item)
+        {
+            results.push(item);
+            item = iterator.iterateNext();
+        }
+        for(var i=0;i&lt;results.length; ++i)
+        {
+            results[i].style.background = color;
+        }
+    },
+
+/* Annotation Display Management */
+    showAnnotation : function(id, color)
+    {
+        annotation._showAnnotation(id, color, 'volatile', 0);
+    },
+    
+    _showAnnotation : function(id, color, mode, refresh)
+    {
+        if(typeof(annotation.display['ID'+id]) == 'undefined' || annotation.display['ID'+id].mode != 'true')
+        {
+            annotation.display['ID'+id] = {color : color, mode : mode};
+            annotation.getAnnotations(refresh);
+        }
+    },
+    
+    showAllAnnotation : function(infos)
+    {
+        var annotations = infos.evalJSON();
+        for(var i=0; i&lt;annotations.length; ++i)
+        {
+            annotation._showAnnotation(annotations[i].id, annotations[i].color, 'true', 0);
+        }
+        annotation.getAnnotations(1);
+    },
+    
+    hideAnnotation : function(id, color)
+    {
+        annotation._hideAnnotation(id, color, 0)
+    },
+    
+    _hideAnnotation : function(id, color, force)
+    {
+        if(typeof(annotation.display['ID'+id]) == 'undefined' || annotation.display['ID'+id].mode != 'true' || force == 1)
+        {
+            annotation.display['ID'+id] = {color : color, mode : 'false'};
+            annotation.getAnnotations(force);
+        }
+    },
+    
+    hideAllAnnotation : function(infos)
+    {
+        var annotations = infos.evalJSON();
+        for(var i=0; i&lt;annotations.length; ++i)
+        {
+            annotation._hideAnnotation(annotations[i].id, annotations[i].color, 1);
+        }
+    },
+
+/* Events Management */
+    onKeyDown : function(event)
+    {
+        if(event.keyCode == 17 || event.keyCode == 91)
+        {
+            window.getSelection().removeAllRanges();
+            annotation.onAnnotationFlag = 1;
+        }
+    },
+    
+    onKeyUp : function(event)
+    {
+        if(event.keyCode == 17 || event.keyCode == 91)
+        {
+            annotation.onAnnotationFlag = 0;
+        }
+    },
+    
+    onMouseUp : function(event)
+    {
+        if(annotation.onAnnotationFlag == 1)
+        {
+            var initialRange = window.getSelection().getRangeAt(0);
+            annotation.selection = initialRange.toString();
+            var contextInfos = annotation.getContextInfos(initialRange);
+            annotation.context = contextInfos.co;
+            annotation.intraOffset = contextInfos.off;
+            annotation.showAnnotationInputPanel(event.screenX, event.screenY);
+        } else if(window.getSelection().rangeCount == 0
+                || window.getSelection().getRangeAt(0).toString() == ''
+                    || annotation.selection != '')
+        {
+            var node = event.target;    
+            while(node != $('annotationPanel') &amp;&amp; node != $('xwikicontent') &amp;&amp; node != null)
+            {
+                node = node.parentNode;
+            }
+            if(node == null || node != $('annotationPanel'))
+            {
+                annotation.hideAnnotationInputPanel();
+            }
+        }
+    },
+    
+    onAddAnnotationRequest : function()
+    {
+        annotation.annotationText = $('annotationInput').getValue();
+        annotation.hideAnnotationInputPanel();
+        annotation.addAnnotation();
+    },
+    
+    onCancelAnnotationRequest : function()
+    {
+        annotation.hideAnnotationInputPanel();
+        annotation.selection = '';
+    }
+};
+
+(function()
+{
+  function onDOMLoaded()
+  {
+    if(typeof(annotationFeatureEnabled) != 'undefined' &amp;&amp; annotationFeatureEnabled == true)
+    {
+      annotation = new XWiki.Annotation();
+    }
+  }
+  document.observe('dom:loaded', function(event) {onDOMLoaded();});
+})();
+</code></property><property><name>Annotation Feature Client Side Code</name>
+</property>
+<property>
+<parse>0</parse>
+</property>
+<property>
+<use>always</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Panels.AnnotationManager</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<guid>236ff6d4-2d80-4a66-ba64-4d53bba687fc</guid>
+<property>
+<tags/>
+</property>
+</object>
+<content>#includeInContext("XWiki.SkinEditor")</content>
+</xwikidoc>

@@ -123,7 +123,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("wiki.txt");
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int data = 0;
+        int data;
         while (-1 != (data = is.read())) {
             baos.write(data);
         }

@@ -70,7 +70,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         String documentName = nameSerializer.serialize(docBridge.getCurrentDocumentName());
         
         // Parse the macro content into an XDOM.
-        XDOM xdom = null;
+        XDOM xdom;
         try {
             Parser parser = componentManager.lookup(Parser.class, docBridge.getDocumentSyntaxId(documentName));
             xdom = parser.parse(new StringReader(macroContent));

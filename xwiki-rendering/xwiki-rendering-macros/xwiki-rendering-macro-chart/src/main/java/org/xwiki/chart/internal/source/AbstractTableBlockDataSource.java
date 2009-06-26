@@ -180,10 +180,10 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
                 throw new MacroExecutionException(String.format("Invalid range specification: [%s].", range));
             }
 
-            int startRow = 0;
-            int startColumn = 0;
-            int endRow = 0;
-            int endColumn = 0;
+            int startRow;
+            int startColumn;
+            int endRow;
+            int endColumn;
 
             String[] rangeSegments = range.split(RANGE_SEPERATOR);
             startColumn = rangeSegments[0].charAt(0) - 'A';

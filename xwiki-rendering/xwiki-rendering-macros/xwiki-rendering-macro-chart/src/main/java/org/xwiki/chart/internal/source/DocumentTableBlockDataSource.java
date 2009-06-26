@@ -86,7 +86,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         }
         
         // Parse the document content into an XDOM.
-        XDOM xdom = null;
+        XDOM xdom;
         try {
             Parser parser = componentManager.lookup(Parser.class, docBridge.getDocumentSyntaxId(documentName));
             xdom = parser.parse(new StringReader(docBridge.getDocumentContent(documentName)));

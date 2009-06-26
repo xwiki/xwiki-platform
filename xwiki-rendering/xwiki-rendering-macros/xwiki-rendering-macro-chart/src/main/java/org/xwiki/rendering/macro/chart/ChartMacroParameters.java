@@ -170,14 +170,15 @@ public class ChartMacroParameters
     /**
      * @return a Map containing all the parameters.
      */
-    public Map<String, String> getParametersMap() {
+    public Map<String, String> getParametersMap()
+    {
         Map<String, String> map = new HashMap<String, String>();
-        map.put(ChartGenerator.TITLE_PARAM, title);
-        map.put(ChartGenerator.WIDTH_PARAM, String.valueOf(width));
-        map.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(height));
-        map.put(ChartGenerator.TYPE_PARAM, type.toString());
-        map.put(ChartDataSource.SOURCE, source);
-        map.put(ChartDataSource.PARAMS, params);        
+        map.put(ChartGenerator.TITLE_PARAM, getTitle());
+        map.put(ChartGenerator.WIDTH_PARAM, String.valueOf(getWidth()));
+        map.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(getHeight()));
+        map.put(ChartGenerator.TYPE_PARAM, getType());
+        map.put(ChartDataSource.SOURCE, getSource());
+        map.put(ChartDataSource.PARAMS, getParams());        
         return map;
     }
 }

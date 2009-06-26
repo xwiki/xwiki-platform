@@ -52,14 +52,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id: $
  * @since 2.0M1
  */
-
 @Component("chart")
 public class ChartMacro extends AbstractMacro<ChartMacroParameters>
 {
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "Displays a chart generated from miscelaneous data sources.";
+    private static final String DESCRIPTION = "Displays a chart generated from miscellaneous data sources.";
 
     /**
      * Used for building the actual chart.
@@ -133,7 +132,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     {
         Map<String, String> paramsMap = parameters.getParametersMap();
         String source = paramsMap.get("source");
-        File chartFile = null;
+        File chartFile;
         try {
             ChartDataSource dataSource = componentManager.lookup(ChartDataSource.class, source);
             byte[] chart =

@@ -64,13 +64,13 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      * Used for building the actual chart.
      */
     @Requirement
-    protected ChartGenerator chartGenerator;
+    private ChartGenerator chartGenerator;
 
     /**
      * Used for getting web URLs from specific filenames.
      */
     @Requirement
-    protected DocumentAccessBridge documentAccessBridge;
+    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * The component manager needed for instantiating the datasource factory.

@@ -181,17 +181,10 @@
             </goals>
             <phase>test</phase>
             <configuration>
+              <comparisonVersion>2.0-milestone-1</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <!-- Excludes for the 2.0 M1 release. Once it's released remove them. -->
-                <exclude>org/xwiki/rendering/block/Block</exclude>
-                <exclude>org/xwiki/rendering/block/AbstractBlock</exclude>
-                <exclude>org/xwiki/rendering/parser/ParseException</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/XWikiXHTMLImageRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/XWikiXHTMLLinkRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/SimpleXHTMLImageRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/SimpleXHTMLLinkRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/XHTMLRenderer</exclude>
+                <!-- Excludes for the 2.0 M2 release. Once it's released remove them. -->
               </excludes>
             </configuration>
           </execution>

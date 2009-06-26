@@ -120,12 +120,12 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     }
 
     /**
-     * Builds the chart according to the specifications passed in.
+     * Builds the chart image according to the specifications passed in.
      * 
-     * @param parameters macro parameters.
-     * @param content macro content.
-     * @return name of the image file generated.
-     * @throws MacroExecutionException if an error occurs while generating / saving the chart image.
+     * @param parameters macro parameters
+     * @param content macro content
+     * @return the name of the generated image file
+     * @throws MacroExecutionException if an error occurs while generating / saving the chart image
      */
     private String generateChart(ChartMacroParameters parameters, String content)
         throws MacroExecutionException
@@ -152,11 +152,11 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     }
 
     /**
-     * Returns the temporary directory into which chart image files will be saved.
+     * Returns the temporary file into which the chart image will be saved.
      * 
-     * @param parameters macro parameters.
-     * @param content macro content.
-     * @return the chart image file directory.
+     * @param parameters macro parameters
+     * @param content macro content
+     * @return the chart image file
      */
     protected File getChartImageFile(ChartMacroParameters parameters, String content)
     {

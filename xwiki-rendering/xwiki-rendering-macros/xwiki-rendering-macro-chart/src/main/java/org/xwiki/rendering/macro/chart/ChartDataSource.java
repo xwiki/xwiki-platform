@@ -32,7 +32,6 @@ import org.xwiki.rendering.macro.MacroExecutionException;
  * @version $Id: $
  * @since 2.0M1
  */
-
 @ComponentRole
 public interface ChartDataSource
 {

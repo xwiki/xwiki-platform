@@ -79,8 +79,8 @@ public interface Block extends Cloneable
     void insertChildAfter(Block blockToInsert, Block previousBlock);
 
     /**
-     * Replaces an existing children block with the passed new block. 
-     * Also sets the new block's parent to be the current block.
+     * Replaces an existing children block with the passed new block. Also sets the new block's parent to be the current
+     * block.
      * 
      * @param newBlock the new block to replace the old block with
      * @param oldBlock the block to replace with the new block
@@ -88,14 +88,14 @@ public interface Block extends Cloneable
     void replaceChild(Block newBlock, Block oldBlock);
 
     /**
-     * Replaces an existing children block with the passed new blocks. 
-     * Also sets the new block's parents to be the current block.
+     * Replaces an existing children block with the passed new blocks. Also sets the new block's parents to be the
+     * current block.
      * 
      * @param newBlocks the new blocks to replace the old block with
      * @param oldBlock the block to replace with the new blocks
      */
     void replaceChild(List<Block> newBlocks, Block oldBlock);
-    
+
     /**
      * Get the parent block. All blocks have a parent and the top level parent is the {@link XDOM} object.
      * 
@@ -137,7 +137,10 @@ public interface Block extends Cloneable
     <T extends Block> List<T> getChildrenByType(Class<T> blockClass, boolean recurse);
 
     /**
-     * Look forward to find a block which inherit or is provided type.
+     * Look upward to find a block which inherit or is provided type.
+     * <p>
+     * The difference with {@link #getParentBlockByType(Class)} is that this one look also at previous block in the same
+     * parent when {@link #getParentBlockByType(Class)} only look at parents.
      * 
      * @param <T> the class of the Blocks to return
      * @param blockClass the block class to look for
@@ -148,7 +151,10 @@ public interface Block extends Cloneable
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
 
     /**
-     * Look forward to find a block which inherit or is provided type.
+     * Recursively look at parents to find a block which inherits or is provided type.
+     * <p>
+     * The difference with {@link #getPreviousBlockByType(Class, boolean)} is that this one only look at parent when
+     * {@link #getPreviousBlockByType(Class, boolean)} look at previous block in the same parent.
      * 
      * @param <T> the class of the Blocks to return
      * @param blockClass the block class to look for

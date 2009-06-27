@@ -28,13 +28,16 @@ import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 
 /**
+ * Force all ending lines based on UNIX new lines (<code>\n</code>) to make parsing quicker and easier for following
+ * filters.
+ * 
  * @version $Id$
  * @since 1.8M1
  */
 @Component("nl")
 public class NewLineFilter extends AbstractFilter implements Initializable
 {
-    private static final Pattern MSNEWLINE_PATTERN = Pattern.compile("\\r\\n|\\r");
+    private static final Pattern ALTERNATIVE_LINE_ENDINGS = Pattern.compile("\r\n?");
 
     /**
      * {@inheritDoc}
@@ -54,6 +57,6 @@ public class NewLineFilter extends AbstractFilter implements Initializable
      */
     public String filter(String content, FilterContext filterContext)
     {
-        return MSNEWLINE_PATTERN.matcher(content).replaceAll("\n");
+        return ALTERNATIVE_LINE_ENDINGS.matcher(content).replaceAll("\n");
     }
 }

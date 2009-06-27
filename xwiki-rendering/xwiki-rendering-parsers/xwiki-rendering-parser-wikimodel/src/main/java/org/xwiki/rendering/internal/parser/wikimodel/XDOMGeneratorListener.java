@@ -380,7 +380,7 @@ public class XDOMGeneratorListener implements IWemListener
         List<Block> children = generateListFromStack();
         HeaderLevel headerLevel = HeaderLevel.parseInt(level);
         Map<String, String> parameters = convertParameters(params);
-        String id = "H" + this.idGenerator.generateUniqueId(this.renderersUtils.renderPlainText(children));
+        String id = this.idGenerator.generateUniqueId("H", this.renderersUtils.renderPlainText(children));
 
         this.stack.push(new HeaderBlock(children, headerLevel, parameters, id));
     }

@@ -37,7 +37,7 @@ public class IndentVelocityMacroFilter implements VelocityMacroFilter
     /**
      * Match indentation spaces.
      */
-    private static final Pattern INDENT_PATTERN = Pattern.compile("^[ \t]*", Pattern.MULTILINE);
+    private static final Pattern INDENT_PATTERN = Pattern.compile("^[ \t]++", Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}

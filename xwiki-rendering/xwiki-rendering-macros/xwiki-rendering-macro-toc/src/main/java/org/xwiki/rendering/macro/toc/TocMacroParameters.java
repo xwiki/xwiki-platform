@@ -54,7 +54,7 @@ public class TocMacroParameters
     /**
      * Indicate if the start has been set or if it has the default value.
      */
-    private boolean startSet;
+    private boolean customStart;
 
     /**
      * The maximum section level. For example if 3 then all section levels from 4 will not be listed.
@@ -84,7 +84,7 @@ public class TocMacroParameters
         }
 
         this.start = start;
-        this.startSet = true;
+        this.customStart = true;
     }
 
     /**
@@ -98,9 +98,9 @@ public class TocMacroParameters
     /**
      * @return indicate if the start has been set or if it has the default value.
      */
-    public boolean isStartSet()
+    public boolean isCustomStart()
     {
-        return this.startSet;
+        return this.customStart;
     }
 
     /**

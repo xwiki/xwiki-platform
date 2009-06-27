@@ -73,11 +73,7 @@ public class IdGenerator
     public String generateUniqueId(String prefix, String text)
     {
         // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
-        String idPrefix;
-        if (prefix != null) {
-            idPrefix = prefix;
-        }
-        idPrefix = text.replaceAll("[^a-zA-Z0-9]", "");
+        String idPrefix = (prefix != null ? prefix : "") + text.replaceAll("[^a-zA-Z0-9]", "");
 
         int occurence = 0;
         String id = idPrefix;

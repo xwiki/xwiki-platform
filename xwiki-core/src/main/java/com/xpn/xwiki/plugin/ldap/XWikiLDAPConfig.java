@@ -134,12 +134,12 @@ public final class XWikiLDAPConfig
      */
     public String getLDAPParam(String prefName, String cfgName, String def, XWikiContext context)
     {
-        String param = def;
+        String param = null;
 
         try {
             param = context.getWiki().getXWikiPreference(prefName, context);
         } catch (Exception e) {
-            // ignore
+            LOG.error("Failed to get preferences", e);
         }
 
         if (param == null || "".equals(param)) {

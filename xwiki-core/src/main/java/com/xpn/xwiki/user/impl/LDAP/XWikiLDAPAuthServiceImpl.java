@@ -561,21 +561,15 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             LOG.debug("Updating group membership for the user: " + xwikiUserName);
         }
 
-        // ASSUMING the implementation still returns the actual list. In this case
-        // manipulations to the list are for real.
-        // get the list of groups the user already belongs to
-        Collection<String> userGroups =
+        Collection<String> xwikiUserGroupList =
             context.getWiki().getGroupService(context).getAllGroupsNamesForMember(xwikiUserName, 0, 0, context);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("The user belongs to following XWiki groups: ");
-            for (String userGroupName : userGroups) {
+            for (String userGroupName : xwikiUserGroupList) {
                 LOG.debug(userGroupName);
             }
         }
-
-        Collection<String> xwikiUserGroupList =
-            context.getWiki().getGroupService(context).getAllGroupsNamesForMember(xwikiUserName, 0, 0, context);
 
         // go through mapped groups to locate the user
         for (Map.Entry<String, Set<String>> entry : groupMappings.entrySet()) {

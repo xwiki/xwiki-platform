@@ -209,6 +209,7 @@ public class XWikiLDAPConfigTest extends TestCase
     {
         assertEquals("localhost", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, prefContext));
         assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", null, cfgContext));
+        assertEquals("127.0.0.1", XWikiLDAPConfig.getInstance().getLDAPParam("ldap_server", "default", cfgContext));
     }
 
     public void testIsLDAPEnabled()

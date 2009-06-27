@@ -139,7 +139,7 @@ public final class XWikiLDAPConfig
         try {
             param = context.getWiki().getXWikiPreference(prefName, context);
         } catch (Exception e) {
-            // ignore
+            LOG.error("Failed to get preferences", e);
         }
 
         if (param == null || "".equals(param)) {

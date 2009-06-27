@@ -33,5 +33,5 @@ public enum ListType
     /**
      * Each list item start with a bullet.
      */
-    BULLETED;
+    BULLETED
 }

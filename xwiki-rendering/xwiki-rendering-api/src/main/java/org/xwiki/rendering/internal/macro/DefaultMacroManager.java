@@ -221,12 +221,9 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
      */
     public boolean exists(String macroName, Syntax syntax)
     {
-        if (this.syntaxSpecificMacros.get(syntax) != null
-            && this.syntaxSpecificMacros.get(syntax).get(macroName) != null) {
-            return true;
-        }
+        return this.syntaxSpecificMacros.get(syntax) != null
+            && this.syntaxSpecificMacros.get(syntax).get(macroName) != null;
 
-        return false;
     }
 
     /**
@@ -236,10 +233,6 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
      */
     public boolean exists(String macroName)
     {
-        if (this.allSyntaxesMacros.get(macroName) != null) {
-            return true;
-        }
-
-        return false;
+        return this.allSyntaxesMacros.get(macroName) != null;
     }
 }

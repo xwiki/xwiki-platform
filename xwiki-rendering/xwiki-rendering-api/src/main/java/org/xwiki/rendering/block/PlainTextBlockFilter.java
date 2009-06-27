@@ -72,7 +72,7 @@ public class PlainTextBlockFilter implements BlockFilter
     {
         if (VALID_PLAINTEXT_BLOCKS.contains(block.getClass())) {
             return Collections.singletonList(block);
-        } else if (block.getClass() == LinkBlock.class && ((LinkBlock) block).getChildren().size() == 0) {
+        } else if (block.getClass() == LinkBlock.class && block.getChildren().size() == 0) {
             Link link = ((LinkBlock) block).getLink();
             if (link.getType() == LinkType.DOCUMENT) {
                 return this.parseUtils.parsePlainText(this.linkLabelGenerator.generate(link));

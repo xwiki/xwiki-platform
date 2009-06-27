@@ -61,7 +61,7 @@ public class XWikiSyntaxLinkRenderer
     public void beginRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI,
         Map<String, String> parameters)
     {
-        if (!isFreeStandingURI || (isFreeStandingURI && !parameters.isEmpty())) {
+        if (!isFreeStandingURI || !parameters.isEmpty()) {
             printer.print("[[");
         }
     }
@@ -85,7 +85,7 @@ public class XWikiSyntaxLinkRenderer
             printer.print(this.parametersPrinter.print(parameters, '~'));
         }
 
-        if (!isFreeStandingURI || (isFreeStandingURI && !parameters.isEmpty())) {
+        if (!isFreeStandingURI || !parameters.isEmpty()) {
             printer.print("]]");
         }
     }

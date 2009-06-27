@@ -58,7 +58,7 @@ public class TestSimpleMacro extends AbstractNoParameterMacro
         throws MacroExecutionException
     {
         int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
-        return Arrays.asList(new Block[] {new ParagraphBlock(Arrays.<Block> asList(new WordBlock("simplemacro"
-            + wordCount)))});
+        return Arrays.<Block>asList(new ParagraphBlock(Arrays.<Block>asList(new WordBlock("simplemacro"
+            + wordCount))));
     }
 }

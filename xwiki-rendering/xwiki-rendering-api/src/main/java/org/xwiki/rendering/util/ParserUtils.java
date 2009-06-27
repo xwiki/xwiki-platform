@@ -66,7 +66,7 @@ public class ParserUtils
 
                 word.setLength(0);
             } else if (c == '\r') {
-                continue;
+                // Do nothing, skip it
             } else if (c == ' ') {
                 if (word.length() > 0) {
                     blockList.add(new WordBlock(word.toString()));

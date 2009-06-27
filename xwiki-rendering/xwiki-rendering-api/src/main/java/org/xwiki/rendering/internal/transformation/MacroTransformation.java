@@ -119,7 +119,7 @@ public class MacroTransformation extends AbstractTransformation
         }
     }
 
-    private boolean transformOnce(MacroTransformationContext context, Syntax syntax) throws TransformationException
+    private boolean transformOnce(MacroTransformationContext context, Syntax syntax)
     {
         // 1) Get highest priority macro to execute
         MacroHolder macroHolder = getHighestPriorityMacro(context.getXDOM(), syntax);

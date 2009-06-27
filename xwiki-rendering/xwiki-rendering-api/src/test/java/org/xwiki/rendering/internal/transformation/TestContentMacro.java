@@ -56,6 +56,6 @@ public class TestContentMacro extends AbstractNoParameterMacro
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Arrays.asList(new Block[] {new WordBlock(content)});
+        return Arrays.<Block>asList(new WordBlock(content));
     }
 }

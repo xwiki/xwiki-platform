@@ -40,13 +40,11 @@ public class BlockTest extends TestCase
 {
     public void testGetBlocksByType()
     {
-        ParagraphBlock pb1 =
-            new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays
-                .asList(new Block[] {new WordBlock("title1")}), HeaderLevel.LEVEL1)));
-        ParagraphBlock pb2 =
-            new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays
-                .asList(new Block[] {new WordBlock("title2")}), HeaderLevel.LEVEL2)));
-        ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
+        ParagraphBlock pb1 = new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(
+            Arrays.<Block>asList(new WordBlock("title1")), HeaderLevel.LEVEL1)));
+        ParagraphBlock pb2 = new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(
+            Arrays.<Block>asList(new WordBlock("title2")), HeaderLevel.LEVEL2)));
+        ParagraphBlock pb3 = new ParagraphBlock(Arrays.<Block>asList(pb1, pb2));
 
         List<HeaderBlock> results = pb1.getChildrenByType(HeaderBlock.class, true);
         assertEquals(1, results.size());
@@ -114,7 +112,7 @@ public class BlockTest extends TestCase
         Link link = new Link();
         link.setReference("reference");
         LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), link, false);
-        Block rootBlock = new ParagraphBlock(Arrays.asList((Block) wb, ib, lb));
+        Block rootBlock = new ParagraphBlock(Arrays.<Block>asList(wb, ib, lb));
 
         Block newRootBlock = rootBlock.clone();
 

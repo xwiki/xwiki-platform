@@ -59,7 +59,7 @@ public class TestFormatMacro extends AbstractNoParameterMacro
         throws MacroExecutionException
     {
         int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
-        return Arrays.asList(new Block[] { new FormatBlock(Arrays.<Block>asList(
-            new WordBlock("formatmacro" + wordCount)), Format.NONE, Collections.singletonMap("param", "value"))});
+        return Arrays.<Block>asList(new FormatBlock(Arrays.<Block>asList(
+            new WordBlock("formatmacro" + wordCount)), Format.NONE, Collections.singletonMap("param", "value")));
     }
 }

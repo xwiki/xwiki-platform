@@ -165,7 +165,6 @@ public class Link implements Cloneable
         boolean shouldAddSpace = false;
         StringBuffer sb = new StringBuffer();
         if (getReference() != null) {
-            sb.append(shouldAddSpace ? " " : "");
             sb.append("Reference = [").append(getReference()).append("]");
             shouldAddSpace = true;
         }
@@ -182,7 +181,6 @@ public class Link implements Cloneable
         if (getInterWikiAlias() != null) {
             sb.append(shouldAddSpace ? " " : "");
             sb.append("InterWikiAlias = [").append(getInterWikiAlias()).append("]");
-            shouldAddSpace = true;
         }
 
         return sb.toString();

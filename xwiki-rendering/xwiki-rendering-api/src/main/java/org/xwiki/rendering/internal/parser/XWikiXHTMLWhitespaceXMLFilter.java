@@ -108,7 +108,7 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
     {
         // Always remove leading/trailing white spaces if we're in wiki mode even if we're inside CDATA and PRE
         // elements.
-        return this.containsWikiSyntax ? true : super.shouldRemoveWhiteSpaces();
+        return this.containsWikiSyntax || super.shouldRemoveWhiteSpaces();
     }
 
     /**

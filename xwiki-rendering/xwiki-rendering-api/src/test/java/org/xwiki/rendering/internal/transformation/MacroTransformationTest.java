@@ -144,9 +144,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endMacroMarkerStandalone [testprioritymacro] []\n"
             + "endDocument";
 
-        XDOM dom = new XDOM(Arrays.asList(
-            (Block) new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
-            (Block) new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap(), false)));
+        XDOM dom = new XDOM(Arrays.<Block>asList(
+            new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
+            new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap(), false)));
 
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 

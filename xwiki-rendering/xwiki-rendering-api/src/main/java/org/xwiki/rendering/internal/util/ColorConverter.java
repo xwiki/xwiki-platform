@@ -120,13 +120,13 @@ public final class ColorConverter extends AbstractConverter
         if (value.length() != 7) {
             throw new IllegalArgumentException(USAGE);
         }
-        int colorValue = 0;
+        int colorValue;
         try {
             colorValue = Integer.parseInt(value.substring(1), 16);
-            return new Color(colorValue);
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(value + "is not a valid Html color\n " + ex);
         }
+        return new Color(colorValue);
     }
 
     /**

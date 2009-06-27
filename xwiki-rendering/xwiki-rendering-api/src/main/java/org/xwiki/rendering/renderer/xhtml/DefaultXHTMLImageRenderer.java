@@ -95,7 +95,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer
         Map<String, String> attributes = new LinkedHashMap<String, String>();
 
         // First we need to compute the image URL.
-        String imageURL = null;
+        String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
             DocumentImage documentImage = (DocumentImage) image;
             imageURL = this.wikiModel.getAttachmentURL(documentImage.getDocumentName(), 

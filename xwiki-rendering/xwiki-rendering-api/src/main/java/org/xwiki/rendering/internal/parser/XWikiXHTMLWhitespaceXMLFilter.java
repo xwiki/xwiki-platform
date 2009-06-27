@@ -74,7 +74,7 @@ public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
     public void setProperty(String name, Object value) throws SAXNotRecognizedException, SAXNotSupportedException
     {
         if (SAX_CONTAINS_WIKI_SYNTAX_PROPERTY.equalsIgnoreCase(name)) {
-            this.containsWikiSyntax = ((Boolean) value).booleanValue();
+            this.containsWikiSyntax = (Boolean) value;
         } else {
             super.setProperty(name, value);
         }

@@ -88,8 +88,7 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
             BeanInfo beanInfo = Introspector.getBeanInfo(this.parametersBeanClass);
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             if (propertyDescriptors != null) {
-                for (int i = 0; i < propertyDescriptors.length; i++) {
-                    PropertyDescriptor propertyDescriptor = propertyDescriptors[i];
+                for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
                     if (propertyDescriptor != null) {
                         extractParameterDescriptor(propertyDescriptor, getParametersBeanClass().newInstance());
                     }

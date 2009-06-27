@@ -126,7 +126,10 @@ public interface Block extends Cloneable
     <T extends Block> List<T> getChildrenByType(Class<T> blockClass, boolean recurse);
 
     /**
-     * Look forward to find a block which inherit or is provided type.
+     * Look upward to find a block which inherit or is provided type.
+     * <p>
+     * The difference with {@link #getParentBlockByType(Class)} is that this one look also at previous block in the same
+     * parent when {@link #getParentBlockByType(Class)} only look at parents.
      * 
      * @param <T> the class of the Blocks to return
      * @param blockClass the block class to look for
@@ -137,7 +140,10 @@ public interface Block extends Cloneable
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
 
     /**
-     * Look forward to find a block which inherit or is provided type.
+     * Recursively look at parents to find a block which inherits or is provided type.
+     * <p>
+     * The difference with {@link #getPreviousBlockByType(Class, boolean)} is that this one only look at parent when
+     * {@link #getPreviousBlockByType(Class, boolean)} look at previous block in the same parent.
      * 
      * @param <T> the class of the Blocks to return
      * @param blockClass the block class to look for

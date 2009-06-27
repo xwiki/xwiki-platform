@@ -142,7 +142,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
 
         if (parameters.getScope() == Scope.LOCAL) {
             root = context.getCurrentMacroBlock().getParent();
-            if (!parameters.isStartSet()) {
+            if (!parameters.isCustomStart()) {
                 SectionBlock rootSection = context.getCurrentMacroBlock().getParentBlockByType(SectionBlock.class);
                 HeaderBlock header = rootSection.getHeaderBlock();
                 if (header != null) {

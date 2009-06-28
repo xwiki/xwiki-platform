@@ -17,61 +17,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.internal.macro.rss;
 
 import java.net.SocketTimeoutException;
 import java.net.URLConnection;
 import java.text.MessageFormat;
-import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
+import org.apache.commons.lang.StringUtils;
 
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 /**
- * Auxiliary class which takes care of extracting the data from a RSS feed and providing it to the Rss macro.
+ * Factory implementation using Rome to return the feed's data.
  * 
  * @version $Id$
  * @since 1.9
  */
-public class FeedReader
+public class DefaultRomeFeedFactory implements RomeFeedFactory
 {
     /**
-     * The maximum number of seconds to wait when inquiring the RSS feed provider.
+     * The maximum number of milliseconds to wait when inquiring the RSS feed provider.
      */
-    protected static final int TIMEOUT_SECONDS = 5;
+    private static final int TIMEOUT_MILLISECONDS = 5000;
 
     /**
-     * Unique ID for Class Serialization.
+     * {@inheritDoc}
+     * @see RomeFeedFactory#createFeed(org.xwiki.rendering.macro.rss.RssMacroParameters)
      */
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * The actual feed from which the data needs to be read from.
-     */
-    private SyndFeed feed;
-
-    /**
-     * @param parameters the Rss macro's parameters needed for getting the data
-     * @throws MacroExecutionException in case the feed cannot be read
-     */
-    public FeedReader(RssMacroParameters parameters) throws MacroExecutionException
+    public SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException
     {
         if (StringUtils.isEmpty(parameters.getFeed())) {
             throw new MacroExecutionException("The required 'feed' parameter is missing");
         }
 
-        SyndFeedInput input = new SyndFeedInput();
+        SyndFeedInput syndFeedInput = new SyndFeedInput();
 
+        SyndFeed feed;
         try {
             URLConnection connection = parameters.getFeedURL().openConnection();
-            connection.setConnectTimeout(TIMEOUT_SECONDS * 1000);
-            feed = input.build(new XmlReader(connection));
+            connection.setConnectTimeout(TIMEOUT_MILLISECONDS);
+            feed = syndFeedInput.build(new XmlReader(connection));
         } catch (SocketTimeoutException ex) {
             throw new MacroExecutionException(MessageFormat.format("Connection timeout when trying to reach [{0}]",
                 parameters.getFeedURL()));
@@ -83,46 +72,7 @@ public class FeedReader
             throw new MacroExecutionException(MessageFormat.format("No feed found at [{0}]",
                 parameters.getFeedURL()));
         }
-    }
 
-    /**
-     * @return the feed's image URL
-     */
-    public String getImageURL()
-    {
-        return feed.getImage().getUrl();
-    }
-
-    /**
-     * @return whether the feed has an image or not
-     */
-    public boolean hasImage()
-    {
-        return feed.getImage() != null;
-    }
-
-    /**
-     * @return the feed's link
-     */
-    public String getLink()
-    {
-        return feed.getLink();
-    }
-
-    /**
-     * @return the feed's title
-     */
-    public String getTitle()
-    {
-        return feed.getTitle();
-    }
-
-    /**
-     * @return a list containing the feed's entries
-     */
-    @SuppressWarnings("unchecked")
-    public List getEntries()
-    {
-        return feed.getEntries();
+        return feed;
     }
 }

@@ -17,15 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.internal.macro.rss;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -40,7 +39,6 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.URLImage;
-//import org.xwiki.rendering.listener.xml.XMLElement;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -58,7 +56,7 @@ import org.xwiki.rendering.util.ParserUtils;
  */
 @Component("rss")
 public class RssMacro extends AbstractMacro<RssMacroParameters>
-{        
+{
     /**
      * The name of the CSS class attribute.
      */
@@ -87,6 +85,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     private ParserUtils parserUtils = new ParserUtils();
 
     /**
+     * Create a Feed object from a feed specified as a URL.
+     */
+    private RomeFeedFactory romeFeedFactory = new DefaultRomeFeedFactory();
+
+    /**
      * Create and initialize the descriptor of the macro.
      */
     public RssMacro()
@@ -95,16 +98,94 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     }
 
     /**
-     * Renders the given RSS's entries.
+     * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     */
+    public boolean supportsInlineMode()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
+     */
+    public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
+        
+        BoxMacroParameters boxParameters = new BoxMacroParameters();
+        boolean hasImage = parameters.isImage() && (feed.getImage() != null);
+        boxParameters.setCssClass("rssfeed");
+ 
+        if (!StringUtils.isEmpty(parameters.getWidth())) {
+            boxParameters.setWidth(parameters.getWidth());
+        }
+
+        boxParameters.setBlockTitle(generateBoxTitle("rsschanneltitle", feed));
+
+        if (hasImage) {
+            boxParameters.setImage(feed.getImage().getUrl());
+        } 
+
+        List<Block> result = boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
+        generaterEntries(result.get(0), feed, parameters, context);
+
+        return result;
+    }
+
+    /**
+     * Renders the RSS's title.
+     * 
+     * @param cssClass the CSS sheet
+     * @param feed the RSS feed data
+     * @return the list of blocks making the RSS Box title
+     */
+    private List< ? extends Block> generateBoxTitle(String cssClass, SyndFeed feed)
+    {
+        List<Block> titleBlocks;
+
+        if (feed.getLink() == null) {
+            titleBlocks = this.parserUtils.parsePlainText(feed.getTitle());
+        } else {
+            // Title link.
+            Link titleLink = new Link();
+            titleLink.setReference(feed.getLink());
+            titleLink.setType(LinkType.URI);
+            
+            // Title text link.
+            Block titleTextLinkBlock =
+                    new LinkBlock(this.parserUtils.parsePlainText(feed.getTitle()), titleLink, true);
+            
+            // Rss icon.
+            String imagePath = skinAccessBridge.getSkinFile("icons/black-rss.png");
+            ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
+            
+            // Title rss icon link.
+            Block titleImageLinkBlock = new LinkBlock(Arrays.<Block>asList(imageBlock), titleLink, true);
+            
+            titleBlocks = Arrays.<Block>asList(titleTextLinkBlock, titleImageLinkBlock);            
+        }
+        ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);
+        titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);
+
+        return Collections.singletonList(titleBlock);
+    }
+
+    /**
+     * Renders the given RSS's entries.
+     *
      * @param parentBlock the parent Block to which the output is going to be added
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param parameters our parameter helper object
      * @param context the macro's transformation context
      * @throws MacroExecutionException if the content cannot be rendered
-     */ 
-    private void renderEntries(Block parentBlock, FeedReader feed, RssMacroParameters parameters, 
-        MacroTransformationContext context) throws MacroExecutionException 
+     */
+    private void generaterEntries(Block parentBlock, SyndFeed feed, RssMacroParameters parameters,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         int maxElements = parameters.getCount();
         int count = 0;
@@ -140,86 +221,12 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
         }
     }
-
+    
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
+     * @param romeFeedFactory a custom implementation to use instead of the default, useful for tests
      */
-    public boolean supportsInlineMode()
+    protected void setFeedFactory(RomeFeedFactory romeFeedFactory)
     {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
-     */
-    public List<Block> execute(RssMacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
-    {
-        FeedReader feed = new FeedReader(parameters);
-        
-        BoxMacroParameters boxParameters = new BoxMacroParameters();
-        boolean hasImage = parameters.isImage() && feed.hasImage();
-        boxParameters.setCssClass("rssfeed");
- 
-        if (!StringUtils.isEmpty(parameters.getWidth())) {
-            boxParameters.setWidth(parameters.getWidth());
-        }
-
-        renderFeedOrEntryTitle(boxParameters, "rsschanneltitle", feed.getTitle(), feed.getLink());
-
-        List<Block> result = null;
-        if (hasImage) {
-            boxParameters.setImage(feed.getImageURL());
-        } 
-        result = boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
-        renderEntries(result.get(0), feed, parameters, context);
-
-        return result;
-    }
-
-    /**
-     * Renders the RSS's title.
-     * 
-     * @param boxParameters the BoxParameters where the title will be fitted
-     * @param cssClass the CSS sheet
-     * @param title the title's text
-     * @param link the title's link (if there is one)
-     */
-    private void renderFeedOrEntryTitle(BoxMacroParameters boxParameters, String cssClass, String title, String link)
-    {
-        List<Block> titleBlocks = null;
-
-        if (link == null) {
-            titleBlocks = this.parserUtils.parsePlainText(title);
-        } else {
-            // Title link.
-            Link titleLink = new Link();
-            titleLink.setReference(link);
-            titleLink.setType(LinkType.URI);
-            
-            // Title text link.
-            Block titleTextLinkBlock = new LinkBlock(this.parserUtils.parsePlainText(title), titleLink, true);
-            
-            // Rss icon.
-            String imagePath = skinAccessBridge.getSkinFile("icons/black-rss.png");
-            ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
-            List<Block> imageBlockList = new ArrayList<Block>();
-            imageBlockList.add(imageBlock);
-            
-            // Title rss icon link.
-            Block titleImageLinkBlock = new LinkBlock(imageBlockList, titleLink, true);
-            
-            titleBlocks = new ArrayList<Block>();
-            titleBlocks.add(titleTextLinkBlock);
-            titleBlocks.add(titleImageLinkBlock);            
-        }
-        ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);
-        titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);
-
-        boxParameters.setBlockTitle(Collections.singletonList(titleBlock));
+        this.romeFeedFactory = romeFeedFactory;
     }
 }

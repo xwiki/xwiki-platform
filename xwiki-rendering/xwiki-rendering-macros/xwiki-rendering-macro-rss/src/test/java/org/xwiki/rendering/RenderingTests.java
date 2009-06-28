@@ -19,16 +19,14 @@
  */
 package org.xwiki.rendering;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.rendering.internal.MockSkinAccessBridge;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.bridge.SkinAccessBridge;
+import org.jmock.Mockery;
+import org.jmock.Expectations;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -40,14 +38,22 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Rss Macro");
+        RenderingTestSuite suite = new RenderingTestSuite("Test RSS Macro");
         
         suite.addTestsFromResource("macrorss1", true);
         suite.addTestsFromResource("macrorss2", true);
 
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
-        mocks.add(MockSkinAccessBridge.getComponentDescriptor());
+        ComponentManagerTestSetup setup = new ComponentManagerTestSetup(suite);
 
-        return new ComponentManagerTestSetup(suite, mocks);
+        Mockery context = new Mockery();
+        final SkinAccessBridge mockSkinBridge = context.mock(SkinAccessBridge.class);
+        setup.getComponentManager().registerComponent(SkinAccessBridge.class, mockSkinBridge);
+
+        context.checking(new Expectations() {{
+            allowing(mockSkinBridge).getSkinFile(with(any(String.class)));
+            will(returnValue("/xwiki/skins/albatross/icons/black-rss.png"));
+        }});
+        
+        return setup;
     }
 }

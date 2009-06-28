@@ -224,14 +224,14 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     /**
      * Get tags from a document.
      * 
-     * @param fullName name of the document.
+     * @param documentName name of the document.
      * @param context XWiki context.
      * @return list of tags.
      * @throws XWikiException if document read fails (possible failures: insufficient rights, DB access problems, etc).
      */
-    public List<String> getTagsFromDocument(String fullName, XWikiContext context) throws XWikiException
+    public List<String> getTagsFromDocument(String documentName, XWikiContext context) throws XWikiException
     {
-        return getTagsFromDocument(context.getWiki().getDocument(fullName, context));
+        return getTagsFromDocument(context.getWiki().getDocument(documentName, context));
     }
 
     /**
@@ -251,14 +251,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * Add a tag to a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to set.
-     * @param fullName name of the document.
+     * @param documentName name of the document.
      * @param context XWiki context.
      * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
      */
-    public TagOperationResult addTagToDocument(String tag, String fullName, XWikiContext context) throws XWikiException
+    public TagOperationResult addTagToDocument(String tag, String documentName, XWikiContext context)
+        throws XWikiException
     {
-        return addTagToDocument(tag, context.getWiki().getDocument(fullName, context), context);
+        return addTagToDocument(tag, context.getWiki().getDocument(documentName, context), context);
     }
 
     /**
@@ -292,15 +293,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * Remove a tag from a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to remove.
-     * @param fullName name of the document.
+     * @param documentName name of the document.
      * @param context XWiki context.
      * @return the {@link TagOperationResult result} of the operation
      * @throws XWikiException if document save fails for some reason (Insufficient rights, DB access, etc).
      */
-    public TagOperationResult removeTagFromDocument(String tag, String fullName, XWikiContext context)
+    public TagOperationResult removeTagFromDocument(String tag, String documentName, XWikiContext context)
         throws XWikiException
     {
-        return removeTagFromDocument(tag, context.getWiki().getDocument(fullName, context), context);
+        return removeTagFromDocument(tag, context.getWiki().getDocument(documentName, context), context);
     }
 
     /**

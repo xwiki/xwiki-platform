@@ -131,27 +131,27 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     /**
      * Get tags from a document.
      * 
-     * @param fullName name of the document.
+     * @param documentName name of the document.
      * @return list of tags.
      * @throws XWikiException if document read fails (possible failures: insufficient rights, DB access problems, etc).
      */
-    public List<String> getTagsFromDocument(String fullName) throws XWikiException
+    public List<String> getTagsFromDocument(String documentName) throws XWikiException
     {
-        return this.getProtectedPlugin().getTagsFromDocument(fullName, this.context);
+        return this.getProtectedPlugin().getTagsFromDocument(documentName, this.context);
     }
 
     /**
      * Add a tag to a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to set.
-     * @param fullName name of the document.
+     * @param documentName name of the document.
      * @return the {@link TagOperationResult result} of the operation
      */
-    public TagOperationResult addTagToDocument(String tag, String fullName)
+    public TagOperationResult addTagToDocument(String tag, String documentName)
     {
         TagOperationResult result;
         try {
-            XWikiDocument document = this.context.getWiki().getDocument(fullName, this.context);
+            XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
             if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
                 result = this.getProtectedPlugin().addTagToDocument(tag, document, this.context);
             } else {
@@ -167,16 +167,16 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * Remove a tag from a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to remove.
-     * @param fullName name of the document.
+     * @param documentName name of the document.
      * @return the {@link TagOperationResult result} of the operation
      */
-    public TagOperationResult removeTagFromDocument(String tag, String fullName)
+    public TagOperationResult removeTagFromDocument(String tag, String documentName)
     {
         TagOperationResult result;
         try {
-            XWikiDocument document = this.context.getWiki().getDocument(fullName, this.context);
+            XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
             if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
-                result = this.getProtectedPlugin().removeTagFromDocument(tag, fullName, this.context);
+                result = this.getProtectedPlugin().removeTagFromDocument(tag, documentName, this.context);
             } else {
                 result = TagOperationResult.NOT_ALLOWED;
             }

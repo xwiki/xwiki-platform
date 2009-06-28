@@ -164,6 +164,31 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
+     * Add a list of tags to a document. The document is saved (minor edit) after this operation
+     * 
+     * @param tags the comma separated list of tags to set; whitespace around the tags is stripped
+     * @param documentName the name of the target document
+     * @return the {@link TagOperationResult result} of the operation. {@link TagOperationResult#NO_EFFECT} is returned
+     *         only if all the tags were already set on the document, {@link TagOperationResult#OK} is returned even if
+     *         only some of the tags are new.
+     */
+    public TagOperationResult addTagsToDocument(String tags, String documentName)
+    {
+        TagOperationResult result;
+        try {
+            XWikiDocument document = this.context.getWiki().getDocument(documentName, this.context);
+            if (this.context.getWiki().checkAccess(TAG_ACCESS_RIGHT, document, this.context)) {
+                result = this.getProtectedPlugin().addTagsToDocument(tags, document, this.context);
+            } else {
+                result = TagOperationResult.NOT_ALLOWED;
+            }
+        } catch (Exception ex) {
+            result = TagOperationResult.FAILED;
+        }
+        return result;
+    }
+
+    /**
      * Remove a tag from a document. The document is saved (minor edit) after this operation.
      * 
      * @param tag tag to remove.

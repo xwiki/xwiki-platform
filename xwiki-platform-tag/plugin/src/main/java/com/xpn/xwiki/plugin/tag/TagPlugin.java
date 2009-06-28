@@ -61,6 +61,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      */
     public static final String TAG_PROPERTY = "tags";
 
+    /** L10N key for the "tag added" document edit comment. */
+    public static final String DOC_COMMENT_TAG_ADDED = "plugin.tag.editcomment.added";
+
     /**
      * Tag plugin constructor.
      * 
@@ -281,11 +284,66 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
 
             List<String> commentArgs = new ArrayList<String>();
             commentArgs.add(tag);
-            String comment = context.getMessageTool().get("plugin.tag.editcomment.added", commentArgs);
+            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
             context.getWiki().saveDocument(document, comment, true, context);
 
             return TagOperationResult.OK;
         }
+        return TagOperationResult.NO_EFFECT;
+    }
+
+    /**
+     * Add a list of tags to a document. The document is saved (minor edit) after this operation.
+     * 
+     * @param tags the comma separated list of tags to set; whitespace around the tags is stripped
+     * @param documentName the name of the target document
+     * @param context the current request context.
+     * @return the {@link TagOperationResult result} of the operation. {@link TagOperationResult#NO_EFFECT} is returned
+     *         only if all the tags were already set on the document, {@link TagOperationResult#OK} is returned even if
+     *         only some of the tags are new.
+     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     */
+    public TagOperationResult addTagsToDocument(String tags, String documentName, XWikiContext context)
+        throws XWikiException
+    {
+        return addTagsToDocument(tags, context.getWiki().getDocument(documentName, context), context);
+    }
+
+    /**
+     * Add a list of tags to a document. The document is saved (minor edit) after this operation.
+     * 
+     * @param tags the comma separated list of tags to set; whitespace around the tags is stripped
+     * @param document the target document
+     * @param context the current request context
+     * @return the {@link TagOperationResult result} of the operation. {@link TagOperationResult#NO_EFFECT} is returned
+     *         only if all the tags were already set on the document, {@link TagOperationResult#OK} is returned even if
+     *         only some of the tags are new.
+     * @throws XWikiException if document save fails (possible failures: insufficient rights, DB access problems, etc).
+     */
+    public TagOperationResult addTagsToDocument(String tags, XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        List<String> documentTags = getTagsFromDocument(document);
+        String[] newTags = tags.split("\\s*+,\\s*+");
+        boolean added = false;
+
+        for (String tag : newTags) {
+            if (!StringUtils.isBlank(tag) && !documentTags.contains(tag)) {
+                documentTags.add(tag);
+                added = true;
+            }
+        }
+
+        if (added) {
+            setDocumentTags(document, documentTags, context);
+            List<String> commentArgs = new ArrayList<String>();
+            commentArgs.add(tags);
+            String comment = context.getMessageTool().get(DOC_COMMENT_TAG_ADDED, commentArgs);
+            context.getWiki().saveDocument(document, comment, true, context);
+
+            return TagOperationResult.OK;
+        }
+
         return TagOperationResult.NO_EFFECT;
     }
 

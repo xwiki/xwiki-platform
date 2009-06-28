@@ -23,6 +23,9 @@ package com.xpn.xwiki.plugin.tag;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -37,6 +40,9 @@ import com.xpn.xwiki.plugin.PluginApi;
  */
 public class TagPluginApi extends PluginApi<TagPlugin>
 {
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(TagPluginApi.class);
+
     /** The required access level for modifying document tags. */
     private static final String TAG_ACCESS_RIGHT = "edit";
 
@@ -158,6 +164,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
+            LOG.warn("Failed to add tag to document: " + ex.getMessage());
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -183,6 +190,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
+            LOG.warn("Failed to add tags to document: " + ex.getMessage());
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -206,6 +214,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
+            LOG.warn("Failed to remove tag from document: " + ex.getMessage());
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -229,6 +238,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
+            LOG.warn("Failed to rename tag: " + ex.getMessage());
             result = TagOperationResult.FAILED;
         }
         return result;
@@ -251,6 +261,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
                 result = TagOperationResult.NOT_ALLOWED;
             }
         } catch (Exception ex) {
+            LOG.warn("Failed to delete tag: " + ex.getMessage());
             result = TagOperationResult.FAILED;
         }
         return result;

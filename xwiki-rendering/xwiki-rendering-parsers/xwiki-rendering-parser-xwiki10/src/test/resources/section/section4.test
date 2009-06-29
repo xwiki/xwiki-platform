@@ -15,6 +15,6 @@
 #end
 
 
-== $msg.get("xe.dashboard.wiki") ==
+== {{html clean="false"}}$msg.get("xe.dashboard.wiki"){{/html}} ==
 {{/html}}
 {{/velocity}}

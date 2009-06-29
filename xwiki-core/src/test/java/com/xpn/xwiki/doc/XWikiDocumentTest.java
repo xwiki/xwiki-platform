@@ -521,6 +521,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDisplay10()
     {
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
+
         assertEquals("string", this.document.display("string", "view", getContext()));
         assertEquals(
             "{pre}<input size='30' id='Space.Page_0_string' value='string' name='Space.Page_0_string' type='text'/>{/pre}",
@@ -534,6 +536,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDisplay()
     {
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
+
         this.document.setSyntaxId("xwiki/2.0");
 
         assertEquals("string", this.document.display("string", "view", getContext()));
@@ -547,6 +551,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDisplay1020()
     {
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
+
         XWikiDocument doc10 = new XWikiDocument();
         doc10.setSyntaxId("xwiki/1.0");
         getContext().setDoc(doc10);
@@ -563,6 +569,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDisplay2010()
     {
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
+
         XWikiDocument doc10 = new XWikiDocument();
         doc10.setSyntaxId("xwiki/2.0");
         getContext().setDoc(doc10);
@@ -580,6 +588,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDisplayTemplate10()
     {
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/1.0"));
+
         getContext().put("isInRenderingEngine", false);
 
         assertEquals("string", this.document.display("string", "view", getContext()));
@@ -595,6 +605,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testDisplayTemplate20()
     {
+        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").will(returnValue("xwiki/2.0"));
+
         getContext().put("isInRenderingEngine", false);
 
         this.document.setSyntaxId("xwiki/2.0");

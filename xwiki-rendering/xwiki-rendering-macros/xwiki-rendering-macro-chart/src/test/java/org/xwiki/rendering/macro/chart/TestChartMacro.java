@@ -38,6 +38,6 @@ public class TestChartMacro extends ChartMacro
      */
     protected File getChartImageFile(ChartMacroParameters parameters, String content)
     {
-        return new File("./chart.png");
+        return new File("./target/chart.png");
     }    
 }

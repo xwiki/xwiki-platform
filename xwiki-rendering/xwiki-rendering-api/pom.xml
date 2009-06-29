@@ -83,7 +83,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.xwiki.platform</groupId>
-          <artifactId>xwiki-core-configuration-api</artifactId>
+          <artifactId>xwiki-core-configuration-default</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -162,7 +162,7 @@
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.xwiki.platform:xwiki-core-bridge</exclude>
-                    <exclude>org.xwiki.platform:xwiki-core-configuration-api</exclude>
+                    <exclude>org.xwiki.platform:xwiki-core-configuration-default</exclude>
                   </excludes>
                 </bannedDependencies>
               </rules>

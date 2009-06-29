@@ -278,7 +278,20 @@ public class ExtendedVelocityParser extends VelocityParser
     public int getVar(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityParserContext context)
         throws InvalidVelocityException
     {
-        int i = super.getVar(array, currentIndex, velocityBlock, context);
+        StringBuffer varName = new StringBuffer();
+
+        int i = super.getVar(array, currentIndex, varName, null, context);
+
+        if (velocityBlock != null) {
+            if ("msg".equals(varName.toString())) {
+                // Make sure translated messages are protected since it can contain html
+                velocityBlock.append("{{html clean=\"false\"}}");
+                velocityBlock.append(array, currentIndex, i - currentIndex);
+                velocityBlock.append("{{/html}}");
+            } else {
+                velocityBlock.append(array, currentIndex, i - currentIndex);
+            }
+        }
 
         ((ExtendedVelocityParserContext) context).setVelocity(true);
 

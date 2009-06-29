@@ -65,6 +65,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("velocity/velocity25", false);
         suite.addTestsFromResource("velocity/velocity26", false);
         suite.addTestsFromResource("velocity/velocity27", false);
+        suite.addTestsFromResource("velocity/velocity28", false);
 
         // Groovy
         suite.addTestsFromResource("groovy/groovy1", false);

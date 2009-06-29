@@ -1592,6 +1592,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String displayTooltip(String fieldname, BaseObject obj, XWikiContext context)
     {
+        String result = "";
+
         try {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
             String tooltip = pclass.getTooltip(context);
@@ -1599,19 +1601,73 @@ public class XWikiDocument implements DocumentModelBridge
                 String img =
                     "<img src=\"" + context.getWiki().getSkinFile("info.gif", context)
                         + "\" class=\"tooltip_image\" align=\"middle\" />";
-                return context.getWiki().addTooltip(img, tooltip, context);
-            } else {
-                return "";
+                result = context.getWiki().addTooltip(img, tooltip, context);
             }
         } catch (Exception e) {
-            return "";
+
         }
+
+        return result;
+    }
+
+    public String display(String fieldname, XWikiContext context)
+    {
+        String result = "";
+
+        try {
+            BaseObject object = getxWikiObject();
+            if (object == null) {
+                object = getFirstObject(fieldname, context);
+            }
+
+            result = display(fieldname, object, context);
+        } catch (Exception e) {
+            LOG.error("Failed to display field " + fieldname + " of document " + getFullName(), e);
+        }
+
+        return result;
+    }
+
+    public String display(String fieldname, BaseObject obj, XWikiContext context)
+    {
+        String type = null;
+        try {
+            type = (String) context.get("display");
+        } catch (Exception e) {
+        }
+
+        if (type == null) {
+            type = "view";
+        }
+
+        return display(fieldname, type, obj, context);
+    }
+
+    public String display(String fieldname, String mode, XWikiContext context)
+    {
+        return display(fieldname, mode, "", context);
     }
 
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
-            context);
+        return display(fieldname, type, "", obj, context);
+    }
+
+    public String display(String fieldname, String mode, String prefix, XWikiContext context)
+    {
+        try {
+            BaseObject object = getxWikiObject();
+            if (object == null) {
+                object = getFirstObject(fieldname, context);
+            }
+            if (object == null) {
+                return "";
+            } else {
+                return display(fieldname, mode, prefix, object, context);
+            }
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /**
@@ -1625,12 +1681,19 @@ public class XWikiDocument implements DocumentModelBridge
         return display(fieldname, type, "", obj, syntaxId, context);
     }
 
+    public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context)
+    {
+        return display(fieldname, type, pref, obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
+            context);
+    }
+
     public String display(String fieldname, String type, String pref, BaseObject obj, String syntaxId,
         XWikiContext context)
     {
         if (obj == null) {
             return "";
         }
+
         boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) context.get("isInRenderingEngine"));
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
@@ -1719,62 +1782,12 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object ["
-                + (obj == null ? "NULL" : obj.getName()) + "]");
+            LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object [" + obj.getName()
+                + "]");
             ex.printStackTrace();
             return "";
         } finally {
             restoreContext(backup, context);
-        }
-    }
-
-    public String display(String fieldname, BaseObject obj, XWikiContext context)
-    {
-        String type = null;
-        try {
-            type = (String) context.get("display");
-        } catch (Exception e) {
-        }
-        if (type == null) {
-            type = "view";
-        }
-        return display(fieldname, type, obj, context);
-    }
-
-    public String display(String fieldname, XWikiContext context)
-    {
-        try {
-            BaseObject object = getxWikiObject();
-            if (object == null) {
-                object = getFirstObject(fieldname, context);
-            }
-            return display(fieldname, object, context);
-        } catch (Exception e) {
-            LOG.error("Failed to display field " + fieldname + " of document " + getFullName(), e);
-        }
-        return "";
-    }
-
-    public String display(String fieldname, String mode, XWikiContext context)
-    {
-        return display(fieldname, mode, "", context);
-    }
-
-    public String display(String fieldname, String mode, String prefix, XWikiContext context)
-    {
-        try {
-            BaseObject object = getxWikiObject();
-            if (object == null) {
-                object = getFirstObject(fieldname, context);
-            }
-            if (object == null) {
-                return "";
-            } else {
-                return display(fieldname, mode, prefix, object, context.getDoc() != null ? context.getDoc()
-                    .getSyntaxId() : getSyntaxId(), context);
-            }
-        } catch (Exception e) {
-            return "";
         }
     }
 
@@ -3946,10 +3959,10 @@ public class XWikiDocument implements DocumentModelBridge
      * renaming algorithm takes into account the fact that there are several ways to write a link to a given page and
      * all those forms need to be renamed. For example the following links all point to the same page:
      * <ul>
-     *   <li>[Page]</li>
-     *   <li>[Page?param=1]</li>
-     *   <li>[currentwiki:Page]</li>
-     *   <li>[CurrentSpace.Page]</li>
+     * <li>[Page]</li>
+     * <li>[Page?param=1]</li>
+     * <li>[currentwiki:Page]</li>
+     * <li>[CurrentSpace.Page]</li>
      * </ul>
      * <p>
      * Note: links without a space are renamed with the space added.

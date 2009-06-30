@@ -37,7 +37,6 @@ import org.junit.Test;
  * @version $Id$
  * @since 2.0M1
  */
-
 public class CompositeConfigurationSourceTest
 {
     private CompositeConfigurationSource composite;
@@ -145,16 +144,20 @@ public class CompositeConfigurationSourceTest
     }
     
     @Test
-    public void testTypeConversions()
+    public void testTypeConversionsWhenDefaultValuesAreNotUsed()
     {
         config1.setProperty("key1", "true");
-        config1.setProperty("key2", "hi,this,is,a,list,of,strings");
-        config1.setProperty("key3", "prop1=value1,prop2=value2,prop3=value3");
+        config1.setProperty("key2", "item1,item2");
+        config1.setProperty("key3", "prop1=value1,prop2=value2");
         
-        Assert.assertTrue(composite.<Boolean>getProperty("key1", false));
-        List<String> list = composite.getProperty("key2", new ArrayList<String>());
-        Assert.assertTrue(!list.isEmpty());
+        // Default value is not used since the property exists and is converted to boolean automatically
+        Assert.assertTrue(composite.getProperty("key1", false));
+
+        // Default value is not used since the property exists and is converted to List automatically
+        Assert.assertEquals(Arrays.asList("item1", "item2"), composite.getProperty("key2", new ArrayList<String>()));
+        
+        // Default value is not used since the property exists and is converted to Properties automatically
         Properties props = composite.getProperty("key3", new Properties());
-        Assert.assertTrue(!props.isEmpty());
+        Assert.assertEquals("value1", props.getProperty("prop1"));
     }
 }

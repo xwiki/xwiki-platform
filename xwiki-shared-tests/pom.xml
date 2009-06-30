@@ -65,5 +65,12 @@
       <artifactId>ant</artifactId>
       <version>1.7.0</version>
     </dependency>
+    <!-- Make sure we provide a default implementation of slf4j for any test indirectly use it -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.8</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
 </project>

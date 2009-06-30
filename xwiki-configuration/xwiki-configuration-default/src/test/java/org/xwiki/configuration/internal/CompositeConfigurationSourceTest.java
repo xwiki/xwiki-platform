@@ -19,6 +19,7 @@
  */
 package org.xwiki.configuration.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -141,5 +142,19 @@ public class CompositeConfigurationSourceTest
     {
         Assert.assertTrue(composite.getProperty("unknown", Properties.class).isEmpty());
         Assert.assertTrue(composite.getProperty("unknown", List.class).isEmpty());
+    }
+    
+    @Test
+    public void testTypeConversions()
+    {
+        config1.setProperty("key1", "true");
+        config1.setProperty("key2", "hi,this,is,a,list,of,strings");
+        config1.setProperty("key3", "prop1=value1,prop2=value2,prop3=value3");
+        
+        Assert.assertTrue(composite.<Boolean>getProperty("key1", false));
+        List<String> list = composite.getProperty("key2", new ArrayList<String>());
+        Assert.assertTrue(!list.isEmpty());
+        Properties props = composite.getProperty("key3", new Properties());
+        Assert.assertTrue(!props.isEmpty());
     }
 }

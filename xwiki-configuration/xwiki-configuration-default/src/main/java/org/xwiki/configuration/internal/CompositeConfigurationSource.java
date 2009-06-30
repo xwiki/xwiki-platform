@@ -114,7 +114,7 @@ public class CompositeConfigurationSource implements ConfigurationSource
         T result = null;
         for (ConfigurationSource source : this.sources) {
             if (source.containsKey(key)) {
-                result = source.<T>getProperty(key);
+                result = source.<T>getProperty(key, defaultValue);
                 break;
             }
         }

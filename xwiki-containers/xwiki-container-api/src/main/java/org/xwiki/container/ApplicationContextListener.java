@@ -20,6 +20,8 @@
  */
 package org.xwiki.container;
 
+import org.xwiki.component.annotation.ComponentRole;
+
 /**
  * Allows interested components to perform startup / shutdown tasks and be notified when the {@link ApplicationContext}
  * is created / being destroyed.
@@ -27,6 +29,7 @@ package org.xwiki.container;
  * @version $Id$
  * @since 1.9M2
  */
+@ComponentRole
 public interface ApplicationContextListener
 {
     /**

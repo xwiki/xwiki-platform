@@ -228,6 +228,16 @@ public class MacroSelector implements Updatable, MouseListener, KeyboardListener
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see Updatable#canUpdate()
+     */
+    public boolean canUpdate()
+    {
+        return displayer.getTextArea().isAttached() && displayer.getTextArea().isEnabled();
+    }
+
+    /**
      * @return the number of macros currently selected
      */
     public int getMacroCount()

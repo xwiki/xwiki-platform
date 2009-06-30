@@ -30,4 +30,9 @@ public interface Updatable
      * Updates the state of this object.
      */
     void update();
+
+    /**
+     * @return {@code true} if this object can be updated at this point, {@code false} otherwise
+     */
+    boolean canUpdate();
 }

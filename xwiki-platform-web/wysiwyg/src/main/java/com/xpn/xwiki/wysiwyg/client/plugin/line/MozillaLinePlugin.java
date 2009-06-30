@@ -111,11 +111,11 @@ public class MozillaLinePlugin extends LinePlugin
      * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the newly
      * created paragraph.
      * 
-     * @see LinePlugin#replaceEmptyDivsWithParagraphs()
+     * @see LinePlugin#replaceEmptyLinesWithParagraphs()
      */
-    protected void replaceEmptyDivsWithParagraphs()
+    protected void replaceEmptyLinesWithParagraphs()
     {
-        super.replaceEmptyDivsWithParagraphs();
+        super.replaceEmptyLinesWithParagraphs();
 
         Document document = getTextArea().getDocument();
         NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");

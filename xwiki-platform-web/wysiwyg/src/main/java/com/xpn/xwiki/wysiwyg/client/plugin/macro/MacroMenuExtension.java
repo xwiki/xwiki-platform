@@ -106,13 +106,16 @@ public class MacroMenuExtension implements Updatable, MenuListener
     {
         this.plugin = plugin;
 
-        MenuItem refresh = new MenuItem(Strings.INSTANCE.macroRefresh(),
-            new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.REFRESH, null, false));
+        MenuItem refresh =
+            new MenuItem(Strings.INSTANCE.macroRefresh(), new RichTextAreaCommand(plugin.getTextArea(),
+                MacroPlugin.REFRESH, null, false));
         refresh.setIcon(Images.INSTANCE.macroRefresh().createElement());
-        collapse = new MenuItem(Strings.INSTANCE.macroCollapseAll(),
-            new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.COLLAPSE));
-        expand = new MenuItem(Strings.INSTANCE.macroExpandAll(),
-            new RichTextAreaCommand(plugin.getTextArea(), MacroPlugin.EXPAND));
+        collapse =
+            new MenuItem(Strings.INSTANCE.macroCollapseAll(), new RichTextAreaCommand(plugin.getTextArea(),
+                MacroPlugin.COLLAPSE));
+        expand =
+            new MenuItem(Strings.INSTANCE.macroExpandAll(), new RichTextAreaCommand(plugin.getTextArea(),
+                MacroPlugin.EXPAND));
         edit = new MenuItem(Strings.INSTANCE.macroEdit(), new com.google.gwt.user.client.Command()
         {
             public void execute()
@@ -221,5 +224,15 @@ public class MacroMenuExtension implements Updatable, MenuListener
             collapse.setText(Strings.INSTANCE.macroCollapseAll());
             expand.setText(Strings.INSTANCE.macroExpandAll());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Updatable#canUpdate()
+     */
+    public boolean canUpdate()
+    {
+        return plugin.getTextArea().isAttached() && plugin.getTextArea().isEnabled();
     }
 }

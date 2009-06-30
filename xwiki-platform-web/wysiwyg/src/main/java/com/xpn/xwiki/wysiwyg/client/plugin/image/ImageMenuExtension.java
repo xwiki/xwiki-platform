@@ -185,4 +185,14 @@ public class ImageMenuExtension extends MenuItemUIExtension implements Updatable
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Updatable#canUpdate()
+     */
+    public boolean canUpdate()
+    {
+        return plugin.getTextArea().isAttached() && plugin.getTextArea().isEnabled();
+    }
 }

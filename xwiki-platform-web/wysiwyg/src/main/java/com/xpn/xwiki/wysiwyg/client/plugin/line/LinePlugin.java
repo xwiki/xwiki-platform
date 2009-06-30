@@ -327,25 +327,25 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
     }
 
     /**
-     * Replaces empty DIVs with paragraphs. Empty DIVs are used by Wikimodel as empty lines between block level
-     * elements, but since the user should be able to write on these empty lines we convert them to paragraphs.
+     * Replaces {@code <div class="wikimodel-emptyline"/>} with {@code <p/>}. Empty lines are used by WikiModel to
+     * separate block level elements, but since the user should be able to write on these empty lines we convert them to
+     * paragraphs.
      */
-    protected void replaceEmptyDivsWithParagraphs()
+    protected void replaceEmptyLinesWithParagraphs()
     {
         Document document = getTextArea().getDocument();
         NodeList<com.google.gwt.dom.client.Element> divs = document.getBody().getElementsByTagName("div");
-        // Since NodeList is updated when one of its nodes are detached, we have to store the empty DIVs in a separate
-        // list.
-        List<Node> emptyDivs = new ArrayList<Node>();
+        // Since NodeList is updated when one of its nodes are detached, we store the empty lines in a separate list.
+        List<Node> emptyLines = new ArrayList<Node>();
         for (int i = 0; i < divs.getLength(); i++) {
-            Node div = divs.getItem(i);
-            if (!div.hasChildNodes()) {
-                emptyDivs.add(div);
+            Element div = divs.getItem(i).cast();
+            if (div.hasClassName("wikimodel-emptyline")) {
+                emptyLines.add(div);
             }
         }
-        // Replace the empty DIVs with paragraphs.
-        for (Node div : emptyDivs) {
-            div.getParentNode().replaceChild(document.xCreatePElement(), div);
+        // Replace the empty lines with paragraphs.
+        for (Node emptyLine : emptyLines) {
+            emptyLine.getParentNode().replaceChild(document.xCreatePElement(), emptyLine);
         }
     }
 
@@ -648,6 +648,6 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
     protected void onReset()
     {
         markInitialLineBreaks();
-        replaceEmptyDivsWithParagraphs();
+        replaceEmptyLinesWithParagraphs();
     }
 }

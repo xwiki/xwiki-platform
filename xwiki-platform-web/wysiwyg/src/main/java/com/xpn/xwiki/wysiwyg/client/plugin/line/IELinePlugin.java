@@ -92,11 +92,11 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
      * We overwrite in order to fix a IE bug which makes empty paragraphs invisible. Setting the inner HTML to the empty
      * string seems to do the trick.
      * 
-     * @see LinePlugin#replaceEmptyDivsWithParagraphs()
+     * @see LinePlugin#replaceEmptyLinesWithParagraphs()
      */
-    protected void replaceEmptyDivsWithParagraphs()
+    protected void replaceEmptyLinesWithParagraphs()
     {
-        super.replaceEmptyDivsWithParagraphs();
+        super.replaceEmptyLinesWithParagraphs();
         ensureEmptyLinesAreEditable((Element) getTextArea().getDocument().getBody().cast());
     }
 

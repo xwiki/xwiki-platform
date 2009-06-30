@@ -300,7 +300,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
 
         assertEquals(H1, executable.getParameter(rta));
         assertTrue(executable.execute(rta, P));
-        assertEquals("<p><span style=\"display: block;\">header</span></p>", clean(rta.getHTML()));
+        assertEquals("<p><span style=\"display: block\">header</span></p>", clean(rta.getHTML()).replace(";", ""));
         assertEquals(P, executable.getParameter(rta));
 
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -324,6 +324,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
 
         FormatBlockExecutable.replace(element, "ins");
         assertFalse(element.hasChildNodes());
-        assertEquals("<span><ins style=\"display: none;\">?<!--$--><em>*</em></ins></span>", clean(parent.getString()));
+        assertEquals("<span><ins style=\"display: none\">?<!--$--><em>*</em></ins></span>", clean(parent.getString())
+            .replace(String.valueOf(';'), ""));
     }
 }

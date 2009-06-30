@@ -88,7 +88,7 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
         public boolean execute()
         {
             try {
-                if (iterator.hasNext()) {
+                if (canUpdate() && iterator.hasNext()) {
                     Map.Entry<String, UIExtension> entry = iterator.next();
                     entry.getValue().setEnabled(entry.getKey(),
                         sv.isValid(entry.getKey(), richTextEditor.getTextArea()));
@@ -605,6 +605,16 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     public void update()
     {
         DeferredCommand.addCommand(new SyntaxValidationCommand());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Updatable#canUpdate()
+     */
+    public boolean canUpdate()
+    {
+        return getUI().isAttached();
     }
 
     /**

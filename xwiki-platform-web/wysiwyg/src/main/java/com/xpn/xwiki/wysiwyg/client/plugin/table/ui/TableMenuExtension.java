@@ -100,25 +100,33 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
         super("menu");
         this.plugin = plugin;
 
-        MenuItem insertTable = new MenuItem(Strings.INSTANCE.insertTable(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertTable.NAME), null, false));
+        MenuItem insertTable =
+            new MenuItem(Strings.INSTANCE.insertTable(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                InsertTable.NAME), null, false));
 
         createTableMenus.add(insertTable);
 
-        MenuItem deleteCol = new MenuItem(Strings.INSTANCE.deleteCol(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(DeleteCol.NAME)));
-        MenuItem deleteRow = new MenuItem(Strings.INSTANCE.deleteRow(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(DeleteRow.NAME)));
-        MenuItem deleteTable = new MenuItem(Strings.INSTANCE.deleteTable(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(DeleteTable.NAME)));
-        MenuItem insertColAfter = new MenuItem(Strings.INSTANCE.insertColAfter(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertColAfter.NAME)));
-        MenuItem insertColBefore = new MenuItem(Strings.INSTANCE.insertColBefore(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertColBefore.NAME)));
-        MenuItem insertRowAfter = new MenuItem(Strings.INSTANCE.insertRowAfter(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertRowAfter.NAME)));
-        MenuItem insertRowBefore = new MenuItem(Strings.INSTANCE.insertRowBefore(),
-            new RichTextAreaCommand(plugin.getTextArea(), new Command(InsertRowBefore.NAME)));
+        MenuItem deleteCol =
+            new MenuItem(Strings.INSTANCE.deleteCol(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                DeleteCol.NAME)));
+        MenuItem deleteRow =
+            new MenuItem(Strings.INSTANCE.deleteRow(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                DeleteRow.NAME)));
+        MenuItem deleteTable =
+            new MenuItem(Strings.INSTANCE.deleteTable(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                DeleteTable.NAME)));
+        MenuItem insertColAfter =
+            new MenuItem(Strings.INSTANCE.insertColAfter(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                InsertColAfter.NAME)));
+        MenuItem insertColBefore =
+            new MenuItem(Strings.INSTANCE.insertColBefore(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                InsertColBefore.NAME)));
+        MenuItem insertRowAfter =
+            new MenuItem(Strings.INSTANCE.insertRowAfter(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                InsertRowAfter.NAME)));
+        MenuItem insertRowBefore =
+            new MenuItem(Strings.INSTANCE.insertRowBefore(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
+                InsertRowBefore.NAME)));
 
         editMenuItems.put(DeleteCol.NAME, deleteCol);
         editMenuItems.put(DeleteRow.NAME, deleteRow);
@@ -217,5 +225,15 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
                 }
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Updatable#canUpdate()
+     */
+    public boolean canUpdate()
+    {
+        return plugin.getTextArea().isAttached() && plugin.getTextArea().isEnabled();
     }
 }

@@ -185,7 +185,8 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     public void onClick(Widget sender)
     {
         Command command = buttons.get(sender);
-        if (command != null && ((FocusWidget) sender).isEnabled()) {
+        // We have to test if the text area is attached because this method can be called after the event was consumed.
+        if (command != null && getTextArea().isAttached() && ((FocusWidget) sender).isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }

@@ -100,7 +100,9 @@ public class DeferredUpdater
     private void onUpdate()
     {
         try {
-            updatable.update();
+            if (updatable.canUpdate()) {
+                updatable.update();
+            }
         } catch (Throwable t) {
             Console.getInstance().error(t, DeferredUpdater.class.getName(), updatable.getClass().getName());
         }

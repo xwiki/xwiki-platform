@@ -149,4 +149,14 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
             updater.deferUpdate();
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Updatable#canUpdate()
+     */
+    public boolean canUpdate()
+    {
+        return getTextArea().isAttached() && getTextArea().isEnabled();
+    }
 }

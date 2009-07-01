@@ -169,4 +169,17 @@ public class IEDOMUtils extends DOMUtils
     {
         return getAttributeNames(element).length() > 0;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#ensureBlockIsEditable(Element)
+     */
+    public void ensureBlockIsEditable(Element block)
+    {
+        if (!block.hasChildNodes()) {
+            // Note: appending an empty text node doesn't help.
+            block.setInnerHTML("");
+        }
+    }
 }

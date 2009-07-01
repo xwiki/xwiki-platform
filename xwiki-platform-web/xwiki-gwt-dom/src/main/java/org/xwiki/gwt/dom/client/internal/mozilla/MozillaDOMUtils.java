@@ -71,7 +71,7 @@ public class MozillaDOMUtils extends DOMUtils
                 if (!isInline(child) && getFirstLeaf(child) == descendant) {
                     Node refNode = getFarthestInlineAncestor(descendant);
                     refNode = refNode == null ? child : refNode.getParentNode();
-                    refNode.appendChild(((Document) refNode.getOwnerDocument()).xCreateBRElement());
+                    ensureBlockIsEditable((Element) refNode);
                 }
             }
             if (offset == length) {
@@ -81,11 +81,21 @@ public class MozillaDOMUtils extends DOMUtils
                 if (!isInline(child) && getLastLeaf(child) == nextLevelSibling) {
                     Node refNode = getFarthestInlineAncestor(nextLevelSibling);
                     refNode = refNode == null ? child : refNode.getParentNode();
-                    refNode.appendChild(((Document) refNode.getOwnerDocument()).xCreateBRElement());
+                    ensureBlockIsEditable((Element) refNode);
                 }
             }
         }
 
         return nextLevelSibling;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#ensureBlockIsEditable(Element)
+     */
+    public void ensureBlockIsEditable(Element block)
+    {
+        block.appendChild(((Document) block.getOwnerDocument()).xCreateBRElement());
     }
 }

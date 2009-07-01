@@ -1281,4 +1281,16 @@ public abstract class DOMUtils
         // At this point, we should have an element to scroll into view.
         ((Element) node).scrollIntoView();
     }
+
+    /**
+     * Ensures the given block-level element can be edited in design mode. This method is required because in some
+     * browsers you can't place the caret inside elements that don't have any visible content and thus you cannot edit
+     * them.
+     * 
+     * @param block a block-level DOM element
+     */
+    public void ensureBlockIsEditable(Element block)
+    {
+        // Do nothing by default.
+    }
 }

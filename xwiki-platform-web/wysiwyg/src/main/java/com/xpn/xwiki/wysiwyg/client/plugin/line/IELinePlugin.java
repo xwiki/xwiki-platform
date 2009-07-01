@@ -24,7 +24,6 @@ import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.NodeList;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -60,8 +59,8 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
 
     /**
      * {@inheritDoc}<br/>
-     * We overwrite in order to fix a IE bug which makes empty lines invisible. Setting the inner HTML to the empty
-     * string seems to do the trick.
+     * If the caret is inside an empty block level container and we insert an empty line before then the caret doesn't
+     * remain in its place. We have to reset the caret.
      * 
      * @see LinePlugin#insertEmptyLine(Node, Range)
      */
@@ -69,52 +68,9 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
     {
         super.insertEmptyLine(container, caret);
 
-        Node emptyLine;
-        if (domUtils.isFlowContainer(container)) {
-            emptyLine = container.getFirstChild();
-        } else {
-            emptyLine = container.getPreviousSibling();
-
-            if (!container.hasChildNodes()) {
-                // If the caret is inside an empty block level container and we insert an empty line before then the
-                // caret doesn't remain in its place. We have to reset the caret.
-                container.appendChild(container.getOwnerDocument().createTextNode(""));
-                caret.selectNodeContents(container.getFirstChild());
-            }
-        }
-        // Empty lines are not displayed in IE. Strangely, setting the inner HTML to the empty string
-        // forces IE to render the empty lines. Appending an empty text node doesn't help.
-        Element.as(emptyLine).setInnerHTML("");
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a IE bug which makes empty paragraphs invisible. Setting the inner HTML to the empty
-     * string seems to do the trick.
-     * 
-     * @see LinePlugin#replaceEmptyLinesWithParagraphs()
-     */
-    protected void replaceEmptyLinesWithParagraphs()
-    {
-        super.replaceEmptyLinesWithParagraphs();
-        ensureEmptyLinesAreEditable((Element) getTextArea().getDocument().getBody().cast());
-    }
-
-    /**
-     * Ensures all the empty lines inside the given container are editable.
-     * 
-     * @param container the element where to look for empty lines
-     */
-    protected void ensureEmptyLinesAreEditable(Element container)
-    {
-        NodeList<com.google.gwt.dom.client.Element> paragraphs = container.getElementsByTagName("p");
-        for (int i = 0; i < paragraphs.getLength(); i++) {
-            Element paragraph = paragraphs.getItem(i).cast();
-            if (!paragraph.hasChildNodes()) {
-                // Empty paragraphs are not displayed in IE. Strangely, setting the inner HTML to the empty string
-                // forces IE to render the empty paragraphs. Appending an empty text node doesn't help.
-                paragraph.setInnerHTML("");
-            }
+        if (!container.hasChildNodes()) {
+            container.appendChild(container.getOwnerDocument().createTextNode(""));
+            caret.selectNodeContents(container.getFirstChild());
         }
     }
 
@@ -125,6 +81,6 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
      */
     public void onInnerHTMLChange(Element element)
     {
-        ensureEmptyLinesAreEditable(element);
+        element.ensureEditable();
     }
 }

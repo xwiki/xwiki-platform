@@ -106,27 +106,58 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
 
         createTableMenus.add(insertTable);
 
+        createEditMenuItems();
+
+        submenu = new MenuBar(true);
+        submenu.setAnimationEnabled(false);
+        submenu.addAll(createTableMenus);
+
+        menu = new MenuItem(Strings.INSTANCE.table(), submenu);
+        menu.setIcon(Images.INSTANCE.insertTable().createElement());
+        menu.addMenuListener(this);
+
+        addFeature(TablePluginFactory.getInstance().getPluginName(), menu);
+    }
+
+    /**
+     * Creates the menu items used for editing a table.
+     */
+    private void createEditMenuItems()
+    {
         MenuItem deleteCol =
             new MenuItem(Strings.INSTANCE.deleteCol(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 DeleteCol.NAME)));
+        deleteCol.setIcon(Images.INSTANCE.deleteCol().createElement());
+
         MenuItem deleteRow =
             new MenuItem(Strings.INSTANCE.deleteRow(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 DeleteRow.NAME)));
+        deleteRow.setIcon(Images.INSTANCE.deleteRow().createElement());
+
         MenuItem deleteTable =
             new MenuItem(Strings.INSTANCE.deleteTable(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 DeleteTable.NAME)));
+        deleteTable.setIcon(Images.INSTANCE.deleteTable().createElement());
+
         MenuItem insertColAfter =
             new MenuItem(Strings.INSTANCE.insertColAfter(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 InsertColAfter.NAME)));
+        insertColAfter.setIcon(Images.INSTANCE.insertColAfter().createElement());
+
         MenuItem insertColBefore =
             new MenuItem(Strings.INSTANCE.insertColBefore(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 InsertColBefore.NAME)));
+        insertColBefore.setIcon(Images.INSTANCE.insertColBefore().createElement());
+
         MenuItem insertRowAfter =
             new MenuItem(Strings.INSTANCE.insertRowAfter(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 InsertRowAfter.NAME)));
+        insertRowAfter.setIcon(Images.INSTANCE.insertRowAfter().createElement());
+
         MenuItem insertRowBefore =
             new MenuItem(Strings.INSTANCE.insertRowBefore(), new RichTextAreaCommand(plugin.getTextArea(), new Command(
                 InsertRowBefore.NAME)));
+        insertRowBefore.setIcon(Images.INSTANCE.insertRowBefore().createElement());
 
         editMenuItems.put(DeleteCol.NAME, deleteCol);
         editMenuItems.put(DeleteRow.NAME, deleteRow);
@@ -145,16 +176,6 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
         editTableMenus.add(deleteRow);
         editTableMenus.add(new MenuItemSeparator());
         editTableMenus.add(deleteTable);
-
-        submenu = new MenuBar(true);
-        submenu.setAnimationEnabled(false);
-        submenu.addAll(createTableMenus);
-
-        menu = new MenuItem(Strings.INSTANCE.table(), submenu);
-        menu.setIcon(Images.INSTANCE.insertTable().createElement());
-        menu.addMenuListener(this);
-
-        addFeature(TablePluginFactory.getInstance().getPluginName(), menu);
     }
 
     /**

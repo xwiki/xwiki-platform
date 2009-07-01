@@ -562,6 +562,9 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
         }
         br.getParentNode().removeChild(br);
 
+        // Ensure the newly created paragraph can be edited.
+        Element.as(paragraph).ensureEditable();
+
         // Place the caret inside the new container, at the beginning.
         if (!start.hasChildNodes()) {
             start.appendChild(getTextArea().getDocument().createTextNode(""));
@@ -584,6 +587,7 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
         Document document = getTextArea().getDocument();
         // Create a new empty line.
         Element emptyLine = document.xCreatePElement().cast();
+        domUtils.ensureBlockIsEditable(emptyLine);
 
         if (domUtils.isFlowContainer(container)) {
             // We are at the beginning of a flow container. Since it can contain block elements we insert the empty line
@@ -649,5 +653,6 @@ public class LinePlugin extends AbstractPlugin implements KeyboardListener, Comm
     {
         markInitialLineBreaks();
         replaceEmptyLinesWithParagraphs();
+        Element.as(getTextArea().getDocument().getBody()).ensureEditable();
     }
 }

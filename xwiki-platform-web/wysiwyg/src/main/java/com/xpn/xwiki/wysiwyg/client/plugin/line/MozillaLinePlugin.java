@@ -19,11 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.line;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.NodeList;
 
 /**
  * Mozilla specific implementation of the {@link LinePlugin}.
@@ -59,73 +57,5 @@ public class MozillaLinePlugin extends LinePlugin
 
         // It seems there's no visible element on the new line. We should add one.
         domUtils.insertAfter(getTextArea().getDocument().xCreateBRElement(), lastLeaf);
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the created
-     * paragraph if it's empty.
-     * 
-     * @see LinePlugin#splitLine(Node, Range)
-     */
-    protected void splitLine(Node container, Range caret)
-    {
-        super.splitLine(container, caret);
-
-        // The caret should have been placed inside the new paragraph.
-        Node paragraph = domUtils.getNearestBlockContainer(caret.getStartContainer());
-        // Look if there is any visible element on the new line, taking care to remain in the current block container.
-        Node leaf = domUtils.getFirstLeaf(paragraph);
-        do {
-            if (needsSpace(leaf)) {
-                return;
-            }
-            leaf = domUtils.getNextLeaf(leaf);
-        } while (leaf != null && paragraph == domUtils.getNearestBlockContainer(leaf));
-        // It seems there's no visible element inside the newly created paragraph. We should add one.
-        paragraph.appendChild(getTextArea().getDocument().xCreateBRElement());
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which makes empty lines invisible. We add a line break to the newly
-     * created empty line.
-     * 
-     * @see LinePlugin#insertEmptyLine(Node, Range)
-     */
-    protected void insertEmptyLine(Node container, Range caret)
-    {
-        super.insertEmptyLine(container, caret);
-
-        Node emptyLine;
-        if (domUtils.isFlowContainer(container)) {
-            emptyLine = container.getFirstChild();
-        } else {
-            emptyLine = container.getPreviousSibling();
-        }
-        emptyLine.appendChild(getTextArea().getDocument().xCreateBRElement());
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * We overwrite in order to fix a Mozilla bug which makes empty paragraphs invisible. We add a BR to the newly
-     * created paragraph.
-     * 
-     * @see LinePlugin#replaceEmptyLinesWithParagraphs()
-     */
-    protected void replaceEmptyLinesWithParagraphs()
-    {
-        super.replaceEmptyLinesWithParagraphs();
-
-        Document document = getTextArea().getDocument();
-        NodeList<com.google.gwt.dom.client.Element> paragraphs = document.getBody().getElementsByTagName("p");
-        for (int i = 0; i < paragraphs.getLength(); i++) {
-            Node paragraph = paragraphs.getItem(i);
-            if (!paragraph.hasChildNodes()) {
-                // The user cannot place the caret inside an empty paragraph in Firefox. The workaround to make an empty
-                // paragraph editable is to append a BR.
-                paragraph.appendChild(document.xCreateBRElement());
-            }
-        }
     }
 }

@@ -43,7 +43,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
      * Default panel style.
      */
     private static final String DEFAULT_PANEL_STYLE = "xTablePanel";
-    
+
     /**
      * Row number text input.
      */
@@ -53,17 +53,17 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
      * Column number text input.
      */
     private TextBox cols;
-    
+
     /**
      * Border size text input.
      */
     private TextBox borderSize;
-    
+
     /**
      * Table has a heading row.
      */
     private CheckBox header;
-    
+
     /**
      * Insert button.
      */
@@ -72,8 +72,8 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
     /**
      * Is the insertion action canceled.
      */
-    private boolean canceled = true;
-    
+    private boolean canceled;
+
     /**
      * Default constructor.
      */
@@ -83,11 +83,11 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
 
         // Initialize insert button
         insertButton = new Button(Strings.INSTANCE.tableInsertButton(), this);
-        
+
         // Miscellaneous settings
         getDialog().setIcon(Images.INSTANCE.insertTable().createImage());
-        getDialog().setCaption(Strings.INSTANCE.table());     
-        
+        getDialog().setCaption(Strings.INSTANCE.table());
+
         // Create main panel
         FlowPanel mainPanel = new FlowPanel();
         mainPanel.addStyleName("xTableMainPanel");
@@ -101,15 +101,15 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         // Main panel initialization
         initWidget(mainPanel);
     }
-    
+
     /**
      * @return the panel holding the rows settings for the table
      */
     private Panel getRowsPanel()
     {
-        rows = new TextBox();               
-        FlowPanel panel = new FlowPanel();        
-        
+        rows = new TextBox();
+        FlowPanel panel = new FlowPanel();
+
         rows.setMaxLength(2);
         rows.setVisibleLength(2);
         rows.setText(Strings.INSTANCE.tableRowsDefault());
@@ -117,17 +117,17 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(new Label(Strings.INSTANCE.tableRowsLabel()));
         panel.add(rows);
-        
+
         return panel;
     }
-    
+
     /**
      * @return the panel holding the columns settings for the table
      */
     private Panel getColsPanel()
     {
-        cols = new TextBox();                
-        FlowPanel panel = new FlowPanel();        
+        cols = new TextBox();
+        FlowPanel panel = new FlowPanel();
 
         cols.setMaxLength(2);
         cols.setVisibleLength(2);
@@ -136,18 +136,18 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(new Label(Strings.INSTANCE.tableColsLabel()));
         panel.add(cols);
-        
+
         return panel;
     }
-    
+
     /**
      * @return the panel holding the border settings for the table
      */
     private Panel getBorderPanel()
     {
-        borderSize = new TextBox();                       
-        FlowPanel panel = new FlowPanel();        
-        
+        borderSize = new TextBox();
+        FlowPanel panel = new FlowPanel();
+
         borderSize.setMaxLength(2);
         borderSize.setVisibleLength(2);
         borderSize.setText(Strings.INSTANCE.tableBorderDefault());
@@ -156,25 +156,25 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         panel.add(new Label(Strings.INSTANCE.tableBorderLabel()));
         panel.add(borderSize);
         panel.add(new Label(Strings.INSTANCE.tablePixel()));
-        
+
         return panel;
     }
-    
+
     /**
      * @return the panel holding the border settings for the table
      */
     private Panel getHeaderPanel()
     {
-        header = new CheckBox();                       
-        FlowPanel panel = new FlowPanel();        
-        
+        header = new CheckBox();
+        FlowPanel panel = new FlowPanel();
+
         header.setChecked(true);
-        panel.addStyleName(DEFAULT_PANEL_STYLE);        
+        panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(header);
         panel.add(new Label(Strings.INSTANCE.tableHeaderLabel()));
-        
+
         return panel;
-    }       
+    }
 
     /**
      * Get requested row number.
@@ -195,7 +195,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
     {
         return cols.getText();
     }
-    
+
     /**
      * Get requested border size.
      * 
@@ -205,7 +205,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
     {
         return borderSize.getText();
     }
-    
+
     /**
      * Does the table include a header row.
      * 
@@ -214,7 +214,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
     public boolean hasHeader()
     {
         return header.isChecked();
-    }    
+    }
 
     /**
      * Check if the insertion action been canceled by the user.
@@ -238,5 +238,17 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
             canceled = false;
             hide();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CompositeDialogBox#center()
+     */
+    public void center()
+    {
+        // Reset the canceled state before showing the dialog.
+        canceled = true;
+        super.center();
     }
 }

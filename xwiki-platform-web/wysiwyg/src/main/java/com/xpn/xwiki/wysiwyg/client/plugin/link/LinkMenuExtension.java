@@ -138,6 +138,7 @@ public class LinkMenuExtension extends MenuItemUIExtension implements Updatable,
                 plugin.onUnlink();
             }
         });
+        removeLink.setIcon(Images.INSTANCE.unlink().createElement());
 
         editLinkMenus = new ArrayList<UIObject>();
         editLinkMenus.add(editLink);

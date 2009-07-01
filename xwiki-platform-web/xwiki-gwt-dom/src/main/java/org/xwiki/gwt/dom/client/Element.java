@@ -381,4 +381,32 @@ public class Element extends com.google.gwt.dom.client.Element
         }
         setClassName(newClassName.toString().trim());
     }
+
+    /**
+     * Ensures this element can be edited in design mode. This method is required because in some browsers you can't
+     * place the caret inside elements that don't have any visible content and thus you cannot edit them.
+     */
+    public final void ensureEditable()
+    {
+        if (DOMUtils.getInstance().isInline(this) || getOffsetWidth() == 0) {
+            return;
+        }
+
+        boolean editable = false;
+        Node child = getFirstChild();
+        while (child != null) {
+            if (child.getNodeType() == Node.TEXT_NODE) {
+                editable = editable || child.getNodeValue().length() > 0;
+            } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                Element element = (Element) child;
+                editable = editable || element.getOffsetWidth() > 0 || "br".equalsIgnoreCase(element.getTagName());
+                element.ensureEditable();
+            }
+            child = child.getNextSibling();
+        }
+
+        if (!editable) {
+            DOMUtils.getInstance().ensureBlockIsEditable(this);
+        }
+    }
 }

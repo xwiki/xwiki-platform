@@ -31,34 +31,16 @@ import com.google.gwt.user.client.ui.Widget;
 public class ColorPicker extends PopupPanel implements ClickListener
 {
     /**
-     * The colors present on the default color palette.
+     * Creates a new color picker that uses the given color palette.
+     * 
+     * @param palette the color palette to be used by this color picker
      */
-    public static final String[][] COLORS = {
-        {"#000000", "#444444", "#666666", "#999999", "#CCCCCC", "#EEEEEE", "#F3F3F3", "#FFFFFF"},
-        {"#FF0000", "#FF9900", "#FFFF00", "#00FF00", "#00FFFF", "#0000FF", "#9900FF", "#FF00FF"},
-        {"#F4CCCC", "#FCE5CD", "#FFF2CC", "#D9EAD3", "#D0E0E3", "#CFE2F3", "#D9D2E9", "#EAD1DC"},
-        {"#EA9999", "#F9CB9C", "#FFE599", "#B6D7A8", "#A2C4C9", "#9FC5E8", "#B4A7D6", "#D5A6BD"},
-        {"#E06666", "#F6B26B", "#FFD966", "#93C47D", "#76A5AF", "#6FA8DC", "#8E7CC3", "#C27BA0"},
-        {"#CC0000", "#E69138", "#F1C232", "#6AA84F", "#45818E", "#3D85C6", "#674EA7", "#A64D79"},
-        {"#990000", "#B45F06", "#BF9000", "#38761D", "#134F5C", "#0B5394", "#351C75", "#741B47"},
-        {"#660000", "#783F04", "#7F6000", "#274E13", "#0C343D", "#073763", "#20124D", "#4C1130"}
-    };
-
-    /**
-     * The color palette used for picking the color.
-     */
-    private final ColorPalette palette;
-
-    /**
-     * Creates a new color picker that uses the default color palette.
-     */
-    public ColorPicker()
+    public ColorPicker(ColorPalette palette)
     {
         super(true, false);
 
         addStyleName("xColorPicker");
 
-        palette = new ColorPalette(COLORS);
         palette.addClickListener(this);
 
         setWidget(palette);
@@ -71,9 +53,17 @@ public class ColorPicker extends PopupPanel implements ClickListener
      */
     public void onClick(Widget sender)
     {
-        if (sender == palette) {
+        if (sender == getWidget()) {
             hide();
         }
+    }
+
+    /**
+     * @return the color palette used by this color picker
+     */
+    protected ColorPalette getColorPalette()
+    {
+        return (ColorPalette) getWidget();
     }
 
     /**
@@ -81,7 +71,7 @@ public class ColorPicker extends PopupPanel implements ClickListener
      */
     public String getColor()
     {
-        return palette.getSelectedColor();
+        return getColorPalette().getSelectedColor();
     }
 
     /**
@@ -91,7 +81,7 @@ public class ColorPicker extends PopupPanel implements ClickListener
      */
     public void setColor(String color)
     {
-        palette.setSelectedColor(convertToHex(color));
+        getColorPalette().setSelectedColor(convertToHex(color));
     }
 
     /**

@@ -45,23 +45,24 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
     private ColorCell selectedCell;
 
     /**
-     * The color grid that makes up the palette.
+     * The array of color codes used to fill the color grid.
      */
-    private final Grid colorGrid;
+    private final String[] colors;
 
     /**
-     * The matrix of color codes used to fill the color grid.
+     * The maximum number of columns the color grid can have.
      */
-    private final String[][] colors;
+    private final int columnCount;
 
     /**
      * Creates a new color palette using the specified color codes to fill the color grid.
      * 
-     * @param colors the matrix of color codes that are used to fill the color grid.
+     * @param colors the array of color codes that are used to fill the color grid.
+     * @param columnCount the maximum number of columns the color grid can have.
      */
-    public ColorPalette(String[][] colors)
+    public ColorPalette(String[] colors, int columnCount)
     {
-        colorGrid = new Grid(colors.length, colors[0].length);
+        Grid colorGrid = new Grid(1 + (colors.length - 1) / columnCount, Math.min(columnCount, colors.length));
         colorGrid.addStyleName("xColorPalette");
         colorGrid.setBorderWidth(0);
         colorGrid.setCellPadding(0);
@@ -69,10 +70,9 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
         colorGrid.addTableListener(this);
 
         this.colors = colors;
+        this.columnCount = columnCount;
         for (int i = 0; i < colors.length; i++) {
-            for (int j = 0; j < colors[0].length; j++) {
-                colorGrid.setWidget(i, j, new ColorCell(colors[i][j]));
-            }
+            colorGrid.setWidget(i / columnCount, i % columnCount, new ColorCell(colors[i]));
         }
 
         initWidget(colorGrid);
@@ -99,13 +99,21 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
     }
 
     /**
+     * @return the color grid that makes up this palette.
+     */
+    protected Grid getColorGrid()
+    {
+        return (Grid) getWidget();
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see TableListener#onCellClicked(SourcesTableEvents, int, int)
      */
     public void onCellClicked(SourcesTableEvents sender, int row, int column)
     {
-        if (sender == colorGrid) {
+        if (sender == getColorGrid()) {
             setSelectedCell(row, column);
             clickListeners.fireClick(this);
         }
@@ -119,7 +127,7 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
      */
     private void setSelectedCell(int row, int column)
     {
-        ColorCell wantedCell = (ColorCell) colorGrid.getWidget(row, column);
+        ColorCell wantedCell = (ColorCell) getColorGrid().getWidget(row, column);
         if (selectedCell != wantedCell) {
             if (selectedCell != null) {
                 selectedCell.setSelected(false);
@@ -145,11 +153,9 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
     public void setSelectedColor(String color)
     {
         for (int i = 0; i < colors.length; i++) {
-            for (int j = 0; j < colors[0].length; j++) {
-                if (colors[i][j].equals(color)) {
-                    setSelectedCell(i, j);
-                    return;
-                }
+            if (colors[i].equals(color)) {
+                setSelectedCell(i / columnCount, i % columnCount);
+                return;
             }
         }
         if (selectedCell != null) {

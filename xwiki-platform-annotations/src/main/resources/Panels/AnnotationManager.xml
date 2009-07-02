@@ -8,13 +8,13 @@
 <translation>0</translation>
 <parent></parent>
 <creator>XWiki.Admin</creator>
-<author>XWiki.lpereira</author>
+<author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor>XWiki.lpereira</contentAuthor>
+<contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1240502446000</creationDate>
-<date>1245754166000</date>
-<contentUpdateDate>1245754166000</contentUpdateDate>
-<version>251.1</version>
+<date>1246537576000</date>
+<contentUpdateDate>1246537576000</contentUpdateDate>
+<version>16.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -119,6 +119,20 @@
   #end
 #end
 
+&lt;style type="text/css"&gt;
+.truncate
+{
+ overflow: hidden;
+ white-space: nowrap;
+}
+
+.untruncate
+{
+ overflow: inherit;
+ white-space: inherit;
+}
+&lt;/style&gt; 
+
 #if($active=="true")
 &lt;div id="annotationPanel" style="display:none"&gt;
 #panelheader('Annotation editor')
@@ -145,11 +159,12 @@
   #set ($color = $user.annotationColor)
   #break
  #end
- &lt;div onClick="annotation.toggleMode($annotation.get('annotationID'))" onMouseOut="annotation.hideAnnotation($annotation.get('annotationID'), '$color')" onMouseOver="annotation.showAnnotation($annotation.get('annotationID'), '$color')"&gt;
-  *$annotation.get('annotation')*
-  by &lt;span style="background: $color"&gt;[$annotation.get('author')]&lt;/span&gt;
-  &lt;img src="/xwiki/resources/icons/silk/delete.gif" onClick="annotation.removeAnnotation($annotation.get('annotationID'))"/&gt;
- &lt;/div&gt;
+## '$annotation.get('annotation').toString().replaceAll("[^\\]*'", "\\'")'
+&lt;div onClick="annotation.toggleMode($annotation.get('annotationID'))" onMouseOut="annotation.hideAnnotation($annotation.get('annotationID'))" onMouseOver="annotation.showAnnotation($annotation.get('annotationID'), '$color')"&gt;
+&lt;div id="annotext_ID$annotation.get('annotationID')" class="truncate"&gt;*$annotation.get('annotation')*&lt;/div&gt;
+*...* by &lt;span style="background: $color"&gt;[$annotation.get('author')]&lt;/span&gt;
+&lt;img src="/xwiki/resources/icons/silk/delete.gif" onClick="annotation.removeAnnotation($annotation.get('annotationID'))"/&gt;
+&lt;/div&gt;
  #if($str != "[")
   #set ($str = $str + ",{\'id\' : \'"+$annotation.get('annotationID')+"\', \'color\' : \'"+$color+"\'}")
  #else
@@ -315,10 +330,10 @@ XWiki.Annotation.prototype =
     {
         return "&lt;?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?&gt;" +
         "&lt;annotationRequest xmlns=\"http://www.xwiki.org\"&gt;" +
-        "&lt;initialSelection&gt;"+annotation.selection+"&lt;/initialSelection&gt;" +
-        "&lt;selectionContext&gt;"+annotation.context+"&lt;/selectionContext&gt;" +
+        "&lt;initialSelection&gt;&lt;![CDATA["+annotation.selection+"]]&gt;&lt;/initialSelection&gt;" +
+        "&lt;selectionContext&gt;&lt;![CDATA["+annotation.context+"]]&gt;&lt;/selectionContext&gt;" +
         "&lt;contextOffset&gt;"+annotation.intraOffset+"&lt;/contextOffset&gt;" +
-        "&lt;annotation&gt;"+annotation.annotationText+"&lt;/annotation&gt;" +
+        "&lt;annotation&gt;&lt;![CDATA["+annotation.annotationText+"]]&gt;&lt;/annotation&gt;" +
         "&lt;/annotationRequest&gt;";
     },
 
@@ -451,7 +466,7 @@ XWiki.Annotation.prototype =
                 },
                 onFailure: function()
                 {
-                    window.alert('failure');
+                    // window.alert('Callback Failure.');
                 }
             });
         }
@@ -530,7 +545,10 @@ XWiki.Annotation.prototype =
     {
         var response = transport.responseText || "no response text";
         response = response.evalJSON();
-        if(response.responseCode != 0) window.alert(response.responseCode);
+        if(response.responseCode != 0)
+        {
+            // window.alert(response.responseCode);
+        }
         else
         {
             $('xwikicontent').replace('&lt;div id="xwikicontent"&gt;'+response.source+'&lt;/div&gt;');
@@ -541,7 +559,7 @@ XWiki.Annotation.prototype =
     
     failureCallback : function()
     {
-        window.alert('Failure callback.');
+        // window.alert('Callback Failure.');
     },
 
 /* Display */
@@ -593,6 +611,11 @@ XWiki.Annotation.prototype =
         {
             results[i].style.background = 'none';
         }
+        var name = 'annotext_'+id;
+        if($(name))
+        {
+         $(name).setAttribute('class', 'truncate');
+        }
     },
     
     highlightAnnotation : function(id, color)
@@ -609,6 +632,11 @@ XWiki.Annotation.prototype =
         for(var i=0;i&lt;results.length; ++i)
         {
             results[i].style.background = color;
+        }
+        var name = 'annotext_'+id;
+        if($(name))
+        {
+         $(name).setAttribute('class', 'untruncate');
         }
     },
 
@@ -725,6 +753,7 @@ XWiki.Annotation.prototype =
     if(typeof(annotationFeatureEnabled) != 'undefined' &amp;&amp; annotationFeatureEnabled == true)
     {
       annotation = new XWiki.Annotation();
+      // window.alert(annotation);
     }
   }
   document.observe('dom:loaded', function(event) {onDOMLoaded();});
@@ -772,5 +801,5 @@ XWiki.Annotation.prototype =
 <tags/>
 </property>
 </object>
-<content>#includeInContext("XWiki.SkinEditor")</content>
+<content></content>
 </xwikidoc>

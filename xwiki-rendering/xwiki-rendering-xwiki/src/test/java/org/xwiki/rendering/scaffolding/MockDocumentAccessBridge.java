@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -44,9 +45,10 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @return the descriptor of the component.
      */
-    public static ComponentDescriptor getComponentDescriptor()
+    public static ComponentDescriptor<DocumentAccessBridge> getComponentDescriptor()
     {
-        DefaultComponentDescriptor componentDescriptor = new DefaultComponentDescriptor();
+        DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor = 
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
 
         componentDescriptor.setRole(DocumentAccessBridge.class);
         componentDescriptor.setImplementation(MockDocumentAccessBridge.class);
@@ -128,8 +130,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, int, String)
      */
-    public String getProperty(String documentName, String className, int objectNumber, String propertyName)
-        throws Exception
+    public Object getProperty(String documentName, String className, int objectNumber, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -139,7 +140,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
      */
-    public String getProperty(String documentName, String className, String propertyName) throws Exception
+    public Object getProperty(String documentName, String className, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -149,11 +150,21 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String)
      */
-    public String getProperty(String documentName, String propertyName) throws Exception
+    public Object getProperty(String documentName, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperties(String, String)
+     */
+    public List<Object> getProperties(String documentName, String className)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+    
     /**
      * {@inheritDoc}
      * 

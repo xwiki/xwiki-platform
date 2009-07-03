@@ -19,6 +19,7 @@
  */
 package org.xwiki.bridge;
 
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
@@ -140,10 +141,10 @@ public interface DocumentAccessBridge
      * @param className The name of the class.
      * @param objectNumber The number of the object from the given class.
      * @param propertyName The name of the property to retrieve.
-     * @return A <code>string</code> representation of the property value.
-     * @throws Exception If the document cannot be accessed.
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
+     *         (the document doesn't exist for example)
      */
-    String getProperty(String documentName, String className, int objectNumber, String propertyName) throws Exception;
+    Object getProperty(String documentName, String className, int objectNumber, String propertyName);
 
     /**
      * Retrieves the value for an object property, from the first object of the given class.
@@ -151,10 +152,10 @@ public interface DocumentAccessBridge
      * @param documentName The name of the document to access.
      * @param className The name of the class.
      * @param propertyName The name of the property to retrieve.
-     * @return A <code>string</code> representation of the property value.
-     * @throws Exception If the document cannot be accessed.
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
+     *         (the document doesn't exist for example)
      */
-    String getProperty(String documentName, String className, String propertyName) throws Exception;
+    Object getProperty(String documentName, String className, String propertyName);
 
     /**
      * Retrieves the value for an object property, from the first object of any class that has a property with that
@@ -162,11 +163,18 @@ public interface DocumentAccessBridge
      * 
      * @param documentName The name of the document to access.
      * @param propertyName The name of the property to retrieve.
-     * @return A <code>string</code> representation of the property value.
-     * @throws Exception If the document cannot be accessed.
+     * @return the property value or null if it doesn't exist or an error occurred while looking for the property
+     *         (the document doesn't exist for example)
      */
-    String getProperty(String documentName, String propertyName) throws Exception;
+    Object getProperty(String documentName, String propertyName);
 
+    /**
+     * @param documentName the name of the document to access
+     * @param className the name of the class in the passed document from which to get the properties
+     * @return the list of properties available in the passed document and class names
+     */
+    List<Object> getProperties(String documentName, String className);
+    
     /**
      * @param className The name of the class.
      * @param propertyName The name of the property.

@@ -81,8 +81,8 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
         Mock mockConfigurationSource = mock(ConfigurationSource.class);
         mockConfigurationSource.stubs().method("getProperty").with(eq("cache.defaultCache"), ANYTHING).will(
             returnValue(this.roleHint));
-//        mockConfigurationSource.stubs().method("getProperty").will(returnValue(this.roleHint));
-        getComponentManager().registerComponent(ConfigurationSource.class, mockConfigurationSource.proxy());
+        getComponentManager().registerComponent(ConfigurationSource.class, "xwikiproperties", 
+            mockConfigurationSource.proxy());
     }
 
     /**

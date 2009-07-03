@@ -39,6 +39,7 @@ public class AbstractComponentTestCase
     public void setUp() throws Exception
     {
         this.initializer.initializeContainer();
+        this.initializer.initializeConfigurationSource();
         this.initializer.initializeExecution();
     }
 

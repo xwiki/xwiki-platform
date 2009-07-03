@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -199,14 +201,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, int, String)
      */
-    public String getProperty(String documentName, String className, int objectNumber, String propertyName)
-        throws Exception
+    public Object getProperty(String documentName, String className, int objectNumber, String propertyName)
     {
         try {
             XWikiContext xcontext = getContext();
             return ((BaseProperty) xcontext.getWiki().getDocument(documentName, xcontext).getObject(className,
-                objectNumber).get(propertyName)).getValue()
-                + "";
+                objectNumber).get(propertyName)).getValue();
         } catch (Exception ex) {
             return null;
         }
@@ -217,14 +217,13 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
      */
-    public String getProperty(String documentName, String className, String propertyName) throws Exception
+    public Object getProperty(String documentName, String className, String propertyName)
     {
         try {
             XWikiContext xcontext = getContext();
 
             return ((BaseProperty) xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).get(
-                propertyName)).getValue()
-                + "";
+                propertyName)).getValue();
         } catch (Exception ex) {
             return null;
         }
@@ -235,16 +234,28 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String)
      */
-    public String getProperty(String documentName, String propertyName) throws Exception
+    public Object getProperty(String documentName, String propertyName)
     {
         try {
             XWikiContext xcontext = getContext();
             return ((BaseProperty) xcontext.getWiki().getDocument(documentName, xcontext).getFirstObject(propertyName,
-                xcontext).get(propertyName)).getValue()
-                + "";
+                xcontext).get(propertyName)).getValue();
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    public List<Object> getProperties(String documentName, String className)
+    {
+        List<Object> result;
+        try {
+            XWikiContext xcontext = getContext();
+            result = new ArrayList<Object>(
+                xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).getFieldList());
+        } catch (Exception ex) {
+            result = Collections.emptyList();
+        }
+        return result;
     }
 
     /**

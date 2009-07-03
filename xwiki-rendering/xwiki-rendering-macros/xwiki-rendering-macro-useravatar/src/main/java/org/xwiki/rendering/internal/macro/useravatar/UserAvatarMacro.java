@@ -83,15 +83,15 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
     public List<Block> execute(UserAvatarMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        String fileName = null;
         String userName = parameters.getUsername();
         Block resultedBlock = null;
 
+        // Find the avatar attachment name or null if not defined or an error happened when locating it
+        String fileName = null;
         if (documentAccessBridge.exists(userName)) {
-            try {
-                fileName = documentAccessBridge.getProperty(userName, "XWiki.XWikiUsers", "avatar");
-            } catch (Exception e) {
-                throw new MacroExecutionException("Failed to retrieve user avatar for user [" + userName + "]", e);
+            Object avatarProperty = documentAccessBridge.getProperty(userName, "XWiki.XWikiUsers", "avatar");
+            if (avatarProperty != null) {
+                fileName = avatarProperty.toString(); 
             }
         } else {
             throw new MacroExecutionException("User " + userName + " is not registered in this wiki");

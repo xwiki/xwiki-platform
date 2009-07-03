@@ -17,10 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.scaffolding;
+package org.xwiki.test;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -35,22 +36,6 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 public class MockConfigurationSource implements ConfigurationSource
 {
-    /**
-     * Create and return a descriptor for this component.
-     * 
-     * @return the descriptor of the component.
-     */
-    public static ComponentDescriptor<ConfigurationSource> getComponentDescriptor()
-    {
-        DefaultComponentDescriptor<ConfigurationSource> componentDescriptor = 
-            new DefaultComponentDescriptor<ConfigurationSource>();
-
-        componentDescriptor.setRole(ConfigurationSource.class);
-        componentDescriptor.setImplementation(MockConfigurationSource.class);
-
-        return componentDescriptor;
-    }
-
     public boolean containsKey(String key)
     {
         return false;
@@ -63,7 +48,13 @@ public class MockConfigurationSource implements ConfigurationSource
 
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        return null;
+        T result = null;
+        if (List.class.getName().equals(valueClass.getName())) {
+            result = (T) Collections.emptyList();
+        } else if (Properties.class.getName().equals(valueClass.getName())) {
+            result = (T) new Properties();
+        }
+        return result;
     }
 
     public <T> T getProperty(String key, T defaultValue)

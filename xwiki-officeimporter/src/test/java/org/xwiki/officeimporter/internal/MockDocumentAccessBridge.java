@@ -19,6 +19,7 @@
  */
 package org.xwiki.officeimporter.internal;
 
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -137,8 +138,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, int, String)
      */
-    public String getProperty(String documentName, String className, int objectNumber, String propertyName)
-        throws Exception
+    public Object getProperty(String documentName, String className, int objectNumber, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -148,7 +148,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
      */
-    public String getProperty(String documentName, String className, String propertyName) throws Exception
+    public Object getProperty(String documentName, String className, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -158,7 +158,17 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getProperty(String, String)
      */
-    public String getProperty(String documentName, String propertyName) throws Exception
+    public Object getProperty(String documentName, String propertyName)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperties(String, String)
+     */
+    public List<Object> getProperties(String documentName, String className)
     {
         throw new RuntimeException("Not implemented");
     }

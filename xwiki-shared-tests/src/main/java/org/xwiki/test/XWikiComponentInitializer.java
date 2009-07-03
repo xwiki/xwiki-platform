@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
@@ -65,6 +66,14 @@ public class XWikiComponentInitializer
                 throw new RuntimeException("Not implemented");
             }
         });
+    }
+    
+    public void initializeConfigurationSource() throws Exception
+    {
+        // Register the mock configuration source for different roles so that tests always use the mock
+        ConfigurationSource mockSource = new MockConfigurationSource();
+        getComponentManager().registerComponent(ConfigurationSource.class, mockSource); 
+        getComponentManager().registerComponent(ConfigurationSource.class, "xwikiproperties", mockSource); 
     }
     
     public void initializeExecution() throws Exception

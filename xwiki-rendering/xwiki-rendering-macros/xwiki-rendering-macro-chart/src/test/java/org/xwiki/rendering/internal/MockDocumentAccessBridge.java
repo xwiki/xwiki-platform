@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -165,7 +166,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      */
-    public String getProperty(String arg0, String arg1) throws Exception
+    public Object getProperty(String arg0, String arg1)
     {
         return null;
     }
@@ -173,7 +174,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      */
-    public String getProperty(String arg0, String arg1, String arg2) throws Exception
+    public Object getProperty(String arg0, String arg1, String arg2)
     {
         return null;
     }
@@ -181,9 +182,19 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      */
-    public String getProperty(String arg0, String arg1, int arg2, String arg3) throws Exception
+    public Object getProperty(String arg0, String arg1, int arg2, String arg3)
     {
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getProperties(String, String)
+     */
+    public List<Object> getProperties(String documentName, String className)
+    {
+        throw new RuntimeException("Not implemented");
     }
 
     /**

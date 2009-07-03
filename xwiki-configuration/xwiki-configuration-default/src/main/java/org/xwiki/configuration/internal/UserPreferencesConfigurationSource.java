@@ -17,44 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal;
+package org.xwiki.configuration.internal;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.configuration.ConfigurationSource;
-
-import com.xpn.xwiki.CoreConfiguration;
 
 /**
- * Configuration for the Core module.
- * 
+ * Configuration source taking its data in the User Preferences wiki document
+ * (the user profile page) using data from a XWikiUsers object attached
+ * to that document. 
+ *  
  * @version $Id$
- * @since 1.8RC2
+ * @since 2.0M2
  */
-@Component
-public class DefaultCoreConfiguration implements CoreConfiguration
+@Component("user")
+public class UserPreferencesConfigurationSource  extends AbstractDocumentConfigurationSource
 {
-    /**
-     * Prefix for configuration keys for the Core module.
-     */
-    private static final String PREFIX = "core.";
+    private static final String CLASS_NAME = "XWiki.XWikiUsers";
 
-    /**
-     * @see CoreConfiguration#getDefaultDocumentSyntax()
-     */
-    private static final String DEFAULT_DEFAULT_DOCUMENT_SYNTAX = "xwiki/2.0";
-
-    /**
-     * Defines from where to read the rendering configuration data. 
-     */
-    @Requirement("all")
-    private ConfigurationSource configuration;
-
-    /**
-     * @see CoreConfiguration#getDefaultDocumentSyntax()
-     */
-    public String getDefaultDocumentSyntax()
+    @Override
+    protected String getClassName()
     {
-        return this.configuration.getProperty(PREFIX + "defaultDocumentSyntax", DEFAULT_DEFAULT_DOCUMENT_SYNTAX);
+        return CLASS_NAME;
+    }
+
+    @Override
+    protected String getDocumentName()
+    {
+        return getDocumentAccessBridge().getCurrentUser();
     }
 }

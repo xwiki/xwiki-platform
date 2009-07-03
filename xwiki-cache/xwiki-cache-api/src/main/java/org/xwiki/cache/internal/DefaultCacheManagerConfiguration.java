@@ -48,9 +48,13 @@ public class DefaultCacheManagerConfiguration implements CacheManagerConfigurati
     private static final String DEFAULT_LOCALCACHE_HINT = "jbosscache/local";
 
     /**
-     * Defines from where to read the rendering configuration data. 
+     * We read the cache configuration data only from the XWiki configuration file. We don't look
+     * for cache configuration in other sources (such as in the XWikiPreferences page for example) since
+     * the cache configuration is farm wide and shouldn't be overridden in wikis. In addition that
+     * would cause some cyclic dependency since the configuration source would look for config data
+     * in wiki pages thus calling the cache store which in turn would call this class again.
      */
-    @Requirement
+    @Requirement("xwikiproperties")
     private ConfigurationSource configuration;
 
     /**

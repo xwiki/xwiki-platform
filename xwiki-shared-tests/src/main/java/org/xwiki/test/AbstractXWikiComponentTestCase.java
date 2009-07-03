@@ -49,6 +49,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     protected void setUp() throws Exception
     {
         this.initializer.initializeContainer();
+        this.initializer.initializeConfigurationSource();
 
         // Put before execution context initialization because it could be needed for some executing context
         // initializer

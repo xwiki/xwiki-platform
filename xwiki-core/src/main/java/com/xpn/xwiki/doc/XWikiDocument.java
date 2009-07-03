@@ -5270,7 +5270,17 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String getDefaultDocumentSyntax()
     {
-        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class)).getDefaultDocumentSyntax();
+        // If there's no parser available for the specified syntax default to XWiki 2.0 syntax
+        String syntaxId = ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class)).getDefaultDocumentSyntax(); 
+        
+        try {
+            Utils.getComponent(Parser.class, syntaxId);
+        } catch (Exception e) {
+            LOG.warn("Failed to find parser for syntax [" + syntaxId + "]. Defaulting to xwiki/2.0 syntax.");
+            syntaxId = XWIKI20_SYNTAXID;
+        }
+        
+        return syntaxId; 
     }
 
     /**

@@ -36,6 +36,11 @@ import java.util.HashMap;
 public class CacheConfiguration extends HashMap<String, Object>
 {
     /**
+     * Since this class is a Map it needs to be serializable and thus have a unique id for Serialization. 
+     */
+    private static final long serialVersionUID = -7298684313672163845L;
+    
+    /**
      * The configuration identifier.
      */
     private String configurationId;

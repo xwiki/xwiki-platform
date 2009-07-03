@@ -27,7 +27,7 @@ import java.util.HashMap;
  * A configuration identifier can be defined. It will be used to me the cache unique for clustering process.
  * <p>
  * This is also used by implementations to associate the cache with a configuration file which overwrite the
- * configuration it contains. This way any cache can be tunned in a particular installation with option specifics to
+ * configuration it contains. This way any cache can be tuned in a particular installation with option specifics to
  * chosen cache implementation.
  * 
  * @version $Id$

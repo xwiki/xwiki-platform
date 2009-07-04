@@ -4,5 +4,10 @@
 $cdoc.getEscapedContent()
 </pre>
 #else
-$cdoc.getRenderedContent()
+#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaVersion))
+#if ($outputSyntax)
+$cdoc.getRenderedContent($outputSyntax)##
+#else
+$cdoc.getRenderedContent()##
+#end
 #end

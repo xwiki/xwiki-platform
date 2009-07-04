@@ -4,7 +4,19 @@
 ### TODO: Web service?
 ###
 <div id="xwikicontent">
-$cdoc.getRenderedContent()
+## Get the proper syntax object for the provided request parameters
+#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+#if ($outputSyntax)
+  #set($syntaxType = $outputSyntax.type.toIdString())
+  #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
+    $cdoc.getRenderedContent($outputSyntax)
+  #else
+    ## Make sure to print correctly the result when it's not html
+    <pre>$escapetool.html($cdoc.getRenderedContent($outputSyntax))</pre>
+  #end
+#else
+  $cdoc.getRenderedContent()
+#end
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
 </div>

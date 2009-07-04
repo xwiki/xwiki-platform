@@ -123,6 +123,11 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     public boolean equals(Object obj)
     {
+        // Same Java object, they sure are equal
+        if (this == obj) {
+            return true;
+        }
+
         if (!super.equals(obj)) {
             return false;
         }

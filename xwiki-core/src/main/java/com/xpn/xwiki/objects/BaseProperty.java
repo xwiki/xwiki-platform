@@ -70,6 +70,11 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     @Override
     public boolean equals(Object el)
     {
+        // Same Java object, they sure are equal
+        if (this == el) {
+            return true;
+        }
+
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
         if ((this.object == null) || ((BaseProperty) el).getObject() == null) {

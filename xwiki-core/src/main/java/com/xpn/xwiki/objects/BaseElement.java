@@ -92,6 +92,11 @@ public abstract class BaseElement implements ElementInterface, Serializable
     @Override
     public boolean equals(Object el)
     {
+        // Same Java object, they sure are equal
+        if (this == el) {
+            return true;
+        }
+
         if (el == null) {
             return false;
         }

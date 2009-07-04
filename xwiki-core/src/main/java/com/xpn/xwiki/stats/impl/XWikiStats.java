@@ -25,6 +25,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -32,9 +35,6 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
-
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
 
 /**
  * Base class for all stored statistics object.
@@ -183,6 +183,11 @@ public class XWikiStats extends BaseCollection
     @Override
     public boolean equals(Object obj)
     {
+        // Same Java object, they sure are equal
+        if (this == obj) {
+            return true;
+        }
+
         if (!super.equals(obj)) {
             return false;
         }

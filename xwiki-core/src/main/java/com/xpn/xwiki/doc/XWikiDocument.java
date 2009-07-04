@@ -2284,6 +2284,11 @@ public class XWikiDocument implements DocumentModelBridge
     @Override
     public boolean equals(Object object)
     {
+        // Same Java object, they sure are equal
+        if (this == object) {
+            return true;
+        }
+
         XWikiDocument doc = (XWikiDocument) object;
         if (!getName().equals(doc.getName())) {
             return false;

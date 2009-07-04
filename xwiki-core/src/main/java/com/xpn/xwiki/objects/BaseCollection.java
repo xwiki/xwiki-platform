@@ -479,6 +479,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     @Override
     public boolean equals(Object coll)
     {
+        // Same Java object, they sure are equal
+        if (this == coll) {
+            return true;
+        }
+
         if (!super.equals(coll)) {
             return false;
         }

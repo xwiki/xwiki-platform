@@ -30,6 +30,7 @@ public class ObjectRemoveForm extends ObjectAddForm
 
     private static final Log LOG = LogFactory.getLog(ObjectRemoveForm.class);
 
+    @Override
     public void readRequest()
     {
         super.readRequest();
@@ -44,7 +45,7 @@ public class ObjectRemoveForm extends ObjectAddForm
 
     public int getClassId()
     {
-        return classId;
+        return this.classId;
     }
 
     public void setClassId(int classId)

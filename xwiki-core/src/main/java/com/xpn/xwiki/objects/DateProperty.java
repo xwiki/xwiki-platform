@@ -21,11 +21,11 @@
 
 package com.xpn.xwiki.objects;
 
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.dom4j.Element;
+import org.dom4j.dom.DOMElement;
 
 public class DateProperty extends BaseProperty implements Cloneable
 {
@@ -35,11 +35,13 @@ public class DateProperty extends BaseProperty implements Cloneable
     {
     }
 
+    @Override
     public Object getValue()
     {
-        return value;
+        return this.value;
     }
 
+    @Override
     public Element toXML()
     {
         Element el = new DOMElement(getName());
@@ -47,6 +49,7 @@ public class DateProperty extends BaseProperty implements Cloneable
         return el;
     }
 
+    @Override
     public String toXMLString()
     {
         try {
@@ -56,11 +59,13 @@ public class DateProperty extends BaseProperty implements Cloneable
         }
     }
 
+    @Override
     public void setValue(Object value)
     {
         this.value = (Date) value;
     }
 
+    @Override
     public String toText()
     {
         Date d = (Date) getValue();
@@ -68,6 +73,7 @@ public class DateProperty extends BaseProperty implements Cloneable
         return (d == null) ? "" : d.toString();
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (!super.equals(obj)) {
@@ -81,6 +87,7 @@ public class DateProperty extends BaseProperty implements Cloneable
         return getValue().equals(((DateProperty) obj).getValue());
     }
 
+    @Override
     public Object clone()
     {
         DateProperty property = (DateProperty) super.clone();

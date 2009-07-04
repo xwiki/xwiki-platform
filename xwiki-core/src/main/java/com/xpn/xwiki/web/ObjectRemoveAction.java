@@ -42,25 +42,27 @@ public class ObjectRemoveAction extends XWikiAction
         String className = form.getClassName();
         int classId = form.getClassId();
         if (StringUtils.isBlank(className)) {
-            ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool()
-                .get("platform.core.action.objectRemove.noClassnameSpecified"));
+            ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool().get(
+                "platform.core.action.objectRemove.noClassnameSpecified"));
         } else if (classId < 0) {
-            ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool()
-                .get("platform.core.action.objectRemove.noObjectSpecified"));
+            ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool().get(
+                "platform.core.action.objectRemove.noObjectSpecified"));
         } else {
             obj = doc.getObject(className, classId);
             if (obj == null) {
-                ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool()
-                    .get("platform.core.action.objectRemove.invalidObject"));                
+                ((VelocityContext) context.get("vcontext")).put("message", context.getMessageTool().get(
+                    "platform.core.action.objectRemove.invalidObject"));
             }
         }
         return obj;
     }
+
     /**
      * {@inheritDoc}
      * 
      * @see XWikiAction#action(XWikiContext)
      */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -71,8 +73,7 @@ public class ObjectRemoveAction extends XWikiAction
             return true;
         }
         doc.removeObject(obj);
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), true,
-            context);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), true, context);
 
         if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
             response.setStatus(204);
@@ -90,6 +91,7 @@ public class ObjectRemoveAction extends XWikiAction
      * 
      * @see XWikiAction#render(XWikiContext)
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {

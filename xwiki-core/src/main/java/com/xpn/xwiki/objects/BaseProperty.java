@@ -21,7 +21,10 @@
 
 package com.xpn.xwiki.objects;
 
-import com.xpn.xwiki.web.Utils;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringWriter;
+
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.dom.DOMDocument;
@@ -29,9 +32,7 @@ import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringWriter;
+import com.xpn.xwiki.web.Utils;
 
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
@@ -66,6 +67,7 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
      * 
      * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object el)
     {
         // I hate this.. needed for hibernate to find the object
@@ -74,8 +76,9 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
             return (hashCode() == el.hashCode());
         }
 
-        if (!super.equals(el))
+        if (!super.equals(el)) {
             return false;
+        }
 
         return (getId() == ((BaseProperty) el).getId());
     }
@@ -108,6 +111,7 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
      * 
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode()
     {
         // I hate this.. needed for hibernate to find the object
@@ -129,6 +133,7 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
      * 
      * @see com.xpn.xwiki.objects.BaseElement#clone()
      */
+    @Override
     public Object clone()
     {
         BaseProperty property = (BaseProperty) super.clone();
@@ -199,6 +204,7 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         return toXMLString();

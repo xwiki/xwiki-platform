@@ -21,38 +21,50 @@
 
 package com.xpn.xwiki.objects;
 
-
-public abstract class NumberProperty extends BaseProperty {
+public abstract class NumberProperty extends BaseProperty
+{
     private Number value;
 
-    public NumberProperty() {
+    public NumberProperty()
+    {
     }
 
-    public Object getValue() {
-        return value;
+    @Override
+    public Object getValue()
+    {
+        return this.value;
     }
 
-    public void setValue(Object value) {
-        this.value = (Number)value;
+    @Override
+    public void setValue(Object value)
+    {
+        this.value = (Number) value;
     }
 
-    public String toText() {
-        Number nb = (Number)getValue();
-        return (nb==null) ? "" : nb.toString();
+    @Override
+    public String toText()
+    {
+        Number nb = (Number) getValue();
+        return (nb == null) ? "" : nb.toString();
     }
 
-    public boolean equals(Object obj) {
-        if (!super.equals(obj))
-         return false;
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!super.equals(obj)) {
+            return false;
+        }
 
-       if ((getValue()==null)
-            && (((NumberProperty)obj).getValue()==null))
-         return true;
+        if ((getValue() == null) && (((NumberProperty) obj).getValue() == null)) {
+            return true;
+        }
 
-       return getValue().equals(((NumberProperty)obj).getValue());
+        return getValue().equals(((NumberProperty) obj).getValue());
     }
 
-    public Object clone() {
+    @Override
+    public Object clone()
+    {
         NumberProperty property = (NumberProperty) super.clone();
         property.setValue(getValue());
         return property;

@@ -240,7 +240,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("CREATE SCHEMA " + schema + " AUTHORIZATION DBA");
             } else if (DatabaseProduct.DB2 == databaseProduct) {
-                stmt.execute("CREATE SCHEMA " + schema );
+                stmt.execute("CREATE SCHEMA " + schema);
             } else {
                 stmt.execute("create database " + schema);
             }
@@ -465,13 +465,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // session.saveOrUpdate(doc);
             }
 
-            // Remove properties planned for removal
+            // Remove objects planned for removal
             if (doc.getObjectsToRemove().size() > 0) {
-                for (int i = 0; i < doc.getObjectsToRemove().size(); i++) {
-                    BaseObject bobj = doc.getObjectsToRemove().get(i);
-                    if (bobj != null) {
-                        deleteXWikiObject(bobj, context, false);
-                    }
+                for (BaseObject removedObject : doc.getObjectsToRemove()) {
+                    deleteXWikiObject(removedObject, context, false);
                 }
                 doc.setObjectsToRemove(new ArrayList<BaseObject>());
             }
@@ -571,7 +568,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-                // TODO: Delete all objects for which we don't have a name in the Map..
+                // TODO: Delete all objects for which we don't have a name in the Map
                 for (Vector<BaseObject> objects : doc.getxWikiObjects().values()) {
                     for (BaseObject obj : objects) {
                         if (obj != null) {
@@ -650,12 +647,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 doc.setDate(new Date(doc.getDate().getTime()));
                 doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
                 doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
-                
+
                 // If the syntaxId is not set, default to XWiki Syntax 1.0
                 if (StringUtils.isBlank(doc.getSyntaxId())) {
                     doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
                 }
-                
+
             } catch (ObjectNotFoundException e) { // No document
                 doc.setNew(true);
                 return doc;
@@ -916,7 +913,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
              * session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
              */
             BaseClass bclass = object.getxWikiClass(context);
-            List handledProps = new ArrayList();
+            List<String> handledProps = new ArrayList<String>();
             if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                 // save object using the custom mapping
                 Map objmap = object.getCustomMappingMap();
@@ -942,7 +939,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             session.delete(prop);
                         }
                     }
-                    object.setFieldsToRemove(new ArrayList());
+                    object.setFieldsToRemove(new ArrayList<BaseProperty>());
                 }
 
                 Iterator it = object.getPropertyList().iterator();
@@ -1151,6 +1148,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void deleteXWikiCollection(BaseCollection object, XWikiContext context, boolean bTransaction, boolean evict)
         throws XWikiException
     {
+        if (object == null) {
+            return;
+        }
         try {
             if (bTransaction) {
                 checkHibernate(context);

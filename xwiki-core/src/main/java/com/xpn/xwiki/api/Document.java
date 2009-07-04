@@ -1767,11 +1767,27 @@ public class Document extends Api
         return this.doc.isProgrammaticContent();
     }
 
-    public boolean removeObject(Object obj)
+    /**
+     * Remove an XObject from the document. The changes are not persisted until the document is saved.
+     * 
+     * @param object the object to remove
+     * @return {@code true} if the object was successfully removed, {@code false} if the object was not found in the
+     *         current document.
+     */
+    public boolean removeObject(Object object)
     {
-        return getDoc().removeObject(obj.getBaseObject());
+        return getDoc().removeObject(object.getBaseObject());
     }
 
+    /**
+     * Remove all the objects of a given type (XClass) from the document. The object counter is left unchanged, so that
+     * future objects will have new (different) numbers. However, on some storage engines the counter will be reset if
+     * the document is removed from the cache and reloaded from the persistent storage.
+     * 
+     * @param className The class name of the objects to be removed.
+     * @return {@code true} if the objects were successfully removed, {@code false} if no object from the target class
+     *         was in the current document.
+     */
     public boolean removeObjects(String className)
     {
         return getDoc().removeObjects(className);

@@ -1426,17 +1426,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void addObject(String classname, BaseObject object)
     {
-        if (object != null) {
-            object.setWiki(getDatabase());
-            object.setName(getFullName());
-        }
         Vector<BaseObject> vobj = getObjects(classname);
         if (vobj == null) {
             setObject(classname, 0, object);
         } else {
             setObject(classname, vobj.size(), object);
         }
-        setContentDirty(true);
     }
 
     public void setObject(String classname, int nb, BaseObject object)
@@ -4589,19 +4584,27 @@ public class XWikiDocument implements DocumentModelBridge
         return false;
     }
 
-    public boolean removeObject(BaseObject bobj)
+    /**
+     * Remove an XObject from the document. The changes are not persisted until the document is saved.
+     * 
+     * @param object the object to remove
+     * @return {@code true} if the object was successfully removed, {@code false} if the object was not found in the
+     *         current document.
+     */
+    public boolean removeObject(BaseObject object)
     {
-        Vector<BaseObject> objects = getObjects(bobj.getClassName());
+        Vector<BaseObject> objects = getObjects(object.getClassName());
+        // No objects at all, nothing to remove
         if (objects == null) {
             return false;
         }
         // Sometimes the object vector is wrongly indexed, meaning that objects are not at the right position
         // Check if the right object is in place
-        int objectPosition = bobj.getNumber();
+        int objectPosition = object.getNumber();
         BaseObject storedObject = objects.elementAt(objectPosition);
-        if (storedObject == null || !storedObject.equals(bobj)) {
+        if (storedObject == null || !storedObject.equals(object)) {
             // Try to find the correct position
-            objectPosition = objects.indexOf(bobj);
+            objectPosition = objects.indexOf(object);
         }
         // If the object is not in the document, simply ignore this request
         if (objectPosition < 0) {
@@ -4611,29 +4614,36 @@ public class XWikiDocument implements DocumentModelBridge
         // in the vector
         objects.set(objectPosition, null);
         // Schedule the object for removal from the storage
-        addObjectsToRemove(bobj);
+        addObjectsToRemove(object);
         return true;
     }
 
     /**
-     * Remove all the objects of a given type (XClass) from the document.
+     * Remove all the objects of a given type (XClass) from the document. The object counter is left unchanged, so that
+     * future objects will have new (different) numbers. However, on some storage engines the counter will be reset if
+     * the document is removed from the cache and reloaded from the persistent storage.
      * 
      * @param className The class name of the objects to be removed.
+     * @return {@code true} if the objects were successfully removed, {@code false} if no object from the target class
+     *         was in the current document.
      */
     public boolean removeObjects(String className)
     {
         Vector<BaseObject> objects = getObjects(className);
+        // No objects at all, nothing to remove
         if (objects == null) {
             return false;
         }
-        Iterator<BaseObject> it = objects.iterator();
-        while (it.hasNext()) {
-            BaseObject bobj = it.next();
-            if (bobj != null) {
-                objects.set(bobj.getNumber(), null);
-                addObjectsToRemove(bobj);
+        // Schedule the object for removal from the storage
+        for (BaseObject object : objects) {
+            if (object != null) {
+                addObjectsToRemove(object);
             }
         }
+        // Empty the vector, retaining its size
+        int currentSize = objects.size();
+        objects.setSize(0);
+        objects.setSize(currentSize);
         return true;
     }
 

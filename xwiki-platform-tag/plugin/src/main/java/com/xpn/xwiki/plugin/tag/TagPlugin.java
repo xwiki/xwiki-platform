@@ -92,7 +92,8 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * Get tags of the given document.
      * 
      * @param document document to search in.
-     * @return list of tags.
+     * @return list of tags. The list is a snapshot of the current tags. Changes to this list won't affect the document,
+     *         and changes to the document's tags won't be visible in the returned list.
      */
     @SuppressWarnings("unchecked")
     private List<String> getTagsFromDocument(XWikiDocument document)

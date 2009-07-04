@@ -741,4 +741,49 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("[[newspace.newpage]]", doc2.getContent());
         assertEquals("[[newspace.newpage]]", doc3.getContent());
     }
+
+    /**
+     * Normally the xobject vector has the Nth object on the Nth position, but in case an object gets misplaced, trying
+     * to remove it should indeed remove that object, and no other.
+     */
+    public void testRemovingObjectWithWrongObjectVector()
+    {
+        // Setup: Create a document and two xobjects
+        XWikiDocument doc = new XWikiDocument();
+        BaseObject o1 = new BaseObject(), o2 = new BaseObject();
+        o1.setClassName(CLASSNAME);
+        o2.setClassName(CLASSNAME);
+
+        // First test: put the second xobject on the third position
+        // addObject creates the object vector and configures the objects
+        doc.addObject(CLASSNAME, o1);
+        doc.addObject(CLASSNAME, o2);
+        // Mess up the object vector
+        Vector<BaseObject> objects = doc.getObjects(CLASSNAME);
+        objects.setSize(3);
+        objects.set(1, null);
+        objects.set(2, o2);
+        // Call the tested method
+        doc.removeObject(o2);
+        // Check the correct behavior:
+        assertTrue(objects.contains(o1));
+        assertFalse(objects.contains(o2));
+        assertNull(objects.get(1));
+        assertNull(objects.get(2));
+
+        // Second test: swap the two objects, so that the first object is in the position the second should have
+        // Start over, re-adding the two objects
+        doc = new XWikiDocument();
+        doc.addObject(CLASSNAME, o1);
+        doc.addObject(CLASSNAME, o2);
+        // Swap the two objects
+        objects = doc.getObjects(CLASSNAME);
+        objects.set(0, o2);
+        objects.set(1, o1);
+        // Call the tested method
+        doc.removeObject(o2);
+        // Check the correct behavior
+        assertTrue(objects.contains(o1));
+        assertFalse(objects.contains(o2));
+    }
 }

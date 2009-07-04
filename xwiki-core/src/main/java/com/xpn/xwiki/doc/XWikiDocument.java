@@ -4595,10 +4595,22 @@ public class XWikiDocument implements DocumentModelBridge
         if (objects == null) {
             return false;
         }
-        if (objects.elementAt(bobj.getNumber()) == null) {
+        // Sometimes the object vector is wrongly indexed, meaning that objects are not at the right position
+        // Check if the right object is in place
+        int objectPosition = bobj.getNumber();
+        BaseObject storedObject = objects.elementAt(objectPosition);
+        if (storedObject == null || !storedObject.equals(bobj)) {
+            // Try to find the correct position
+            objectPosition = objects.indexOf(bobj);
+        }
+        // If the object is not in the document, simply ignore this request
+        if (objectPosition < 0) {
             return false;
         }
-        objects.set(bobj.getNumber(), null);
+        // We don't remove objects, but set null in their place, so that the object number corresponds to its position
+        // in the vector
+        objects.set(objectPosition, null);
+        // Schedule the object for removal from the storage
         addObjectsToRemove(bobj);
         return true;
     }

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1233158003000</date>
-<contentUpdateDate>1233158003000</contentUpdateDate>
-<version>4.1</version>
+<date>1246705230000</date>
+<contentUpdateDate>1246705230000</contentUpdateDate>
+<version>3.1</version>
 <title>Translations</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -173,9 +173,9 @@ XWiki.XWikiServerClass_visibility_private=Private
 # DOC
 ##
 wikimanager.doc.createwiki.intro=Create a new wiki. This will create the wiki descriptor document in the main wiki and its associated database or schema depends on the database engine being used.
-wikimanager.doc.createwiki.wikiname=Choose an identifier name for your wiki. It will be use :\n\
+wikimanager.doc.createwiki.wikiname=Choose an identifier name for your wiki. It will be used :\n\
 * as database name in the database engine used as XWiki back-end.\n\
-* to target the wiki pages from another wiki with "wikiname:Space.Name" syntax.\n\
+* to target the wiki pages from another wiki with "wikiidentifier:Space.Name" syntax.\n\
 * to generate the wiki descriptor page name in the main wiki (~~XWiki.XWikiServer*Wikiindentifier*~~).\n\
 Wiki identifier has to contains only lowercase alphanumeric characters (0-9, a-z).
 wikimanager.doc.createwiki.desc=Set all the properties  of your wiki here. All theses properties can be changed at any time in the wiki's descriptor page.
@@ -185,12 +185,12 @@ wikimanager.doc.createwiki.desc.server=The alias used to access the wiki.
 wikimanager.doc.createwiki.desc.server.creation=The alias used to access the wiki. The current alias suffix is ~~{0}~~. To change it edit this wiki page and search the \"$ALIASSUFFIX\" in TOOLS section.&lt;br /&gt;You can add more aliases latter in the wiki's descriptor page.
 wikimanager.doc.createwiki.desc.owner=A global user who will have all the rights on this wiki.
 wikimanager.doc.createwiki.desc.iswikitemplate=Indicate if this wiki can be use as template when creating a new wiki.
-wikimanager.doc.createwiki.desc.secure=If enabled, all this wiki's URLs will starting with ~~https~~.
+wikimanager.doc.createwiki.desc.secure=If enabled, all this wiki's generated externals URLs will starting with ~~https~~.
 wikimanager.doc.createwiki.desc.homepage=The home page of the wiki.
 wikimanager.doc.createwiki.datafrom=When creating a new wiki you obtain by default an empty wiki. You can use wiki template and/or XAR packages as content sources for the new wiki.
-wikimanager.doc.createwiki.datafrom.template=First the wiki template content will be copied in the new wiki. To add more templates in the list set property ~~Visibility~~ of the wiki "template" in its wiki descriptor page.
+wikimanager.doc.createwiki.datafrom.template=First the wiki template content will be copied in the new wiki. You can make any wiki a template by enabling ~~Template~~ properties in [Wiki Manager main page&gt;WikiManager.WebHome] or in the wiki descritor page.
 wikimanager.doc.createwiki.datafrom.package=Then the attached XAR file will be imported into the new wiki. To add more packages in the list attach XAR files to this page.
-wikimanager.doc.createwiki.members=By default a new wiki is independent meaning that except for administrators no global user will have access to it. Here you can decide which global users and groups will have access to the new wiki.
+wikimanager.doc.createwiki.members=By default a new wiki is independent, meaning that except for administrators no global user will have access to it. Here you can decide which global users and groups will have access to the new wiki.
 wikimanager.doc.createwiki.members.readers=Give "read" and "comment" rights to provided users and groups.
 wikimanager.doc.createwiki.members.writers=Give readers rights as well as "write" to provided users and groups.
 wikimanager.doc.createwiki.members.administrators=Give "admin" right which means all rights to provided users and groups.

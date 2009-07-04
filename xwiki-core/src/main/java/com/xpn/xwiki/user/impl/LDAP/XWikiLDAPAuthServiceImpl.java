@@ -199,7 +199,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         // First we check in the local context for a valid ldap user
         try {
-            principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context);
+            principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context, true);
         } catch (Exception e) {
             // continue
             if (LOG.isDebugEnabled()) {
@@ -214,7 +214,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             try {
                 context.setDatabase(context.getMainXWiki());
                 try {
-                    principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context);
+                    principal = ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context, false);
                 } catch (Exception e) {
                     // continue
                     if (LOG.isDebugEnabled()) {
@@ -272,6 +272,26 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      */
     protected Principal ldapAuthenticateInContext(String ldapUid, String validXWikiUserName, String password,
         XWikiContext context) throws XWikiException, UnsupportedEncodingException, LDAPException
+    {
+        return ldapAuthenticateInContext(ldapUid, validXWikiUserName, password, context, false);
+    }
+
+    /**
+     * Try LDAP login for given context and return {@link Principal}.
+     * 
+     * @param ldapUid the name of the ldap user to log in.
+     * @param validXWikiUserName the name of the XWiki user to log in.
+     * @param password the password of the user to log in.
+     * @param context the XWiki context.
+     * @param local indicate if it's a local authentication. Supposed to return a local user {@link Principal} (whithout
+     *            the wiki name).
+     * @return the {@link Principal}.
+     * @throws XWikiException error when login.
+     * @throws UnsupportedEncodingException error when login.
+     * @throws LDAPException error when login.
+     */
+    protected Principal ldapAuthenticateInContext(String ldapUid, String validXWikiUserName, String password,
+        XWikiContext context, boolean local) throws XWikiException, UnsupportedEncodingException, LDAPException
     {
         Principal principal = null;
 
@@ -422,7 +442,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         syncUser(userProfile, searchAttributes, ldapDn, ldapUid, ldapUtils, context);
 
         // from now on we can enter the application
-        principal = new SimplePrincipal(context.getDatabase() + ":" + userProfile.getFullName());
+        if (local) {
+            principal = new SimplePrincipal(userProfile.getFullName());
+        } else {
+            principal = new SimplePrincipal(context.getDatabase() + ":" + userProfile.getFullName());
+        }
 
         // ////////////////////////////////////////////////////////////////////
         // 9. sync groups membership

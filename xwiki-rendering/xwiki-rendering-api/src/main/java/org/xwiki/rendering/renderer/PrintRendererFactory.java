@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.renderer;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -35,6 +37,12 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 @ComponentRole
 public interface PrintRendererFactory
 {
+    /**
+     * @return the syntaxes of the supported renderers
+     * @since 1.9.1,2.0M2
+     */
+    List<Syntax> getAvailableSyntaxes();
+
     /**
      * @param targetSyntax the syntax identifier of the renderer.
      * @param printer used by the renderer use to print.

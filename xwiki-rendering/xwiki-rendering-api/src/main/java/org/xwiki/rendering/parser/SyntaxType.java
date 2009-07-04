@@ -43,6 +43,12 @@ public class SyntaxType
     public static final SyntaxType XHTML = getSyntaxType("XHTML");
 
     public static final SyntaxType HTML = getSyntaxType("HTML");
+    
+    public static final SyntaxType PLAIN = getSyntaxType("PLAIN");
+    
+    public static final SyntaxType EVENT = getSyntaxType("EVENT");
+    
+    public static final SyntaxType TEX = getSyntaxType("TEX");
 
     private static Map<String, SyntaxType> syntaxTypeMap;
 
@@ -97,18 +103,5 @@ public class SyntaxType
     {
         // no need to call id's equals method as SyntaxType for an id should be unique
         return this == obj;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode()
-    {
-        // use the default implementation based on internal address of the object as SyntaxType for an id should be
-        // unique
-        return super.hashCode();
     }
 }

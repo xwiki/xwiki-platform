@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
@@ -47,6 +51,10 @@ import org.xwiki.rendering.renderer.xhtml.XWikiXHTMLLinkRenderer;
 @Component
 public class DefaultPrintRendererFactory implements PrintRendererFactory
 {
+    private static final List<Syntax> AVAILABLE_SYNTAXES =
+        Collections.unmodifiableList(Arrays.asList(Syntax.XHTML_1_0, Syntax.XWIKI_2_0, Syntax.EVENT_1_0,
+            Syntax.TEX_1_0, Syntax.PLAIN_1_0));
+
     @Requirement
     private DocumentAccessBridge documentAccessBridge;
 
@@ -58,6 +66,16 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
 
     @Requirement
     private DocumentNameSerializer documentNameSerializer;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.PrintRendererFactory#getAvailableSyntaxes()
+     */
+    public List<Syntax> getAvailableSyntaxes()
+    {
+        return AVAILABLE_SYNTAXES;
+    }
 
     /**
      * {@inheritDoc}

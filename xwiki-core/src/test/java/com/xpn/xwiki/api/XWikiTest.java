@@ -28,6 +28,7 @@ import java.util.Random;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.rendering.parser.Syntax;
 
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -164,5 +165,14 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         long copyCreationTime = this.apiXWiki.getDocument(copyName).getCreationDate().getTime();
 
         assertTrue(startTime <= copyCreationTime && copyCreationTime <= endTime);
+    }
+
+    public void testGetAvailableRendererSyntax()
+    {
+        assertEquals(Syntax.PLAIN_1_0, this.apiXWiki.getAvailableRendererSyntax("plain", "1.0"));
+        assertEquals(Syntax.PLAIN_1_0, this.apiXWiki.getAvailableRendererSyntax("Plain", "1.0"));
+        assertEquals(Syntax.PLAIN_1_0, this.apiXWiki.getAvailableRendererSyntax("plain", null));
+        assertNull(this.apiXWiki.getAvailableRendererSyntax("plai", "1.0"));
+        assertNull(this.apiXWiki.getAvailableRendererSyntax("plai", null));
     }
 }

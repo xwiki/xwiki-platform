@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.rendering.parser.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -472,6 +473,16 @@ public class Document extends Api
         return this.doc.getRenderedContent(text, syntaxId, getXWikiContext());
     }
 
+    /**
+     * @param targetSyntax the syntax in which render the document content
+     * @return the rendered content
+     * @throws XWikiException error when rendering content
+     */
+    public String getRenderedContent(Syntax targetSyntax) throws XWikiException
+    {
+        return this.doc.getRenderedContent(targetSyntax, getXWikiContext());
+    }
+    
     /**
      * return a escaped version of the content of this document
      */

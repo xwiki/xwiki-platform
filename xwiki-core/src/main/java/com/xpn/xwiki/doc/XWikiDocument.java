@@ -86,6 +86,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -313,6 +314,11 @@ public class XWikiDocument implements DocumentModelBridge
     private DocumentNameSerializer compactDocumentNameSerializer =
         (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class, "compact");
 
+    /**
+     * Used to create proper {@link Syntax} objects.
+     */
+    SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+
     public XWikiStoreInterface getStore(XWikiContext context)
     {
         return context.getWiki().getStore();
@@ -509,10 +515,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setContent(XDOM content) throws XWikiException
     {
-        setContent(renderXDOM(content, getSyntaxId()));
+        setContent(renderXDOM(content, getSyntax()));
     }
 
-    public String getRenderedContent(XWikiContext context) throws XWikiException
+    public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
         // Note: We are currently duplicating code from the other getRendered signature since there are
         // some unresolved issues with saving/restoring the context in some cases (need to be investigated),
@@ -533,7 +539,7 @@ public class XWikiDocument implements DocumentModelBridge
                 renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
             } else {
                 renderedContent =
-                    performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), "xhtml/1.0", true);
+                    performSyntaxConversion(getTranslatedContent(context), getSyntaxId(), targetSyntax, true);
             }
         } finally {
             if (isInRenderingEngine != null) {
@@ -543,6 +549,11 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
         return renderedContent;
+    }
+
+    public String getRenderedContent(XWikiContext context) throws XWikiException
+    {
+        return getRenderedContent(Syntax.XHTML_1_0, context);
     }
 
     /**
@@ -571,7 +582,7 @@ public class XWikiDocument implements DocumentModelBridge
             if (is10Syntax(syntaxId)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-                result = performSyntaxConversion(text, getSyntaxId(), "xhtml/1.0", true);
+                result = performSyntaxConversion(text, getSyntaxId(), Syntax.XHTML_1_0, true);
             }
         } catch (XWikiException e) {
             // Failed to render for some reason. This method should normally throw an exception but this
@@ -714,7 +725,7 @@ public class XWikiDocument implements DocumentModelBridge
                 if (blocks.size() > 0) {
                     HeaderBlock header = blocks.get(0);
                     if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
-                        title = renderXDOM(new XDOM(header.getChildren()), "plain/1.0");
+                        title = renderXDOM(new XDOM(header.getChildren()), Syntax.PLAIN_1_0);
                     }
                 }
             }
@@ -4318,6 +4329,31 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @return the syntax of the document
+     */
+    private Syntax getSyntax()
+    {
+        Syntax syntax = null;
+
+        String syntaxId = getDefaultDocumentSyntax();
+        try {
+            syntax = this.syntaxFactory.createSyntaxFromIdString(getSyntaxId());
+        } catch (ParseException e) {
+            LOG.error("Failed to genrate Syntax object for syntax identifier [" + syntaxId + "] in page ["
+                + getDocumentName() + "]", e);
+
+            syntaxId = getDefaultDocumentSyntax();
+            try {
+                syntax = this.syntaxFactory.createSyntaxFromIdString(getDefaultDocumentSyntax());
+            } catch (ParseException e1) {
+                LOG.error("Failed to genrate default Syntax object. The defautlt syntax id in [" + syntaxId + "]", e);
+            }
+        }
+
+        return syntax;
+    }
+
+    /**
      * @param syntaxId the new syntax id to set (eg "xwiki/1.0", "xwiki/2.0", etc)
      * @see #getSyntaxId()
      */
@@ -4618,7 +4654,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 DocumentSection docSection =
                     new DocumentSection(sectionNumber++, documentSectionIndex, documentSectionLevel, renderXDOM(
-                        new XDOM(header.getChildren()), getSyntaxId()));
+                        new XDOM(header.getChildren()), getSyntax()));
                 splitSections.add(docSection);
             }
 
@@ -4681,7 +4717,7 @@ public class XWikiDocument implements DocumentModelBridge
 
             if (headers.size() >= sectionNumber) {
                 SectionBlock section = headers.get(sectionNumber - 1).getSection();
-                content = renderXDOM(new XDOM(Collections.<Block> singletonList(section)), getSyntaxId());
+                content = renderXDOM(new XDOM(Collections.<Block> singletonList(section)), getSyntax());
             }
         }
 
@@ -4756,7 +4792,7 @@ public class XWikiDocument implements DocumentModelBridge
             header.getSection().replace(blocks);
 
             // render back XDOM to document's content syntax
-            content = renderXDOM(xdom, getSyntaxId());
+            content = renderXDOM(xdom, getSyntax());
         }
 
         return content;
@@ -5138,8 +5174,24 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void convertSyntax(String targetSyntaxId, XWikiContext context) throws XWikiException
     {
+        try {
+            convertSyntax(this.syntaxFactory.createSyntaxFromIdString(targetSyntaxId), context);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
+        }
+    }
+
+    /**
+     * Convert the current document content from its current syntax to the new syntax passed as parameter.
+     * 
+     * @param targetSyntax the syntax to convert to (eg "xwiki/2.0", "xhtml/1.0", etc)
+     * @throws XWikiException if an exception occurred during the conversion process
+     */
+    public void convertSyntax(Syntax targetSyntax, XWikiContext context) throws XWikiException
+    {
         // convert content
-        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntaxId, false));
+        setContent(performSyntaxConversion(getContent(), getSyntaxId(), targetSyntax, false));
 
         // convert objects
         Map<String, Vector<BaseObject>> objectsByClass = getxWikiObjects();
@@ -5154,7 +5206,7 @@ public class XWikiDocument implements DocumentModelBridge
                             LargeStringProperty field = (LargeStringProperty) bobject.getField(textAreaClass.getName());
 
                             if (field != null) {
-                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntaxId,
+                                field.setValue(performSyntaxConversion(field.getValue(), getSyntaxId(), targetSyntax,
                                     false));
                             }
                         }
@@ -5164,7 +5216,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         // change syntax id
-        setSyntaxId(targetSyntaxId);
+        setSyntaxId(targetSyntax.toIdString());
     }
 
     /**
@@ -5188,21 +5240,21 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @param content the content to convert
      * @param currentSyntaxId the syntax of the current content to convert
-     * @param targetSyntaxId the new syntax after the conversion
+     * @param targetSyntax the new syntax after the conversion
      * @param transform indicate if transformations has to be applied or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private static String performSyntaxConversion(String content, String currentSyntaxId, String targetSyntaxId,
+    private static String performSyntaxConversion(String content, String currentSyntaxId, Syntax targetSyntax,
         boolean transform) throws XWikiException
     {
         try {
             XDOM dom = parseContent(currentSyntaxId, content);
 
-            return performSyntaxConversion(dom, currentSyntaxId, targetSyntaxId, transform);
+            return performSyntaxConversion(dom, currentSyntaxId, targetSyntax, transform);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
+                "Failed to convert document to syntax [" + targetSyntax + "]", e);
         }
     }
 
@@ -5211,12 +5263,12 @@ public class XWikiDocument implements DocumentModelBridge
      * 
      * @param content the XDOM content to convert, the XDOM can be modified during the transformation
      * @param currentSyntaxId the syntax of the current content to convert
-     * @param targetSyntaxId the new syntax after the conversion
+     * @param targetSyntax the new syntax after the conversion
      * @param transform indicate if transformations has to be applied or not
      * @return the converted content in the new syntax
      * @throws XWikiException if an exception occurred during the conversion process
      */
-    private static String performSyntaxConversion(XDOM content, String currentSyntaxId, String targetSyntaxId,
+    private static String performSyntaxConversion(XDOM content, String currentSyntaxId, Syntax targetSyntax,
         boolean transform) throws XWikiException
     {
         try {
@@ -5230,10 +5282,10 @@ public class XWikiDocument implements DocumentModelBridge
             }
 
             // Render XDOM
-            return renderXDOM(content, targetSyntaxId);
+            return renderXDOM(content, targetSyntax);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to convert document to syntax [" + targetSyntaxId + "]", e);
+                "Failed to convert document to syntax [" + targetSyntax + "]", e);
         }
     }
 
@@ -5241,24 +5293,23 @@ public class XWikiDocument implements DocumentModelBridge
      * Render privided XDOM into content of the provided syntax identifier.
      * 
      * @param content the XDOM content to render
-     * @param targetSyntaxId the syntax identifier of the rendered content
+     * @param targetSyntax the syntax identifier of the rendered content
      * @return the rendered content
      * @throws XWikiException if an exception occurred during the rendering process
      */
-    private static String renderXDOM(XDOM content, String targetSyntaxId) throws XWikiException
+    private static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
         try {
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
             PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
 
             WikiPrinter printer = new DefaultWikiPrinter();
 
-            content.traverse(factory.createRenderer(syntaxFactory.createSyntaxFromIdString(targetSyntaxId), printer));
+            content.traverse(factory.createRenderer(targetSyntax, printer));
 
             return printer.toString();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to render document to syntax [" + targetSyntaxId + "]", e);
+                "Failed to render document to syntax [" + targetSyntax + "]", e);
         }
 
     }

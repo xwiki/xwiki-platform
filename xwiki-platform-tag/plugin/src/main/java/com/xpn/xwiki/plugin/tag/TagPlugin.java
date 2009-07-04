@@ -29,12 +29,18 @@ import java.util.TreeMap;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
@@ -45,6 +51,9 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  */
 public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
+    /** Logging helper object. */
+    public static final Log LOG = LogFactory.getLog(TagPlugin.class);
+
     /**
      * The identifier for this plugin; used for accessing the plugin from velocity, and as the action returning the
      * extension content.
@@ -116,7 +125,37 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     private void setDocumentTags(XWikiDocument document, List<String> tags, XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) document.getObject(TAG_CLASS, true, context).safeget(TAG_PROPERTY);
+        // Properties aren't added to an object unless a value is specified either from the Web or from an XML.
+        if (prop == null) {
+            prop = createTagProperty(document.getObject(TAG_CLASS, true, context), context);
+        }
         prop.setValue(tags);
+    }
+
+    /**
+     * Create and add the main tag property to the provided tag object. The new property corresponds to the definition
+     * in the tag class, but in case of an error, the default type is a relational-stored list.
+     * 
+     * @param tagObject the target tag object
+     * @param context the current request context
+     * @return the created property
+     * @see #TAG_PROPERTY
+     */
+    private BaseProperty createTagProperty(BaseObject tagObject, XWikiContext context)
+    {
+        BaseProperty tagProperty;
+        try {
+            BaseClass tagClass = context.getWiki().getClass(TAG_CLASS, context);
+            PropertyClass tagPropertyDefinition = (PropertyClass) tagClass.getField(TAG_PROPERTY);
+            tagProperty = tagPropertyDefinition.newProperty();
+        } catch (XWikiException ex) {
+            LOG.warn("Failed to properly create tag property for the tag object, creating a default one");
+            tagProperty = new DBStringListProperty();
+        }
+        tagProperty.setName(TAG_PROPERTY);
+        tagProperty.setObject(tagObject);
+        tagObject.safeput(TAG_PROPERTY, tagProperty);
+        return tagProperty;
     }
 
     /**

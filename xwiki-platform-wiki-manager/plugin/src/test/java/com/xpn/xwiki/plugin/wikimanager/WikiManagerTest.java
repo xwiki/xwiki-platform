@@ -43,11 +43,13 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
  */
 public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 {
-    private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
-
     private static final String MAIN_WIKI_NAME = "xwiki";
 
     private static final String TARGET_WIKI_NAME = "wikitosave";
+
+    private Map<String, Map<String, XWikiDocument>> databases = new HashMap<String, Map<String, XWikiDocument>>();
+
+    private WikiManager wikiManager;
 
     private Map<String, XWikiDocument> getDocuments(String database, boolean create) throws XWikiException
     {
@@ -100,7 +102,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         getContext().setDatabase(MAIN_WIKI_NAME);
         getContext().setMainXWiki(MAIN_WIKI_NAME);
 
@@ -173,6 +175,8 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         });
 
         mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
+        this.wikiManager = new WikiManager(null);
     }
 
     // ///////////////////////////////////////////////////////////////////////////////////////:
@@ -195,7 +199,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiDocument doc = new XWikiDocument("DocumentSpace", "DocumentName");
 
-        WikiManager.getInstance().saveDocument(TARGET_WIKI_NAME, doc, "", getContext());
+        this.wikiManager.saveDocument(TARGET_WIKI_NAME, doc, "", getContext());
 
         assertEquals(MAIN_WIKI_NAME, getContext().getDatabase());
         assertTrue(databases.containsKey(TARGET_WIKI_NAME)
@@ -208,7 +212,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         // ///
 
-        XWikiDocument doc = WikiManager.getInstance().getDocument(TARGET_WIKI_NAME, DOCFULLNAME, getContext());
+        XWikiDocument doc = this.wikiManager.getDocument(TARGET_WIKI_NAME, DOCFULLNAME, getContext());
 
         assertFalse(doc.isNew());
         assertEquals(MAIN_WIKI_NAME, getContext().getDatabase());
@@ -221,7 +225,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
 
         getContext().setDatabase("anotherwiki");
 
-        Wiki wiki = WikiManager.getInstance().getWikiFromName("WikInamE", getContext());
+        Wiki wiki = this.wikiManager.getWikiFromName("WikInamE", getContext());
 
         assertSame(doc, wiki.getDocument());
     }
@@ -229,7 +233,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetWikiAliasWhenDocumentDoesNorExists() throws XWikiException
     {
         try {
-            WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, getContext());
+            this.wikiManager.getWikiAlias("WikInamE", 0, true, getContext());
 
             fail("getWikiAlias should throw WikiManagerException when alias document does not exists");
         } catch (WikiManagerException expected) {
@@ -244,7 +248,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
 
         try {
-            WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, getContext());
+            this.wikiManager.getWikiAlias("WikInamE", 0, true, getContext());
 
             fail("getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists");
         } catch (WikiManagerException expected) {
@@ -259,7 +263,7 @@ public class WikiManagerTest extends AbstractBridgedXWikiComponentTestCase
         databases.get(MAIN_WIKI_NAME).put("XWiki.XWikiServerWikiname", doc);
 
         try {
-            WikiManager.getInstance().getWikiAlias("WikInamE", 0, true, getContext());
+            this.wikiManager.getWikiAlias("WikInamE", 0, true, getContext());
 
             fail("getWikiAlias should throw XObjectDocumentDoesNotExistException when alias document does not exists");
         } catch (WikiManagerException expected) {

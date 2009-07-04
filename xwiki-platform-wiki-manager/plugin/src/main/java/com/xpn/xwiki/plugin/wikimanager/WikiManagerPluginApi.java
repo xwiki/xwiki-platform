@@ -72,6 +72,11 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
     private GlobalSearchPluginApi searchApi;
 
     /**
+     * Protected API for managing wikis (create wiki, delete wiki, create wiki from template, etc).
+     */
+    private WikiManager wikiManager;
+
+    /**
      * The plugin internationalization service.
      */
     private XWikiPluginMessageTool messageTool;
@@ -94,6 +99,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         context.put(WikiManagerMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
 
         this.searchApi = plugin.getGlobalSearchApiPlugin(context);
+        this.wikiManager = new WikiManager(this.messageTool);
     }
 
     /**
@@ -134,6 +140,30 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
     }
 
+    /**
+     * @return true if the it's possible to create a wiki in this context
+     */
+    public boolean canCreateWiki()
+    {
+        return this.wikiManager.canCreateWiki(this.context);
+    }
+
+    /**
+     * @return true if the it's possible to edit a wiki descriptor in this context
+     */
+    public boolean canEditWiki()
+    {
+        return this.wikiManager.canDeleteWiki(this.context);
+    }
+
+    /**
+     * @return true if the it's possible to delete a wiki in this context
+     */
+    public boolean canDeleteWiki()
+    {
+        return this.wikiManager.canEditWiki(this.context);
+    }
+
     // ////////////////////////////////////////////////////////////////////////////
     // Wikis management
 
@@ -170,7 +200,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            if (!hasAdminRights()) {
+            if (!canCreateWiki()) {
                 throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, this.messageTool.get(
                     WikiManagerMessageTool.ERROR_RIGHTTOCREATEWIKI, wikiName));
             }
@@ -189,8 +219,8 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
 
             String comment = WikiManagerMessageTool.COMMENT_CREATEEMPTYWIKI;
 
-            WikiManager.getInstance().createNewWiki(wikiXObjectDocument, failOnExist, realTemplateWikiName,
-                realPkgName, comment, this.context);
+            this.wikiManager.createNewWiki(wikiXObjectDocument, failOnExist, realTemplateWikiName, realPkgName,
+                comment, this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
@@ -222,12 +252,12 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            if (!hasAdminRights()) {
+            if (!canDeleteWiki()) {
                 throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, this.messageTool.get(
                     WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
             }
 
-            WikiManager.getInstance().deleteWiki(wikiName, deleteDatabase, this.context);
+            this.wikiManager.deleteWiki(wikiName, deleteDatabase, this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
@@ -302,12 +332,12 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            if (!hasAdminRights()) {
+            if (!canEditWiki()) {
                 throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, this.messageTool.get(
                     WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
             }
 
-            WikiManager.getInstance().deleteWikiAlias(wikiName, objectId, this.context);
+            this.wikiManager.deleteWikiAlias(wikiName, objectId, this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
@@ -329,7 +359,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         Wiki doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWikiFromName(wikiName, context);
+            doc = this.wikiManager.getWikiFromName(wikiName, context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
         }
@@ -346,7 +376,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         List<Wiki> wikiList = Collections.emptyList();
 
         try {
-            wikiList = WikiManager.getInstance().getAllWikis(context);
+            wikiList = this.wikiManager.getAllWikis(context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
         }
@@ -366,7 +396,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         Wiki doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWikiFromDocumentName(documentFullName, this.context);
+            doc = this.wikiManager.getWikiFromDocumentName(documentFullName, this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
         }
@@ -413,7 +443,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         XWikiServer doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
+            doc = this.wikiManager.getWikiAlias(wikiName, objectId, true, this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGET, wikiName), e);
         }
@@ -432,7 +462,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         List<XWikiServer> listDocument = Collections.emptyList();
 
         try {
-            listDocument = WikiManager.getInstance().getWikiAliasList(this.context);
+            listDocument = this.wikiManager.getWikiAliasList(this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGETALL), e);
         }
@@ -473,7 +503,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      */
     public boolean isWikiExist(String wikiName, int objectId)
     {
-        return WikiManager.getInstance().isWikiAliasExist(wikiName, objectId, this.context);
+        return this.wikiManager.isWikiAliasExist(wikiName, objectId, this.context);
     }
 
     /**
@@ -529,7 +559,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            XWikiServer wikiAlias = WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
+            XWikiServer wikiAlias = this.wikiManager.getWikiAlias(wikiName, objectId, true, this.context);
             wikiAlias.setVisibility(visibility);
             wikiAlias.save();
         } catch (WikiManagerException e) {
@@ -564,7 +594,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            Wiki wiki = WikiManager.getInstance().getWikiFromName(wikiName, this.context);
+            Wiki wiki = this.wikiManager.getWikiFromName(wikiName, this.context);
             XWikiServer wikiAlias = wiki.getFirstWikiAlias();
             wikiAlias.setIsWikiTemplate(isWikiTemplate);
             wikiAlias.save();
@@ -622,7 +652,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             String[] params = new String[] {templateName, packageName};
             String message = this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE, params);
-            WikiManager.getInstance().createWikiTemplate(wikiXObjectDocument, packageName, message, this.context);
+            this.wikiManager.createWikiTemplate(wikiXObjectDocument, packageName, message, this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
@@ -673,7 +703,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         XWikiServer doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWikiTemplateAlias(wikiName, objectId, this.context, true);
+            doc = this.wikiManager.getWikiTemplateAlias(wikiName, objectId, this.context, true);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
         }
@@ -690,7 +720,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         List<XWikiServer> listDocument = Collections.emptyList();
 
         try {
-            listDocument = WikiManager.getInstance().getWikiTemplateAliasList(this.context);
+            listDocument = this.wikiManager.getWikiTemplateAliasList(this.context);
         } catch (WikiManagerException e) {
             logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
         }

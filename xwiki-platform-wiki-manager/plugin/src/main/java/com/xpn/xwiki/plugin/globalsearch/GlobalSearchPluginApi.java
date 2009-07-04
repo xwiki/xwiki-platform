@@ -65,7 +65,7 @@ public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
         this.messageTool = new GlobalSearchMessageTool(locale, plugin, context);
         context.put(GlobalSearchMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
 
-        this.search = new GlobalSearch(messageTool);
+        this.search = new GlobalSearch(this.messageTool);
     }
 
     /**

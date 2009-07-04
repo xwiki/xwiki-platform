@@ -44,6 +44,7 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -51,39 +52,28 @@ import com.xpn.xwiki.util.Util;
  * 
  * @version $Id$
  */
-final class WikiManager
+public final class WikiManager
 {
     /**
      * The logging tool.
      */
     protected static final Log LOG = LogFactory.getLog(WikiManager.class);
 
+    /**
+     * The message tool to use to generate error or comments.
+     */
+    private XWikiPluginMessageTool messageTool;
+
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Unique instance of WikiManager.
-     */
-    private static WikiManager instance;
-
-    /**
      * Hidden constructor of WikiManager only access via getInstance().
+     * 
+     * @param messageTool the message tool
      */
-    private WikiManager()
+    public WikiManager(XWikiPluginMessageTool messageTool)
     {
-    }
-
-    /**
-     * @return a unique instance of WikiManager. Thread safe.
-     */
-    public static WikiManager getInstance()
-    {
-        synchronized (WikiManager.class) {
-            if (instance == null) {
-                instance = new WikiManager();
-            }
-        }
-
-        return instance;
+        this.messageTool = messageTool;
     }
 
     /**
@@ -94,7 +84,7 @@ final class WikiManager
      */
     public XWikiPluginMessageTool getMessageTool(XWikiContext context)
     {
-        return WikiManagerMessageTool.getDefault(context);
+        return this.messageTool != null ? this.messageTool : WikiManagerMessageTool.getDefault(context);
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -129,9 +119,9 @@ final class WikiManager
      * @param wikiName the name of the wiki where to get the document.
      * @param fullname the full name of the document to get.
      * @param context the XWiki context.
-     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it
-     *         dos not exist return new XWikiDocument.
-     * @throws XWikiException error when calling {@link XWiki#getDocument(String, XWikiContext)}}.
+     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it dos not
+     *         exist return new XWikiDocument.
+     * @throws XWikiException error when calling {@link XWiki#getDocument(String, XWikiContext)} .
      * @see com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
      */
     public XWikiDocument getDocument(String wikiName, String fullname, XWikiContext context) throws XWikiException
@@ -173,6 +163,41 @@ final class WikiManager
 
     // ////////////////////////////////////////////////////////////////////////////
     // Wikis management
+
+    /**
+     * @param context the XWiki context
+     * @return true if the it's possible to create a wiki in this context
+     */
+    public boolean canCreateWiki(XWikiContext context)
+    {
+        XWikiRightService rightService = context.getWiki().getRightService();
+
+        return context.getWiki().isVirtualMode() && rightService.hasAdminRights(context)
+            && rightService.hasProgrammingRights(context);
+    }
+
+    /**
+     * @param context the XWiki context
+     * @return true if the it's possible to edit a wiki descriptor in this context
+     */
+    public boolean canEditWiki(XWikiContext context)
+    {
+        XWikiRightService rightService = context.getWiki().getRightService();
+
+        return rightService.hasAdminRights(context) && rightService.hasProgrammingRights(context);
+    }
+
+    /**
+     * @param context the XWiki context
+     * @return true if the it's possible to delete a wiki in this context
+     */
+    public boolean canDeleteWiki(XWikiContext context)
+    {
+        XWikiRightService rightService = context.getWiki().getRightService();
+
+        return context.getWiki().isVirtualMode() && rightService.hasAdminRights(context)
+            && rightService.hasProgrammingRights(context);
+    }
 
     /**
      * Get {@link Wiki} described by provided document.
@@ -261,8 +286,7 @@ final class WikiManager
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki()
-                .getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
+            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
 
         if (appmanager == null) {
             return null;
@@ -538,8 +562,7 @@ final class WikiManager
      * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param context the XWiki context.
      * @return the new wiki descriptor document to save.
-     * @throws XWikiException
-     *             <ul>
+     * @throws XWikiException <ul>
      *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
      *             </ul>
      */
@@ -590,8 +613,7 @@ final class WikiManager
      * 
      * @param targetWiki the name of the new database/schema.
      * @param context the Xwiki context.
-     * @throws WikiManagerException
-     *             <ul>
+     * @throws WikiManagerException <ul>
      *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
      *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *             </ul>
@@ -698,8 +720,7 @@ final class WikiManager
      *             </ul>
      * @since 1.1
      */
-    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context)
-        throws XWikiException
+    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context) throws XWikiException
     {
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
 
@@ -743,8 +764,8 @@ final class WikiManager
      * @param objectId the id of the XWiki object included in the document to manage.
      * @param validate when wiki descriptor document does not exist :
      *            <ul>
-     *            <li> if true, throw an exception with code {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
-     *            <li> if false, return new document unsaved
+     *            <li>if true, throw an exception with code {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
+     *            <li>if false, return new document unsaved
      *            </ul>
      * @param context the XWiki context.
      * @return a wiki descriptor document.
@@ -802,14 +823,14 @@ final class WikiManager
      * @param context the XWiki context.
      * @param validate when wiki descriptor document does not exist :
      *            <ul>
-     *            <li> if true, throw an exception with code {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
+     *            <li> if true, throw an exception with code {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS} 
      *            <li> if false, return new document unsaved
      *            </ul>
      * @return a wiki descriptor document.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>getting {@link XWikiServerClass} unique instance.</li>
-     *             <li>or when searching for wiki descriptor with "visibility" field equals to "template".</li>
+     *             <li>getting {@link XWikiServerClass} unique instance.</li> <li>or when searching for wiki descriptor
+     *             with "visibility" field equals to "template".</li>
      *             </ul>
      */
     public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, XWikiContext context, boolean validate)
@@ -827,8 +848,8 @@ final class WikiManager
      * @return a list of {@link XWikiServer}.
      * @throws XWikiException eeor when:
      *             <ul>
-     *             <li>getting {@link XWikiServerClass} unique instance.</li>
-     *             <li>or when searching for all wikis descriptors with "visibility" field equals to "template".</li>
+     *             <li>getting {@link XWikiServerClass} unique instance.</li> <li>or when searching for all wikis
+     *             descriptors with "visibility" field equals to "template".</li>
      *             </ul>
      */
     public List<XWikiServer> getWikiTemplateAliasList(XWikiContext context) throws XWikiException

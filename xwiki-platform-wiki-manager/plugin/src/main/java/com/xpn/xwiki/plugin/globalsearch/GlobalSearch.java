@@ -101,7 +101,7 @@ final class GlobalSearch
      * 
      * @param messageTool the plugin internationalization service.
      */
-    GlobalSearch(XWikiPluginMessageTool messageTool)
+    public GlobalSearch(XWikiPluginMessageTool messageTool)
     {
         this.messageTool = messageTool;
     }

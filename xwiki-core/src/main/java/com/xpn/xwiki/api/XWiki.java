@@ -30,6 +30,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.query.QueryManager;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -2684,5 +2686,43 @@ public class XWiki extends Api
     public String getDefaultDocumentSyntax()
     {
         return this.xwiki.getDefaultDocumentSyntax();
+    }
+
+    /**
+     * Find the corresponding available renderer syntax.
+     * <p>
+     * If <code>syntaxVersion</code> is null the last version of the available provided syntax type is returned.
+     * 
+     * @param syntaxType the syntax type
+     * @param syntaxVersion the syntax version
+     * @return the available corresponding {@link Syntax}. Null if no available renderer can be found.
+     */
+    public Syntax getAvailableRendererSyntax(String syntaxType, String syntaxVersion)
+    {
+        Syntax syntax = null;
+
+        PrintRendererFactory printRendererFactory =
+            (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
+
+        List<Syntax> availableSyntaxes = printRendererFactory.getAvailableSyntaxes();
+
+        for (Syntax availableSyntax : availableSyntaxes) {
+            if (syntaxVersion != null) {
+                if (availableSyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
+                    && availableSyntax.getVersion().equals(syntaxVersion)) {
+                    syntax = availableSyntax;
+                    break;
+                }
+            } else {
+                // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example. We
+                // should have a Version which implements Comparable like we have SyntaxId in Syntax
+                if (availableSyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
+                    && (syntax == null || availableSyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
+                    syntax = availableSyntax;
+                }
+            }
+        }
+
+        return syntax;
     }
 }

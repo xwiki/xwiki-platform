@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.Syntax;
@@ -43,6 +47,10 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
 @Component
 public class DefaultPrintRendererFactory implements PrintRendererFactory
 {
+    private static final List<Syntax> AVAILABLE_SYNTAXES =
+        Collections.unmodifiableList(Arrays.asList(Syntax.XHTML_1_0, Syntax.XWIKI_2_0, Syntax.EVENT_1_0,
+            Syntax.TEX_1_0, Syntax.PLAIN_1_0));
+
     /**
      * Factory to easily create an XHTML Image and Link Renderers.
      */
@@ -55,6 +63,16 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.renderer.PrintRendererFactory#getAvailableSyntaxes()
+     */
+    public List<Syntax> getAvailableSyntaxes()
+    {
+        return AVAILABLE_SYNTAXES;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.PrintRendererFactory#createRenderer(org.xwiki.rendering.parser.Syntax,
      *      org.xwiki.rendering.renderer.printer.WikiPrinter)
      */
@@ -63,8 +81,9 @@ public class DefaultPrintRendererFactory implements PrintRendererFactory
         PrintRenderer result;
 
         if (targetSyntax.toIdString().equals("xhtml/1.0")) {
-            result = new XHTMLRenderer(printer, this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
-                this.xhtmlRendererFactory.createXHTMLImageRenderer());
+            result =
+                new XHTMLRenderer(printer, this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
+                    this.xhtmlRendererFactory.createXHTMLImageRenderer());
         } else if (targetSyntax.toIdString().equals("xwiki/2.0")) {
             result = new XWikiSyntaxRenderer(printer);
         } else if (targetSyntax.toIdString().equals("event/1.0")) {

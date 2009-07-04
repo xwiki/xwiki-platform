@@ -43,6 +43,12 @@ public class SyntaxType
     public static final SyntaxType XHTML = getSyntaxType("XHTML");
 
     public static final SyntaxType HTML = getSyntaxType("HTML");
+    
+    public static final SyntaxType PLAIN = getSyntaxType("PLAIN");
+    
+    public static final SyntaxType EVENT = getSyntaxType("EVENT");
+    
+    public static final SyntaxType TEX = getSyntaxType("TEX");
 
     private static Map<String, SyntaxType> syntaxTypeMap;
 

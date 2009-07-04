@@ -187,7 +187,9 @@
                 <!-- Excludes for the 2.0 M2 release. Once it's released remove them. -->
                 <exclude>org/xwiki/rendering/macro/MacroManager</exclude>
                 <exclude>org/xwiki/rendering/macro/MacroSource</exclude>
-                <exclude>org/xwiki/rendering/macro/AbstractMacroSource</exclude>                
+                <exclude>org/xwiki/rendering/macro/AbstractMacroSource</exclude>
+                <!-- Seems clirr plugin consider adding new API as an error (which I don't understand). -->
+                <exclude>org/xwiki/rendering/renderer/PrintRendererFactory</exclude>                
               </excludes>
             </configuration>
           </execution>

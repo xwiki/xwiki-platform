@@ -1289,6 +1289,9 @@ Space header, footer
   color: #999;
   border-top: 1px solid #ddd;
 }
+#xdocAuthors {
+  text-align: right;
+}
 
 #xwikilicence {
 }

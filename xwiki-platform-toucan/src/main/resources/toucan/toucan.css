@@ -1282,6 +1282,14 @@ Space header, footer
     text-decoration: none;
 }
 
+#xdocFooter {
+  margin: 1em 0 2em;
+  padding-top: 0.5em;
+  font-size: 90%;
+  color: #999;
+  border-top: 1px solid #ddd;
+}
+
 #xwikilicence {
 }
 

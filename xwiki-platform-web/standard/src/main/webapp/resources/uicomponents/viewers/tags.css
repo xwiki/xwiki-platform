@@ -1,0 +1,77 @@
+.doc-tags {
+  width: 48%;
+  float: left;
+}
+.tag-wrapper {
+ padding: 2px 1px;
+}
+.tag-wrapper .separator {
+ display: none;
+}
+a.tag-delete, a.tag-delete:visited {
+  vertical-align: super;
+  font-size: 70%;
+  font-weight: bold;
+  color: #FFF;
+  text-decoration: none !important;
+}
+.tag-wrapper:hover a.tag-delete, * html a.tag-delete, * html a.tag-delete:visited {
+  color: #999;
+}
+.tag-wrapper a.tag-delete:hover {
+  color: #C00;
+}
+.tag-add {
+  color: #999;
+  display: inline;
+}
+.tag-add a, .tag-add a:visited {
+  color: #999;
+  font-size: 80%;
+  text-decoration: none;
+}
+.tag-add a:hover {
+  color: #000;
+}
+
+.tag-add-form {
+  z-index: 1000;
+  position: absolute;
+  border: 1px solid #f9f9f9;
+  vertical-align: top !important;
+}
+.tag-add-form div {
+  border: 1px solid #eee;
+  padding: 4px 8px;
+  background: #f5f5f5;
+  overflow: hidden;
+}
+
+.tag-add-form label {
+  font-size: 80%;
+  margin: 2px 0;
+}
+
+.tag-add-form .input-tag {
+  border: 1px solid #ddd;
+  width: 16em;
+  height: 80%;
+  margin-right: 3px;
+}
+
+.tag-add-form .buttonwrapper {
+  margin-left: 0;
+}
+
+#body .tag-add-form .button {
+  font-size: 80%;
+  padding: 3px 5px !important;
+  cursor: pointer;
+  display: inline-block;
+  min-height: 0 !important;
+}
+
+.tag-add-form .button-add-tag-cancel {
+  font-size: 80%;
+  padding: 4px 5px !important;
+}

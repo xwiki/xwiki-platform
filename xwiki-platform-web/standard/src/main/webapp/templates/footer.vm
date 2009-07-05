@@ -2,7 +2,6 @@
 <div id="footerglobal" class="layoutsection">
 <div class="minwidth"></div>
 <hr/>
-  <div id="xwikidocinfo"><div class="minwidth"></div>#if ($tdoc)$msg.get("creator"): $xwiki.getLocalUserName($tdoc.creator) $msg.get("createdon") $!xwiki.formatDate($tdoc.creationDate)#end</div>
   <div id="xwikilicence">$!copyright</div>
   #set ($version = $xwiki.getWebPreference("version"))
   #if ("$!version" == "")

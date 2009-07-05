@@ -1,6 +1,24 @@
 ##
+## Document footer: tags, creation date, modification date
 ##
-## Extra data: comments, attachments ...
+##
+<div id="xdocFooter">
+  #template("documentTags.vm")
+  <div class="xdocAuthors">
+    <div class="xdocCreation"> ## Creation
+      $msg.get('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])<br/>
+      #if($tdoc.realLanguage != $doc.realLanguage)
+        $msg.get('core.footer.translationCreation', [$tdoc.realLanguage, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])<br/>
+      #end
+    </div>
+    <div class="xdocLastModification"> ## Last modification
+      $msg.get('core.footer.modification', $xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+    </div>
+  </div>
+</div>
+##
+##
+## More document related data: comments, attachments ...
 ##
 <div id="xwikidata" class="layoutsubsection">
 ##
@@ -46,16 +64,6 @@
 #foreach($docextra in $docextras)<span id="${listtool.get($docextra, 0)}anchor">&nbsp;</span>#end
 </div>
 #end
-#macro(docabout)
-<div class="about">
-##
-## Last modification
-##
-<span id="aboutauthor">$msg.get("lastmodifiedby") $xwiki.getLocalUserName($tdoc.author)</span>
-<span id="aboutdate">$msg.get("lastmodifiedon") $!xwiki.formatDate($tdoc.date)</span>
-</div>
-#end
-#docabout()
 ##
 ## Display tabs
 ##

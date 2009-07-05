@@ -20,57 +20,12 @@
 package org.xwiki.rendering.macro.footnote;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.footnote.FootnoteMacro} Macro.
+ * Parameters for the {@link org.xwiki.rendering.internal.macro.footnote.FootnoteMacro} Macro. None at the moment, but
+ * the rendering engine requires specifying a class for parameters.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.0M2
  */
 public class FootnoteMacroParameters
 {
-    // /**
-    // * @version $Id$
-    // */
-    // public enum Scope
-    // {
-    // /**
-    // * Put the footnote at the end of the current section.
-    // */
-    // SECTION,
-    //    
-    // /**
-    // * Inside included documents, put the footnote at the end of the included document.
-    // */
-    // DOCUMENT_LOCAL,
-    //    
-    // /**
-    // * Put the footnote at the end of the global (including) document.
-    // */
-    // GLOBAL;
-    // };
-    //    
-    // /**
-    // *
-    // */
-    // private Scope scope = Scope.GLOBAL;
-    //    
-    // /**
-    // * @param scope If local only section in the current scope will be listed. For example if the macro is written in
-    // a
-    // * section, only subsections of this section will be listed.
-    // */
-    // @ParameterDescription("if local only section in the current scope will be listed. "
-    // + "For example if the macro is written in a section, only subsections of this section will be listed")
-    // public void setScope(Scope scope)
-    // {
-    // this.scope = scope;
-    // }
-    //    
-    // /**
-    // * @return if {@link Scope#LOCAL} only section in the current scope will be listed. For example if the macro is
-    // * written in a section, only subsections of this section will be listed.
-    // */
-    // public Scope getScope()
-    // {
-    // return this.scope;
-    // }
 }

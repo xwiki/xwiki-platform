@@ -12,7 +12,7 @@
       #end
     </div>
     <div class="xdocLastModification"> ## Last modification
-      $msg.get('core.footer.modification', $xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
+      $msg.get('core.footer.modification', [$xwiki.getUserName($tdoc.author), $xwiki.formatDate($tdoc.date)])
     </div>
   </div>
 </div>

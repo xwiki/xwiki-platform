@@ -924,14 +924,19 @@ $fn
 #end
 ##
 ##
-## Macro to include childs of a page
+## Macro to include children of a page
 ##
 #set($clevel = 1)
+## Deprecated name, use #includeChildren
 #macro(includeChilds $page)
- #includeChilds($page false)
+ #includeChildren($page false)
 #end
-## Macro to include childs at multiple levels
+## Deprecated name, use #includeChildren
 #macro(includeChilds $page $withPageBreaks)
+  #includeChildren($page $withPageBreaks)
+#end
+## Macro to include children at multiple levels
+#macro(includeChildren $page $withPageBreaks)
  #if($clevel!=0)
   #foreach($childDocName in $xwiki.searchDocuments("where doc.parent='$page' order by doc.creationDate"))
     #set($childDoc = $xwiki.getDocument($childDocName))
@@ -941,18 +946,18 @@ $fn
      #end
      $childDoc.getRenderedContent()
      #set($clevel = $xwiki.add($clevel,-1))
-     #includeChilds($childDocName $withPageBreaks)
+     #includeChildren($childDocName $withPageBreaks)
      #set($clevel = $xwiki.add($clevel,1))
     #end
   #end
  #end
 #end
 
-## Macro to include childs of a page
+## Macro to include linked pages
 #macro(includeLinks $page)
  #includeLinks($page false)
 #end
-## Macro to include childs at multiple levels
+## Macro to include linked pages at multiple levels
 #macro(includeLinks $page $withPageBreaks)
  #if($clevel!=0)
   #set($pageDoc = $xwiki.getDocument($page))

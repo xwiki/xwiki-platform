@@ -188,6 +188,7 @@ XWiki.widgets.Suggest = Class.create({
   {
     // if input stays the same, do nothing
     //
+    val = val.strip();
     if (val == this.sInput) {
       return false;
     }
@@ -240,7 +241,7 @@ XWiki.widgets.Suggest = Class.create({
     var pointer = this;
 
     // create ajax request
-    var url = this.options.script + this.options.varname + "=" + escape(this.fld.value);
+    var url = this.options.script + this.options.varname + "=" + escape(this.fld.value.strip());
     var method = this.options.method;
     var headers = {};
     if (this.options.json) {

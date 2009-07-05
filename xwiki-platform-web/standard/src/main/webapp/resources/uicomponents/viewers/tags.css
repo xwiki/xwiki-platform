@@ -40,6 +40,9 @@ a.tag-delete, a.tag-delete:visited {
   border: 1px solid #f9f9f9;
   vertical-align: top !important;
 }
+* html .tag-add-form {
+  width: 190px;
+}
 .tag-add-form div {
   border: 1px solid #eee;
   padding: 4px 8px;

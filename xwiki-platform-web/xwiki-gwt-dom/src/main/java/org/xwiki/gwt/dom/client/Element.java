@@ -388,7 +388,8 @@ public class Element extends com.google.gwt.dom.client.Element
      */
     public final void ensureEditable()
     {
-        if (DOMUtils.getInstance().isInline(this) || getOffsetWidth() == 0) {
+        DOMUtils domUtils = DOMUtils.getInstance();
+        if (domUtils.isInline(this) || getOffsetWidth() == 0) {
             return;
         }
 
@@ -399,14 +400,14 @@ public class Element extends com.google.gwt.dom.client.Element
                 editable = editable || child.getNodeValue().length() > 0;
             } else if (child.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) child;
-                editable = editable || element.getOffsetWidth() > 0 || "br".equalsIgnoreCase(element.getTagName());
+                editable = editable || element.getOffsetWidth() > 0 || domUtils.isOrContainsLineBreak(child);
                 element.ensureEditable();
             }
             child = child.getNextSibling();
         }
 
         if (!editable) {
-            DOMUtils.getInstance().ensureBlockIsEditable(this);
+            domUtils.ensureBlockIsEditable(this);
         }
     }
 }

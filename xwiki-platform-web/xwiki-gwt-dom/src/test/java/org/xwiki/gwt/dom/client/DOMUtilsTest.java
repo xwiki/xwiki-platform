@@ -866,4 +866,19 @@ public class DOMUtilsTest extends AbstractDOMTest
         range.collapse(true);
         assertNull(domUtils.getPreviousNode(range));
     }
+
+    /**
+     * Unit test for {@link DOMUtils#isOrContainsLineBreak(Node)}.
+     */
+    public void testIsOrContainsLineBreak()
+    {
+        container.setInnerHTML("a<strong></strong><del>x</del><br/><span><br/></span><em><ins><br/></ins></em>");
+        assertFalse(domUtils.isOrContainsLineBreak(null));
+        assertFalse(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(0)));
+        assertFalse(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(1)));
+        assertFalse(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(2)));
+        assertTrue(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(3)));
+        assertTrue(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(4)));
+        assertTrue(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(5)));
+    }
 }

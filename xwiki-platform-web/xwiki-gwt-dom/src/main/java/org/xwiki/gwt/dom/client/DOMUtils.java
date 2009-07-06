@@ -43,6 +43,11 @@ public abstract class DOMUtils
     public static final String UNSUPPORTED_NODE_TYPE = "Unsupported node type!";
 
     /**
+     * The {@code <br/>} tag name.
+     */
+    public static final String BR = "br";
+
+    /**
      * The list of all HTML elements that can have both in-line and block-level content, as specified by the XHTML 1.0
      * strict DTD.
      * <p>
@@ -77,7 +82,7 @@ public abstract class DOMUtils
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3192
      */
     public static final String[] HTML_EMPTY_TAGS =
-        new String[] {"area", "base", "basefont", "br", "col", "frame", "hr", "img", "input", "isindex", "link",
+        new String[] {"area", "base", "basefont", BR, "col", "frame", "hr", "img", "input", "isindex", "link",
             "meta", "param", "nextid", "bgsound", "embed", "keygen", "spacer", "wbr"};
 
     /**
@@ -1292,5 +1297,16 @@ public abstract class DOMUtils
     public void ensureBlockIsEditable(Element block)
     {
         // Do nothing by default.
+    }
+
+    /**
+     * @param node the node to check for line breaks
+     * @return {@code true} if the given node or one of its descendants is a BR (line break), {@code false} otherwise
+     */
+    public boolean isOrContainsLineBreak(Node node)
+    {
+        return node != null
+            && (BR.equalsIgnoreCase(node.getNodeName()) || (node.getNodeType() == Node.ELEMENT_NODE && Element.as(node)
+                .getElementsByTagName(BR).getLength() > 0));
     }
 }

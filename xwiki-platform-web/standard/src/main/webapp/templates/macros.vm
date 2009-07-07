@@ -2131,7 +2131,8 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #set($objectIndex = $util.parseInt($propertyId.substring($util.add($objectIndexPos, 1), $propertyNamePos)))
 #set($className = $propertyId.substring(0, $objectIndexPos))
 #set($propertyValue = $editedDocument.getObject($className, $objectIndex).getProperty($propertyName).getValue())
-#wysiwyg_input($propertyId $propertyValue)
+## Make sure the property value is always a string. Use the empty string for unset properties.
+#wysiwyg_input($propertyId "$!propertyValue")
 #end
 #end
 

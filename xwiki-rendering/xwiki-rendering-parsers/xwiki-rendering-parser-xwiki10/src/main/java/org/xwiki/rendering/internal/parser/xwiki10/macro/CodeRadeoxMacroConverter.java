@@ -22,7 +22,9 @@ package org.xwiki.rendering.internal.parser.xwiki10.macro;
 import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.macro.AbstractRadeoxMacroConverter;
+import org.xwiki.rendering.parser.xwiki10.macro.RadeoxMacroParameters;
 
 /**
  * 
@@ -47,6 +49,12 @@ public class CodeRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         }
     }
 
+    @Override
+    protected String convertContent(String content, RadeoxMacroParameters parameters, FilterContext filterContext)
+    {
+        return super.convertContent(content, parameters, filterContext).trim();
+    }
+    
     public boolean supportContent()
     {
         return true;

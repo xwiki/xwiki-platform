@@ -74,15 +74,13 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
         StringBuffer result = new StringBuffer();
 
         String escapedContent = this.escapeFilter.filter(content, filterContext);
-        
+
         Matcher matcher = CODEMACRO_PATTERN.matcher(escapedContent);
         int currentIndex = 0;
         for (; matcher.find(); currentIndex = matcher.end()) {
             String before = escapedContent.substring(currentIndex, matcher.start());
 
-            if (currentIndex > 0) {
-                before = CleanUtil.setLeadingNewLines(before, 2);
-            }
+            before = CleanUtil.setTrailingNewLines(before, 2);
 
             String macroResult =
                 this.codeMacroConverter.convert("code", RadeoxMacrosFilter.getMacroParameters(this.codeMacroConverter,

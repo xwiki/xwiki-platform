@@ -504,6 +504,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             + "== header 2==\nheader 2 content");
         this.document.setSyntaxId("xwiki/2.0");
 
+        // Modify section content
         String content1 = this.document.updateDocumentSection(2, "== header 2==\nmodified header 2 content");
 
         assertEquals(
@@ -517,6 +518,11 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(
             "content not in section\n\n= header 1 =\n\nmodified also header 1 content\n\n== header 2 ==\n\nheader 2 content",
             content2);
+
+        // Remove a section
+        String content3 = this.document.updateDocumentSection(2, "");
+
+        assertEquals("content not in section\n\n= header 1 =\n\nheader 1 content", content3);
     }
 
     public void testDisplay10()

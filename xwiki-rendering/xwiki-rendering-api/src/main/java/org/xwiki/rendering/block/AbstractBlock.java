@@ -150,7 +150,7 @@ public abstract class AbstractBlock implements Block
             block.setParent(this);
         }
         blocks.addAll(pos, newBlocks);
-        blocks.remove(pos + 1);
+        blocks.remove(pos + newBlocks.size());
     }
 
     /**

@@ -32,9 +32,12 @@ XWiki.currentWiki = "${context.database}";
 XWiki.currentSpace = "${doc.space}";
 XWiki.editor = "$!{editor}";
 XWiki.viewer = "$!{viewer}";
+XWiki.contextaction = "${context.getAction()}";
 XWiki.docisnew = $!doc.isNew();
+XWiki.docsyntax = "$!doc.getSyntaxId()";
 XWiki.blacklistedSpaces = [ #foreach($space in $blacklistedSpaces)#if($velocityCount > 1),#end"$space"#end ];
 window.docviewurl = "${doc.getURL('view')}";
+window.docediturl = "${doc.getURL('edit')}";
 window.docsaveurl = "${doc.getURL('save')}";
 // ]]>
 </script>

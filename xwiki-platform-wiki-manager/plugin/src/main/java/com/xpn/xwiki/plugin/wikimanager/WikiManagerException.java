@@ -30,6 +30,11 @@ import com.xpn.xwiki.plugin.PluginException;
 public class WikiManagerException extends PluginException
 {
     /**
+     * Serialize id.
+     */
+    private static final long serialVersionUID = -6451750749104331619L;
+
+    /**
      * Error when trying to use provided user that does not exists.
      * <p>
      * TODO : move in XWikiException

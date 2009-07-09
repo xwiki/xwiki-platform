@@ -19,12 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.SourcesTabEvents;
+import com.google.gwt.user.client.ui.TabListener;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -40,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * @version $Id$
  */
 public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSelectorWizardStep<T> implements
-    ClickListener
+    TabListener
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -48,49 +52,29 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     private static final String STYLE_LOADING = "loading";
 
     /**
-     * Style for the selected tab change button.
+     * Loading class for the time to load the step to which it has been toggled.
      */
-    private static final String STYLE_SELECTED_BUTTON = "xSelected";
+    private static final String STYLE_ERROR = "errormessage";
 
     /**
-     * Wizard step for the selection from the current page.
+     * The map of wizard step instances of the steps aggregated by this step.
      */
-    private WizardStep currentPageStep;
+    private Map<String, WizardStep> steps = new HashMap<String, WizardStep>();
 
     /**
-     * Flag to store if the current page step has been initialized or not.
+     * The state of the initialization of the aggregated wizard steps.
      */
-    private boolean isCurrentPageInitialized;
+    private Map<WizardStep, Boolean> initialized = new HashMap<WizardStep, Boolean>();
 
     /**
-     * Wizard step for the selection from the whole wiki.
+     * The tabbed panel of the wizard step.
      */
-    private WizardStep allWikiStep;
-
+    private final TabPanel tabPanel = new TabPanel();
+    
     /**
-     * Flag to store if the all pages step has been initialized or not.
-     */
-    private boolean isAllPagesInitialized;
-
-    /**
-     * Specifies whether the current page is selected or not.
-     */
-    private boolean isCurrentPage;
-
-    /**
-     * The main panel of wizard step.
+     * The main panel of this wizard step.
      */
     private final FlowPanel mainPanel = new FlowPanel();
-
-    /**
-     * The button to set the current page selector active.
-     */
-    private final Button setCurrentPageButton = new Button(Strings.INSTANCE.selectorSelectFromCurrentPage());
-
-    /**
-     * The button to set all the pages selector active.
-     */
-    private final Button setAllPagesButton = new Button(Strings.INSTANCE.selectorSelectFromAllPages());
 
     /**
      * The current resource edited by this wizard step.
@@ -106,113 +90,154 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     {
         this.editedResource = editedResource;
 
-        // instantiate the currentPage
+        // instantiate the main panel
         mainPanel.addStyleName("xSelectorStep");
+        
+        tabPanel.addStyleName("xStepsTabs");
 
-        Panel buttonsStrip = new FlowPanel();
-        buttonsStrip.addStyleName("xToggleButtons");
+        // add an empty flow panel for each step to show in the tabs panel
+        for (String stepName : getStepNames()) {
+            tabPanel.add(new FlowPanel(), stepName);
+        }
 
-        setCurrentPageButton.addClickListener(this);
-        setAllPagesButton.addClickListener(this);
-        buttonsStrip.add(setCurrentPageButton);
-        buttonsStrip.add(setAllPagesButton);
-
-        mainPanel.add(buttonsStrip);
-
-        // put the current page in by default. Will be toggled on init if necessary, else it will be initialized
-        isCurrentPage = true;
-        setCurrentPageButton.addStyleName(STYLE_SELECTED_BUTTON);
-        setAllPagesButton.removeStyleName(STYLE_SELECTED_BUTTON);
-        mainPanel.add(getCurrentPageStep().display());
+        tabPanel.addTabListener(this);
+        mainPanel.add(tabPanel);
     }
 
     /**
-     * Lazy initializer and getter for the current page wizard step.
-     * 
-     * @return the current page selector wizard step
+     * @param name the name of the step to get
+     * @return the step for the passed name
      */
-    private WizardStep getCurrentPageStep()
+    protected WizardStep getStep(String name)
     {
-        if (currentPageStep == null) {
-            currentPageStep = getCurrentPageSelectorInstance();
+        if (steps.get(name) == null) {
+            // save it in the steps
+            steps.put(name, getStepInstance(name));
+            // as uninitialized
+            initialized.put(steps.get(name), false);
         }
-        return currentPageStep;
+        return steps.get(name);
     }
 
     /**
-     * Returns an instance of the current page selector. To be overridden by subclasses to provide specific behaviour.
-     * 
-     * @return an instance of the selector for the current page
+     * @param name the name of the step to initialize
+     * @return an instance of the step recognized by the passed name
      */
-    protected abstract WizardStep getCurrentPageSelectorInstance();
+    protected abstract WizardStep getStepInstance(String name);
 
     /**
-     * Lazy initializer and getter for the entire wiki wizard step.
-     * 
-     * @return the all wiki selector wizard step
+     * @return the list of all step names
      */
-    private WizardStep getAllPagesStep()
+    protected abstract List<String> getStepNames();
+
+    /**
+     * @return the step which should be selected by default, the first step name by default
+     */
+    protected String getDefaultStepName()
     {
-        if (allWikiStep == null) {
-            allWikiStep = getAllPagesSelectorInstance();
-        }
-        return allWikiStep;
+        return getStepNames().get(0);
     }
 
     /**
-     * Returns an instance of the all pages selector. To be overridden by subclasses to provide specific behaviour.
-     * 
-     * @return an instance of the selector for all the pages
+     * {@inheritDoc}
      */
-    protected abstract WizardStep getAllPagesSelectorInstance();
-
-    /**
-     * Toggles the current wizard step.
-     */
-    private void toggleCurrentStep()
+    public void onTabSelected(SourcesTabEvents sender, int tabIndex)
     {
-        if (mainPanel.getWidgetCount() > 1) {
-            mainPanel.remove(1);
+        if (sender != tabPanel) {
+            return;
         }
-        mainPanel.addStyleName(STYLE_LOADING);
+        tabPanel.addStyleName(STYLE_LOADING);
 
-        final WizardStep stepToShow = isCurrentPage ? getAllPagesStep() : getCurrentPageStep();
+        // get the step to be prepared and shown
+        String stepName = tabPanel.getTabBar().getTabHTML(tabIndex);
+        final WizardStep stepToShow = getStep(stepName);
+
+        final FlowPanel stepPanel = (FlowPanel) tabPanel.getWidget(tabPanel.getDeckPanel().getVisibleWidget());
+        // hide its contents until after load
+        if (stepPanel.getWidgetCount() > 0) {
+            stepPanel.getWidget(0).setVisible(false);
+        }
+
+        // initialize only if it wasn't initialized before
         lazyInitializeStep(stepToShow, new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
             {
-                mainPanel.add(stepToShow.display());
-                mainPanel.removeStyleName(STYLE_LOADING);
+                // add the UI of the step we switched to to the tabbed panel, if not already there
+                if (stepPanel.getWidgetCount() == 0) {
+                    stepPanel.add(stepToShow.display());
+                }
+                // show content back
+                stepPanel.getWidget(0).setVisible(true);
+                tabPanel.removeStyleName(STYLE_LOADING);
             }
 
             public void onFailure(Throwable caught)
             {
-                mainPanel.removeStyleName(STYLE_LOADING);
-                Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
-                error.addStyleName("errormessage");
-                mainPanel.add(error);
+                stepPanel.setVisible(true);
+                tabPanel.removeStyleName(STYLE_LOADING);
+                showError(Strings.INSTANCE.linkErrorLoadingData());
             }
         });
-        if (isCurrentPage) {
-            setAllPagesButton.addStyleName(STYLE_SELECTED_BUTTON);
-            setCurrentPageButton.removeStyleName(STYLE_SELECTED_BUTTON);
-        } else {
-            setCurrentPageButton.addStyleName(STYLE_SELECTED_BUTTON);
-            setAllPagesButton.removeStyleName(STYLE_SELECTED_BUTTON);
-        }
-        isCurrentPage = !isCurrentPage;
     }
 
     /**
-     * @return the currently selected wizard step
+     * Helper function to show an error in the main panel.
+     * 
+     * @param message the error message
+     */
+    private void showError(String message)
+    {
+        Label error = new Label(message);
+        error.addStyleName(STYLE_ERROR);
+        tabPanel.add(error);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex)
+    {
+        // nothing by default
+        return true;
+    }
+
+    /**
+     * Selects the tab indicated by the passed name.
+     * 
+     * @param tabName the name of the tab to select
+     */
+    protected void selectTab(String tabName)
+    {
+        // searched for the specified tab and select it
+        for (int i = 0; i < tabPanel.getTabBar().getTabCount(); i++) {
+            if (tabPanel.getTabBar().getTabHTML(i).equals(tabName)) {
+                tabPanel.selectTab(i);
+                break;
+            }
+        }
+    }
+
+    /**
+     * @return the currently selected wizard step, or the default step if no selection is made
      */
     private WizardStep getCurrentStep()
     {
-        if (isCurrentPage) {
-            return getCurrentPageStep();
-        } else {
-            return getAllPagesStep();
+        String selectedStepName = getSelectedStepName();
+        return getStep(selectedStepName == null ? getDefaultStepName() : selectedStepName);
+    }
+
+    /**
+     * @return the name of the currently selected wizard step, or {@code null} if no selection is made
+     */
+    private String getSelectedStepName()
+    {
+        int selectedTab = tabPanel.getTabBar().getSelectedTab();
+        String currentStepName = null;
+        if (selectedTab > 0) {
+            currentStepName = tabPanel.getTabBar().getTabHTML(selectedTab);
         }
+        return currentStepName;
     }
 
     /**
@@ -253,22 +278,16 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     public void init(Object data, final AsyncCallback< ? > cb)
     {
         // reset initialization of aggregated steps
-        isCurrentPageInitialized = false;
-        isAllPagesInitialized = false;
+        for (WizardStep step : initialized.keySet()) {
+            initialized.put(step, false);
+        }
 
         super.init(data, new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
             {
-                // check if it needs to load the "all pages" tab
-                boolean requiresAllPages = loadAllPages();
-                // if it's a link to a different page than the current page and the current page is not current step or
-                // if it's a current page step and current page is not active, change the step
-                if ((requiresAllPages && isCurrentPage) || (!requiresAllPages && !isCurrentPage)) {
-                    toggleCurrentStep();
-                }
-
-                lazyInitializeStep(getCurrentStep(), cb);
+                // dispatch the initialization
+                dispatchInit(cb);
             }
 
             public void onFailure(Throwable caught)
@@ -279,6 +298,37 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     }
 
     /**
+     * Dispatches the initialization of the tabbed panel to the appropriate step, depending on the required step, the
+     * initialization of this aggregator and the current selected step, if any.
+     * 
+     * @param cb the initialization callback
+     */
+    private void dispatchInit(final AsyncCallback< ? > cb)
+    {
+        String stepName = getRequiredStep();
+        if (stepName != null) {
+            // if a requirement on the needed step is made,
+            if (getSelectedStepName() == null || !getSelectedStepName().equals(stepName)) {
+                // the tabs should be switched if the required step is not already selected
+                selectTab(stepName);
+                cb.onSuccess(null);
+            } else {
+                lazyInitializeStep(getCurrentStep(), cb);
+            }
+        } else {
+            // if a requirement is not made
+            if (getSelectedStepName() == null) {
+                // and no selection already exists, just select the default step
+                selectTab(getDefaultStepName());
+                cb.onSuccess(null);
+            } else {
+                // otherwise, fake a selection on the current tab to initialize the current tab
+                lazyInitializeStep(getCurrentStep(), cb);
+            }
+        }
+    }
+
+    /**
      * Initializes the passed step only if it wasn't initialized yet (i.e. it's the first display of this step).
      * 
      * @param step the step to initialize
@@ -286,14 +336,9 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      */
     private void lazyInitializeStep(WizardStep step, AsyncCallback< ? > cb)
     {
-        if (step == currentPageStep && !isCurrentPageInitialized) {
+        if (!initialized.get(step)) {
             step.init(getData(), cb);
-            isCurrentPageInitialized = true;
-            return;
-        }
-        if (step == allWikiStep && !isAllPagesInitialized) {
-            step.init(getData(), cb);
-            isAllPagesInitialized = true;
+            initialized.put(step, true);
             return;
         }
         // nothing to do, just signal success
@@ -301,14 +346,14 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     }
 
     /**
-     * Helper function to determine if a link to be edited / created needs the all pages tree or not. To be overwritten
-     * by subclasses to detect whether the data being handled requires the "all pages" step to be loaded or not.
-     * 
-     * @return {@code true} if the link requires the full wiki, {@code false} otherwise.
+     * @return the name of the step required to be loaded by the current created or edited element, if any, or null
+     *         otherwise (if previous selection should be preserved). To be overwritten by subclasses to detect whether
+     *         the data being handled requires the "all pages" step to be loaded or not.
      */
-    protected boolean loadAllPages()
+    protected String getRequiredStep()
     {
-        return true;
+        // by default, no requirement is made
+        return null;
     }
 
     /**
@@ -325,20 +370,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         getCurrentStep().onSubmit(async);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onClick(Widget sender)
-    {
-        if (sender == setCurrentPageButton && !isCurrentPage) {
-            toggleCurrentStep();
-        }
-
-        if (sender == setAllPagesButton && isCurrentPage) {
-            toggleCurrentStep();
-        }
     }
 
     /**

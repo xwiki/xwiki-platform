@@ -28,7 +28,9 @@
     };
     function onLoad() {
         // Create a new editor instance.
-        new WysiwygEditor({hookId: 'demo', debug: true});
+        new WysiwygEditor({hookId: 'demo', debug: true, 
+            plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($full && $request.sync) sync#end',
+            menu: 'link image table macro'});
     }
   </script>
 </body>

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
@@ -137,6 +138,14 @@ public interface WysiwygServiceAsync
     void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async);
 
     /**
+     * @param start the start index of the list of pages to return
+     * @param count the number of pages to return
+     * @param async object used for asynchronous communication between server and client, to return on success the
+     *            recently {@code count} modified pages of the current user, starting from position {@code start}
+     */
+    void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async);
+
+    /**
      * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
      * replaced with a default value.
      * 
@@ -177,8 +186,7 @@ public interface WysiwygServiceAsync
      * @param pageName the name of the page to get image attachments from
      * @param async object used for asynchronous communication between server and client.
      */
-    void getImageAttachments(String wikiName, String spaceName, String pageName, 
-        AsyncCallback<List<Attachment>> async);
+    void getImageAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
 
     /**
      * Returns all the attachments from the referred page.

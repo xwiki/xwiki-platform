@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
@@ -156,6 +157,14 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     public void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async)
     {
         service.getPageNames(wikiName, spaceName, async);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async)
+    {
+        service.getRecentlyModifiedPages(start, count, async);
     }
 
     /**

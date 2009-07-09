@@ -27,6 +27,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Dictionary;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
@@ -171,6 +172,14 @@ public interface WysiwygService extends RemoteService
      * @return the list of the page names from a given space and a given wiki.
      */
     List<String> getPageNames(String wikiName, String spaceName);
+
+    /**
+     * @param start the start index of the list of pages to return
+     * @param count the number of pages to return
+     * @return the recently {@code count} modified pages of the current user, starting from position {@code start}
+     * @throws XWikiGWTException if something goes wrong on the server
+     */
+    List<Document> getRecentlyModifiedPages(int start, int count) throws XWikiGWTException;
 
     /**
      * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is

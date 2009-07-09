@@ -50,7 +50,8 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
     public WikipageExplorerWizardStep(ResourceName editedResource)
     {
         // build a standard selector which shows "Add page" and no attachments.
-        super(true, false, false, editedResource.toString());
+        // FIXME: size hardcoding is very bad, remove when a method to control this from CSS will be found 
+        super(true, false, false, editedResource.toString(), 455, 280);
         this.editedResource = editedResource;
     }
 

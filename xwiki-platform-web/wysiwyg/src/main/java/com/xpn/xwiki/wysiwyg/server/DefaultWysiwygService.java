@@ -33,6 +33,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
@@ -93,6 +94,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * Default XWiki logger to report errors correctly.
      */
     private static final Log LOG = LogFactory.getLog(DefaultWysiwygService.class);
+
+    /**
+     * The name of the view action.
+     */
+    private static final String VIEW_ACTION = "view";
 
     /**
      * The object used to synchronize the content edited by multiple users when the real time feature of the editor is
@@ -403,6 +409,38 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
+     * @throws XWikiException
+     */
+    public List<com.xpn.xwiki.gwt.api.client.Document> getRecentlyModifiedPages(int start, int count)
+        throws XWikiGWTException
+    {
+        try {
+            List<com.xpn.xwiki.gwt.api.client.Document> results =
+                new ArrayList<com.xpn.xwiki.gwt.api.client.Document>();
+            List<String> documentNames;
+            documentNames =
+                getXWikiContext().getWiki().getStore().searchDocumentsNames(
+                    "where 1=1 and doc.author='" + getXWikiContext().getUser() + "' order by doc.date desc", count,
+                    start, getXWikiContext());
+            for (String docName : documentNames) {
+                DocumentModelBridge doc = getXWikiContext().getWiki().getDocument(docName, getXWikiContext());
+                com.xpn.xwiki.gwt.api.client.Document xwikiDoc = new com.xpn.xwiki.gwt.api.client.Document();
+                xwikiDoc.setFullName(doc.getFullName());
+                xwikiDoc.setTitle(doc.getTitle());
+                // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
+                xwikiDoc.setUploadURL(getDocumentAccessBridge().getURL(doc.getFullName(), VIEW_ACTION, "", ""));
+                results.add(xwikiDoc);
+            }
+            return results;
+
+        } catch (XWikiException e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see WysiwygService#getPageLink(String, String, String, String, String)
      */
     public LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor)
@@ -412,7 +450,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         // get the url to the targeted document from the bridge
         DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
         String pageReference = serializer.serialize(docName);
-        String pageURL = getDocumentAccessBridge().getURL(pageReference, "view", queryString, anchor);
+        String pageURL = getDocumentAccessBridge().getURL(pageReference, VIEW_ACTION, queryString, anchor);
 
         // get a document name serializer to return the page reference
         if (queryString != null) {

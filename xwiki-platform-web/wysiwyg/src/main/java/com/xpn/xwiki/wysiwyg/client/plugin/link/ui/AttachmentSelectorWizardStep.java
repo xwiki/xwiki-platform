@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -47,42 +50,53 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWiza
      * {@inheritDoc}
      */
     @Override
-    protected WizardStep getCurrentPageSelectorInstance()
-    {
-        return new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected WizardStep getAllPagesSelectorInstance()
-    {
-        return new AttachmentExplorerWizardStep(getEditedResource());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean loadAllPages()
+    protected String getRequiredStep()
     {
         if (StringUtils.isEmpty(getData().getReference())) {
             // no reference set, default with current page
-            return false;
+            return Strings.INSTANCE.selectorSelectFromCurrentPage();
         }
 
         // check if the edited attachment is in the current page
         ResourceName resource = new ResourceName(getData().getReference(), true);
         // check match on current page
-        return !resource.matchesUpToPage(getEditedResource());
+        if (resource.matchesUpToPage(getEditedResource())) {
+            return Strings.INSTANCE.selectorSelectFromCurrentPage();
+        } else {
+            return Strings.INSTANCE.selectorSelectFromAllPages();
+        }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected WizardStep getStepInstance(String name)
+    {
+        if (name.equals(Strings.INSTANCE.selectorSelectFromCurrentPage())) {
+            return new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
+        }
+        if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
+            return new AttachmentExplorerWizardStep(getEditedResource());
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<String> getStepNames()
+    {
+        return Arrays.asList(Strings.INSTANCE.selectorSelectFromCurrentPage(), Strings.INSTANCE
+            .selectorSelectFromAllPages());
+    }
+
     /**
      * {@inheritDoc}
      */
     public String getStepTitle()
     {
         return Strings.INSTANCE.linkSelectAttachmentTitle();
-    }    
+    }
 }

@@ -17,32 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
+package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.Arrays;
 import java.util.List;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorAggregatorWizardStep;
 
 /**
- * Wizard step to select the image to insert, by aggregating a current page selector step and an "all pages" selector
- * step.
+ * Creates a page selector aggregator, to switch between the recent changed pages and all pages.
  * 
  * @version $Id$
  */
-public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<ImageConfig>
+public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<LinkConfig>
 {
     /**
-     * Builds an image selector wizard step for the currently edited resource.
+     * Builds a page selector step for the currently edited resource.
      * 
-     * @param editedResource the currently edited resource.
+     * @param editedResource the resource edited by this aggregator step
      */
-    public ImageSelectorWizardStep(ResourceName editedResource)
+    public PageSelectorWizardStep(ResourceName editedResource)
     {
         super(editedResource);
     }
@@ -53,19 +52,11 @@ public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardSte
     @Override
     protected String getRequiredStep()
     {
-        if (StringUtils.isEmpty(getData().getReference())) {
-            // no reference set, default with current page
-            return Strings.INSTANCE.selectorSelectFromCurrentPage();
-        }
-
-        // check if the edited attachment is in the current page
-        ResourceName resource = new ResourceName(getData().getReference(), true);
-        // check match on current page
-        if (resource.matchesUpToPage(getEditedResource())) {
-            return Strings.INSTANCE.selectorSelectFromCurrentPage();
-        } else {
+        // if it's an edited link, require all pages
+        if (!StringUtils.isEmpty(getData().getReference())) {
             return Strings.INSTANCE.selectorSelectFromAllPages();
         }
+        return null;
     }
 
     /**
@@ -74,12 +65,11 @@ public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardSte
     @Override
     protected WizardStep getStepInstance(String name)
     {
-        if (name.equals(Strings.INSTANCE.selectorSelectFromCurrentPage())) {
-            return new CurrentPageImageSelectorWizardStep(getEditedResource());
+        if (name.equals(Strings.INSTANCE.selectorSelectFromRecentPages())) {
+            return new RecentChangesSelectorWizardStep(getEditedResource());
         }
         if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            // create an explorer which does not show wiki selector, by default
-            return new ImagesExplorerWizardStep(getEditedResource(), false);
+            return new WikipageExplorerWizardStep(getEditedResource());
         }
         return null;
     }
@@ -90,7 +80,7 @@ public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardSte
     @Override
     protected List<String> getStepNames()
     {
-        return Arrays.asList(Strings.INSTANCE.selectorSelectFromCurrentPage(), Strings.INSTANCE
+        return Arrays.asList(Strings.INSTANCE.selectorSelectFromRecentPages(), Strings.INSTANCE
             .selectorSelectFromAllPages());
     }
 
@@ -99,6 +89,6 @@ public class ImageSelectorWizardStep extends AbstractSelectorAggregatorWizardSte
      */
     public String getStepTitle()
     {
-        return Strings.INSTANCE.imageSelectImageTitle();
+        return Strings.INSTANCE.linkSelectWikipageTitle();
     }
 }

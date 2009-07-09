@@ -22,23 +22,6 @@
   width: 98%;
 }
 
-/* Styles for the attachment link step */
-.xToggleButtons {
-  background-color: #eeeeee;
-}
-
-.xToggleButtons button {
-  height: 25px;
-  line-height: 17px;
-  background-color: #eeeeee;
-  border: none;
-  cursor: pointer;
-}
-
-.xToggleButtons button.xSelected {
-  background-color: #ffffff;
-}
-
 .xSelectorStep .listGrid, .xExplorerPanel .listGrid {
   border: none;
 }
@@ -48,24 +31,78 @@
   overflow: auto;
 }
 
-.xAttachmentsSelector {
+/* Re-style the default tab panel */
+.xStepsTabs {
+  width: 100%;
+  height: 100%;
+}
+
+.xStepsTabs .gwt-TabBar tr {
+  background-color: #eeeeee;
+}
+
+.xStepsTabs .gwt-TabBar .gwt-TabBarItem {
+  background-color: #eeeeee;
+  height: 25px;
+  line-height: 19px;
+  font-weight: normal;
+  padding: 0 6px;
+  margin-left: 0;
+}
+
+.xStepsTabs .gwt-TabBar .gwt-TabBarItem-selected {
+  background-color: #ffffff;
+}
+
+.xStepsTabs .gwt-TabPanelBottom {
+  border: none;
+  padding: 0;
+  height: 325px;
+}
+
+/* selector overflow is hidden due to an issue with table sizes in IE: all scrolls are to be handled inside */
+.xSelectorStep {
+  /* dialog body height minus its border to make sure it fits  well in IE6 too */
+  height: 346px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  overflow: hidden;
+}
+
+/* Attachments, pages lists */
+.xAttachmentsSelector, .xPagesSelector {
   margin-top: 5px;
 }
 
-.xAttachmentsSelector .xAttachPreview, .xAttachmentsSelector .xNewFilePreview {
+.xAttachmentsSelector .xAttachPreview, .xAttachmentsSelector .xNewFilePreview, 
+.xPagesSelector .xPagePreview, .xPagesSelector .xNewPagePreview {
   padding: 5px 5px 5px 20px;
   cursor: pointer;
   background-position: left center;
   background-repeat: no-repeat;
 }
 .xAttachmentsSelector .xAttachPreview {
+  background-image: url(../images/attach.gif);
+}
+
+.xPagesSelector .xPagePreview {
   background-image: url(../images/page_white_text.gif);
 }
 
-.xAttachmentsSelector .xNewFilePreview {
+.xAttachmentsSelector .xNewFilePreview, .xPagesSelector .xNewPagePreview {
   background-image: url(../images/bullet_add.gif);
 }
 
-.xAttachmentsSelector .xListItem-selected {
+.xAttachmentsSelector .xListItem-selected, .xPagesSelector .xListItem-selected {
   background-color: #D4E8FF;
+}
+
+.xPagePreview .xPagePreviewTitle {
+  margin-bottom: 3px;
+  font-style: italic;
+}
+
+.xPagePreview .xPagePreviewFullname {
+  margin-top: 3px;
 }

@@ -88,7 +88,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                     step = new EmailAddressLinkWizardStep();
                     break;
                 case WIKIPAGE:
-                    step = new WikipageExplorerWizardStep(getEditedResource());
+                    step = new PageSelectorWizardStep(getEditedResource());
                     break;
                 case WIKIPAGECREATOR:
                     step = new CreateNewPageWizardStep(getEditedResource());

@@ -216,6 +216,8 @@ public interface Strings extends Constants
     String linkNoAttachmentSelectedError();
 
     String linkConfigTitle();
+    
+    String linkNewPageOptionLabel();
 
     String linkCreateNewPageTitle();
 
@@ -228,6 +230,8 @@ public interface Strings extends Constants
     String selectorSelectFromCurrentPage();
 
     String selectorSelectFromAllPages();
+    
+    String selectorSelectFromRecentPages();
 
     String linkErrorLoadingData();   
 

@@ -4323,18 +4323,18 @@ public class XWikiDocument implements DocumentModelBridge
     {
         Syntax syntax = null;
 
-        String syntaxId = getDefaultDocumentSyntax();
+        String syntaxId = getSyntaxId();
         try {
-            syntax = this.syntaxFactory.createSyntaxFromIdString(getSyntaxId());
+            syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
-            LOG.error("Failed to genrate Syntax object for syntax identifier [" + syntaxId + "] in page ["
+            LOG.error("Failed to generate Syntax object for syntax identifier [" + syntaxId + "] in page ["
                 + getDocumentName() + "]", e);
 
             syntaxId = getDefaultDocumentSyntax();
             try {
-                syntax = this.syntaxFactory.createSyntaxFromIdString(getDefaultDocumentSyntax());
+                syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             } catch (ParseException e1) {
-                LOG.error("Failed to genrate default Syntax object. The defautlt syntax id in [" + syntaxId + "]", e);
+                LOG.error("Failed to generate default Syntax object. The defautlt syntax id in [" + syntaxId + "]", e);
             }
         }
 

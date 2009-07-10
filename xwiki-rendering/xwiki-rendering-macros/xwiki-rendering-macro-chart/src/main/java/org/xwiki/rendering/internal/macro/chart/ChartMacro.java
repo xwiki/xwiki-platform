@@ -49,7 +49,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 /**
  * A macro for rendering charts.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @Component("chart")

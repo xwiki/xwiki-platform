@@ -42,7 +42,7 @@ import org.xwiki.component.phase.InitializationException;
  * The default implementation of {@link ChartGenerator} component interface which utilizes the jfreechart charting
  * library.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @Component

@@ -27,7 +27,7 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * A component interface for defining various chart generators.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @ComponentRole

@@ -29,7 +29,7 @@ import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
 /**
  * Parameters for chart macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 public class ChartMacroParameters

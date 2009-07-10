@@ -30,7 +30,7 @@ import org.junit.Assert;
 /**
  * Unit tests for {@link RssMacro}.
  * 
- * @version $Id: RssMacroFailureConditionsTest.java 20958 2009-06-08 10:14:00Z asiri $
+ * @version $Id$
  * @since 1.9
  */
 public class RssMacroTest

@@ -29,7 +29,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 /**
  * Interface for defining various data sources for charts.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 @ComponentRole

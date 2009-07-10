@@ -33,7 +33,7 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 /**
  * {@link DocumentAccessBridge} mock implementation used for tests.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 public class MockDocumentAccessBridge implements DocumentAccessBridge

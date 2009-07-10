@@ -22,7 +22,7 @@ package org.xwiki.chart;
 /**
  * The class used to indicate exceptions specific to the Chart generator.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M1
  */
 public class ChartGeneratorException extends Exception

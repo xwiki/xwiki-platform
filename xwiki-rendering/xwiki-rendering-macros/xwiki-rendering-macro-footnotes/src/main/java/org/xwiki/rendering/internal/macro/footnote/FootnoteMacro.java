@@ -46,7 +46,7 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
     public static final String MACRO_NAME = "footnote";
 
     /** The description of the macro. */
-    private static final String DESCRIPTION = "Genereates a footnote to display at the end of the page.";
+    private static final String DESCRIPTION = "Generates a footnote to display at the end of the page.";
 
     /** The description of the macro content. */
     private static final String CONTENT_DESCRIPTION = "the text to place in the footnote";

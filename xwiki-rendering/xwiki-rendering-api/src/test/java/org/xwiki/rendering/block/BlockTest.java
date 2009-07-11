@@ -19,8 +19,10 @@
  */
 package org.xwiki.rendering.block;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -40,11 +42,13 @@ public class BlockTest extends TestCase
 {
     public void testGetBlocksByType()
     {
-        ParagraphBlock pb1 = new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(
-            Arrays.<Block>asList(new WordBlock("title1")), HeaderLevel.LEVEL1)));
-        ParagraphBlock pb2 = new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(
-            Arrays.<Block>asList(new WordBlock("title2")), HeaderLevel.LEVEL2)));
-        ParagraphBlock pb3 = new ParagraphBlock(Arrays.<Block>asList(pb1, pb2));
+        ParagraphBlock pb1 =
+            new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays.<Block> asList(new WordBlock("title1")),
+                HeaderLevel.LEVEL1)));
+        ParagraphBlock pb2 =
+            new ParagraphBlock(Arrays.<Block> asList(new HeaderBlock(Arrays.<Block> asList(new WordBlock("title2")),
+                HeaderLevel.LEVEL2)));
+        ParagraphBlock pb3 = new ParagraphBlock(Arrays.<Block> asList(pb1, pb2));
 
         List<HeaderBlock> results = pb1.getChildrenByType(HeaderBlock.class, true);
         assertEquals(1, results.size());
@@ -95,14 +99,41 @@ public class BlockTest extends TestCase
 
     public void testReplaceBlock()
     {
-        Block wb = new WordBlock("block");
-        Block parentBlock = new ParagraphBlock(Arrays.asList(wb));
+        // It's important all blocks have same content to make sure replacement api don't find the position of the
+        // old block using Object#equals
+        Block word1 = new WordBlock("block");
+        Block word2 = new WordBlock("block");
+        Block word3 = new WordBlock("block");
 
-        Block newBlock = new WordBlock("newblock");
-        parentBlock.replaceChild(newBlock, wb);
+        Block parentBlock = new ParagraphBlock(Arrays.asList(word1, word2));
+
+        // replace by one
+        parentBlock.replaceChild(word3, word1);
+
+        assertEquals(2, parentBlock.getChildren().size());
+        assertSame(word3, parentBlock.getChildren().get(0));
+        assertSame(word2, parentBlock.getChildren().get(1));
+
+        // replace by nothing
+        parentBlock.replaceChild(Collections.<Block> emptyList(), word2);
 
         assertEquals(1, parentBlock.getChildren().size());
-        assertSame(newBlock, parentBlock.getChildren().get(0));
+        assertSame(word3, parentBlock.getChildren().get(0));
+
+        // replace by several
+        parentBlock.replaceChild(Arrays.asList(word1, word2), word3);
+
+        assertEquals(2, parentBlock.getChildren().size());
+        assertSame(word1, parentBlock.getChildren().get(0));
+        assertSame(word2, parentBlock.getChildren().get(1));
+
+        // provide not existing block to replace
+        try {
+            parentBlock.replaceChild(word3, new WordBlock("not existing"));
+            fail("Should have thrown an InvalidParameterException exception");
+        } catch (InvalidParameterException e) {
+            // expected
+        }
     }
 
     public void testClone()
@@ -112,7 +143,7 @@ public class BlockTest extends TestCase
         Link link = new Link();
         link.setReference("reference");
         LinkBlock lb = new LinkBlock(Arrays.asList((Block) new WordBlock("label")), link, false);
-        Block rootBlock = new ParagraphBlock(Arrays.<Block>asList(wb, ib, lb));
+        Block rootBlock = new ParagraphBlock(Arrays.<Block> asList(wb, ib, lb));
 
         Block newRootBlock = rootBlock.clone();
 

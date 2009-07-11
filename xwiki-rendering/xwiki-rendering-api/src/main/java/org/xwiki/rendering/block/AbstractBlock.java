@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.block;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -106,7 +107,7 @@ public abstract class AbstractBlock implements Block
         if (nextBlock == null) {
             this.childrenBlocks.add(blockToInsert);
         } else {
-            this.childrenBlocks.add(this.childrenBlocks.indexOf(nextBlock), blockToInsert);
+            this.childrenBlocks.add(indexOfChild(nextBlock), blockToInsert);
         }
     }
 
@@ -123,7 +124,7 @@ public abstract class AbstractBlock implements Block
         if (previousBlock == null) {
             this.childrenBlocks.add(blockToInsert);
         } else {
-            this.childrenBlocks.add(this.childrenBlocks.indexOf(previousBlock) + 1, blockToInsert);
+            this.childrenBlocks.add(indexOfChild(previousBlock) + 1, blockToInsert);
         }
     }
 
@@ -144,13 +145,48 @@ public abstract class AbstractBlock implements Block
      */
     public void replaceChild(List<Block> newBlocks, Block oldBlock)
     {
+        int position = indexOfChild(oldBlock);
+
+        if (position == -1) {
+            throw new InvalidParameterException("Provided Block to replace is not a child");
+        }
+
         List<Block> blocks = getChildren();
-        int pos = blocks.indexOf(oldBlock);
+
+        // remove old child
+        blocks.remove(position);
+        oldBlock.setParent(null);
+
+        // insert new children
         for (Block block : newBlocks) {
             block.setParent(this);
         }
-        blocks.addAll(pos, newBlocks);
-        blocks.remove(pos + newBlocks.size());
+        blocks.addAll(position, newBlocks);
+
+    }
+
+    /**
+     * Get the position of the provided block in the list of children.
+     * <p>
+     * Can't use {@link List#indexOf(Object)} since it's using {@link Object#equals(Object)} internally which is not
+     * what we want since two WordBlock with the same text or two spaces are equals for example but we want to be able
+     * to target one specific Block.
+     * 
+     * @param block the block
+     * @return the position of the block, -1 if the block can't be found
+     */
+    private int indexOfChild(Block block)
+    {
+        int position = 0;
+
+        for (Block child : getChildren()) {
+            if (child == block) {
+                return position;
+            }
+            ++position;
+        }
+
+        return -1;
     }
 
     /**
@@ -290,9 +326,9 @@ public abstract class AbstractBlock implements Block
             return null;
         }
 
-        List<Block> blocks = getParent().getChildren();
-        int index = blocks.indexOf(this);
+        int index = indexOfChild(this);
 
+        List<Block> blocks = getParent().getChildren();
         for (int i = index - 1; i >= 0; --i) {
             Block previousBlock = blocks.get(i);
             if (blockClass.isAssignableFrom(previousBlock.getClass())) {

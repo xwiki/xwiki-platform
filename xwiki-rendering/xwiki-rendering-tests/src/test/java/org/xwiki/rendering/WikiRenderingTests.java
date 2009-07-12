@@ -20,7 +20,6 @@
 package org.xwiki.rendering;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import junit.framework.Test;
@@ -33,8 +32,8 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * Rendering tests requiring a {@link WikiModel} implementation (ie tests that must have the notion of a wiki 
- * to run fine).
+ * Rendering tests requiring a {@link WikiModel} implementation (ie tests that must have the notion of a wiki to run
+ * fine).
  * 
  * @version $Id$
  * @since 2.0M1
@@ -73,8 +72,8 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("image/image2", false);
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
-        
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
+
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor< ? >>();
         mocks.add(MockWikiModel.getComponentDescriptor());
 
         return new ComponentManagerTestSetup(suite, mocks);

@@ -76,17 +76,16 @@ public class RenderingTestCase extends MockObjectTestCase
             transformationManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
         }
 
-        PrintRendererFactory rendererFactory = 
-            (PrintRendererFactory) getComponentManager().lookup(PrintRendererFactory.class);
-        SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.class);
+        PrintRendererFactory rendererFactory = getComponentManager().lookup(PrintRendererFactory.class);
+        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
         WikiPrinter printer = new DefaultWikiPrinter();
-        Renderer renderer = rendererFactory.createRenderer(
-            syntaxFactory.createSyntaxFromIdString(this.targetSyntaxId), printer);
+        Renderer renderer =
+            rendererFactory.createRenderer(syntaxFactory.createSyntaxFromIdString(this.targetSyntaxId), printer);
         dom.traverse(renderer);
 
         assertEquals(this.expected, printer.toString());
     }
-    
+
     public void setComponentManager(ComponentManager componentManager)
     {
         this.componentManager = componentManager;

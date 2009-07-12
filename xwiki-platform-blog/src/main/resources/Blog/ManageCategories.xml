@@ -50,5 +50,5 @@
 
 1.1 $msg.get("xe.blog.categories.addcategory")
 
-#showCreateCategoryBox($tree)</content>
+#showCreateCategoryBoxWithForm($tree)</content>
 </xwikidoc>

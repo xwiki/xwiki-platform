@@ -272,8 +272,22 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
  * @todo When javascript is disabled, a link to "Manage categories" should be displayed instead.
  *       This "form" should be created from javascript.
  *###
-#macro(showCreateCategoryBox $tree)
+#macro(showCreateCategoryBoxWithForm $tree)
   &lt;form action="" method="post"&gt;
+  #showCreateCategoryBox($tree)
+  &lt;/form&gt;
+#end
+#**
+ * Generates a box for creating a new category. This allows to enter the name of the new
+ * category, and select a parent category from the existing ones. Note that this does not create
+ * a HTML form element, but requires one to be defined already as its ancestor.
+ * 
+ * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
+ *        is the name of a category, and the value contains the names of all its subcategories.
+ * @todo When javascript is disabled, a link to "Manage categories" should be displayed instead.
+ *       This "form" should be created from javascript.
+ *###
+#macro(showCreateCategoryBox $tree)
   &lt;div class='create-category'&gt;
     &lt;input type="hidden" name="xaction" value="create"/&gt;
     &lt;label&gt;$msg.get("xe.blog.categories.new") &lt;input type="text" name="newCategoryName"&gt;&lt;/input&gt;&lt;/label&gt;
@@ -286,7 +300,6 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     &lt;/label&gt;
     &lt;span class="buttonwrapper"&gt;&lt;input class="button" type="button" value="Add" id="blog_AddCategoryButton"&gt;&lt;/input&gt;&lt;/span&gt;
   &lt;/div&gt;
-  &lt;/form&gt;
 #end
 ##
 ##

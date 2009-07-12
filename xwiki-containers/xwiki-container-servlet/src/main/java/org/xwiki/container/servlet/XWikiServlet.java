@@ -33,19 +33,19 @@ import java.io.IOException;
 
 public class XWikiServlet extends HttpServlet
 {
-    protected void service(HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse) throws ServletException, IOException
+    protected void service(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
+        throws ServletException, IOException
     {
         // Get the Component Manager instance set up in XWikiPlexusServletContextListener from the ServletContext
-        ComponentManager componentManager = 
+        ComponentManager componentManager =
             (ComponentManager) getServletContext().getAttribute(ComponentManager.class.getName());
         if (componentManager == null) {
             throw new ServletException("Plexus container is not initialized");
         }
-        
+
         ActionManager manager;
         try {
-            manager = (ActionManager) componentManager.lookup(ActionManager.class);
+            manager = componentManager.lookup(ActionManager.class);
         } catch (ComponentLookupException e) {
             // We cannot find the Action manager, not much we can do, abort...
             throw new ServletException("Failed to locate Action Manager component.", e);
@@ -55,7 +55,7 @@ public class XWikiServlet extends HttpServlet
         // components needing them can depend on the Container component to get them.
         try {
             ServletContainerInitializer containerInitializer =
-                (ServletContainerInitializer) componentManager.lookup(ServletContainerInitializer.class);
+                componentManager.lookup(ServletContainerInitializer.class);
             containerInitializer.initializeRequest(httpServletRequest);
             containerInitializer.initializeResponse(httpServletResponse);
             containerInitializer.initializeSession(httpServletRequest);

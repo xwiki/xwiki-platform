@@ -20,8 +20,6 @@
  */
 package org.xwiki.container.servlet;
 
-import java.lang.reflect.Method;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -49,7 +47,7 @@ public class XWikiServletContextListener implements ServletContextListener
      */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {
-        // Initializes the Embeddable Component Manager 
+        // Initializes the Embeddable Component Manager
         EmbeddableComponentManager ecm = new EmbeddableComponentManager();
         ecm.initialize(this.getClass().getClassLoader());
         this.componentManager = ecm;
@@ -57,14 +55,14 @@ public class XWikiServletContextListener implements ServletContextListener
         // Use a Component Event Manager that stacks Component instance creation events till we tell it to flush them.
         // The reason is that the Observation Manager used to send the events is a component itself and we need the
         // Application Context to be set up before we start sending events since there can be Observation Listener
-        // components that require the Application Context (this is the case for example for the Office Importer 
+        // components that require the Application Context (this is the case for example for the Office Importer
         // Lifecycle Listener).
         StackingComponentEventManager eventManager = new StackingComponentEventManager();
         ecm.setComponentEventManager(eventManager);
-        
+
         // Initializes XWiki's Container with the Servlet Context.
         try {
-            ServletContainerInitializer containerInitializer = 
+            ServletContainerInitializer containerInitializer =
                 this.componentManager.lookup(ServletContainerInitializer.class);
             containerInitializer.initializeApplicationContext(servletContextEvent.getServletContext());
         } catch (ComponentLookupException e) {
@@ -112,12 +110,11 @@ public class XWikiServletContextListener implements ServletContextListener
             // Nothing to do here.
             // TODO: Log a warning
         }
-        
+
         try {
             ApplicationContextListenerManager applicationContextListenerManager =
-                (ApplicationContextListenerManager) this.componentManager
-                    .lookup(ApplicationContextListenerManager.class);
-            Container container = (Container) this.componentManager.lookup(Container.class);
+                this.componentManager.lookup(ApplicationContextListenerManager.class);
+            Container container = this.componentManager.lookup(Container.class);
             applicationContextListenerManager.destroyApplicationContext(container.getApplicationContext());
         } catch (ComponentLookupException ex) {
             // Nothing to do here.

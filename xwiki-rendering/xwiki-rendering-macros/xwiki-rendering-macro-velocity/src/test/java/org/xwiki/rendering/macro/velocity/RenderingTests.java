@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
@@ -64,6 +65,9 @@ public class RenderingTests extends TestCase
 
         // Document Access Bridge Mock
         final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        componentManager.registerComponent(DocumentAccessBridge.class, mockDocumentAccessBridge);
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
     }
 }

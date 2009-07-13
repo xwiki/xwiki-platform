@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
@@ -45,22 +46,30 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroscript2", true);
         suite.addTestsFromResource("macroscript3", true);
         suite.addTestsFromResource("macroscript4", true);
-        
+
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
 
         return testSetup;
     }
-    
+
     public static void setUpMocks(EmbeddableComponentManager componentManager)
     {
         Mockery context = new Mockery();
 
         // Document Access Bridge Mock setup
         final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        context.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
-        }});
-        componentManager.registerComponent(DocumentAccessBridge.class, mockDocumentAccessBridge);
+        context.checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).hasProgrammingRights();
+                will(returnValue(true));
+            }
+        });
+
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
     }
 }

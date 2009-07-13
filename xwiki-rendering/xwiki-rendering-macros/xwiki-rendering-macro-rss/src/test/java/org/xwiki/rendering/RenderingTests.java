@@ -22,11 +22,12 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.xwiki.bridge.SkinAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
-import org.xwiki.bridge.SkinAccessBridge;
-import org.jmock.Mockery;
-import org.jmock.Expectations;
 
 /**
  * All Rendering integration tests defined in text files using a special format.
@@ -39,21 +40,27 @@ public class RenderingTests extends TestCase
     public static Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test RSS Macro");
-        
+
         suite.addTestsFromResource("macrorss1", true);
         suite.addTestsFromResource("macrorss2", true);
 
         ComponentManagerTestSetup setup = new ComponentManagerTestSetup(suite);
 
         Mockery context = new Mockery();
-        final SkinAccessBridge mockSkinBridge = context.mock(SkinAccessBridge.class);
-        setup.getComponentManager().registerComponent(SkinAccessBridge.class, mockSkinBridge);
 
-        context.checking(new Expectations() {{
-            allowing(mockSkinBridge).getSkinFile(with(any(String.class)));
-            will(returnValue("/xwiki/skins/albatross/icons/black-rss.png"));
-        }});
-        
+        final SkinAccessBridge mockSkinAccessBridge = context.mock(SkinAccessBridge.class);
+        DefaultComponentDescriptor<SkinAccessBridge> descriptorSAB = new DefaultComponentDescriptor<SkinAccessBridge>();
+        descriptorSAB.setRole(SkinAccessBridge.class);
+        setup.getComponentManager().registerComponent(descriptorSAB, mockSkinAccessBridge);
+
+        context.checking(new Expectations()
+        {
+            {
+                allowing(mockSkinAccessBridge).getSkinFile(with(any(String.class)));
+                will(returnValue("/xwiki/skins/albatross/icons/black-rss.png"));
+            }
+        });
+
         return setup;
     }
 }

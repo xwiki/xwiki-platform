@@ -20,6 +20,8 @@
 package org.xwiki.rendering.internal.parser;
 
 import org.jmock.Mock;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
@@ -36,8 +38,14 @@ public class XWikiLinkParserTest extends AbstractRenderingTestCase
     {
         // Create a Mock WikiModel implementation so that the link parser works in wiki mode
         Mock mockWikiModel = mock(WikiModel.class);
-        getComponentManager().registerComponent(WikiModel.class, mockWikiModel.proxy());
-        LinkParser parser = getComponentManager().lookup(LinkParser.class, "xwiki/2.0"); 
+
+        DefaultComponentDescriptor<WikiModel> componentDescriptor = new DefaultComponentDescriptor<WikiModel>();
+        componentDescriptor.setRole(WikiModel.class);
+        componentDescriptor.setInstantiationStrategy(ComponentInstantiationStrategy.SINGLETON);
+        componentDescriptor.setImplementation(null);
+
+        getComponentManager().registerComponent(componentDescriptor, (WikiModel) mockWikiModel.proxy());
+        LinkParser parser = getComponentManager().lookup(LinkParser.class, "xwiki/2.0");
 
         Link link = parser.parse("");
         assertEquals("", link.getReference());
@@ -85,7 +93,7 @@ public class XWikiLinkParserTest extends AbstractRenderingTestCase
         assertEquals("mailto:john@smith.com", link.getReference());
         assertEquals(LinkType.URI, link.getType());
         assertEquals("Reference = [mailto:john@smith.com]", link.toString());
-        
+
         // Verify image: URI is recognized
         link = parser.parse("image:some:content");
         assertEquals("image:some:content", link.getReference());
@@ -97,13 +105,13 @@ public class XWikiLinkParserTest extends AbstractRenderingTestCase
         assertEquals("attach:some:content", link.getReference());
         assertEquals(LinkType.URI, link.getType());
         assertEquals("Reference = [attach:some:content]", link.toString());
-        
+
         // Verify that unknown URIs are ignored
         // Note: We consider that myxwiki is the wiki name and http://xwiki.org is the page name
         link = parser.parse("mywiki:http://xwiki.org");
         assertEquals("mywiki:http://xwiki.org", link.getReference());
         assertEquals(LinkType.DOCUMENT, link.getType());
         assertEquals("Reference = [mywiki:http://xwiki.org]", link.toString());
-        
-}
+
+    }
 }

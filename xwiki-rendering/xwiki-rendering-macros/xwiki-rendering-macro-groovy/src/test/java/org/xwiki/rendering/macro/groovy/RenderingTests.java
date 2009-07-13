@@ -28,6 +28,7 @@ import junit.framework.TestCase;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.script.ScriptContextManager;
@@ -61,18 +62,32 @@ public class RenderingTests extends TestCase
 
         // Document Access Bridge Mock
         final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        context.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
-        }});
-        componentManager.registerComponent(DocumentAccessBridge.class, mockDocumentAccessBridge);
-        
+        context.checking(new Expectations()
+        {
+            {
+                allowing(mockDocumentAccessBridge).hasProgrammingRights();
+                will(returnValue(true));
+            }
+        });
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
+
         // Script Context Mock
         final ScriptContextManager mockScriptContextManager = context.mock(ScriptContextManager.class);
         final SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
-        context.checking(new Expectations() {{
-            allowing(mockScriptContextManager).getScriptContext(); will(returnValue(scriptContext));
-        }});
-        componentManager.registerComponent(ScriptContextManager.class, mockScriptContextManager);
+        context.checking(new Expectations()
+        {
+            {
+                allowing(mockScriptContextManager).getScriptContext();
+                will(returnValue(scriptContext));
+            }
+        });
+        DefaultComponentDescriptor<ScriptContextManager> descriptorSCM =
+            new DefaultComponentDescriptor<ScriptContextManager>();
+        descriptorSCM.setRole(ScriptContextManager.class);
+        componentManager.registerComponent(descriptorSCM, mockScriptContextManager);
     }
 }

@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 
 /**
  * Unit tests for {@link EmbeddableComponentManager}.
@@ -38,20 +39,20 @@ public class EmbeddableComponentManagerTest
     public static interface Role
     {
     }
-    
+
     public static class RoleImpl implements Role
     {
     }
-    
+
     public static class OtherRoleImpl implements Role
     {
     }
-    
+
     @Test
     public void testGetComponentDescriptorList() throws Exception
     {
         EmbeddableComponentManager ecm = new EmbeddableComponentManager();
-        
+
         DefaultComponentDescriptor<Role> d1 = new DefaultComponentDescriptor<Role>();
         d1.setRole(Role.class);
         d1.setRoleHint("hint1");
@@ -61,13 +62,13 @@ public class EmbeddableComponentManagerTest
         d2.setRole(Role.class);
         d2.setRoleHint("hint2");
         ecm.registerComponent(d2);
-        
+
         List<ComponentDescriptor<Role>> cds = ecm.getComponentDescriptorList(Role.class);
         Assert.assertEquals(2, cds.size());
         Assert.assertTrue(cds.contains(d1));
         Assert.assertTrue(cds.contains(d2));
     }
-    
+
     @Test
     public void testRegisterComponentOverExistingOne() throws Exception
     {
@@ -79,14 +80,50 @@ public class EmbeddableComponentManagerTest
         ecm.registerComponent(d1);
 
         Object instance = ecm.lookup(Role.class);
-        Assert.assertEquals(RoleImpl.class.getName(), instance.getClass().getName());
-        
+        Assert.assertSame(RoleImpl.class, instance.getClass());
+
         DefaultComponentDescriptor<Role> d2 = new DefaultComponentDescriptor<Role>();
         d2.setRole(Role.class);
         d2.setImplementation(OtherRoleImpl.class);
         ecm.registerComponent(d2);
 
         instance = ecm.lookup(Role.class);
-        Assert.assertEquals(OtherRoleImpl.class.getName(), instance.getClass().getName());
+        Assert.assertSame(OtherRoleImpl.class, instance.getClass());
+    }
+
+    @Test
+    public void testRegisterComponentInstance() throws Exception
+    {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+
+        DefaultComponentDescriptor<Role> d1 = new DefaultComponentDescriptor<Role>();
+        d1.setRole(Role.class);
+        d1.setImplementation(RoleImpl.class);
+        Role instance = new RoleImpl();
+        ecm.registerComponent(d1, instance);
+
+        Assert.assertSame(instance, ecm.lookup(Role.class));
+    }
+
+    @Test
+    public void testUnregisterComponent() throws Exception
+    {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+
+        DefaultComponentDescriptor<Role> d1 = new DefaultComponentDescriptor<Role>();
+        d1.setRole(Role.class);
+        d1.setImplementation(RoleImpl.class);
+        ecm.registerComponent(d1);
+
+        Assert.assertSame(RoleImpl.class, ecm.lookup(Role.class).getClass());
+
+        ecm.unregisterComponent(d1.getRole(), d1.getRoleHint());
+
+        try {
+            ecm.lookup(d1.getRole());
+            Assert.fail("Should have thrown a ComponentLookupException");
+        } catch (ComponentLookupException e) {
+            // expected
+        }
     }
 }

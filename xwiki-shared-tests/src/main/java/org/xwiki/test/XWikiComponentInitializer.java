@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.container.ApplicationContext;
@@ -32,13 +33,18 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 
+/**
+ * Initialize a component manager used in unit tests.
+ * 
+ * @version $Id$
+ */
 public class XWikiComponentInitializer
 {
     private EmbeddableComponentManager componentManager;
 
     /**
-     * This method should be called before {@link #initializeExecution()} since some components will require the Container
-     * component to be set up (for example to access resource such as the XWikiconfiguration file).
+     * This method should be called before {@link #initializeExecution()} since some components will require the
+     * Container component to be set up (for example to access resource such as the XWikiconfiguration file).
      */
     public void initializeContainer() throws Exception
     {
@@ -67,15 +73,24 @@ public class XWikiComponentInitializer
             }
         });
     }
-    
+
     public void initializeConfigurationSource() throws Exception
     {
         // Register the mock configuration source for different roles so that tests always use the mock
         ConfigurationSource mockSource = new MockConfigurationSource();
-        getComponentManager().registerComponent(ConfigurationSource.class, mockSource); 
-        getComponentManager().registerComponent(ConfigurationSource.class, "xwikiproperties", mockSource); 
+
+        DefaultComponentDescriptor<ConfigurationSource> descriptor;
+
+        descriptor = new DefaultComponentDescriptor<ConfigurationSource>();
+        descriptor.setRole(ConfigurationSource.class);
+        getComponentManager().registerComponent(descriptor, mockSource);
+
+        descriptor = new DefaultComponentDescriptor<ConfigurationSource>();
+        descriptor.setRole(ConfigurationSource.class);
+        descriptor.setRoleHint("xwikiproperties");
+        getComponentManager().registerComponent(descriptor, mockSource);
     }
-    
+
     public void initializeExecution() throws Exception
     {
         // Initialize the Execution Context
@@ -85,11 +100,11 @@ public class XWikiComponentInitializer
         ExecutionContext ec = new ExecutionContext();
 
         // Make sure we push this empty context in the Execution component before we call the initialization
-        // so that we don't get any NPE if some initializer code asks to get the Execution Context. This 
+        // so that we don't get any NPE if some initializer code asks to get the Execution Context. This
         // happens for example with the Velocity Execution Context initializer which in turns calls the Velocity
         // Context initializers and some of them look inside the Execution Context.
         execution.setContext(ec);
-        
+
         ecm.initialize(ec);
     }
 

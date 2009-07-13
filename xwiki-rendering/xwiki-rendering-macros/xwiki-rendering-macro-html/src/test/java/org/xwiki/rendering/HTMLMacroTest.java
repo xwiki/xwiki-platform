@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentNameSerializer;
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -52,13 +52,19 @@ public class HTMLMacroTest extends AbstractComponentTestCase
     {
         super.setUp();
 
-        DocumentAccessBridge dab = this.context.mock(DocumentAccessBridge.class);
-        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentAccessBridge.class, dab);
-            
-        DocumentNameSerializer dns = this.context.mock(DocumentNameSerializer.class);
-        ((EmbeddableComponentManager) getComponentManager()).registerComponent(DocumentNameSerializer.class, dns);
+        DocumentAccessBridge mockDocumentAccessBridge = this.context.mock(DocumentAccessBridge.class);
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
+
+        DocumentNameSerializer mockDocumentNameSerializer = this.context.mock(DocumentNameSerializer.class);
+        DefaultComponentDescriptor<DocumentNameSerializer> descriptorDNS =
+            new DefaultComponentDescriptor<DocumentNameSerializer>();
+        descriptorDNS.setRole(DocumentNameSerializer.class);
+        getComponentManager().registerComponent(descriptorDNS, mockDocumentNameSerializer);
     }
-    
+
     /**
      * Verify that inline HTML macros with non inline content generate an exception.
      */

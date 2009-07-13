@@ -22,48 +22,77 @@ package org.xwiki.component.manager;
 import org.xwiki.observation.event.Event;
 
 /**
- * Event sent to tell that a new Component Descriptor has been registered.
+ * Base class for events about components descriptors.
  * 
  * @version $Id$
  * @since 2.0M1
  */
-public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEvent
+public abstract class AbstractComponentDescriptorEvent implements Event
 {
+    private Class< ? > role;
+
+    private String roleHint;
+
     /**
      * Watches all roles (whenever a component is added it'll trigger this event).
      */
-    public ComponentDescriptorAddedEvent()
+    public AbstractComponentDescriptorEvent()
     {
-
+        this.role = null;
     }
 
     /**
      * @param role the component role to watch (all components matching this role will trigger this event)
      */
-    public ComponentDescriptorAddedEvent(Class< ? > role)
+    public AbstractComponentDescriptorEvent(Class< ? > role)
     {
-        super(role);
+        this.role = role;
     }
-    
+
     /**
      * @param role the component role/rolehint to watch
      */
-    public ComponentDescriptorAddedEvent(Class< ? > role, String roleHint)
+    public AbstractComponentDescriptorEvent(Class< ? > role, String roleHint)
     {
-        super(role, roleHint);
+        this.role = role;
+        this.roleHint = roleHint;
+    }
+
+    /**
+     * @return the component's role being watched or null if all components registrations are watched
+     */
+    public Class< ? > getRole()
+    {
+        return this.role;
+    }
+
+    /**
+     * @return the component's role hint being watched or null if all role's components registrations are watched
+     */
+    public String getRoleHint()
+    {
+        return this.roleHint;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Event#matches(Object)
+     * @see org.xwiki.observation.event.Event#matches(java.lang.Object)
      */
     public boolean matches(Object otherEvent)
     {
         boolean result = false;
 
-        if (ComponentDescriptorAddedEvent.class.isAssignableFrom(otherEvent.getClass())) {
-            result = super.matches(otherEvent);
+        if (otherEvent instanceof AbstractComponentDescriptorEvent) {
+            // If we're watching all roles return a match
+            if (getRole() == null) {
+                result = true;
+            } else {
+                AbstractComponentDescriptorEvent event = (AbstractComponentDescriptorEvent) otherEvent;
+                if (getRole() == event.getRole()) {
+                    result = getRoleHint() == null || getRoleHint().equals(event.getRoleHint());
+                }
+            }
         }
 
         return result;

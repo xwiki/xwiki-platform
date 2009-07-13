@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jmock.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
@@ -47,23 +48,25 @@ import org.xwiki.velocity.VelocityManager;
 public class IncludeMacroTest extends AbstractRenderingTestCase
 {
     private Mock mockDocumentAccessBridge;
-    
+
     @Override
     protected void registerComponents() throws Exception
     {
         this.mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(DocumentAccessBridge.class, this.mockDocumentAccessBridge.proxy()); 
+
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptor =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptor.setRole(DocumentAccessBridge.class);
+        getComponentManager().registerComponent(descriptor,
+            (DocumentAccessBridge) this.mockDocumentAccessBridge.proxy());
     }
 
     public void testIncludeMacroWithNewContext() throws Exception
     {
-        String expected = "beginDocument\n"
-            + "beginMacroMarkerStandalone [velocity] [] [$myvar]\n"
-            + "beginParagraph\n"
-            + "onWord [hello]\n"
-            + "endParagraph\n"
-            + "endMacroMarkerStandalone [velocity] [] [$myvar]\n"
-            + "endDocument";
+        String expected =
+            "beginDocument\n" + "beginMacroMarkerStandalone [velocity] [] [$myvar]\n" + "beginParagraph\n"
+                + "onWord [hello]\n" + "endParagraph\n" + "endMacroMarkerStandalone [velocity] [] [$myvar]\n"
+                + "endDocument";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.
@@ -88,21 +91,19 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
-        MacroTransformation macroTransformation = 
+        MacroTransformation macroTransformation =
             (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
         MacroTransformationContext context = new MacroTransformationContext();
         context.setMacroTransformation(macroTransformation);
-        
+
         List<Block> blocks = macro.execute(parameters, null, context);
 
         assertBlocks(expected, blocks);
     }
-    
+
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
-        String expected = "beginDocument\n"
-            + "onMacroStandalone [someMacro] []\n"
-            + "endDocument";
+        String expected = "beginDocument\n" + "onMacroStandalone [someMacro] []\n" + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
@@ -119,7 +120,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
         assertBlocks(expected, blocks);
     }
-    
+
     public void testIncludeMacroWithNoDocumentSpecified() throws Exception
     {
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
@@ -129,8 +130,8 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             macro.execute(parameters, null, new MacroTransformationContext());
             fail("An exception should have been thrown");
         } catch (MacroExecutionException expected) {
-            assertEquals("You must specify a 'document' parameter pointing to the document to include.",
-                expected.getMessage());
+            assertEquals("You must specify a 'document' parameter pointing to the document to include.", expected
+                .getMessage());
         }
     }
 }

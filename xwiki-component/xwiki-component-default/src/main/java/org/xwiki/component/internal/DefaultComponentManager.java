@@ -31,8 +31,8 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 
 /**
- * Wraps the Component Manager in a component so that components requiring the component Manager can
- * have it injected automatically.
+ * Wraps the Component Manager in a component so that components requiring the component Manager can have it injected
+ * automatically.
  * 
  * @version $Id$
  * @since 2.0M1
@@ -47,6 +47,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -56,15 +57,17 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#getComponentDescriptor(Class, String)
      */
     public <T> ComponentDescriptor<T> getComponentDescriptor(Class<T> role, String roleHint)
     {
         return this.componentManager.getComponentDescriptor(role, roleHint);
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#getComponentDescriptorList(Class)
      */
     public <T> List<ComponentDescriptor<T>> getComponentDescriptorList(Class<T> role)
@@ -74,6 +77,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#lookup(Class, String)
      */
     public <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException
@@ -83,6 +87,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#lookup(Class)
      */
     public <T> T lookup(Class<T> role) throws ComponentLookupException
@@ -92,6 +97,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#lookupList(Class)
      */
     public <T> List<T> lookupList(Class<T> role) throws ComponentLookupException
@@ -101,6 +107,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#lookupMap(Class)
      */
     public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException
@@ -110,6 +117,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#registerComponent(ComponentDescriptor)
      */
     public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException
@@ -119,6 +127,29 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#registerComponent(org.xwiki.component.descriptor.ComponentDescriptor,
+     *      java.lang.Object)
+     */
+    public <T> void registerComponent(ComponentDescriptor<T> componentDescriptor, T componentInstance)
+        throws ComponentRepositoryException
+    {
+        this.componentManager.registerComponent(componentDescriptor, componentInstance);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.component.manager.ComponentManager#unregisterComponent(java.lang.Class, java.lang.String)
+     */
+    public void unregisterComponent(Class< ? > role, String roleHint)
+    {
+        this.componentManager.unregisterComponent(role, roleHint);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see ComponentManager#release(Object)
      */
     public <T> void release(T component) throws ComponentLifecycleException
@@ -128,6 +159,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#hasComponent(Class, String)
      */
     public <T> boolean hasComponent(Class<T> role, String roleHint)
@@ -137,6 +169,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#hasComponent(Class)
      */
     public <T> boolean hasComponent(Class<T> role)
@@ -146,6 +179,7 @@ public class DefaultComponentManager implements ComponentManager, Composable
 
     /**
      * {@inheritDoc}
+     * 
      * @see ComponentManager#setComponentEventManager(ComponentEventManager)
      */
     public void setComponentEventManager(ComponentEventManager eventManager)

@@ -26,62 +26,69 @@ import java.util.Map;
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 
+/**
+ * Provide way to access and modify components repository.
+ * 
+ * @version $Id$
+ */
 @ComponentRole
 public interface ComponentManager
 {
     /**
      * @param <T> the component role type
-     * @param role the class (aka role) that the component implements 
-     * @return true if the component has already been instantiated or not. Always return false for components with
-     *         a per-lookup instantiation strategy
+     * @param role the class (aka role) that the component implements
+     * @return true if the component has already been instantiated or not. Always return false for components with a
+     *         per-lookup instantiation strategy
      */
-    <T> boolean hasComponent(Class< T > role);
+    <T> boolean hasComponent(Class<T> role);
 
     /**
      * @param <T> the component role type
      * @param role the class (aka role) that the component implements
-     * @param roleHint the hint that differentiates a component implementation from another one (each component
-     *        is registered with a hint; the "default" hint being the default) 
-     * @return true if the component has already been instantiated or not. Always return false for components with
-     *         a per-lookup instantiation strategy
+     * @param roleHint the hint that differentiates a component implementation from another one (each component is
+     *            registered with a hint; the "default" hint being the default)
+     * @return true if the component has already been instantiated or not. Always return false for components with a
+     *         per-lookup instantiation strategy
      */
-    <T> boolean hasComponent(Class< T > role, String roleHint);
-    
+    <T> boolean hasComponent(Class<T> role, String roleHint);
+
     /**
-     * Find a component instance that implements that passed interface class. If the component has a singleton
-     * lifecycle then this method always return the same instance.
-     *  
-     * @param role the class (aka role) that the component implements 
-     * @return the component instance
-     * @throws ComponentLookupException in case the component cannot be found 
-     */
-    < T > T lookup(Class< T > role) throws ComponentLookupException;
-    
-    /**
-     * Find a component instance that implements that passed interface class. If the component has a singleton
-     * lifecycle then this method always return the same instance.
-     *  
+     * Find a component instance that implements that passed interface class. If the component has a singleton lifecycle
+     * then this method always return the same instance.
+     * 
+     * @param <T> the component role type
      * @param role the class (aka role) that the component implements
-     * @param roleHint the hint that differentiates a component implementation from another one (each component
-     *        is registered with a hint; the "default" hint being the default) 
      * @return the component instance
-     * @throws ComponentLookupException in case the component cannot be found 
+     * @throws ComponentLookupException in case the component cannot be found
      */
-    < T > T lookup(Class< T > role, String roleHint) throws ComponentLookupException;
+    <T> T lookup(Class<T> role) throws ComponentLookupException;
+
+    /**
+     * Find a component instance that implements that passed interface class. If the component has a singleton lifecycle
+     * then this method always return the same instance.
+     * 
+     * @param <T> the component role type
+     * @param role the class (aka role) that the component implements
+     * @param roleHint the hint that differentiates a component implementation from another one (each component is
+     *            registered with a hint; the "default" hint being the default)
+     * @return the component instance
+     * @throws ComponentLookupException in case the component cannot be found
+     */
+    <T> T lookup(Class<T> role, String roleHint) throws ComponentLookupException;
 
     /**
      * Remove a component from the list of available components.
      * 
-     * @param <T> the component class 
+     * @param <T> the component role type
      * @param component the component to release passed as a component instance. The component definition matching the
-     *        passed instance is removed
-     * @throws ComponentLifecycleException if the component's ending lifecycle raises an error 
+     *            passed instance is removed
+     * @throws ComponentLifecycleException if the component's ending lifecycle raises an error
      */
-    < T > void release(T component) throws ComponentLifecycleException;
+    <T> void release(T component) throws ComponentLifecycleException;
 
-    < T > Map<String, T> lookupMap(Class< T > role) throws ComponentLookupException;
+    <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException;
 
-    < T > List< T > lookupList(Class< T > role) throws ComponentLookupException;
+    <T> List<T> lookupList(Class<T> role) throws ComponentLookupException;
 
     /**
      * Add a component in the component repository programmaticaly.
@@ -89,27 +96,53 @@ public interface ComponentManager
      * If a component with the same role and role hint already exists it will be replaced by this provided one when
      * lookup.
      * 
+     * @param <T> the component role type
      * @param componentDescriptor the descriptor of the component to register.
      * @throws ComponentRepositoryException error when registering component descriptor.
      * @since 1.7M1
      */
-    < T > void registerComponent(ComponentDescriptor< T > componentDescriptor) throws ComponentRepositoryException;
+    <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException;
 
     /**
+     * Add a component in the component repository programmaticaly. This method also makes possible to set the instance
+     * returned by the {@link ComponentManager} instead of letting it created it from descriptor.
+     * <p>
+     * If a component with the same role and role hint already exists it will be replaced by this provided one when
+     * lookup.
+     * 
+     * @param <T> the component role type
+     * @param componentDescriptor the descriptor of the component to register.
+     * @param componentInstance the initial component instance
+     * @throws ComponentRepositoryException error when registering component descriptor.
+     * @since 2.0M2
+     */
+    <T> void registerComponent(ComponentDescriptor<T> componentDescriptor, T componentInstance)
+        throws ComponentRepositoryException;
+
+    /**
+     * Remove a component from the component repository programmaticaly.
+     * 
+     * @param role the role identifying the component
+     * @param roleHint the hint identifying the component
+     */
+    void unregisterComponent(Class< ? > role, String roleHint);
+
+    /**
+     * @param <T> the component role type
      * @param role the role identifying the component
      * @param roleHint the hint identifying the component
      * @return the descriptor for the component matching the passed parameter or null if this component doesn't exist
      * @since 2.0M1
      */
-    < T > ComponentDescriptor< T > getComponentDescriptor(Class< T > role, String roleHint);
+    <T> ComponentDescriptor<T> getComponentDescriptor(Class<T> role, String roleHint);
 
     /**
      * @param <T> the role class for which to return all component implementations
-     * @param role the role class for which to return all component implementations  
+     * @param role the role class for which to return all component implementations
      * @return all component implementations for the passed role
      */
-    < T > List<ComponentDescriptor<T>> getComponentDescriptorList(Class< T > role);
-    
+    <T> List<ComponentDescriptor<T>> getComponentDescriptorList(Class<T> role);
+
     /**
      * @param eventManager the manager to use to send events when a component is instantiated.
      */

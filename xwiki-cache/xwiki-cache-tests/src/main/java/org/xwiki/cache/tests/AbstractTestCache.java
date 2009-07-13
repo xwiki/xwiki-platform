@@ -25,6 +25,7 @@ import java.io.InputStream;
 import org.jmock.Mock;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
@@ -81,8 +82,12 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
         Mock mockConfigurationSource = mock(ConfigurationSource.class);
         mockConfigurationSource.stubs().method("getProperty").with(eq("cache.defaultCache"), ANYTHING).will(
             returnValue(this.roleHint));
-        getComponentManager().registerComponent(ConfigurationSource.class, "xwikiproperties", 
-            mockConfigurationSource.proxy());
+
+        DefaultComponentDescriptor<ConfigurationSource> descriptor =
+            new DefaultComponentDescriptor<ConfigurationSource>();
+        descriptor.setRole(ConfigurationSource.class);
+        descriptor.setRoleHint("xwikiproperties");
+        getComponentManager().registerComponent(descriptor, (ConfigurationSource) mockConfigurationSource.proxy());
     }
 
     /**
@@ -111,7 +116,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        CacheManager cacheManager = (CacheManager) getComponentManager().lookup(CacheManager.class);
+        CacheManager cacheManager = getComponentManager().lookup(CacheManager.class);
 
         CacheFactory factory = cacheManager.getCacheFactory();
 

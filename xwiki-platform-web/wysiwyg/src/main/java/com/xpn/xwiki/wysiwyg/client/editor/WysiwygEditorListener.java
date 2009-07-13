@@ -160,6 +160,12 @@ public class WysiwygEditorListener implements TabListener
         if (tabPanel.getTabBar().getSelectedTab() == index) {
             return false;
         }
+        if (index == WysiwygEditor.WIKI_TAB_INDEX && editor.getRichTextEditor().getTextArea().isEnabled()) {
+            // Notify the plug-ins that the content of the rich text area is about to be submitted.
+            // We have to do this before the tabs are actually switched because plug-ins can't access the computed style
+            // of the rich text area when it is hidden.
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
+        }
         return true;
     }
 
@@ -177,8 +183,6 @@ public class WysiwygEditorListener implements TabListener
         } else {
             // We test if the RTE textarea is enabled to be sure that the editor is not already being switched.  
             if (index == WysiwygEditor.WIKI_TAB_INDEX && editor.getRichTextEditor().getTextArea().isEnabled()) {
-                // Notify the plug-ins that the content of the rich text area is about to be submitted.
-                editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
                 // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
                 // Make the request to convert the HTML to Wiki syntax.
                 wysiwygService.fromHTML(editor.getPlainTextEditor().getTextArea().getText(), 

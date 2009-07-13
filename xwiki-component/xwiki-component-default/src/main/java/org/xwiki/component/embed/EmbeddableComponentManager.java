@@ -303,61 +303,67 @@ public class EmbeddableComponentManager implements ComponentManager
                 }
             }
         }
+
         return instance;
     }
 
     @SuppressWarnings("unchecked")
     private <T> T createInstance(RoleHint<T> roleHint) throws Exception
     {
-        T instance = null;
-
-        // Instantiate component
         ComponentDescriptor<T> descriptor = (ComponentDescriptor<T>) this.descriptors.get(roleHint);
-        if (descriptor != null) {
-            instance = descriptor.getImplementation().newInstance();
 
-            // Set each dependency
-            for (ComponentDependency< ? > dependency : descriptor.getComponentDependencies()) {
+        if (descriptor == null) {
+            throw new ComponentLookupException("Can't find descriptor for the component [" + roleHint + "]");
+        }
 
-                // TODO: Handle dependency cycles
+        return createInstance(descriptor);
+    }
 
-                // Handle different field types
-                Object fieldValue;
-                if ((dependency.getMappingType() != null) && List.class.isAssignableFrom(dependency.getMappingType())) {
-                    fieldValue = lookupList(dependency.getRole());
-                } else if ((dependency.getMappingType() != null)
-                    && Map.class.isAssignableFrom(dependency.getMappingType())) {
-                    fieldValue = lookupMap(dependency.getRole());
-                } else {
-                    fieldValue = lookup(dependency.getRole(), dependency.getRoleHint());
-                }
+    private <T> T createInstance(ComponentDescriptor<T> descriptor) throws Exception
+    {
+        T instance = descriptor.getImplementation().newInstance();
 
-                // Set the field by introspection
-                if (fieldValue != null) {
-                    ReflectionUtils.setFieldValue(instance, dependency.getName(), fieldValue);
-                }
+        // Set each dependency
+        for (ComponentDependency< ? > dependency : descriptor.getComponentDependencies()) {
+
+            // TODO: Handle dependency cycles
+
+            // Handle different field types
+            Object fieldValue;
+            if ((dependency.getMappingType() != null) && List.class.isAssignableFrom(dependency.getMappingType())) {
+                fieldValue = lookupList(dependency.getRole());
+            } else if ((dependency.getMappingType() != null) && Map.class.isAssignableFrom(dependency.getMappingType())) {
+                fieldValue = lookupMap(dependency.getRole());
+            } else {
+                fieldValue = lookup(dependency.getRole(), dependency.getRoleHint());
             }
 
-            // Call Lifecycle
-
-            // LogEnabled
-            if (LogEnabled.class.isAssignableFrom(descriptor.getImplementation())) {
-                ((LogEnabled) instance).enableLogging(new CommonsLoggingLogger(instance.getClass()));
-            }
-
-            // Composable
-            // Only support Composable for classes implementing ComponentManager since for all other components
-            // they should have ComponentManager injected.
-            if (ComponentManager.class.isAssignableFrom(descriptor.getImplementation())
-                && Composable.class.isAssignableFrom(descriptor.getImplementation())) {
-                ((Composable) instance).compose(this);
-            }
-
-            // Initializable
-            if (Initializable.class.isAssignableFrom(descriptor.getImplementation())) {
-                ((Initializable) instance).initialize();
+            // Set the field by introspection
+            if (fieldValue != null) {
+                ReflectionUtils.setFieldValue(instance, dependency.getName(), fieldValue);
             }
         }
+
+        // Call Lifecycle
+
+        // LogEnabled
+        if (LogEnabled.class.isAssignableFrom(descriptor.getImplementation())) {
+            ((LogEnabled) instance).enableLogging(new CommonsLoggingLogger(instance.getClass()));
+        }
+
+        // Composable
+        // Only support Composable for classes implementing ComponentManager since for all other components
+        // they should have ComponentManager injected.
+        if (ComponentManager.class.isAssignableFrom(descriptor.getImplementation())
+            && Composable.class.isAssignableFrom(descriptor.getImplementation())) {
+            ((Composable) instance).compose(this);
+        }
+
+        // Initializable
+        if (Initializable.class.isAssignableFrom(descriptor.getImplementation())) {
+            ((Initializable) instance).initialize();
+        }
+
         return instance;
     }
 }

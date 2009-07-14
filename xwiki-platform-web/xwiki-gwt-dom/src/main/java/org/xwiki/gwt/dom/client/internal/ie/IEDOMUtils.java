@@ -81,8 +81,17 @@ public class IEDOMUtils extends DOMUtils
     /*-{
         var attrNames = [];
         for(var i = 0; i < element.attributes.length; i++){
-            if(element.attributes[i].specified) {
-                attrNames.push(element.attributes[i].nodeName);
+            var attribute = element.attributes[i];
+            // On IE attributes and properties are stored in the same array. We exclude all objects and functions, 
+            // since attributes should be strings, numbers. Note that this does not ensure the elimination of all 
+            // custom properties, but covers most cases.
+            if (attribute.specified && typeof attribute.nodeValue != 'object' 
+                && typeof attribute.nodeValue != 'function') {
+                attrNames.push(attribute.nodeName);
+            }
+            // Typeof style is object and, in our quest to eliminate custom set properties, this one also gets removed
+            if (element.style.cssText != '') {
+                attrNames.push('style');
             }
         }
         return attrNames;

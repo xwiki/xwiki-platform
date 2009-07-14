@@ -69,7 +69,10 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
             return new RecentChangesSelectorWizardStep(getEditedResource());
         }
         if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            return new WikipageExplorerWizardStep(getEditedResource());
+            return new WikiPageExplorerWizardStep(getEditedResource());
+        }
+        if (name.equals(Strings.INSTANCE.selectorSelectFromSearchPages())) {
+            return new SearchSelectorWizardStep(getEditedResource());
         }
         return null;
     }
@@ -81,7 +84,7 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     protected List<String> getStepNames()
     {
         return Arrays.asList(Strings.INSTANCE.selectorSelectFromRecentPages(), Strings.INSTANCE
-            .selectorSelectFromAllPages());
+            .selectorSelectFromAllPages(), Strings.INSTANCE.selectorSelectFromSearchPages());
     }
 
     /**

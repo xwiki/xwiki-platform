@@ -408,34 +408,62 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws XWikiException
      */
     public List<com.xpn.xwiki.gwt.api.client.Document> getRecentlyModifiedPages(int start, int count)
         throws XWikiGWTException
     {
         try {
-            List<com.xpn.xwiki.gwt.api.client.Document> results =
-                new ArrayList<com.xpn.xwiki.gwt.api.client.Document>();
-            List<String> documentNames;
-            documentNames =
+            List<String> documentNames =
                 getXWikiContext().getWiki().getStore().searchDocumentsNames(
                     "where 1=1 and doc.author='" + getXWikiContext().getUser() + "' order by doc.date desc", count,
                     start, getXWikiContext());
-            for (String docName : documentNames) {
-                DocumentModelBridge doc = getXWikiContext().getWiki().getDocument(docName, getXWikiContext());
-                com.xpn.xwiki.gwt.api.client.Document xwikiDoc = new com.xpn.xwiki.gwt.api.client.Document();
-                xwikiDoc.setFullName(doc.getFullName());
-                xwikiDoc.setTitle(doc.getTitle());
-                // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
-                xwikiDoc.setUploadURL(getDocumentAccessBridge().getURL(doc.getFullName(), VIEW_ACTION, "", ""));
-                results.add(xwikiDoc);
-            }
-            return results;
-
+            return prepareDocumentResultsList(documentNames);
         } catch (XWikiException e) {
             throw getXWikiGWTException(e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<com.xpn.xwiki.gwt.api.client.Document> getMatchingPages(String keyword, int start, int count)
+        throws XWikiGWTException
+    {
+        try {
+            // FIXME: this fullname comparison with the keyword does not contain the wiki name
+            String escapedKeyword = keyword.replaceAll("'", "''").toLowerCase();
+            List<String> documentNames =
+                getXWikiContext().getWiki().getStore().searchDocumentsNames(
+                    "where lower(doc.title) like '%" + escapedKeyword + "%' or lower(doc.fullName) like '%"
+                        + escapedKeyword + "%'", count, start, getXWikiContext());
+            return prepareDocumentResultsList(documentNames);
+        } catch (XWikiException e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
+    /**
+     * Helper function to prepare a list of {@link com.xpn.xwiki.gwt.api.client.Document}s (with fullname, title, etc)
+     * from a list of document names.
+     * 
+     * @param docNames the list of names of the documents to include in the list
+     * @return the list of {@link com.xpn.xwiki.gwt.api.client.Document}s corresponding to the passed names
+     * @throws XWikiException if anything goes wrong retrieving the documents
+     */
+    private List<com.xpn.xwiki.gwt.api.client.Document> prepareDocumentResultsList(List<String> docNames)
+        throws XWikiException
+    {
+        List<com.xpn.xwiki.gwt.api.client.Document> results = new ArrayList<com.xpn.xwiki.gwt.api.client.Document>();
+        for (String docName : docNames) {
+            DocumentModelBridge doc = getXWikiContext().getWiki().getDocument(docName, getXWikiContext());
+            com.xpn.xwiki.gwt.api.client.Document xwikiDoc = new com.xpn.xwiki.gwt.api.client.Document();
+            xwikiDoc.setFullName(doc.getFullName());
+            xwikiDoc.setTitle(doc.getTitle());
+            // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
+            xwikiDoc.setUploadURL(getDocumentAccessBridge().getURL(doc.getFullName(), VIEW_ACTION, "", ""));
+            results.add(xwikiDoc);
+        }
+        return results;
     }
 
     /**

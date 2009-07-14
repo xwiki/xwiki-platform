@@ -206,6 +206,10 @@ public interface Strings extends Constants
     String linkURLToEmailAddressTextBoxTooltip();
 
     String linkURLToWebPageTextBoxTooltip();
+    
+    String linkWikipageSearchTooltip();
+    
+    String linkWikipageSearchButton();
 
     String linkSelectWikipageTitle();
 
@@ -232,6 +236,8 @@ public interface Strings extends Constants
     String selectorSelectFromAllPages();
     
     String selectorSelectFromRecentPages();
+    
+    String selectorSelectFromSearchPages();
 
     String linkErrorLoadingData();   
 

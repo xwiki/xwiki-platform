@@ -34,7 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
  * 
  * @version $Id$
  */
-public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
+public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
 {
     /**
      * The resource edited currently (the wiki page for which this wysiwyg is instantiated).
@@ -47,7 +47,7 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
      * 
      * @param editedResource the currently edited resource
      */
-    public WikipageExplorerWizardStep(ResourceName editedResource)
+    public WikiPageExplorerWizardStep(ResourceName editedResource)
     {
         // build a standard selector which shows "Add page" and no attachments.
         // FIXME: size hardcoding is very bad, remove when a method to control this from CSS will be found 
@@ -73,9 +73,9 @@ public class WikipageExplorerWizardStep extends AbstractExplorerWizardStep
     public String getNextStep()
     {
         if (getData().getType() == LinkType.NEW_WIKIPAGE && StringUtils.isEmpty(getData().getReference())) {
-            return LinkWizardSteps.WIKIPAGECREATOR.toString();
+            return LinkWizardSteps.WIKI_PAGE_CREATOR.toString();
         } else {
-            return LinkWizardSteps.WIKIPAGECONFIG.toString();
+            return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
         }
     }
 

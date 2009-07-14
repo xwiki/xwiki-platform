@@ -95,7 +95,6 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
      */
     public AbstractPageListSelectorWizardStep(ResourceName editedResource)
     {
-        super();
         this.editedResource = editedResource;
         mainPanel.addStyleName("xPagesSelector");
         // create an empty pages list
@@ -184,9 +183,9 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
         // check out the selection
         if (pagesList.getSelectedItem() != null
             && pagesList.getSelectedItem().getWidget(0) instanceof NewPageOptionWidget) {
-            return LinkWizardSteps.WIKIPAGECREATOR.toString();
+            return LinkWizardSteps.WIKI_PAGE_CREATOR.toString();
         }
-        return LinkWizardSteps.WIKIPAGECONFIG.toString();
+        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
     }
 
     /**
@@ -228,8 +227,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
             ResourceName editedPage = new ResourceName(getData().getReference(), false).getRelativeTo(editedResource);
             ResourceName selectedPage =
                 new ResourceName(selectedOption.getDocument().getFullName(), false).getRelativeTo(editedResource);
-            if (!StringUtils.isEmpty(getData().getReference()) 
-                && editedPage.toString().equals(selectedPage.toString())) {
+            if (!StringUtils.isEmpty(getData().getReference()) && editedPage.equals(selectedPage)) {
                 changedDoc = false;
             }
             if (changedDoc) {
@@ -243,5 +241,21 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
             }
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * @return the pagesList
+     */
+    public ListBox getPagesList()
+    {
+        return pagesList;
+    }
+
+    /**
+     * @return the mainPanel
+     */
+    public FlowPanel getMainPanel()
+    {
+        return mainPanel;
     }
 }

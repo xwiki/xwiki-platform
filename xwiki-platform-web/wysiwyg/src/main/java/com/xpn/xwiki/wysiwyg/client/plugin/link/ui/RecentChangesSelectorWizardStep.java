@@ -41,6 +41,7 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
     public RecentChangesSelectorWizardStep(ResourceName editedResource)
     {
         super(editedResource);
+        getMainPanel().addStyleName("xPagesRecent");
     }
 
     /**

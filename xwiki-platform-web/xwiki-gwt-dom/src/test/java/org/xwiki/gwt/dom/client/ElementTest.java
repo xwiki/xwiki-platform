@@ -170,8 +170,37 @@ public class ElementTest extends AbstractDOMTest
         for (int i = 0; i < attributeNames.length(); i++) {
             attrList.remove(attributeNames.get(i));
         }
+
+        assertEquals("", attrList.get(0));
         assertEquals(0, attrList.size());
     }
+
+    /**
+     * Unit test for {@link Element#getAttributeNames()}, for the case when the element also has custom properties set,
+     * which should be excluded from the attribute names.
+     */
+    public void testGetAttributeNamesExcludesProperties()
+    {
+        Element element = Document.get().createSpanElement().cast();
+        assertEquals(0, element.getAttributeNames().length());
+
+        String propertyFunc = "xx";
+        ((JavaScriptObject) element.cast()).set(propertyFunc, JavaScriptObject.createFunction());
+        String propertyObj = "yy";
+        ((JavaScriptObject) element.cast()).set(propertyObj, JavaScriptObject.createObject());
+        element.getStyle().setProperty(Style.BACKGROUND_COLOR, "rgb(255, 255, 0)");
+        debug();
+
+        assertEquals(0, element.getAttributeNames().length());
+    }
+
+    /**
+     * Natively invokes the debugger.
+     */
+    private native void debug()
+    /*-{
+        debugger;
+    }-*/;
 
     /**
      * Unit test for {@link Element#hasClassName(String)}.

@@ -63,6 +63,9 @@ public class PagePreviewWidget extends Composite
         if (!StringUtils.isEmpty(doc.getTitle())) {
             ui.add(title);
         }
+        String prettyName = StringUtils.isEmpty(doc.getTitle()) ? "" : doc.getTitle() + " - ";
+        prettyName += doc.getFullName();
+        ui.setTitle(prettyName);
         ui.add(pageName);
         ui.addStyleName("xPagePreview");
         return ui;

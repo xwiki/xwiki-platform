@@ -82,9 +82,9 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
             // in the tree when it will be loaded next. Even if the upload dialog could be canceled and then this is
             // useless, there is no further point where we could access the explorer to invalidate it.
             invalidateExplorerData();
-            return LinkWizardSteps.ATTACHUPLOAD.toString();
+            return LinkWizardSteps.ATTACHMENT_UPLOAD.toString();
         }
-        return LinkWizardSteps.WIKIPAGECONFIG.toString();
+        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
     }
 
     /**

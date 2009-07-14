@@ -146,6 +146,15 @@ public interface WysiwygServiceAsync
     void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async);
 
     /**
+     * @param start the start index of the list of pages to return
+     * @param count the number of pages to return
+     * @param keyword the keyword to search the pages for
+     * @param async object used for asynchronous communication between server and client, to return on success the
+     *            {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
+     */
+    void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<Document>> async);
+
+    /**
      * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
      * replaced with a default value.
      * 

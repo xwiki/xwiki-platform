@@ -47,7 +47,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
         /**
          * Steps managed by this wizard: the image selector, the image parameters step and the new image upload step.
          */
-        IMAGESELECTOR, IMAGECONFIG, IMAGEUPLOAD
+        IMAGE_SELECTOR, IMAGE_CONFIG, IMAGE_UPLOAD
     };
 
     /**
@@ -85,13 +85,13 @@ public class ImageWizard extends Wizard implements WizardStepProvider
         WizardStep step = stepsMap.get(requestedStep);
         if (step == null) {
             switch (requestedStep) {
-                case IMAGESELECTOR:
+                case IMAGE_SELECTOR:
                     step = dispatchImageSelectorStep();
                     break;
-                case IMAGECONFIG:
+                case IMAGE_CONFIG:
                     step = new ImageConfigWizardStep();
                     break;
-                case IMAGEUPLOAD:
+                case IMAGE_UPLOAD:
                     step = new ImageUploadWizardStep(getEditedResource());
                     break;
                 default:

@@ -224,9 +224,9 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         // check out the selection
         if (imageList.getSelectedItem() != null
             && imageList.getSelectedItem().getWidget(0) instanceof NewImageOptionWidget) {
-            return ImageWizardSteps.IMAGEUPLOAD.toString();
+            return ImageWizardSteps.IMAGE_UPLOAD.toString();
         }
-        return ImageWizardSteps.IMAGECONFIG.toString();
+        return ImageWizardSteps.IMAGE_CONFIG.toString();
     }
 
     /**

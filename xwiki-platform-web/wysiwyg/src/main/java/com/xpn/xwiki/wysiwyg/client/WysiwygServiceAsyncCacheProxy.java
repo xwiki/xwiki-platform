@@ -166,6 +166,14 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     {
         service.getRecentlyModifiedPages(start, count, async);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<Document>> async)
+    {
+        service.getMatchingPages(keyword, start, count, async);
+    }
 
     /**
      * {@inheritDoc}

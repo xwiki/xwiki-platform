@@ -182,6 +182,15 @@ public interface WysiwygService extends RemoteService
     List<Document> getRecentlyModifiedPages(int start, int count) throws XWikiGWTException;
 
     /**
+     * @param start the start index of the list of pages to return
+     * @param count the number of pages to return
+     * @param keyword the keyword to search the pages for
+     * @return the {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
+     * @throws XWikiGWTException if something goes wrong on the server
+     */
+    List<Document> getMatchingPages(String keyword, int start, int count) throws XWikiGWTException;
+
+    /**
      * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
      * replaced with a default value.
      * 

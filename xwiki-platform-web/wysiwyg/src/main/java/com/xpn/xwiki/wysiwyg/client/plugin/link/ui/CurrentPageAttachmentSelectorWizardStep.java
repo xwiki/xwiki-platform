@@ -203,9 +203,9 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
         // check out the selection
         if (attachmentsList.getSelectedItem() != null
             && attachmentsList.getSelectedItem().getWidget(0) instanceof NewAttachmentOptionWidget) {
-            return LinkWizardSteps.ATTACHUPLOAD.toString();
+            return LinkWizardSteps.ATTACHMENT_UPLOAD.toString();
         }
-        return LinkWizardSteps.WIKIPAGECONFIG.toString();
+        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
     }
 
     /**

@@ -170,7 +170,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         switch (linkParams.getType()) {
             case WIKIPAGE:
             case NEW_WIKIPAGE:
-                getLinkWizard().start(LinkWizardSteps.WIKIPAGE.toString(), linkParams);
+                getLinkWizard().start(LinkWizardSteps.WIKI_PAGE.toString(), linkParams);
                 break;
             case ATTACHMENT:
                 getLinkWizard().start(LinkWizardSteps.ATTACHMENT.toString(), linkParams);
@@ -180,7 +180,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
                 break;
             case EXTERNAL:
             default:
-                getLinkWizard().start(LinkWizardSteps.WEBPAGE.toString(), linkParams);
+                getLinkWizard().start(LinkWizardSteps.WEB_PAGE.toString(), linkParams);
                 break;
         }
     }

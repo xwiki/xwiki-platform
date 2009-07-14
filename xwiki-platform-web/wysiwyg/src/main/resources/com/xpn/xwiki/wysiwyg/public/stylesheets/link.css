@@ -27,7 +27,7 @@
 }
 
 .xSelectorStep .xListBox {
-  height: 320px;
+  height: 315px;
   overflow: auto;
 }
 
@@ -105,4 +105,14 @@
 
 .xPagePreview .xPagePreviewFullname {
   margin-top: 3px;
+}
+
+/* Search tab style */
+.xPagesSearch .xSearchForm {
+  height: 25px;
+  line-height: 19px;
+}
+
+.xSelectorStep .xPagesSearch .xListBox {
+  height: 290px;
 }

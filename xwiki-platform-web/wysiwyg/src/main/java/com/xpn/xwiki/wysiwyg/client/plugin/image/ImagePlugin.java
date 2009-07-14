@@ -173,7 +173,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
             // get selection, textify and set as the default alternative text
             config.setAltText(getTextArea().getDocument().getSelection().getRangeAt(0).toString());
         }
-        imageWizard.start(ImageWizardSteps.IMAGESELECTOR.toString(), config);
+        imageWizard.start(ImageWizardSteps.IMAGE_SELECTOR.toString(), config);
     }
 
     /**

@@ -59,7 +59,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
      */
     public String getNextStep()
     {
-        return LinkWizardSteps.WIKIPAGECONFIG.toString();
+        return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
     }
 
     /**

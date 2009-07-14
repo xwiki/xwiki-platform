@@ -47,7 +47,7 @@ public class LinkWizard extends Wizard implements WizardStepProvider
         /**
          * Steps managed by this wizard.
          */
-        WEBPAGE, EMAIL, WIKIPAGE, WIKIPAGECREATOR, ATTACHMENT, ATTACHUPLOAD, WIKIPAGECONFIG
+        WEB_PAGE, EMAIL, WIKI_PAGE, WIKI_PAGE_CREATOR, ATTACHMENT, ATTACHMENT_UPLOAD, WIKI_PAGE_CONFIG
     };
 
     /**
@@ -87,22 +87,22 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                 case EMAIL:
                     step = new EmailAddressLinkWizardStep();
                     break;
-                case WIKIPAGE:
+                case WIKI_PAGE:
                     step = new PageSelectorWizardStep(getEditedResource());
                     break;
-                case WIKIPAGECREATOR:
+                case WIKI_PAGE_CREATOR:
                     step = new CreateNewPageWizardStep(getEditedResource());
                     break;
                 case ATTACHMENT:
                     step = dispatchAttachmentSelectorStep();
                     break;
-                case ATTACHUPLOAD:
+                case ATTACHMENT_UPLOAD:
                     step = new AttachmentUploadWizardStep(getEditedResource());
                     break;
-                case WIKIPAGECONFIG:
+                case WIKI_PAGE_CONFIG:
                     step = new LinkConfigWizardStep();
                     break;
-                case WEBPAGE:
+                case WEB_PAGE:
                     step = new WebPageLinkWizardStep();
                     break;
                 default:

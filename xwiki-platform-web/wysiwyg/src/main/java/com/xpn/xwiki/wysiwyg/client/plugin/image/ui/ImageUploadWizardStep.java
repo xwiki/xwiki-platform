@@ -98,7 +98,7 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
      */
     public String getNextStep()
     {
-        return ImageWizardSteps.IMAGECONFIG.toString();
+        return ImageWizardSteps.IMAGE_CONFIG.toString();
     }
 
     /**

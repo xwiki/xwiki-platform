@@ -437,6 +437,27 @@ public class ResourceName
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof ResourceName)) {
+            return false;
+        }
+        return this.toString().equals(((ResourceName) obj).toString());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode()
+    {
+        return this.toString().hashCode();
+    }
+
+    /**
      * Compares this resource with the passed resource to check if the values for the components match up to the page
      * component, inclusive. If there are components missing in the current resource, they will be considered matching
      * so that relative resources are matched only on the specified components.

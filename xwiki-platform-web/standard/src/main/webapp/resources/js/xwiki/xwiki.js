@@ -325,26 +325,31 @@ Object.extend(XWiki, {
    * Apply this on links found in the passed content if any, or on the document's all body otherwise.
    */
   fixLinksTargetAttribute: function(content) {
-    if (typeof content == "undefined") {
-      content = document.body;
-    }
-    var anchors = content.select("a[rel]");
-    for (var i = 0; i < anchors.length; i++) {
-        var anchor = anchors[i];
-        if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
-            // Since the rel attribute can have other values we need to only take into account the ones
-            // starting with "_"
-            var values = anchor.getAttribute("rel").split(" ");
-            for (var j = 0; j < values.length; j++) {
-                if (values[j].charAt(0) == "_") {
-                    anchor.target = values[j].substring(1);
-                    break;
-                } else if (values[j] == "external") {
-                    anchor.target = "_blank";
-                    break;
-                }
-            }
-        }
+    // apply this transformation only in the view mode, to not apply transformation on the content in edit mode to 
+    // avoid having it saved by the wysiwyg afterwards. Actually it should be anything different from edit or inline, 
+    // but like this is consistent with the next function, for section editing.
+    if (XWiki.contextaction == "view") {
+      if (typeof content == "undefined") {
+        content = document.body;
+      }
+      var anchors = content.select("a[rel]");
+      for (var i = 0; i < anchors.length; i++) {
+          var anchor = anchors[i];
+          if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
+              // Since the rel attribute can have other values we need to only take into account the ones
+              // starting with "_"
+              var values = anchor.getAttribute("rel").split(" ");
+              for (var j = 0; j < values.length; j++) {
+                  if (values[j].charAt(0) == "_") {
+                      anchor.target = values[j].substring(1);
+                      break;
+                  } else if (values[j] == "external") {
+                      anchor.target = "_blank";
+                      break;
+                  }
+              }
+          }
+      }
     }
   },
 

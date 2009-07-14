@@ -24,7 +24,7 @@ xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
 # xwiki.unknownActionResponse=view
 
-#-# The encoding to use when transformin strings to and from byte arrays. This causes the jvm encoding to be ignored, since we want
+#-# The encoding to use when transformin strings to and from byte arrays. This causes the jvm encoding to be ignored,
 #-# since we want to be independend of the underlying system.
 xwiki.encoding=$xwikiCfgEncoding
 

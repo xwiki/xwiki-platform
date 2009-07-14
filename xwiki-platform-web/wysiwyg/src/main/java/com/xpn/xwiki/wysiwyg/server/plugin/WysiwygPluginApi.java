@@ -23,6 +23,9 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.ecs.xhtml.input;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -75,15 +78,25 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
-     * @param syntaxId The syntax identifier, like "xwiki/2.0".
-     * @return true if the specified syntax is currently supported by the editor.
+     * Checks if there is a parser and a renderer available for the specified syntax.
+     * 
+     * @param syntaxId the syntax identifier, like <em>xwiki/2.0</em>
+     * @return {@code true} if the specified syntax is currently supported by the editor, {@code false} otherwise
      */
     public boolean isSyntaxSupported(String syntaxId)
     {
         try {
+            // Check if the syntax id can be parsed.
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+
+            // Check if there is a parser available for the specified syntax.
             Utils.getComponent(Parser.class, syntaxId);
-            return true;
-        } catch (RuntimeException e) {
+
+            // Check if there is a renderer available for the specified syntax.
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
+            return factory.getAvailableSyntaxes().contains(syntax);
+        } catch (Throwable t) {
             return false;
         }
     }

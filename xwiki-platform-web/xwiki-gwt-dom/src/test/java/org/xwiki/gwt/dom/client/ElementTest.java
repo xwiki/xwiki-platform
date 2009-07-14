@@ -189,18 +189,9 @@ public class ElementTest extends AbstractDOMTest
         String propertyObj = "yy";
         ((JavaScriptObject) element.cast()).set(propertyObj, JavaScriptObject.createObject());
         element.getStyle().setProperty(Style.BACKGROUND_COLOR, "rgb(255, 255, 0)");
-        debug();
 
         assertEquals(0, element.getAttributeNames().length());
     }
-
-    /**
-     * Natively invokes the debugger.
-     */
-    private native void debug()
-    /*-{
-        debugger;
-    }-*/;
 
     /**
      * Unit test for {@link Element#hasClassName(String)}.

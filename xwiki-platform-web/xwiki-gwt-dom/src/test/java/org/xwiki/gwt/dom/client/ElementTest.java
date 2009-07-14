@@ -171,7 +171,6 @@ public class ElementTest extends AbstractDOMTest
             attrList.remove(attributeNames.get(i));
         }
 
-        assertEquals("", attrList.get(0));
         assertEquals(0, attrList.size());
     }
 
@@ -188,19 +187,9 @@ public class ElementTest extends AbstractDOMTest
         ((JavaScriptObject) element.cast()).set(propertyFunc, JavaScriptObject.createFunction());
         String propertyObj = "yy";
         ((JavaScriptObject) element.cast()).set(propertyObj, JavaScriptObject.createObject());
-        element.getStyle().setProperty(Style.BACKGROUND_COLOR, "rgb(255, 255, 0)");
-        debug();
 
         assertEquals(0, element.getAttributeNames().length());
     }
-
-    /**
-     * Natively invokes the debugger.
-     */
-    private native void debug()
-    /*-{
-        debugger;
-    }-*/;
 
     /**
      * Unit test for {@link Element#hasClassName(String)}.

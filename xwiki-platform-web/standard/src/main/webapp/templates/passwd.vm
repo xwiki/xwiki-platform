@@ -24,10 +24,12 @@
     </div>
   </form>
 #else
+$response.setStatus(403)
 #xwikimessageboxstart($msg.get("platform.core.errorMessageType") $msg.get("platform.core.profile.passwd.notAllowed"))
 #xwikimessageboxend()
 #end
 #else
+$response.setStatus(400)
 #xwikimessageboxstart($msg.get("platform.core.noticeMessageType") $msg.get("platform.core.profile.passwd.notaUser"))
 #xwikimessageboxend()
 #end

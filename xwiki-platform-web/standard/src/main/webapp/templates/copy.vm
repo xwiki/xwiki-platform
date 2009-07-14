@@ -4,6 +4,7 @@
 #if(!$xwiki.hasAccessLevel("edit"))
   #template("accessdenied.vm")
 #elseif($doc.isNew())
+  $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
     #error("$msg.get('core.rename.nonexistingDocument')")
@@ -22,19 +23,19 @@
     #set($targetwiki = $context.database)
     #if($targetdoc != "")
     #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
-	#if($language)
-	 #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}", "language=${language}"))
-	 #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}", "language=${language}"))
-	#else
-	 #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}"))
-	 #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}"))
+    #if($language)
+      #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}", "language=${language}"))
+      #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}", "language=${language}"))
+    #else
+      #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}"))
+      #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}"))
     #end
     #set($sourcelink = "<a href='${fromurl}'>#if($sourcewiki!='xwiki')$sourcewiki:#end$sourcedoc #if($language)($language)#end</a>")
     #set($targetlink = "<a href='${tourl}'>#if($targetwiki!='xwiki')$targetwiki:#end$targetdoc</a>")
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="">
-	<div><input type="hidden" name="xpage" value="copy" /></div>
+    <div><input type="hidden" name="xpage" value="copy" /></div>
     <table>
     <tr><td>$msg.get("core.copy.sourcedoc"):</td>
     <td>$doc.fullName <input type="hidden" name="sourcedoc" value="$doc.fullName" size="60"/></td></tr>

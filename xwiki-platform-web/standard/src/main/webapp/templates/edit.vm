@@ -46,6 +46,7 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #set($force = $!request.get('force'))
 #if (($tdoc.getLocked()==true)&&(!$force))
 <div class="layoutsection">
+$response.setStatus(423)
 #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
 <a href="$doc.getURL($context.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
 #xwikimessageboxend()

@@ -4,6 +4,7 @@
 #if(!$xwiki.hasAccessLevel('delete'))
   #template("accessdenied.vm")
 #elseif($doc.isNew())
+  $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
     #error("$msg.get('core.rename.nonexistingDocument')")
@@ -28,12 +29,15 @@
       ## with step=2.
       #set ($newFullName = "${request.newSpaceName}.${request.newPageName}")
       #if((!$request.newPageName) || ($request.newPageName.trim().equals("")))
-        #error("$msg.get('core.rename.emptyName')")
+        $response.setStatus(400)
+        #error($msg.get('core.rename.emptyName'))
         #template("renameStep1.vm")
       #elseif($xwiki.exists($newFullName))
+        $response.setStatus(409)
         #error("$msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])")
         #template("renameStep1.vm")
       #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newFullName))
+        $response.setStatus(403)
         #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
         #template('renameStep1.vm')
       #else

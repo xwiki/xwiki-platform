@@ -10,6 +10,7 @@
 #set($rev1=$request.get("rev1"))
 #set($rev2=$request.get("rev2"))
 #if(!$rev1 || !$rev2)
+  $response.setStatus(400)
   #error($msg.get("core.versions.delete.needselect"))
   <center><a href="javascript:history.go(-1)">$msg.get("core.versions.delete.goback")</a></center> 
 #else

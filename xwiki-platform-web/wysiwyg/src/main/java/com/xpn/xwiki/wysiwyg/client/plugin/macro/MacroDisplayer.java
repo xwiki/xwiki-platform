@@ -63,6 +63,16 @@ public class MacroDisplayer implements InnerHTMLListener
     public static final String INLINE_MACRO_STYLE_NAME = MACRO_STYLE_NAME + "-inline";
 
     /**
+     * The prefix of the start macro comment node.
+     */
+    public static final String START_MACRO_COMMENT_PREFIX = "startmacro:";
+
+    /**
+     * The value of the stop macro comment node.
+     */
+    public static final String STOP_MACRO_COMMENT_VALUE = "stopmacro";
+
+    /**
      * Collection of DOM utility methods.
      */
     protected final DOMUtils domUtils = DOMUtils.getInstance();
@@ -133,8 +143,21 @@ public class MacroDisplayer implements InnerHTMLListener
         // Look for the stop macro comment.
         Node stop = start.getNextSibling();
         int siblingCount = 0;
-        while (stop != null
-            && (stop.getNodeType() != DOMUtils.COMMENT_NODE || !"stopmacro".equals(stop.getNodeValue()))) {
+        int openedMacrosCount = 0;
+        while (stop != null) {
+            if (stop.getNodeType() == DOMUtils.COMMENT_NODE) {
+                if (stop.getNodeValue().startsWith(START_MACRO_COMMENT_PREFIX)) {
+                    // Nested macro. Ignore the next stop macro comment.
+                    openedMacrosCount++;
+                } else if (STOP_MACRO_COMMENT_VALUE.equals(stop.getNodeValue())) {
+                    // Check if there are nested macros opened.
+                    if (openedMacrosCount == 0) {
+                        break;
+                    }
+                    openedMacrosCount--;
+                }
+            }
+
             stop = stop.getNextSibling();
             siblingCount++;
         }
@@ -231,17 +254,27 @@ public class MacroDisplayer implements InnerHTMLListener
 
     /**
      * @param root the root of a DOM subtree
-     * @return the list of start macro comment nodes under the given subtree
+     * @return the list of start macro comment nodes for the top level macros under the given subtree (nested macros are
+     *         ignored)
      */
     private List<Node> getStartMacroComments(Node root)
     {
         Document document = (Document) root.getOwnerDocument();
         Iterator<Node> iterator = document.getIterator(root);
         List<Node> startMacroComments = new ArrayList<Node>();
+        int openedMacrosCount = 0;
         while (iterator.hasNext()) {
             Node node = iterator.next();
-            if (node.getNodeType() == DOMUtils.COMMENT_NODE && node.getNodeValue().startsWith("startmacro:")) {
-                startMacroComments.add(node);
+            if (node.getNodeType() == DOMUtils.COMMENT_NODE) {
+                if (node.getNodeValue().startsWith(START_MACRO_COMMENT_PREFIX)) {
+                    // Include only the top level macros.
+                    if (openedMacrosCount == 0) {
+                        startMacroComments.add(node);
+                    }
+                    openedMacrosCount++;
+                } else if (STOP_MACRO_COMMENT_VALUE.equals(node.getNodeValue())) {
+                    openedMacrosCount--;
+                }
             }
         }
         return startMacroComments;

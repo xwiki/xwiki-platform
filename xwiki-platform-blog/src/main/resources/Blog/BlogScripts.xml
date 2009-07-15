@@ -93,6 +93,7 @@
 <name>Blog.BlogScripts</name>
 <number>0</number>
 <className>XWiki.JavaScriptExtension</className>
+<guid>fee8479f-4003-4fb8-837a-97642e3ff753</guid>
 <property>
 <cache>long</cache>
 </property>
@@ -263,7 +264,11 @@ XWiki.Blog = {
     new Ajax.Request("${xwiki.getURL('__name__', 'save', "ajax=1&amp;template=${blogCategoryTemplate}")}".replace(/__name__/g, safeName) + "&amp;parent=" + parent + "&amp;title=" + title + "&amp;${blogCategoryClassname}_0_name=" + title, {
       method: "get",
       onSuccess: XWiki.Blog.updateCategoryTree.bindAsEventListener(this, name, parentCategory, parentSpace),
-      onFailure: function() {alert("This category already exists.")}
+      on1223: function(response) {response.request.options.onSuccess(response)},
+      on409: function() {alert("This category already exists")},
+      on403: function() {alert("You are not allowed to perform this action")},
+      on401: function() {alert("You have been logged out, please login")},
+      onFailure: function() {alert("Failed to add category")}
     });
   },
 

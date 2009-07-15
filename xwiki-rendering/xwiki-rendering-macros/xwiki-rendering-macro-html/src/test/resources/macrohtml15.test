@@ -10,4 +10,4 @@
 .#-----------------------------------------------------
 <!--startmacro:html|-|wiki="true"|-|
 <div>{{testtextmacro}}<br/>{{/testtextmacro}}</div>
---><div><!--startmacro:testtextmacro|-||-|<br/>-->&lt;br/&gt;<!--stopmacro--></div><!--stopmacro-->
+--><div>&lt;br/&gt;</div><!--stopmacro-->

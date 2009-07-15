@@ -13,4 +13,11 @@
 <p>hello</p>
 {{html}}world{{/html}}
 --><p>hello</p><p>
-<!--startmacro:html|-|clean="false"|-|world-->world<!--stopmacro--></p><!--stopmacro-->
+world</p><!--stopmacro-->
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+{{html wiki="true"}}
+<p>hello</p>
+{{html}}world{{/html}}
+{{/html}}

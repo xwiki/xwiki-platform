@@ -165,4 +165,40 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
             super.endParagraph(parameters);
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer#onMacro(java.lang.String,
+     *      java.util.Map, java.lang.String, boolean)
+     */
+    @Override
+    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    {
+        // Don't print anything since we are already in the html macro.
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer#beginMacroMarker(java.lang.String,
+     *      java.util.Map, java.lang.String, boolean)
+     */
+    @Override
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
+    {
+        // Don't print anything since we are already in the html macro.
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer#endMacroMarker(java.lang.String,
+     *      java.util.Map, java.lang.String, boolean)
+     */
+    @Override
+    public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
+    {
+        // Don't print anything since we are already in the html macro.
+    }
 }

@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -105,7 +107,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
         // Create an image metadata extractor for this text area
         metaDataExtractor = new ImageMetaDataExtractor();
         // do the initial extracting on the loaded document
-        metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+        metaDataExtractor.onInnerHTMLChange((Element) getTextArea().getDocument().getDocumentElement());
         getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
 
         // Create an image behavior adjuster for this text area

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 XE_VERSION=2.0-SNAPSHOT;
-GWT_VERSION=1.5.3;
+GWT_VERSION=1.6.4;
 
 JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun/bin;
 M2_REPO=~/.m2/repository;
 APP_DIR=`dirname $0`/webapps/xwiki;
-WYSIWYG_PATH=resources/js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg;
+WYSIWYG_PATH=resources/js/xwiki/wysiwyg/xwe;
 
 $JAVA32_HOME/java \
 -Xmx1024m \
@@ -23,10 +23,10 @@ $M2_REPO/com/google/gwt/incubator-glasspanel/r729/incubator-glasspanel-r729.jar:
 $M2_REPO/com/smartgwt/smartgwt/1.0b2/smartgwt-1.0b2.jar:\
 $M2_REPO/com/google/gwt/gwt-dev/$GWT_VERSION/gwt-dev-$GWT_VERSION-linux.jar:\
 $M2_REPO/com/google/gwt/gwt-user/$GWT_VERSION/gwt-user-$GWT_VERSION.jar \
-com.google.gwt.dev.GWTShell \
+com.google.gwt.dev.HostedMode \
 -logLevel WARN \
 -style DETAILED \
 -noserver \
 -port 8080 \
--out $APP_DIR/$WYSIWYG_PATH \
-xwiki/$WYSIWYG_PATH/Wysiwyg.html
+-startupUrl xwiki/$WYSIWYG_PATH/Wysiwyg.html \
+com.xpn.xwiki.wysiwyg.Wysiwyg

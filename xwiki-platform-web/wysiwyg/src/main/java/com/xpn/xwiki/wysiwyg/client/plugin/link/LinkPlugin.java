@@ -104,7 +104,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         // Initialize the metadata extractor, to handle link metadatas
         metaDataExtractor = new LinkMetaDataExtractor();
         // do the initial extracting on the loaded document
-        metaDataExtractor.onInnerHTMLChange(getTextArea().getDocument().getDocumentElement());
+        metaDataExtractor.onInnerHTMLChange((Element) getTextArea().getDocument().getDocumentElement());
         getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
         
         // create an empty link handler and add it to the RTA command manager

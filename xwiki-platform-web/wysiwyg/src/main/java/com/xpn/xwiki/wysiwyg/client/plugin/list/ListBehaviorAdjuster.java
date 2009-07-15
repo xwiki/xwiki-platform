@@ -441,7 +441,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
         if (needsCleanup) {
             // Clean the whole document as an operation on a list can impact more than one list (two consecutive lists
             // can be impacted by the same delete)
-            cleanUp(textArea.getDocument().getDocumentElement());
+            cleanUp((Element) textArea.getDocument().getDocumentElement());
         } else {
             return;
         }
@@ -496,7 +496,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
                 Command.INSERT_UNORDERED_LIST);
         // clean up the lists in the document on delete, indent, outdent and reset
         if (needCleanup.contains(command)) {
-            cleanUp(getTextArea().getDocument().getDocumentElement());
+            cleanUp((Element) getTextArea().getDocument().getDocumentElement());
         }
     }
 }

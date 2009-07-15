@@ -1,3 +1,5 @@
+## The module name must match the value of the rename-to attribute from Wysiwyg.gwt.xml
+#set($moduleName = "xwe")
 /**
  * XWiki's custom WYSIWYG controller.
  * Usage: \$xwiki.jsfx.use("path/to/XWikiWysiwyg.js", {'forceSkinAction': true, 'lazy': true})
@@ -39,7 +41,7 @@ var Wysiwyg =
     {
         // Test if the code has been already loaded.
         // GWT loads the WYSIWYG code in an in-line frame with the 'com.xpn.xwiki.wysiwyg.Wysiwyg' id.
-        if (document.getElementById('com.xpn.xwiki.wysiwyg.Wysiwyg') || this.readyState != 0) {
+        if (document.getElementById('${moduleName}') || this.readyState != 0) {
             return;
         }
 
@@ -49,7 +51,7 @@ var Wysiwyg =
         // Create the script tag to be used for importing the GWT script loader.
         var script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = '$xwiki.getSkinFile("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js")';
+        script.src = '$xwiki.getSkinFile("js/xwiki/wysiwyg/${moduleName}/${moduleName}.nocache.js")';
 
         // The default GWT script loader calls document.write() twice which prevents us from loading the WYSIWYG code
         // on demand, after the document has been loaded. To overcome this we have to overwrite the document.write()
@@ -169,15 +171,15 @@ var Wysiwyg =
      * Try to wrap onScriptLoad in order to be notified when the WYSIWYG script is loaded.
      */
     maybeHookOnScriptLoad: function() {
-        if (com_xpn_xwiki_wysiwyg_Wysiwyg && com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad) {
-            var onScriptLoad = com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad;
-            com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad = function() {
+        if (${moduleName} && ${moduleName}.onScriptLoad) {
+            var onScriptLoad = ${moduleName}.onScriptLoad;
+            ${moduleName}.onScriptLoad = function() {
                 Wysiwyg.hookGwtOnLoad();
                 onScriptLoad();
 
                 // Restore the default onScriptLoad function.
-                if (com_xpn_xwiki_wysiwyg_Wysiwyg && com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad) {
-                    com_xpn_xwiki_wysiwyg_Wysiwyg.onScriptLoad = onScriptLoad;
+                if (${moduleName} && ${moduleName}.onScriptLoad) {
+                    ${moduleName}.onScriptLoad = onScriptLoad;
                 }
                 onScriptLoad = undefined;
             }
@@ -191,7 +193,7 @@ var Wysiwyg =
      * Wrap gwtOnLoad in order to be notified when the WYSIWYG module is loaded.
      */
     hookGwtOnLoad: function() {
-        var iframe = document.getElementById('com.xpn.xwiki.wysiwyg.Wysiwyg');
+        var iframe = document.getElementById('${moduleName}');
         var gwtOnLoad = iframe.contentWindow.gwtOnLoad;
         iframe.contentWindow.gwtOnLoad = function(errFn, modName, modBase) {
             gwtOnLoad(function() {

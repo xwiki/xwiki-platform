@@ -28,11 +28,11 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
-import com.xpn.xwiki.wysiwyg.client.widget.RadioButton;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
@@ -152,13 +152,13 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         hAlignPanel.add(hAlignLabel);
         alignmentOptions = new ArrayList<RadioButton>();
         RadioButton leftRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignLeftLabel());
-        leftRadio.setValue(ImageConfig.ImageAlignment.LEFT.toString());
+        leftRadio.setFormValue(ImageConfig.ImageAlignment.LEFT.toString());
         leftRadio.addKeyboardListener(this);
         RadioButton centerRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignCenterLabel());
-        centerRadio.setValue(ImageConfig.ImageAlignment.CENTER.toString());
+        centerRadio.setFormValue(ImageConfig.ImageAlignment.CENTER.toString());
         centerRadio.addKeyboardListener(this);
         RadioButton rightRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignRightLabel());
-        rightRadio.setValue(ImageConfig.ImageAlignment.RIGHT.toString());
+        rightRadio.setFormValue(ImageConfig.ImageAlignment.RIGHT.toString());
         rightRadio.addKeyboardListener(this);
         alignmentOptions.add(leftRadio);
         alignmentOptions.add(centerRadio);
@@ -181,13 +181,13 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         vAlignPanel.addStyleName("xVAlignPanel");
         vAlignPanel.add(vAlignLabel);
         RadioButton topRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignTopLabel());
-        topRadio.setValue(ImageConfig.ImageAlignment.TOP.toString());
+        topRadio.setFormValue(ImageConfig.ImageAlignment.TOP.toString());
         topRadio.addKeyboardListener(this);
         RadioButton middleRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignMiddleLabel());
-        middleRadio.setValue(ImageConfig.ImageAlignment.MIDDLE.toString());
+        middleRadio.setFormValue(ImageConfig.ImageAlignment.MIDDLE.toString());
         middleRadio.addKeyboardListener(this);
         RadioButton bottomRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignBottomLabel());
-        bottomRadio.setValue(ImageConfig.ImageAlignment.BOTTOM.toString());
+        bottomRadio.setFormValue(ImageConfig.ImageAlignment.BOTTOM.toString());
         bottomRadio.addKeyboardListener(this);
         alignmentOptions.add(topRadio);
         alignmentOptions.add(middleRadio);
@@ -206,7 +206,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     {
         for (RadioButton rb : alignmentOptions) {
             if (rb.isChecked()) {
-                return ImageConfig.ImageAlignment.valueOf(rb.getValue());
+                return ImageConfig.ImageAlignment.valueOf(rb.getFormValue());
             }
         }
         return null;

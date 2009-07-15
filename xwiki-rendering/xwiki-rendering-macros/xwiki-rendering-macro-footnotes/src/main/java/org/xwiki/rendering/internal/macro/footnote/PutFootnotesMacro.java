@@ -42,7 +42,6 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.footnote.FootnoteMacroParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -86,7 +85,7 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
      */
     public PutFootnotesMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, null, FootnoteMacroParameters.class));
+        super(DESCRIPTION, FootnoteMacroParameters.class);
     }
 
     /**

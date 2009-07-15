@@ -31,7 +31,6 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
 import org.xwiki.rendering.macro.code.CodeMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -60,8 +59,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      */
     public CodeMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
-            CodeMacroParameters.class));
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), CodeMacroParameters.class);
     }
 
     /**

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.jmock.Mock;
@@ -132,6 +133,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
+        
+        this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
     public void testScriptContext() throws XWikiException

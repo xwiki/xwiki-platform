@@ -23,16 +23,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
@@ -43,10 +40,12 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
+
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  * Macro that output latest feed entries from a RSS feed.
@@ -94,7 +93,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     public RssMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, null, RssMacroParameters.class));
+        super(DESCRIPTION, RssMacroParameters.class);
     }
 
     /**

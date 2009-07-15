@@ -35,9 +35,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.script.ScriptContextManager;
 
@@ -63,20 +60,11 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * @param macroDescriptor the descriptor of the macro
-     */
-    public AbstractJRSR223ScriptMacro(MacroDescriptor macroDescriptor)
-    {
-        super(macroDescriptor);
-    }
-
-    /**
      * @param macroDescription the text description of the macro.
      */
     public AbstractJRSR223ScriptMacro(String macroDescription)
     {
-        super(new DefaultMacroDescriptor(macroDescription, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
-            JSR223ScriptMacroParameters.class));
+        super(macroDescription, JSR223ScriptMacroParameters.class);
     }
 
     /**
@@ -85,7 +73,28 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
      */
     public AbstractJRSR223ScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
     {
-        super(new DefaultMacroDescriptor(macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class));
+        super(macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class);
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     * @param parametersBeanClass class of the parameters bean for this macro.
+     */
+    public AbstractJRSR223ScriptMacro(String macroDescription,
+        Class< ? extends JSR223ScriptMacroParameters> parametersBeanClass)
+    {
+        super(macroDescription, parametersBeanClass);
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     * @param contentDescriptor the description of the macro content.
+     * @param parametersBeanClass class of the parameters bean for this macro.
+     */
+    public AbstractJRSR223ScriptMacro(String macroDescription, ContentDescriptor contentDescriptor,
+        Class< ? extends JSR223ScriptMacroParameters> parametersBeanClass)
+    {
+        super(macroDescription, contentDescriptor, parametersBeanClass);
     }
 
     /**

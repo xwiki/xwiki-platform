@@ -39,12 +39,18 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xml</artifactId>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-xml</artifactId>
+      <artifactId>xwiki-core-properties</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-observation</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
@@ -85,7 +91,7 @@
           <groupId>org.xwiki.platform</groupId>
           <artifactId>xwiki-core-configuration-default</artifactId>
         </exclusion>
-      </exclusions>
+      </exclusions>      
     </dependency>
     <dependency>
       <groupId>jmock</groupId>
@@ -188,6 +194,11 @@
                 <exclude>org/xwiki/rendering/macro/MacroManager</exclude>
                 <exclude>org/xwiki/rendering/macro/MacroSource</exclude>
                 <exclude>org/xwiki/rendering/macro/AbstractMacroSource</exclude>
+                <exclude>org/xwiki/rendering/block/AbstractBlock</exclude>                
+                <exclude>org/xwiki/rendering/macro/AbstractMacro</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/AbstractMacroDescriptor</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/DefaultMacroDescriptor</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/DefaultParameterDescriptor</exclude>
                 <!-- Seems clirr plugin consider adding new API as an error (which I don't understand). -->
                 <exclude>org/xwiki/rendering/renderer/PrintRendererFactory</exclude>                
               </excludes>

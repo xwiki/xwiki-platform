@@ -20,19 +20,18 @@
 package org.xwiki.rendering.internal.macro;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.jmock.Mock;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.internal.macro.DefaultMacroManager;
 import org.xwiki.rendering.internal.transformation.TestSimpleMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
@@ -49,6 +48,8 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
     private Mock mockComponentManager;
 
     private DefaultMacroManager source;
+    
+    private SyntaxFactory syntaxFactory;
 
     /**
      * {@inheritDoc}
@@ -64,6 +65,7 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
         this.mockComponentManager = mock(ComponentManager.class);
 
         this.source = (DefaultMacroManager) getComponentManager().lookup(MacroManager.class);
+        this.syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
         this.source.enableLogging((Logger) this.mockLogger.proxy());
     }
 
@@ -96,14 +98,15 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
         this.source.getMacro("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 
+    @SuppressWarnings("unchecked")
     public void testMacroRegisteredForAGivenSyntaxOnly() throws Exception
     {
         Macro< ? > macro = new TestSimpleMacro();
-        this.mockComponentManager.expects(once()).method("lookupMap").will(
-            returnValue(Collections.singletonMap("macro/xwiki/2.0", macro)));
-        ReflectionUtils.setFieldValue(this.source, "componentManager", this.mockComponentManager.proxy());
-        this.source.initialize();
-
+        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("macro/xwiki/2.0");
+        getComponentManager().registerComponent(descriptor, macro);
+        
         assertFalse(this.source.exists("macro"));
         assertTrue(this.source.exists("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
 
@@ -111,18 +114,22 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
         assertSame(macro, macroResult);
     }
 
+    @SuppressWarnings("unchecked")
     public void testMacroRegisteredForAGivenSyntaxOverridesMacroRegisteredForAllSyntaxes() throws Exception
     {
         Macro< ? > macro1 = new TestSimpleMacro();
         Macro< ? > macro2 = new TestSimpleMacro();
-        Map<String, Macro< ? >> macroDefinitions = new HashMap<String, Macro< ? >>();
-        macroDefinitions.put("macro", macro1);
-        macroDefinitions.put("macro/xwiki/2.0", macro2);
-
-        this.mockComponentManager.expects(once()).method("lookupMap").will(returnValue(macroDefinitions));
-        ReflectionUtils.setFieldValue(this.source, "componentManager", this.mockComponentManager.proxy());
-        this.source.initialize();
-
+        
+        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("macro");
+        getComponentManager().registerComponent(descriptor, macro1);
+        
+        descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("macro/xwiki/2.0");
+        getComponentManager().registerComponent(descriptor, macro2);
+        
         assertTrue(this.source.exists("macro"));
         assertTrue(this.source.exists("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
 
@@ -149,7 +156,7 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
                 + "followed by the syntax for which it is valid. In that case the macro name should be followed by "
                 + "a \"/\" followed by the syntax name followed by another \"/\" followed by the syntax version. "
                 + "This macro will not be available in the system."));
-        this.source.initialize();
+        this.source.getMacroNames(syntaxFactory.createSyntaxFromIdString("macro/xwiki/2.0"));
     }
 
 }

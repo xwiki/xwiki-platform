@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+import org.xwiki.properties.PropertyDescriptor;
+
 /**
  * The default implementation of {@link ParameterDescriptor}.
  * 
@@ -28,31 +30,19 @@ package org.xwiki.rendering.macro.descriptor;
 public class DefaultParameterDescriptor implements ParameterDescriptor
 {
     /**
-     * The name of the parameter.
-     */
-    private String name;
-
-    /**
      * The description of the parameter.
      */
-    private String description;
+    private PropertyDescriptor propertyDescriptor;
 
     /**
-     * The type of the parameter.
-     */
-    private Class< ? > type;
-
-    /**
-     * The default value of the parameter.
-     */
-    private Object defaultValue;
-
-    /**
-     * Indicate if the parameter is mandatory.
+     * Creates a new {@link DefaultParameterDescriptor} instance using the given {@link PropertyDescriptor}.
      * 
-     * @since 1.7
+     * @param propertyDescriptor The {@link PropertyDescriptor} instance.
      */
-    private boolean mandatory;
+    public DefaultParameterDescriptor(PropertyDescriptor propertyDescriptor)
+    {
+        this.propertyDescriptor = propertyDescriptor;
+    }
 
     /**
      * {@inheritDoc}
@@ -61,15 +51,7 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public String getName()
     {
-        return this.name;
-    }
-
-    /**
-     * @param name the name of the parameter.
-     */
-    public void setName(String name)
-    {
-        this.name = name;
+        return propertyDescriptor.getName();
     }
 
     /**
@@ -79,15 +61,7 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public String getDescription()
     {
-        return this.description;
-    }
-
-    /**
-     * @param description the description of the parameter.
-     */
-    public void setDescription(String description)
-    {
-        this.description = description;
+        return propertyDescriptor.getDescription();
     }
 
     /**
@@ -97,15 +71,7 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public Class< ? > getType()
     {
-        return this.type;
-    }
-
-    /**
-     * @param type the type of the parameter.
-     */
-    public void setType(Class< ? > type)
-    {
-        this.type = type;
+        return propertyDescriptor.getPropertyClass();
     }
 
     /**
@@ -115,15 +81,7 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public Object getDefaultValue()
     {
-        return this.defaultValue;
-    }
-
-    /**
-     * @param defaultValue the default value of the parameter.
-     */
-    public void setDefaultValue(Object defaultValue)
-    {
-        this.defaultValue = defaultValue;
+        return propertyDescriptor.getDefaultValue();
     }
 
     /**
@@ -134,15 +92,6 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
      */
     public boolean isMandatory()
     {
-        return this.mandatory;
-    }
-
-    /**
-     * @param mandatory indicate if the parameter is mandatory.
-     * @since 1.7
-     */
-    public void setMandatory(boolean mandatory)
-    {
-        this.mandatory = mandatory;
+        return propertyDescriptor.isMandatory();
     }
 }

@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.script.AbstractScriptMacro;
 import org.xwiki.rendering.macro.velocity.VelocityMacroConfiguration;
 import org.xwiki.rendering.macro.velocity.VelocityMacroParameters;
@@ -71,8 +70,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      */
     public VelocityMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
-            VelocityMacroParameters.class));
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), VelocityMacroParameters.class);
     }
 
     /**

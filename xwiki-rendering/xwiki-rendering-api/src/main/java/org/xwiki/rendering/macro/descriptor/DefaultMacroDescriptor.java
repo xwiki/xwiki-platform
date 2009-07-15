@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
+import org.xwiki.properties.BeanDescriptor;
+
 /**
  * Describe a macro with no parameters.
  * 
@@ -32,41 +34,28 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
      */
     public DefaultMacroDescriptor(String description)
     {
-        super(description, new DefaultContentDescriptor(), Object.class);
+        super(description, new DefaultContentDescriptor(), null);       
     }
-
+    
     /**
      * @param description the description of the macro.
-     * @param parametersBeanClass the class of the JAVA bean containing macro parameters.
-     */
-    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
-    {
-        super(description, new DefaultContentDescriptor(), parametersBeanClass);
-
-        extractParameterDescriptorMap();
-    }
-
-    /**
-     * @param description the description of the macro.
-     * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
+     * @param contentDescriptor description of the macro content.
      */
     public DefaultMacroDescriptor(String description, ContentDescriptor contentDescriptor)
     {
-        super(description, contentDescriptor, Object.class);
-
-        extractParameterDescriptorMap();
+        super(description, contentDescriptor, null);
     }
 
     /**
      * @param description the description of the macro.
      * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
-     * @param parametersBeanClass the class of the JAVA bean containing macro parameters.
+     * @param parametersBeanDescriptor the description of the parameters bean.
      */
     public DefaultMacroDescriptor(String description, ContentDescriptor contentDescriptor,
-        Class< ? > parametersBeanClass)
+        BeanDescriptor parametersBeanDescriptor)
     {
-        super(description, contentDescriptor, parametersBeanClass);
-
+        super(description, contentDescriptor, parametersBeanDescriptor);
+        
         extractParameterDescriptorMap();
-    }
+    }    
 }

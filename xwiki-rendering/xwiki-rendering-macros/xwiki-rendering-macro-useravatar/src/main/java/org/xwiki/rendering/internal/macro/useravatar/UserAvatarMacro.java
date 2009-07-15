@@ -30,15 +30,14 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.listener.DefaultAttachement;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Allows displaying the avatar for a specific user.
@@ -71,7 +70,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
      */
     public UserAvatarMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, null, UserAvatarMacroParameters.class));
+        super(DESCRIPTION, UserAvatarMacroParameters.class);
     }
 
     /**
@@ -108,11 +107,11 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
         imageBlock.setParameter("title", shortName);
 
         if (parameters.getWidth() != null) {
-            imageBlock.setParameter("width", parameters.getWidth());
+            imageBlock.setParameter("width", String.valueOf(parameters.getWidth()));
         }
 
         if (parameters.getHeight() != null) {
-            imageBlock.setParameter("height", parameters.getHeight());
+            imageBlock.setParameter("height", String.valueOf(parameters.getHeight()));
         }
 
         resultedBlock = imageBlock;

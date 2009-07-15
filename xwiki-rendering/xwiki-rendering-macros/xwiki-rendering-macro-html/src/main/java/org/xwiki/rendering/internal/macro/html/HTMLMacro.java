@@ -39,7 +39,6 @@ import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.html.HTMLMacroParameters;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
@@ -96,14 +95,13 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      */
     @Requirement
     private XHTMLRendererFactory xhtmlRendererFactory;
-    
+
     /**
      * Create and initialize the descriptor of the macro.
      */
     public HTMLMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
-            HTMLMacroParameters.class));
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), HTMLMacroParameters.class);
     }
 
     /**
@@ -246,9 +244,9 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
 
             // Render the whole parsed content as a XHTML string
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRenderer renderer = new HTMLMacroXHTMLRenderer(printer, 
-                this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
-                this.xhtmlRendererFactory.createXHTMLImageRenderer());
+            PrintRenderer renderer =
+                new HTMLMacroXHTMLRenderer(printer, this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
+                    this.xhtmlRendererFactory.createXHTMLImageRenderer());
             xdom.traverse(renderer);
 
             xhtml = printer.toString();

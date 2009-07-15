@@ -29,19 +29,17 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
-import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
+import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -75,9 +73,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      */
     public TocMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, null, TocMacroParameters.class));
-
-        registerConverter(new EnumConverter(Scope.class), Scope.class);
+        super(DESCRIPTION, TocMacroParameters.class);
 
         // Make sure this macro is executed as one of the last macros to be executed since
         // other macros can generate headers which need to be taken into account by the TOC
@@ -92,6 +88,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      */
     public void initialize() throws InitializationException
     {
+        super.initialize();
         this.tocBlockFilter = new TocBlockFilter(linkLabelGenerator);
     }
 

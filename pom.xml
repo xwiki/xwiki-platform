@@ -102,5 +102,6 @@
     <module>xwiki-rest</module>
     <module>xwiki-refactoring</module>
     <module>xwiki-chart</module>
+    <module>xwiki-properties</module>
   </modules>
 </project>

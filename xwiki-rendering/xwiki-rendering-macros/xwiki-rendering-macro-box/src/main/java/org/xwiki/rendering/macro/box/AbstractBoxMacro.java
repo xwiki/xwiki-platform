@@ -39,7 +39,7 @@ import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -60,13 +60,15 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     private ComponentManager componentManager;
 
     /**
-     * A macro should overwrite this method.
+     * Creates a new box macro.
      * 
-     * @param macroDescriptor the macro descriptor.
+     * @param description string describing this macro.
+     * @param contentDescriptor the {@link ContentDescriptor} describing the content of this macro.
+     * @param parametersBeanClass class of the parameters bean.
      */
-    protected AbstractBoxMacro(MacroDescriptor macroDescriptor)
+    protected AbstractBoxMacro(String description, ContentDescriptor contentDescriptor, Class< ? > parametersBeanClass)
     {
-        super(macroDescriptor);
+        super(description, contentDescriptor, parametersBeanClass);
     }
 
     /**

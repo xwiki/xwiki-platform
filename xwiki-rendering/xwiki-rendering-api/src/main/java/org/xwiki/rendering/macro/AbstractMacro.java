@@ -19,9 +19,14 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.Converter;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.properties.BeanManager;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 
 /**
@@ -29,8 +34,29 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Macro<P>
+public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Macro<P>, Initializable
 {
+    /**
+     * The {@link BeanManager} component.
+     */
+    @Requirement
+    protected BeanManager beanManager;
+
+    /**
+     * Macro description used to generate the macro descriptor.
+     */
+    private String description;
+
+    /**
+     * Content descriptor used to generate the macro descriptor.
+     */
+    private ContentDescriptor contentDescriptor;
+
+    /**
+     * Parameter bean class used to generate the macro descriptor.
+     */
+    private Class< ? > parametersBeanClass;
+
     /**
      * The descriptor of the macro.
      */
@@ -42,24 +68,61 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     private int priority = 1000;
 
     /**
-     * @param macroDescriptor the {@link MacroDescriptor}.
+     * Creates a new {@link Macro} instance.
+     * 
+     * @param description a string describing this macro.
      */
-    public AbstractMacro(MacroDescriptor macroDescriptor)
+    public AbstractMacro(String description)
     {
-        setDescriptor(macroDescriptor);
+        this.description = description;
+        this.contentDescriptor = new DefaultContentDescriptor();
+        this.parametersBeanClass = Object.class;
+    }
+    
+    /**
+     * Creates a new {@link Macro} instance.
+     * 
+     * @param description a string describing this macro.
+     * @param contentDescriptor {@link ContentDescriptor} for this macro.
+     */
+    public AbstractMacro(String description, ContentDescriptor contentDescriptor)
+    {
+        this(description);
+        this.contentDescriptor = contentDescriptor;
+    }
+    
+    /**
+     * Creates a new {@link Macro} instance.
+     * 
+     * @param description a string describing this macro.
+     * @param parametersBeanClass class of the parameters bean of this macro.
+     */
+    public AbstractMacro(String description,  Class< ? > parametersBeanClass)
+    {
+        this(description);
+        this.parametersBeanClass = parametersBeanClass;
     }
 
     /**
-     * Register a converter for a specific type used by the macro parameters bean.
-     * <p>
-     * Note: each enum type used has to be registered because BeanUtil does not support generic types.
+     * Creates a new {@link Macro} instance.
      * 
-     * @param converter the BeanUtil {@link Converter}
-     * @param clazz the class for which to assign the {@link Converter}
+     * @param description string describing this macro.
+     * @param contentDescriptor the {@link ContentDescriptor} describing the content of this macro.
+     * @param parametersBeanClass class of the parameters bean.
      */
-    protected void registerConverter(Converter converter, Class< ? > clazz)
+    public AbstractMacro(String description, ContentDescriptor contentDescriptor, Class< ? > parametersBeanClass)
     {
-        ConvertUtils.register(converter, clazz);
+        this(description, contentDescriptor);
+        this.parametersBeanClass = parametersBeanClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void initialize() throws InitializationException
+    {
+        setDescriptor(new DefaultMacroDescriptor(description, contentDescriptor, beanManager
+            .getBeanDescriptor(parametersBeanClass)));
     }
 
     /**
@@ -73,13 +136,13 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     }
 
     /**
-     * @param priority the macro priority to use (lower means execute before others) 
+     * @param priority the macro priority to use (lower means execute before others)
      */
     public void setPriority(int priority)
     {
         this.priority = priority;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -89,7 +152,7 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     {
         return this.macroDescriptor;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -102,10 +165,11 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
         }
         return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
     }
-    
+
     /**
      * Allows macro classes extending other macro classes to override the macro descriptor with their own.
-     * @param descriptor the overriding descriptor to set 
+     * 
+     * @param descriptor the overriding descriptor to set
      */
     protected void setDescriptor(MacroDescriptor descriptor)
     {

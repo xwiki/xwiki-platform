@@ -34,12 +34,10 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
-import org.xwiki.rendering.internal.util.EnumConverter;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -86,9 +84,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     public IncludeMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, null, IncludeMacroParameters.class));
-
-        registerConverter(new EnumConverter(Context.class), Context.class);
+        super(DESCRIPTION, IncludeMacroParameters.class);        
         
         // The include macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the included page before the other macros are executed.

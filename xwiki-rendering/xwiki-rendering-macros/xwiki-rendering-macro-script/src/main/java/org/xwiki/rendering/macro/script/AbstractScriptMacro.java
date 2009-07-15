@@ -33,9 +33,6 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -67,22 +64,11 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private ParserUtils parserUtils = new ParserUtils();
 
     /**
-     * The constructor.
-     * 
-     * @param macroDescriptor the description of the macro.
-     */
-    public AbstractScriptMacro(MacroDescriptor macroDescriptor)
-    {
-        super(macroDescriptor);
-    }
-
-    /**
      * @param macroDescription the text description of the macro.
      */
     public AbstractScriptMacro(String macroDescription)
     {
-        super(new DefaultMacroDescriptor(macroDescription, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
-            ScriptMacroParameters.class));
+        super(macroDescription, ScriptMacroParameters.class);
     }
 
     /**
@@ -91,7 +77,27 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      */
     public AbstractScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
     {
-        super(new DefaultMacroDescriptor(macroDescription, contentDescriptor, ScriptMacroParameters.class));
+        super(macroDescription, contentDescriptor, ScriptMacroParameters.class);
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     * @param parametersBeanClass class of the parameters bean for this macro.
+     */
+    public AbstractScriptMacro(String macroDescription, Class< ? extends ScriptMacroParameters> parametersBeanClass)
+    {
+        super(macroDescription, parametersBeanClass);
+    }
+
+    /**
+     * @param macroDescription the text description of the macro.
+     * @param contentDescriptor the description of the macro content.
+     * @param parametersBeanClass class of the parameters bean for this macro.
+     */
+    public AbstractScriptMacro(String macroDescription, ContentDescriptor contentDescriptor,
+        Class< ? extends ScriptMacroParameters> parametersBeanClass)
+    {
+        super(macroDescription, contentDescriptor, parametersBeanClass);
     }
 
     /**

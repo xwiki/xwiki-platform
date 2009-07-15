@@ -21,18 +21,18 @@ package org.xwiki.rendering.macro.descriptor;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterHidden;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
-
-import junit.framework.TestCase;
+import org.xwiki.properties.BeanManager;
+import org.xwiki.properties.annotations.PropertyDescription;
+import org.xwiki.properties.annotations.PropertyHidden;
+import org.xwiki.properties.annotations.PropertyMandatory;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Validate {@link DefaultMacroDescriptor} and {@link AbstractMacroDescriptor}.
  * 
  * @version $Id$
  */
-public class DefaultMacroDescriptorTest extends TestCase
+public class DefaultMacroDescriptorTest extends AbstractRenderingTestCase
 {
     public static class ParametersTests
     {
@@ -68,7 +68,7 @@ public class DefaultMacroDescriptorTest extends TestCase
             return this.upperParam;
         }
 
-        @ParameterDescription("param1 description")
+        @PropertyDescription("param1 description")
         public void setParam1(String param1)
         {
             this.param1 = param1;
@@ -79,8 +79,8 @@ public class DefaultMacroDescriptorTest extends TestCase
             return this.param1;
         }
 
-        @ParameterMandatory
-        @ParameterDescription("param2 description")
+        @PropertyMandatory
+        @PropertyDescription("param2 description")
         public void setParam2(int param1)
         {
             this.param2 = param1;
@@ -96,14 +96,14 @@ public class DefaultMacroDescriptorTest extends TestCase
             this.param3 = param1;
         }
 
-        @ParameterMandatory
-        @ParameterDescription("param3 description")
+        @PropertyMandatory
+        @PropertyDescription("param3 description")
         public boolean getParam3()
         {
             return this.param3;
         }
 
-        @ParameterHidden
+        @PropertyHidden
         public void setHiddenParameter(String hiddenParameter)
         {
             this.hiddenParameter = hiddenParameter;
@@ -115,7 +115,16 @@ public class DefaultMacroDescriptorTest extends TestCase
         }
     }
 
-    private DefaultMacroDescriptor macroDescriptor = new DefaultMacroDescriptor("Description", ParametersTests.class);
+    private DefaultMacroDescriptor macroDescriptor;
+
+    protected void setUp() throws Exception
+    {
+        super.setUp();
+        BeanManager propertiesManager = getComponentManager().lookup(BeanManager.class);
+        macroDescriptor =
+            new DefaultMacroDescriptor("Description", new DefaultContentDescriptor(), propertiesManager
+                .getBeanDescriptor(ParametersTests.class));
+    }
 
     public void testParameterDescriptor()
     {

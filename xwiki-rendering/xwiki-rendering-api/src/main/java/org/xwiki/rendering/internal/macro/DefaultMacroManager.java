@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,8 +28,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
@@ -46,26 +43,14 @@ import org.xwiki.rendering.parser.SyntaxFactory;
  * @since 1.9M1
  */
 @Component
-public class DefaultMacroManager extends AbstractLogEnabled implements MacroManager, Initializable
+public class DefaultMacroManager extends AbstractLogEnabled implements MacroManager
 {
-    /**
-     * Cache of macros for syntax-specific macros. Index is the syntax and value is a Map with an index being the macro
-     * name the value the Macro.
-     */
-    protected Map<Syntax, Map<String, Macro< ? >>> syntaxSpecificMacros;
-
-    /**
-     * Cache of macros for macros registered for all syntaxes. Index is the syntax and value is a Map with an index
-     * being the macro name the value the Macro.
-     */
-    protected Map<String, Macro< ? >> allSyntaxesMacros;
-
     /**
      * Allows transforming a syntax specified as text into a {@link Syntax} object. Injected by the component manager
      * subsystem.
      */
     @Requirement
-    protected SyntaxFactory syntaxFactory;
+    private SyntaxFactory syntaxFactory;
 
     /**
      * The component manager we use to lookup macro implementations registered as components.
@@ -74,51 +59,44 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
     private ComponentManager componentManager;
 
     /**
-     * Creates a new {@link DefaultMacroManager} instance.
-     */
-    public DefaultMacroManager()
-    {
-        // Create macro caches.
-        this.syntaxSpecificMacros = new HashMap<Syntax, Map<String, Macro< ? >>>();
-        this.allSyntaxesMacros = new HashMap<String, Macro< ? >>();
-    }
-
-    /**
      * {@inheritDoc}
      * 
-     * @see Initializable#initialize()
+     * @see org.xwiki.rendering.macro.MacroManager#getMacroNames(Syntax)
      */
     @SuppressWarnings("unchecked")
-    public void initialize() throws InitializationException
+    public Set<String> getMacroNames(Syntax syntax) throws MacroLookupException
     {
-        // Find all registered macros
+        Set<String> result = new TreeSet<String>();
+
+        // Lookup all registered macros
         Map<String, Macro> allMacros;
         try {
             allMacros = this.componentManager.lookupMap(Macro.class);
         } catch (ComponentLookupException e) {
-            throw new InitializationException("Failed to lookup Macros", e);
+            throw new MacroLookupException("Failed to lookup Macros", e);
         }
 
-        // Now sort through the ones that are registered for a given syntax and those registered for all syntaxes.
+        // Loop through all the macros and filter those macros that will work with the given syntax.
         for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
-
             // Verify if we have a syntax specified.
             String[] hintParts = entry.getKey().split("/");
             if (hintParts.length == 3) {
                 // We've found a macro registered for a given syntax
                 String syntaxAsString = hintParts[1] + "/" + hintParts[2];
                 String macroName = hintParts[0];
-                Syntax syntax;
+                Syntax macroSyntax;
                 try {
-                    syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxAsString);
+                    macroSyntax = this.syntaxFactory.createSyntaxFromIdString(syntaxAsString);
                 } catch (ParseException e) {
-                    throw new InitializationException("Failed to initialize Macro [" + macroName
+                    throw new MacroLookupException("Failed to initialize Macro [" + macroName
                         + "] due to an invalid Syntax [" + syntaxAsString + "]", e);
                 }
-                registerMacroForSyntax(macroName, syntax, entry.getValue());
+                if (macroSyntax.equals(syntax)) {
+                    result.add(macroName);
+                }
             } else if (hintParts.length == 1) {
                 // We've found a macro registered for all syntaxes
-                registerMacroForAllSyntaxes(hintParts[0], entry.getValue());
+                result.add(hintParts[0]);
             } else {
                 // We ignore invalid macro descriptors but log it as warning.
                 getLogger()
@@ -131,54 +109,6 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
                             + "This macro will not be available in the system.");
             }
         }
-    }
-
-    /**
-     * Register a macro for a specific syntax.
-     * 
-     * @param macroName the name of the macro to register.
-     * @param syntax the syntax for which to register the macro. If null the macro is registered for all syntaxes.
-     * @param macro the macro to register
-     */
-    protected void registerMacroForSyntax(String macroName, Syntax syntax, Macro< ? > macro)
-    {
-        Map<String, Macro< ? >> macrosForSyntax = this.syntaxSpecificMacros.get(syntax);
-        if (macrosForSyntax == null) {
-            macrosForSyntax = new HashMap<String, Macro< ? >>();
-            this.syntaxSpecificMacros.put(syntax, macrosForSyntax);
-        }
-
-        macrosForSyntax.put(macroName, macro);
-    }
-
-    /**
-     * Register a macro for all syntaxes.
-     * 
-     * @param macroName the name of the macro to register.
-     * @param macro the macro to register
-     */
-    protected void registerMacroForAllSyntaxes(String macroName, Macro< ? > macro)
-    {
-        this.allSyntaxesMacros.put(macroName, macro);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.MacroManager#getMacroNames(Syntax)
-     */
-    public Set<String> getMacroNames(Syntax syntax)
-    {
-        Set<String> result = new TreeSet<String>();
-
-        // first we put the macros that are not specific to any syntax.
-        result.addAll(this.allSyntaxesMacros.keySet());
-
-        // then we add macros for this syntax in particular if any.
-        // if macro with same name is defined for both, the one specific to the desired syntax wins.
-        if (this.syntaxSpecificMacros.containsKey(syntax)) {
-            result.addAll(this.syntaxSpecificMacros.get(syntax).keySet());
-        }
 
         return result;
     }
@@ -190,14 +120,19 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
      */
     public Macro< ? > getMacro(String macroName, Syntax syntax) throws MacroLookupException
     {
-        // First check in macros registered for all syntaxes
-        Map<String, Macro< ? >> macrosForSyntax = this.syntaxSpecificMacros.get(syntax);
-        if (macrosForSyntax != null && macrosForSyntax.containsKey(macroName)) {
-            return macrosForSyntax.get(macroName);
+        // First search for a macro registered for the given syntax.
+        String macroHint = macroName + "/" + syntax.toIdString();
+        try {
+            return componentManager.lookup(Macro.class, macroHint);
+        } catch (ComponentLookupException ex1) {
+            // Now search for a macro registered for all syntaxes.
+            try {
+                return componentManager.lookup(Macro.class, macroName);
+            } catch (ComponentLookupException ex2) {
+                throw new MacroLookupException(String.format("No macro named [%s] is available for syntax [%s].",
+                    macroName, syntax.toIdString()));
+            }
         }
-
-        // If not found, check in macros for all syntaxes
-        return this.getMacro(macroName);
     }
 
     /**
@@ -207,11 +142,11 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
      */
     public Macro< ? > getMacro(String macroName) throws MacroLookupException
     {
-        if (this.allSyntaxesMacros.containsKey(macroName)) {
-            return this.allSyntaxesMacros.get(macroName);
+        try {
+            return componentManager.lookup(Macro.class, macroName);
+        } catch (ComponentLookupException ex) {
+            throw new MacroLookupException(String.format("No macro named [%s] can be found.", macroName));
         }
-
-        throw new MacroLookupException("No [" + macroName + "] could be found");
     }
 
     /**
@@ -221,9 +156,14 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
      */
     public boolean exists(String macroName, Syntax syntax)
     {
-        return this.syntaxSpecificMacros.get(syntax) != null
-            && this.syntaxSpecificMacros.get(syntax).get(macroName) != null;
-
+        String macroHint = macroName + "/" + syntax.toIdString();
+        boolean hasMacro = true;
+        try {
+            componentManager.lookup(Macro.class, macroHint);
+        } catch (ComponentLookupException ex) {
+            hasMacro = false;
+        }
+        return hasMacro;
     }
 
     /**
@@ -233,6 +173,12 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
      */
     public boolean exists(String macroName)
     {
-        return this.allSyntaxesMacros.get(macroName) != null;
+        boolean hasMacro = true;
+        try {
+            componentManager.lookup(Macro.class, macroName);
+        } catch (ComponentLookupException ex) {
+            hasMacro = false;
+        }
+        return hasMacro;
     }
 }

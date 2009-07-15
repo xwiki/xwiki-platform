@@ -26,7 +26,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
@@ -237,24 +236,6 @@ public abstract class AbstractBlock implements Block
     public void setParameter(String name, String value)
     {
         this.parameters.put(name, value);
-    }
-
-    /**
-     * Set a parameter on the current block. A parameter is any semantic data associated with a block. It can be used
-     * for various purposes and provide additional information to the renderers/listeners. For example you can pass
-     * style information such as <code>style="color:red"</code> (in that example the name would be <code>style</code>
-     * and the value <code>"color:red"</code>) to indicate that the current block should be displayed in red.
-     * <p>
-     * Note that there are currently no well-defined known parameter names and you'll need to check what the different
-     * renderers/listeners support to know what to use.
-     * </p>
-     * 
-     * @param name the parameter's name
-     * @param value the parameter's value
-     */
-    public void setParameter(String name, Object value)
-    {
-        setParameter(name, ConvertUtils.convert(value));
     }
 
     /**

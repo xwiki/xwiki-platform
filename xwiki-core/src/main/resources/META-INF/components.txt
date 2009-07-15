@@ -17,3 +17,5 @@ com.xpn.xwiki.store.VoidAttachmentVersioningStore
 com.xpn.xwiki.store.XWikiHibernateRecycleBinStore
 com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
+com.xpn.xwiki.internal.DefaultWikiMacroBuilder
+com.xpn.xwiki.internal.DefaultWikiMacroInitializer

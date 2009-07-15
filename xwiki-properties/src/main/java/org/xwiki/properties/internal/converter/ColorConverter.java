@@ -17,33 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util;
+package org.xwiki.properties.internal.converter;
 
 import java.awt.Color;
+import java.text.MessageFormat;
 import java.util.StringTokenizer;
 
-import org.apache.commons.beanutils.converters.AbstractConverter;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.properties.converter.ConversionException;
 
 /**
  * Bean Utils converter that converts a value into an {@link Color} object.
  * 
- * @version $Id$
- * @since 1.6M2
+ * @version $Id: $
+ * @since 2.0M2
  */
-public final class ColorConverter extends AbstractConverter
+@Component("java.awt.Color")
+public class ColorConverter extends AbstractConverter
 {
-    private static final ColorConverter instance = new ColorConverter();
-
+    /**
+     * The String input supported by this {@link org.apache.commons.beanutils.Converter}.
+     */
     private static final String USAGE = "Color value should be in the form of '#xxxxxx' or 'r,g,b'";
-
-    public static ColorConverter getInstance()
-    {
-        return instance;
-    }
-
-    private ColorConverter()
-    {
-    }
 
     /**
      * {@inheritDoc}
@@ -51,11 +47,11 @@ public final class ColorConverter extends AbstractConverter
      * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToType(java.lang.Class, java.lang.Object)
      */
     @Override
-    protected Object convertToType(Class type, Object value) throws Throwable
+    protected <T> T convertToType(Class<T> type, Object value)
     {
-        Object color = null;
+        T color = null;
         if (value != null) {
-            color = parse(value.toString());
+            color = type.cast(parse(value.toString()));
         }
 
         return color;
@@ -67,75 +63,76 @@ public final class ColorConverter extends AbstractConverter
      * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToString(java.lang.Object)
      */
     @Override
-    protected String convertToString(Object value) throws Throwable
+    protected String convertToString(Object value)
     {
         Color colorValue = (Color) value;
 
-        return colorValue.getRed() + "," + colorValue.getGreen() + "," + colorValue.getBlue();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.commons.beanutils.converters.AbstractConverter#getDefaultType()
-     */
-    @Override
-    protected Class getDefaultType()
-    {
-        return Color.class;
+        return MessageFormat.format("{0},{1},{2}", colorValue.getRed(), colorValue.getGreen(), colorValue.getBlue());
     }
 
     /**
      * Parsers a String in the form "x, y, z" into an SWT RGB class.
      * 
-     * @param value
+     * @param value the color as String
      * @return RGB
      */
     protected Color parseRGB(String value)
     {
         StringTokenizer items = new StringTokenizer(value, ",");
-        int red = 0;
-        int green = 0;
-        int blue = 0;
-        if (items.hasMoreTokens()) {
-            red = parseNumber(items.nextToken());
+
+        try {
+            int red = 0;
+            if (items.hasMoreTokens()) {
+                red = Integer.parseInt(items.nextToken().trim());
+            }
+
+            int green = 0;
+            if (items.hasMoreTokens()) {
+                green = Integer.parseInt(items.nextToken().trim());
+            }
+
+            int blue = 0;
+            if (items.hasMoreTokens()) {
+                blue = Integer.parseInt(items.nextToken().trim());
+            }
+
+            return new Color(red, green, blue);
+        } catch (NumberFormatException ex) {
+            throw new ConversionException(value + "is not a valid RGB colo", ex);
         }
-        if (items.hasMoreTokens()) {
-            green = parseNumber(items.nextToken());
-        }
-        if (items.hasMoreTokens()) {
-            blue = parseNumber(items.nextToken());
-        }
-        return new Color(red, green, blue);
     }
 
     /**
-     * Parsers a String in the form "#xxxxxx" into an SWT RGB class
+     * Parsers a String in the form "#xxxxxx" into an SWT RGB class.
      * 
-     * @param value
+     * @param value the color as String
      * @return RGB
      */
     protected Color parseHtml(String value)
     {
         if (value.length() != 7) {
-            throw new IllegalArgumentException(USAGE);
+            throw new ConversionException(USAGE);
         }
-        int colorValue;
+
+        int colorValue = 0;
         try {
             colorValue = Integer.parseInt(value.substring(1), 16);
+            return new Color(colorValue);
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException(value + "is not a valid Html color\n " + ex);
+            throw new ConversionException(value + "is not a valid Html color", ex);
         }
-        return new Color(colorValue);
     }
 
     /**
-     * Parse a String
+     * Convert a String in {@link Color}.
+     * 
+     * @param value the String to parse
+     * @return the {@link Color}
      */
     public Color parse(String value)
     {
         if (value.length() <= 1) {
-            throw new IllegalArgumentException(USAGE);
+            throw new ConversionException(USAGE);
         }
 
         if (value.charAt(0) == '#') {
@@ -143,12 +140,7 @@ public final class ColorConverter extends AbstractConverter
         } else if (value.indexOf(',') != -1) {
             return parseRGB(value);
         } else {
-            throw new IllegalArgumentException(USAGE);
+            throw new ConversionException(USAGE);
         }
-    }
-
-    protected int parseNumber(String text)
-    {
-        return Integer.parseInt(text.trim());
     }
 }

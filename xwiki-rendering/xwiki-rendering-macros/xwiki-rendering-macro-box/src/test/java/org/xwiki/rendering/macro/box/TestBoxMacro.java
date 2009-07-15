@@ -26,7 +26,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 @Component("testbox")
@@ -34,7 +34,7 @@ public class TestBoxMacro extends AbstractBoxMacro<BoxMacroParameters>
 {
     public TestBoxMacro()
     {
-        super(new DefaultMacroDescriptor("TestBoxMacro", BoxMacroParameters.class));
+        super("TestBoxMacro", new DefaultContentDescriptor(), BoxMacroParameters.class);
     }
 
     /**

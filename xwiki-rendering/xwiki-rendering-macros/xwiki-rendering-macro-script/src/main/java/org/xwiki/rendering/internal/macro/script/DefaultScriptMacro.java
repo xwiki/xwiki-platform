@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.macro.script;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro;
 import org.xwiki.rendering.macro.script.DefaultScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -56,8 +55,7 @@ public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScript
      */
     public DefaultScriptMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
-            DefaultScriptMacroParameters.class));
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), DefaultScriptMacroParameters.class);
     }
 
     /**

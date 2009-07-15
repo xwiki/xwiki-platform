@@ -27,10 +27,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
@@ -73,6 +73,12 @@ public class MacroTransformation extends AbstractTransformation
      */
     @Requirement
     private MacroManager macroManager;
+    
+    /**
+     * The {@link BeanManager} component.
+     */
+    @Requirement
+    private BeanManager beanManager;
 
     private class MacroHolder implements Comparable<MacroHolder>
     {
@@ -153,7 +159,7 @@ public class MacroTransformation extends AbstractTransformation
             try {
                 macroParameters = macroHolder.macro.getDescriptor().getParametersBeanClass().newInstance();
                 // TODO: BeanUtils shouldn't be exposed to users of the Macro
-                BeanUtils.populate(macroParameters, macroHolder.macroBlock.getParameters());
+                beanManager.populate(macroParameters, macroHolder.macroBlock.getParameters());
             } catch (Exception e) {
                 // One macro parameter was invalid.
                 // The macro will not be executed and we generate an error message instead of the macro

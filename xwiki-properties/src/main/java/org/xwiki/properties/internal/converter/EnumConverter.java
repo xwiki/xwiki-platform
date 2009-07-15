@@ -17,62 +17,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.util;
+package org.xwiki.properties.internal.converter;
 
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.beanutils.converters.AbstractConverter;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.properties.converter.ConversionException;
 
 /**
  * Bean Utils converter that converts a value into an enumeration class value.
  * 
- * @version $Id$
- * @since 1.6M2
+ * @version $Id: $
+ * @since 2.0M2
  */
+@Component("enum")
 public class EnumConverter extends AbstractConverter
 {
-    Class< ? extends Enum> defaultType;
-
-    public EnumConverter(Class< ? extends Enum> defaultType)
-    {
-        this.defaultType = defaultType;
-    }
-
     /**
      * {@inheritDoc}
      * 
      * @see org.apache.commons.beanutils.converters.AbstractConverter#convertToType(java.lang.Class, java.lang.Object)
      */
     @Override
-    protected Object convertToType(Class type, Object value) throws Throwable
+    protected <T> T convertToType(Class<T> type, Object value)
     {
-        Object[] enumValues = type.getEnumConstants();
+        if (value != null) {
+            Object[] enumValues = type.getEnumConstants();
 
-        String testValue = value.toString();
-        for (Object enumValue : enumValues) {
-            if (enumValue.toString().equalsIgnoreCase(testValue)) {
-                return enumValue;
+            String testValue = value.toString();
+            for (Object enumValue : enumValues) {
+                if (enumValue.toString().equalsIgnoreCase(testValue)) {
+                    return type.cast(enumValue);
+                }
             }
+
+            throw new ConversionException(generateInvalidErrorMessage(enumValues, testValue));
+        } else {
+            return null;
         }
-
-        throw new ConversionException(generateInvalidErrorMessage(enumValues, testValue));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.apache.commons.beanutils.converters.AbstractConverter#getDefaultType()
-     */
-    @Override
-    protected Class getDefaultType()
-    {
-        return this.defaultType;
     }
 
     /**
      * Generate error message to use in the {@link ConversionException}.
      * 
      * @param enumValues possible values of the enum.
-     * @param value the value to convert.
+     * @param testValue the value to convert.
      * @return the generated error message.
      */
     private String generateInvalidErrorMessage(Object[] enumValues, String testValue)

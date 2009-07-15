@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 
 /**
  * Base class for a macro which does not support any parameter.
@@ -36,6 +35,6 @@ public abstract class AbstractNoParameterMacro extends AbstractMacro<Object>
      */
     public AbstractNoParameterMacro(String description)
     {
-        super(new DefaultMacroDescriptor(description));
+        super(description);
     }
 }

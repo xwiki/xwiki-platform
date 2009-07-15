@@ -43,7 +43,6 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.chart.ChartDataSource;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -89,7 +88,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     public ChartMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, ChartMacroParameters.class));
+        super(DESCRIPTION, ChartMacroParameters.class);
     }
 
     /**

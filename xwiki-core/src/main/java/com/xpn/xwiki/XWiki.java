@@ -91,6 +91,7 @@ import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.query.QueryException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
@@ -775,6 +776,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Save the configured syntaxes
         String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
         this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
+        
+        // Initialize all wiki macros        
+        try {
+            WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
+            wikiMacroInitializer.init();
+        } catch (ComponentLookupException ex) {
+            LOG.error("Error while initializing wiki macros", ex);
+        }
     }
 
     public XWikiStoreInterface getNotCacheStore()

@@ -19,17 +19,16 @@
  */
 package org.xwiki.rendering.internal.macro.id;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.id.IdMacroParameters;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Allows putting a reference/location in a page. In HTML for example this is called an Anchor. It allows pointing to
@@ -53,7 +52,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
      */
     public IdMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, null, IdMacroParameters.class));
+        super(DESCRIPTION, IdMacroParameters.class);
         
         // Set a high priority so that this macro executes before most others.
         setPriority(20);

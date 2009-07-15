@@ -318,14 +318,6 @@ public class Document extends com.google.gwt.dom.client.Document
     }-*/;
 
     /**
-     * @return the document element.
-     */
-    public final native Element getDocumentElement()
-    /*-{
-        return this.documentElement;
-    }-*/;
-
-    /**
      * Creates an empty document fragment.<br/>
      * A DocumentFragment is a minimal document object that has no parent. It supports the following DOM 2 methods:
      * appendChild, cloneNode, hasAttributes, hasChildNodes, insertBefore, normalize, removeChild, replaceChild.<br/>

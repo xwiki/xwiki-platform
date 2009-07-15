@@ -105,8 +105,6 @@ public class JavaScriptObject extends com.google.gwt.core.client.JavaScriptObjec
     /**
      * Returns all the keys set in this JavaScript object, to use with {@link JavaScriptObject#get(String)} to iterate
      * over all properties, without knowing their names.
-     * <p>
-     * TODO: refactor this to return a map of (key, value) pairs.
      * 
      * @return the array of keys set in this JavaScript object
      */

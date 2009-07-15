@@ -784,27 +784,27 @@ public class DOMUtilsTest extends AbstractDOMTest
     {
         container.setInnerHTML("<p><em>a</em>b</p>");
         domUtils.splitHTMLNode(container, container.getFirstChild().getFirstChild().getFirstChild(), 0);
-        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", container.getInnerHTML());
+        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<p><em>b</em>a</p>");
         domUtils.splitHTMLNode(container, container.getFirstChild().getFirstChild().getFirstChild(), 1);
-        assertEquals("<p><em>b</em></p><p><em></em>a</p>", container.getInnerHTML());
+        assertEquals("<p><em>b</em></p><p><em></em>a</p>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<p><em>x</em>y</p>");
         domUtils.splitHTMLNode(container, container.getFirstChild().getLastChild(), 1);
-        assertEquals("<p><em>x</em>y</p><p><br></p>", container.getInnerHTML());
+        assertEquals("<p><em>x</em>y</p><p><br></p>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<p><em>y</em>x</p>");
         domUtils.splitHTMLNode(container, container.getFirstChild().getLastChild(), 0);
-        assertEquals("<p><em>y</em></p><p>x</p>", container.getInnerHTML());
+        assertEquals("<p><em>y</em></p><p>x</p>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<p><em>1</em>2</p>");
         domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 0);
-        assertEquals("<p><em></em><em>1</em>2</p>", container.getInnerHTML());
+        assertEquals("<p><em></em><em>1</em>2</p>", container.getInnerHTML().toLowerCase());
 
         container.setInnerHTML("<p><em>2</em>1</p>");
         domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 1);
-        assertEquals("<p><em>2</em><em></em>1</p>", container.getInnerHTML());
+        assertEquals("<p><em>2</em><em></em>1</p>", container.getInnerHTML().toLowerCase());
     }
 
     /**

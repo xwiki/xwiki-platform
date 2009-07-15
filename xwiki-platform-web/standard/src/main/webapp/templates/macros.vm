@@ -2020,7 +2020,7 @@ $xwiki.jsfx.use("js/smartclient/skins/Enterprise/load_skin.js")
 ## XWikiExplorer (used by the link plug-in)
 $xwiki.jsfx.use("js/xwiki/xwikiexplorer/xwikiexplorer.js", true)
 ## WYSIWYG
-$xwiki.jsfx.use("js/xwiki/wysiwyg/gwt/com.xpn.xwiki.wysiwyg.Wysiwyg/XWikiWysiwyg.js", {"forceSkinAction": true, "lazy": ${lazy}})
+$xwiki.jsfx.use("js/xwiki/wysiwyg/xwe/XWikiWysiwyg.js", {"forceSkinAction": true, "lazy": ${lazy}})
 #end
 
 #**

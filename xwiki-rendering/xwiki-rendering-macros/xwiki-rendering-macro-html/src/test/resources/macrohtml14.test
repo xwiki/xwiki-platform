@@ -14,6 +14,6 @@
 .#-----------------------------------------------------
 <!--startmacro:html|-|clean="true" wiki="true"|-|
 <div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
---><div><!--startmacro:html|-|clean="false"|-|<ul><li>standalone content</li></ul>--><ul><li>standalone content</li></ul><!--stopmacro--></div><!--stopmacro--><!--startmacro:html|-|clean="false" wiki="true"|-|
+--><div><ul><li>standalone content</li></ul></div><!--stopmacro--><!--startmacro:html|-|clean="false" wiki="true"|-|
 <div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
---><div><!--startmacro:html|-|clean="false"|-|<ul><li>standalone content</li></ul>--><ul><li>standalone content</li></ul><!--stopmacro--></div><!--stopmacro-->
+--><div><ul><li>standalone content</li></ul></div><!--stopmacro-->

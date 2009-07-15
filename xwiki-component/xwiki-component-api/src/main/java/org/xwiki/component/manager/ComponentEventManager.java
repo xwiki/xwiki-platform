@@ -37,7 +37,7 @@ public interface ComponentEventManager
      * Notify all listeners that a component with the passed descriptor has been registered.
      * 
      * @param descriptor the descriptor for the instantiated component
-     * @since 2.0M1
+     * @since 2.0M2
      */
     void notifyComponentRegistered(ComponentDescriptor< ? > descriptor);
 
@@ -45,7 +45,7 @@ public interface ComponentEventManager
      * Notify all listeners that a component with the passed descriptor has been unregistered.
      * 
      * @param descriptor the descriptor for the instantiated component
-     * @since 2.0M1
+     * @since 2.0M2
      */
     void notifyComponentUnregistered(ComponentDescriptor< ? > descriptor);
 }

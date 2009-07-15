@@ -19,8 +19,6 @@
  */
 package org.xwiki.component.manager;
 
-import org.xwiki.observation.event.Event;
-
 /**
  * Event sent to tell that a new Component Descriptor has been registered.
  * 
@@ -44,9 +42,10 @@ public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEv
     {
         super(role);
     }
-    
+
     /**
-     * @param role the component role/rolehint to watch
+     * @param role the component role to watch
+     * @param roleHint the component role hint to watch
      */
     public ComponentDescriptorAddedEvent(Class< ? > role, String roleHint)
     {
@@ -56,7 +55,7 @@ public class ComponentDescriptorAddedEvent extends AbstractComponentDescriptorEv
     /**
      * {@inheritDoc}
      * 
-     * @see Event#matches(Object)
+     * @see org.xwiki.component.manager.AbstractComponentDescriptorEvent#matches(java.lang.Object)
      */
     public boolean matches(Object otherEvent)
     {

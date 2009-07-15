@@ -63,10 +63,13 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
     public void testIncludeMacroWithNewContext() throws Exception
     {
-        String expected =
-            "beginDocument\n" + "beginMacroMarkerStandalone [velocity] [] [$myvar]\n" + "beginParagraph\n"
-                + "onWord [hello]\n" + "endParagraph\n" + "endMacroMarkerStandalone [velocity] [] [$myvar]\n"
-                + "endDocument";
+        String expected = "beginDocument\n"
+            + "beginMacroMarkerStandalone [velocity] [] [$myvar]\n"
+            + "beginParagraph\n"
+            + "onWord [hello]\n"
+            + "endParagraph\n"
+            + "endMacroMarkerStandalone [velocity] [] [$myvar]\n"
+            + "endDocument";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.
@@ -103,7 +106,9 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
-        String expected = "beginDocument\n" + "onMacroStandalone [someMacro] []\n" + "endDocument";
+        String expected = "beginDocument\n"
+            + "onMacroStandalone [someMacro] []\n"
+            + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
         mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
@@ -130,8 +135,8 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             macro.execute(parameters, null, new MacroTransformationContext());
             fail("An exception should have been thrown");
         } catch (MacroExecutionException expected) {
-            assertEquals("You must specify a 'document' parameter pointing to the document to include.", expected
-                .getMessage());
+            assertEquals("You must specify a 'document' parameter pointing to the document to include.",
+                expected.getMessage());
         }
     }
 }

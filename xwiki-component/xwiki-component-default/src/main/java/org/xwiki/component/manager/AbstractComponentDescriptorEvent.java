@@ -25,7 +25,7 @@ import org.xwiki.observation.event.Event;
  * Base class for events about components descriptors.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.0M2
  */
 public abstract class AbstractComponentDescriptorEvent implements Event
 {
@@ -89,7 +89,9 @@ public abstract class AbstractComponentDescriptorEvent implements Event
                 result = true;
             } else {
                 AbstractComponentDescriptorEvent event = (AbstractComponentDescriptorEvent) otherEvent;
-                if (getRole() == event.getRole()) {
+                // It's possible Class reference are not the same when it coming for different ClassLoader so we
+                // compare class names
+                if (getRole().getName().equals(event.getRole().getName())) {
                     result = getRoleHint() == null || getRoleHint().equals(event.getRoleHint());
                 }
             }

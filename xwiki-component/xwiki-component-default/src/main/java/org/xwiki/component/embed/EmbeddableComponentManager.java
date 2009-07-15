@@ -215,7 +215,9 @@ public class EmbeddableComponentManager implements ComponentManager
         synchronized (this) {
             List<ComponentDescriptor<T>> results = new ArrayList<ComponentDescriptor<T>>();
             for (Map.Entry<RoleHint< ? >, ComponentDescriptor< ? >> entry : this.descriptors.entrySet()) {
-                if (entry.getKey().getRole() == role) {
+                // It's possible Class reference are not the same when it coming for different ClassLoader so we
+                // compare class names
+                if (entry.getKey().getRole().getName().equals(role.getName())) {
                     results.add((ComponentDescriptor<T>) entry.getValue());
                 }
             }
@@ -262,7 +264,9 @@ public class EmbeddableComponentManager implements ComponentManager
         List<T> objects = new ArrayList<T>();
         synchronized (this) {
             for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
-                if (roleHint.getRole() == role) {
+                // It's possible Class reference are not the same when it coming for different ClassLoader so we
+                // compare class names
+                if (roleHint.getRole().getName().equals(role.getName())) {
                     objects.add(initialize((RoleHint<T>) roleHint));
                 }
             }
@@ -276,7 +280,9 @@ public class EmbeddableComponentManager implements ComponentManager
         Map<String, T> objects = new HashMap<String, T>();
         synchronized (this) {
             for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
-                if (roleHint.getRole() == role) {
+                // It's possible Class reference are not the same when it coming for different ClassLoader so we
+                // compare class names
+                if (roleHint.getRole().getName().equals(role.getName())) {
                     objects.put(roleHint.getHint(), initialize((RoleHint<T>) roleHint));
                 }
             }

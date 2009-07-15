@@ -44,7 +44,8 @@ public class ComponentDescriptorRemovedEvent extends AbstractComponentDescriptor
     }
 
     /**
-     * @param role the component role/rolehint to watch
+     * @param role the component role to watch
+     * @param roleHint the component role hint to watch
      */
     public ComponentDescriptorRemovedEvent(Class< ? > role, String roleHint)
     {

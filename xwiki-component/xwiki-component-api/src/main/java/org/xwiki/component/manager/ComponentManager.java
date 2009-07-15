@@ -124,6 +124,7 @@ public interface ComponentManager
      * 
      * @param role the role identifying the component
      * @param roleHint the hint identifying the component
+     * @since 2.0M2
      */
     void unregisterComponent(Class< ? > role, String roleHint);
 

@@ -20,16 +20,15 @@
 package com.xpn.xwiki.wysiwyg.server.cleaner;
 
 import java.io.StringReader;
-import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import junit.framework.TestCase;
 
-import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.wysiwyg.server.cleaner.internal.NestedAnchorsFilter;
 
@@ -65,10 +64,10 @@ public class NestedAnchorsFilterTest extends TestCase
                 + "<!--stopwikilink--> .org<br /></p></body></html>";
         Document doc = prepareDocument(documentString);
 
-        String before = serializeDocument(doc);
+        String before = HTMLUtils.toString(doc);
         filter.filter(doc, null);
 
-        String after = serializeDocument(doc);
+        String after = HTMLUtils.toString(doc);
 
         assertEquals(before, after);
     }
@@ -91,7 +90,7 @@ public class NestedAnchorsFilterTest extends TestCase
 
         Document doc = prepareDocument(documentString);
         filter.filter(doc, null);
-        String actual = serializeDocument(doc);
+        String actual = HTMLUtils.toString(doc);
 
         String expected = PROLOGUE_DTD + beforeAnchor + anchorLabel + afterAnchor;
 
@@ -116,7 +115,7 @@ public class NestedAnchorsFilterTest extends TestCase
 
         Document doc = prepareDocument(documentString);
         filter.filter(doc, null);
-        String actual = serializeDocument(doc);
+        String actual = HTMLUtils.toString(doc);
 
         String expected = PROLOGUE_DTD + beforeAnchor + anchorLabel + "com" + afterAnchor;
         assertEquals(expected, actual);
@@ -135,21 +134,5 @@ public class NestedAnchorsFilterTest extends TestCase
         DocumentBuilder builder = factory.newDocumentBuilder();
         InputSource inputSource = new InputSource(new StringReader(stringSource));
         return builder.parse(inputSource);
-    }
-
-    /**
-     * Serializes the passed document.
-     * 
-     * @param document the document to serialize
-     * @return the XML String corresponding to the passed document
-     * @throws Exception if there is a serialization exception
-     */
-    private String serializeDocument(Document document) throws Exception
-    {
-        XMLSerializer serializer = new XMLSerializer();
-        StringWriter writer = new StringWriter();
-        serializer.setOutputCharStream(writer);
-        serializer.serialize(document);
-        return writer.toString();
     }
 }

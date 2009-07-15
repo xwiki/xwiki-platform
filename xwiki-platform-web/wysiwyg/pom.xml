@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -86,6 +87,13 @@
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <!-- GWT Unit tests fail to run from Eclipse if xercesImpl is in the class path. -->
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -125,7 +133,7 @@
         <artifactId>gwt-maven-plugin</artifactId>
         <version>1.1</version>
         <configuration>
-          <webappDirectory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg/gwt</webappDirectory>
+          <webappDirectory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg</webappDirectory>
           <style>${gwt.js.style}</style>
           <!--
             In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
@@ -270,10 +278,4 @@
       </activation>
     </profile>
   </profiles>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>gwt-maven</id>
-      <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>

@@ -22,6 +22,11 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>WysiwygService</servlet-name>
-    <url-pattern>/WysiwygService</url-pattern>
+    <url-pattern>/xwe/WysiwygService</url-pattern>
   </servlet-mapping>
+
+  <!-- Default page to serve -->
+  <welcome-file-list>
+    <welcome-file>Wysiwyg.html</welcome-file>
+  </welcome-file-list>
 </web-app>

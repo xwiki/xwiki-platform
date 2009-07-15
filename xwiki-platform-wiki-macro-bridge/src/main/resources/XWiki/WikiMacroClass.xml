@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xwikidoc>
+<web>XWiki</web>
+<name>WikiMacroClass</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1246871019000</creationDate>
+<date>1247660117000</date>
+<contentUpdateDate>1247660117000</contentUpdateDate>
+<version>20.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<class>
+<name>XWiki.WikiMacroClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<content>
+<editor>---</editor>
+<name>content</name>
+<number>3</number>
+<picker>0</picker>
+<prettyName>Macro content</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<editor>PureText</editor>
+<name>description</name>
+<number>2</number>
+<picker>0</picker>
+<prettyName>Macro description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<name>name</name>
+<number>1</number>
+<picker>0</picker>
+<prettyName>Macro name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<content>
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+= Existing wiki macro definitions: =
+#set($mxwiki=$xwiki.getXWiki())
+#set($mcontext=$context.getContext())
+#set($sql="select doc.fullName from XWikiDocument doc, BaseObject obj where doc.fullName=obj.name and obj.className='XWiki.WikiMacroClass'")
+#set($mdocs=$mxwiki.getStore().search($sql, 0, 0, $mcontext))
+#info("[$listtool.size($mdocs)] wiki macro definition(s) found:")
+&lt;br/&gt;
+#foreach($mdoc in $mdocs)
+  [[$mdoc&gt;&gt;$mdoc]]
+#end
+{{/html}}
+{{/velocity}}
+</content>
+</xwikidoc>

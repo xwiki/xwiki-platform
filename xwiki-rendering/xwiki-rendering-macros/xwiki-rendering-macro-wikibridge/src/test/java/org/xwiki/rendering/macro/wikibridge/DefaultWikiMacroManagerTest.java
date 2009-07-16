@@ -38,32 +38,35 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
      * The {@link WikiMacroManager} component.
      */
     private WikiMacroManager wikiMacroManager;
-    
+
     /**
      * The {@link MacroManager} component.
      */
     private MacroManager macroManager;
-    
+
     /**
      * A {@link WikiMacro} instance.
      */
     private WikiMacro wikiMacro;
-    
+
     /**
      * {@inheritDoc}
      */
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         macroManager = getComponentManager().lookup(MacroManager.class);
         wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
-        
+
         // Create a wiki macro with no parameters.
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Test Wiki Macro", new ArrayList<WikiMacroParameterDescriptor>());
-        wikiMacro = new WikiMacro("testwikimacro", descriptor, "== Test ==", "xwiki/2.0", getComponentManager());
-    }    
-    
+        WikiMacroDescriptor descriptor =
+            new WikiMacroDescriptor("Test Wiki Macro", new ArrayList<WikiMacroParameterDescriptor>());
+        wikiMacro =
+            new WikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "== Test ==", "xwiki/2.0",
+                getComponentManager());
+    }
+
     /**
      * Tests wiki macro registration.
      */
@@ -71,16 +74,16 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
     {
         String docName = "xwiki:Main.TestMacro";
         assertTrue(!wikiMacroManager.hasWikiMacro(docName));
-        
+
         wikiMacroManager.registerWikiMacro(docName, wikiMacro);
         assertTrue(wikiMacroManager.hasWikiMacro(docName));
- 
-        Macro<?> registeredMacro = macroManager.getMacro("testwikimacro");
+
+        Macro< ? > registeredMacro = macroManager.getMacro("testwikimacro");
         assertEquals(0, registeredMacro.compareTo(wikiMacro));
-        
+
         wikiMacroManager.unregisterWikiMacro(docName);
         assertTrue(!wikiMacroManager.hasWikiMacro(docName));
-        
+
         assertTrue(!macroManager.exists("testwikimacro"));
     }
 }

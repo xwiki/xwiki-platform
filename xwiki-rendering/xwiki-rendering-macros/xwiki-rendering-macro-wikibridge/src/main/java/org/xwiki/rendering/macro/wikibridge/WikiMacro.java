@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -56,14 +57,12 @@ public class WikiMacro implements Macro<WikiMacroParameters>
      * The key under which macro context will be available in the XwikiContext for scripts.
      */
     private static final String MACRO_KEY = "macro";
-    
+
     /**
-     * Macro hint for {@link Transformation} component.
-     * 
-     * Same as MACRO_KEY (Check style fix)
+     * Macro hint for {@link Transformation} component. Same as MACRO_KEY (Check style fix)
      */
-    private static final String MACRO_HINT = MACRO_KEY;    
-    
+    private static final String MACRO_HINT = MACRO_KEY;
+
     /**
      * The key under which macro body will be available inside macro context.
      */
@@ -73,16 +72,26 @@ public class WikiMacro implements Macro<WikiMacroParameters>
      * The key under which macro parameters will be available inside macro context.
      */
     private static final String MACRO_PARAMS_KEY = "params";
-    
+
     /**
      * The key under which macro transformation context will be available inside macro context.
      */
     private static final String MACRO_CONTEXT_KEY = "context";
-    
+
+    /**
+     * They key used to access the current context document stored in XWikiContext.
+     */
+    private static final String CONTEXT_DOCUMENT_KEY = "doc";
+
     /**
      * The {@link MacroDescriptor} for this macro.
      */
     private MacroDescriptor descriptor;
+
+    /**
+     * Document which contains the definition of this macro.
+     */
+    private String macroDocument;
 
     /**
      * Name of this macro.
@@ -112,14 +121,15 @@ public class WikiMacro implements Macro<WikiMacroParameters>
     /**
      * Constructs a new {@link WikiMacro}.
      * 
+     * @param macroDocument document which contains the definition of this macro.
      * @param macroName name of the macro.
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @param macroContent macro content to be evaluated.
      * @param syntaxId syntax of the macroContent.
      * @param componentManager {@link ComponentManager} component used to look up for other components.
      */
-    public WikiMacro(String macroName, MacroDescriptor descriptor, String macroContent, String syntaxId,
-        ComponentManager componentManager)
+    public WikiMacro(String macroDocument, String macroName, MacroDescriptor descriptor, String macroContent,
+        String syntaxId, ComponentManager componentManager)
     {
         this.macroName = macroName;
         this.descriptor = descriptor;
@@ -165,20 +175,31 @@ public class WikiMacro implements Macro<WikiMacroParameters>
         } catch (ParseException ex) {
             throw new MacroExecutionException("Error while parsing macro content", ex);
         }
-        
-        // Set macro context inside XWikiContext.
+
+        // Prepare macro execution environment.
         Map<String, Object> macroContext = new HashMap<String, Object>();
         macroContext.put(MACRO_PARAMS_KEY, parameters);
-        macroContext.put(MACRO_CONTENT_KEY, macroContent);        
+        macroContext.put(MACRO_CONTENT_KEY, macroContent);
         macroContext.put(MACRO_CONTEXT_KEY, context);
+        Map xwikiContext = null;
+        Object contextDoc = null;
         try {
             Execution execution = componentManager.lookup(Execution.class);
-            Map xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
+            xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
             xwikiContext.put(MACRO_KEY, macroContext);
-        } catch (ComponentLookupException ex) {
-            throw new MacroExecutionException("Error while injecting macro parameters", ex);
+
+            // Save current context document.
+            contextDoc = xwikiContext.get(CONTEXT_DOCUMENT_KEY);
+
+            // Set the macro definition document as the context document, this is required to give the macro access to
+            // it's parameters, otherwise macro will not be able to access it's parameters if the user executing the
+            // macro does not have programming rights.
+            DocumentAccessBridge docBridge = componentManager.lookup(DocumentAccessBridge.class);
+            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(macroDocument));
+        } catch (Exception ex) {
+            throw new MacroExecutionException("Error while preparing macro execution environment", ex);
         }
-        
+
         // Perform internal macro transformations.
         try {
             SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
@@ -187,6 +208,9 @@ public class WikiMacro implements Macro<WikiMacroParameters>
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
         }
+
+        // Reset the context document.
+        xwikiContext.put(CONTEXT_DOCUMENT_KEY, contextDoc);
 
         List<Block> result = xdom.getChildren();
         // If in inline mode remove any top level paragraph.

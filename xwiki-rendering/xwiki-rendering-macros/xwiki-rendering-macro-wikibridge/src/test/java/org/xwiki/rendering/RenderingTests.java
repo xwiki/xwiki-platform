@@ -20,9 +20,14 @@
 
 package org.xwiki.rendering;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -46,6 +51,9 @@ public class RenderingTests extends TestCase
         
         suite.addTestsFromResource("wikimacro1", true);
         
-        return new ComponentManagerTestSetup(suite);
+        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
+        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
+        
+        return new ComponentManagerTestSetup(suite, mocks);
     }
 }

@@ -165,6 +165,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         MacroDescriptor macroDescriptor = new WikiMacroDescriptor(macroDescription, parameterDescriptors);
 
         // Create & return the macro.
-        return new WikiMacro(macroName, macroDescriptor, macroContent, doc.getSyntaxId(), componentManager);
+        return new WikiMacro(doc.getFullName(), macroName, macroDescriptor, macroContent, doc.getSyntaxId(),
+            componentManager);
     }
 }

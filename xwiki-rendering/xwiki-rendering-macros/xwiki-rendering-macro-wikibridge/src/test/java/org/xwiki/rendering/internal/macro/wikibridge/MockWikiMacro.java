@@ -42,7 +42,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * A wrapper macro used for testing a {@link WikiMacro} instance.
- *
+ * 
  * @version $Id$
  * @since 2.0M2
  */
@@ -53,19 +53,19 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
      * The internal {@link WikiMacro} instance.
      */
     private WikiMacro wikiMacro;
-    
+
     /**
      * The {@link ComponentManager} component.
      */
     @Requirement
     private ComponentManager componentManager;
-    
+
     /**
      * The {@link Execution} component.
      */
     @Requirement
     private Execution execution;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -77,11 +77,13 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
         List<WikiMacroParameterDescriptor> params = new ArrayList<WikiMacroParameterDescriptor>();
         params.add(param1);
         params.add(param2);
-        
+
         // Initialize the internal WikiMacro instance.
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Test Wiki Macro", params);
-        this.wikiMacro = new WikiMacro("testwikimacro", descriptor, "This is **testwikimacro**", "xwiki/2.0", componentManager);
-        
+        this.wikiMacro =
+            new WikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "This is **testwikimacro**",
+                "xwiki/2.0", componentManager);
+
         // Set a dummy XWikiContext.
         execution.getContext().setProperty("xwikicontext", new HashMap<String, Object>());
     }
@@ -108,7 +110,7 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
      */
     public int getPriority()
     {
-        return this.wikiMacro.getPriority();    
+        return this.wikiMacro.getPriority();
     }
 
     /**
@@ -125,5 +127,5 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
     public int compareTo(Macro< ? > o)
     {
         return this.wikiMacro.compareTo(o);
-    }    
+    }
 }

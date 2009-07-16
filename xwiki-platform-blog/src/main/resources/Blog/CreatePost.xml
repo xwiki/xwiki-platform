@@ -58,7 +58,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #set($title = $util.encodeURI($name))
   $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}"))
 #end## name == ''
-#elseif("$!request.entryTitle" != '')## !hasEdit && form submitted
+#elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
   #template('accessdenied.vm')
 #end## hasEdit</content>
 </xwikidoc>

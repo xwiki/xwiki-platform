@@ -153,9 +153,6 @@ XWiki.Blog = {
   addBehaviorToNewPostForm : function() {
     var form = $("newBlogPost");
     if (form) {
-      Event.observe(form, "submit", function() {
-        form.action="${xwiki.getURL('__space__.__name__', 'inline')}".replace(/__space__/, encodeURIComponent(form.space.value)).replace(/__name__/, encodeURIComponent(form.title.value));
-      });
       var title = form.elements.namedItem("entryTitle");
       if (title) {
         Event.observe(title, "focus", function() {

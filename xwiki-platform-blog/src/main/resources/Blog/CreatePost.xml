@@ -36,8 +36,8 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #if($space == '')
     #set($space = $doc.space)
   #end
-  1.1 $msg.get("xe.blog.post.createpost")
-  &lt;form action="${xwiki.getURL('Blog.CreatePost')}" id="newBlogPost" method="post"&gt;
+  1.1 $msg.get('xe.blog.post.createpost')
+  &lt;form action="${xwiki.getURL('Blog.CreatePost', 'view', 'xpage=plain')}" id="newBlogPost" method="post"&gt;
   &lt;div&gt;
     &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
     &lt;input type="text" name="entryTitle" value="$msg.get("xe.blog.post.title")"/&gt;
@@ -58,5 +58,7 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #set($title = $util.encodeURI($name))
   $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}"))
 #end## name == ''
+#elseif("$!request.entryTitle" != '')## !hasEdit && form submitted
+  #template('accessdenied.vm')
 #end## hasEdit</content>
 </xwikidoc>

@@ -19,8 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
+import org.xwiki.gwt.dom.client.Document;
+
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.HasClickHandlers;
 
 /**
  * A command that simulates a click when executed. Click commands can be associated with shortcut keys.
@@ -30,26 +33,24 @@ import com.google.gwt.user.client.ui.Widget;
 public final class ClickCommand implements com.google.gwt.user.client.Command
 {
     /**
-     * The object listening to click events.
-     */
-    private final ClickListener listener;
-
-    /**
      * The object sending the click events.
      */
-    private final Widget sender;
+    private final HasClickHandlers clickable;
 
     /**
-     * Creates a new click command that will simulate a click on the specified widget for the given listener, when
-     * executed.
-     * 
-     * @param listener the object listening to click events
-     * @param sender the object sending the click events
+     * The native event used to simulate a click on {@link #clickable}.
      */
-    public ClickCommand(ClickListener listener, Widget sender)
+    private final NativeEvent nativeClickEvent;
+
+    /**
+     * Creates a new click command that will simulate a click on the specified object when executed.
+     * 
+     * @param clickable an object that can be clicked
+     */
+    public ClickCommand(HasClickHandlers clickable)
     {
-        this.listener = listener;
-        this.sender = sender;
+        this.clickable = clickable;
+        nativeClickEvent = Document.get().createClickEvent(0, 0, 0, 0, 0, false, false, false, false);
     }
 
     /**
@@ -60,9 +61,9 @@ public final class ClickCommand implements com.google.gwt.user.client.Command
     public void execute()
     {
         try {
-            listener.onClick(sender);
+            DomEvent.fireNativeEvent(nativeClickEvent, clickable);
         } catch (Throwable t) {
-            Console.getInstance().error(t, ClickCommand.class.getName(), listener.getClass().getName());
+            Console.getInstance().error(t, ClickCommand.class.getName());
         }
     }
 }

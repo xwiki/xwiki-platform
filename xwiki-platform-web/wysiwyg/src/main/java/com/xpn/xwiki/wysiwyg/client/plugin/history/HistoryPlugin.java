@@ -19,15 +19,18 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -40,6 +43,7 @@ import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
+import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey.ModifierKey;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -49,12 +53,17 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class HistoryPlugin extends AbstractPlugin implements ClickListener
+public class HistoryPlugin extends AbstractPlugin implements ClickHandler
 {
     /**
      * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
     private final Map<PushButton, Command> buttons = new HashMap<PushButton, Command>();
+
+    /**
+     * The list of handler registrations used by this plug-in.
+     */
+    private final List<HandlerRegistration> registrations = new ArrayList<HandlerRegistration>();
 
     /**
      * Associates commands to shortcut keys.
@@ -84,7 +93,7 @@ public class HistoryPlugin extends AbstractPlugin implements ClickListener
         addFeature("redo", Command.REDO, Images.INSTANCE.redo().createImage(), Strings.INSTANCE.redo(), 'Y');
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addKeyboardListener(shortcutKeyManager);
+            registrations.addAll(shortcutKeyManager.addHandlers(getTextArea()));
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -101,14 +110,15 @@ public class HistoryPlugin extends AbstractPlugin implements ClickListener
     private void addFeature(String name, Command command, Image image, String title, char keyCode)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            PushButton button = new PushButton(image, this);
+            PushButton button = new PushButton(image);
+            registrations.add(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
 
-            ClickCommand clickCommand = new ClickCommand(this, button);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_CTRL), clickCommand);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_META), clickCommand);
+            ClickCommand clickCommand = new ClickCommand(button);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), clickCommand);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.META)), clickCommand);
         }
     }
 
@@ -121,14 +131,16 @@ public class HistoryPlugin extends AbstractPlugin implements ClickListener
     {
         for (PushButton button : buttons.keySet()) {
             button.removeFromParent();
-            button.removeClickListener(this);
         }
         buttons.clear();
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeKeyboardListener(shortcutKeyManager);
             shortcutKeyManager.clear();
             toolBarExtension.clearFeatures();
+        }
+
+        for (int i = 0; i < registrations.size(); i++) {
+            registrations.get(i).removeHandler();
         }
 
         super.destroy();
@@ -137,13 +149,13 @@ public class HistoryPlugin extends AbstractPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        Command command = buttons.get(sender);
+        Command command = buttons.get(event.getSource());
         // We have to test if the text area is attached because this method can be called after the event was consumed.
-        if (command != null && getTextArea().isAttached() && ((FocusWidget) sender).isEnabled()) {
+        if (command != null && getTextArea().isAttached() && ((FocusWidget) event.getSource()).isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }

@@ -19,17 +19,20 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.text;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Style;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.ToggleButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -40,6 +43,7 @@ import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
 import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
+import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey.ModifierKey;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleInlineStyleExecutable;
@@ -54,12 +58,17 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleInlineStyleExe
  * 
  * @version $Id$
  */
-public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
+public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
 {
     /**
      * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
     private final Map<ToggleButton, Command> buttons = new HashMap<ToggleButton, Command>();
+
+    /**
+     * The list of handler registrations used by this plug-in.
+     */
+    private final List<HandlerRegistration> registrations = new ArrayList<HandlerRegistration>();
 
     /**
      * User interface extension for the editor tool bar.
@@ -105,7 +114,7 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
             getTextArea().addKeyboardListener(this);
             getTextArea().addMouseListener(this);
             getTextArea().getCommandManager().addCommandListener(this);
-            getTextArea().addKeyboardListener(shortcutKeyManager);
+            registrations.addAll(shortcutKeyManager.addHandlers(getTextArea()));
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -123,7 +132,8 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     {
         ToggleButton button = null;
         if (getTextArea().getCommandManager().isSupported(command)) {
-            button = new ToggleButton(image, this);
+            button = new ToggleButton(image);
+            registrations.add(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -145,9 +155,9 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     {
         ToggleButton button = addFeature(name, command, image, title);
         if (button != null) {
-            ClickCommand clickCommand = new ClickCommand(this, button);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_CTRL), clickCommand);
-            shortcutKeyManager.put(new ShortcutKey(keyCode, KeyboardListener.MODIFIER_META), clickCommand);
+            ClickCommand clickCommand = new ClickCommand(button);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.CTRL)), clickCommand);
+            shortcutKeyManager.put(new ShortcutKey(keyCode, EnumSet.of(ModifierKey.META)), clickCommand);
         }
         return button;
     }
@@ -161,7 +171,6 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     {
         for (ToggleButton button : buttons.keySet()) {
             button.removeFromParent();
-            button.removeClickListener(this);
         }
         buttons.clear();
 
@@ -169,9 +178,12 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
             getTextArea().removeMouseListener(this);
             getTextArea().removeKeyboardListener(this);
             getTextArea().getCommandManager().removeCommandListener(this);
-            getTextArea().removeKeyboardListener(shortcutKeyManager);
             shortcutKeyManager.clear();
             toolBarExtension.clearFeatures();
+        }
+
+        for (int i = 0; i < registrations.size(); i++) {
+            registrations.get(i).removeHandler();
         }
 
         super.destroy();
@@ -180,13 +192,13 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        Command command = buttons.get(sender);
+        Command command = buttons.get(event.getSource());
         // We have to test if the text area is attached because this method can be called after the event was consumed.
-        if (command != null && getTextArea().isAttached() && ((FocusWidget) sender).isEnabled()) {
+        if (command != null && getTextArea().isAttached() && ((FocusWidget) event.getSource()).isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }

@@ -31,65 +31,60 @@ import com.google.gwt.user.client.ui.TextArea;
  * @version $Id$
  */
 public class PlainTextEditor extends Composite
-{   
+{
     /**
      * Container panel.
      */
     private FlowPanel container;
-    
+
     /**
-     * The textArea to wrap.
+     * The plain text area.
      */
-    private TextArea textArea; 
-    
+    private TextArea textArea;
+
     /**
-     * Constructor.
+     * Creates a new plain text editor that wraps the given text area element.
      * 
-     * @param originalTextArea TextArea element to wrap.
+     * @param textAreaElement the plain HTML text area element to wrap
      */
-    public PlainTextEditor(TextAreaElement originalTextArea)
-    {        
-        container = new FlowPanel();       
-        textArea = new TextArea();          
-        textArea.setName(originalTextArea.getName());        
-        textArea.getElement().setId(originalTextArea.getId());        
-        textArea.setText(originalTextArea.getValue());
-        textArea.setHeight(originalTextArea.getOffsetHeight() + "px");
-        textArea.setStyleName("xPlainTextEditor");        
-        container.add(textArea);        
-        originalTextArea.getParentElement().removeChild(originalTextArea);
+    public PlainTextEditor(TextAreaElement textAreaElement)
+    {
+        textArea = TextArea.wrap(textAreaElement);
+        textArea.setStyleName("xPlainTextEditor");
+
+        container = new FlowPanel();
+        container.add(textArea);
+
         initWidget(container);
     }
-    
+
     /**
-     * Get the TextArea of the editor.
-     * 
-     * @return The TextArea for this editor.
+     * @return the text area used by the editor
      */
     public TextArea getTextArea()
     {
         return textArea;
     }
-    
+
     /**
      * Set focus on the editor.
      * 
-     * @param focused True to set the focus on the editor, false to unset it.
+     * @param focused {@code true} to set the focus on the editor, {@code false} blur the editor
      */
     public void setFocus(boolean focused)
     {
         textArea.setFocus(focused);
     }
-    
+
     /**
-     * Set the editor loading state. While in loading state a spinner will be displayed. 
+     * Puts the editor in loading state. While in loading state a spinner will be displayed.
      * 
-     * @param loading true to display the editor in loading mode, false to remove the loading mode.
+     * @param loading {@code true} to enter the loading state, {@code false} to leave the loading state
      */
     public void setLoading(boolean loading)
-    {        
+    {
         if (loading) {
-            container.addStyleName(WysiwygEditor.STYLE_NAME_LOADING);            
+            container.addStyleName(WysiwygEditor.STYLE_NAME_LOADING);
             textArea.addStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
         } else {
             container.removeStyleName(WysiwygEditor.STYLE_NAME_LOADING);

@@ -19,20 +19,23 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util;
 
-import com.google.gwt.user.client.ui.KeyboardListenerAdapter;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @version $Id$
  */
-public class TextBoxNumberFilter extends KeyboardListenerAdapter
+public class TextBoxNumberFilter implements KeyPressHandler
 {
     /**
      * List of forbidden keys in the TextBox.
      */
-    private static final char[] AUTHORIZED_KEYS =
-    {KEY_BACKSPACE, KEY_DELETE, KEY_HOME, KEY_END, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN};
+    private static final char[] AUTHORIZED_KEYS = {
+        KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_DELETE, KeyCodes.KEY_HOME, KeyCodes.KEY_END, KeyCodes.KEY_LEFT,
+        KeyCodes.KEY_UP, KeyCodes.KEY_RIGHT, KeyCodes.KEY_DOWN
+    };
 
     /**
      * Determine if a char must be filtered.
@@ -56,13 +59,13 @@ public class TextBoxNumberFilter extends KeyboardListenerAdapter
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListenerAdapter#onKeyPress(Widget, char, int)
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        if (isFilteredKey(keyCode)) {
+        if (isFilteredKey(event.getCharCode())) {
             // Suppress the current keyboard event.
-            ((TextBox) sender).cancelKey();
+            ((TextBox) event.getSource()).cancelKey();
         }
     }
 }

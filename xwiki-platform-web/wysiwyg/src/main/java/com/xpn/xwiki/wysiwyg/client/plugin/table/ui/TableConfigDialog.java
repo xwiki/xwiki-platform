@@ -113,7 +113,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         rows.setMaxLength(2);
         rows.setVisibleLength(2);
         rows.setText(Strings.INSTANCE.tableRowsDefault());
-        rows.addKeyboardListener(new TextBoxNumberFilter());
+        rows.addKeyPressHandler(new TextBoxNumberFilter());
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(new Label(Strings.INSTANCE.tableRowsLabel()));
         panel.add(rows);
@@ -132,7 +132,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         cols.setMaxLength(2);
         cols.setVisibleLength(2);
         cols.setText(Strings.INSTANCE.tableColsDefault());
-        cols.addKeyboardListener(new TextBoxNumberFilter());
+        cols.addKeyPressHandler(new TextBoxNumberFilter());
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(new Label(Strings.INSTANCE.tableColsLabel()));
         panel.add(cols);
@@ -151,7 +151,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         borderSize.setMaxLength(2);
         borderSize.setVisibleLength(2);
         borderSize.setText(Strings.INSTANCE.tableBorderDefault());
-        borderSize.addKeyboardListener(new TextBoxNumberFilter());
+        borderSize.addKeyPressHandler(new TextBoxNumberFilter());
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(new Label(Strings.INSTANCE.tableBorderLabel()));
         panel.add(borderSize);

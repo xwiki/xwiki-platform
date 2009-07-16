@@ -19,17 +19,24 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util;
 
+import com.google.gwt.event.dom.client.HasMouseDownHandlers;
+import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
+import com.google.gwt.event.dom.client.HasMouseUpHandlers;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.MouseListener;
-import com.google.gwt.user.client.ui.SourcesMouseEvents;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * Adapts {@link SourcesMouseEvents} to {@link SourcesDragEvents}.
+ * Adapts mouse events to drag events.
  * 
  * @version $Id$
  */
-public class DragAdaptor implements SourcesDragEvents, MouseListener
+public class DragAdaptor implements SourcesDragEvents, MouseDownHandler, MouseMoveHandler, MouseUpHandler
 {
     /**
      * The number of pixels the mouse has to move before the drag starts, after the mouse button was pressed.
@@ -74,7 +81,9 @@ public class DragAdaptor implements SourcesDragEvents, MouseListener
     public DragAdaptor(Widget adaptee)
     {
         this.adaptee = adaptee;
-        ((SourcesMouseEvents) adaptee).addMouseListener(this);
+        ((HasMouseDownHandlers) adaptee).addMouseDownHandler(this);
+        ((HasMouseMoveHandlers) adaptee).addMouseMoveHandler(this);
+        ((HasMouseUpHandlers) adaptee).addMouseUpHandler(this);
     }
 
     /**
@@ -100,46 +109,28 @@ public class DragAdaptor implements SourcesDragEvents, MouseListener
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseDown(Widget, int, int)
+     * @see MouseDownHandler#onMouseDown(MouseDownEvent)
      */
-    public void onMouseDown(Widget sender, int x, int y)
+    public void onMouseDown(MouseDownEvent event)
     {
-        if (sender == adaptee) {
+        if (event.getSource() == adaptee) {
             mouseDown = true;
             DOM.setCapture(adaptee.getElement());
-            xMouseDown = x;
-            yMouseDown = y;
+            xMouseDown = event.getX();
+            yMouseDown = event.getY();
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseEnter(Widget)
+     * @see MouseDownHandler#onMouseDown(MouseDownEvent)
      */
-    public void onMouseEnter(Widget sender)
+    public void onMouseMove(MouseMoveEvent event)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseLeave(Widget)
-     */
-    public void onMouseLeave(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseMove(Widget, int, int)
-     */
-    public void onMouseMove(Widget sender, int x, int y)
-    {
-        if (sender == adaptee) {
+        if (event.getSource() == adaptee) {
+            int x = event.getX();
+            int y = event.getY();
             if (dragging) {
                 dragListeners.fireDrag(adaptee, x, y);
             } else if (mouseDown && (Math.abs(x - xMouseDown) > DELTA || Math.abs(y - yMouseDown) > DELTA)) {
@@ -152,16 +143,16 @@ public class DragAdaptor implements SourcesDragEvents, MouseListener
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseUp(Widget, int, int)
+     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
      */
-    public void onMouseUp(Widget sender, int x, int y)
+    public void onMouseUp(MouseUpEvent event)
     {
-        if (sender == adaptee) {
+        if (event.getSource() == adaptee) {
             mouseDown = false;
             DOM.releaseCapture(adaptee.getElement());
             if (dragging) {
                 dragging = false;
-                dragListeners.fireDragEnd(adaptee, x, y);
+                dragListeners.fireDragEnd(adaptee, event.getX(), event.getY());
             }
         }
     }

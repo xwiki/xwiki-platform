@@ -1,24 +1,21 @@
-.xImporterTabPanel {
-  width: 480px;
-  height: 360px;
+.xImporterPanel {
+  width: 100%;
+  height: 100%;
+  /* hidden overflow since the IE browsers detect badly the size of some tables */
+  overflow: hidden;
 }
 
-.xImporterInfoLabel {
-  text-align: center;
-  padding-bottom: 5px;  
+.xImporterTabPanel {
+  width: 459px;
+  height: auto;
 }
 
 .xImporterClipboardTabEditor {
-  width: 100%;
-  height: 260px;
-  border: solid 1px #000000;
+  height: 240px;
 }
 
-.xImporterImportButton {
-  width: 60px;
-}
-
-.xImporterCancelButton {
-  width: 60px;
-  margin-left: 5px;
+.xImporterDialog .xDialogFooter .gwt-CheckBox {
+  float: left;
+  padding-top: 0;
+  margin-bottom: 0;
 }

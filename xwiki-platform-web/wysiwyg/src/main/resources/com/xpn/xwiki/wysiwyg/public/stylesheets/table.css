@@ -1,21 +1,7 @@
-.xTableMainPanel {
-  padding-top: 1em;
-  padding-bottom: 1em;
-}
-
-.xTablePanel {
-  margin: 1em;  
-}
-
-.xTablePanel .gwt-Label {
-  font-weight: bold;
+.xTablePixel {
   display: inline;
 }
 
-.xTablePanel .gwt-TextBox {
-  display: inline;
-}
-
-.xTablePanel .gwt-CheckBox {
-  display: inline;
-}
+.xTablePanel .xBorderInput {
+  width: 410px;
+} 

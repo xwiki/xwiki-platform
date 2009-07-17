@@ -22,8 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.DockPanel;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Panel;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
@@ -32,23 +32,8 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
  * @version $Id$
  * @since 1.8M2
  */
-public class ButtonPanel extends DockPanel
+public class ButtonPanel extends FlowPanel
 {
-    /**
-     * Width of the entire button panel.
-     */
-    private static final String BUTTON_PANEL_WIDTH = "100%";
-    
-    /**
-     * Width of the 'filter styles' checkbox.
-     */
-    private static final String STYLES_CHECKBOX_WIDTH = "80%";
-    
-    /**
-     * Width of buttons.
-     */
-    private static final String BUTTON_WIDTH = "10%";
-    
     /**
      * Filter Styles check box.
      */
@@ -72,22 +57,20 @@ public class ButtonPanel extends DockPanel
     public ButtonPanel(ClickListener listener)
     {
         filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importerFilterStylesCheckBoxCaption());
-        add(filterStylesCheckBox, DockPanel.WEST);
-        setCellHorizontalAlignment(filterStylesCheckBox, HasHorizontalAlignment.ALIGN_LEFT);
-        setCellWidth(filterStylesCheckBox, STYLES_CHECKBOX_WIDTH);
-        cancelButton = new Button(Strings.INSTANCE.importerCancelButtonCaption());
-        cancelButton.addStyleName("xImporterCancelButton");
-        cancelButton.addClickListener(listener);
-        add(cancelButton, DockPanel.EAST);
-        setCellHorizontalAlignment(cancelButton, HasHorizontalAlignment.ALIGN_RIGHT);
-        setCellWidth(cancelButton, BUTTON_WIDTH);
+        add(filterStylesCheckBox);
         importButton = new Button(Strings.INSTANCE.importerImportButtonCaption());
         importButton.addStyleName("xImporterImportButton");
         importButton.addClickListener(listener);
-        add(importButton, DockPanel.EAST);
-        setCellHorizontalAlignment(importButton, HasHorizontalAlignment.ALIGN_RIGHT);
-        setCellWidth(importButton, BUTTON_WIDTH);
-        setWidth(BUTTON_PANEL_WIDTH);
+        cancelButton = new Button(Strings.INSTANCE.importerCancelButtonCaption());
+        cancelButton.addStyleName("xImporterCancelButton");
+        cancelButton.addClickListener(listener);
+        add(cancelButton);
+        add(importButton);
+
+        // add a clear floats panel
+        Panel fakeClearPanel = new FlowPanel();
+        fakeClearPanel.addStyleName("clearfloats");
+        add(fakeClearPanel);
     }
 
     /**
@@ -112,5 +95,5 @@ public class ButtonPanel extends DockPanel
     public Button getCancelButton()
     {
         return cancelButton;
-    }    
+    }
 }

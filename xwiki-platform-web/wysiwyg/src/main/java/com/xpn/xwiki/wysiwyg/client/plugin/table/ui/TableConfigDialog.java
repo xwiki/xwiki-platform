@@ -30,19 +30,34 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.TextBoxNumberFilter;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
+import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
 
 /**
  * Table creation dialog.
  * 
  * @version $Id$
  */
-public class TableConfigDialog extends CompositeDialogBox implements ClickListener
+public class TableConfigDialog extends ComplexDialogBox implements ClickListener
 {
     /**
      * Default panel style.
      */
     private static final String DEFAULT_PANEL_STYLE = "xTablePanel";
+
+    /**
+     * Style of the information labels.
+     */
+    private static final String INFO_LABEL_STYLE = "xInfoLabel";
+
+    /**
+     * Style used to signal mandatory elements.
+     */
+    private static final String MANDATORY_STYLE = "mandatory";
+
+    /**
+     * Style of the information labels.
+     */
+    private static final String HELP_LABEL_STYLE = "xHelpLabel";
 
     /**
      * Row number text input.
@@ -87,6 +102,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         // Miscellaneous settings
         getDialog().setIcon(Images.INSTANCE.insertTable().createImage());
         getDialog().setCaption(Strings.INSTANCE.table());
+        getHeader().clear();
 
         // Create main panel
         FlowPanel mainPanel = new FlowPanel();
@@ -94,12 +110,12 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         mainPanel.add(getRowsPanel());
         mainPanel.add(getColsPanel());
         // FIXME : activate table border option when possible
-        // mainPanel.add(getBorderPanel());
+        //mainPanel.add(getBorderPanel());
         mainPanel.add(getHeaderPanel());
-        mainPanel.add(insertButton);
+        getFooter().add(insertButton);
 
         // Main panel initialization
-        initWidget(mainPanel);
+        getBody().add(mainPanel);
     }
 
     /**
@@ -110,12 +126,16 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         rows = new TextBox();
         FlowPanel panel = new FlowPanel();
 
-        rows.setMaxLength(2);
-        rows.setVisibleLength(2);
         rows.setText(Strings.INSTANCE.tableRowsDefault());
         rows.addKeyPressHandler(new TextBoxNumberFilter());
         panel.addStyleName(DEFAULT_PANEL_STYLE);
-        panel.add(new Label(Strings.INSTANCE.tableRowsLabel()));
+        Label rowsLabel = new Label(Strings.INSTANCE.tableRowsLabel());
+        rowsLabel.setStyleName(INFO_LABEL_STYLE);
+        rowsLabel.addStyleDependentName(MANDATORY_STYLE);
+        Label rowsHelpLabel = new Label(Strings.INSTANCE.tableRowsHelpLabel());
+        rowsHelpLabel.setStyleName(HELP_LABEL_STYLE);
+        panel.add(rowsLabel);
+        panel.add(rowsHelpLabel);
         panel.add(rows);
 
         return panel;
@@ -129,12 +149,16 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
         cols = new TextBox();
         FlowPanel panel = new FlowPanel();
 
-        cols.setMaxLength(2);
-        cols.setVisibleLength(2);
         cols.setText(Strings.INSTANCE.tableColsDefault());
         cols.addKeyPressHandler(new TextBoxNumberFilter());
         panel.addStyleName(DEFAULT_PANEL_STYLE);
-        panel.add(new Label(Strings.INSTANCE.tableColsLabel()));
+        Label colsLabel = new Label(Strings.INSTANCE.tableColsLabel());
+        colsLabel.setStyleName(INFO_LABEL_STYLE);
+        colsLabel.addStyleDependentName(MANDATORY_STYLE);
+        Label colsHelpLabel = new Label(Strings.INSTANCE.tableColsHelpLabel());
+        colsHelpLabel.setStyleName(HELP_LABEL_STYLE);
+        panel.add(colsLabel);
+        panel.add(colsHelpLabel);
         panel.add(cols);
 
         return panel;
@@ -146,16 +170,22 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
     private Panel getBorderPanel()
     {
         borderSize = new TextBox();
+        borderSize.addStyleName("xBorderInput");
         FlowPanel panel = new FlowPanel();
 
-        borderSize.setMaxLength(2);
-        borderSize.setVisibleLength(2);
         borderSize.setText(Strings.INSTANCE.tableBorderDefault());
         borderSize.addKeyPressHandler(new TextBoxNumberFilter());
         panel.addStyleName(DEFAULT_PANEL_STYLE);
-        panel.add(new Label(Strings.INSTANCE.tableBorderLabel()));
+        Label borderSizeLabel = new Label(Strings.INSTANCE.tableBorderLabel());
+        borderSizeLabel.setStyleName(INFO_LABEL_STYLE);
+        Label borderSizeHelpLabel = new Label(Strings.INSTANCE.tableBorderHelpLabel());
+        borderSizeHelpLabel.setStyleName(HELP_LABEL_STYLE);
+        panel.add(borderSizeLabel);
+        panel.add(borderSizeHelpLabel);
         panel.add(borderSize);
-        panel.add(new Label(Strings.INSTANCE.tablePixel()));
+        Label borderPixelLabel = new Label(Strings.INSTANCE.tablePixel());
+        borderPixelLabel.setStyleName("xTablePixel");
+        panel.add(borderPixelLabel);
 
         return panel;
     }
@@ -165,13 +195,17 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
      */
     private Panel getHeaderPanel()
     {
-        header = new CheckBox();
+        header = new CheckBox(Strings.INSTANCE.tableHeaderLabel());
+        header.addStyleName(INFO_LABEL_STYLE);
         FlowPanel panel = new FlowPanel();
 
         header.setChecked(true);
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(header);
-        panel.add(new Label(Strings.INSTANCE.tableHeaderLabel()));
+
+        Label headerHelpLabel = new Label(Strings.INSTANCE.tableHeaderHelpLabel());
+        headerHelpLabel.setStyleName(HELP_LABEL_STYLE);
+        panel.add(headerHelpLabel);
 
         return panel;
     }
@@ -243,7 +277,7 @@ public class TableConfigDialog extends CompositeDialogBox implements ClickListen
     /**
      * {@inheritDoc}
      * 
-     * @see CompositeDialogBox#center()
+     * @see ComplexDialogBox#center()
      */
     public void center()
     {

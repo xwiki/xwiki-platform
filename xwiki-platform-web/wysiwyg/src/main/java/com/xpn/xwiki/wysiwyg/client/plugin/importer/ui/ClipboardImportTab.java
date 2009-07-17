@@ -20,9 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RichTextArea;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
@@ -35,12 +35,7 @@ public class ClipboardImportTab extends Composite
     /**
      * Container panel.
      */
-    private VerticalPanel mainPanel;
-
-    /**
-     * Information label.
-     */
-    private Label infoLabel;
+    private FlowPanel mainPanel;
 
     /**
      * Editor area (where the user can paste his content).
@@ -53,13 +48,16 @@ public class ClipboardImportTab extends Composite
     public ClipboardImportTab()
     {
         // Main container panel.
-        mainPanel = new VerticalPanel();
-        mainPanel.setSpacing(5);
+        mainPanel = new FlowPanel();
 
         // Info label.
-        infoLabel = new Label(Strings.INSTANCE.importerClipboardTabInfoLabel());
-        infoLabel.addStyleName("xImporterInfoLabel");
+        Label infoLabel = new Label(Strings.INSTANCE.importerClipboardTabInfoLabel());
+        infoLabel.setStyleName("xInfoLabel");
+        infoLabel.addStyleDependentName("mandatory");
+        Label helpLabel = new Label(Strings.INSTANCE.importerClipboardTabHelpLabel());
+        helpLabel.setStyleName("xHelpLabel");
         mainPanel.add(infoLabel);
+        mainPanel.add(helpLabel);
 
         // Editor panel.
         editor = new RichTextArea();
@@ -77,7 +75,7 @@ public class ClipboardImportTab extends Composite
     {
         editor.setHTML("");
     }
-    
+
     /**
      * @return the html content of editor.
      */

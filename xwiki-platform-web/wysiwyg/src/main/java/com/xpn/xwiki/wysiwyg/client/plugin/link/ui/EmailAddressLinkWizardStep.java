@@ -61,16 +61,6 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkWizardStep#getLabelTextBoxTooltip()
-     */
-    protected String getLabelTextBoxTooltip()
-    {
-        return Strings.INSTANCE.linkEmailAddressLabelTextBoxTooltip();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see AbstractExternalLinkWizardStep#getErrorMessage()
      */
     protected String getErrorMessage()
@@ -81,21 +71,20 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkWizardStep#getInputDefaultText()
-     */
-    protected String getInputDefaultText()
-    {
-        return Strings.INSTANCE.linkEmailAddressTextBox();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see AbstractExternalLinkWizardStep#getURLLabel()
      */
     protected String getURLLabel()
     {
         return Strings.INSTANCE.linkEmailLabel();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getURLHelpLabel()
+    {
+        return Strings.INSTANCE.linkEmailHelpLabel();
     }
 
     /**

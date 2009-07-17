@@ -73,8 +73,13 @@ public class CreateNewPageWizardStep implements WizardStep
     {
         this.editedResource = editedResource;
         Label pageNameLabel = new Label(Strings.INSTANCE.linkNewPageLabel());
+        pageNameLabel.setStyleName("xInfoLabel");
+        pageNameLabel.addStyleDependentName("mandatory");
+        Label helpPageNameLabel = new Label(Strings.INSTANCE.linkNewPageTextBoxTooltip());
+        helpPageNameLabel.setStyleName("xHelpLabel");
         mainPanel.addStyleName("xLinkToNewPage");
         mainPanel.add(pageNameLabel);
+        mainPanel.add(helpPageNameLabel);
         pageNameTextBox.setTitle(Strings.INSTANCE.linkNewPageTextBoxTooltip());
         mainPanel.add(pageNameTextBox);
     }

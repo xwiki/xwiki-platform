@@ -21,10 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
@@ -37,23 +37,18 @@ public class FileImportTab extends Composite
     /**
      * Container panel.
      */
-    private VerticalPanel verticalPanel;
-
-    /**
-     * Information label.
-     */
-    private Label infoLabel;
+    private FlowPanel mainPanel;
 
     /**
      * A {@link FormPanel} to hold the fileUpload widget.
      */
-    private FormPanel formPanel;    
-    
+    private FormPanel formPanel;
+
     /**
      * The {@link FileUpload} widget.
      */
     private FileUpload fileUpload;
-    
+
     /**
      * Default constructor.
      * 
@@ -63,14 +58,18 @@ public class FileImportTab extends Composite
     public FileImportTab(String uploadUrl, FormHandler formHandler)
     {
         // Main container panel.
-        verticalPanel = new VerticalPanel();
-        verticalPanel.setSpacing(5);
+        mainPanel = new FlowPanel();
 
         // Info label.
-        infoLabel = new Label(Strings.INSTANCE.importerFileTabInfoLabel());
-        infoLabel.addStyleName("xImporterInfoLabel");
-        verticalPanel.add(infoLabel);
+        Label infoLabel = new Label(Strings.INSTANCE.importerFileTabInfoLabel());
+        infoLabel.setStyleName("xInfoLabel");
+        infoLabel.addStyleDependentName("mandatory");
+        mainPanel.add(infoLabel);
         
+        Label helpLabel = new Label(Strings.INSTANCE.importerFileTabHelpLabel());
+        helpLabel.setStyleName("xHelpLabel");
+        mainPanel.add(helpLabel);
+
         // Form panel.
         formPanel = new FormPanel();
         formPanel.setAction(uploadUrl);
@@ -78,14 +77,14 @@ public class FileImportTab extends Composite
         formPanel.setMethod(FormPanel.METHOD_POST);
         fileUpload = new FileUpload();
         fileUpload.setName("filepath");
-        formPanel.add(fileUpload);  
+        formPanel.add(fileUpload);
         formPanel.addFormHandler(formHandler);
-        verticalPanel.add(formPanel);
+        mainPanel.add(formPanel);
 
         // Finalize.
-        initWidget(verticalPanel);
+        initWidget(mainPanel);
     }
-    
+
     /**
      * Submits the internal form.
      */
@@ -93,12 +92,12 @@ public class FileImportTab extends Composite
     {
         formPanel.submit();
     }
-    
+
     /**
      * @return the file name entered into {@link FileUpload} widget.
      */
-    public String getFileName() 
+    public String getFileName()
     {
         return fileUpload.getFilename();
-    }        
+    }
 }

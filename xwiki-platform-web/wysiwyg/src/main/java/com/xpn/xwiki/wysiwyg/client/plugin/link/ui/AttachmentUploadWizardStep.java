@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -104,6 +105,15 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     public String getWiki()
     {
         return linkData.getWiki();
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getFileHelpLabel()
+    {
+        return Strings.INSTANCE.linkAttachmentUploadHelpLabel();
     }
 
     /**

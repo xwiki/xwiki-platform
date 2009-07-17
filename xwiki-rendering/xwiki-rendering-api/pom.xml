@@ -199,6 +199,9 @@
                 <exclude>org/xwiki/rendering/macro/descriptor/AbstractMacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/DefaultMacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/DefaultParameterDescriptor</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/annotation/ParameterDescription</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/annotation/ParameterHidden</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/annotation/ParameterMandatory</exclude>
                 <!-- Seems clirr plugin consider adding new API as an error (which I don't understand). -->
                 <exclude>org/xwiki/rendering/renderer/PrintRendererFactory</exclude>                
               </excludes>

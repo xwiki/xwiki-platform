@@ -83,6 +83,34 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <!-- Ensure that no macro module uses the HTML macro. We want to ensure this since we want to let users be
+           able to disable the HTML macro (for security reasons) and the rest of XWiki should continue to work fine
+      -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.xwiki.platform:xwiki-core-rendering-macro-html</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      
+    </plugins>
+  </build>
   <modules>
     <module>xwiki-rendering-macro-id</module>
     <module>xwiki-rendering-macro-include</module>

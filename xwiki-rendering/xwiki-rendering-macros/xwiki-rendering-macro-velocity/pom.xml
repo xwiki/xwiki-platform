@@ -93,6 +93,16 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>
+      <!-- Since we currently need the HTML macro for testing the Velocity macro we need to ensure that the
+           enforcer plugin doesn't make the build fail. Note that it would be nice if the enforcer plugin
+           could support banned dependencies for a given scope. -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <fail>false</fail>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

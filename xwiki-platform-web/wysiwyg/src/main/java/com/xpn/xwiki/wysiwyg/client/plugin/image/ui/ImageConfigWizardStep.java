@@ -47,6 +47,16 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
 public class ImageConfigWizardStep implements WizardStep, KeyboardListener, SourcesNavigationEvents
 {
     /**
+     * The style for the information labels.
+     */
+    private static final String INFO_LABEL_STYLE = "xInfoLabel";
+    
+    /**
+     * The style for the help labels.
+     */
+    private static final String HELP_LABEL_STYLE = "xHelpLabel";
+    
+    /**
      * The image data to be edited by this wizard step.
      */
     private ImageConfig imageData;
@@ -104,9 +114,19 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         heightBox.addKeyboardListener(this);
         FlowPanel sizePanel = new FlowPanel();
         sizePanel.addStyleName("xSizePanel");
-        sizePanel.add(new Label(Strings.INSTANCE.imageWidthLabel()));
+        Label widthLabel = new Label(Strings.INSTANCE.imageWidthLabel());
+        widthLabel.setStyleName(INFO_LABEL_STYLE);
+        Label widthHelpLabel = new Label(Strings.INSTANCE.imageWidthHelpLabel());
+        widthHelpLabel.setStyleName(HELP_LABEL_STYLE);        
+        sizePanel.add(widthLabel);
+        sizePanel.add(widthHelpLabel);
         sizePanel.add(widthBox);
-        sizePanel.add(new Label(Strings.INSTANCE.imageHeightLabel()));
+        Label heightLabel = new Label(Strings.INSTANCE.imageHeightLabel());
+        heightLabel.setStyleName(INFO_LABEL_STYLE);
+        Label heightHelpLabel = new Label(Strings.INSTANCE.imageHeightHelpLabel());
+        heightHelpLabel.setStyleName(HELP_LABEL_STYLE);
+        sizePanel.add(heightLabel);
+        sizePanel.add(heightHelpLabel);
         sizePanel.add(heightBox);
 
         return sizePanel;
@@ -120,9 +140,13 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         altTextBox = new TextBox();
         altTextBox.addKeyboardListener(this);
         Label altTextLabel = new Label(Strings.INSTANCE.imageAltTextLabel());
+        altTextLabel.setStyleName(INFO_LABEL_STYLE);
+        Label altTextHelpLabel = new Label(Strings.INSTANCE.imageAltTextHelpLabel());
+        altTextHelpLabel.setStyleName(HELP_LABEL_STYLE);
         FlowPanel altTextPanel = new FlowPanel();
         altTextPanel.addStyleName("xAltPanel");
         altTextPanel.add(altTextLabel);
+        altTextPanel.add(altTextHelpLabel);
         altTextPanel.add(altTextBox);
 
         return altTextPanel;
@@ -148,8 +172,12 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     {
         FlowPanel hAlignPanel = new FlowPanel();
         Label hAlignLabel = new Label(Strings.INSTANCE.imageHorizontalAlignmentLabel());
+        hAlignLabel.setStyleName(INFO_LABEL_STYLE);
+        Label hAlignHelpLabel = new Label(Strings.INSTANCE.imageHorizontalAlignmentHelpLabel());
+        hAlignHelpLabel.setStyleName(HELP_LABEL_STYLE);
         hAlignPanel.addStyleName("xHAlignPanel");
         hAlignPanel.add(hAlignLabel);
+        hAlignPanel.add(hAlignHelpLabel);
         alignmentOptions = new ArrayList<RadioButton>();
         RadioButton leftRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignLeftLabel());
         leftRadio.setFormValue(ImageConfig.ImageAlignment.LEFT.toString());
@@ -178,8 +206,12 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     {
         FlowPanel vAlignPanel = new FlowPanel();
         Label vAlignLabel = new Label(Strings.INSTANCE.imageVerticalAlignmentLabel());
+        vAlignLabel.setStyleName(INFO_LABEL_STYLE);
+        Label vAlignHelpLabel = new Label(Strings.INSTANCE.imageVerticalAlignmentHelpLabel());
+        vAlignHelpLabel.setStyleName(HELP_LABEL_STYLE);
         vAlignPanel.addStyleName("xVAlignPanel");
         vAlignPanel.add(vAlignLabel);
+        vAlignPanel.add(vAlignHelpLabel);
         RadioButton topRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignTopLabel());
         topRadio.setFormValue(ImageConfig.ImageAlignment.TOP.toString());
         topRadio.addKeyboardListener(this);
@@ -221,7 +253,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     {
         String alignValue = alignment != null ? alignment.toString() : "";
         for (RadioButton rb : alignmentOptions) {
-            if (rb.getValue().equals(alignValue)) {
+            if (rb.getFormValue().equals(alignValue)) {
                 rb.setChecked(true);
             } else {
                 rb.setChecked(false);

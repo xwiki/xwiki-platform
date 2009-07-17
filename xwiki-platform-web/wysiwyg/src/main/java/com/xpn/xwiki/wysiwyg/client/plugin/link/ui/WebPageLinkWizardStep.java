@@ -41,16 +41,6 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getLabelTextBoxTooltip()
-     */
-    protected String getLabelTextBoxTooltip()
-    {
-        return Strings.INSTANCE.linkWebPageLabelTextBoxTooltip();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see AbstractExternalLinkTab#getErrorMessage()
      */
     protected String getErrorMessage()
@@ -61,21 +51,20 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getInputDefaultText()
-     */
-    protected String getInputDefaultText()
-    {
-        return Strings.INSTANCE.linkWebPageTextBox();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see AbstractExternalLinkTab#getURLLabel()
      */
     protected String getURLLabel()
     {
         return Strings.INSTANCE.linkWebPageLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getURLHelpLabel()
+    {
+        return Strings.INSTANCE.linkWebPageHelpLabel();
     }
 
     /**

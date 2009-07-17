@@ -12,22 +12,7 @@
 }
 
 .xMacroLabel, .xMacroParameterLabel {
-  color: #666;
-  font-size: 85%;
-  font-weight: bolder;
-  margin-bottom: 3px;
-  text-transform: capitalize;
-}
-
-.xMacroParameterLabel-mandatory {
-  color: #5A1;
-}
-
-.xMacroDescription, .xMacroParameterDescription {
-  color: #777;
-  font-size: 75%;
-  font-style: italic;
-  margin-bottom: 3px;
+  padding-top: 0;
 }
 
 .xMacroDescription {
@@ -46,16 +31,7 @@
 }
 
 .xMacroParameter textarea {
-  width: 433px;
   height: 150px;
-  border: 1px solid #AAA;
-  padding: 2px;
-}
-
-.xMacroParameter .textInput {
-  width: 433px;
-  border: 1px solid #AAA;
-  padding: 2px;
 }
 
 .xMacroParameter option {

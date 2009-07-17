@@ -181,9 +181,15 @@ public interface Strings extends Constants
 
     String linkOpenInNewWindowLabel();
 
+    String linkOpenInNewWindowHelpLabel();
+
     String linkWebPageLabel();
 
+    String linkWebPageHelpLabel();
+
     String linkEmailLabel();
+
+    String linkEmailHelpLabel();
 
     String linkEmailAddressTextBox();
 
@@ -199,16 +205,12 @@ public interface Strings extends Constants
 
     String linkConfigTooltipTextBoxTooltip();
 
-    String linkWebPageLabelTextBoxTooltip();
-
-    String linkEmailAddressLabelTextBoxTooltip();
-
     String linkURLToEmailAddressTextBoxTooltip();
 
     String linkURLToWebPageTextBoxTooltip();
-    
+
     String linkWikipageSearchTooltip();
-    
+
     String linkWikipageSearchButton();
 
     String linkSelectWikipageTitle();
@@ -217,10 +219,12 @@ public interface Strings extends Constants
 
     String linkSelectAttachmentTitle();
 
+    String linkAttachmentUploadHelpLabel();
+
     String linkNoAttachmentSelectedError();
 
     String linkConfigTitle();
-    
+
     String linkNewPageOptionLabel();
 
     String linkCreateNewPageTitle();
@@ -234,12 +238,12 @@ public interface Strings extends Constants
     String selectorSelectFromCurrentPage();
 
     String selectorSelectFromAllPages();
-    
+
     String selectorSelectFromRecentPages();
-    
+
     String selectorSelectFromSearchPages();
 
-    String linkErrorLoadingData();   
+    String linkErrorLoadingData();
 
     String fileUploadLabel();
 
@@ -256,7 +260,7 @@ public interface Strings extends Constants
     String fileUploadSubmitError();
 
     String fileUploadNoPathError();
-    
+
     String fileGetSubmitError();
 
     String image();
@@ -281,11 +285,19 @@ public interface Strings extends Constants
 
     String imageWidthLabel();
 
+    String imageWidthHelpLabel();
+
     String imageHeightLabel();
+
+    String imageHeightHelpLabel();
 
     String imageHorizontalAlignmentLabel();
 
+    String imageHorizontalAlignmentHelpLabel();
+
     String imageVerticalAlignmentLabel();
+
+    String imageVerticalAlignmentHelpLabel();
 
     String imageAlignLeftLabel();
 
@@ -303,23 +315,35 @@ public interface Strings extends Constants
 
     String imageAltTextLabel();
 
+    String imageAltTextHelpLabel();
+
+    String imageUploadHelpLabel();
+
     String imageNoImageSelectedError();
 
     String table();
 
     String tableRowsLabel();
 
+    String tableRowsHelpLabel();
+
     String tableRowsDefault();
 
     String tableColsLabel();
+
+    String tableColsHelpLabel();
 
     String tableColsDefault();
 
     String tableBorderLabel();
 
+    String tableBorderHelpLabel();
+
     String tableBorderDefault();
 
     String tableHeaderLabel();
+
+    String tableHeaderHelpLabel();
 
     String tablePixel();
 
@@ -333,9 +357,13 @@ public interface Strings extends Constants
 
     String importerClipboardTabInfoLabel();
 
+    String importerClipboardTabHelpLabel();
+
     String importerFileTabCaption();
 
     String importerFileTabInfoLabel();
+
+    String importerFileTabHelpLabel();
 
     String importerFilterStylesCheckBoxCaption();
 

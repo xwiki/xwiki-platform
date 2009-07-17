@@ -87,21 +87,37 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     public LinkConfigWizardStep()
     {
+        String infoLabelStyle = "xInfoLabel";
+        String helpLabelStyle = "xHelpLabel";
         Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
+        labelLabel.setStyleName(infoLabelStyle);
+        labelLabel.addStyleDependentName("mandatory");
+        Label helpLabelLabel = new Label(getLabelTextBoxTooltip());
+        helpLabelLabel.setStyleName(helpLabelStyle);
         // on enter in the textbox, submit the form
         labelTextBox.addKeyboardListener(this);
         labelTextBox.setTitle(getLabelTextBoxTooltip());
         tooltipTextBox.setTitle(getTooltipTextBoxTooltip());
         mainPanel.add(labelLabel);
+        mainPanel.add(helpLabelLabel);
         mainPanel.add(getLabelTextBox());
         mainPanel.addStyleName(DEFAULT_STYLE_NAME);
         Label tooltipLabel = new Label(Strings.INSTANCE.linkTooltipLabel());
+        tooltipLabel.setStyleName(infoLabelStyle);
+        Label helpTooltipLabel = new Label(getTooltipTextBoxTooltip());
+        helpTooltipLabel.setStyleName(helpLabelStyle);
         // on enter in the textbox, submit the form
         tooltipTextBox.addKeyboardListener(this);
         mainPanel.add(tooltipLabel);
+        mainPanel.add(helpTooltipLabel);
         mainPanel.add(tooltipTextBox);
         newWindowCheckBox = new CheckBox(Strings.INSTANCE.linkOpenInNewWindowLabel());
+        // just add the style, because we need to be able to still detect this is a checkbox
+        newWindowCheckBox.addStyleName(infoLabelStyle);
+        Label helpNewWindowLabel = new Label(Strings.INSTANCE.linkOpenInNewWindowHelpLabel());
+        helpNewWindowLabel.setStyleName(helpLabelStyle);
         mainPanel.add(newWindowCheckBox);
+        mainPanel.add(helpNewWindowLabel);
     }
 
     /**

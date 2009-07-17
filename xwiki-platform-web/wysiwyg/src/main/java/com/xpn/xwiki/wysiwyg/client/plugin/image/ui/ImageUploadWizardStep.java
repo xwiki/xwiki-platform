@@ -20,6 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -91,6 +92,15 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
         imageData.setImageURL(attach.getDownloadUrl());
         ResourceName ref = new ResourceName(attach.getReference(), true);
         imageData.setReference(ref.getRelativeTo(editedResource).toString());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getFileHelpLabel()
+    {
+        return Strings.INSTANCE.imageUploadHelpLabel();
     }
 
     /**

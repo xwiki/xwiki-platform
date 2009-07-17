@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardStep implements FocusListener
+public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardStep
 {
     /**
      * The text box to store the URI of the created link.
@@ -52,8 +51,11 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     {
         super();
         Label urlLabel = new Label(getURLLabel());
+        urlLabel.setStyleName("xInfoLabel");
+        urlLabel.addStyleDependentName("mandatory");
+        Label helpUrlLabel = new Label(getURLHelpLabel());
+        helpUrlLabel.setStyleName("xHelpLabel");
 
-        urlTextBox.addFocusListener(this);
         urlTextBox.setTitle(getURLTextBoxTooltip());
         urlTextBox.addKeyboardListener(this);
 
@@ -66,6 +68,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         FlowPanel urlPanel = new FlowPanel();
         urlPanel.addStyleName("url");
         urlPanel.add(urlLabel);
+        urlPanel.add(helpUrlLabel);
         urlPanel.add(urlTextBox);
 
         mainPanel.add(urlPanel);
@@ -81,7 +84,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         {
             public void onSuccess(Boolean result)
             {
-                urlTextBox.setText(getLinkData().getUrl() == null ? getInputDefaultText() : getLinkData().getUrl());
+                urlTextBox.setText(getLinkData().getUrl() == null ? "" : getLinkData().getUrl());
                 cb.onSuccess(null);
             }
 
@@ -134,7 +137,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     protected void validateAndSaveData(AsyncCallback<Boolean> async)
     {
         // validate this data
-        if (urlTextBox.getText().trim().length() == 0 || urlTextBox.getText().equals(getInputDefaultText())) {
+        if (urlTextBox.getText().trim().length() == 0) {
             Window.alert(getErrorMessage());
             async.onSuccess(false);
         } else {
@@ -143,28 +146,6 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
             getLinkData().setReference(linkUri);
             async.onSuccess(true);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onFocus(Widget)
-     */
-    public void onFocus(Widget sender)
-    {
-        if (sender == urlTextBox && urlTextBox.getText().trim().equals(getInputDefaultText())) {
-            urlTextBox.selectAll();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onLostFocus(Widget)
-     */
-    public void onLostFocus(Widget sender)
-    {
-        // ignore
     }
 
     /**
@@ -181,9 +162,9 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     protected abstract String getURLLabel();
 
     /**
-     * @return the default input text for the text box holding the external url.
+     * @return the label text for the help label for the url of the external link to be created.
      */
-    protected abstract String getInputDefaultText();
+    protected abstract String getURLHelpLabel();
 
     /**
      * @return the error message to be displayed when the user uri is missing.

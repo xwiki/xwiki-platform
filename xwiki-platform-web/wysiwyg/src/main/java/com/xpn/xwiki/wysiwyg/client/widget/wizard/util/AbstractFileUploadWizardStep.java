@@ -71,16 +71,39 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         fileUploadForm.setMethod(FormPanel.METHOD_POST);
         // set the url on submit time, just before upload
 
-        Label fileLabel = new Label(Strings.INSTANCE.fileUploadLabel());
+        Label fileLabel = new Label(getFileLabel());
+        fileLabel.setStyleName("xInfoLabel");
+        fileLabel.addStyleDependentName("mandatory");
         fileUploadInput.setName(getFileUploadInputName());
         FlowPanel formPanel = new FlowPanel();
 
         formPanel.add(fileLabel);
+        if (!StringUtils.isEmpty(getFileHelpLabel())) {
+            Label fileHelpLabel = new Label(getFileHelpLabel());
+            fileHelpLabel.setStyleName("xHelpLabel");
+            formPanel.add(fileHelpLabel);
+        }
         formPanel.add(fileUploadInput);
 
         fileUploadForm.setWidget(formPanel);
 
         mainPanel.add(fileUploadForm);
+    }
+
+    /**
+     * @return the label of the file input
+     */
+    protected String getFileLabel()
+    {
+        return Strings.INSTANCE.fileUploadLabel();
+    }
+
+    /**
+     * @return the help label for the file input
+     */
+    protected String getFileHelpLabel()
+    {
+        return null;
     }
 
     /**

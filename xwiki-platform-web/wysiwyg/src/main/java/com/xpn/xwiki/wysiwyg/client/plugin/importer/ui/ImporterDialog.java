@@ -25,25 +25,24 @@ import java.util.Map;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormSubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormSubmitEvent;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
+import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
 
 /**
  * Office Importer wysiwyg dialog box.
  * 
  * @version $Id$
  */
-public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<String>, ClickListener, FormHandler
+public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<String>, ClickListener, FormHandler
 {
     /**
      * 'loading' style name.
@@ -51,19 +50,9 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
     private static final String STYLE_LOADING = "loading";
 
     /**
-     * CSS style used by tab panel.
-     */
-    private static final String STYLE_TAB_PANEL = "xImporterTabPanel";
-
-    /**
      * Container panel.
      */
-    private VerticalPanel mainPanel;
-
-    /**
-     * Hidden panel for displaying progress.
-     */
-    private HorizontalPanel progressPanel;
+    private FlowPanel mainPanel;
 
     /**
      * Tab panel.
@@ -107,18 +96,14 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
         super(false, true);
         getDialog().setIcon(Images.INSTANCE.importer().createImage());
         getDialog().setCaption(Strings.INSTANCE.importerCaption());
+        addStyleName("xImporterDialog");
+        getHeader().clear();
+
         this.fullPageName = space + "." + page;
 
         // Main container panel.
-        mainPanel = new VerticalPanel();
-        mainPanel.setSpacing(5);
-
-        // Progress panel
-        progressPanel = new HorizontalPanel();
-        progressPanel.addStyleName(STYLE_TAB_PANEL);
-        progressPanel.addStyleName(STYLE_LOADING);
-        progressPanel.setVisible(false);
-        mainPanel.add(progressPanel);
+        mainPanel = new FlowPanel();
+        mainPanel.addStyleName("xImporterPanel");
 
         // Tab panel.
         tabPanel = new TabPanel();
@@ -128,15 +113,14 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
         fileImportTab = new FileImportTab(uploadUrl, this);
         tabPanel.add(fileImportTab, Strings.INSTANCE.importerFileTabCaption());
         tabPanel.selectTab(0);
-        tabPanel.addStyleName(STYLE_TAB_PANEL);
+        tabPanel.addStyleName("xImporterTabPanel");
         mainPanel.add(tabPanel);
 
         // Button panel.
         buttonPanel = new ButtonPanel(this);
-        mainPanel.add(buttonPanel);
+        getFooter().add(buttonPanel);
 
-        // Finalize.
-        initWidget(mainPanel);
+        getBody().add(mainPanel);
     }
 
     /**
@@ -185,7 +169,7 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
     {
         tabPanel.setVisible(false);
         enableControls(false);
-        progressPanel.setVisible(true);
+        mainPanel.addStyleName(STYLE_LOADING);
     }
 
     /**
@@ -193,7 +177,7 @@ public class ImporterDialog extends CompositeDialogBox implements AsyncCallback<
      */
     private void stopProgress()
     {
-        progressPanel.setVisible(false);
+        mainPanel.removeStyleName(STYLE_LOADING);
         tabPanel.setVisible(true);
         enableControls(true);
     }

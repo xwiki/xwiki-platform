@@ -1,22 +1,3 @@
-.xLinkToUrl .gwt-Label, .xLinkConfig .gwt-Label, 
-.xLinkToNewPage .gwt-Label, .xUploadPanel .gwt-Label {
-  font-weight: bold;
-  width: 300px;
-  padding: 5px;
-}
-
-.xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, 
-.xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload { 
-  font-size: x-small;
-  margin: 0 5px;
-  width: 300px;
-}
-
-.xLinkToUrl span.gwt-CheckBox, .xLinkConfig span.gwt-CheckBox {
-  display: block;
-  margin: 0 5px;
-}
-
 /* The width does not seem to be set on IE for the xwiki explorer input. The following should fit correctly*/
 .xExplorerPanel input {
   width: 98%;
@@ -29,35 +10,6 @@
 .xSelectorStep .xListBox {
   height: 315px;
   overflow: auto;
-}
-
-/* Re-style the default tab panel */
-.xStepsTabs {
-  width: 100%;
-  height: 100%;
-}
-
-.xStepsTabs .gwt-TabBar tr {
-  background-color: #eeeeee;
-}
-
-.xStepsTabs .gwt-TabBar .gwt-TabBarItem {
-  background-color: #eeeeee;
-  height: 25px;
-  line-height: 19px;
-  font-weight: normal;
-  padding: 0 6px;
-  margin-left: 0;
-}
-
-.xStepsTabs .gwt-TabBar .gwt-TabBarItem-selected {
-  background-color: #ffffff;
-}
-
-.xStepsTabs .gwt-TabPanelBottom {
-  border: none;
-  padding: 0;
-  height: 325px;
 }
 
 /* selector overflow is hidden due to an issue with table sizes in IE: all scrolls are to be handled inside */

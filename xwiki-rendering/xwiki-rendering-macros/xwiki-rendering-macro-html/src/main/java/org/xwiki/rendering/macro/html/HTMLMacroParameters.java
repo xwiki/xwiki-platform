@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.html;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.html.HTMLMacro} Macro.
@@ -42,7 +42,7 @@ public class HTMLMacroParameters
     /**
      * @param wiki indicate if the user has asked to interpret wiki syntax or not
      */
-    @ParameterDescription("Indicate if the wiki syntax in the macro will be interpreted or not.")
+    @PropertyDescription("Indicate if the wiki syntax in the macro will be interpreted or not.")
     public void setWiki(boolean wiki)
     {
         this.wiki = wiki;
@@ -51,7 +51,7 @@ public class HTMLMacroParameters
     /**
      * @param clean indicate if the HTML should be transformed into valid XHTML or not
      */
-    @ParameterDescription("Indicate if the HTML should be transformed into valid XHTML or not.")
+    @PropertyDescription("Indicate if the HTML should be transformed into valid XHTML or not.")
     public void setClean(boolean clean)
     {
         this.clean = clean;

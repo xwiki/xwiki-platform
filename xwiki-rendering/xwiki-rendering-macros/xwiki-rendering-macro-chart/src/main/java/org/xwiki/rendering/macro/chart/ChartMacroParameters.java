@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.chart.ChartGenerator;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for chart macro.
@@ -75,7 +75,7 @@ public class ChartMacroParameters
     /**
      * @param title - refer to {@link #getTitle()}.
      */
-    @ParameterDescription("The title of the chart.")
+    @PropertyDescription("The title of the chart.")
     public void setTitle(String title)
     {
         this.title = title;
@@ -92,7 +92,7 @@ public class ChartMacroParameters
     /**
      * @param width - refer to {@link #getWidth()}.
      */
-    @ParameterDescription("The width of the chart.")
+    @PropertyDescription("The width of the chart.")
     public void setWidth(int width)
     {
         this.width = width;
@@ -109,7 +109,7 @@ public class ChartMacroParameters
     /**
      * @param height - refer to {@link #getHeight()}.
      */
-    @ParameterDescription("The height of the chart.")
+    @PropertyDescription("The height of the chart.")
     public void setHeight(int height)
     {
         this.height = height;
@@ -126,8 +126,8 @@ public class ChartMacroParameters
     /**
      * @param chartType - refer to {@link #getType()}.
      */
-    @ParameterMandatory
-    @ParameterDescription("The type of the chart.")
+    @PropertyMandatory
+    @PropertyDescription("The type of the chart.")
     public void setType(String chartType)
     {
         this.type = chartType;
@@ -144,7 +144,7 @@ public class ChartMacroParameters
     /**
      * @param source - refer to {@link #getSource()
      */
-    @ParameterDescription("The string describing the data source.")
+    @PropertyDescription("The string describing the data source.")
     public void setSource(String source)
     {
         this.source = source;
@@ -161,7 +161,7 @@ public class ChartMacroParameters
     /**
      * @param params Additional parameters for the data source.
      */
-    @ParameterDescription("Additional parameters for the datasource.")
+    @PropertyDescription("Additional parameters for the datasource.")
     public void setParams(String params)
     {
         this.params = params;

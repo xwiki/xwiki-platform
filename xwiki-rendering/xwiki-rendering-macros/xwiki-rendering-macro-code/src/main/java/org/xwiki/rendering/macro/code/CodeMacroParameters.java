@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.code;
 
+import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.code.CodeMacro} Macro.
@@ -51,7 +51,7 @@ public class CodeMacroParameters extends BoxMacroParameters
     /**
      * @param language the language identifier.
      */
-    @ParameterDescription("the language identifier (java, python, etc.)")
+    @PropertyDescription("the language identifier (java, python, etc.)")
     public void setLanguage(String language)
     {
         this.language = language;

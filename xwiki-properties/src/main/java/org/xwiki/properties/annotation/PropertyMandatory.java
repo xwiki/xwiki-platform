@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor.annotation;
+package org.xwiki.properties.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,15 +25,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to indicate a method is not part of the macro parameter public api. For example this will not be
- * in the generated {@link org.xwiki.rendering.macro.descriptor.MacroDescriptor}.
+ * Use this annotation to indicate that a property is mandatory.
  * 
- * @version $Id$
- * @since 1.9M1
+ * @version $Id: ParameterMandatory.java 18023 2009-03-25 21:17:30Z tmortagne $
+ * @since 2.0M2
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ParameterHidden
+@Target({ElementType.METHOD, ElementType.FIELD })
+public @interface PropertyMandatory
 {
 
 }

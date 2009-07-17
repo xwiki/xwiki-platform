@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor.annotation;
+package org.xwiki.properties.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -25,17 +25,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to add a description to a macro parameters bean method.
+ * Use this annotation to indicate a method is not part of the property bean public api. For example this will not be in
+ * the generated {@link org.xwiki.properties.BeanDescriptor}.
  * 
- * @version $Id$
- * @since 1.7M2
+ * @version $Id: ParameterHidden.java 18089 2009-03-27 15:51:39Z tmortagne $
+ * @since 2.0M2
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface ParameterDescription
+@Target({ElementType.METHOD, ElementType.FIELD })
+public @interface PropertyHidden
 {
-    /**
-     * The description.
-     */
-    String value();
+
 }

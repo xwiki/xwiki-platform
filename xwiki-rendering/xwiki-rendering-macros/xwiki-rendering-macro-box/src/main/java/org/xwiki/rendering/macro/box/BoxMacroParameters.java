@@ -22,9 +22,9 @@ package org.xwiki.rendering.macro.box;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterHidden;
 
 /**
  * Parameters for macro box.
@@ -71,7 +71,7 @@ public class BoxMacroParameters
     /**
      * @param blockTitle - refer to {@link #getBlockTitle()}
      */
-    @ParameterHidden
+    @PropertyHidden
     public void setBlockTitle(List< ? extends Block> blockTitle)
     {
         this.blockTitle = blockTitle;
@@ -88,7 +88,7 @@ public class BoxMacroParameters
     /**
      * @param title - refer to {@link #getTitle()}
      */
-    @ParameterDescription("the title which is to be displayed in the message box")
+    @PropertyDescription("the title which is to be displayed in the message box")
     public void setTitle(String title)
     {
         this.title = title;
@@ -106,7 +106,7 @@ public class BoxMacroParameters
     /**
      * @param image - refer to {@link #getImage()}
      */
-    @ParameterDescription("the image which is to be displayed in the message box")
+    @PropertyDescription("the image which is to be displayed in the message box")
     public void setImage(String image)
     {
         this.image = image;
@@ -124,7 +124,7 @@ public class BoxMacroParameters
     /**
      * @param cssClass - refer to {@link BoxMacroParameters#getCssClass()}
      */
-    @ParameterDescription("A CSS class to add to the box element")
+    @PropertyDescription("A CSS class to add to the box element")
     public void setCssClass(String cssClass)
     {
         this.cssClass = cssClass;
@@ -141,7 +141,7 @@ public class BoxMacroParameters
     /**
      * @param width - refer to {@link BoxMacroParameters#getWidth()}
      */
-    @ParameterDescription("An optional width for the box, expressed in px or %")
+    @PropertyDescription("An optional width for the box, expressed in px or %")
     public void setWidth(String width)
     {
         this.width = width;

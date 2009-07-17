@@ -24,8 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 
 /**
@@ -78,8 +78,8 @@ public class RssMacroParameters
      * @param feed the RSS feed URL.
      * @throws MacroParameterException if the feed URL is malformed.
      */
-    @ParameterMandatory
-    @ParameterDescription("URL of the RSS feed")
+    @PropertyMandatory
+    @PropertyDescription("URL of the RSS feed")
     public void setFeed(String feed) throws MacroParameterException
     {
         this.feed = feed;
@@ -93,7 +93,7 @@ public class RssMacroParameters
     /**
      * @param image whether to display the feed's image.
      */
-    @ParameterDescription("If the feeds has an image associated, display it?")
+    @PropertyDescription("If the feeds has an image associated, display it?")
     public void setImage(boolean image)
     {
         this.image = image;
@@ -110,7 +110,7 @@ public class RssMacroParameters
     /**
      * @param width the width of the RSS box, that will dismiss potential CSS rules defining its default value.
      */
-    @ParameterDescription("The width, in px or %, of the box containing the RSS output (default is 30%)")
+    @PropertyDescription("The width, in px or %, of the box containing the RSS output (default is 30%)")
     public void setWidth(String width)
     {
         this.width = width;
@@ -127,7 +127,7 @@ public class RssMacroParameters
     /**
      * @param count the number of feed items to display.
      */
-    @ParameterDescription("The maximum number of feed items to display on the page.")
+    @PropertyDescription("The maximum number of feed items to display on the page.")
     public void setCount(int count)
     {
         this.count = count;
@@ -152,7 +152,7 @@ public class RssMacroParameters
     /**
      * @param content if "true" displays the content of each feed in addition to the feed item link
      */
-    @ParameterDescription("Display content for feed entries")
+    @PropertyDescription("Display content for feed entries")
     public void setContent(boolean content)
     {
         this.content = content;

@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.include;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -60,8 +60,8 @@ public class IncludeMacroParameters
     /**
      * @param document the name of the document to include.
      */
-    @ParameterMandatory
-    @ParameterDescription("the name of the document to include")
+    @PropertyMandatory
+    @PropertyDescription("the name of the document to include")
     public void setDocument(String document)
     {
         this.document = document;
@@ -79,7 +79,7 @@ public class IncludeMacroParameters
      * @param context defines whether the included page is executed in its separated execution context or whether it's
      *            executed in the context of the current page.
      */
-    @ParameterDescription("defines whether the included page is executed in its separated execution context"
+    @PropertyDescription("defines whether the included page is executed in its separated execution context"
         + " or whether it's executed in the context of the current page")
     public void setContext(Context context)
     {

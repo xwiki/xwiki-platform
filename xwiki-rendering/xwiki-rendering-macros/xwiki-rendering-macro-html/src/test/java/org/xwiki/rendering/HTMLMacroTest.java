@@ -20,11 +20,13 @@
 package org.xwiki.rendering;
 
 import org.jmock.Mockery;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -76,5 +78,14 @@ public class HTMLMacroTest extends AbstractComponentTestCase
         MacroTransformationContext context = new MacroTransformationContext();
         context.setInline(true);
         macro.execute(parameters, "<ul><li>item</li></ul>", context);
+    }
+
+    @Test
+    public void macroDescriptor() throws Exception
+    {
+        HTMLMacro macro = (HTMLMacro) getComponentManager().lookup(Macro.class, "html");
+
+        Assert.assertEquals("Indicate if the HTML should be transformed into valid XHTML or not.",
+            macro.getDescriptor().getParameterDescriptorMap().get("clean").getDescription());
     }
 }

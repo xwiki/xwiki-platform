@@ -31,7 +31,7 @@ public interface RawProperties
      * Set a custom property to the bean.
      * <p>
      * This method need to be named that way or any other way that don't match property getter/setter naming. We could
-     * used {@link org.xwiki.properties.annotations.PropertyHidden} but it's better to avoid it if possible.
+     * used {@link org.xwiki.properties.annotation.PropertyHidden} but it's better to avoid it if possible.
      * 
      * @param propertyName the name of the custom property
      * @param value the value of the property

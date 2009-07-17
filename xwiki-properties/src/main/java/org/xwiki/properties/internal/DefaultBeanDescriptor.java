@@ -32,9 +32,9 @@ import java.util.Map;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.PropertyDescriptor;
-import org.xwiki.properties.annotations.PropertyDescription;
-import org.xwiki.properties.annotations.PropertyHidden;
-import org.xwiki.properties.annotations.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyHidden;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Default implementation for BeanDescriptor.

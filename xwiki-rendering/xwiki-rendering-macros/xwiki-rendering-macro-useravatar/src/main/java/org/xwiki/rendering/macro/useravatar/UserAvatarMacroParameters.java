@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.useravatar;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.useravatar.UserAvatarMacro} Macro.
@@ -56,8 +56,8 @@ public class UserAvatarMacroParameters
     /**
      * @param username the name of the user whose avatar is to be displayed
      */
-    @ParameterMandatory
-    @ParameterDescription("the name of the user whose avatar is to be displayed")
+    @PropertyMandatory
+    @PropertyDescription("the name of the user whose avatar is to be displayed")
     public void setUsername(String username)
     {
         this.username = username;
@@ -74,7 +74,7 @@ public class UserAvatarMacroParameters
     /**
      * @param width the width of the image
      */
-    @ParameterDescription("the image's width")
+    @PropertyDescription("the image's width")
     public void setWidth(Integer width)
     {
         this.width = width;
@@ -91,7 +91,7 @@ public class UserAvatarMacroParameters
     /**
      * @param height the height of the image
      */
-    @ParameterDescription("the image's height")
+    @PropertyDescription("the image's height")
     public void setHeight(Integer height)
     {
         this.height = height;

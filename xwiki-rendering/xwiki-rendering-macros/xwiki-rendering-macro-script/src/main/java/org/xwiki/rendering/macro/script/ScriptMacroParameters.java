@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.script;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
  * Parameters for the {@link AbstractScriptMacro} Macro.
@@ -42,7 +42,7 @@ public class ScriptMacroParameters
     /**
      * @param output indicate the output result has to be inserted back in the document.
      */
-    @ParameterDescription("indicate the output result has to be inserted back in the document")
+    @PropertyDescription("indicate the output result has to be inserted back in the document")
     public void setOutput(boolean output)
     {
         this.output = output;
@@ -61,7 +61,7 @@ public class ScriptMacroParameters
      *            it's put in a verbatim block.
      * @since 2.0M1
      */
-    @ParameterDescription("indicate if the result of the script execution has to be parsed by the current wiki parser."
+    @PropertyDescription("indicate if the result of the script execution has to be parsed by the current wiki parser."
         + " If not it's put in a verbatim block")
     public void setWiki(boolean wiki)
     {

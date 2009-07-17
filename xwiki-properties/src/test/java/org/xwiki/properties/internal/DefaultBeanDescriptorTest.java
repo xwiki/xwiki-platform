@@ -22,9 +22,9 @@ package org.xwiki.properties.internal;
 import junit.framework.TestCase;
 
 import org.xwiki.properties.PropertyDescriptor;
-import org.xwiki.properties.annotations.PropertyDescription;
-import org.xwiki.properties.annotations.PropertyHidden;
-import org.xwiki.properties.annotations.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyHidden;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Validate {@link DefaultBeanDescriptor}.

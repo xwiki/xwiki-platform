@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.id;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyMandatory;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.id.IdMacro} Macro.
@@ -38,8 +38,8 @@ public class IdMacroParameters
     /**
      * @param name the identifier string.
      */
-    @ParameterMandatory
-    @ParameterDescription("the identifier string")
+    @PropertyMandatory
+    @PropertyDescription("the identifier string")
     public void setName(String name)
     {
         this.name = name;

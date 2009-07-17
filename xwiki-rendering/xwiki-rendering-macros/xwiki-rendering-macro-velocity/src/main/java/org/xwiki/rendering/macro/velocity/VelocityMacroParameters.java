@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.velocity;
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
+import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.rendering.macro.script.ScriptMacroParameters;
 
 /**
@@ -40,7 +40,7 @@ public class VelocityMacroParameters extends ScriptMacroParameters
      * @param filter indicate which filtering mode to use.
      * @since 2.0M1
      */
-    @ParameterDescription("indicate which filtering mode to use")
+    @PropertyDescription("indicate which filtering mode to use")
     public void setFilter(String filter)
     {
         this.filter = filter;

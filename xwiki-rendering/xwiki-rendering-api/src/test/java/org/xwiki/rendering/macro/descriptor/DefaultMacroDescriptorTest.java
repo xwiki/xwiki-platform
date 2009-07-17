@@ -22,9 +22,9 @@ package org.xwiki.rendering.macro.descriptor;
 import java.util.Map;
 
 import org.xwiki.properties.BeanManager;
-import org.xwiki.properties.annotations.PropertyDescription;
-import org.xwiki.properties.annotations.PropertyHidden;
-import org.xwiki.properties.annotations.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyHidden;
+import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**

@@ -25,7 +25,6 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 
@@ -74,11 +73,9 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public AbstractMacro(String description)
     {
-        this.description = description;
-        this.contentDescriptor = new DefaultContentDescriptor();
-        this.parametersBeanClass = Object.class;
+        this(description, null, Object.class);
     }
-    
+
     /**
      * Creates a new {@link Macro} instance.
      * 
@@ -87,20 +84,18 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public AbstractMacro(String description, ContentDescriptor contentDescriptor)
     {
-        this(description);
-        this.contentDescriptor = contentDescriptor;
+        this(description, contentDescriptor, Object.class);
     }
-    
+
     /**
      * Creates a new {@link Macro} instance.
      * 
      * @param description a string describing this macro.
      * @param parametersBeanClass class of the parameters bean of this macro.
      */
-    public AbstractMacro(String description,  Class< ? > parametersBeanClass)
+    public AbstractMacro(String description, Class< ? > parametersBeanClass)
     {
-        this(description);
-        this.parametersBeanClass = parametersBeanClass;
+        this(description, null, parametersBeanClass);
     }
 
     /**
@@ -112,7 +107,8 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public AbstractMacro(String description, ContentDescriptor contentDescriptor, Class< ? > parametersBeanClass)
     {
-        this(description, contentDescriptor);
+        this.description = description;
+        this.parametersBeanClass = Object.class;
         this.parametersBeanClass = parametersBeanClass;
     }
 
@@ -121,8 +117,8 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public void initialize() throws InitializationException
     {
-        setDescriptor(new DefaultMacroDescriptor(description, contentDescriptor, beanManager
-            .getBeanDescriptor(parametersBeanClass)));
+        setDescriptor(new DefaultMacroDescriptor(description, contentDescriptor,
+            beanManager.getBeanDescriptor(parametersBeanClass)));
     }
 
     /**

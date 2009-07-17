@@ -44,8 +44,8 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface Converter
 {
     /**
-     * @param <T> the type in which the provided value has o be converted
-     * @param targetType the type in which the provided value has o be converted
+     * @param <T> the type in which the provided value has to be converted
+     * @param targetType the type in which the provided value has to be converted
      * @param sourceValue the value to convert
      * @return the converted value
      */

@@ -1283,7 +1283,7 @@ Space header, footer
 }
 
 #xdocFooter {
-  margin: 1em 0 2em;
+  margin: 1em 0 0;
   padding-top: 0.5em;
   font-size: 90%;
   color: #999;

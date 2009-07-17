@@ -108,7 +108,7 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     public AbstractMacro(String description, ContentDescriptor contentDescriptor, Class< ? > parametersBeanClass)
     {
         this.description = description;
-        this.parametersBeanClass = Object.class;
+        this.contentDescriptor = contentDescriptor;
         this.parametersBeanClass = parametersBeanClass;
     }
 

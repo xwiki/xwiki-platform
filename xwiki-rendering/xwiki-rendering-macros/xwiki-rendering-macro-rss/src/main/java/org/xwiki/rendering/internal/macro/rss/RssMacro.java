@@ -31,8 +31,8 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.ImageBlock;
 import org.xwiki.rendering.block.LinkBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.URLImage;
@@ -41,6 +41,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
 
@@ -211,10 +212,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
                 // A case where doing this might hurt is if a feed declares "text" and has any XML inside it does
                 // not want to be interpreted as such, but displayed as is instead. But this certainly is too rare
                 // compared to mis-formed feeds that say text while they want to say HTML.
-                Block html =
-                    new MacroBlock("html", Collections.singletonMap("wiki", "false"),
-                        entry.getDescription().getValue(), context.isInline());
-
+                Block html = new RawBlock(entry.getDescription().getValue(), Syntax.XHTML_1_0);
                 parentBlock.addChild(new GroupBlock(Arrays.asList(html), Collections.singletonMap(CLASS_ATTRIBUTE,
                     "rssitemdescription")));
             }

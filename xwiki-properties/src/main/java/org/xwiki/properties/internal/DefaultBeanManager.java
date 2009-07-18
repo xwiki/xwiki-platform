@@ -79,11 +79,11 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
         // Populate
         populateBean(bean, remainingValues);
 
-        // If the bean implements RowProperties, inject remaining properties
+        // If the bean implements RawProperties, inject remaining properties
         if (!remainingValues.isEmpty() && bean instanceof RawProperties) {
-            RawProperties rowProperties = (RawProperties) bean;
+            RawProperties rawProperties = (RawProperties) bean;
             for (Map.Entry<String, Object> entry : remainingValues.entrySet()) {
-                rowProperties.set(entry.getKey(), entry.getValue());
+                rawProperties.set(entry.getKey(), entry.getValue());
             }
         }
 

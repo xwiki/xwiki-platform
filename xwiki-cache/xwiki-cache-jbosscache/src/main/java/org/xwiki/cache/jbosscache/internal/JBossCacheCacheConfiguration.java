@@ -248,8 +248,8 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
             XmlConfigurationParser parser = new XmlConfigurationParser();
             config = parser.parseStream(is);
 
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Properties loaded: " + propertiesFilename);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Properties loaded: " + propertiesFilename);
             }
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {

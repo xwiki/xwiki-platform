@@ -38,17 +38,17 @@ public class ChartMacroParameters
      * @see ChartMacroParameters#getTitle()
      */
     private String title;
-    
+
     /**
      * @see ChartMacroParameters#getHeight()
      */
     private int height = 300;
-    
+
     /**
      * @see ChartMacroParameters#getWidth()
      */
     private int width = 400;
-    
+
     /**
      * @see ChartMacroParameters#getType()
      */
@@ -58,12 +58,12 @@ public class ChartMacroParameters
      * @see ChartMacroParameters#getSource()
      */
     private String source = "xdom";
-    
+
     /**
      * @see ChartMacroParameters#getParams()
      */
     private String params;
-    
+
     /**
      * @return The title of the chart.
      */
@@ -75,7 +75,7 @@ public class ChartMacroParameters
     /**
      * @param title - refer to {@link #getTitle()}.
      */
-    @PropertyDescription("The title of the chart.")
+    @PropertyDescription("The title of the chart (appears on top of the chart image)")
     public void setTitle(String title)
     {
         this.title = title;
@@ -92,7 +92,7 @@ public class ChartMacroParameters
     /**
      * @param width - refer to {@link #getWidth()}.
      */
-    @PropertyDescription("The width of the chart.")
+    @PropertyDescription("The width of the generated chart image")
     public void setWidth(int width)
     {
         this.width = width;
@@ -109,12 +109,12 @@ public class ChartMacroParameters
     /**
      * @param height - refer to {@link #getHeight()}.
      */
-    @PropertyDescription("The height of the chart.")
+    @PropertyDescription("The height of the generated chart image")
     public void setHeight(int height)
     {
         this.height = height;
     }
-    
+
     /**
      * @return the type of the chart.
      */
@@ -127,7 +127,7 @@ public class ChartMacroParameters
      * @param chartType - refer to {@link #getType()}.
      */
     @PropertyMandatory
-    @PropertyDescription("The type of the chart.")
+    @PropertyDescription("The type of the chart (Ex. pie, line, area or bar)")
     public void setType(String chartType)
     {
         this.type = chartType;
@@ -143,13 +143,14 @@ public class ChartMacroParameters
 
     /**
      * @param source - refer to {@link #getSource()
+
      */
-    @PropertyDescription("The string describing the data source.")
+    @PropertyDescription("The string describing the type of input data source (Ex. xdom or inline)")
     public void setSource(String source)
     {
         this.source = source;
     }
-        
+
     /**
      * @return Additional parameters for the data source.
      */
@@ -161,7 +162,7 @@ public class ChartMacroParameters
     /**
      * @param params Additional parameters for the data source.
      */
-    @PropertyDescription("Additional parameters for the datasource.")
+    @PropertyDescription("Additional parameters for the data source")
     public void setParams(String params)
     {
         this.params = params;
@@ -178,7 +179,7 @@ public class ChartMacroParameters
         map.put(ChartGenerator.HEIGHT_PARAM, String.valueOf(getHeight()));
         map.put(ChartGenerator.TYPE_PARAM, getType());
         map.put(ChartDataSource.SOURCE, getSource());
-        map.put(ChartDataSource.PARAMS, getParams());        
+        map.put(ChartDataSource.PARAMS, getParams());
         return map;
     }
 }

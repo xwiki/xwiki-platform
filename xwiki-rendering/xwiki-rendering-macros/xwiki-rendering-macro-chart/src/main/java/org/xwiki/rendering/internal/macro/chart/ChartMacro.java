@@ -43,6 +43,7 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.chart.ChartDataSource;
 import org.xwiki.rendering.macro.chart.ChartMacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -57,7 +58,12 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "Displays a chart generated from miscellaneous data sources.";
+    private static final String DESCRIPTION = "Displays a graphical chart generated from miscellaneous data sources";
+    
+    /**
+     * The description of the macro content.
+     */
+    private static final String CONTENT_DESCRIPTION = "Input data for the chart macro (Ex. for 'inline' source mode)";
 
     /**
      * Used for building the actual chart.
@@ -88,7 +94,7 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      */
     public ChartMacro()
     {
-        super(DESCRIPTION, ChartMacroParameters.class);
+        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), ChartMacroParameters.class);
     }
 
     /**

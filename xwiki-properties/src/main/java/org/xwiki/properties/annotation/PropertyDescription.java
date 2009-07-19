@@ -25,7 +25,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to add a description to a macro property bean method.
+ * Use this annotation to add a description to a property bean method.
  * 
  * @version $Id: ParameterDescription.java 18089 2009-03-27 15:51:39Z tmortagne $
  * @since 2.0M2

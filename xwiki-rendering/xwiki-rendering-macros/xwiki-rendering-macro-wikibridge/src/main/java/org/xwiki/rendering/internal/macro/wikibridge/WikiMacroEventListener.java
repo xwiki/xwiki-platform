@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -53,6 +56,12 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
      */
     @Requirement
     private DocumentAccessBridge docBridge;
+
+    /**
+     * The {@link DocumentNameSerializer} component.
+     */
+    @Requirement
+    private DocumentNameSerializer docNameSerializer;
 
     /**
      * The {@link WikiMacroBuilder} component.
@@ -92,32 +101,32 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
     public void onEvent(Event event, Object source, Object data)
     {
         if (event instanceof AbstractDocumentEvent) {
-            // TODO: This approach towards extracting the document name doesn't look right. But we cannot use
-            // 'source' parameter without depending on xwiki-core. This must be fixed.
-            String documentName = ((AbstractDocumentEvent) event).getEventFilter().getFilter();
-            
-            // TODO: This needs to be discussed.
-            if (!documentName.startsWith("xwiki:")) {
-                getLogger().error("Wiki macro registration from virtual wikis are not allowed");
-                return;
-            }
+            DocumentModelBridge document = (DocumentModelBridge) source;
+            DocumentName documentName = docBridge.getDocumentName(document.getFullName());
+            String fullDocumentName = docNameSerializer.serialize(documentName);
 
             if (event instanceof DocumentSaveEvent || event instanceof DocumentUpdateEvent) {
                 // Unregister any existing macro registered under this document.
-                if (wikiMacroManager.hasWikiMacro(documentName)) {
-                    wikiMacroManager.unregisterWikiMacro(documentName);
+                if (wikiMacroManager.hasWikiMacro(fullDocumentName)) {
+                    wikiMacroManager.unregisterWikiMacro(fullDocumentName);
                 }
 
                 // Check whether the given document has a wiki macro defined in it.
                 String macroName =
-                    (String) docBridge.getProperty(documentName, WikiMacroBuilder.WIKI_MACRO_CLASS, 0,
+                    (String) docBridge.getProperty(fullDocumentName, WikiMacroBuilder.WIKI_MACRO_CLASS, 0,
                         WikiMacroBuilder.MACRO_NAME_PROPERTY);
 
                 if (null != macroName) {
+                    // Make sure the wiki macro is defined on the main wiki.
+                    if (!fullDocumentName.startsWith("xwiki:")) {
+                        getLogger().error("Wiki macro registration from virtual wikis are not allowed");
+                        return;
+                    }
+
                     // Attempt to build a wiki macro.
                     WikiMacro wikiMacro = null;
                     try {
-                        wikiMacro = macroBuilder.buildMacro(documentName);
+                        wikiMacro = macroBuilder.buildMacro(fullDocumentName);
                     } catch (WikiMacroBuilderException ex) {
                         getLogger().error(ex.getMessage());
                         return;
@@ -131,10 +140,10 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
                     }
 
                     // Register macro.
-                    wikiMacroManager.registerWikiMacro(documentName, wikiMacro);
+                    wikiMacroManager.registerWikiMacro(fullDocumentName, wikiMacro);
                 }
-            } else if (event instanceof DocumentDeleteEvent && wikiMacroManager.hasWikiMacro(documentName)) {
-                wikiMacroManager.unregisterWikiMacro(documentName);
+            } else if (event instanceof DocumentDeleteEvent && wikiMacroManager.hasWikiMacro(fullDocumentName)) {
+                wikiMacroManager.unregisterWikiMacro(fullDocumentName);
             }
         }
     }

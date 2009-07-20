@@ -33,6 +33,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
@@ -79,7 +80,8 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
         params.add(param2);
 
         // Initialize the internal WikiMacro instance.
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Test Wiki Macro", params);
+        WikiMacroDescriptor descriptor =
+            new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(false), params);
         this.wikiMacro =
             new WikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "This is **testwikimacro**",
                 "xwiki/2.0", componentManager);

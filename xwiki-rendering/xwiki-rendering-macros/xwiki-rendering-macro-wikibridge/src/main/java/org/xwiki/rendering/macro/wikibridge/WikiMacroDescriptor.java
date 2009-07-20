@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 
@@ -40,21 +39,29 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * Macro description.
      */
     private String description;
+
+    /**
+     * Macro content description.
+     */
+    private ContentDescriptor contentDescriptor;
     
     /**
      * Parameter descriptors.
      */
     private List<WikiMacroParameterDescriptor> parameterDescriptors;
-    
+
     /**
      * Creates a new {@link WikiMacroDescriptor} instance.
      * 
      * @param description macro description.
+     * @param contentDescriptor macro content description.
      * @param parameterDescriptors parameter descriptors.
      */
-    public WikiMacroDescriptor(String description, List<WikiMacroParameterDescriptor> parameterDescriptors)
+    public WikiMacroDescriptor(String description, ContentDescriptor contentDescriptor,
+        List<WikiMacroParameterDescriptor> parameterDescriptors)
     {
         this.description = description;
+        this.contentDescriptor = contentDescriptor;
         this.parameterDescriptors = parameterDescriptors;
     }
 
@@ -71,7 +78,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
      */
     public ContentDescriptor getContentDescriptor()
     {
-        return new DefaultContentDescriptor();
+        return this.contentDescriptor;
     }
 
     /**
@@ -88,11 +95,11 @@ public class WikiMacroDescriptor implements MacroDescriptor
     public Map<String, ParameterDescriptor> getParameterDescriptorMap()
     {
         Map<String, ParameterDescriptor> descriptors = new HashMap<String, ParameterDescriptor>();
-        
+
         for (WikiMacroParameterDescriptor descriptor : parameterDescriptors) {
             descriptors.put(descriptor.getName(), descriptor);
         }
-        
+
         return descriptors;
     }
 }

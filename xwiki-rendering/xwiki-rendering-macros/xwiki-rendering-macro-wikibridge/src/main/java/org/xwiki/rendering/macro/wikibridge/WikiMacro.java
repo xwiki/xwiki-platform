@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -164,6 +165,18 @@ public class WikiMacro implements Macro<WikiMacroParameters>
                 throw new MacroParameterException(String.format("Unknown parameter : [%s]", parameterName));
             }
         }
+        
+        // Verify macro content against the content descriptor.
+        // Question: Do we need this check?        
+        if (null == getDescriptor().getContentDescriptor()) {
+            if (!StringUtils.isEmpty(macroContent)) {
+                throw new MacroExecutionException("Invalid macro content: this macro does not support content");
+            }
+        } else if(getDescriptor().getContentDescriptor().isMandatory()) {
+            if (StringUtils.isEmpty(macroContent)) {
+                throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
+            }
+        }        
 
         // Parse the wiki macro content.
         XDOM xdom = null;

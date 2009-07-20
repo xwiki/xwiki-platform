@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
@@ -61,7 +62,8 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
 
         // Create a wiki macro with no parameters.
         WikiMacroDescriptor descriptor =
-            new WikiMacroDescriptor("Test Wiki Macro", new ArrayList<WikiMacroParameterDescriptor>());
+            new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(),
+                new ArrayList<WikiMacroParameterDescriptor>());
         wikiMacro =
             new WikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "== Test ==", "xwiki/2.0",
                 getComponentManager());

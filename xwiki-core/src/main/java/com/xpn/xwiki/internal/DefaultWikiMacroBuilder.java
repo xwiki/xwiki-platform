@@ -30,6 +30,8 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroBuilder;
@@ -54,47 +56,68 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
     /**
      * Constant for representing XWiki.WikiMacroClass xwiki class.
      */
-    String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
+    private static final String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
 
     /**
      * Constant for representing macro name property.
      */
-    String MACRO_NAME_PROPERTY = "name";
-    
+    private static final String MACRO_NAME_PROPERTY = "name";
+
     /**
-     * Constant for representing macro name property.
+     * Constant for representing macro description property.
      */
-    String MACRO_DESCRIPTION_PROPERTY = "description";
-    
+    private static final String MACRO_DESCRIPTION_PROPERTY = "description";
+
     /**
-     * Constant for representing macro name property.
+     * Constant for representing macro content type property.
      */
-    String MACRO_CONTENT_PROPERTY = "content";
-    
+    private static final String MACRO_CONTENT_TYPE_PROPERTY = "contentType";
+
+    /**
+     * Constant for representing macro content mandatory status.
+     */
+    private static final String MACRO_CONTENT_MANDATORY = "Mandatory";
+
+    /**
+     * Constant for representing macro content optional status.
+     */
+    private static final String MACRO_CONTENT_OPTIONAL = "Optional";
+
+    /**
+     * Constant for representing macro content empty status.
+     */
+    private static final String MACRO_CONTENT_EMPTY = "No content";
+
+    /**
+     * Constant for representing macro content description property.
+     */
+    private static final String MACRO_CONTENT_DESCRIPTION_PROPERTY = "contentDescription";
+
+    /**
+     * Constant for representing macro code property.
+     */
+    private static final String MACRO_CODE_PROPERTY = "code";
+
     /**
      * Constant for representing XWiki.WikiMacroParameterClass xwiki class.
      */
-    String WIKI_MACRO_PARAMETER_CLASS = "XWiki.WikiMacroParameterClass";
-    
+    private static final String WIKI_MACRO_PARAMETER_CLASS = "XWiki.WikiMacroParameterClass";
+
     /**
-     * Constant for representing parameter name property.
-     * 
-     * Same as MACRO_NAME_PROPERTY (Check style Fix)
+     * Constant for representing parameter name property. Same as MACRO_NAME_PROPERTY (Check style Fix)
      */
-    String PARAMETER_NAME_PROPERTY = MACRO_NAME_PROPERTY; 
-    
+    private static final String PARAMETER_NAME_PROPERTY = "name";
+
     /**
-     * Constant for representing parameter description property.
-     * 
-     * Same as MACRO_DESCRIPTION_PROPERTY (Check style Fix)
+     * Constant for representing parameter description property. Same as MACRO_DESCRIPTION_PROPERTY (Check style Fix)
      */
-    String PARAMETER_DESCRIPTION_PROPERTY = MACRO_DESCRIPTION_PROPERTY; 
-    
+    private static final String PARAMETER_DESCRIPTION_PROPERTY = "description";
+
     /**
      * Constant for representing parameter mandatory property.
      */
-    String PARAMETER_MANDATORY_PROPERTY = "mandatory";    
-    
+    private static final String PARAMETER_MANDATORY_PROPERTY = "mandatory";
+
     /**
      * The {@link ComponentManager} component.
      */
@@ -151,7 +174,9 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         // Extract macro definition.
         String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
-        String macroContent = macroDefinition.getStringValue(MACRO_CONTENT_PROPERTY);
+        String macroContentType = macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY);
+        String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
+        String macroCode = macroDefinition.getStringValue(MACRO_CODE_PROPERTY);
 
         // Verify macro name.
         if (StringUtils.isEmpty(macroName)) {
@@ -165,10 +190,22 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
                 String.format("Incomplete macro definition in [%s], macro description is empty", doc.getFullName()));
         }
 
-        // Verify macro content.
-        if (StringUtils.isEmpty(macroContent)) {
+        // Verify macro content type.
+        if (StringUtils.isEmpty(macroContentType)) {
+            macroContentType = MACRO_CONTENT_OPTIONAL;
+        }
+
+        // Verify macro content description.
+        if (!macroContentType.equals(MACRO_CONTENT_EMPTY) && StringUtils.isEmpty(macroContentDescription)) {
+            String errorMsg = "Incomplete macro definition in [%s], macro content description is empty";
+            getLogger().warn(String.format(errorMsg, doc.getFullName()));
+            macroContentDescription = "Macro content";
+        }
+
+        // Verify macro code.
+        if (StringUtils.isEmpty(macroCode)) {
             throw new WikiMacroBuilderException(String.format(
-                "Incomplete macro definition in [%s], macro content is empty", doc.getFullName()));
+                "Incomplete macro definition in [%s], macro code is empty", doc.getFullName()));
         }
 
         // Extract macro parameters.
@@ -205,11 +242,19 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
             }
         }
 
-        // Create the macro descriptor.
-        MacroDescriptor macroDescriptor = new WikiMacroDescriptor(macroDescription, parameterDescriptors);
+        // Create macro content descriptor.
+        ContentDescriptor contentDescriptor = null;
+        if (!macroContentType.equals(MACRO_CONTENT_EMPTY)) {
+            contentDescriptor =
+                new DefaultContentDescriptor(macroContentDescription, macroContentType.equals(MACRO_CONTENT_MANDATORY));
+        }
+
+        // Create macro descriptor.
+        MacroDescriptor macroDescriptor =
+            new WikiMacroDescriptor(macroDescription, contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
-        return new WikiMacro(doc.getFullName(), macroName, macroDescriptor, macroContent, doc.getSyntaxId(),
+        return new WikiMacro(doc.getFullName(), macroName, macroDescriptor, macroCode, doc.getSyntaxId(),
             componentManager);
     }
 
@@ -222,10 +267,10 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         try {
             XWikiDocument doc = getContext().getWiki().getDocument(documentName, getContext());
             BaseObject macroDefinition = doc.getObject(WIKI_MACRO_CLASS);
-            result = (null != macroDefinition); 
+            result = (null != macroDefinition);
         } catch (XWikiException ex) {
             result = false;
-        }                
+        }
         return result;
-    }        
+    }
 }

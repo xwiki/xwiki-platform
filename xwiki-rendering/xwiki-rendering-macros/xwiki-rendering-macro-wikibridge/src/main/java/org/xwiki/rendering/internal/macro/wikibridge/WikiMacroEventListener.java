@@ -112,11 +112,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
                 }
 
                 // Check whether the given document has a wiki macro defined in it.
-                String macroName =
-                    (String) docBridge.getProperty(fullDocumentName, WikiMacroBuilder.WIKI_MACRO_CLASS, 0,
-                        WikiMacroBuilder.MACRO_NAME_PROPERTY);
-
-                if (null != macroName) {
+                if (macroBuilder.containsMacro(fullDocumentName)) {
                     // Make sure the wiki macro is defined on the main wiki.
                     if (!fullDocumentName.startsWith("xwiki:")) {
                         getLogger().error("Wiki macro registration from virtual wikis are not allowed");

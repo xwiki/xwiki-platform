@@ -52,6 +52,50 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiMacroBuilder
 {
     /**
+     * Constant for representing XWiki.WikiMacroClass xwiki class.
+     */
+    String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
+
+    /**
+     * Constant for representing macro name property.
+     */
+    String MACRO_NAME_PROPERTY = "name";
+    
+    /**
+     * Constant for representing macro name property.
+     */
+    String MACRO_DESCRIPTION_PROPERTY = "description";
+    
+    /**
+     * Constant for representing macro name property.
+     */
+    String MACRO_CONTENT_PROPERTY = "content";
+    
+    /**
+     * Constant for representing XWiki.WikiMacroParameterClass xwiki class.
+     */
+    String WIKI_MACRO_PARAMETER_CLASS = "XWiki.WikiMacroParameterClass";
+    
+    /**
+     * Constant for representing parameter name property.
+     * 
+     * Same as MACRO_NAME_PROPERTY (Check style Fix)
+     */
+    String PARAMETER_NAME_PROPERTY = MACRO_NAME_PROPERTY; 
+    
+    /**
+     * Constant for representing parameter description property.
+     * 
+     * Same as MACRO_DESCRIPTION_PROPERTY (Check style Fix)
+     */
+    String PARAMETER_DESCRIPTION_PROPERTY = MACRO_DESCRIPTION_PROPERTY; 
+    
+    /**
+     * Constant for representing parameter mandatory property.
+     */
+    String PARAMETER_MANDATORY_PROPERTY = "mandatory";    
+    
+    /**
      * The {@link ComponentManager} component.
      */
     @Requirement
@@ -168,4 +212,20 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         return new WikiMacro(doc.getFullName(), macroName, macroDescriptor, macroContent, doc.getSyntaxId(),
             componentManager);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean containsMacro(String documentName)
+    {
+        boolean result = true;
+        try {
+            XWikiDocument doc = getContext().getWiki().getDocument(documentName, getContext());
+            BaseObject macroDefinition = doc.getObject(WIKI_MACRO_CLASS);
+            result = (null != macroDefinition); 
+        } catch (XWikiException ex) {
+            result = false;
+        }                
+        return result;
+    }        
 }

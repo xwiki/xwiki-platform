@@ -32,54 +32,17 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface WikiMacroBuilder
 {
     /**
-     * Constant for representing XWiki.WikiMacroClass xwiki class.
-     */
-    String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
-
-    /**
-     * Constant for representing macro name property.
-     */
-    String MACRO_NAME_PROPERTY = "name";
-    
-    /**
-     * Constant for representing macro name property.
-     */
-    String MACRO_DESCRIPTION_PROPERTY = "description";
-    
-    /**
-     * Constant for representing macro name property.
-     */
-    String MACRO_CONTENT_PROPERTY = "content";
-    
-    /**
-     * Constant for representing XWiki.WikiMacroParameterClass xwiki class.
-     */
-    String WIKI_MACRO_PARAMETER_CLASS = "XWiki.WikiMacroParameterClass";
-    
-    /**
-     * Constant for representing parameter name property.
+     * Searches the given document for a wiki macro definition.
      * 
-     * Same as MACRO_NAME_PROPERTY (Check style Fix)
+     * @param documentName name of the document to search for a wiki macro definition.
+     * @return true if the given document contains a wiki macro definition, false otherwise.
      */
-    String PARAMETER_NAME_PROPERTY = MACRO_NAME_PROPERTY; 
+    boolean containsMacro(String documentName);
     
     /**
-     * Constant for representing parameter description property.
+     * Tries to build a {@link WikiMacro} if a definition is found on the given document.
      * 
-     * Same as MACRO_DESCRIPTION_PROPERTY (Check style Fix)
-     */
-    String PARAMETER_DESCRIPTION_PROPERTY = MACRO_DESCRIPTION_PROPERTY; 
-    
-    /**
-     * Constant for representing parameter mandatory property.
-     */
-    String PARAMETER_MANDATORY_PROPERTY = "mandatory";    
-    
-    /**
-     * Searches the given document for a wiki macro definition and tries to build a {@link WikiMacro} if a definition is
-     * found.
-     * 
-     * @param documentName name of the document to search for wiki macros.
+     * @param documentName name of the document on which the macro is defined.
      * @return a {@link WikiMacro} corresponding to the macro definition found.
      * @throws WikiMacroBuilderException if no macro definition is found or if an error is encountered while building
      *             the macro.

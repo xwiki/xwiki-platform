@@ -157,22 +157,9 @@ public class WikiMacro implements Macro<WikiMacroParameters>
                 throw new MacroParameterException(String.format("Parameter [%s] is mandatory", parameterName));
             }
         }
-
-        // Next, make sure no extra parameters are provided other than those defined by the macro.
-        // Question: Do we need this check?
-        for (String parameterName : parameters.getParameterNames()) {
-            if (null == parameterDescriptors.get(parameterName)) {
-                throw new MacroParameterException(String.format("Unknown parameter : [%s]", parameterName));
-            }
-        }
         
         // Verify macro content against the content descriptor.
-        // Question: Do we need this check?        
-        if (null == getDescriptor().getContentDescriptor()) {
-            if (!StringUtils.isEmpty(macroContent)) {
-                throw new MacroExecutionException("Invalid macro content: this macro does not support content");
-            }
-        } else if(getDescriptor().getContentDescriptor().isMandatory()) {
+        if(getDescriptor().getContentDescriptor().isMandatory()) {
             if (StringUtils.isEmpty(macroContent)) {
                 throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
             }

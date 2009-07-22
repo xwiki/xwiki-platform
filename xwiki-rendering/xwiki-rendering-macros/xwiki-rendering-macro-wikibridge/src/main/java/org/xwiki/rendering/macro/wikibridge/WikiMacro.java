@@ -157,13 +157,13 @@ public class WikiMacro implements Macro<WikiMacroParameters>
                 throw new MacroParameterException(String.format("Parameter [%s] is mandatory", parameterName));
             }
         }
-        
+
         // Verify macro content against the content descriptor.
-        if(getDescriptor().getContentDescriptor().isMandatory()) {
+        if (getDescriptor().getContentDescriptor() != null && getDescriptor().getContentDescriptor().isMandatory()) {
             if (StringUtils.isEmpty(macroContent)) {
                 throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
             }
-        }        
+        }
 
         // Parse the wiki macro content.
         XDOM xdom = null;

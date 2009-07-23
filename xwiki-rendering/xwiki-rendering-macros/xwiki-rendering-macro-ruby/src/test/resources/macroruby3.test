@@ -1,0 +1,28 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{ruby}}
+require 'java'
+include_class 'java.util.TreeSet'
+set = TreeSet.new
+set.add "foo"
+set.add "Bar"
+set.add "baz"
+set.each do |v|
+  puts "value: #{v}"
+end
+{{/ruby}}
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:ruby|-||-|
+require 'java'
+include_class 'java.util.TreeSet'
+set = TreeSet.new
+set.add "foo"
+set.add "Bar"
+set.add "baz"
+set.each do |v|
+  puts "value: #{v}"
+end
+--><p>value: Bar<br/>value: baz<br/>value: foo</p><!--stopmacro-->

@@ -127,6 +127,7 @@
     <module>xwiki-rendering-macro-chart</module>
     <module>xwiki-rendering-macro-footnotes</module>
     <module>xwiki-rendering-macro-wikibridge</module>
+    <module>xwiki-rendering-macro-ruby</module>
   </modules>
 </project>
        

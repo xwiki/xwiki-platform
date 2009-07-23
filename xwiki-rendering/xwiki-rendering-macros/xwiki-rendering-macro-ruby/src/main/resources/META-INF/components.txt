@@ -1,0 +1,1 @@
+org.xwiki.rendering.internal.macro.ruby.RubyMacro

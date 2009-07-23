@@ -1,0 +1,14 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{ruby}}
+puts "Hello World!!!"
+{{/ruby}}
+
+== Hello {{ruby}}puts "World!!!"{{/ruby}}==
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<!--startmacro:ruby|-||-|
+puts "Hello World!!!"
+--><p>Hello World!!!</p><!--stopmacro--><h2 id="HHello"><span>Hello <!--startmacro:ruby|-||-|puts "World!!!"-->World!!!<!--stopmacro--></span></h2>

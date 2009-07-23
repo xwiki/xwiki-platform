@@ -40,7 +40,7 @@ public class RubyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroParam
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "Execute a ruby script.";
+    private static final String DESCRIPTION = "Executes a ruby script.";
 
     /**
      * The description of the macro content.

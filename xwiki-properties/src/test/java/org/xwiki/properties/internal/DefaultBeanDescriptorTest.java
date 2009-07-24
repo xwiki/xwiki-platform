@@ -29,7 +29,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
 /**
  * Validate {@link DefaultBeanDescriptor}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultBeanDescriptorTest extends TestCase
 {

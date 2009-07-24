@@ -22,7 +22,7 @@ package org.xwiki.properties;
 /**
  * Base exception of this module.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 public class PropertyException extends Exception

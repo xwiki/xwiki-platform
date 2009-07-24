@@ -26,7 +26,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Validate {@link EnumConverter} component.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class EnumConverterTest extends AbstractXWikiComponentTestCase
 {

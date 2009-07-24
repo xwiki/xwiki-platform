@@ -31,7 +31,7 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 /**
  * A macro for executing ruby scripts.
  * 
- * @version $Id:$
+ * @version $Id$
  * @since 2.0M2
  */
 @Component("ruby")

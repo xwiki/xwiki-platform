@@ -39,7 +39,7 @@ import org.xwiki.properties.annotation.PropertyMandatory;
 /**
  * Default implementation for BeanDescriptor.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDescriptor

@@ -27,7 +27,7 @@ import org.xwiki.properties.PropertyDescriptor;
 /**
  * Default implementation for {@link PropertyDescriptor}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 public class DefaultPropertyDescriptor implements PropertyDescriptor

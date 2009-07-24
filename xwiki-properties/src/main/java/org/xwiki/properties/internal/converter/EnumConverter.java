@@ -26,7 +26,7 @@ import org.xwiki.properties.converter.ConversionException;
 /**
  * Bean Utils converter that converts a value into an enumeration class value.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 @Component("enum")

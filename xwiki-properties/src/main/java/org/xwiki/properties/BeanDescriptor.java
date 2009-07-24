@@ -30,7 +30,7 @@ import java.util.Collection;
  * <li>public fields. The name of the property is the name of the field.</li>
  * </ul>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 public interface BeanDescriptor

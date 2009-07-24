@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.ComponentRole;
  * public fields) are given to it as custom non converted properties</li>
  * </ul>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 @ComponentRole

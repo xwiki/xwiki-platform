@@ -28,7 +28,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Validate {@link ColorConverter} component.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ColorConverterTest extends AbstractXWikiComponentTestCase
 {

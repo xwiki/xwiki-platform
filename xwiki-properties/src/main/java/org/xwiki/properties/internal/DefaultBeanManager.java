@@ -49,7 +49,7 @@ import org.xwiki.properties.RawProperties;
  * {@link org.xwiki.properties.internal.converter.ColorConverter}.</li>
  * </ul>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 @Component

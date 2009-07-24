@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
 /**
  * Use this annotation to indicate that a property is mandatory.
  * 
- * @version $Id: ParameterMandatory.java 18023 2009-03-25 21:17:30Z tmortagne $
+ * @version $Id$
  * @since 2.0M2
  */
 @Retention(RetentionPolicy.RUNTIME)

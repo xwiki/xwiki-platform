@@ -25,7 +25,7 @@ import java.lang.reflect.Method;
 /**
  * Describe a property in a bean.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 public interface PropertyDescriptor

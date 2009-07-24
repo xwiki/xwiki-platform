@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 /**
  * Rendering tests for ruby macro.
  * 
- * @version $Id:$
+ * @version $Id$
  * @since 2.0M2
  */
 public class RenderingTests extends TestCase

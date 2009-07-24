@@ -22,7 +22,7 @@ package org.xwiki.properties;
 /**
  * A bean can implement this interface to be provided with remaining values as custom properties.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 2.0M2
  */
 public interface RawProperties

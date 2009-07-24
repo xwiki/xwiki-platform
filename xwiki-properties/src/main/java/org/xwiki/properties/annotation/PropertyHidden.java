@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
  * Use this annotation to indicate a method is not part of the property bean public api. For example this will not be in
  * the generated {@link org.xwiki.properties.BeanDescriptor}.
  * 
- * @version $Id: ParameterHidden.java 18089 2009-03-27 15:51:39Z tmortagne $
+ * @version $Id$
  * @since 2.0M2
  */
 @Retention(RetentionPolicy.RUNTIME)

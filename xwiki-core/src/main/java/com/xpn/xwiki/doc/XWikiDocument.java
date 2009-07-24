@@ -3651,7 +3651,7 @@ public class XWikiDocument implements DocumentModelBridge
         XWikiDocument tdoc = this;
 
         if (!((language == null) || (language.equals("")) || language.equals(this.defaultLanguage))) {
-            tdoc = new XWikiDocument(getSpace(), getName());
+            tdoc = new XWikiDocument(getDatabase(), getSpace(), getName());
             tdoc.setLanguage(language);
             String database = context.getDatabase();
             try {

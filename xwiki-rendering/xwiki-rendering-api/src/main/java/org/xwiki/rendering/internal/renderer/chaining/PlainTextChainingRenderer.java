@@ -222,17 +222,6 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     {
         getPrinter().print(protectedString);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(java.lang.String, org.xwiki.rendering.parser.Syntax)
-     */
-    @Override
-    public void onRawText(String text, Syntax syntax)
-    {
-        getPrinter().print(text);
-    }
     
     /**
      * {@inheritDoc}

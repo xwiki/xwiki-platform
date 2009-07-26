@@ -29,6 +29,7 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -220,6 +221,18 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         getPrinter().print(protectedString);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(java.lang.String,
+     *      org.xwiki.rendering.parser.Syntax)
+     */
+    @Override
+    public void onRawText(String text, Syntax syntax)
+    {
+        getPrinter().print(text);
     }
 
     /**

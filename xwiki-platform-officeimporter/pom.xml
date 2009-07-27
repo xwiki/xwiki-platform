@@ -29,7 +29,6 @@
     <version>23-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.xpn.xwiki.platform.applications</groupId>
   <artifactId>xwiki-application-officeimporter</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Applications - Office Importer</name>

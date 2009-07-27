@@ -2153,14 +2153,14 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 <script type="text/javascript">
 //<![CDATA[
 var $jsVarName = {
-  hookId: '${fieldId}',
-  syntax: '${editedDocument.syntaxId}',
+  hookId: '$!{fieldId}',
+  syntax: '$!{editedDocument.syntaxId}',
 #if("$!wysiwyg_inputURLQueryString" != "")
   ## We get this content in edit mode so that we are able to detect the edit context in the javascript transformations 
   ## executed on the document. This does not affect the way the document is rendered, since the used template handles 
   ## it anyway, it only affects the way the javascript variables are set (XWiki.contextaction = "edit") and other 
   ## velocity variables potentially used in wysiwyginput.vm.
-  inputURL: '${editedDocument.getExternalURL("edit", $wysiwyg_inputURLQueryString)}',
+  inputURL: '$!{editedDocument.getExternalURL("edit", $wysiwyg_inputURLQueryString)}',
 #end
 #if($full)
   displayTabs: true,
@@ -2169,12 +2169,12 @@ var $jsVarName = {
   plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($full && $request.sync) sync#end',
   menu: 'link image table macro',
   toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol | link unlink | importer',
-  wiki: '${editedDocument.wiki.replace("'", "\'")}',
-  space: '${editedDocument.space.replace("'", "\'")}',
-  page: '${editedDocument.name.replace("'", "\'")}',
+  wiki: '$!{editedDocument.wiki.replace("'", "\'")}',
+  space: '$!{editedDocument.space.replace("'", "\'")}',
+  page: '$!{editedDocument.name.replace("'", "\'")}',
 #if($full && $request.sync)
   // Additional configuration for the real-time editing feature.
-  syncPage: '${editedDocument.fullName.replace("'", "\'")}',
+  syncPage: '$!{editedDocument.fullName.replace("'", "\'")}',
 #if($request.reset=="1")
   syncReset: 1,
 #end

@@ -1510,7 +1510,7 @@ $html
   #if("$!options.url" != "")
     #set($dataurl = $options.url)
   #elseif("$!options.resultPage" != "")
-    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=$!{className}&collist=${collist2}${classparams}") )
+    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}${classparams}") )
   #else
     #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}${classparams}"))
   #end

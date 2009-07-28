@@ -11,9 +11,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261143000</creationDate>
-<date>1248764323000</date>
-<contentUpdateDate>1248764323000</contentUpdateDate>
-<version>4.1</version>
+<date>1248766933000</date>
+<contentUpdateDate>1248766933000</contentUpdateDate>
+<version>2.1</version>
 <title>Office Importer</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -275,33 +275,33 @@ select#childPagesNamingMethod {
 &lt;input id="filepath" type="file" name="filePath" value="" size="40" onchange="javascript:XWiki.officeImporter.populateTargetPageInputField(this.value);"/&gt;&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.target")&lt;/h2&gt;
 &lt;p class="office_importer_target"&gt;
-&lt;label for="targetSpace"  class="inputtext"&gt;
+&lt;label for="targetSpaceInputId"  class="inputtext"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.targetspace") : &lt;/span&gt;
 &lt;input id="targetSpaceInputId" type="text" name="targetSpace" value="$!{targetdoc.space}"/&gt;
 &lt;/label&gt;
-&lt;label for="targetPage" class="inputtext"&gt;
+&lt;label for="targetPageInputId" class="inputtext"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.targetpage") : &lt;/span&gt;
 &lt;input id="targetPageInputId" name="targetPage" type="text" value="$!{targetdoc.name}" onchange="javascript:validateUserInputs();"/&gt;
 &lt;/label&gt;
-&lt;label for="appendContent" id="appenContent" class="radio"&gt;
+&lt;label for="appendContentInputId" id="appenContent" class="radio"&gt;
 &lt;span&gt;$msg.get("xe.officeimporter.import.appendresult") : &lt;/span&gt;
-&lt;input name="appendContent" type="checkbox" value="true" /&gt;&lt;/label&gt;
+&lt;input id="appendContentInputId" name="appendContent" type="checkbox" value="true" /&gt;&lt;/label&gt;
 &lt;/p&gt;
 &lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.target")&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.styles")&lt;/h2&gt;
 &lt;p class="office_importer_styles"&gt;
-&lt;label for="filterStyles" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input name="filterStyles" type="checkbox" value="strict"/&gt;&lt;/label&gt;
+&lt;label for="filterStylesInputId" class="radio"&gt;$msg.get("xe.officeimporter.import.filterstyles") : &lt;input id="filterStylesInputId" name="filterStyles" type="checkbox" value="strict"/&gt;&lt;/label&gt;
 &lt;/p&gt;
 &lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.styles")&lt;/p&gt;
 &lt;h2&gt;$msg.get("xe.officeimporter.import.splitting")&lt;/h2&gt;
 &lt;div class="office_importer_splittingcontent"&gt;
-&lt;label for="splitDocument" class="radio"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.splitdocument") : &lt;/span&gt;&lt;input name="splitDocument" type="checkbox" value="true"/&gt;&lt;/label&gt;
+&lt;label for="splitDocumentInputId" class="radio"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.splitdocument") : &lt;/span&gt;&lt;input id="splitDocumentInputId" name="splitDocument" type="checkbox" value="true"/&gt;&lt;/label&gt;
 &lt;p class="office_importer_splitting"&gt;
-&lt;label for="headingLevelsToSplit"  class="multipleselect"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.headinglevels") : &lt;/span&gt; 
-&lt;select size="5" multiple="multiple" name="headingLevelsToSplit" class="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}"&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt;#end&lt;/select&gt;
+&lt;label for="headingLevelsToSplitInputId" class="multipleselect"&gt;&lt;span&gt;$msg.get("xe.officeimporter.import.splitting.headinglevels") : &lt;/span&gt; 
+&lt;select id="headingLevelsToSplitInputId" size="5" multiple="multiple" name="headingLevelsToSplit" class="headingLevelsToSplit"&gt;#foreach($h in [1..6]) &lt;option value="${h}"&gt;$msg.get("xe.officeimporter.import.splitting.heading")-${h}&lt;/option&gt;#end&lt;/select&gt;
 &lt;/label&gt;
-&lt;label for="childPagesNamingMethod" class="select"&gt;&lt;span&gt;
-$msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndHeading"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandheading")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;
+&lt;label for="childPagesNamingMethodInputId" class="select"&gt;&lt;span&gt;
+$msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select id="childPagesNamingMethodInputId" name="childPagesNamingMethod"&gt;&lt;option value="headingNames"&gt;$msg.get("xe.officeimporter.import.splitting.naming.headingnames")&lt;/option&gt;&lt;option value="mainPageNameAndHeading"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandheading")&lt;/option&gt;&lt;option value="mainPageNameAndNumbering"&gt;$msg.get("xe.officeimporter.import.splitting.naming.mainpagenameandnumbering")&lt;/option&gt;&lt;/select&gt;
 &lt;/label&gt;
 &lt;/p&gt;&lt;p class="help_message"&gt;$msg.get("xe.officeimporter.import.help.splitting")&lt;/p&gt;
 &lt;input type="hidden" name="groovyFilter" value="" /&gt;

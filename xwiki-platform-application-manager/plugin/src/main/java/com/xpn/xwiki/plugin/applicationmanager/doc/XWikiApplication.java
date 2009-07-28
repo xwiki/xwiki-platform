@@ -465,13 +465,12 @@ public class XWikiApplication extends DefaultXObjectDocument
         StringBuffer filter = new StringBuffer();
 
         for (XWikiApplication app : applications) {
-            if (filter.length() > 0) {
-                filter.append(HQL_OR);
-            }
-
             String appFilter = app.createHqlFilter(type, values, false, includeAppDesc);
 
             if (!appFilter.equals("")) {
+                if (filter.length() > 0) {
+                    filter.append(HQL_OR);
+                }
                 filter.append(HQL_GROUP_OPEN);
                 filter.append(appFilter);
                 filter.append(HQL_GROUP_CLOSE);

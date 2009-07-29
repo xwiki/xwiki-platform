@@ -26,7 +26,7 @@ body.main {
     and to import it without the rest of the style sheets.
   */
   background-color: #FFFFFF !important;
-  background-image: none;
+  background-image: none !important;
   /*
     We use float:left in order to remove the body from the normal flow and thus prevent collapsing margins between
     body and its first in-flow block-level child. Otherwise the vertical scroll bar would be visible because of the

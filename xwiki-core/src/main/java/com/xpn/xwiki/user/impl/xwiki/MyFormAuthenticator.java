@@ -137,9 +137,13 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
                         log.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
                     request.setUserPrincipal(principal);
-                } else if (username != null || password != null) {
-                    // failed authentication with remembered login, better forget login now
-                    this.persistentLoginManager.forgetLogin(request, response);
+                } else {
+                    // Failed to authenticate, better cleanup the user stored in the session
+                    request.setUserPrincipal(null);
+                    if (username != null || password != null) {
+                        // Failed authentication with remembered login, better forget login now
+                        this.persistentLoginManager.forgetLogin(request, response);
+                    }
                 }
             }
         }

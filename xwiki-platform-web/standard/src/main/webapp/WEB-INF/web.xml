@@ -145,9 +145,9 @@
          Note: the URL should not start with /, because it allows the context name to be changed. If it starts with /,
          then it should be an absolute URL, including the application context path.
     <init-param>
+      <description>The address to redirect to when the client hits the root of the application.</description>
       <param-name>homePage</param-name>
       <param-value>bin/Main/</param-value>
-      <description>The address to redirect to when the client hits the root of the application.</description>
     </init-param>
     -->
   </servlet>
@@ -156,9 +156,9 @@
     <servlet-name>xmlrpc</servlet-name>
     <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
     <init-param>
+      <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
       <param-name>enabledForExtensions</param-name>
       <param-value>false</param-value>
-      <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
     </init-param>
   </servlet>
 
@@ -273,20 +273,22 @@
   </error-page>
 
   <!-- Struts Tag Library Descriptors -->
-  <taglib>
-    <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
-  </taglib>
+  <jsp-config>
+    <taglib>
+      <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
+      <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
+    </taglib>
 
-  <taglib>
-    <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
-  </taglib>
+    <taglib>
+      <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
+      <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
+    </taglib>
 
-  <taglib>
-    <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
-    <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
-  </taglib>
+    <taglib>
+      <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
+      <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
+    </taglib>
+  </jsp-config>
 
   <!-- Uncomment if you wish to use a DataSource to define the Database connection
   <resource-ref>
@@ -299,7 +301,7 @@
 
   <env-entry>
     <env-entry-name>XWikiConfig</env-entry-name>
-    <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
     <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
   </env-entry>
 </web-app>

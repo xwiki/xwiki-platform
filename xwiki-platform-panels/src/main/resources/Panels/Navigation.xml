@@ -136,46 +136,45 @@
 </property>
 <property>
 <content>#panelheader($msg.get('xe.panels.navigation'))
-#set ($hiddenSpaces = ['XWiki', 'Admin', 'Panels'])
 #set ($hiddenPages = ['Main.WebRss', 'Main.WebSearch', 'Main.LuceneSearch', 'Main.WebSearchRss', 'Main.BlogRss', 'Blog.Macros', 'Main.TagsRss', 'Main.RegisterNewUserAction', 'Main.SpaceIndex', 'Blog.Category'])
-#set ($blackListedPages = ['WebPreferences'])
+#set ($blacklistedPages = ['WebPreferences'])
 &lt;div id="xwikinavcontainer"&gt;
 #set($spaces = $xwiki.spaces)
 #set($i = 0)
 #set($spacecount = 0)
 &lt;div id="xwikinav" class="accordion"&gt;
 #foreach($space in $spaces)
-#if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$hiddenSpaces.contains($space)))
-#if ($doc.space == $space)
-#set ($spacecount = $i)
-#end
-#set($i = $i + 1)
-&lt;div id="xwikinav${space}"&gt;
-&lt;div id="xwikinav${space}Header" class="accordionTabTitleBar"&gt;&lt;h6&gt;$space&lt;/h6&gt;&lt;/div&gt;
-&lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
-#set ($escapedSpace = $space.replaceAll("'", "''"))
-#set($hql = $xwiki.searchDocuments("doc.space='$escapedSpace' order by doc.name"))
-#foreach($page in $hql)
-#if (!$hiddenPages.contains($page) || $hasAdmin)
-#set($dotIndex = $page.indexOf('.')+1)
-#set($pageName = $page.substring($dotIndex, $page.length()))
-#if (!$blackListedPages.contains($pageName) || $hasAdmin)
-#if ($doc.fullName == $page)
-- *${doc.name}*
-#else
-- [$page]
-#end
-#end
-#end
+  #if ($hasAdmin || ($xwiki.hasAccessLevel('view', "${space}.WebHome") &amp;&amp; !$blacklistedSpaces.contains($space)))
+    #if ($doc.space == $space)
+      #set ($spacecount = $i)
+    #end
+    #set($i = $i + 1)
+    &lt;div id="xwikinav${space}"&gt;
+    &lt;div id="xwikinav${space}Header" class="accordionTabTitleBar"&gt;&lt;h6&gt;$space&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
+    #set ($escapedSpace = $space.replaceAll("'", "''"))
+    #set($hql = $xwiki.searchDocuments("doc.space='$escapedSpace' order by doc.name"))
+    #foreach($page in $hql)
+      #if (!$hiddenPages.contains($page) || $hasAdmin)
+        #set($dotIndex = $page.indexOf('.')+1)
+        #set($pageName = $page.substring($dotIndex))
+        #if (!$blacklistedPages.contains($pageName) || $hasAdmin)
+          #if ($doc.fullName == $page)
+            - *${doc.name}*
+          #else
+            - [$page]
+          #end
+        #end
+      #end
+    #end
+    &lt;/div&gt;
+    &lt;/div&gt;
+  #end
 #end
 &lt;/div&gt;
 &lt;/div&gt;
-#end
-#end
-&lt;/div&gt;
-&lt;/div&gt;
-$xwiki.jsfx.use("js/scriptaculous/scriptaculous.js")
-$xwiki.jsfx.use("js/xwiki/accordion/accordion.js")
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
+$xwiki.jsfx.use('js/xwiki/accordion/accordion.js')
 &lt;script type="text/javascript"&gt;
 var obj = {div:'xwikinav',no:$spacecount,height:250};
 var acc = createAccordion(obj);

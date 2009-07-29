@@ -216,7 +216,9 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
         HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
         configuration.setParameters(cleaningParams);
-        return HTMLUtils.toString(cleaner.clean(new StringReader(htmlPaste), configuration));
+        org.w3c.dom.Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
+        HTMLUtils.stripHTMLEnvelope(cleanedDocument);
+        return HTMLUtils.toString(cleanedDocument);
     }
 
     /**

@@ -82,8 +82,8 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
         WikiMacroDescriptor descriptor =
             new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(false), params);
         this.wikiMacro =
-            new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "This is **testwikimacro**",
-                "xwiki/2.0", componentManager);
+            new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", true, descriptor,
+                "This is **testwikimacro**", "xwiki/2.0", componentManager);
 
         // Set a dummy XWikiContext.
         execution.getContext().setProperty("xwikicontext", new HashMap<String, Object>());

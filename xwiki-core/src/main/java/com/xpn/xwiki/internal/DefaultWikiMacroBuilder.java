@@ -70,6 +70,11 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
     private static final String MACRO_DESCRIPTION_PROPERTY = "description";
 
     /**
+     * Constant for representing macro inline support property.
+     */
+    private static final String MACRO_INLINE_PROPERTY = "supportsInlineMode";
+
+    /**
      * Constant for representing macro content type property.
      */
     private static final String MACRO_CONTENT_TYPE_PROPERTY = "contentType";
@@ -175,6 +180,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         // Extract macro definition.
         String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
+        boolean macroSupportsInlineMode = (macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) == 0) ? false : true;
         String macroContentType = macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY);
         String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
         String macroCode = macroDefinition.getStringValue(MACRO_CODE_PROPERTY);
@@ -255,8 +261,8 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
             new WikiMacroDescriptor(macroDescription, contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
-        return new DefaultWikiMacro(doc.getFullName(), macroName, macroDescriptor, macroCode, doc.getSyntaxId(),
-            componentManager);
+        return new DefaultWikiMacro(doc.getFullName(), macroName, macroSupportsInlineMode, macroDescriptor, macroCode, doc
+            .getSyntaxId(), componentManager);
     }
 
     /**

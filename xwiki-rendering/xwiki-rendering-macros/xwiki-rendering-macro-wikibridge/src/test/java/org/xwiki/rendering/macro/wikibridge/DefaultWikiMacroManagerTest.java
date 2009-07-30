@@ -66,8 +66,8 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
             new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(),
                 new ArrayList<WikiMacroParameterDescriptor>());
         wikiMacro =
-            new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "== Test ==", "xwiki/2.0",
-                getComponentManager());
+            new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", true, descriptor, "== Test ==",
+                "xwiki/2.0", getComponentManager());
     }
 
     /**

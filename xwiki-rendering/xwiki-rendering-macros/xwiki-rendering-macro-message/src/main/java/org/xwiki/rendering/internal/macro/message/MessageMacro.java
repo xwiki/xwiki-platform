@@ -29,6 +29,7 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
@@ -61,7 +62,7 @@ public class MessageMacro extends AbstractMacro<Object>
      */
     public MessageMacro()
     {
-        super(DESCRIPTION);
+        super(DESCRIPTION, new DefaultContentDescriptor(true));
     }
 
     /**

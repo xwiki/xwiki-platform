@@ -143,7 +143,7 @@
 
 
 #lb .lb-content {
-	padding: 0 18px;
+  padding: 4px 18px;
 }
 
 .lb-content{
@@ -153,7 +153,8 @@
 
 #close-wrap {
 	position: relative;
-	top: 30px;
+	top: 18px;
+	right: 7px;
 	text-align: right;
 	cursor: default;
 }

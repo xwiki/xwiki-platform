@@ -26,12 +26,9 @@ import org.xwiki.chart.model.DefaultChartModel;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.chart.ChartDataSource;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * Super class for {@link TableBlock} based {@link ChartDataSource} implementations.
@@ -129,18 +126,15 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
     }
 
     /**
-     * Parses the cell content as a string.
+     * Renders the cell content as a string.
      * 
      * @param cell the {@link TableCellBlock}.
-     * @return cell content parsed as a string.
+     * @return cell content rendered as a string.
      */
     private String cellContentAsString(TableCellBlock cell)
     {
-        XDOM cellContent = new XDOM(cell.getChildren());
-        WikiPrinter printer = new DefaultWikiPrinter();
-        XWikiSyntaxRenderer renderer = new XWikiSyntaxRenderer(printer);
-        cellContent.traverse(renderer);
-        return printer.toString();
+        RenderersUtils utils = new RenderersUtils();
+        return utils.renderPlainText(cell.getChildren());        
     }
 
     /**

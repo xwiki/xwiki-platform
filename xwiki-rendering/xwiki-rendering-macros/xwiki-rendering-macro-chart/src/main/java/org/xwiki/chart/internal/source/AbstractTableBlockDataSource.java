@@ -52,6 +52,11 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
      * Regex for specifying a table cell. (for range)
      */
     private static final String RANGE_PATTERN = "[A-Z][0-9]+";
+    
+    /**
+     * Renderer utils.
+     */
+    private RenderersUtils rendererUtils = new RenderersUtils();
 
     /**
      * {@inheritDoc}
@@ -132,9 +137,8 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
      * @return cell content rendered as a string.
      */
     private String cellContentAsString(TableCellBlock cell)
-    {
-        RenderersUtils utils = new RenderersUtils();
-        return utils.renderPlainText(cell.getChildren());        
+    {        
+        return rendererUtils.renderPlainText(cell.getChildren());        
     }
 
     /**

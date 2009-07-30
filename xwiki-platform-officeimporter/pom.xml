@@ -26,7 +26,7 @@
   <parent>
     <artifactId>xwiki-applications</artifactId>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
-    <version>22</version>
+    <version>23-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-application-officeimporter</artifactId>

@@ -54,7 +54,7 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
     private static final String RANGE_PATTERN = "[A-Z][0-9]+";
     
     /**
-     * Renderer utils.
+     * {@link RenderersUtils} used to render table cells as strings.
      */
     private RenderersUtils rendererUtils = new RenderersUtils();
 

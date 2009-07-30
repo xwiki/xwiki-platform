@@ -35,14 +35,13 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * A wrapper macro used for testing a {@link WikiMacro} instance.
+ * A wrapper macro used for testing a {@link DefaultWikiMacro} instance.
  * 
  * @version $Id$
  * @since 2.0M2
@@ -51,9 +50,9 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
 {
     /**
-     * The internal {@link WikiMacro} instance.
+     * The internal {@link DefaultWikiMacro} instance.
      */
-    private WikiMacro wikiMacro;
+    private DefaultWikiMacro wikiMacro;
 
     /**
      * The {@link ComponentManager} component.
@@ -83,7 +82,7 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
         WikiMacroDescriptor descriptor =
             new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(false), params);
         this.wikiMacro =
-            new WikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "This is **testwikimacro**",
+            new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "This is **testwikimacro**",
                 "xwiki/2.0", componentManager);
 
         // Set a dummy XWikiContext.

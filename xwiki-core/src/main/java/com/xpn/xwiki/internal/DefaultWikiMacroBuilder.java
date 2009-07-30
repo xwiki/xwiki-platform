@@ -30,6 +30,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -254,7 +255,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
             new WikiMacroDescriptor(macroDescription, contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
-        return new WikiMacro(doc.getFullName(), macroName, macroDescriptor, macroCode, doc.getSyntaxId(),
+        return new DefaultWikiMacro(doc.getFullName(), macroName, macroDescriptor, macroCode, doc.getSyntaxId(),
             componentManager);
     }
 

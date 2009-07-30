@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.wikibridge;
 
 import java.util.ArrayList;
 
+import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
@@ -46,9 +47,9 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
     private MacroManager macroManager;
 
     /**
-     * A {@link WikiMacro} instance.
+     * A {@link DefaultWikiMacro} instance.
      */
-    private WikiMacro wikiMacro;
+    private DefaultWikiMacro wikiMacro;
 
     /**
      * {@inheritDoc}
@@ -65,7 +66,7 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
             new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(),
                 new ArrayList<WikiMacroParameterDescriptor>());
         wikiMacro =
-            new WikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "== Test ==", "xwiki/2.0",
+            new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", descriptor, "== Test ==", "xwiki/2.0",
                 getComponentManager());
     }
 

@@ -637,7 +637,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-footnote</artifactId>
+      <artifactId>xwiki-core-rendering-macro-footnotes</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>

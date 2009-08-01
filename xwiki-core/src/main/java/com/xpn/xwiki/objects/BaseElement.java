@@ -27,6 +27,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 public abstract class BaseElement implements ElementInterface, Serializable
 {
@@ -152,6 +154,27 @@ public abstract class BaseElement implements ElementInterface, Serializable
     }
 
     /**
+     * Return the document where this element is stored.
+     * 
+     * @param context the XWiki context
+     * @return the document
+     */
+    public XWikiDocument getDocument(XWikiContext context) throws XWikiException
+    {
+        String database = context.getDatabase();
+
+        try {
+            if (getWiki() != null) {
+                context.setDatabase(getWiki());
+            }
+
+            return context.getWiki().getDocument(getName(), context);
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    /**
      * @return the syntax id of the document containing this element. If an error occurs while retrieving the document a
      *         syntax id of "xwiki/1.0" is assumed.
      */
@@ -159,7 +182,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
     {
         String syntaxId;
         try {
-            syntaxId = context.getWiki().getDocument(getName(), context).getSyntaxId();
+            syntaxId = getDocument(context).getSyntaxId();
         } catch (Exception e) {
             LOG.warn("Error while getting the syntax corresponding to object [" + getName()
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");

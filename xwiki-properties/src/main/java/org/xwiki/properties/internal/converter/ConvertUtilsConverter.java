@@ -24,7 +24,6 @@ import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.converter.Converter;
 
 /**
@@ -40,11 +39,13 @@ import org.xwiki.properties.converter.Converter;
 public class ConvertUtilsConverter implements Converter, Initializable
 {
     /**
-     * {@inheritDoc}
+     * By default {@link ConvertUtils#convert(Object, Class)} does not throw any exceptions for failed conversions.
+     * Instead it will return some default value corresponding to the target type. We must override this behavior in
+     * order to get the desired functionality.
      */
-    public void initialize() throws InitializationException
+    public void initialize()
     {
-        BeanUtilsBean.getInstance().getConvertUtils().register(true, false, 0);                
+        BeanUtilsBean.getInstance().getConvertUtils().register(true, false, 0);
     }
 
     /**
@@ -61,7 +62,7 @@ public class ConvertUtilsConverter implements Converter, Initializable
         try {
             return (T) ConvertUtils.convert(sourceValue, targetType);
         } catch (ConversionException ex) {
-            throw new org.xwiki.properties.converter.ConversionException(ex);
+            throw new org.xwiki.properties.converter.ConversionException("Error while performing type conversion", ex);
         }
     }
 }

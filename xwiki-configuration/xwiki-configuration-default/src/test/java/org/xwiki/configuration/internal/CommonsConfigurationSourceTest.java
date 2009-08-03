@@ -29,6 +29,7 @@ import org.apache.commons.configuration.Configuration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.configuration.ConversionException;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -42,24 +43,25 @@ import org.xwiki.test.AbstractComponentTestCase;
 public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 {
     private Configuration configuration;
-    
+
     private CommonsConfigurationSource source;
-    
+
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
         this.source = new CommonsConfigurationSource();
+        ConverterManager converterManager = getComponentManager().lookup(ConverterManager.class);
+        ReflectionUtils.setFieldValue(source, "converterManager", converterManager);
         this.configuration = new BaseConfiguration();
         this.source.setConfiguration(this.configuration);
-        this.source.setConverterManager(getComponentManager().lookup(ConverterManager.class));
     }
 
     @Test
     public void testDefaultValue()
     {
         configuration.setProperty("string", "value");
-        
+
         Assert.assertEquals("default", source.getProperty("unknown", "default"));
         Assert.assertEquals("value", source.getProperty("string", "default"));
     }
@@ -93,7 +95,7 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
         // Try to retrieve a Boolean property as a String
         source.getProperty("boolean", String.class);
     }
-    
+
     @Test
     public void testBooleanProperty()
     {
@@ -103,13 +105,13 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
         Assert.assertEquals(true, source.getProperty("boolean"));
         Assert.assertEquals(true, source.getProperty("boolean", Boolean.class));
     }
-    
+
     @Test(expected = NoSuchElementException.class)
     public void testUnknownBooleanProperty()
     {
         source.getProperty("unknown", Boolean.class);
     }
-    
+
     @Test
     public void testListProperty()
     {

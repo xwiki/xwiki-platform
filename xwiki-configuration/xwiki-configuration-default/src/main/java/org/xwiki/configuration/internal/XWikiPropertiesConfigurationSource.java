@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.Container;
-import org.xwiki.properties.ConverterManager;
 
 /**
  * Looks for configuration data in {@code /WEB-INF/xwiki.properties}.
@@ -48,12 +47,6 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     private Container container;
     
     /**
-     * Injected by the Component Manager.
-     */
-    @Requirement
-    private ConverterManager converterManager;
-    
-    /**
      * {@inheritDoc}
      * @see Initializable#initialize()
      */
@@ -65,7 +58,6 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
         try {
             xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
             setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));
-            setConverterManager(converterManager);
         } catch (Exception e) {
             // Note: if we cannot read the configuration file we log a warning but continue since XWiki will use 
             // default values for all configurable elements.

@@ -26,6 +26,7 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.apache.commons.configuration.Configuration;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.properties.ConverterManager;
@@ -45,21 +46,12 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
     /**
      * Component used for performing type conversions.
      */
+    @Requirement
     private ConverterManager converterManager;
 
     protected void setConfiguration(Configuration configuration)
     {
         this.configuration = configuration;
-    }
-
-    /**
-     * Sets the {@link ConverterManager} component used for type conversions.
-     * 
-     * @param converterManager the {@link ConverterManager} component.
-     */
-    protected void setConverterManager(ConverterManager converterManager)
-    {
-        this.converterManager = converterManager;
     }
 
     /**

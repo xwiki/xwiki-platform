@@ -30,6 +30,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.configuration.ConversionException;
+import org.xwiki.properties.ConverterManager;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link CommonsConfigurationSource}.
@@ -37,18 +39,20 @@ import org.xwiki.configuration.ConversionException;
  * @version $Id$
  * @since 2.0M1
  */
-public class CommonsConfigurationSourceTest
+public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
 {
     private Configuration configuration;
     
     private CommonsConfigurationSource source;
     
     @Before
-    public void testSetup()
+    public void setUp() throws Exception
     {
+        super.setUp();
         this.source = new CommonsConfigurationSource();
         this.configuration = new BaseConfiguration();
         this.source.setConfiguration(this.configuration);
+        this.source.setConverterManager(getComponentManager().lookup(ConverterManager.class));
     }
 
     @Test

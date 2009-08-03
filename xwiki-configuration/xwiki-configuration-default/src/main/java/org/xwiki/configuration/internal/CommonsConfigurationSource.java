@@ -19,21 +19,22 @@
  */
 package org.xwiki.configuration.internal;
 
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.configuration.ConfigurationSource;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConversionException;
-
-import java.util.List;
-import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
+import org.apache.commons.configuration.Configuration;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.properties.ConverterManager;
+
 /**
- * Wrap a Commons Configuration instance into a XWiki {@link ConfigurationSource}. This allows
- * us to reuse the <a href= "http://commons.apache.org/configuration/"numerous types of
- * Configuration<a/> provided by Commons Configuration (properties file, XML files, databases, etc).
- *
+ * Wrap a Commons Configuration instance into a XWiki {@link ConfigurationSource}. This allows us to reuse the <a href=
+ * "http://commons.apache.org/configuration/"numerous types of Configuration<a/> provided by Commons Configuration
+ * (properties file, XML files, databases, etc).
+ * 
  * @version $Id$
  * @since 1.6M1
  */
@@ -41,13 +42,29 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 {
     private Configuration configuration;
 
+    /**
+     * Component used for performing type conversions.
+     */
+    private ConverterManager converterManager;
+
     protected void setConfiguration(Configuration configuration)
     {
-        this.configuration = configuration;    
+        this.configuration = configuration;
+    }
+
+    /**
+     * Sets the {@link ConverterManager} component used for type conversions.
+     * 
+     * @param converterManager the {@link ConverterManager} component.
+     */
+    protected void setConverterManager(ConverterManager converterManager)
+    {
+        this.converterManager = converterManager;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getProperty(String, Object)
      */
     @SuppressWarnings("unchecked")
@@ -58,6 +75,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getProperty(String)
      */
     @SuppressWarnings("unchecked")
@@ -68,6 +86,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getProperty(String, Class)
      */
     @SuppressWarnings("unchecked")
@@ -77,16 +96,19 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
         try {
             if (String.class.getName().equals(valueClass.getName())) {
                 result = (T) this.configuration.getString(key);
-            } else if (Boolean.class.getName().equals(valueClass.getName())) {
-                result = (T) Boolean.valueOf(this.configuration.getBoolean(key));
             } else if (List.class.getName().equals(valueClass.getName())) {
                 result = (T) this.configuration.getList(key);
             } else if (Properties.class.getName().equals(valueClass.getName())) {
                 result = (T) this.configuration.getProperties(key);
+            } else if (null != getProperty(key)) {
+                result = this.converterManager.convert(valueClass, getProperty(key));
             } else {
-                result = (T) getProperty(key);
+                throw new NoSuchElementException("No property named [" + key + "] is set");
             }
-        } catch (ConversionException e) {
+        } catch (org.apache.commons.configuration.ConversionException e) {
+            throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["
+                + valueClass.getName() + "]", e);
+        } catch (org.xwiki.properties.converter.ConversionException e) {
             throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["
                 + valueClass.getName() + "]", e);
         }
@@ -95,6 +117,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#getKeys()
      */
     @SuppressWarnings("unchecked")
@@ -110,6 +133,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#containsKey(String)
      */
     public boolean containsKey(String key)
@@ -119,18 +143,19 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
 
     /**
      * {@inheritDoc}
+     * 
      * @see ConfigurationSource#isEmpty()
      */
     public boolean isEmpty()
     {
         return this.configuration.isEmpty();
     }
-    
+
     private <T> T getProperty(String key, T defaultValue, Class<T> valueClass)
     {
         T result = getProperty(key, valueClass);
         if (result == null) {
-            result = defaultValue; 
+            result = defaultValue;
         }
         return result;
     }

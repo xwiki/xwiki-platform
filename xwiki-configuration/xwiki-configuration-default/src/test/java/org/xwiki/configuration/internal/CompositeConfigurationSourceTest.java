@@ -30,6 +30,8 @@ import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.properties.ConverterManager;
+import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link CompositeConfigurationSource}.
@@ -37,7 +39,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 2.0M1
  */
-public class CompositeConfigurationSourceTest
+public class CompositeConfigurationSourceTest extends AbstractComponentTestCase
 {
     private CompositeConfigurationSource composite;
     
@@ -46,18 +48,21 @@ public class CompositeConfigurationSourceTest
     private Configuration config2;
     
     @Before
-    public void testSetup()
+    public void setUp() throws Exception
     {
+        super.setUp();
         this.composite = new CompositeConfigurationSource();
 
         CommonsConfigurationSource source1 = new CommonsConfigurationSource();
         this.config1 = new BaseConfiguration();
         source1.setConfiguration(this.config1);
+        source1.setConverterManager(getComponentManager().lookup(ConverterManager.class));
         this.composite.addConfigurationSource(source1);
         
         CommonsConfigurationSource source2 = new CommonsConfigurationSource();
         this.config2 = new BaseConfiguration();
         source2.setConfiguration(this.config2);
+        source2.setConverterManager(getComponentManager().lookup(ConverterManager.class));
         this.composite.addConfigurationSource(source2);
     }
 

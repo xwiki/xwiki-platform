@@ -19,8 +19,12 @@
  */
 package org.xwiki.properties.internal.converter;
 
+import org.apache.commons.beanutils.BeanUtilsBean;
+import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.converter.Converter;
 
 /**
@@ -33,8 +37,16 @@ import org.xwiki.properties.converter.Converter;
  * @since 2.0M2
  */
 @Component
-public class ConvertUtilsConverter implements Converter
+public class ConvertUtilsConverter implements Converter, Initializable
 {
+    /**
+     * {@inheritDoc}
+     */
+    public void initialize() throws InitializationException
+    {
+        BeanUtilsBean.getInstance().getConvertUtils().register(true, false, 0);                
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -46,6 +58,10 @@ public class ConvertUtilsConverter implements Converter
         // We can't use Class#cast(Object) because ConvertUtils#convert always return Object form of the targetType even
         // if targetType is a primitive. When using casting syntax Object form is implicitly converter to proper
         // primitive type.
-        return (T) ConvertUtils.convert(sourceValue, targetType);
+        try {
+            return (T) ConvertUtils.convert(sourceValue, targetType);
+        } catch (ConversionException ex) {
+            throw new org.xwiki.properties.converter.ConversionException(ex);
+        }
     }
 }

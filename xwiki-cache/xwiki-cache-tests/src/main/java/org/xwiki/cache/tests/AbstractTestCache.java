@@ -19,9 +19,6 @@
  */
 package org.xwiki.cache.tests;
 
-import java.io.File;
-import java.io.InputStream;
-
 import org.jmock.Mock;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.CacheManager;
@@ -88,26 +85,6 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase
         descriptor.setRole(ConfigurationSource.class);
         descriptor.setRoleHint("xwikiproperties");
         getComponentManager().registerComponent(descriptor, (ConfigurationSource) mockConfigurationSource.proxy());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getResourceAsStream(java.lang.String)
-     */
-    public InputStream getResourceAsStream(String resourceName)
-    {
-        return getClass().getResourceAsStream(resourceName);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.container.ApplicationContext#getTemporaryDirectory()
-     */
-    public File getTemporaryDirectory()
-    {
-        throw new UnsupportedOperationException("This method is not implemented for this test class.");
     }
 
     /**

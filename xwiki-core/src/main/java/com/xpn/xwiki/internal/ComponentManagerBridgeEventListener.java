@@ -29,16 +29,17 @@ import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.web.Utils;
+import org.xwiki.component.annotation.Component;
 
 /**
  * This is  a temporary bridge to allow non components to call Utils.getComponent() and
  * get a component instance without having to pass around a XWiki Context (in order to 
  * retrieve the Servlet Context to get the component manager from an attribute).
- * We're using introspection in order to not have to depend on the XWiki Core module
  *
  * @version $Id$
  * @since 2.0M2
  */
+@Component("componentManagerBridge")
 public class ComponentManagerBridgeEventListener implements EventListener
 {
     @Requirement

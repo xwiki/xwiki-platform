@@ -297,6 +297,10 @@ span.edit_section {
 	background-color:transparent;
 }
 
+.itemCount {
+  color: #888;
+}
+
 .code {
 	font-family: courier, courier new, monospace;
 	white-space: pre;

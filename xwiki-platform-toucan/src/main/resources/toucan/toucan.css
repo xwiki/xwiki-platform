@@ -1607,6 +1607,7 @@ html > body #actionmenu {
 
 #actionmenu a {
     text-decoration: none;
+    cursor: default;
     color: #444;
     text-decoration: none;
     display: block;
@@ -1620,6 +1621,9 @@ html > body #actionmenu {
     line-height: 20px;
     font-size: 0.9em;
     font-weight: bold;
+}
+#actionmenu a:link, #actionmenu a:visited {
+  cursor: pointer;
 }
 
 #actionmenu .editinfo a {

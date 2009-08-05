@@ -181,7 +181,8 @@
   padding: 8px;
   /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
   float: left;
-  margin: 0px 8px 0px -128px;
+  /* Large negative bottom margin fixes a float push bug in IE */
+  margin: 0px 8px -10000in -128px;
 }
 /* Reorganize the date as 3 centered rows */
 .blogdate .month, .blogdate .year, .blogdate .day {
@@ -298,7 +299,8 @@ div.hide-message{
   padding: 0px;
   /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
   float: left;
-  margin: 0px 8px 3px -56px;
+  /* Large negative bottom margin fixes a float push bug in IE */
+  margin: 0px 8px -10000in -56px;
   background: $hbgColor;
   border: 1px solid $borderColor;
   border: 2px solid $shadowColor;

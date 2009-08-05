@@ -45,9 +45,6 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -77,6 +74,7 @@ import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
 import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
+import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
  * The default implementation for {@link WysiwygService}.
@@ -180,22 +178,20 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String parseAndRender(String html, String syntax)
     {
         try {
-            Syntax xhtmlSyntax = new Syntax(SyntaxType.XHTML, "1.0");
-
             // Parse
-            Parser parser = (Parser) Utils.getComponent(Parser.class, xhtmlSyntax.toIdString());
-            XDOM dom = parser.parse(new StringReader(cleanHTML(html)));
+            Parser parser = (Parser) Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
+            XDOM xdom = parser.parse(new StringReader(cleanHTML(html)));
 
             // Execute macros
             SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
             TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.class);
-            txManager.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(syntax));
+            txManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
-            XHTMLRenderer renderer = (XHTMLRenderer) factory.createRenderer(xhtmlSyntax, printer);
-            dom.traverse(renderer);
+            BlockRenderer renderer =
+                (BlockRenderer) Utils.getComponent(BlockRenderer.class, Syntax.XHTML_1_0.toIdString());
+            renderer.render(xdom, printer);
 
             return printer.toString();
         } catch (ParseException e) {
@@ -208,7 +204,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#cleanOfficeHTML(String, String)
+     * @see WysiwygService#cleanOfficeHTML(String, String, java.util.Map)
      */
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
@@ -265,7 +261,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#syncEditorContent(Revision, String, int)
+     * @see WysiwygService#syncEditorContent(com.xpn.xwiki.wysiwyg.client.diff.Revision, String, int, boolean)
      */
     public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version, boolean syncReset)
         throws XWikiGWTException

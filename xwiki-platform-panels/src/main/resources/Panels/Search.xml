@@ -140,7 +140,7 @@
     &lt;div id="globalsearch"&gt;
       &lt;input id="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" onfocus="if (this.value == '$msg.get('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$msg.get('panels.search.inputText')'; this.blur()"/&gt;
 &amp;nbsp;
-      &lt;input class="button" value="$msg.get('panels.search.submit')" type="image" src="$xwiki.getSkinFile("go.png")"/&gt;
+      &lt;input class="button" value="$msg.get('panels.search.submit')" type="image" src="$xwiki.getSkinFile('go.png')" alt="$msg.get('panels.search.submit')"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;
 #panelfooter()</content>

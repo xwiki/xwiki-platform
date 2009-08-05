@@ -20,19 +20,16 @@
 package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.component.manager.ComponentManager;
 import org.jmock.cglib.MockObjectTestCase;
 
 import java.io.StringReader;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 /**
  * @version $Id$
@@ -68,20 +65,17 @@ public class RenderingTestCase extends MockObjectTestCase
     protected void runTest() throws Throwable
     {
         Parser parser = getComponentManager().lookup(Parser.class, this.parserId);
-        XDOM dom = parser.parse(new StringReader(this.input));
+        XDOM xdom = parser.parse(new StringReader(this.input));
 
         if (this.runTransformations) {
+            SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
             TransformationManager transformationManager = getComponentManager().lookup(TransformationManager.class);
-            // TODO: Decide if this is the best way. Right now we're forcing the usage of XWiki 2.0 macros.
-            transformationManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
+            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(this.parserId));
         }
 
-        PrintRendererFactory rendererFactory = getComponentManager().lookup(PrintRendererFactory.class);
-        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
+        BlockRenderer renderer = getComponentManager().lookup(BlockRenderer.class, this.targetSyntaxId);
         WikiPrinter printer = new DefaultWikiPrinter();
-        Renderer renderer =
-            rendererFactory.createRenderer(syntaxFactory.createSyntaxFromIdString(this.targetSyntaxId), printer);
-        dom.traverse(renderer);
+        renderer.render(xdom, printer);
 
         assertEquals(this.expected, printer.toString());
     }

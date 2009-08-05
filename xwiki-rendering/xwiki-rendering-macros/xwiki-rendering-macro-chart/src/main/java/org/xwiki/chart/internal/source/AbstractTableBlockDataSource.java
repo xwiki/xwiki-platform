@@ -23,12 +23,15 @@ import java.util.Map;
 
 import org.xwiki.chart.model.ChartModel;
 import org.xwiki.chart.model.DefaultChartModel;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.TableCellBlock;
 import org.xwiki.rendering.block.TableRowBlock;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.chart.ChartDataSource;
-import org.xwiki.rendering.util.RenderersUtils;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Super class for {@link TableBlock} based {@link ChartDataSource} implementations.
@@ -54,9 +57,10 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
     private static final String RANGE_PATTERN = "[A-Z][0-9]+";
     
     /**
-     * {@link RenderersUtils} used to render table cells as strings.
+     * Used to convert cell blocks in plain text so that it can be converted to numbers.
      */
-    private RenderersUtils rendererUtils = new RenderersUtils();
+    @Requirement("plain/1.0")
+    private BlockRenderer plainTextBlockRenderer;
 
     /**
      * {@inheritDoc}
@@ -137,8 +141,10 @@ public abstract class AbstractTableBlockDataSource implements ChartDataSource
      * @return cell content rendered as a string.
      */
     private String cellContentAsString(TableCellBlock cell)
-    {        
-        return rendererUtils.renderPlainText(cell.getChildren());        
+    {
+        WikiPrinter printer = new DefaultWikiPrinter();
+        this.plainTextBlockRenderer.render(cell.getChildren(), printer);
+        return printer.toString();
     }
 
     /**

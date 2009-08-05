@@ -24,24 +24,8 @@ import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
-import java.util.List;
-
 public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
 {
-    public void testGetAvailableSyntaxes() throws Exception
-    {
-        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
-        List<Syntax> syntaxes = syntaxFactory.getAvailableSyntaxes();
-        assertTrue("XWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.XWIKI, "2.0")));
-        assertTrue("Confluence syntax not found", syntaxes.contains(new Syntax(SyntaxType.CONFLUENCE, "1.0")));
-        assertTrue("Creole syntax not found", syntaxes.contains(new Syntax(SyntaxType.CREOLE, "1.0")));
-        assertTrue("JspWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.JSPWIKI, "1.0")));
-        assertTrue("MediaWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.MEDIAWIKI, "1.0")));
-        assertTrue("TWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.TWIKI, "1.0")));
-        assertTrue("XHTML syntax not found", syntaxes.contains(new Syntax(SyntaxType.XHTML, "1.0")));
-        assertTrue("HTML syntax not found", syntaxes.contains(new Syntax(SyntaxType.HTML, "4.01")));
-    }
-
     public void testCreateSyntaxFromSyntaxIdString() throws Exception
     {
         SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);

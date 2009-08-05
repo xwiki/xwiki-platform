@@ -44,9 +44,9 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.xhtml.XHTMLRendererFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLConstants;
@@ -91,10 +91,12 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
     private ComponentManager componentManager;
 
     /**
-     * Factory to easily create an XHTML Image and Link Renderer.
+     * Factory to create special XHTML renderer for the HTML Macro. We override the default XHTML renderer since we
+     * want special behaviors, for example to not escape special symbols (since we don't want to escape HTML tags for
+     * example).
      */
-    @Requirement
-    private XHTMLRendererFactory xhtmlRendererFactory;
+    @Requirement("xhtmlmacro/1.0")
+    private PrintRendererFactory xhtmlRendererFactory;
 
     /**
      * Create and initialize the descriptor of the macro.
@@ -244,9 +246,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
 
             // Render the whole parsed content as a XHTML string
             WikiPrinter printer = new DefaultWikiPrinter();
-            PrintRenderer renderer =
-                new HTMLMacroXHTMLRenderer(printer, this.xhtmlRendererFactory.createXHTMLLinkRenderer(),
-                    this.xhtmlRendererFactory.createXHTMLImageRenderer());
+            PrintRenderer renderer = this.xhtmlRendererFactory.createRenderer(printer);
             xdom.traverse(renderer);
 
             xhtml = printer.toString();

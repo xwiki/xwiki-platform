@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
@@ -38,7 +37,6 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
 {
     /**
-     * @param printer the object to which to write the XHTML output to
      * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because link
      *            rendering depends on how the underlying system wants to handle it. For example for XWiki we check if
      *            the document exists, we get the document URL, etc.
@@ -46,11 +44,12 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
      *            image rendering depends on how the underlying system wants to handle it. For example for XWiki we
      *            check if the image exists as a document attachments, we get its URL, etc.
      * @param listenerChain the chain of listener filters used to compute various states
+     * @since 2.0M3
      */
-    public HTMLMacroXHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer,
-        XHTMLImageRenderer imageRenderer, ListenerChain listenerChain)
+    public HTMLMacroXHTMLChainingRenderer(XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
+        ListenerChain listenerChain)
     {
-        super(printer, linkRenderer, imageRenderer, listenerChain);
+        super(linkRenderer, imageRenderer, listenerChain);
     }
 
     /**

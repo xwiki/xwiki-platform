@@ -58,7 +58,6 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     private XHTMLWikiPrinter xhtmlWikiPrinter;
 
     /**
-     * @param printer the object to which to write the XHTML output to
      * @param linkRenderer the object to render link events into XHTML. This is done so that it's pluggable because link
      *            rendering depends on how the underlying system wants to handle it. For example for XWiki we check if
      *            the document exists, we get the document URL, etc.
@@ -67,15 +66,14 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
      *            check if the image exists as a document attachments, we get its URL, etc.
      * @param listenerChain the chain of listener filters used to compute various states
      */
-    public XHTMLChainingRenderer(WikiPrinter printer, XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
+    public XHTMLChainingRenderer(XHTMLLinkRenderer linkRenderer, XHTMLImageRenderer imageRenderer,
         ListenerChain listenerChain)
     {
-        super(printer, listenerChain);
+        setListenerChain(listenerChain);
 
         this.linkRenderer = linkRenderer;
         this.imageRenderer = imageRenderer;
         this.macroRenderer = new XHTMLMacroRenderer();
-        this.xhtmlWikiPrinter = new XHTMLWikiPrinter(printer);
     }
 
     // State
@@ -96,10 +94,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     protected void pushPrinter(WikiPrinter wikiPrinter)
     {
         super.pushPrinter(wikiPrinter);
-
-        if (this.xhtmlWikiPrinter != null) {
-            this.xhtmlWikiPrinter.setWikiPrinter(getPrinter());
-        }
+        getXHTMLWikiPrinter().setWikiPrinter(getPrinter());
     }
 
     /**
@@ -111,14 +106,14 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     protected void popPrinter()
     {
         super.popPrinter();
-
-        if (this.xhtmlWikiPrinter != null) {
-            this.xhtmlWikiPrinter.setWikiPrinter(getPrinter());
-        }
+        getXHTMLWikiPrinter().setWikiPrinter(getPrinter());
     }
 
     protected XHTMLWikiPrinter getXHTMLWikiPrinter()
     {
+        if (this.xhtmlWikiPrinter == null) {
+            this.xhtmlWikiPrinter = new XHTMLWikiPrinter(getPrinter());
+        }
         return this.xhtmlWikiPrinter;
     }
 
@@ -353,7 +348,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onSpecialSymbol(String)
+     * @see AbstractChainingPrintRenderer#onSpecialSymbol(char)
      */
     @Override
     public void onSpecialSymbol(char symbol)

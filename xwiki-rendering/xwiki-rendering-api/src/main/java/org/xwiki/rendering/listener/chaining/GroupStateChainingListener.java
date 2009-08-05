@@ -36,7 +36,7 @@ public class GroupStateChainingListener extends AbstractChainingListener
 
     public GroupStateChainingListener(ListenerChain listenerChain)
     {
-        super(listenerChain);
+        setListenerChain(listenerChain);
     }
 
     public int getDocumentDepth()

@@ -25,13 +25,13 @@ import java.util.Collections;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -42,7 +42,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class MacroTransformationTest extends AbstractRenderingTestCase
 {
-    private MacroTransformation transformation;
+    private Transformation transformation;
     
     /**
      * {@inheritDoc}
@@ -54,7 +54,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
     {
         super.setUp();
 
-        this.transformation = (MacroTransformation) getComponentManager().lookup(Transformation.class, "macro");
+        this.transformation = getComponentManager().lookup(Transformation.class, "macro");
     }
 
     /**
@@ -76,7 +76,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new EventsRenderer(printer));
+        getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
         assertEquals(expected, printer.toString());
     }
 
@@ -101,7 +101,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new EventsRenderer(printer));
+        getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
         assertEquals(expected, printer.toString());
     }
     
@@ -122,7 +122,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new EventsRenderer(printer));
+        getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
         assertEquals(expected, printer.toString());
     }
     
@@ -151,7 +151,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new EventsRenderer(printer));
+        getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
         assertEquals(expected, printer.toString());
     }
     

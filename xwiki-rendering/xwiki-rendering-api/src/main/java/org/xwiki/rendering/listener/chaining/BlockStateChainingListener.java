@@ -104,7 +104,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
 
     public BlockStateChainingListener(ListenerChain listenerChain)
     {
-        super(listenerChain);
+        setListenerChain(listenerChain);
     }
 
     /**

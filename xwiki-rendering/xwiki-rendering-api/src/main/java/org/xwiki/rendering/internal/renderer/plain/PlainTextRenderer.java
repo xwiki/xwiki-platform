@@ -17,13 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.renderer.plain;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.internal.renderer.chaining.PlainTextChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Print only plain text information. For example it remove anything which need a specific syntax a simple plain text
@@ -31,20 +37,29 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * label like in a TOC.
  * 
  * @version $Id$
- * @since 1.9M1
+ * @since 2.0M3
  */
-public class PlainTextRenderer extends AbstractChainingPrintRenderer
+@Component("plain/1.0")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class PlainTextRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
-    /**
-     * @param printer the object where the XWiki Syntax output will be printed to
-     * @param linkLabelGenerator the plain text renderer only print link label so it need LinkLabelGenerator to generate
-     *            it when there is not explicit one. If null the reference is printed.
-     */
-    public PlainTextRenderer(WikiPrinter printer, LinkLabelGenerator linkLabelGenerator)
-    {
-        super(printer, new ListenerChain());
+    @Requirement
+    private LinkLabelGenerator linkLabelGenerator;
 
-        new BlockStateChainingListener(getListenerChain());
-        new PlainTextChainingRenderer(printer, linkLabelGenerator, getListenerChain());
+    /**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     * @since 2.0M3
+     */
+    public void initialize() throws InitializationException
+    {
+        ListenerChain chain = new ListenerChain();
+        setListenerChain(chain);
+
+        // Construct the listener chain in the right order. Listeners early in the chain are called before listeners
+        // placed later in the chain.
+        chain.addListener(this);
+        chain.addListener(new BlockStateChainingListener(chain));
+        chain.addListener(new PlainTextChainingRenderer(this.linkLabelGenerator, chain));
     }
 }

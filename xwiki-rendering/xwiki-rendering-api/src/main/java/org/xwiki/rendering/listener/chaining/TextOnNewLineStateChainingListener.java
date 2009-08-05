@@ -42,7 +42,7 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
 
     public TextOnNewLineStateChainingListener(ListenerChain listenerChain)
     {
-        super(listenerChain);
+        setListenerChain(listenerChain);
     }
 
     /**

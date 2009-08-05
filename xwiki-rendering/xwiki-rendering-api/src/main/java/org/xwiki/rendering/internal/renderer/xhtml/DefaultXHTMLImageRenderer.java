@@ -17,12 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.xhtml;
+package org.xwiki.rendering.internal.renderer.xhtml;
 
+import org.xwiki.rendering.renderer.xhtml.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxImageRenderer;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxImageRenderer;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
@@ -39,9 +46,10 @@ import org.xwiki.rendering.wiki.WikiModel;
  * </ul>
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.0M3
  */
-public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer
+@Component
+public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializable
 {
     /**
      * @see #setXHTMLWikiPrinter(XHTMLWikiPrinter)
@@ -58,21 +66,25 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer
      */
     private XWikiSyntaxImageRenderer imageRenderer;
 
-    /**
-     * Constructor to be used when outside of a wiki. 
-     */
-    public DefaultXHTMLImageRenderer()
-    {
-        this(null);
-    }
+    @Requirement
+    private ComponentManager componentManager;
 
     /**
-     * @param wikiModel the {@link WikiModel}.
+     * {@inheritDoc}
+     * @see Initializable#initialize()
      */
-    public DefaultXHTMLImageRenderer(WikiModel wikiModel)
+    public void initialize() throws InitializationException
     {
-        this.wikiModel = wikiModel;
+        // TODO: Transform it into a component later on
         this.imageRenderer = new XWikiSyntaxImageRenderer();
+
+        // Try to find a WikiModel implementation and set it if it can be found. If not it means we're in
+        // non wiki mode (i.e. no attachment in wiki documents and no links to documents for example).
+        try {
+            this.wikiModel = this.componentManager.lookup(WikiModel.class);
+        } catch (ComponentLookupException e) {
+            // There's no WikiModel implementation available. this.wikiModel stays null.
+        }
     }
 
     /**

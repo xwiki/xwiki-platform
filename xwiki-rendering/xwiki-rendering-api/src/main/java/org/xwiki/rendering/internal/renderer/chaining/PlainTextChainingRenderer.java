@@ -29,11 +29,8 @@ import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.printer.XMLWikiPrinter;
 
 /**
  * Print only plain text information. For example it remove anything which need a specific syntax a simple plain text
@@ -47,25 +44,24 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
 {
     private boolean isFirstElementRendered = false;
 
-    private XMLWikiPrinter xmlWikiPrinter;
-
     /**
      * Generate link label.
      */
     private LinkLabelGenerator linkLabelGenerator;
 
-    public PlainTextChainingRenderer(WikiPrinter printer, LinkLabelGenerator linkLabelGenerator,
-        ListenerChain listenerChain)
+    /**
+     * The plain text renderer supports when no link label generator is set.
+     */
+    public PlainTextChainingRenderer(ListenerChain listenerChain)
     {
-        super(printer, listenerChain);
-
-        this.linkLabelGenerator = linkLabelGenerator;
-        this.xmlWikiPrinter = new XMLWikiPrinter(printer);
+        this(null, listenerChain);
     }
 
-    protected XMLWikiPrinter getXMLWikiPrinter()
+    public PlainTextChainingRenderer(LinkLabelGenerator linkLabelGenerator, ListenerChain listenerChain)
     {
-        return this.xmlWikiPrinter;
+        setListenerChain(listenerChain);
+
+        this.linkLabelGenerator = linkLabelGenerator;
     }
 
     // State

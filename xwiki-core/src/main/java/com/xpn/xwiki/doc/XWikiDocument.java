@@ -88,7 +88,6 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
@@ -132,6 +131,7 @@ import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
+import org.xwiki.rendering.renderer.BlockRenderer;
 
 public class XWikiDocument implements DocumentModelBridge
 {
@@ -5316,18 +5316,14 @@ public class XWikiDocument implements DocumentModelBridge
     private static String renderXDOM(XDOM content, Syntax targetSyntax) throws XWikiException
     {
         try {
-            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
-
+            BlockRenderer renderer = (BlockRenderer) Utils.getComponent(BlockRenderer.class, targetSyntax.toIdString());
             WikiPrinter printer = new DefaultWikiPrinter();
-
-            content.traverse(factory.createRenderer(targetSyntax, printer));
-
+            renderer.render(content, printer);
             return printer.toString();
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to render document to syntax [" + targetSyntax + "]", e);
         }
-
     }
 
     private XDOM parseContent(String content) throws XWikiException

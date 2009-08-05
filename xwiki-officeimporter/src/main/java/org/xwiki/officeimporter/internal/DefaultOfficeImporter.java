@@ -61,10 +61,9 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -121,10 +120,16 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     private Parser xwikiParser;
 
     /**
-     * Factory to get various syntax renderers.
+     * To render XDOM into XWiki Syntax 2.0.
      */
-    @Requirement
-    private PrintRendererFactory rendererFactory;
+    @Requirement("xwiki/2.0")
+    private BlockRenderer xwikiSyntaxRenderer;
+
+    /**
+     * To Render XDOM into XHTML.
+     */
+    @Requirement("xhtml/1.0")
+    private BlockRenderer xhtmlRenderer;
 
     /**
      * The {@link DocumentSplitter} used for splitting documents.
@@ -160,7 +165,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 importerFilter.filter(targetWikiDocument, xdom, false);
                 if (!isSplitRequest(params)) {
                     saveDocument(targetWikiDocument, extractTitle(xdom), importerFilter.filter(targetWikiDocument,
-                        renderXdom(xdom, XWIKI_20), false), isAppendRequest(params));
+                        renderXdom(xdom, this.xwikiSyntaxRenderer), false), isAppendRequest(params));
                     attachArtifacts(targetWikiDocument, artifacts);
                 } else {
                     splitImport(targetWikiDocument, xdom, artifacts, params, importerFilter);
@@ -191,7 +196,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 docBridge.setAttachmentContent(documentName, PRESENTATION_ARCHIVE_NAME, archive);
                 String xwikiPresentationCode = buildPresentationFrameCode(PRESENTATION_ARCHIVE_NAME, "output.html");
                 XDOM xdom = xwikiParser.parse(new StringReader(xwikiPresentationCode));
-                return renderXdom(xdom, XHTML_10);
+                return renderXdom(xdom, this.xhtmlRenderer);
             } else {
                 InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
                 attachArtifacts(documentName, artifacts);
@@ -247,15 +252,14 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * Utility method for rendering a given xdom into target syntax.
      * 
-     * @param xdom the {@link XDOM}.
-     * @param targetSyntax target syntax.
-     * @return the rendered content in target syntax.
+     * @param xdom the {@link XDOM}
+     * @param renderer the renderer to use to perform the XDOM rendering
+     * @return the rendered content in target syntax
      */
-    private String renderXdom(XDOM xdom, Syntax targetSyntax)
+    private String renderXdom(XDOM xdom, BlockRenderer renderer)
     {
         WikiPrinter printer = new DefaultWikiPrinter();
-        Listener listener = this.rendererFactory.createRenderer(targetSyntax, printer);
-        xdom.traverse(listener);
+        renderer.render(xdom, printer);
         return printer.toString();
     }
 
@@ -292,7 +296,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                     return blocks;
                 }
             });
-            title = renderXdom(new XDOM(clonedHeaderBlock.getChildren()), XWIKI_20);
+            title = renderXdom(new XDOM(clonedHeaderBlock.getChildren()), this.xwikiSyntaxRenderer);
             // Strip line-feed and new-line characters if present.
             title = title.replaceAll("[\n\r]", "");
             // Truncate long titles.
@@ -338,7 +342,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                     tempArtifacts.put(imageName, artifacts.remove(imageName));
                 }
                 attachArtifacts(doc.getFullName(), tempArtifacts);
-                String content = renderXdom(childXdom, XWIKI_20);
+                String content = renderXdom(childXdom, this.xwikiSyntaxRenderer);
                 // Check if this is an append request (only root doc can be appended).
                 boolean append = doc.equals(rootDoc) ? isAppendRequest(params) : false;
                 saveDocument(doc.getFullName(), extractTitle(doc.getXdom()), importerFilter.filter(doc.getFullName(),
@@ -390,9 +394,9 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         if (namingMethodParam == null || namingMethodParam.equals("")) {
             throw new OfficeImporterException("Unable to determine child pages naming method.");
         } else if (namingMethodParam.equals("headingNames")) {
-            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, rendererFactory, false);
+            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, this.xwikiSyntaxRenderer, false);
         } else if (namingMethodParam.equals("mainPageNameAndHeading")) {
-            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, rendererFactory, true);
+            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, this.xwikiSyntaxRenderer, true);
         } else if (namingMethodParam.equals("mainPageNameAndNumbering")) {
             return new PageIndexNamingCriterion(targetWikiDocument, docBridge);
         } else {
@@ -440,12 +444,12 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         try {
             if (docBridge.exists(documentName) && append) {
                 // Must make sure that the target document is in xwiki 2.0 syntax.
-                if (!docBridge.getDocumentSyntaxId(documentName).equals(XWIKI_20.toIdString())) {
+                if (!docBridge.getDocumentSyntaxId(documentName).equals(Syntax.XWIKI_2_0.toIdString())) {
                     throw new OfficeImporterException("Target document is not an xwiki 2.0 document.");
                 }
                 String oldContent = docBridge.getDocumentContent(documentName);
                 // Append the new content.
-                docBridge.setDocumentSyntaxId(documentName, XWIKI_20.toIdString());
+                docBridge.setDocumentSyntaxId(documentName, Syntax.XWIKI_2_0.toIdString());
                 // Insert a newline between the old content and the appended content.
                 docBridge.setDocumentContent(documentName, oldContent + "\n" + content, "Updated by office importer",
                     false);
@@ -453,7 +457,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 if (null != title) {
                     docBridge.getDocument(documentName).setTitle(title);
                 }
-                docBridge.setDocumentSyntaxId(documentName, XWIKI_20.toIdString());
+                docBridge.setDocumentSyntaxId(documentName, Syntax.XWIKI_2_0.toIdString());
                 docBridge.setDocumentContent(documentName, content, "Updated by office importer", false);
             }
         } catch (Exception ex) {

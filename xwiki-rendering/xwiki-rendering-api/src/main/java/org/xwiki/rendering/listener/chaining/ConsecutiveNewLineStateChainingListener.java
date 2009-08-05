@@ -41,7 +41,7 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
 
     public ConsecutiveNewLineStateChainingListener(ListenerChain listenerChain)
     {
-        super(listenerChain);
+        setListenerChain(listenerChain);
     }
 
     /**

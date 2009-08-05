@@ -17,48 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.html;
+package org.xwiki.rendering.internal.renderer.xwiki;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.renderer.*;
+import org.xwiki.rendering.internal.renderer.chaining.XWikiSyntaxChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
+import org.xwiki.rendering.listener.chaining.ConsecutiveNewLineStateChainingListener;
+import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
+import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
- * Renderer that generates XHTML from a XDOM resulting from the parsing of text containing HTML mixed with wiki syntax.
- * We override the default XHTML renderer since we want special behaviors, for example to not escape special symbols
- * (since we don't want to escape HTML tags for example). 
+ * Generates XWiki Syntax from {@link org.xwiki.rendering.block.XDOM}. This is useful for example to convert other wiki
+ * syntaxes to the XWiki syntax. It's also useful in our tests to verify that round-tripping from XWiki Syntax to the
+ * DOM and back to XWiki Syntax generates the same content as the initial syntax.
  * 
- * @version $Id $
- * @since 1.8.3
+ * @version $Id$
+ * @since 2.0M3
  */
-@Component("xhtmlmacro/1.0")
+@Component("xwiki/2.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class HTMLMacroXHTMLRenderer extends AbstractChainingPrintRenderer implements Initializable
+public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
-    /**
-     * To render link events into XHTML. This is done so that it's pluggable because link rendering depends on how
-     * the underlying system wants to handle it. For example for XWiki we check if the document exists, we get the
-     * document URL, etc.
-     */
-    @Requirement
-    private XHTMLLinkRenderer linkRenderer;
-
-    /**
-     * To render image events into XHTML. This is done so that it's pluggable because image rendering depends
-     * on how the underlying system wants to handle it. For example for XWiki we check if the image exists as a
-     * document attachments, we get its URL, etc.
-     */
-    @Requirement
-    private XHTMLImageRenderer imageRenderer;
-
     /**
      * {@inheritDoc}
      * @see Initializable#initialize()
@@ -66,13 +54,19 @@ public class HTMLMacroXHTMLRenderer extends AbstractChainingPrintRenderer implem
      */
     public void initialize() throws InitializationException
     {
-        ListenerChain chain = new ListenerChain();
+        ListenerChain chain = new XWikiSyntaxListenerChain();
         setListenerChain(chain);
 
         // Construct the listener chain in the right order. Listeners early in the chain are called before listeners
-        // placed later in the chain.
+        // placed later in the chain. This chzin allows using several listeners that make it easier
+        // to write the XWiki Syntax chaining listener, for example for saving states (are we in a list, in a
+        // paragraph, are we starting a new line, etc).
         chain.addListener(this);
+        chain.addListener(new LookaheadChainingListener(chain, 2));
+        chain.addListener(new GroupStateChainingListener(chain));
         chain.addListener(new BlockStateChainingListener(chain));
-        chain.addListener(new HTMLMacroXHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
+        chain.addListener(new ConsecutiveNewLineStateChainingListener(chain));
+        chain.addListener(new TextOnNewLineStateChainingListener(chain));
+        chain.addListener(new XWikiSyntaxChainingRenderer(chain));
     }
 }

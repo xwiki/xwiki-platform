@@ -28,7 +28,6 @@ import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 
 /**
  * Parser for Confluence syntax.
@@ -39,11 +38,6 @@ import org.xwiki.rendering.parser.SyntaxType;
 @Component("confluence/1.0")
 public class WikiModelConfluenceParser extends AbstractWikiModelParser
 {
-    /**
-     * Confluence 1.0 Syntax.
-     */
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.CONFLUENCE, "1.0");
-
     /**
      * @see #getLinkParser()
      */
@@ -63,7 +57,7 @@ public class WikiModelConfluenceParser extends AbstractWikiModelParser
      */
     public Syntax getSyntax()
     {
-        return SYNTAX;
+        return Syntax.CONFLUENCE_1_0;
     }
 
     /**

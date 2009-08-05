@@ -27,7 +27,6 @@ import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 
 /**
@@ -50,18 +49,13 @@ public class WikiModelXWikiParser extends AbstractWikiModelParser
     private ImageParser imageParser;
 
     /**
-     * XWiki 2.0 Syntax.
-     */
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
-
-    /**
      * {@inheritDoc}
      * 
      * @see Parser#getSyntax()
      */
     public Syntax getSyntax()
     {
-        return SYNTAX;
+        return Syntax.XWIKI_2_0;
     }
 
     /**

@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLUtils;
 
@@ -40,11 +39,6 @@ import org.xwiki.xml.html.HTMLUtils;
 @Component("html/4.01")
 public class WikiModelHTMLParser extends WikiModelXHTMLParser
 {
-    /**
-     * The HTML syntax supported by this parser.
-     */
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.HTML, "4.01");
-
     /**
      * Used to clean the HTML into valid XHTML. Injected by the Component Manager.
      */
@@ -59,7 +53,7 @@ public class WikiModelHTMLParser extends WikiModelXHTMLParser
     @Override
     public Syntax getSyntax()
     {
-        return SYNTAX;
+        return Syntax.HTML_4_01;
     }
     
     /**

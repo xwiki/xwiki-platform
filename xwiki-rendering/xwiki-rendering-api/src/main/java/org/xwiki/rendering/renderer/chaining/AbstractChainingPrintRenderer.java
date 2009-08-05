@@ -22,7 +22,7 @@ package org.xwiki.rendering.renderer.chaining;
 import java.util.Stack;
 
 import org.xwiki.rendering.listener.chaining.AbstractChainingListener;
-import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -36,16 +36,6 @@ public abstract class AbstractChainingPrintRenderer extends AbstractChainingList
      * The printer stack. Can be used to print in a specific printer and then easily return to the previous one.
      */
     private Stack<WikiPrinter> printers = new Stack<WikiPrinter>();
-
-    /**
-     * @param printer the main printer
-     * @param listenerChain the entry point of the chain of listeners
-     */
-    public AbstractChainingPrintRenderer(WikiPrinter printer, ListenerChain listenerChain)
-    {
-        super(listenerChain);
-        this.pushPrinter(printer);
-    }
 
     /**
      * @return the main printer.
@@ -66,6 +56,16 @@ public abstract class AbstractChainingPrintRenderer extends AbstractChainingList
     }
 
     /**
+     * {@inheritDoc}
+     * @see PrintRenderer#setPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
+     * @since 2.0M3
+     */
+    public void setPrinter(WikiPrinter printer)
+    {
+        pushPrinter(printer);
+    }
+
+    /**
      * Change the current {@link WikiPrinter} with the provided one.
      * 
      * @param wikiPrinter the new {@link WikiPrinter} to use
@@ -73,6 +73,17 @@ public abstract class AbstractChainingPrintRenderer extends AbstractChainingList
     protected void pushPrinter(WikiPrinter wikiPrinter)
     {
         this.printers.push(wikiPrinter);
+
+        // Since we're setting a new printer to use, make sure that all print renderers in the chain have the new
+        // printer set. Only do this if we're on the top level Print Renderer.
+        if (getListenerChain().indexOf(getClass()) == 0) {
+            ChainingListener nextListener = this;
+            while ((nextListener = getListenerChain().getNextListener(nextListener.getClass())) != null) {
+                if (PrintRenderer.class.isAssignableFrom(nextListener.getClass())) {
+                    ((PrintRenderer) nextListener).setPrinter(wikiPrinter);
+                }
+            }
+        }
     }
 
     /**

@@ -22,10 +22,13 @@ package org.xwiki.rendering.block;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.util.IdGenerator;
-import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * @version $Id$
@@ -163,9 +166,24 @@ public class HeaderBlock extends AbstractFatherBlock
      */
     public String getPlainTextTitle()
     {
-        RenderersUtils renderersUtils = new RenderersUtils();
-
-        return renderersUtils.renderPlainText(getChildren());
+        // Note: Since we don't have access to components from inside Blocks we initialize a plain text renderer
+        // manually. Also note that we don't set the link label generator since 1) we want to use the reference as is
+        // and the Plain Text Renderer supports when no link label generator is set, and 2) we don't an easy access
+        // to the link label generator component from here since we don't have access to components at all from here.
+        // TODO: Remove the need for this method here since Blocks shouldn't contain logic.
+        WikiPrinter printer = new DefaultWikiPrinter();
+        PlainTextRenderer renderer = new PlainTextRenderer();
+        try {
+            renderer.initialize();
+        } catch (InitializationException e) {
+            // This should not happen
+            throw new RuntimeException("Failed to initialize Plain Text Renderer", e);
+        }
+        renderer.setPrinter(printer);
+        for (Block block : getChildren()) {
+            block.traverse(renderer);
+        }
+        return printer.toString();
     }
 
     /**

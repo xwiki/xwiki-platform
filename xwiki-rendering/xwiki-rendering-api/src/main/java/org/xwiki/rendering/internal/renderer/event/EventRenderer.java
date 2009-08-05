@@ -17,29 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.renderer.event;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.internal.renderer.chaining.EventsChainingRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Print names of events. Useful for debugging and tracing in general. Note that this class is not located in the test
  * source tree since it's currently used at runtime by the WYSIWYG editor for its runtime debug mode.
  * 
  * @version $Id$
- * @since 1.5M1
+ * @since 2.0M3
  */
-public class EventsRenderer extends AbstractChainingPrintRenderer
+@Component("event/1.0")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class EventRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
     /**
-     * @param printer the object where the XWiki Syntax output will be printed to 
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     * @since 2.0M3
      */
-    public EventsRenderer(WikiPrinter printer)
+    public void initialize() throws InitializationException
     {
-        super(printer, new ListenerChain());
-        
-        new EventsChainingRenderer(printer, getListenerChain());
+        ListenerChain chain = new ListenerChain();
+        setListenerChain(chain);
+
+        // Construct the listener chain in the right order. Listeners early in the chain are called before listeners
+        // placed later in the chain.
+        chain.addListener(this);
+        chain.addListener(new EventsChainingRenderer(chain));
     }
 }

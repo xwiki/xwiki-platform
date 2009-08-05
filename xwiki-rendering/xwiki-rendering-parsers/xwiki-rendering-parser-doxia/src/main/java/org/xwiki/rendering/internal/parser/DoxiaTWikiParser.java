@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.parser;
 import org.apache.maven.doxia.module.twiki.TWikiParser;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser;
 
 /**
@@ -32,8 +31,6 @@ import org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser;
 @Component("twiki/1.0")
 public class DoxiaTWikiParser extends AbstractDoxiaParser
 {
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.TWIKI, "1.0");
-
     /**
      * {@inheritDoc}
      * 
@@ -41,7 +38,7 @@ public class DoxiaTWikiParser extends AbstractDoxiaParser
      */
     public Syntax getSyntax()
     {
-        return SYNTAX;
+        return Syntax.TWIKI_1_0;
     }
 
     /**

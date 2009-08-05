@@ -551,6 +551,29 @@ public class Utils
     }
 
     /**
+     * @param <T> the component type
+     * @param role the role for which to return implementing components
+     * @return all components implementing the passed role
+     * @since 2.0M3
+     */
+    public static <T> List<T> getComponentList(Class< T > role)
+    {
+        List<T> components;
+        if (componentManager != null) {
+            try {
+                components = componentManager.lookupList(role);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to load components with role [" + role.getName() + "]", e);
+            }
+        } else {
+            throw new RuntimeException("Component manager has not been initialized before lookup for role ["
+                + role.getName() + "]");
+        }
+
+        return components;
+    }
+
+    /**
      * Check if placeholders are enabled in the current context.
      * 
      * @param context The current context.

@@ -22,13 +22,13 @@ package org.xwiki.rendering.internal.parser.doxia;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.parser.doxia.XDOMGeneratorSink;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 
 import java.io.Reader;
+import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
  * @version $Id$
@@ -42,12 +42,15 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
     @Requirement
     protected ImageParser imageParser;
 
+    @Requirement("plain/1.0")
+    private BlockRenderer plainTextBlockRenderer;
+
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
     public XDOM parse(Reader source) throws ParseException
     {
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
-        XDOMGeneratorSink sink = new XDOMGeneratorSink(this.linkParser);
+        XDOMGeneratorSink sink = new XDOMGeneratorSink(this.linkParser, this.plainTextBlockRenderer);
 
         try {
             parser.parse(source, sink);

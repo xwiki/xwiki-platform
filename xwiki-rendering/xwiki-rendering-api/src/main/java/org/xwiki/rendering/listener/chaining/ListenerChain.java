@@ -86,7 +86,7 @@ public class ListenerChain
     public ChainingListener getNextListener(Class< ? extends ChainingListener> listenerClass)
     {
         ChainingListener next = null;
-        int pos = this.nextListeners.indexOf(listenerClass);
+        int pos = indexOf(listenerClass);
         if (pos > -1 && this.nextListeners.size() > pos + 1) {
             next = this.listeners.get(this.nextListeners.get(pos + 1)).peek();
         }
@@ -103,11 +103,20 @@ public class ListenerChain
         return this.listeners.get(listenerClass).peek();
     }
 
+    /**
+     * @param listenerClass the listener class for which to find the position in the chain
+     * @return the position in the chain (first position is 0)
+     */
+    public int indexOf(Class< ? extends ChainingListener> listenerClass)
+    {
+        return this.nextListeners.indexOf(listenerClass);
+    }
+
     public void pushListener(Class< ? extends ChainingListener> listenerClass)
     {
         if (StackableChainingListener.class.isAssignableFrom(listenerClass)) {
             Stack<ChainingListener> stack = this.listeners.get(listenerClass);
-            ((StackableChainingListener) stack.peek()).createChainingListenerInstance();
+            stack.push(((StackableChainingListener) stack.peek()).createChainingListenerInstance());
         }
     }
 

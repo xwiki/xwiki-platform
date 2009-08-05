@@ -44,8 +44,10 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.util.IdGenerator;
-import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * Doxia Sink that generates a XWiki {@link XDOM} object containing page Blocks.
@@ -57,6 +59,11 @@ public class XDOMGeneratorSink implements Sink
 {
     private LinkParser linkParser;
 
+    /**
+     * Used to render Bocks into plain text for computing unique HTML ids for Headers.
+     */
+    private BlockRenderer plainTextBlockRenderer;
+
     private Stack<Block> stack = new Stack<Block>();
 
     private final MarkerBlock marker = new MarkerBlock();
@@ -66,8 +73,6 @@ public class XDOMGeneratorSink implements Sink
 
     private IdGenerator idGenerator = new IdGenerator();
 
-    private RenderersUtils renderersUtils = new RenderersUtils();
-
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -75,9 +80,13 @@ public class XDOMGeneratorSink implements Sink
         }
     }
 
-    public XDOMGeneratorSink(LinkParser linkParser)
+    /**
+     * @since 2.0M3
+     */
+    public XDOMGeneratorSink(LinkParser linkParser, BlockRenderer plainTextBlockRenderer)
     {
         this.linkParser = linkParser;
+        this.plainTextBlockRenderer = plainTextBlockRenderer;
     }
 
     public XDOM getDOM()
@@ -371,7 +380,9 @@ public class XDOMGeneratorSink implements Sink
     public void section1_()
     {
         List<Block> children = generateListFromStack();
-        String id = "H" + this.idGenerator.generateUniqueId(this.renderersUtils.renderPlainText(children));
+        WikiPrinter printer = new DefaultWikiPrinter();
+        this.plainTextBlockRenderer.render(children, printer);
+        String id = "H" + this.idGenerator.generateUniqueId(printer.toString());
 
         List<Block> headerTitleBlocks = generateListFromStack();
         this.stack.push(new HeaderBlock(headerTitleBlocks, HeaderLevel.LEVEL1, id));

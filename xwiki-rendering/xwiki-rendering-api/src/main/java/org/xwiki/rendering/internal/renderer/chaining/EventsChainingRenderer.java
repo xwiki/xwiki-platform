@@ -34,7 +34,6 @@ import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
  * Prints listener event names in a format useful for testing and debugging.
@@ -44,9 +43,9 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  */
 public class EventsChainingRenderer extends AbstractChainingPrintRenderer
 {
-    public EventsChainingRenderer(WikiPrinter printer, ListenerChain listenerChain)
+    public EventsChainingRenderer(ListenerChain listenerChain)
     {
-        super(printer, listenerChain);
+        setListenerChain(listenerChain);
     }
 
     // Events

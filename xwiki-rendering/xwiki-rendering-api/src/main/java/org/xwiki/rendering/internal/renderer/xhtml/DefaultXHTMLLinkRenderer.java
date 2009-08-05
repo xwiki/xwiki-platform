@@ -17,13 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.xhtml;
+package org.xwiki.rendering.internal.renderer.xhtml;
 
+import org.xwiki.rendering.renderer.xhtml.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxLinkRenderer;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
@@ -41,9 +48,10 @@ import org.xwiki.rendering.wiki.WikiModel;
  * </ul>
  * 
  * @version $Id$
- * @since 1.8RC3
+ * @since 2.0M3
  */
-public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
+@Component
+public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializable
 {
     /**
      * The XHTML element <code>class</code> parameter.
@@ -83,12 +91,17 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
     /**
      * Used to generate a link label.
      */
+    @Requirement
     private LinkLabelGenerator linkLabelGenerator;
 
     /**
      * Used to extract the attachment information form the reference if the link is targeting an attachment.
      */
+    @Requirement
     private AttachmentParser attachmentParser;
+
+    @Requirement
+    private ComponentManager componentManager;
 
     /**
      * Used to save the original syntax of the link reference.
@@ -96,30 +109,21 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer
     private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
 
     /**
-     * Constructor to be used when outside of a wiki. 
-     * 
-     * @param linkLabelGenerator used to generate a link label.
-     * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
-     *            attachment.
+     * {@inheritDoc}
+     * @see Initializable#initialize()
      */
-    public DefaultXHTMLLinkRenderer(LinkLabelGenerator linkLabelGenerator, AttachmentParser attachmentParser)
+    public void initialize() throws InitializationException
     {
-        this(null, linkLabelGenerator, attachmentParser);
-    }
-
-    /**
-     * @param wikiModel used to generate the link targeting a local document.
-     * @param linkLabelGenerator used to generate a link label.
-     * @param attachmentParser used to extract the attachment information form the reference if the link is targeting an
-     *            attachment.
-     */
-    public DefaultXHTMLLinkRenderer(WikiModel wikiModel, LinkLabelGenerator linkLabelGenerator,
-        AttachmentParser attachmentParser)
-    {
-        this.wikiModel = wikiModel;
-        this.linkLabelGenerator = linkLabelGenerator;
-        this.attachmentParser = attachmentParser;
+        // TODO: Transform it into a component later on
         this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
+
+        // Try to find a WikiModel implementation and set it if it can be found. If not it means we're in
+        // non wiki mode (i.e. no attachment in wiki documents and no links to documents for example).
+        try {
+            this.wikiModel = this.componentManager.lookup(WikiModel.class);
+        } catch (ComponentLookupException e) {
+            // There's no WikiModel implementation available. this.wikiModel stays null.
+        }
     }
 
     /**

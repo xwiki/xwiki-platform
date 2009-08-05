@@ -27,14 +27,20 @@ package org.xwiki.rendering.parser;
  * @version $Id$
  * @since 1.5M2
  */
-public class Syntax
+    public class Syntax
 {
     public static final Syntax XHTML_1_0 = new Syntax(SyntaxType.XHTML, "1.0");
+    public static final Syntax HTML_4_01 = new Syntax(SyntaxType.HTML, "4.01");
     public static final Syntax XWIKI_2_0 = new Syntax(SyntaxType.XWIKI, "2.0");
     public static final Syntax PLAIN_1_0 = new Syntax(SyntaxType.PLAIN, "1.0");
     public static final Syntax EVENT_1_0 = new Syntax(SyntaxType.EVENT, "1.0");
     public static final Syntax TEX_1_0 = new Syntax(SyntaxType.TEX, "1.0");
-    
+    public static final Syntax CREOLE_1_0 = new Syntax(SyntaxType.CREOLE, "1.0");
+    public static final Syntax JSPWIKI_1_0 = new Syntax(SyntaxType.JSPWIKI, "1.0");
+    public static final Syntax MEDIAWIKI_1_0 = new Syntax(SyntaxType.MEDIAWIKI, "1.0");
+    public static final Syntax CONFLUENCE_1_0 = new Syntax(SyntaxType.CONFLUENCE, "1.0");
+    public static final Syntax TWIKI_1_0 = new Syntax(SyntaxType.TWIKI, "1.0");
+
     private SyntaxType type;
 
     private String version;

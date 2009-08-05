@@ -34,6 +34,7 @@ public interface SyntaxFactory
 
     /**
      * @return a list of all Syntaxes for which there's a {@link Parser} available
+     * @deprecated starting with 2.0M3 you should directly lookup the Parser using the Component Manager
      */
     List<Syntax> getAvailableSyntaxes();
 }

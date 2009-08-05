@@ -22,11 +22,6 @@ package org.xwiki.rendering.listener.chaining;
 import java.util.Collections;
 import java.util.Map;
 
-import org.xwiki.rendering.listener.chaining.AbstractChainingListener;
-import org.xwiki.rendering.listener.chaining.EventType;
-import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
-
 import junit.framework.TestCase;
 
 /**
@@ -43,7 +38,7 @@ public class LookaheadChainingListenerTest extends TestCase
 
         public TestChainingListener(ListenerChain listenerChain)
         {
-            super(listenerChain);
+            setListenerChain(listenerChain);
         }
 
         @Override
@@ -75,7 +70,9 @@ public class LookaheadChainingListenerTest extends TestCase
     {
         ListenerChain chain = new ListenerChain();
         LookaheadChainingListener listener = new LookaheadChainingListener(chain, 2);
+        chain.addListener(listener);
         TestChainingListener testListener = new TestChainingListener(chain);
+        chain.addListener(testListener);
 
         // The begin document flushes
         listener.beginDocument(Collections.<String, String> emptyMap());

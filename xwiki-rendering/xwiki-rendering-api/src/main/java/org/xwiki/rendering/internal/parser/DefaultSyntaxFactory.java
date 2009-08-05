@@ -29,8 +29,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
@@ -42,7 +40,7 @@ import org.xwiki.rendering.parser.SyntaxType;
  * @since 1.5M2
  */
 @Component
-public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFactory, Initializable
+public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFactory
 {
     /**
      * Used to cut the syntax identifier into syntax name and syntax version.
@@ -54,33 +52,6 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
      */
     @Requirement
     private ComponentManager componentManager;
-
-    /**
-     * The list of available syntaxes.
-     */
-    private List<Syntax> syntaxes;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        List<Syntax> syntaxList = new ArrayList<Syntax>();
-        List<Parser> parsers;
-        try {
-            parsers = this.componentManager.lookupList(Parser.class);
-        } catch (ComponentLookupException e) {
-            throw new InitializationException("Failed to lookup the list of available Syntaxes", e);
-        }
-
-        for (Parser parser : parsers) {
-            syntaxList.add(parser.getSyntax());
-        }
-
-        this.syntaxes = syntaxList;
-    }
 
     /**
      * {@inheritDoc}
@@ -106,9 +77,23 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.parser.SyntaxFactory#getAvailableSyntaxes()
+     * @deprecated starting with 2.0M3 you should directly lookup the Parser using the Component Manager
      */
     public List<Syntax> getAvailableSyntaxes()
     {
-        return this.syntaxes;
+        List<Syntax> parserSyntaxList = new ArrayList<Syntax>();
+        List<Parser> parsers;
+        try {
+            parsers = this.componentManager.lookupList(Parser.class);
+        } catch (ComponentLookupException e) {
+            // TODO: Do we need a Rendering RuntimeException? Or should we throw a checked exception instead?
+            throw new RuntimeException("Failed to lookup the list of available Parser Syntaxes", e);
+        }
+
+        for (Parser parser : parsers) {
+            parserSyntaxList.add(parser.getSyntax());
+        }
+
+        return parserSyntaxList;
     }
 }

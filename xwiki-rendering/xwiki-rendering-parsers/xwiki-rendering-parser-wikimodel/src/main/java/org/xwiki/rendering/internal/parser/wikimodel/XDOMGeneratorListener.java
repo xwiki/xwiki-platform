@@ -75,8 +75,10 @@ import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.util.IdGenerator;
-import org.xwiki.rendering.util.RenderersUtils;
 
 /**
  * Transforms WikiModel events into XWiki Rendering events.
@@ -102,7 +104,10 @@ public class XDOMGeneratorListener implements IWemListener
 
     private IdGenerator idGenerator = new IdGenerator();
 
-    private RenderersUtils renderersUtils = new RenderersUtils();
+    /**
+     * Used to render Bocks into plain text for computing unique HTML ids for Headers.
+     */
+    private BlockRenderer plainTextBlockRenderer;
 
     private class MarkerBlock extends AbstractBlock
     {
@@ -112,13 +117,18 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
-    // TODO: Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links.
-    // See http://code.google.com/p/wikimodel/issues/detail?id=87
-    public XDOMGeneratorListener(Parser parser, LinkParser linkParser, ImageParser imageParser)
+    /**
+     * @see XDOMGeneratorListener
+     * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
+     * @since 2.0M3
+     */
+    public XDOMGeneratorListener(Parser parser, LinkParser linkParser, ImageParser imageParser,
+        BlockRenderer plainTextBlockRenderer)
     {
         this.parser = parser;
         this.linkParser = linkParser;
         this.imageParser = imageParser;
+        this.plainTextBlockRenderer = plainTextBlockRenderer;
     }
 
     public XDOM getXDOM()
@@ -380,7 +390,10 @@ public class XDOMGeneratorListener implements IWemListener
         List<Block> children = generateListFromStack();
         HeaderLevel headerLevel = HeaderLevel.parseInt(level);
         Map<String, String> parameters = convertParameters(params);
-        String id = this.idGenerator.generateUniqueId("H", this.renderersUtils.renderPlainText(children));
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        this.plainTextBlockRenderer.render(children, printer);
+        String id = this.idGenerator.generateUniqueId("H", printer.toString());
 
         this.stack.push(new HeaderBlock(children, headerLevel, parameters, id));
     }
@@ -489,7 +502,7 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.wikimodel.wem.IWemListener#onHorizontalLine()
+     * @see org.wikimodel.wem.IWemListener#onHorizontalLine(org.wikimodel.wem.WikiParameters)
      */
     public void onHorizontalLine(WikiParameters params)
     {

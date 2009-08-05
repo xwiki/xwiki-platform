@@ -43,12 +43,12 @@ public abstract class AbstractChainingListener implements ChainingListener
     private ListenerChain listenerChain;
 
     /**
-     * @param listenerChain the chain to use to know the next listener to call on events
+     * @param listenerChain see {@link #getListenerChain()}
+     * @since 2.0M3
      */
-    public AbstractChainingListener(ListenerChain listenerChain)
+    public void setListenerChain(ListenerChain listenerChain)
     {
         this.listenerChain = listenerChain;
-        this.listenerChain.addListener(this);
     }
 
     /**

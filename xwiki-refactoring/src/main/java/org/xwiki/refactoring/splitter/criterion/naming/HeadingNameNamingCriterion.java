@@ -30,10 +30,7 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
@@ -46,9 +43,9 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 public class HeadingNameNamingCriterion implements NamingCriterion
 {
     /**
-     * Factory to get xwiki 2.0 syntax renderer.
+     * Used to render block to xwiki 2.0 syntax.
      */
-    private PrintRendererFactory rendererFactory;
+    private BlockRenderer xwikiSyntaxRenderer;
 
     /**
      * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
@@ -86,15 +83,15 @@ public class HeadingNameNamingCriterion implements NamingCriterion
      * 
      * @param baseDocumentName name of the document that is being split.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
-     * @param rendererFactory {@link PrintRendererFactory} used to get xwiki 2.0 syntax renderer.
+     * @param xwikiSyntaxRenderer the renderer to convert to xwiki 2.0 syntax
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
      */
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
-        PrintRendererFactory rendererFactory, boolean prependBasePageName)
+        BlockRenderer xwikiSyntaxRenderer, boolean prependBasePageName)
     {
         this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
         this.docBridge = docBridge;
-        this.rendererFactory = rendererFactory;
+        this.xwikiSyntaxRenderer = xwikiSyntaxRenderer;
         this.documentNames = new ArrayList<String>();
         int dot = baseDocumentName.lastIndexOf('.');
         this.spaceName = (dot != -1) ? baseDocumentName.substring(0, dot) : "Main";
@@ -126,9 +123,10 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                     }
                 });
                 XDOM xdom = new XDOM(clonedHeaderBlock.getChildren());
+
                 WikiPrinter printer = new DefaultWikiPrinter();
-                Listener listener = this.rendererFactory.createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
-                xdom.traverse(listener);
+                this.xwikiSyntaxRenderer.render(xdom, printer);
+
                 documentName = cleanPageName(printer.toString());
             }
         }

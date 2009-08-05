@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
+package org.xwiki.rendering.internal.renderer.xwiki;
 
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
@@ -29,7 +29,7 @@ import org.xwiki.rendering.listener.URLImage;
  * <code>(optional document name)@(attachment name)</code>.
  * 
  * @version $Id$
- * @since 1.7M3
+ * @since 2.0M3
  */
 public class XWikiSyntaxImageRenderer
 {

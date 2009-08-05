@@ -31,15 +31,15 @@ import org.wikimodel.wem.xwiki.XWikiReferenceParser;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.xml.XMLUtils;
 
 /**
@@ -58,9 +58,11 @@ public class XWikiCommentHandler extends CommentHandler
 
     private ImageParser imageParser;
 
-    private PrintRendererFactory printRendererFactory;
+    private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
     private XWikiReferenceParser referenceParser;
+
+    private BlockRenderer plainTextBlockRenderer;
 
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
@@ -68,14 +70,20 @@ public class XWikiCommentHandler extends CommentHandler
      */
     private Stack<String> commentContentStack = new Stack<String>();
 
+    /**
+     * @since 2.0M3
+     * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links.
+     *       See http://code.google.com/p/wikimodel/issues/detail?id=87
+     */
     public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser,
-        PrintRendererFactory printRendererFactory)
+        PrintRendererFactory xwikiSyntaxPrintRendererFactory, BlockRenderer plainTextBlockRenderer)
     {
         this.parser = parser;
         this.linkParser = linkParser;
-        this.printRendererFactory = printRendererFactory;
+        this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
         this.referenceParser = new XWikiReferenceParser();
         this.imageParser = imageParser;
+        this.plainTextBlockRenderer = plainTextBlockRenderer;
     }
 
     @Override
@@ -105,7 +113,7 @@ public class XWikiCommentHandler extends CommentHandler
     private void handleLinkCommentStart(String content, TagStack stack)
     {
         stack.pushStackParameter("xdomGeneratorListener", new XDOMGeneratorListener(this.parser, this.linkParser,
-            this.imageParser));
+            this.imageParser, this.plainTextBlockRenderer));
         stack.pushStackParameter("isInLink", true);
         stack.pushStackParameter("isFreeStandingLink", false);
         stack.pushStackParameter("linkParameters", WikiParameters.EMPTY);
@@ -129,15 +137,18 @@ public class XWikiCommentHandler extends CommentHandler
         // see WikiModelXHTMLParser#getLinkLabelParser()
         // see http://code.google.com/p/wikimodel/issues/detail?id=87
         // TODO: remove this workaround when wiki syntax in link labels will be supported by wikimodel
-        XWikiSyntaxRenderer renderer =
-            (XWikiSyntaxRenderer) this.printRendererFactory
-                .createRenderer(new Syntax(SyntaxType.XWIKI, "2.0"), printer);
+        PrintRenderer renderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.popStackParameter("xdomGeneratorListener");
 
         renderer.beginDocument(Collections.<String, String> emptyMap());
         // We make sure we have the right states to have the right escaping but we want only the label so we can't
         // simply traverse a LinkBlock
-        ((XWikiSyntaxListenerChain) renderer.getListenerChain()).getBlockStateChainingListener().pushLinkDepth();
+        // TODO: This is a big hack and a bug since it'll fail if someone provides his own implementation of
+        // PrintRendererFactory for the XWiki 2.0 Syntax.
+        ChainingListener rendererAsChainingListener = (ChainingListener) renderer;
+        XWikiSyntaxListenerChain xwikiSyntaxListenerChain =
+            (XWikiSyntaxListenerChain) rendererAsChainingListener.getListenerChain();
+        xwikiSyntaxListenerChain.getBlockStateChainingListener().pushLinkDepth();
         for (Block block : listener.getXDOM().getChildren()) {
             block.traverse(renderer);
         }

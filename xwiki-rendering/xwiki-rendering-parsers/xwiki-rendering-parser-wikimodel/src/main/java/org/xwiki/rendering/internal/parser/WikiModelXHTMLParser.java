@@ -33,7 +33,6 @@ import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
@@ -55,11 +54,6 @@ import org.xwiki.xml.XMLReaderFactory;
 public class WikiModelXHTMLParser extends AbstractWikiModelParser
 {
     /**
-     * The XHTML syntax supported by this parser.
-     */
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
-
-    /**
      * The parser used for the link label parsing. For (x)html parsing, this will be an xwiki 2.0 parser, since it's 
      * more convenient to pass link labels in xwiki syntax. See referred resource for more details.
      * 
@@ -80,8 +74,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     @Requirement("xwiki/2.0")
     private ImageParser imageParser;
 
-    @Requirement
-    private PrintRendererFactory printRendererFactory;
+    @Requirement("xwiki/2.0")
+    private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
     /**
      * A special factory that create foolproof XML reader that have the following characteristics:
@@ -103,7 +97,7 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
      */
     public Syntax getSyntax()
     {
-        return SYNTAX;
+        return Syntax.XHTML_1_0;
     }
 
     /**
@@ -152,7 +146,8 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
     	
     	XhtmlParser parser = new XhtmlParser();
     	parser.setExtraHandlers(handlers);
-    	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.imageParser, this.printRendererFactory));
+    	parser.setCommentHandler(new XWikiCommentHandler(this, this.linkParser, this.imageParser, 
+            this.xwikiSyntaxPrintRendererFactory, this.plainTextBlockRenderer));
     	
     	// Construct our own XML filter chain since we want to use our own Comment filter.
     	try {

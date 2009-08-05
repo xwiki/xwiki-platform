@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.renderer.xhtml;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.listener.ImageListener;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
@@ -28,6 +29,7 @@ import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
  * @version $Id$
  * @since 1.8RC3
  */
+@ComponentRole
 public interface XHTMLImageRenderer extends ImageListener
 {
     /**

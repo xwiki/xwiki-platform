@@ -17,35 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.renderer.tex;
 
+import org.xwiki.rendering.renderer.*;
 import org.wikimodel.wem.tex.TexSerializer;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelGeneratorListener;
 import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelPrinterAdapter;
 
 /**
- * Print in LaTeX syntax.
- * 
+ * Generates LaTeX syntax from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
+ *
  * @version $Id$
+ * @since 2.0M3
  */
+@Component("tex/1.0")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class TexRenderer extends WrappingListener implements PrintRenderer
 {
     /**
      * The printer.
      */
     private WikiPrinter printer;
-
-    /**
-     * @param printer the printer.
-     */
-    public TexRenderer(WikiPrinter printer)
-    {
-        this.printer = printer;
-        setWrappedListener(new WikiModelGeneratorListener(new TexSerializer(new WikiModelPrinterAdapter(getPrinter()),
-            null, null, null)));
-    }
 
     /**
      * {@inheritDoc}
@@ -55,5 +52,17 @@ public class TexRenderer extends WrappingListener implements PrintRenderer
     public WikiPrinter getPrinter()
     {
         return this.printer;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#setPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
+     * @since 2.0M3
+     */
+    public void setPrinter(WikiPrinter printer)
+    {
+        this.printer = printer;
+        setWrappedListener(new WikiModelGeneratorListener(new TexSerializer(new WikiModelPrinterAdapter(getPrinter()),
+            null, null, null)));
     }
 }

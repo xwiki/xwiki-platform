@@ -28,6 +28,8 @@ import org.xwiki.rendering.parser.ParseException;
 import org.wikimodel.wem.IWikiParser;
 
 import java.io.Reader;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.renderer.BlockRenderer;
 
 /**
  * Common code for all WikiModel-based parsers.
@@ -37,6 +39,12 @@ import java.io.Reader;
  */
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
+    /**
+     * Used by the XDOMGeneratorListener to generate unique header ids.
+     */
+    @Requirement("plain/1.0")
+    protected BlockRenderer plainTextBlockRenderer;
+
     /**
      * @return the WikiModel parser instance to use to parse input content.
      * @throws ParseException when there's a problem creating an instance of the parser to use
@@ -60,8 +68,8 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
      *         in links and they need to be handled in the XDOMGeneratorListener. By default, the link label 
      *         parser is the same one as the source parser (this), but you should overwrite this method if you
      *         need to use a special parser.
-     * @see XDOMGeneratorListener#XDOMGeneratorListener(Parser, LinkParser, ImageParser)
-     * @see http://code.google.com/p/wikimodel/issues/detail?id=87 
+     * @see XDOMGeneratorListener
+     * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
      * TODO: Remove this method when the parser will not need to be passed to the XDOMGeneratorListener anymore.
      */
     protected Parser getLinkLabelParser() 
@@ -78,8 +86,8 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
         IWikiParser parser = createWikiModelParser();
 
         // We pass the LinkParser corresponding to the syntax.
-        XDOMGeneratorListener listener =
-            new XDOMGeneratorListener(this.getLinkLabelParser(), getLinkParser(), getImageParser());
+        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.getLinkLabelParser(), getLinkParser(),
+            getImageParser(), this.plainTextBlockRenderer);
 
         try {
             parser.parse(source, listener);

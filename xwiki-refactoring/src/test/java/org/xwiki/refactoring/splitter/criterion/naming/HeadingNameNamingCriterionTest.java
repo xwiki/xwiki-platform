@@ -26,7 +26,8 @@ import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
@@ -48,11 +49,6 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
     private DocumentAccessBridge docBridge;
 
     /**
-     * Factory to get various syntax renderers.
-     */
-    private PrintRendererFactory rendererFactory;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#setUp()
@@ -64,7 +60,6 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
 
         xwikiParser = (Parser) getComponentManager().lookup(Parser.class, "xwiki/2.0");
         docBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.class, "default");
-        rendererFactory = (PrintRendererFactory) getComponentManager().lookup(PrintRendererFactory.class, "default");
     }
 
     @Override
@@ -83,8 +78,8 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
     public void testDocumentNamesGeneration() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Heading="));
-        NamingCriterion namingCriterion =
-            new HeadingNameNamingCriterion("Test.Test", docBridge, rendererFactory, false);
+        NamingCriterion namingCriterion = new HeadingNameNamingCriterion("Test.Test", docBridge,
+            getComponentManager().lookup(BlockRenderer.class, Syntax.XWIKI_2_0.toIdString()), false);
         Block sectionBlock = xdom.getChildren().get(0);
         // Test normal heading-name naming
         assertEquals("Test.Heading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));

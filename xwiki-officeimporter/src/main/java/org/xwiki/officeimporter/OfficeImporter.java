@@ -23,8 +23,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 
 /**
  * Entry point to import Office documents into wiki pages.
@@ -35,16 +33,6 @@ import org.xwiki.rendering.parser.SyntaxType;
 @ComponentRole
 public interface OfficeImporter
 {
-    /**
-     * XHTML/1.0 syntax.
-     */
-    Syntax XHTML_10 = new Syntax(SyntaxType.XHTML, "1.0");
-
-    /**
-     * XWiki/2.0 syntax.
-     */
-    Syntax XWIKI_20 = new Syntax(SyntaxType.XWIKI, "2.0");
-
     /**
      * Imports the specified office attachment into xhtml and returns the result. Any artifacts extracted during the
      * import operation will be attached to the wiki document. This method does not update the content of the wiki page.

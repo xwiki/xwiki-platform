@@ -31,7 +31,6 @@ import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,6 +43,7 @@ import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 public class XWiki extends Api
 {
@@ -2701,24 +2701,21 @@ public class XWiki extends Api
     {
         Syntax syntax = null;
 
-        PrintRendererFactory printRendererFactory =
-            (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.class);
-
-        List<Syntax> availableSyntaxes = printRendererFactory.getAvailableSyntaxes();
-
-        for (Syntax availableSyntax : availableSyntaxes) {
+        List<PrintRendererFactory> factories = Utils.getComponentList(PrintRendererFactory.class);
+        for (PrintRendererFactory factory : factories) {
+            Syntax factorySyntax = factory.getSyntax();
             if (syntaxVersion != null) {
-                if (availableSyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
-                    && availableSyntax.getVersion().equals(syntaxVersion)) {
-                    syntax = availableSyntax;
+                if (factorySyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
+                    && factorySyntax.getVersion().equals(syntaxVersion)) {
+                    syntax = factorySyntax;
                     break;
                 }
             } else {
                 // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example. We
                 // should have a Version which implements Comparable like we have SyntaxId in Syntax
-                if (availableSyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
-                    && (syntax == null || availableSyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
-                    syntax = availableSyntax;
+                if (factorySyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
+                    && (syntax == null || factorySyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
+                    syntax = factorySyntax;
                 }
             }
         }

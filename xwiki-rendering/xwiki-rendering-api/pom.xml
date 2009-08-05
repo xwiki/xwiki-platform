@@ -189,7 +189,21 @@
             <configuration>
               <comparisonVersion>2.0-milestone-2</comparisonVersion>
               <excludes>
-                <exclude>**/internal/**</exclude>                
+                <exclude>**/internal/**</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
+                <exclude>org/xwiki/rendering/renderer/EventsRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/PlainTextRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/TexRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/XHTMLRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/XWikiSyntaxRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/PrintRendererFactory</exclude>
+                <exclude>org/xwiki/rendering/renderer/PrintRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/chaining/AbstractChainingPrintRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/DefaultXHTMLImageRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/DefaultXHTMLLinkRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLRendererFactory</exclude>
+                <exclude>org/xwiki/rendering/util/RenderersUtils</exclude>
+                <exclude>org/xwiki/rendering/parser/SyntaxFactory</exclude>
               </excludes>
             </configuration>
           </execution>

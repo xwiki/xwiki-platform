@@ -17,8 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
+package org.xwiki.rendering.internal.renderer.xwiki;
 
+import org.xwiki.rendering.internal.renderer.*;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,7 +30,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * Logic to render a XWiki Link into XWiki syntax.
  * 
  * @version $Id$
- * @since 1.7M1
+ * @since 2.0M3
  */
 public class XWikiSyntaxLinkRenderer
 {

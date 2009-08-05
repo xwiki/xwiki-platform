@@ -23,7 +23,7 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.xwiki.rendering.internal.renderer.XWikiSyntaxEscapeHandler;
+import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxEscapeHandler;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;

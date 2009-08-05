@@ -23,7 +23,8 @@ import java.util.List;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.renderer.EventsRenderer;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
@@ -40,13 +41,17 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
         super(testName);
     }
 
-    protected void assertBlocks(String expected, List<Block> blocks)
+    protected void assertBlocks(String expected, List<Block> blocks) throws Exception
     {
         // Assert the result by parsing it through the EventsRenderer to generate easily
         // assertable events.
         XDOM dom = new XDOM(blocks);
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new EventsRenderer(printer));
+
+        PrintRendererFactory factory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
+        PrintRenderer eventRenderer = factory.createRenderer(printer);
+
+        dom.traverse(eventRenderer);
         assertEquals(expected, printer.toString());
     }
 }

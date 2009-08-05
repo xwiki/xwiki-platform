@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
+package org.xwiki.rendering.internal.renderer.xwiki;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +33,7 @@ import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
  * Escape characters that would be confused for XWiki wiki syntax if they were not escaped.
  * 
  * @version $Id$
- * @since 1.7
+ * @since 2.0M3
  */
 public class XWikiSyntaxEscapeHandler
 {

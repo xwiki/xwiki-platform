@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 
 /**
@@ -36,8 +35,6 @@ import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 @Component("mediawiki/1.0")
 public class WikiModelMediaWikiParser extends AbstractWikiModelParser
 {
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.MEDIAWIKI, "1.0");
-
     /**
      * @see #getLinkParser()
      */
@@ -57,7 +54,7 @@ public class WikiModelMediaWikiParser extends AbstractWikiModelParser
      */
     public Syntax getSyntax()
     {
-        return SYNTAX;
+        return Syntax.MEDIAWIKI_1_0;
     }
 
     /**

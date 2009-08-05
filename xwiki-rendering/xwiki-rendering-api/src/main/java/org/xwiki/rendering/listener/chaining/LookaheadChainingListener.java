@@ -57,7 +57,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
 
     public LookaheadChainingListener(ListenerChain listenerChain, int lookaheadDepth)
     {
-        super(listenerChain);
+        setListenerChain(listenerChain);
         this.lookaheadDepth = lookaheadDepth;
     }
 

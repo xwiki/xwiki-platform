@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.renderer;
 
+import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**
@@ -27,6 +28,7 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
  * @version $Id$
  * @since 1.6M1
  */
+@ComponentRole
 public interface PrintRenderer extends Renderer
 {
     /**
@@ -35,4 +37,10 @@ public interface PrintRenderer extends Renderer
      *         {@link org.xwiki.rendering.renderer.printer.WikiPrinter#toString()}
      */
     WikiPrinter getPrinter();
+
+    /**
+     * @param printer the wiki printer to use when the Renderer needs to output rendered content
+     * @since 2.0M3
+     */
+    void setPrinter(WikiPrinter printer);
 }

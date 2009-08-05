@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.html;
+package org.xwiki.rendering.internal.renderer.xhtml;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
@@ -32,16 +33,14 @@ import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 
 /**
- * Renderer that generates XHTML from a XDOM resulting from the parsing of text containing HTML mixed with wiki syntax.
- * We override the default XHTML renderer since we want special behaviors, for example to not escape special symbols
- * (since we don't want to escape HTML tags for example). 
+ * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
  * 
- * @version $Id $
- * @since 1.8.3
+ * @version $Id$
+ * @since 2.0M3
  */
-@Component("xhtmlmacro/1.0")
+@Component("xhtml/1.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class HTMLMacroXHTMLRenderer extends AbstractChainingPrintRenderer implements Initializable
+public class XHTMLRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
     /**
      * To render link events into XHTML. This is done so that it's pluggable because link rendering depends on how
@@ -73,6 +72,6 @@ public class HTMLMacroXHTMLRenderer extends AbstractChainingPrintRenderer implem
         // placed later in the chain.
         chain.addListener(this);
         chain.addListener(new BlockStateChainingListener(chain));
-        chain.addListener(new HTMLMacroXHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
+        chain.addListener(new XHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
     }
 }

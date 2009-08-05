@@ -398,7 +398,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
             part = new MimeBodyPart();
 
-            part.setContent(processImageUrls(mail.getHtmlPart()), "text/html");
+            part.setContent(processImageUrls(mail.getHtmlPart()), "text/html; charset=" 
+                + context.getWiki().getEncoding());
             part.setHeader("Content-Disposition", "inline");
             part.setHeader("Content-Transfer-Encoding", "quoted-printable");
 

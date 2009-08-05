@@ -50,7 +50,6 @@
 ##
 #if($isAdvancedUser)
 #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("core.menu.edit") "tmEdit")
-<a style="display:none;" href="$doc.getURL($editaction, $languageparams)" accesskey="e">edit</a>
 #submenuitem($doc.getURL("edit", "${languageparams}&amp;editor=wiki") $msg.get("core.menu.edit.wiki") "tmEditWiki")
 #submenuitem($doc.getURL("edit", "$languageparams&amp;editor=wysiwyg") $msg.get("core.menu.edit.visual") "tmEditVisual")
 #submenuitem($doc.getURL("inline", "$languageparams") $msg.get("core.menu.edit.form") "tmEditForm")

@@ -83,7 +83,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
     
     /**
-     * Since there's no reason to use container encoding we force email encoding to UTF-8.
+     * Since Java uses full Unicode Strings and email clients manage it we force email encoding to UTF-8. 
+     * XWiki encoding must be used when working with storage or the container since they can be configured to use
+     * another encoding, this constraint does not apply here.   
      */
     private static final String EMAIL_ENCODING = "UTF-8";
 

@@ -256,9 +256,10 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
         String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item " 
-            + "where obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags' and item=? " 
-            + "order by doc.fullName"; 
+            + "where obj.className=? and obj.name=doc.fullName and obj.id=prop.id.id " 
+            + "and prop.id.name='tags' and item=? order by doc.fullName"; 
         List<Object> parameters = new ArrayList<Object>();
+        parameters.add(TAG_CLASS);
         parameters.add(tag);
         
         return context.getWiki().getStore().searchDocumentsNames(hql, parameters, context);

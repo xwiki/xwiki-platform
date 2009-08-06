@@ -38,6 +38,7 @@ public class TestFormatMacro extends AbstractNoParameterMacro
     public TestFormatMacro()
     {
         super("Format Macro");
+        setDefaultCategory("Test");
     }
 
     /**

@@ -54,6 +54,7 @@ public class TestFailingMacro extends AbstractNoParameterMacro
     public TestFailingMacro()
     {
         super("Failing Macro");
+        setDefaultCategory("Test");
     }
 
     /**

@@ -50,4 +50,14 @@ public interface MacroDescriptor
      * @since 1.7M2
      */
     Map<String, ParameterDescriptor> getParameterDescriptorMap();
+    
+    /**
+     * A macro can define a default category under which it falls. For an example, the "skype" macro would fall under
+     * the "Communication" category of macros. However, a wiki administrator has the ability to override the default
+     * category of a macro and assign it to a different macro category.
+     * 
+     * @return the default category under which this macro should be listed.
+     * @since 2.0M3
+     */
+    String getDefaultCategory();
 }

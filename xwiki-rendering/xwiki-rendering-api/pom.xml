@@ -54,6 +54,11 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-configuration-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.wikimodel</groupId>
       <artifactId>org.wikimodel.wem</artifactId>
     </dependency>
@@ -99,9 +104,31 @@
       <version>1.1.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-junit4</artifactId>
+      <version>2.5.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>    
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>   
+        <configuration>
+          <excludes>
+            <exclude>**/Test*Macro.class</exclude>
+            <exclude>**/TestFailingMacro$MockMacroExecutionException.class</exclude>
+          </excludes>
+        </configuration>     
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -205,6 +232,7 @@
                 <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLRendererFactory</exclude>
                 <exclude>org/xwiki/rendering/util/RenderersUtils</exclude>
                 <exclude>org/xwiki/rendering/parser/SyntaxFactory</exclude>
+                <exclude>org/xwiki/rendering/macro/descriptor/MacroDescriptor</exclude>
               </excludes>
             </configuration>
           </execution>

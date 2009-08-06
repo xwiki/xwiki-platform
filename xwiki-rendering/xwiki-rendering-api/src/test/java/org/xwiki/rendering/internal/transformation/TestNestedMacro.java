@@ -36,6 +36,7 @@ public class TestNestedMacro extends AbstractNoParameterMacro
     public TestNestedMacro()
     {
         super("Nested Macro");
+        setDefaultCategory("Test");
     }
 
     /**

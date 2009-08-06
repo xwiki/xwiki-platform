@@ -24,6 +24,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.properties.BeanManager;
+import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -65,6 +66,11 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      * @see Macro#getPriority()
      */
     private int priority = 1000;
+
+    /**
+     * The default category under which this macro should be listed.
+     */
+    private String defaultCategory;
 
     /**
      * Creates a new {@link Macro} instance.
@@ -117,8 +123,11 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public void initialize() throws InitializationException
     {
-        setDescriptor(new DefaultMacroDescriptor(description, contentDescriptor,
-            beanManager.getBeanDescriptor(parametersBeanClass)));
+        DefaultMacroDescriptor descriptor =
+            new DefaultMacroDescriptor(description, contentDescriptor, beanManager
+                .getBeanDescriptor(parametersBeanClass));
+        descriptor.setDefaultCategory(defaultCategory);
+        setDescriptor(descriptor);
     }
 
     /**
@@ -170,5 +179,24 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     protected void setDescriptor(MacroDescriptor descriptor)
     {
         this.macroDescriptor = descriptor;
+    }
+
+    /**
+     * Allows sub classes to set the default macro category. This method only has an effect if the internal
+     * {@link MacroDescriptor} is of type {@link AbstractMacroDescriptor}.
+     * 
+     * @param defaultCategory the default macro category to be set.
+     */
+    protected void setDefaultCategory(String defaultCategory)
+    {
+        // If setDefaultCategory() method is invoked before macro initialization, this will make sure the macro will
+        // have correct default category after initialization.
+        this.defaultCategory = defaultCategory;
+
+        // In case if setDefaultCategory() is invoked after macro initialization. Only works if the internal
+        // MacroDescriptor is of type AbstractMacroDescriptor.
+        if (getDescriptor() instanceof AbstractMacroDescriptor) {
+            ((AbstractMacroDescriptor) getDescriptor()).setDefaultCategory(defaultCategory);
+        }
     }
 }

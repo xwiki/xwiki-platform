@@ -102,4 +102,13 @@ public class WikiMacroDescriptor implements MacroDescriptor
 
         return descriptors;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDefaultCategory()
+    {
+        // Until we add a category field into XWiki.WikiMacroClass
+        return null;
+    }        
 }

@@ -48,6 +48,11 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
      * The description of the parameters bean.
      */
     private BeanDescriptor parametersBeanDescriptor;
+        
+    /**
+     * Default macro category.
+     */
+    private String defaultCategory;
 
     /**
      * A map containing the {@link ParameterDescriptor} for each parameters supported for this macro.
@@ -124,5 +129,21 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     {
         return (null != parametersBeanDescriptor) ? Collections.unmodifiableMap(this.parameterDescriptorMap)
             : Collections.<String, ParameterDescriptor> emptyMap();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDefaultCategory()
+    {
+        return this.defaultCategory;
+    }        
+    
+    /**
+     * @param defaultCategory default category under which this macro should be listed.
+     */
+    public void setDefaultCategory(String defaultCategory)
+    {
+        this.defaultCategory = defaultCategory;
     }
 }

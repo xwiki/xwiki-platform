@@ -28,10 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * Make threads names created by the application server more meaningful.
- * <p>
- * When it will be possible it would be better to do this a component like a RequestInitializer component to work fo any
- * kind of container. Right now component can't really access the initial URL.
  * 
+ * @todo When it will be possible it would be better to do this a component like a RequestInitializer component to work
+ *       for any kind of container. Right now component can't really access the initial URL.
  * @version $Id$
  * @since 2.0M3
  */

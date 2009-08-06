@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.RoleHint;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -42,7 +43,7 @@ import org.xwiki.component.manager.ComponentManager;
  * @version $Id$
  * @since 1.8.1
  */
-public class ComponentAnnotationLoader
+public class ComponentAnnotationLoader extends AbstractLogEnabled
 {
     /**
      * Location in the classloader of the file defining the list of component implementation class to parser for
@@ -97,6 +98,14 @@ public class ComponentAnnotationLoader
                             if (!componentOverrideClassNames.contains(existingDescriptor.getImplementation())) {
                                 descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()),
                                     descriptor);
+
+                                if (!componentOverrideClassNames.contains(descriptor.getImplementation())) {
+                                    getLogger().warn(
+                                        "Component [" + existingDescriptor.getImplementation().getName()
+                                            + "] is being overwritten by component ["
+                                            + descriptor.getImplementation().getName()
+                                            + "]. It will not be possible to lookup it anymore.");
+                                }
                             }
                         } else {
                             descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()), descriptor);

@@ -35,6 +35,7 @@ import java.util.Map;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.logging.VoidLogger;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -61,6 +62,15 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
      * Factory to create a Component Descriptor from an annotated class.
      */
     private ComponentDescriptorFactory factory = new ComponentDescriptorFactory();
+
+    /**
+     * Default constructor.
+     */
+    public ComponentAnnotationLoader()
+    {
+        // make sure to not fail even if no one provided a logger
+        enableLogging(new VoidLogger());
+    }
 
     /**
      * Loads all components defined using annotations.
@@ -104,7 +114,7 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
                                         "Component [" + existingDescriptor.getImplementation().getName()
                                             + "] is being overwritten by component ["
                                             + descriptor.getImplementation().getName()
-                                            + "]. It will not be possible to lookup it anymore.");
+                                            + "]. It will not be possible to look it up.");
                                 }
                             }
                         } else {

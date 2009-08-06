@@ -165,7 +165,6 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @return list of tags (alphabetical order).
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
-    @SuppressWarnings("unchecked")
     public List<String> getAllTags(XWikiContext context) throws XWikiException
     {
         List<String> results;
@@ -254,14 +253,15 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
      * @return list of docNames.
      * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
      */
-    @SuppressWarnings("unchecked")
     public List<String> getDocumentsWithTag(String tag, XWikiContext context) throws XWikiException
     {
-        String hql =
-            "select doc.fullName from XWikiDocument as doc, BaseObject as obj, DBStringListProperty as prop "
-                + "where obj.name=doc.fullName and obj.className='XWiki.TagClass' and obj.id=prop.id.id "
-                + "and prop.id.name='tags' and '" + tag + "' in elements(prop.list) order by doc.name asc";
-        return context.getWiki().search(hql, context);
+        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item " 
+            + "where obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags' and item=? " 
+            + "order by doc.fullName"; 
+        List<Object> parameters = new ArrayList<Object>();
+        parameters.add(tag);
+        
+        return context.getWiki().getStore().searchDocumentsNames(hql, parameters, context);
     }
 
     /**

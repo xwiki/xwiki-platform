@@ -190,6 +190,7 @@
               <comparisonVersion>2.0-milestone-2</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
+                <!-- The excludes below need to be removed when 2.0M3 is released -->
                 <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
                 <exclude>org/xwiki/rendering/renderer/EventsRenderer</exclude>
                 <exclude>org/xwiki/rendering/renderer/PlainTextRenderer</exclude>

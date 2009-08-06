@@ -108,6 +108,10 @@
     <listener-class>org.xwiki.container.servlet.XWikiServletContextListener</listener-class>
   </listener>
 
+  <listener>
+    <listener-class>org.xwiki.container.servlet.SetThreadNameServletRequestListener</listener-class>
+  </listener>
+
   <servlet>
     <servlet-name>action</servlet-name>
     <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>

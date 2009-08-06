@@ -81,6 +81,11 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 {
     /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
+    
+    /**
+     * Since there's no reason to use container encoding we force email encoding to UTF-8.
+     */
+    private static final String EMAIL_ENCODING = "UTF-8";
 
     /**
      * Error code signaling that the mail template requested for
@@ -350,7 +355,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             message.setRecipients(javax.mail.Message.RecipientType.BCC, bcc);
         }
 
-        message.setSubject(mail.getSubject(), "UTF-8");
+        message.setSubject(mail.getSubject(), EMAIL_ENCODING);
 
         for (Map.Entry<String, String> header : mail.getHeaders().entrySet()) {
             message.setHeader(header.getKey(), header.getValue());
@@ -381,7 +386,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
             Multipart multipart = new MimeMultipart("mixed");
             BodyPart part = new MimeBodyPart();
-            part.setContent(mail.getTextPart(), "text/plain");
+            part.setContent(mail.getTextPart(), "text/plain; charset=" + EMAIL_ENCODING);
             multipart.addBodyPart(part);
             addAttachments(multipart, mail.getAttachments(), context);
             return multipart;
@@ -398,8 +403,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
             part = new MimeBodyPart();
 
-            part.setContent(processImageUrls(mail.getHtmlPart()), "text/html; charset=" 
-                + context.getWiki().getEncoding());
+            part.setContent(processImageUrls(mail.getHtmlPart()), "text/html; charset=" + EMAIL_ENCODING);
             part.setHeader("Content-Disposition", "inline");
             part.setHeader("Content-Transfer-Encoding", "quoted-printable");
 

@@ -49,6 +49,8 @@
       <artifactId>hibernate-validator</artifactId>
       <version>4.0.0.Beta1</version>
     </dependency>
+    
+    <!-- Tests dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-shared-tests</artifactId>

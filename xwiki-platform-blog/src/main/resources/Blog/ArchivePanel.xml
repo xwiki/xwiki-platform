@@ -132,13 +132,13 @@
     #foreach($year in [$firstYear..$lastYear])
       #set($yearArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year"))
       #if($yearArticleCount &gt; 0)
-        * &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}")"&gt;$year &lt;span class="itemCount"&gt;($yearArticleCount)&lt;/span&gt&lt;/a&gt;
+        * &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}")"&gt;$year &lt;span class="itemCount"&gt;($yearArticleCount)&lt;/span&gt;&lt;/a&gt;
         #if($year == $currentYear)
           #foreach($month in [1..12])
             #set($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month"))
             #if($monthArticleCount &gt; 0)
               $tempDate.setMonthOfYear($month)
-              ** &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}&amp;amp;month=${month}")"&gt;$monthFormatter.print($tempDate) &lt;span class="itemCount"&gt;(${monthArticleCount})&lt;/span&gt&lt;/a&gt;
+              ** &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}&amp;amp;month=${month}")"&gt;$monthFormatter.print($tempDate) &lt;span class="itemCount"&gt;(${monthArticleCount})&lt;/span&gt;&lt;/a&gt;
             #end
           #end
         #end

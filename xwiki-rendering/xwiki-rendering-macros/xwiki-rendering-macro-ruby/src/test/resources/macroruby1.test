@@ -2,13 +2,32 @@
 .input|xwiki/2.0
 .#-----------------------------------------------------
 {{ruby}}
-puts "Hello World!!!"
+puts "Hello World"
 {{/ruby}}
 
-== Hello {{ruby}}puts "World!!!"{{/ruby}}==
+= Hello {{ruby}}puts "World"{{/ruby}}=
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|event/1.0
 .#-----------------------------------------------------
-<!--startmacro:ruby|-||-|
-puts "Hello World!!!"
---><p>Hello World!!!</p><!--stopmacro--><h2 id="HHello"><span>Hello <!--startmacro:ruby|-||-|puts "World!!!"-->World!!!<!--stopmacro--></span></h2>
+beginDocument
+beginMacroMarkerStandalone [ruby] [] [
+puts "Hello World"
+]
+beginParagraph
+onWord [Hello]
+onSpace
+onWord [World]
+endParagraph
+endMacroMarkerStandalone [ruby] [] [
+puts "Hello World"
+]
+beginSection
+beginHeader [1, HHello]
+onWord [Hello]
+onSpace
+beginMacroMarkerInline [ruby] [] [puts "World"]
+onWord [World]
+endMacroMarkerInline [ruby] [] [puts "World"]
+endHeader [1, HHello]
+endSection
+endDocument

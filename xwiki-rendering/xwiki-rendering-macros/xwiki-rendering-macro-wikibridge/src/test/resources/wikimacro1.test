@@ -3,6 +3,18 @@
 .#-----------------------------------------------------
 {{testwikimacro param1="val1" param2="val2"/}}
 .#-----------------------------------------------------
-.expect|xhtml/1.0
+.expect|event/1.0
 .#-----------------------------------------------------
-<!--startmacro:testwikimacro|-|param1="val1" param2="val2"--><p>This is <strong>testwikimacro</strong></p><!--stopmacro-->
+beginDocument
+beginMacroMarkerStandalone [testwikimacro] [param1=val1|param2=val2]
+beginParagraph
+onWord [This]
+onSpace
+onWord [is]
+onSpace
+beginFormat [BOLD]
+onWord [testwikimacro]
+endFormat [BOLD]
+endParagraph
+endMacroMarkerStandalone [testwikimacro] [param1=val1|param2=val2]
+endDocument

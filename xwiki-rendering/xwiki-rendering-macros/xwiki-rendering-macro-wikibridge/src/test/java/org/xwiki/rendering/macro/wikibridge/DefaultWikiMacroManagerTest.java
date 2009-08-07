@@ -63,7 +63,7 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
 
         // Create a wiki macro with no parameters.
         WikiMacroDescriptor descriptor =
-            new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(),
+            new WikiMacroDescriptor("Test Wiki Macro", "Test", new DefaultContentDescriptor(),
                 new ArrayList<WikiMacroParameterDescriptor>());
         wikiMacro =
             new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", true, descriptor, "== Test ==",

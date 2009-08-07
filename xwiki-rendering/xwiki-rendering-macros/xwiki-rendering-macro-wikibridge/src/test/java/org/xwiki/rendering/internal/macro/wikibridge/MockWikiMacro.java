@@ -80,7 +80,7 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
 
         // Initialize the internal WikiMacro instance.
         WikiMacroDescriptor descriptor =
-            new WikiMacroDescriptor("Test Wiki Macro", new DefaultContentDescriptor(false), params);
+            new WikiMacroDescriptor("Test Wiki Macro", "Test", new DefaultContentDescriptor(false), params);
         this.wikiMacro =
             new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", true, descriptor,
                 "This is **testwikimacro**", "xwiki/2.0", componentManager);

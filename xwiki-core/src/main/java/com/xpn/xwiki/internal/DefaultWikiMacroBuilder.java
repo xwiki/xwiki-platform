@@ -68,6 +68,11 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
      * Constant for representing macro description property.
      */
     private static final String MACRO_DESCRIPTION_PROPERTY = "description";
+    
+    /**
+     * Constant for representing default macro category property.
+     */
+    private static final String MACRO_DEFAULT_CATEGORY_PROPERTY = "defaultCategory";
 
     /**
      * Constant for representing macro inline support property.
@@ -180,6 +185,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         // Extract macro definition.
         String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
+        String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
         boolean macroSupportsInlineMode = (macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) == 0) ? false : true;
         String macroContentType = macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY);
         String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
@@ -195,6 +201,13 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         if (StringUtils.isEmpty(macroDescription)) {
             getLogger().warn(
                 String.format("Incomplete macro definition in [%s], macro description is empty", doc.getFullName()));
+        }
+        
+        // Verify default macro category.
+        if (StringUtils.isEmpty(macroDefaultCategory)) {
+           macroDefaultCategory = null;
+           getLogger().warn(
+               String.format("Incomplete macro definition in [%s], default macro category is empty", doc.getFullName()));
         }
 
         // Verify macro content type.
@@ -258,7 +271,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
 
         // Create macro descriptor.
         MacroDescriptor macroDescriptor =
-            new WikiMacroDescriptor(macroDescription, contentDescriptor, parameterDescriptors);
+            new WikiMacroDescriptor(macroDescription, macroDefaultCategory, contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
         return new DefaultWikiMacro(doc.getFullName(), macroName, macroSupportsInlineMode, macroDescriptor, macroCode, doc

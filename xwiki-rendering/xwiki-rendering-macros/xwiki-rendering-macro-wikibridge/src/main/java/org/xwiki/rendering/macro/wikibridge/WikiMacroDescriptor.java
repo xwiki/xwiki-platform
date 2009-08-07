@@ -39,12 +39,17 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * Macro description.
      */
     private String description;
+    
+    /**
+     * Default category under which this macro should be listed.
+     */
+    private String defaultCategory;
 
     /**
      * Macro content description.
      */
     private ContentDescriptor contentDescriptor;
-    
+
     /**
      * Parameter descriptors.
      */
@@ -54,15 +59,17 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * Creates a new {@link WikiMacroDescriptor} instance.
      * 
      * @param description macro description.
+     * @param defaultCategory default category under which this macro should be listed.
      * @param contentDescriptor macro content description.
-     * @param parameterDescriptors parameter descriptors.
+     * @param parameterDescriptors parameter descriptors. 
      */
-    public WikiMacroDescriptor(String description, ContentDescriptor contentDescriptor,
+    public WikiMacroDescriptor(String description, String defaultCategory, ContentDescriptor contentDescriptor,
         List<WikiMacroParameterDescriptor> parameterDescriptors)
     {
         this.description = description;
         this.contentDescriptor = contentDescriptor;
         this.parameterDescriptors = parameterDescriptors;
+        this.defaultCategory = defaultCategory;
     }
 
     /**
@@ -108,7 +115,6 @@ public class WikiMacroDescriptor implements MacroDescriptor
      */
     public String getDefaultCategory()
     {
-        // Until we add a category field into XWiki.WikiMacroClass
-        return null;
-    }        
+        return this.defaultCategory;
+    }
 }

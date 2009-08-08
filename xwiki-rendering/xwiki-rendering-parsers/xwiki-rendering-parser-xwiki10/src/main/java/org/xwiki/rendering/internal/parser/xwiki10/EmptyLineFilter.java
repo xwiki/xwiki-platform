@@ -33,7 +33,7 @@ import org.xwiki.rendering.parser.xwiki10.FilterContext;
  * @version $Id$
  * @since 1.8M1
  */
-@Component("nl")
+@Component("el")
 public class EmptyLineFilter extends AbstractFilter implements Initializable
 {
     public static final Pattern EMPTYLINE_PATTERN = Pattern.compile("\n\n+");

@@ -27,7 +27,8 @@ import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 
 /**
- * Provides convenient access to listeners in the chain used for the {@link XWikiSyntaxImageRenderer}.
+ * Provides convenient access to listeners in the chain used for
+ * {@link org.xwiki.rendering.renderer.XWikiSyntaxListenerChain}.
  * 
  * @version $Id$
  * @since 1.8RC1

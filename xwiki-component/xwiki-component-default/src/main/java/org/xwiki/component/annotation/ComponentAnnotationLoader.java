@@ -105,11 +105,11 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
                         if (descriptorMap.containsKey(roleHint)) {
                             // Is the component in the override list?
                             ComponentDescriptor existingDescriptor = descriptorMap.get(roleHint);
-                            if (!componentOverrideClassNames.contains(existingDescriptor.getImplementation())) {
+                            if (!componentOverrideClassNames.contains(existingDescriptor.getImplementation().getName())) {
                                 descriptorMap.put(new RoleHint(componentRoleClass, descriptor.getRoleHint()),
                                     descriptor);
 
-                                if (!componentOverrideClassNames.contains(descriptor.getImplementation())) {
+                                if (!componentOverrideClassNames.contains(descriptor.getImplementation().getName())) {
                                     getLogger().warn(
                                         "Component [" + existingDescriptor.getImplementation().getName()
                                             + "] is being overwritten by component ["

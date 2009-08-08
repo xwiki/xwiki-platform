@@ -26,8 +26,10 @@ import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.core.IsNot;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -80,9 +82,9 @@ public class ComponentAnnotationLoaderTest
 
     public static class ComponentDescriptorMatcher extends TypeSafeMatcher<ComponentDescriptor>
     {
-        private String implementation;
+        private Class<?> implementation;
         
-        public ComponentDescriptorMatcher(String implementation)
+        public ComponentDescriptorMatcher(Class<?> implementation)
         {
             this.implementation = implementation;
         }
@@ -100,11 +102,17 @@ public class ComponentAnnotationLoaderTest
     }
     
     @Factory
-    public static Matcher<ComponentDescriptor> aComponentDescriptorWithImplementation(String implementation)
+    public static Matcher<ComponentDescriptor> aComponentDescriptorWithImplementation(Class<?> implementation)
     {
         return new ComponentDescriptorMatcher(implementation);
     }
 
+    @After
+    public void tearDown() throws Exception
+    {
+        this.context.assertIsSatisfied();
+    }
+    
     /**
      * Verify that when there are several component implementations for the same role/hint then
      * component implementations defined in META-INF/component-overrides.txt are used in priority.
@@ -116,8 +124,8 @@ public class ComponentAnnotationLoaderTest
     	final ComponentManager mockManager = this.context.mock(ComponentManager.class);
 
     	this.context.checking(new Expectations() {{
-    	    allowing(mockManager).registerComponent(with(any(ComponentDescriptor.class)));
-    	    oneOf(mockManager).registerComponent(with(aComponentDescriptorWithImplementation(OverrideRole.class.getName())));
+                allowing(mockManager).registerComponent(
+                    with(new IsNot<ComponentDescriptor>(aComponentDescriptorWithImplementation(SimpleRole.class))));
         }});
 
     	loader.initialize(mockManager, this.getClass().getClassLoader());

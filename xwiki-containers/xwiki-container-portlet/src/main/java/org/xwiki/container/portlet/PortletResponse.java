@@ -20,6 +20,11 @@
  */
 package org.xwiki.container.portlet;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.portlet.RenderResponse;
+
 import org.xwiki.container.Response;
 
 public class PortletResponse implements Response
@@ -34,5 +39,34 @@ public class PortletResponse implements Response
     public javax.portlet.PortletResponse getPortletResponse()
     {
         return this.portletResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OutputStream getOutputStream() throws IOException
+    {
+        if (this.portletResponse instanceof RenderResponse) {
+            return ((RenderResponse) this.portletResponse).getPortletOutputStream();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setContentLength(int length)
+    {
+        // No content length for portlets, do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setContentType(String mimeType)
+    {
+        if (this.portletResponse instanceof RenderResponse) {
+            ((RenderResponse) this.portletResponse).setContentType(mimeType);
+        }
     }
 }

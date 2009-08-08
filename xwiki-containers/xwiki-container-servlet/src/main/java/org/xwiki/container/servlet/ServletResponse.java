@@ -20,9 +20,12 @@
  */
 package org.xwiki.container.servlet;
 
-import org.xwiki.container.Response;
+import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletResponse;
+
+import org.xwiki.container.Response;
 
 public class ServletResponse implements Response
 {
@@ -36,5 +39,33 @@ public class ServletResponse implements Response
     public HttpServletResponse getHttpServletResponse()
     {
         return this.httpServletResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public OutputStream getOutputStream() throws IOException
+    {
+        try {
+            return this.httpServletResponse.getOutputStream();
+        } catch (IllegalStateException ex) {
+            return null;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setContentLength(int length)
+    {
+        this.httpServletResponse.setContentLength(length);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setContentType(String mimeType)
+    {
+        this.httpServletResponse.setContentType(mimeType);
     }
 }

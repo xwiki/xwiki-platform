@@ -148,6 +148,7 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
      */
     protected Set<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
     {
+        // Note: We use a Set to ensure that we don't register duplicate roles.
         Set<Class< ? >> classes = new LinkedHashSet<Class< ? >>();
 
         Component component = componentClass.getAnnotation(Component.class);

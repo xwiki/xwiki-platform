@@ -44,7 +44,6 @@ org.xwiki.rest.resources.tags.TagsResource
 org.xwiki.rest.resources.tags.PagesForTagsResource
 org.xwiki.rest.resources.ModificationsResource
 org.xwiki.rest.resources.wikis.WikiSearchResource
-org.xwiki.rest.exceptions.XWikiExceptionMapper
 org.xwiki.rest.exceptions.QueryExceptionMapper
 org.xwiki.rest.representations.pages.TextPlainPageReader
 org.xwiki.rest.representations.pages.FormUrlEncodedPageReader

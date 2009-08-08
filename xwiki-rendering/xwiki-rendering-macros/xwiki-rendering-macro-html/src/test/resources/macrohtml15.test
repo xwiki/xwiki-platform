@@ -8,6 +8,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-|wiki="true"|-|
-<div>{{testtextmacro}}<br/>{{/testtextmacro}}</div>
---><div>&lt;br/&gt;</div><!--stopmacro-->
+<div>&lt;br/&gt;</div>

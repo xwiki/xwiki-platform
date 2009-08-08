@@ -25,11 +25,12 @@ import java.util.Map;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxImageRenderer;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.DocumentImage;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
@@ -49,6 +50,7 @@ import org.xwiki.rendering.wiki.WikiModel;
  * @since 2.0M3
  */
 @Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializable
 {
     /**
@@ -61,11 +63,6 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
      */
     private WikiModel wikiModel;
 
-    /**
-     * Used to get the original image reference syntax.
-     */
-    private XWikiSyntaxImageRenderer imageRenderer;
-
     @Requirement
     private ComponentManager componentManager;
 
@@ -75,9 +72,6 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
      */
     public void initialize() throws InitializationException
     {
-        // TODO: Transform it into a component later on
-        this.imageRenderer = new XWikiSyntaxImageRenderer();
-
         // Try to find a WikiModel implementation and set it if it can be found. If not it means we're in
         // non wiki mode (i.e. no attachment in wiki documents and no links to documents for example).
         try {
@@ -95,6 +89,16 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
     public void setXHTMLWikiPrinter(XHTMLWikiPrinter printer)
     {
         this.xhtmlPrinter = printer;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see XHTMLImageRenderer#getXHTMLWikiPrinter()
+     */
+    public XHTMLWikiPrinter getXHTMLWikiPrinter()
+    {
+        return this.xhtmlPrinter;
     }
 
     /**
@@ -133,10 +137,7 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
             attributes.put(ALTERNATE, image.getName());
         }
 
-        // And generate the XHTML IMG element. We need to save the image location in XML comment so that
-        // it can be reconstructed later on when moving from XHTML to wiki syntax.
-        this.xhtmlPrinter.printXMLComment("startimage:" + this.imageRenderer.renderImage(image), true);
-        this.xhtmlPrinter.printXMLElement(IMG, attributes);
-        this.xhtmlPrinter.printXMLComment("stopimage");
+        // And generate the XHTML IMG element.
+        getXHTMLWikiPrinter().printXMLElement(IMG, attributes);
     }
 }

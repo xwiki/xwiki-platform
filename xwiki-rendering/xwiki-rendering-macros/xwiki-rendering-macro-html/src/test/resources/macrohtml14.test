@@ -12,8 +12,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-|clean="true" wiki="true"|-|
-<div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
---><div><ul><li>standalone content</li></ul></div><!--stopmacro--><!--startmacro:html|-|clean="false" wiki="true"|-|
-<div>{{html clean=true}}<ul><li>standalone content</li></ul>{{/html}}</div>
---><div><ul><li>standalone content</li></ul></div><!--stopmacro-->
+<div><ul><li>standalone content</li></ul></div><div><ul><li>standalone content</li></ul></div>

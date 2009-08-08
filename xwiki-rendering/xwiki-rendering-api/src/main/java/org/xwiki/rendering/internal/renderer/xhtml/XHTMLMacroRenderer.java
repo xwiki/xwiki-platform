@@ -25,8 +25,8 @@ import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 
 /**
- * Renders a XWiki Macro into XHTML.
- * 
+ * Renders a XWiki Macro into Annotated XHTML (ie the macro definition is created as XHTML comments).
+ *
  * @version $Id$
  * @since 1.7M2
  */

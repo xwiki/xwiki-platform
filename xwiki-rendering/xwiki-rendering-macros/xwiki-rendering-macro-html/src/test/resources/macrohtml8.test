@@ -28,10 +28,6 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-||-|
-<!-\- comment1 -\->
+<!-- comment1 -->
 <p>hello</p>
-<!-\- comment2 -\->
---><!-- comment1 -->
-<p>hello</p>
-<!-- comment2 --><!--stopmacro-->
+<!-- comment2 -->

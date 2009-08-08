@@ -19,49 +19,51 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml;
 
+import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
+import org.xwiki.rendering.listener.chaining.ListenerChain;
+import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
+import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
+import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer;
-import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
-import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
-import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
+import org.xwiki.component.phase.Initializable;
 
 /**
- * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
- * 
+ * Generates Annotated XHTML (ie XHTML containing metadata information, for example macro definition or
+ * link definition) from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
+ * The annotations allow initial source content to be fully reconstructed from the generated XHTML. This is required
+ * for example for doing round tripping between wiki syntax and XHTML syntax in the WYSIWYG editor.
+ *
  * @version $Id$
  * @since 2.0M3
  */
-@Component("xhtml/1.0")
+@Component("annotatedxhtml/1.0")
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class XHTMLRenderer extends AbstractChainingPrintRenderer implements Initializable
+public class AnnotatedXHTMLRenderer extends AbstractChainingPrintRenderer implements Initializable
 {
     /**
-     * To render link events into XHTML. This is done so that it's pluggable because link rendering depends on how
-     * the underlying system wants to handle it. For example for XWiki we check if the document exists, we get the
-     * document URL, etc.
+     * To render link events into annotated XHTML. This is done so that it's pluggable because link rendering depends
+     * on how the underlying system wants to handle it. For example for XWiki we check if the document exists, we get
+     * the document URL, etc.
      */
-    @Requirement
+    @Requirement("annotated")
     private XHTMLLinkRenderer linkRenderer;
 
     /**
-     * To render image events into XHTML. This is done so that it's pluggable because image rendering depends
+     * To render image events into annotated XHTML. This is done so that it's pluggable because image rendering depends
      * on how the underlying system wants to handle it. For example for XWiki we check if the image exists as a
      * document attachments, we get its URL, etc.
      */
-    @Requirement
+    @Requirement("annotated")
     private XHTMLImageRenderer imageRenderer;
 
     /**
      * {@inheritDoc}
-     * @see Initializable#initialize()
+     * @see org.xwiki.component.phase.Initializable#initialize()
      * @since 2.0M3
      */
     public void initialize() throws InitializationException
@@ -74,6 +76,6 @@ public class XHTMLRenderer extends AbstractChainingPrintRenderer implements Init
         chain.addListener(this);
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new EmptyBlockChainingListener(chain));
-        chain.addListener(new XHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
+        chain.addListener(new AnnotatedXHTMLChainingRenderer(this.linkRenderer, this.imageRenderer, chain));
     }
 }

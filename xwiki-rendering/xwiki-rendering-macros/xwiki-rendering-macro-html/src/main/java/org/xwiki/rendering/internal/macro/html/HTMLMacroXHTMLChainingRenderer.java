@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.macro.html;
 
 import java.util.Map;
 
-import org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer;
+import org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
@@ -168,7 +168,7 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer#onMacro(java.lang.String,
+     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#onMacro(java.lang.String,
      *      java.util.Map, java.lang.String, boolean)
      */
     @Override
@@ -180,7 +180,7 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer#beginMacroMarker(java.lang.String,
+     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#beginMacroMarker(java.lang.String,
      *      java.util.Map, java.lang.String, boolean)
      */
     @Override
@@ -192,7 +192,7 @@ public class HTMLMacroXHTMLChainingRenderer extends XHTMLChainingRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.internal.renderer.chaining.XHTMLChainingRenderer#endMacroMarker(java.lang.String,
+     * @see org.xwiki.rendering.internal.renderer.xhtml.XHTMLChainingRenderer#endMacroMarker(java.lang.String,
      *      java.util.Map, java.lang.String, boolean)
      */
     @Override

@@ -17,6 +17,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p><span class="wikiexternallink"><a href="http://xwiki.org"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://xwiki2.org"><span class="wikigeneratedlinkcontent">http://xwiki2.org</span></a></span></a></span></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org"><!--startwikilink:http://xwiki2.org--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://xwiki2.org"><span class="wikigeneratedlinkcontent">http://xwiki2.org</span></a></span><!--stopwikilink--></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

@@ -4,6 +4,35 @@
 .#-----------------------------------------------------
 {{testrss feed="file://feed2.xml" content="true" count="1" image="false"/}}
 .#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [testrss] [feed=file://feed2.xml|content=true|count=1|image=false]
+beginGroup [[class]=[box rssfeed]]
+beginParagraph [[class]=[rsschanneltitle]]
+beginLink [Reference = [http://localhost/feed.xml]] [true]
+onWord [Test]
+onSpace
+onWord [Feed]
+onSpace
+onWord [2]
+endLink [Reference = [http://localhost/feed.xml]] [true]
+beginLink [Reference = [http://localhost/feed.xml]] [true]
+onImage: [/xwiki/skins/albatross/icons/black-rss.png] [false]
+endLink [Reference = [http://localhost/feed.xml]] [true]
+endParagraph [[class]=[rsschanneltitle]]
+beginParagraph [[class]=[rssitemtitle]]
+beginLink [Reference = [http://localhost/blog/item1]] [true]
+onWord [Item1]
+endLink [Reference = [http://localhost/blog/item1]] [true]
+endParagraph [[class]=[rssitemtitle]]
+beginGroup [[class]=[rssitemdescription]]
+onRawText [An item with<b>HTML</b>markup.] [xhtml/1.0]
+endGroup [[class]=[rssitemdescription]]
+endGroup [[class]=[box rssfeed]]
+endMacroMarkerStandalone [testrss] [feed=file://feed2.xml|content=true|count=1|image=false]
+endDocument
+.#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testrss|-|feed="file://feed2.xml" content="true" count="1" image="false"--><div class="box rssfeed"><p class="rsschanneltitle"><!--startwikilink:http://localhost/feed.xml--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><!--stopwikilink--><!--startwikilink:http://localhost/feed.xml--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml"><!--startimage:/xwiki/skins/albatross/icons/black-rss.png--><img src="/xwiki/skins/albatross/icons/black-rss.png" alt="/xwiki/skins/albatross/icons/black-rss.png"/><!--stopimage--></a></span><!--stopwikilink--></p><p class="rssitemtitle"><!--startwikilink:http://localhost/blog/item1--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span><!--stopwikilink--></p><div class="rssitemdescription">An item with<b>HTML</b>markup.</div></div><!--stopmacro-->
+<div class="box rssfeed"><p class="rsschanneltitle"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml">Test Feed 2</a></span><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/feed.xml"><img src="/xwiki/skins/albatross/icons/black-rss.png" alt="/xwiki/skins/albatross/icons/black-rss.png"/></a></span></p><p class="rssitemtitle"><span class="wikiexternallink"><a class="wikimodel-freestanding" href="http://localhost/blog/item1">Item1</a></span></p><div class="rssitemdescription">An item with<b>HTML</b>markup.</div></div>

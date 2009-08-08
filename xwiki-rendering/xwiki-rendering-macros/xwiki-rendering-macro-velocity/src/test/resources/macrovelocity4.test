@@ -46,9 +46,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|
-#set($somevar = "some var value")
-$somevar
---><p>some var value</p><!--stopmacro--><!--startmacro:velocity|-||-|
-$somevar
---><p>some var value</p><!--stopmacro-->
+<p>some var value</p><p>some var value</p>

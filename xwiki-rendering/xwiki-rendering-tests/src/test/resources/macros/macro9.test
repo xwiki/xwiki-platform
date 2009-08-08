@@ -25,6 +25,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p>Execution <span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span> error</p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

@@ -123,10 +123,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>   
         <configuration>
-          <excludes>
-            <exclude>**/Test*Macro.class</exclude>
-            <exclude>**/TestFailingMacro$MockMacroExecutionException.class</exclude>
-          </excludes>
+          <includes>
+            <include>**/*Test.class</include>
+          </includes>
         </configuration>     
       </plugin>
       <plugin>
@@ -232,7 +231,11 @@
                 <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLRendererFactory</exclude>
                 <exclude>org/xwiki/rendering/util/RenderersUtils</exclude>
                 <exclude>org/xwiki/rendering/parser/SyntaxFactory</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLImageRenderer</exclude>
+                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLLinkRenderer</exclude>
+                <exclude>org/xwiki/rendering/parser/SyntaxType</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/MacroDescriptor</exclude>
+                <exclude>org/xwiki/rendering/renderer/printer/MonitoringWikiPrinter</exclude>
               </excludes>
             </configuration>
           </execution>

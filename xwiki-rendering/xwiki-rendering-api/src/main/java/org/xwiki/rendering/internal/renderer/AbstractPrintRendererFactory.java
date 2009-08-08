@@ -26,11 +26,22 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
+/**
+ * Common code for {@link org.xwiki.rendering.renderer.PrintRendererFactory}, implements the logic to lookup and
+ * call the matching Print Renderer.
+ *
+ * @version $Id$
+ * @since 2.0M3
+ */
 public abstract class AbstractPrintRendererFactory implements PrintRendererFactory
 {
     @Requirement
     private ComponentManager componentManager;
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRendererFactory#createRenderer(org.xwiki.rendering.renderer.printer.WikiPrinter)
+     */
     public PrintRenderer createRenderer(WikiPrinter printer)
     {
         PrintRenderer renderer;

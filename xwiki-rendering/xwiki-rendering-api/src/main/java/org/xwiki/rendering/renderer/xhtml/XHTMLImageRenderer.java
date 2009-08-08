@@ -43,12 +43,18 @@ public interface XHTMLImageRenderer extends ImageListener
     String ALTERNATE = "alt";
     
     /**
-     * <code>img</code> XHTML element parameter to indicate where theimage is located.
+     * <code>img</code> XHTML element parameter to indicate where the image is located.
      */
     String SRC = "src";
 
     /**
-     * @param printer the XHTML printer to use to output links as XHTML
+     * @param printer the XHTML printer to use to output images as XHTML
      */
     void setXHTMLWikiPrinter(XHTMLWikiPrinter printer);
+
+    /**
+     * @return the XHTML printer to use to output images as XHTML
+     * @since 2.0M3
+     */
+    XHTMLWikiPrinter getXHTMLWikiPrinter();
 }

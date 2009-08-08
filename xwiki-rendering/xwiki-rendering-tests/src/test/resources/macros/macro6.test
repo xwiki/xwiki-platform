@@ -30,6 +30,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p>First paragraph.</p><p>simplemacro2</p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p>First paragraph.</p><!--startmacro:testsimplemacro|-||-|
 Some **content**
 --><p>simplemacro2</p><!--stopmacro-->

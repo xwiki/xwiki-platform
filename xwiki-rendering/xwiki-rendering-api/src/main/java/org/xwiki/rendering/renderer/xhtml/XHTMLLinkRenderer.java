@@ -48,6 +48,12 @@ public interface XHTMLLinkRenderer extends LinkListener
     void setXHTMLWikiPrinter(XHTMLWikiPrinter printer);
 
     /**
+     * @return the XHTML printer to use to output links as XHTML
+     * @since 2.0M3
+     */
+    XHTMLWikiPrinter getXHTMLWikiPrinter();
+
+    /**
      * @param hasLabel true if the link to be rendered has a label specified or false otherwise. If no label has been
      *            specified then it's up to the XHTML renderer implementation to generate a default label.
      */

@@ -27,7 +27,7 @@ package org.xwiki.rendering.parser;
  * @version $Id$
  * @since 1.5M2
  */
-    public class Syntax
+public class Syntax
 {
     public static final Syntax XHTML_1_0 = new Syntax(SyntaxType.XHTML, "1.0");
     public static final Syntax HTML_4_01 = new Syntax(SyntaxType.HTML, "4.01");
@@ -40,6 +40,12 @@ package org.xwiki.rendering.parser;
     public static final Syntax MEDIAWIKI_1_0 = new Syntax(SyntaxType.MEDIAWIKI, "1.0");
     public static final Syntax CONFLUENCE_1_0 = new Syntax(SyntaxType.CONFLUENCE, "1.0");
     public static final Syntax TWIKI_1_0 = new Syntax(SyntaxType.TWIKI, "1.0");
+
+    /**
+     * This is HTML with annotations (comments) in order to allow round tripping between for example the WYSIWYG editor
+     * and wiki syntax.
+     */
+    public static final Syntax ANNOTATED_XHTML_1_0 = new Syntax(SyntaxType.ANNOTATED_XHTML, "1.0");
 
     private SyntaxType type;
 
@@ -63,7 +69,7 @@ package org.xwiki.rendering.parser;
 
     public String toIdString()
     {
-        return getType().toIdString() + "/" + getVersion().toLowerCase();
+        return getType().getId() + "/" + getVersion().toLowerCase();
     }
 
     /**

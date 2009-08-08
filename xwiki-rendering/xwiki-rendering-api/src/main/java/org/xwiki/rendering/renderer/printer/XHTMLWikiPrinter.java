@@ -230,6 +230,7 @@ public class XHTMLWikiPrinter extends XMLWikiPrinter
     {
         handleSpaceWhenStartElement();
         super.printRaw(raw);
+        this.elementEnded = true;
     }
 
     private void handleSpaceWhenInText()

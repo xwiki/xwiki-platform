@@ -5,10 +5,30 @@
 .#---------------------------------------------------------------
 some {{html}}html content{{/html}} and non html content
 .#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord [some]
+onSpace
+beginMacroMarkerInline [html] [] [html content]
+onRawText [html content] [xhtml/1.0]
+endMacroMarkerInline [html] [] [html content]
+onSpace
+onWord [and]
+onSpace
+onWord [non]
+onSpace
+onWord [html]
+onSpace
+onWord [content]
+endParagraph
+endDocument
+.#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 some {{html}}html content{{/html}} and non html content
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>some <!--startmacro:html|-||-|html content-->html content<!--stopmacro--> and non html content</p>
+<p>some html content and non html content</p>

@@ -31,9 +31,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|
-## some comment
-#if (true)
-  text
-#end
---><p>text</p><!--stopmacro-->
+<p>text</p>

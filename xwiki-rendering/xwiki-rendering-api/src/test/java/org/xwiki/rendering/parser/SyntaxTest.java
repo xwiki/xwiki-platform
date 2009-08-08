@@ -31,10 +31,12 @@ public class SyntaxTest extends TestCase
 {
     public void testEquality()
     {
-        Syntax syntax1 = new Syntax(SyntaxType.XWIKI, "1.0");
-        Syntax syntax2 = new Syntax(SyntaxType.XWIKI, "1.0");
+        Syntax syntax1 = new Syntax(new SyntaxType("mytype", "My Type"), "1.0");
+        Syntax syntax2 = new Syntax(new SyntaxType("mytype", "My Type"), "1.0");
 
-        assertEquals(syntax2.hashCode(), syntax1.hashCode());
+        assertEquals("mytype", syntax1.getType().getId());
+        assertEquals("My Type", syntax1.getType().getName());
+
         assertEquals(syntax2, syntax1);
     }
 

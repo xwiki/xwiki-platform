@@ -504,7 +504,7 @@ public class XWiki extends Api
     /**
      * API allowing to count the total number of documents that would be returned by a parameterized query.
      * 
-     * @param wheresql Parameterized query to use, similar to the ones accepted by
+     * @param parametrizedSqlClause the parameterized query to use, similar to the ones accepted by
      *            {@link #searchDocuments(String, List)}. If possible, it should not contain <code>order by</code> or
      *            <code>group</code> clauses, since this kind of queries are not portable.
      * @param parameterValues The parameter values that replace the question marks.
@@ -2705,7 +2705,7 @@ public class XWiki extends Api
         for (PrintRendererFactory factory : factories) {
             Syntax factorySyntax = factory.getSyntax();
             if (syntaxVersion != null) {
-                if (factorySyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
+                if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
                     && factorySyntax.getVersion().equals(syntaxVersion)) {
                     syntax = factorySyntax;
                     break;
@@ -2713,7 +2713,7 @@ public class XWiki extends Api
             } else {
                 // TODO: improve version comparaison since it does not work when comparing 2.0 and 10.0 for example. We
                 // should have a Version which implements Comparable like we have SyntaxId in Syntax
-                if (factorySyntax.getType().toIdString().equalsIgnoreCase(syntaxType)
+                if (factorySyntax.getType().getId().equalsIgnoreCase(syntaxType)
                     && (syntax == null || factorySyntax.getVersion().compareTo(syntax.getVersion()) > 0)) {
                     syntax = factorySyntax;
                 }

@@ -41,8 +41,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|
-  Some text
---><p>Some text</p><!--stopmacro--><!--startmacro:velocity|-|filter="none"|-|
-  Some text
---><p>&nbsp;&nbsp;Some text</p><!--stopmacro-->
+<p>Some text</p><p>&nbsp;&nbsp;Some text</p>

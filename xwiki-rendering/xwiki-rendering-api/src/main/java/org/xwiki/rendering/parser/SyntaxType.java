@@ -19,89 +19,137 @@
  */
 package org.xwiki.rendering.parser;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 /**
  * @version $Id$
  * @since 1.7M1
  */
 public class SyntaxType
 {
-    public static final SyntaxType XWIKI = getSyntaxType("XWiki");
+    public static final SyntaxType XWIKI = new SyntaxType("xwiki", "XWiki");
 
-    public static final SyntaxType CONFLUENCE = getSyntaxType("Confluence");
+    public static final SyntaxType CONFLUENCE = new SyntaxType("confluence", "Confluence");
 
-    public static final SyntaxType MEDIAWIKI = getSyntaxType("MediaWiki");
+    public static final SyntaxType MEDIAWIKI = new SyntaxType("mediawiki", "MediaWiki");
 
-    public static final SyntaxType CREOLE = getSyntaxType("Creole");
+    public static final SyntaxType CREOLE = new SyntaxType("creole", "Creole");
 
-    public static final SyntaxType JSPWIKI = getSyntaxType("JSPWiki");
+    public static final SyntaxType JSPWIKI = new SyntaxType("jspwiki", "JSPWiki");
 
-    public static final SyntaxType TWIKI = getSyntaxType("TWiki");
+    public static final SyntaxType TWIKI = new SyntaxType("TWiki", "TWiki");
 
-    public static final SyntaxType XHTML = getSyntaxType("XHTML");
+    public static final SyntaxType XHTML = new SyntaxType("xhtml", "XHTML");
 
-    public static final SyntaxType HTML = getSyntaxType("HTML");
+    public static final SyntaxType ANNOTATED_XHTML = new SyntaxType("annotatedxhtml", "Annotated XHTML");
+
+    public static final SyntaxType HTML = new SyntaxType("html", "HTML");
     
-    public static final SyntaxType PLAIN = getSyntaxType("PLAIN");
+    public static final SyntaxType PLAIN = new SyntaxType("plain", "Plain");
     
-    public static final SyntaxType EVENT = getSyntaxType("EVENT");
+    public static final SyntaxType EVENT = new SyntaxType("event", "Event");
     
-    public static final SyntaxType TEX = getSyntaxType("TEX");
+    public static final SyntaxType TEX = new SyntaxType("tex", "TeX");
 
-    private static Map<String, SyntaxType> syntaxTypeMap;
+    /**
+     * @see #getName()
+     */
+    private String name;
 
+    /**
+     * @see #getId()  
+     */
     private String id;
 
-    public static SyntaxType getSyntaxType(String id)
+    /**
+     * @return the technical id of the Syntax type (ex "annotatedxhtml")
+     * @since 2.0M3
+     */
+    public String getId()
     {
-        String lowerId = id.toLowerCase();
-
-        if (syntaxTypeMap == null) {
-            syntaxTypeMap = new ConcurrentHashMap<String, SyntaxType>();
-        }
-
-        SyntaxType syntaxType = syntaxTypeMap.get(lowerId);
-
-        if (syntaxType == null) {
-            syntaxType = new SyntaxType(id);
-            syntaxTypeMap.put(lowerId, syntaxType);
-        }
-
-        return syntaxType;
+        return this.id;
     }
 
-    private SyntaxType(String id)
+    /**
+     * @return the human readable name of the Syntax type (ex "Annotated XHTML")
+     * @since 2.0M3
+     */
+    public String getName()
     {
+        return this.name;
+    }
+
+    /**
+     * @param id the technical id of the Syntax type (ex "annotatedxhtml")
+     * @param name the human readable name of the Syntax type (ex "Annotated XHTML")
+     * @since 2.0M3
+     */
+    public SyntaxType(String id, String name)
+    {
+        this.name = name;
         this.id = id;
     }
 
     /**
      * {@inheritDoc}
+     *
+     * Display a human readable name of the Syntax type.
      * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString()
     {
-        return this.id;
+        return this.name;
     }
 
+    /**
+     * @return the technical id fo the Syntax type
+     * @deprecated starting with 2.0M3 use {@link #getId()} instead
+     */
     public String toIdString()
     {
-        return this.id.toLowerCase();
+        return this.id;
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
+     *
+     * @see Object#hashCode()
      */
     @Override
-    public boolean equals(Object obj)
+    public int hashCode()
     {
-        // no need to call id's equals method as SyntaxType for an id should be unique
-        return this == obj;
+        // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
+        // algorithm.
+        int hash = 7;
+        hash = 31 * hash + (null == getId() ? 0 : getId().hashCode());
+        hash = 31 * hash + (null == getName() ? 0 : getName().hashCode());
+        return hash;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Object#equals(Object)
+     */
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result;
+
+        // See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this algorithm.
+        if (this == object) {
+            result = true;
+        } else {
+            if ((object == null) || (object.getClass() != this.getClass())) {
+                result = false;
+            } else {
+                // object must be Syntax at this point
+                SyntaxType syntaxType = (SyntaxType) object;
+                result = (getId() == syntaxType.getId() || (getId() != null && getId().equals(syntaxType.getId())))
+                    && (getName() == syntaxType.getName() || (getName() != null && getName().equals(
+                        syntaxType.getName())));
+            }
+        }
+        return result;
     }
 }

@@ -6,4 +6,8 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p><span class="wikilink"><a href="#name">label</a></span></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p><!--startwikilink:#name--><span class="wikilink"><a href="#name">label</a></span><!--stopwikilink--></p>

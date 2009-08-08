@@ -1,7 +1,7 @@
-.#-------------------------------------------------------------------
+.#-----------------------------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that macro content support -- (basically that XHTML renderer correctly escape it)
-.#-------------------------------------------------------------------
+.#-----------------------------------------------------------------------------------------
 {{macro}}--{{/macro}}
 [[~~-~~->>reference]]
 image:--
@@ -22,7 +22,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:macro|-||-|-\-\--><!--stopmacro--><p><!--startwikilink:reference--><span class="wikiexternallink"><a href="reference">--</a></span><!--stopwikilink--><br/><!--startimage:-\-\--><img src="--" class="wikimodel-freestanding" alt="--"/><!--stopimage--></p>
+<p><span class="wikiexternallink"><a href="reference">--</a></span><br/><img src="--" class="wikimodel-freestanding" alt="--"/></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

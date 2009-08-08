@@ -54,12 +54,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|
-#macro(somemacro)
-"macro content"
-#end
-
-#somemacro()
---><p>"macro content"</p><!--stopmacro--><!--startmacro:velocity|-||-|
-#somemacro()
---><p>#somemacro()</p><!--stopmacro-->
+<p>"macro content"</p><p>#somemacro()</p>

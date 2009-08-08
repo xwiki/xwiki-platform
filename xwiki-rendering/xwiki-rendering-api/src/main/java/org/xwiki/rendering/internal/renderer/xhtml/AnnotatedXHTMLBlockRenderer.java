@@ -25,16 +25,16 @@ import org.xwiki.rendering.internal.renderer.AbstractBlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 /**
- * Block Renderer for XHTML syntax. To be used to convert XDOM into XHTML.
+ * Block Renderer for Annotated XHTML syntax. To be used to convert XDOM into XHTML.
  *
  * @version $Id$
  * @since 2.0M3
  */
-@Component("xhtml/1.0")
-public class XHTMLBlockRenderer extends AbstractBlockRenderer
+@Component("annotatedxhtml/1.0")
+public class AnnotatedXHTMLBlockRenderer extends AbstractBlockRenderer
 {
-    @Requirement("xhtml/1.0")
-    private PrintRendererFactory xhtmlRendererFactory;
+    @Requirement("annotatedxhtml/1.0")
+    private PrintRendererFactory annotatedXHTMLRendererFactory;
 
     /**
      * {@inheritDoc}
@@ -43,6 +43,6 @@ public class XHTMLBlockRenderer extends AbstractBlockRenderer
     @Override
     protected PrintRendererFactory getPrintRendererFactory()
     {
-        return this.xhtmlRendererFactory;
+        return this.annotatedXHTMLRendererFactory;
     }
 }

@@ -9,8 +9,5 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:html|-|clean="false"|-|
 <meta name="hello" content="world">
 <open>not closed
---><meta name="hello" content="world">
-<open>not closed<!--stopmacro-->

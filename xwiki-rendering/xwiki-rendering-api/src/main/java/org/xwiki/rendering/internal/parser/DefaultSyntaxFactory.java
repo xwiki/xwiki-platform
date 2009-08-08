@@ -62,13 +62,15 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
     {
         Matcher matcher = SYNTAX_PATTERN.matcher(syntaxIdAsString);
         if (!matcher.matches()) {
-            throw new ParseException("Failed to parse Syntax string [" + syntaxIdAsString + "]");
+            throw new ParseException("Invalid Syntax format [" + syntaxIdAsString + "]");
         }
 
         String syntaxId = matcher.group(1);
         String version = matcher.group(2);
 
-        SyntaxType syntaxType = SyntaxType.getSyntaxType(syntaxId);
+        // Use the id as both the human readable name and the technical id (since the syntax string doesn't contain
+        // any information about the pretty name of a syntax type).
+        SyntaxType syntaxType = new SyntaxType(syntaxId, syntaxId);
 
         return new Syntax(syntaxType, version);
     }

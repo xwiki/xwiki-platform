@@ -26,11 +26,12 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxLinkRenderer;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
@@ -51,6 +52,7 @@ import org.xwiki.rendering.wiki.WikiModel;
  * @since 2.0M3
  */
 @Component
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializable
 {
     /**
@@ -104,19 +106,11 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
     private ComponentManager componentManager;
 
     /**
-     * Used to save the original syntax of the link reference.
-     */
-    private XWikiSyntaxLinkRenderer xwikiSyntaxLinkRenderer;
-
-    /**
      * {@inheritDoc}
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
-        // TODO: Transform it into a component later on
-        this.xwikiSyntaxLinkRenderer = new XWikiSyntaxLinkRenderer();
-
         // Try to find a WikiModel implementation and set it if it can be found. If not it means we're in
         // non wiki mode (i.e. no attachment in wiki documents and no links to documents for example).
         try {
@@ -149,16 +143,20 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer#getXHTMLWikiPrinter()
+     */
+    public XHTMLWikiPrinter getXHTMLWikiPrinter()
+    {
+        return this.xhtmlPrinter;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see XHTMLLinkRenderer#beginLink(Link, boolean, Map)
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
-        // Otherwise it would be too difficult to transform a URL into a document name especially since
-        // a link can refer to an external URL.
-        this.xhtmlPrinter.printXMLComment("startwikilink:" + this.xwikiSyntaxLinkRenderer.renderLinkReference(link),
-            true);
-
         if (link.isExternalLink()) {
             beginExternalLink(link, isFreeStandingURI, parameters);
         } else {
@@ -200,8 +198,8 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
             }
         }
         
-        this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
-        this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+        getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
+        getXHTMLWikiPrinter().printXMLStartElement(ANCHOR, aAttributes);
     }
     
     /**
@@ -235,8 +233,8 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
                 link.getQueryString()));
         }
         
-        this.xhtmlPrinter.printXMLStartElement(SPAN, spanAttributes);
-        this.xhtmlPrinter.printXMLStartElement(ANCHOR, aAttributes);
+        getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
+        getXHTMLWikiPrinter().printXMLStartElement(ANCHOR, aAttributes);
     }
 
     /**
@@ -248,19 +246,16 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
     {
         // If there was no link content then generate it based on the passed reference
         if (!this.hasLabel) {
-            this.xhtmlPrinter.printXMLStartElement(SPAN, new String[][] {{CLASS, "wikigeneratedlinkcontent"}});
+            getXHTMLWikiPrinter().printXMLStartElement(SPAN, new String[][] {{CLASS, "wikigeneratedlinkcontent"}});
             if (link.getType() == LinkType.DOCUMENT) {
-                this.xhtmlPrinter.printXML(this.linkLabelGenerator.generate(link));
+                getXHTMLWikiPrinter().printXML(this.linkLabelGenerator.generate(link));
             } else {
-                this.xhtmlPrinter.printXML(link.getReference());
+                getXHTMLWikiPrinter().printXML(link.getReference());
             }
-            this.xhtmlPrinter.printXMLEndElement(SPAN);
+            getXHTMLWikiPrinter().printXMLEndElement(SPAN);
         }
 
-        this.xhtmlPrinter.printXMLEndElement(ANCHOR);
-        this.xhtmlPrinter.printXMLEndElement(SPAN);
-        
-        // Add a XML comment to signify the end of the link.
-        this.xhtmlPrinter.printXMLComment("stopwikilink");
+        getXHTMLWikiPrinter().printXMLEndElement(ANCHOR);
+        getXHTMLWikiPrinter().printXMLEndElement(SPAN);
     }
 }

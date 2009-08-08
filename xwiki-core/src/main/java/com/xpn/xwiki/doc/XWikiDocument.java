@@ -412,8 +412,8 @@ public class XWikiDocument implements DocumentModelBridge
      * Constructor that specifies the local document identifier: space name, document name. {@link #setDatabase(String)}
      * must be called afterwards to specify the wiki name.
      * 
-     * @param web The space this document belongs to.
-     * @param name The name of the document.
+     * @param space the space this document belongs to
+     * @param name the name of the document
      */
     public XWikiDocument(String space, String name)
     {
@@ -568,6 +568,18 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getRenderedContent(String text, String syntaxId, XWikiContext context)
     {
+        return getRenderedContent(text, syntaxId, Syntax.XHTML_1_0.toIdString(), context);
+    }
+
+    /**
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 2.0M3
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId, XWikiContext context)
+    {
         String result;
         HashMap<String, Object> backup = new HashMap<String, Object>();
         Object isInRenderingEngine = context.get("isInRenderingEngine");
@@ -582,12 +594,14 @@ public class XWikiDocument implements DocumentModelBridge
             context.put("isInRenderingEngine", true);
 
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
-            if (is10Syntax(syntaxId)) {
+            if (is10Syntax(sourceSyntaxId)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-                result = performSyntaxConversion(text, getSyntaxId(), Syntax.XHTML_1_0, true);
+                SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
+                result = performSyntaxConversion(text, getSyntaxId(),
+                    syntaxFactory.createSyntaxFromIdString(targetSyntaxId), true);
             }
-        } catch (XWikiException e) {
+        } catch (Exception e) {
             // Failed to render for some reason. This method should normally throw an exception but this
             // requires changing the signature of calling methods too.
             LOG.warn(e);

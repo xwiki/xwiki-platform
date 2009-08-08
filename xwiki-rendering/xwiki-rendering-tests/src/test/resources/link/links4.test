@@ -15,6 +15,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p><span class="wikiexternallink"><a href="http://xwiki.org">label</a></span></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p><!--startwikilink:http://xwiki.org--><span class="wikiexternallink"><a href="http://xwiki.org">label</a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

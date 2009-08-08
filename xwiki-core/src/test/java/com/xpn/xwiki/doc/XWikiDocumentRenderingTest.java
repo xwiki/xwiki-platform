@@ -142,7 +142,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setContent("{{groovy}}print(doc);{{/groovy}}");
         this.document.setSyntaxId("xwiki/2.0");
 
-        assertEquals("<!--startmacro:groovy|-||-|print(doc);--><p>Space.Page</p><!--stopmacro-->", this.document
-            .getRenderedContent(getContext()));
+        assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
     }
 }

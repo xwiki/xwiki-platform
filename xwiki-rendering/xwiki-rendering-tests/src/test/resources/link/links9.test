@@ -22,6 +22,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p>This is a <span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span> element</p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p>This is a <!--startwikilink:mailto:content--><span class="wikiexternallink"><a class="wikimodel-freestanding" href="mailto:content"><span class="wikigeneratedlinkcontent">mailto:content</span></a></span><!--stopwikilink--> element</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

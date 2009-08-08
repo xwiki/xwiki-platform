@@ -36,7 +36,7 @@ public class HTMLMacroXHTMLRendererFactory extends AbstractPrintRendererFactory
     /**
      * The special syntax to recognize the HTML Macro XHTML Renderer.
      */
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.getSyntaxType("xhtmlmacro"), "1.0");
+    private static final Syntax SYNTAX = new Syntax(new SyntaxType("xhtmlmacro", "XHTML Macro"), "1.0");
 
     /**
      * {@inheritDoc}

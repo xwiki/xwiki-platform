@@ -45,7 +45,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>An <!--startmacro:box|-||-|Inline box --><span class="box">Inline box&nbsp;</span><!--stopmacro--> first</p><!--startmacro:box|-||-|A box that should not be inline--><div class="box"><p>A box that should not be inline</p></div><!--stopmacro-->
+<p>An <span class="box">Inline box&nbsp;</span> first</p><div class="box"><p>A box that should not be inline</p></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

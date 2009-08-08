@@ -27,6 +27,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p>Not inline <span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">This macro can only be used by itself on a new line</tt></span> macro</p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p>Not inline <!--startmacro:testsimplemacro|-|--><span class="xwikirenderingerror">Not an inline macro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">This macro can only be used by itself on a new line</tt></span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

@@ -13,6 +13,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p><img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo"/></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p><!--startimage:http://www.google.ro/intl/en_com/images/logo_plain.png--><img src="http://www.google.ro/intl/en_com/images/logo_plain.png" alt="bar" title="foo"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

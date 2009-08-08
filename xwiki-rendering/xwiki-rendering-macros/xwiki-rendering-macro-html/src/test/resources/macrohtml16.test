@@ -6,4 +6,4 @@ inline {{html}}inline{{/html}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>inline <!--startmacro:html|-||-|inline-->inline<!--stopmacro--></p>
+<p>inline inline</p>

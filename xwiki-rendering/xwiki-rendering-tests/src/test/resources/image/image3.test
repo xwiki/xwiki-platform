@@ -13,6 +13,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p><!--startimage:http://some/image.png--><img src="http://some/image.png" class="wikimodel-freestanding" alt="http://some/image.png"/><!--stopimage--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

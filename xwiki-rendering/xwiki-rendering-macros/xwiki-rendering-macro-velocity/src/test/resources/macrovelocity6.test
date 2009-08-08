@@ -59,10 +59,4 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|
-some text #if (true)
-    #if (true)
-      and the end of the sentence indented to be more readable.
-    #end
-  #end
---><p>some text and the end of the sentence indented to be more readable.</p><!--stopmacro-->
+<p>some text and the end of the sentence indented to be more readable.</p>

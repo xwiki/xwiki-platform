@@ -1,7 +1,7 @@
-.#---------------------------------------------------------------------------------------------------------
+.#-------------------------------------------------------------------
 .input|xwiki/2.0
 .# Verify that quote characters in link parameters values are escaped
-.#---------------------------------------------------------------------------------------------------------
+.#-------------------------------------------------------------------
 [[go>>Space.ExistingPage||title="xwiki ~"rox~""]]
 .#-----------------------------------------------------
 .expect|event/1.0
@@ -16,7 +16,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:Space.ExistingPage--><span class="wikiexternallink"><a title="xwiki &quot;rox&quot;" href="Space.ExistingPage">go</a></span><!--stopwikilink--></p>
+<p><span class="wikiexternallink"><a title="xwiki &quot;rox&quot;" href="Space.ExistingPage">go</a></span></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

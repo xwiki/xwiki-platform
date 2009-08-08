@@ -17,43 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.printer;
+package org.xwiki.rendering.internal.renderer.xhtml;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
+import org.xwiki.rendering.parser.Syntax;
 
 /**
- * Allow knowing if something has been printed or not to this printer.
- * 
+ * Create Annotated XHTML Renderers.
+ *
  * @version $Id$
- * @since 1.7
+ * @since 2.0M3
  */
-public class MonitoringWikiPrinter extends WrappingWikiPrinter
+@Component("annotatedxhtml/1.0")
+public class AnnotatedXHTMLRendererFactory extends AbstractPrintRendererFactory
 {
-    private boolean hasContentBeenPrinted;
-
-    public MonitoringWikiPrinter(WikiPrinter printer)
+    /**
+     * {@inheritDoc}
+     * @see AbstractPrintRendererFactory#getSyntax()
+     */
+    public Syntax getSyntax()
     {
-        super(printer);
-        restartMonitoring();
-    }
-
-    public void print(String text)
-    {
-        this.hasContentBeenPrinted = true;
-        super.print(text);
-    }
-
-    public void println(String text)
-    {
-        this.hasContentBeenPrinted = true;
-        super.println(text);
-    }
-
-    public boolean hasContentBeenPrinted()
-    {
-        return this.hasContentBeenPrinted;
-    }
-    
-    public void restartMonitoring()
-    {
-        this.hasContentBeenPrinted = false;
+        return Syntax.ANNOTATED_XHTML_1_0;
     }
 }

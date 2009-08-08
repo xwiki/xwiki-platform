@@ -26,6 +26,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p>Unknown <span class="xwikirenderingerror">Unknown macro: unknown</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.</tt></span> macro</p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p>Unknown <!--startmacro:unknown|-|--><span class="xwikirenderingerror">Unknown macro: unknown</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">The "unknown" macro is not in the list of registered macros. Verify the spelling or contact your administrator.</tt></span><!--stopmacro--> macro</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

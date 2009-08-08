@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.parser;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.parser.ParseException;
 
 public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
 {
@@ -30,11 +30,21 @@ public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
     {
         SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
 
-        // Verify that we can use uppercase in the syntax type name
-        Syntax syntax1 = new Syntax(SyntaxType.XWIKI, "1.0");
-        assertEquals(syntax1, syntaxFactory.createSyntaxFromIdString("XWiki/1.0"));
+        Syntax syntax = syntaxFactory.createSyntaxFromIdString("type/version");
+        assertEquals("type", syntax.getType().getId());
+        assertEquals("type", syntax.getType().getName());
+        assertEquals("version", syntax.getVersion());
+    }
 
-        Syntax syntax2 = new Syntax(SyntaxType.XWIKI, "2.0");
-        assertEquals(syntax2, syntaxFactory.createSyntaxFromIdString("xwiki/2.0"));
+    public void testCreateSyntaxFromSyntaxIdStringWhenInvalid() throws Exception
+    {
+        SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
+
+        try {
+            syntaxFactory.createSyntaxFromIdString("invalid");
+            fail("Should have thrown an exception");
+        } catch (ParseException expected) {
+            assertEquals("Invalid Syntax format [invalid]", expected.getMessage());
+        }
     }
 }

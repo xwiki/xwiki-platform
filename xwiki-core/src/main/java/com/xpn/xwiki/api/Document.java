@@ -474,7 +474,19 @@ public class Document extends Api
     }
 
     /**
-     * @param targetSyntax the syntax in which render the document content
+     * @param text the text to render
+     * @param sourceSyntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param targetSyntaxId the id of the syntax in which to render the document content
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 2.0M3
+     */
+    public String getRenderedContent(String text, String sourceSyntaxId, String targetSyntaxId) throws XWikiException
+    {
+        return this.doc.getRenderedContent(text, sourceSyntaxId, targetSyntaxId, getXWikiContext());
+    }
+
+    /**
+     * @param targetSyntax the syntax in which to render the document content
      * @return the rendered content
      * @throws XWikiException error when rendering content
      */

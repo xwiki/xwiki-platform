@@ -15,6 +15,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<p><span class="wikilink"><a href="/xwiki/bin/view/currentdoc"><span class="wikigeneratedlinkcontent"></span></a></span></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <p><!--startwikilink:--><span class="wikilink"><a href="/xwiki/bin/view/currentdoc"><span class="wikigeneratedlinkcontent"></span></a></span><!--stopwikilink--></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

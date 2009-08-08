@@ -133,7 +133,8 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
      */
     public void initialize() throws InitializationException
     {
-        this.syntax = new Syntax(SyntaxType.getSyntaxType(getSyntaxId() + "-highlight"), "1.0");
+        String highlightSyntaxId = getSyntaxId() + "-highlight";
+        this.syntax = new Syntax(new SyntaxType(highlightSyntaxId, highlightSyntaxId), "1.0");
 
         System.setProperty("python.home", findPygmentsPath());
 

@@ -5,4 +5,4 @@
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:testchart|-|type="bar" source="xdom" params="document:Test.Test;table:table1;range:B1-C3;series:rows;" title="Chart Test" width="640" height="480"|-|--><!--startwikilink:http://localhost/charts/chart.png--><span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><!--startimage:http://localhost/charts/chart.png--><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/><!--stopimage--></a></span><!--stopwikilink--><!--stopmacro-->
+<span class="wikiexternallink"><a title="Chart Test" class="wikimodel-freestanding" href="http://localhost/charts/chart.png"><img src="http://localhost/charts/chart.png" class="wikimodel-freestanding" alt="Chart Test"/></a></span>

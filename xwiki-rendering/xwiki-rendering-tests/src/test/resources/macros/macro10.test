@@ -30,6 +30,10 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+<span param="value">formatmacro1</span><p><span a="b"><span param="value">formatmacro2</span> text</span></p>
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <!--startmacro:testformatmacro|-|--><span param="value">formatmacro1</span><!--stopmacro--><p><span a="b"><!--startmacro:testformatmacro|-|--><span param="value">formatmacro2</span><!--stopmacro--> text</span></p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0

@@ -109,23 +109,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<!--startmacro:velocity|-||-|{{html wiki="true"}}
 <div>
-  #set ($name = "John")
-  #set ($list = ['one', 'two'])
-  <h1>Hello $name</h1>
-  <table>
-    #foreach ($item in $list)
-      <tr>
-        <td>
-          * item
-
-        </td>
-      </tr>
-    #end
-  </table>
-</div>
-{{/html}}--><div>
 <h1>Hello John</h1>
 
 
@@ -135,4 +119,4 @@ endDocument
 
 
 <table><tbody><tr><td><ul><li>item</li></ul></td></tr><tr><td><ul><li>item</li></ul></td></tr></tbody></table>
-</div><!--stopmacro-->
+</div>

@@ -25,6 +25,9 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
+.#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
 <!--startmacro:testsimplemacro|-|--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"--><!--stopmacro--><!--startmacro:testsimplemacro|-|param1="value1" param2="value2"|-|
 content
 --><!--stopmacro--><!--startmacro:testsimplemacro|-||-|

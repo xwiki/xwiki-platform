@@ -17,17 +17,19 @@
 ## conversion exception is thrown.
 #set($content = $tdoc.content)
 #if($request.key)
-#set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
-#if($wysiwygInput && $wysiwygInput.containsKey($request.key))
-#set($content = $wysiwygInput.get($request.key))
-#set($ok = $wysiwygInput.remove($request.key))
-#end
+  #set($wysiwygInput = $request.getSession().getAttribute("com.xpn.xwiki.wysiwyg.input"))
+  #if($wysiwygInput && $wysiwygInput.containsKey($request.key))
+    #set($content = $wysiwygInput.get($request.key))
+    #set($ok = $wysiwygInput.remove($request.key))
+  #end
 #end
 ## We don't always have to render the content:
 ## * If this template is called after a conversion exception then the content is HTML.
 ## * If the WYSIWYG is in real time mode then the content must be empty.
 #if("$!request.render" == "true")
-#set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntaxId()))
+  ## We render using the Annotated XHTML Renderer since we need the extra metadata in order to be able to do full
+  ## Round tripping between HTML and Wiki syntax.
+  #set($content = $tdoc.getRenderedContent($content, $tdoc.getSyntaxId(), "annotatedxhtml/1.0"))
 #end
 <body id="body" class="main">$content</body>
 </html>

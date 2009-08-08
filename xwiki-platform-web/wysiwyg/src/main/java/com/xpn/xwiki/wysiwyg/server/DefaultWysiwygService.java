@@ -190,7 +190,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
             BlockRenderer renderer =
-                (BlockRenderer) Utils.getComponent(BlockRenderer.class, Syntax.XHTML_1_0.toIdString());
+                (BlockRenderer) Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
             renderer.render(xdom, printer);
 
             return printer.toString();

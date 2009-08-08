@@ -295,7 +295,6 @@ public interface Listener extends LinkListener, ImageListener
      * @param content the macro content
      * @param isInline if true the macro is located in a inline content (like paragraph, etc.)
      * @see #onMacro(String, java.util.Map, String, boolean)
-     * @see #onInlineMacro(String, java.util.Map, String)
      */
     void beginMacroMarker(String name, Map<String, String> macroParameters, String content, boolean isInline);
 

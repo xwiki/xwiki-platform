@@ -27,7 +27,6 @@ import org.xwiki.rendering.listener.Listener;
  *
  * @version $Id$
  * @since 1.5M2
- * @see LineBreakBlock
  */
 public final class NewLineBlock extends AbstractBlock
 {

@@ -83,7 +83,7 @@ public class VerbatimBlock extends AbstractBlock
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.AbstractVerbatimBlock#traverse(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener) 
      */
     public void traverse(Listener listener)
     {

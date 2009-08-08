@@ -35,8 +35,8 @@ public interface Block extends Cloneable
 {
     /**
      * Let the block send {@link Listener} events corresponding to its content. For example a Paragraph block will send
-     * the {@link org.xwiki.rendering.listener.Listener#beginParagraph()} and
-     * {@link org.xwiki.rendering.listener.Listener#endParagraph()} events when this method is called.
+     * the {@link org.xwiki.rendering.listener.Listener#beginParagraph} and
+     * {@link org.xwiki.rendering.listener.Listener#endParagraph} events when this method is called.
      * 
      * @param listener the listener to which to send the events to.
      */

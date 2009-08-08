@@ -20,12 +20,12 @@
  */
 package org.xwiki.component.annotation;
 
-import java.util.List;
+import java.util.Set;
 
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.hamcrest.Factory;
 import org.hamcrest.core.IsNot;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -58,8 +58,12 @@ public class ComponentAnnotationLoaderTest
     {
     }
 
+    /**
+     * Note that even though it's not necessary we implement Role to ensure that the SuperRoleImpl component
+     * will only be registered once.
+     */
     @Component
-    public class SuperRoleImpl extends RoleImpl
+    public class SuperRoleImpl extends RoleImpl implements Role
     {
     }
 
@@ -124,8 +128,8 @@ public class ComponentAnnotationLoaderTest
     	final ComponentManager mockManager = this.context.mock(ComponentManager.class);
 
     	this.context.checking(new Expectations() {{
-                allowing(mockManager).registerComponent(
-                    with(new IsNot<ComponentDescriptor>(aComponentDescriptorWithImplementation(SimpleRole.class))));
+            allowing(mockManager).registerComponent(
+                with(new IsNot<ComponentDescriptor>(aComponentDescriptorWithImplementation(SimpleRole.class))));
         }});
 
     	loader.initialize(mockManager, this.getClass().getClassLoader());
@@ -143,9 +147,9 @@ public class ComponentAnnotationLoaderTest
     private void assertComponentRoleClasses(Class< ? > componentClass)
     {
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
-        List<Class< ? >> classes = loader.findComponentRoleClasses(componentClass);
+        Set<Class< ? >> classes = loader.findComponentRoleClasses(componentClass);
         Assert.assertEquals(2, classes.size());
-        Assert.assertEquals(Role.class.getName(), classes.get(0).getName());
-        Assert.assertEquals(ExtendedRole.class.getName(), classes.get(1).getName());
+        Assert.assertTrue(classes.contains(Role.class));
+        Assert.assertTrue(classes.contains(ExtendedRole.class));
     }
 }

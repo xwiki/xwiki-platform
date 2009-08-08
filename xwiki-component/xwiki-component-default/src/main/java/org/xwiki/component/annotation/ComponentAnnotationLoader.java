@@ -31,6 +31,8 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.RoleHint;
@@ -144,9 +146,9 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
      * @param componentClass the component implementation class for which to find the component roles it implements
      * @return the list of component role classes implemented
      */
-    protected List<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
+    protected Set<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
     {
-        List<Class< ? >> classes = new ArrayList<Class< ? >>();
+        Set<Class< ? >> classes = new LinkedHashSet<Class< ? >>();
 
         Component component = componentClass.getAnnotation(Component.class);
         if (component != null && component.roles().length > 0) {

@@ -178,7 +178,7 @@ public abstract class AbstractBlock implements Block
      * @param blocks the list of blocks
      * @return the position of the block, -1 if the block can't be found
      */
-    private static int indexOfBlock(Block block, List<Block> blocks)
+    private int indexOfBlock(Block block, List<Block> blocks)
     {
         int position = 0;
 

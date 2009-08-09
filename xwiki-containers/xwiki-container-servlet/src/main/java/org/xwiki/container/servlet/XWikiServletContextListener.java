@@ -43,7 +43,7 @@ public class XWikiServletContextListener implements ServletContextListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.codehaus.plexus.servlet.PlexusServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+     * @see ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent) 
      */
     public void contextInitialized(ServletContextEvent servletContextEvent)
     {

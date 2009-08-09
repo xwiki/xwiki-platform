@@ -23,11 +23,17 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.junit.Test;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.junit.Before;
-import org.xwiki.rendering.macro.MacroCategoriesManager;
+import org.junit.Test;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroCategoriesManager;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -39,6 +45,8 @@ import org.xwiki.test.AbstractComponentTestCase;
 public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
 {
     private MacroCategoriesManager macroCategoriesManager;
+    
+    private Mockery context = new Mockery();
 
     @Before
     public void setUp() throws Exception
@@ -75,6 +83,40 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
     {
         Set<String> testCategoryMacros = this.macroCategoriesManager.getMacroNames("Test");
         // There should be exactly 4 macros belonging to "Test" category.
-        Assert.assertEquals(4, testCategoryMacros.size());
+        Assert.assertEquals(4, testCategoryMacros.size());        
+    }
+    
+    @Test
+    public void testGetMacroNamesWithSyntaxSpecificMacros() throws Exception
+    {
+        // Create a mock macro.
+        final Macro mockMacro = context.mock(Macro.class);
+        // getDescriptor() is invoked during the process.
+        this.context.checking(new Expectations(){{
+            allowing(mockMacro).getDescriptor();
+            will(returnValue(new DefaultMacroDescriptor("Test macro")));
+        }});
+        
+        // Register this macro against CM as a xwiki/2.0 specific macro.
+        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("mytestmacro/xwiki/2.0");
+        getComponentManager().registerComponent(descriptor, mockMacro);
+        
+        // Override the macro category for this macro. 
+        DefaultRenderingConfiguration configuration =
+            (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
+        configuration.addMacroCategory("mytestmacro/xwiki/2.0", "Test");
+                
+        // Make sure our macro is put into the correct category & registered under correct syntax.
+        Set<String> macrosNames = this.macroCategoriesManager.getMacroNames("Test");
+        Assert.assertTrue(macrosNames.contains("mytestmacro"));       
+        macrosNames = this.macroCategoriesManager.getMacroNames("Test", Syntax.XWIKI_2_0);
+        Assert.assertTrue(macrosNames.contains("mytestmacro"));
+        macrosNames = this.macroCategoriesManager.getMacroNames("Test", Syntax.JSPWIKI_1_0);
+        Assert.assertTrue(!macrosNames.contains("mytestmacro"));
+        
+        // Finally, unregister the test macro.
+        getComponentManager().unregisterComponent(Macro.class, "mytestmacro/xwiki/2.0");
     }
 }

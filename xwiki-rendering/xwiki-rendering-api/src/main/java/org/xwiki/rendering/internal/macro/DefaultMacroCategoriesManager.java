@@ -19,24 +19,24 @@
  */
 package org.xwiki.rendering.internal.macro;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoriesManager;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
-
-import java.util.Set;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.HashSet;
 
 /**
  * Default implementation of {@link MacroCategoriesManager}.
@@ -115,7 +115,7 @@ public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements
                 return true;
             }
         }).get(category);
-        return Collections.unmodifiableSet(macros);
+        return (null != macros) ? Collections.unmodifiableSet(macros) : Collections.<String>emptySet();
     }
 
     /**
@@ -131,7 +131,7 @@ public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements
                 return macroManager.exists(macroName, syntax);
             }
         }).get(category);
-        return Collections.unmodifiableSet(macros);
+        return (null != macros) ? Collections.unmodifiableSet(macros) : Collections.<String>emptySet();
     }
 
     /**
@@ -152,8 +152,21 @@ public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements
 
         // Loop through all the macros and categorize them.
         Properties categories = this.configuration.getMacroCategories();
-        for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
-            if (matcher.match(entry.getKey())) {
+        for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {            
+            // Extract macro name.
+            String [] hintParts = entry.getKey().split("/");
+            String macroName = null;
+            if (hintParts.length > 0) {
+                macroName = hintParts[0];
+            } else {
+                // Question: Will we ever reach this code?
+                getLogger().warn("Invalid macro hint : [" + entry.getKey() + "]");
+                // Skip this macro.
+                continue;
+            }            
+            
+            // Build category map.
+            if (matcher.match(macroName)) {
                 // Check if this macro's category has been overwritten.
                 String category = categories.getProperty(entry.getKey());
 
@@ -165,7 +178,7 @@ public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements
                 if (null == macroNames) {
                     macroNames = new HashSet<String>();
                 }
-                macroNames.add(entry.getKey());
+                macroNames.add(macroName);
                 result.put(category, macroNames);
             }
         }

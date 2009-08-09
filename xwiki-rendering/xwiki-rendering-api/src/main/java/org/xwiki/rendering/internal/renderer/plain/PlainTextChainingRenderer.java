@@ -30,7 +30,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
-import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
+import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 
 /**
  * Print only plain text information. For example it remove anything which need a specific syntax a simple plain text
@@ -76,7 +76,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginParagraph(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginParagraph(java.util.Map)
      */
     @Override
     public void beginParagraph(Map<String, String> parameters)
@@ -87,7 +87,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onNewLine()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onNewLine()
      */
     @Override
     public void onNewLine()
@@ -98,7 +98,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.Link,
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.Link,
      *      boolean, java.util.Map)
      */
     @Override
@@ -118,7 +118,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel,
      *      String, java.util.Map)
      */
     @Override
@@ -130,7 +130,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onWord(java.lang.String)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onWord(java.lang.String)
      */
     @Override
     public void onWord(String word)
@@ -151,7 +151,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginListItem()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginListItem()
      */
     @Override
     public void beginListItem()
@@ -166,7 +166,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onSpace()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onSpace()
      */
     @Override
     public void onSpace()
@@ -177,7 +177,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onSpecialSymbol(char)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onSpecialSymbol(char)
      */
     @Override
     public void onSpecialSymbol(char symbol)
@@ -188,7 +188,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onHorizontalLine(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onHorizontalLine(java.util.Map)
      */
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
@@ -200,7 +200,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onEmptyLines(int)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onEmptyLines(int)
      */
     @Override
     public void onEmptyLines(int count)
@@ -211,7 +211,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onVerbatim(String, boolean, Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onVerbatim(String, boolean, Map)
      */
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
@@ -237,7 +237,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginDefinitionTerm()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginDefinitionTerm()
      */
     @Override
     public void beginDefinitionTerm()
@@ -250,7 +250,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginDefinitionDescription()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginDefinitionDescription()
      */
     @Override
     public void beginDefinitionDescription()
@@ -263,7 +263,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginQuotationLine()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginQuotationLine()
      */
     @Override
     public void beginQuotationLine()
@@ -278,7 +278,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginTable(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginTable(java.util.Map)
      */
     @Override
     public void beginTable(Map<String, String> parameters)
@@ -289,7 +289,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginTableCell(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginTableCell(java.util.Map)
      */
     @Override
     public void beginTableCell(Map<String, String> parameters)
@@ -302,7 +302,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginTableHeadCell(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginTableHeadCell(java.util.Map)
      */
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
@@ -313,7 +313,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#beginTableRow(java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginTableRow(java.util.Map)
      */
     @Override
     public void beginTableRow(Map<String, String> parameters)
@@ -326,7 +326,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#onImage(org.xwiki.rendering.listener.Image,
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onImage(org.xwiki.rendering.listener.Image,
      *      boolean, java.util.Map)
      */
     @Override

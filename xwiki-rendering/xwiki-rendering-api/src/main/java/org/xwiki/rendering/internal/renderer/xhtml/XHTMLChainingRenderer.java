@@ -34,7 +34,7 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.Renderer;
-import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
+import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;
@@ -89,7 +89,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#pushPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#pushPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
      */
     @Override
     protected void pushPrinter(WikiPrinter wikiPrinter)
@@ -101,7 +101,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer#popPrinter()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#popPrinter()
      */
     @Override
     protected void popPrinter()

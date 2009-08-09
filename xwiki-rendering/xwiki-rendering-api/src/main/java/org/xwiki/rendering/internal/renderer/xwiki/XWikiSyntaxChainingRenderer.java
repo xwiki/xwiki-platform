@@ -36,7 +36,7 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.StackableChainingListener;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
-import org.xwiki.rendering.renderer.chaining.AbstractChainingPrintRenderer;
+import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.VoidWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -162,7 +162,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
      */
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -184,7 +184,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#endLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endLink(org.xwiki.rendering.listener.Link, boolean, java.util.Map)
      */
     @Override
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -204,7 +204,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#beginFormat(org.xwiki.rendering.listener.Format, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginFormat(org.xwiki.rendering.listener.Format, java.util.Map)
      */
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -356,7 +356,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel, String, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginHeader(org.xwiki.rendering.listener.HeaderLevel, String, java.util.Map)
      */
     @Override
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -369,7 +369,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#endHeader(org.xwiki.rendering.listener.HeaderLevel, String, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endHeader(org.xwiki.rendering.listener.HeaderLevel, String, java.util.Map)
      */
     @Override
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -413,7 +413,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -480,7 +480,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#beginMacroMarker(String, java.util.Map, String, boolean)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginMacroMarker(String, java.util.Map, String, boolean)
      */
     @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
@@ -512,7 +512,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractChainingPrintRenderer#onId(String)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#onId(String)
      */
     @Override
     public void onId(String name)
@@ -831,7 +831,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     /**
      * {@inheritDoc}
-     * @see AbstractChainingPrintRenderer#setPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#setPrinter(org.xwiki.rendering.renderer.printer.WikiPrinter)
      * @since 2.0M3
      */
     public void setPrinter(WikiPrinter printer)

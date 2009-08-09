@@ -131,7 +131,7 @@ public class BlockTest extends TestCase
         try {
             parentBlock.replaceChild(word3, new WordBlock("not existing"));
             fail("Should have thrown an InvalidParameterException exception");
-        } catch (InvalidParameterException e) {
+        } catch (InvalidParameterException expected) {
             // expected
         }
     }

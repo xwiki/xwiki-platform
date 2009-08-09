@@ -36,13 +36,25 @@ import org.xwiki.rendering.parser.Syntax;
 public interface MacroCategoriesManager
 {
     /**
-     * Returns all the macro categories currently available in the system. This does not include the 'null' macro
-     * category; clients should be aware that there can be macros in the system which do not belong to any category.
+     * Returns all the macro categories currently available in the system. Macros that don't have default or overridden
+     * categories are not included and thus clients should be aware that there can be macros in the system which do
+     * not belong to any category.
      * 
-     * @return set of macro categories available in the system.
-     * @throws MacroLookupException error when lookup macros
+     * @return the macro categories available in the system.
+     * @throws MacroLookupException error when looking up macros
      */
     Set<String> getMacroCategories() throws MacroLookupException;
+
+    /**
+     * Returns all the macro categories currently available in the system for macros registered for a given syntax.
+     * Macros that don't have default or overridden categories are not included and thus clients should be aware that
+     * there can be macros in the system which do not belong to any category.
+     *
+     * @param syntax the syntax to filter the macros by syntax.
+     * @return the macro categories available for the given syntax
+     * @throws MacroLookupException error when looking up macros
+     */
+    Set<String> getMacroCategories(Syntax syntax) throws MacroLookupException;
 
     /**
      * @param category name of the category or null.
@@ -54,7 +66,7 @@ public interface MacroCategoriesManager
 
     /**
      * @param category name of the category or null.
-     * @param syntax filter macros by syntax.
+     * @param syntax the syntax to filter the macros by syntax.
      * @return names of all the macros belonging to the given category (and registered for the given syntax) or if the
      *         category parameter is null, names of all the macros which do not belong to any category (and registered
      *         for the given syntax).

@@ -21,6 +21,8 @@ package org.xwiki.rendering.configuration;
 
 import org.xwiki.component.annotation.ComponentRole;
 
+import java.util.Properties;
+
 /**
  * Configuration properties for the Rendering module.
  * <p>
@@ -54,4 +56,11 @@ public interface RenderingConfiguration
      * @return the format to use to display link labels when the user hasn't specified a label
      */
     String getLinkLabelFormat();
+
+    /**
+     * @return the category names to use for the macros. These are the categories under which they'll be listed
+     *         in UIs for example. If a category for a macro is null then the category defined in the macro
+     *         descriptor (ie defined by the macro author) will be used
+     */
+    Properties getMacroCategories();
 }

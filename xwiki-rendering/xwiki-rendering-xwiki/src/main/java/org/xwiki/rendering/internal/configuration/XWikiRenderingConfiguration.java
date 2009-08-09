@@ -24,6 +24,8 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
+import java.util.Properties;
+
 /**
  * All configuration options for the rendering subsystem.
  * 
@@ -57,5 +59,15 @@ public class XWikiRenderingConfiguration implements RenderingConfiguration
     public String getLinkLabelFormat()
     {
       return this.configuration.getProperty(PREFIX + "linkLabelFormat", DEFAULT_LINK_LABEL_FORMAT);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getMacroCategories()
+     */
+    public Properties getMacroCategories()
+    {
+        return this.configuration.getProperty(PREFIX + "macroCategories", Properties.class);
     }
 }

@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.configuration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
+import java.util.Properties;
+
 /**
  * Basic default implementation to be used when using the XWiki Rendering system standalone.
  * 
@@ -32,9 +34,14 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 public class DefaultRenderingConfiguration implements RenderingConfiguration
 {
     /**
-     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getLinkLabelFormat()
+     * @see #getLinkLabelFormat()
      */
     private String linkLabelFormat = "%p";
+
+    /**
+     * @see #getMacroCategories()
+     */
+    private Properties macroCategories = new Properties();
 
     /**
      * {@inheritDoc}
@@ -51,6 +58,29 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
      */
     public void setLinkLabelFormat(String linkLabelFormat)
     {
+        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
+        // to work even without a configuration store.
         this.linkLabelFormat = linkLabelFormat;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.configuration.RenderingConfiguration#getMacroCategories()
+     */
+    public Properties getMacroCategories()
+    {
+        return this.macroCategories;
+    }
+
+    /**
+     * @param macroName the id of the macro for which to set a category (eg "toc" for the TOC Macro)
+     * @param category the category name to set
+     */
+    public void addMacroCategory(String macroName, String category)
+    {
+        // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
+        // to work even without a configuration store.
+        this.macroCategories.setProperty(macroName, category);
     }
 }

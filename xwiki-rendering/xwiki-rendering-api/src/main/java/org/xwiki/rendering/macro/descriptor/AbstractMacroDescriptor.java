@@ -141,6 +141,7 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     
     /**
      * @param defaultCategory default category under which this macro should be listed.
+     * @see MacroDescriptor#getDefaultCategory()
      */
     public void setDefaultCategory(String defaultCategory)
     {

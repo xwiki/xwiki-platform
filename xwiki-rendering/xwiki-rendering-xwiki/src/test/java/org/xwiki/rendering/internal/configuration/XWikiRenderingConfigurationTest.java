@@ -36,5 +36,8 @@ public class XWikiRenderingConfigurationTest extends AbstractXWikiRenderingTestC
     {
         RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
         assertEquals("%p", configuration.getLinkLabelFormat());
+
+        assertNotNull(configuration.getMacroCategories());
+        assertEquals(0, configuration.getMacroCategories().size());
     }
 }

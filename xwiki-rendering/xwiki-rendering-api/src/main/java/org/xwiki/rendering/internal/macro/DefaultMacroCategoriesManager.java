@@ -19,23 +19,24 @@
  */
 package org.xwiki.rendering.internal.macro;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoriesManager;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+
+import java.util.Set;
+import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Properties;
+import java.util.HashSet;
 
 /**
  * Default implementation of {@link MacroCategoriesManager}.
@@ -47,69 +48,97 @@ import org.xwiki.rendering.parser.Syntax;
 public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements MacroCategoriesManager
 {
     /**
-     * Prefix used for macro configuration keys.
-     */
-    private static final String PREFIX = "org.xwiki.rendering.macro.";
-
-    /**
-     * Postfix used for macro category configuration keys.
-     */
-    private static final String POSTFIX = ".category";
-
-    /**
      * Used to lookup macro implementations registered as components.
      */
     @Requirement
     private ComponentManager componentManager;
 
     /**
-     * Used to read macro category configuration details.
+     * Used to get macro categories defined by the user (if any).
      */
     @Requirement
-    private ConfigurationSource configurationSource;
+    private RenderingConfiguration configuration;
 
     /**
-     * Macro manager component used check existence of macros.
+     * Macro manager component used to check the existence of macros.
      */
     @Requirement
     private MacroManager macroManager;
 
+    private interface MacroMatcher
+    {
+        boolean match(String macroName);
+    }
+
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.MacroCategoriesManager#getMacroCategories()
      */
     public Set<String> getMacroCategories() throws MacroLookupException
     {
-        return Collections.unmodifiableSet(getMacroNamesByCategory().keySet());
+        Set<String> categories = getMacroNamesByCategory(new MacroMatcher() {
+            public boolean match(String macroName)
+            {
+                return true;
+            }
+        }).keySet();
+        return Collections.unmodifiableSet(categories);
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.MacroCategoriesManager#getMacroCategories(org.xwiki.rendering.parser.Syntax) 
+     */
+    public Set<String> getMacroCategories(final Syntax syntax) throws MacroLookupException
+    {
+        Set<String> categories = getMacroNamesByCategory(new MacroMatcher() {
+            public boolean match(String macroName)
+            {
+                return macroManager.exists(macroName, syntax);
+            }
+        }).keySet();
+        return Collections.unmodifiableSet(categories);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.MacroCategoriesManager#getMacroNames(String)
      */
     public Set<String> getMacroNames(String category) throws MacroLookupException
     {
-        return Collections.unmodifiableSet(getMacroNamesByCategory().get(category));
+        Set<String> macros = getMacroNamesByCategory(new MacroMatcher() {
+            public boolean match(String macroName)
+            {
+                return true;
+            }
+        }).get(category);
+        return Collections.unmodifiableSet(macros);
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.MacroCategoriesManager#getMacroNames(String, org.xwiki.rendering.parser.Syntax)   
      */
-    public Set<String> getMacroNames(String category, Syntax syntax) throws MacroLookupException
+    public Set<String> getMacroNames(String category, final Syntax syntax) throws MacroLookupException
     {
-        Set<String> macros = getMacroNamesByCategory().get(category);
-        Set<String> result = new HashSet<String>();
-        for (String macroName : macros) {
-            if (macroManager.exists(macroName, syntax)) {
-                result.add(macroName);
+        Set<String> macros = getMacroNamesByCategory(new MacroMatcher() {
+            public boolean match(String macroName)
+            {
+                return macroManager.exists(macroName, syntax);
             }
-        }
-        return Collections.unmodifiableSet(result);
+        }).get(category);
+        return Collections.unmodifiableSet(macros);
     }
 
     /**
+     * @param matcher a macro name matcher to be able to filter macros, used to filter macros for a given syntax
      * @return macro names grouped by category, including the 'null' macro category.
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, Set<String>> getMacroNamesByCategory() throws MacroLookupException
+    private Map<String, Set<String>> getMacroNamesByCategory(MacroMatcher matcher) throws MacroLookupException
     {
         Map<String, Set<String>> result = new HashMap<String, Set<String>>();
 
@@ -122,20 +151,23 @@ public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements
         }
 
         // Loop through all the macros and categorize them.
-        for (String macroName : allMacros.keySet()) {
-            // Check if this macro's category has been overwritten.
-            String category = configurationSource.getProperty(PREFIX + macroName + POSTFIX, String.class);
+        Properties categories = this.configuration.getMacroCategories();
+        for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
+            if (matcher.match(entry.getKey())) {
+                // Check if this macro's category has been overwritten.
+                String category = categories.getProperty(entry.getKey());
 
-            // If not use the default category set by macro author.
-            category = (null == category) ? allMacros.get(macroName).getDescriptor().getDefaultCategory() : category;
+                // If not, use the default category set by macro author.
+                category = (null == category) ? entry.getValue().getDescriptor().getDefaultCategory() : category;
 
-            // Add to category. Note the category can also be null.
-            Set<String> macroNames = result.get(category);
-            if (null == macroNames) {
-                macroNames = new HashSet<String>();
+                // Add to category. Note the category can also be null.
+                Set<String> macroNames = result.get(category);
+                if (null == macroNames) {
+                    macroNames = new HashSet<String>();
+                }
+                macroNames.add(entry.getKey());
+                result.put(category, macroNames);
             }
-            macroNames.add(macroName);
-            result.put(category, macroNames);
         }
 
         return result;

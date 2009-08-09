@@ -157,6 +157,7 @@
           <includes>
             **/rendering/block/*.java,
             **/rendering/configuration/*.java,
+            **/rendering/converter/Converter.java,
             **/rendering/internal/configuration/*.java,
             **/rendering/internal/parser/*.java,
             **/rendering/listener/*.java,
@@ -236,6 +237,7 @@
                 <exclude>org/xwiki/rendering/parser/SyntaxType</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/MacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/renderer/printer/MonitoringWikiPrinter</exclude>
+                <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude>
               </excludes>
             </configuration>
           </execution>

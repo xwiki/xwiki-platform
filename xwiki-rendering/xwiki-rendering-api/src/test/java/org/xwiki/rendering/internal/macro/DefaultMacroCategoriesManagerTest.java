@@ -17,19 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.internal.macro;
 
 import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Test;
-import org.xwiki.component.internal.ReflectionUtils;
-import org.xwiki.configuration.ConfigurationSource;
+import org.junit.Before;
 import org.xwiki.rendering.macro.MacroCategoriesManager;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -42,11 +40,7 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
 {
     private MacroCategoriesManager macroCategoriesManager;
 
-    private Mockery context = new Mockery();
-
-    /**
-     * {@inheritDoc}
-     */
+    @Before
     public void setUp() throws Exception
     {
         super.setUp();
@@ -56,47 +50,14 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
     @Test
     public void testGetMacroCategories() throws Exception
     {
-        final ConfigurationSource configurationSource = this.context.mock(ConfigurationSource.class);
-        ReflectionUtils.setFieldValue(macroCategoriesManager, "configurationSource", configurationSource);
+        // TODO: This test needs to be improved. Right now it's based on the Test Macro located in the transformation
+        // package and for 4 of them a "Test" category has been set...
+        DefaultRenderingConfiguration configuration =
+            (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
+        configuration.addMacroCategory("testcontentmacro", "Content");
+        configuration.addMacroCategory("testsimplemacro", "Simple");
 
-        this.context.checking(new Expectations()
-        {
-            {
-                String key = "org.xwiki.rendering.macro.testcontentmacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue("Content"));
-
-                key = "org.xwiki.rendering.macro.testfailingmacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue(null));
-
-                key = "org.xwiki.rendering.macro.testformatmacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue(null));
-
-                key = "org.xwiki.rendering.macro.testnestedmacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue(null));
-
-                key = "org.xwiki.rendering.macro.testprioritymacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue(null));
-
-                key = "org.xwiki.rendering.macro.testrecursivemacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue(null));
-
-                key = "org.xwiki.rendering.macro.testsimpleinlinemacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue(null));
-
-                key = "org.xwiki.rendering.macro.testsimplemacro.category";
-                allowing(configurationSource).getProperty(key, String.class);
-                will(returnValue("Simple"));
-            }
-        });
-
-        Set<String> macroCategories = macroCategoriesManager.getMacroCategories();
+        Set<String> macroCategories = this.macroCategoriesManager.getMacroCategories();
 
         // Check for a default category.
         Assert.assertTrue(macroCategories.contains("Test"));
@@ -112,7 +73,7 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
     @Test
     public void testGetMacroNamesForCategory() throws Exception
     {
-        Set<String> testCategoryMacros = macroCategoriesManager.getMacroNames("Test");
+        Set<String> testCategoryMacros = this.macroCategoriesManager.getMacroNames("Test");
         // There should be exactly 4 macros belonging to "Test" category.
         Assert.assertEquals(4, testCategoryMacros.size());
     }

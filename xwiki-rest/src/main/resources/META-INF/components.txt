@@ -55,4 +55,3 @@ org.xwiki.rest.representations.comments.FormUrlEncodedCommentReader
 org.xwiki.rest.representations.tags.TextPlainTagsReader
 org.xwiki.rest.representations.tags.FormUrlEncodedTagsReader
 org.xwiki.rest.exceptions.XWikiExceptionMapper
-org.xwiki.rest.exceptions.QueryExceptionMapper

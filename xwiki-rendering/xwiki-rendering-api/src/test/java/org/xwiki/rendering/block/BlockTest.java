@@ -129,4 +129,24 @@ public class BlockTest extends TestCase
         assertNotSame(ib.getImage(), ((ImageBlock) newRootBlock.getChildren().get(1)).getImage());
         assertNotSame(lb.getLink(), ((LinkBlock) newRootBlock.getChildren().get(2)).getLink());
     }
+
+    public void testGetPreviousBlockByType()
+    {
+        WordBlock lw = new WordBlock("linkword");
+        SpecialSymbolBlock ls = new SpecialSymbolBlock('$');
+
+        Link link = new Link();
+        link.setReference("reference");
+        LinkBlock pl = new LinkBlock(Arrays.<Block> asList(lw, ls), link, false);
+
+        ImageBlock pi = new ImageBlock(new DocumentImage(new DefaultAttachement("document", "attachment")), true);
+
+        ParagraphBlock rootBlock = new ParagraphBlock(Arrays.<Block> asList(pi, pl));
+
+        assertSame(lw, ls.getPreviousBlockByType(WordBlock.class, false));
+        assertNull(ls.getPreviousBlockByType(ImageBlock.class, false));
+        assertSame(pl, ls.getPreviousBlockByType(LinkBlock.class, true));
+        assertSame(pi, ls.getPreviousBlockByType(ImageBlock.class, true));
+        assertSame(rootBlock, ls.getPreviousBlockByType(ParagraphBlock.class, true));
+    }
 }

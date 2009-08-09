@@ -329,9 +329,10 @@ public abstract class AbstractBlock implements Block
             return null;
         }
 
-        List<Block> blocks = getParent().getChildren();
-        int index = indexOfChild(this);
+        int index = indexOfBlock(this, getParent().getChildren());
 
+        // test previous brothers
+        List<Block> blocks = getParent().getChildren();
         for (int i = index - 1; i >= 0; --i) {
             Block previousBlock = blocks.get(i);
             if (blockClass.isAssignableFrom(previousBlock.getClass())) {
@@ -339,7 +340,13 @@ public abstract class AbstractBlock implements Block
             }
         }
 
-        return getParent().getPreviousBlockByType(blockClass, true);
+        // test parent
+        if (blockClass.isAssignableFrom(getParent().getClass())) {
+            return blockClass.cast(getParent());
+        }
+
+        // recurse
+        return recurse ? getParent().getPreviousBlockByType(blockClass, true) : null;
     }
 
     /**

@@ -176,9 +176,25 @@ public abstract class AbstractBlock implements Block
      */
     private int indexOfChild(Block block)
     {
+        return indexOfBlock(block, getChildren());
+    }
+
+    /**
+     * Get the position of the provided block in the provided list of blocks.
+     * <p>
+     * Can't use {@link List#indexOf(Object)} since it's using {@link Object#equals(Object)} internally which is not
+     * what we want since two WordBlock with the same text or two spaces are equals for example but we want to be able
+     * to target one specific Block.
+     * 
+     * @param block the block
+     * @param blocks the list of blocks
+     * @return the position of the block, -1 if the block can't be found
+     */
+    private static int indexOfBlock(Block block, List<Block> blocks)
+    {
         int position = 0;
 
-        for (Block child : getChildren()) {
+        for (Block child : blocks) {
             if (child == block) {
                 return position;
             }
@@ -307,8 +323,9 @@ public abstract class AbstractBlock implements Block
             return null;
         }
 
-        int index = indexOfChild(this);
+        int index = indexOfBlock(this, getParent().getChildren());
 
+        // test previous brothers
         List<Block> blocks = getParent().getChildren();
         for (int i = index - 1; i >= 0; --i) {
             Block previousBlock = blocks.get(i);
@@ -317,7 +334,13 @@ public abstract class AbstractBlock implements Block
             }
         }
 
-        return getParent().getPreviousBlockByType(blockClass, true);
+        // test parent
+        if (blockClass.isAssignableFrom(getParent().getClass())) {
+            return blockClass.cast(getParent());
+        }
+
+        // recurse
+        return recurse ? getParent().getPreviousBlockByType(blockClass, true) : null;
     }
 
     /**

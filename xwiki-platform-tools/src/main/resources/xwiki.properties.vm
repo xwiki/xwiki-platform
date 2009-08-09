@@ -31,6 +31,14 @@
 #-# The default is "%p". Some examples: "%s.%p", "%w:%s.%p".
 # rendering.linkLabelFormat = %p
 
+#-# [Since 2.0M3]
+#-# Overrides default macro categories.
+#-#
+#-# Ex: To redefine the macro category for the TOC macro so that it'd be in the "My Category" category +
+#-# redefine the category for the Script Macro to be "My Other Category", you'd use:
+# rendering.macroCategories = toc:My Category
+# rendering.macroCategories = script:My Other Category
+
 #-------------------------------------------------------------------------------------
 # Cache
 #-------------------------------------------------------------------------------------

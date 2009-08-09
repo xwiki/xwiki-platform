@@ -128,7 +128,9 @@ public class DefaultMacroCategoriesManager extends AbstractLogEnabled implements
         Set<String> macros = getMacroNamesByCategory(new MacroMatcher() {
             public boolean match(String macroName)
             {
-                return macroManager.exists(macroName, syntax);
+                // We have to consider macros registered for the given syntax as well as macros registered for all
+                // syntaxes.
+                return (macroManager.exists(macroName, syntax) || macroManager.exists(macroName));
             }
         }).get(category);
         return (null != macros) ? Collections.unmodifiableSet(macros) : Collections.<String>emptySet();

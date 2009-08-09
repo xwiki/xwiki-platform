@@ -80,10 +80,36 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
 
     @Test
     public void testGetMacroNamesForCategory() throws Exception
-    {
-        Set<String> testCategoryMacros = this.macroCategoriesManager.getMacroNames("Test");
-        // There should be exactly 4 macros belonging to "Test" category.
-        Assert.assertEquals(4, testCategoryMacros.size());        
+    {        
+        // Create a mock macro.
+        final Macro mockMacro = context.mock(Macro.class);
+        // getDescriptor() is invoked during the process.
+        this.context.checking(new Expectations(){{
+            allowing(mockMacro).getDescriptor();
+            will(returnValue(new DefaultMacroDescriptor("Test macro")));
+        }});
+        
+        // Register this macro against CM as a macro registered for all syntaxes.
+        DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("mytestmacro");
+        getComponentManager().registerComponent(descriptor, mockMacro);
+        
+        // Override the macro category for this macro. 
+        DefaultRenderingConfiguration configuration =
+            (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
+        configuration.addMacroCategory("mytestmacro", "Test");
+        
+        // Check whether our macro is in the correct category.
+        Set<String> macroNames = this.macroCategoriesManager.getMacroNames("Test");        
+        Assert.assertTrue(macroNames.contains("mytestmacro"));        
+        
+        // This macro should be registered for all syntaxes.
+        macroNames = this.macroCategoriesManager.getMacroNames("Test", Syntax.JSPWIKI_1_0);
+        Assert.assertTrue(macroNames.contains("mytestmacro"));
+        
+        // Finally, unregister the test macro.
+        getComponentManager().unregisterComponent(Macro.class, "mytestmacro");
     }
     
     @Test

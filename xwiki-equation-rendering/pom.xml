@@ -62,12 +62,32 @@
       <groupId>uk.ac.ed.ph.snuggletex</groupId>
       <artifactId>snuggletex-core</artifactId>
       <version>1.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9-dom</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- JEuclid transforms MathML content to raster images -->
     <dependency>
       <groupId>uk.ac.ed.ph.snuggletex</groupId>
       <artifactId>snuggletex-jeuclid</artifactId>
       <version>1.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9-dom</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

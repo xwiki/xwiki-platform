@@ -126,6 +126,10 @@ public class EquationMacro extends AbstractMacro<EquationMacroParameters>
         if (result == null) {
             result = new WordBlock(content);
         }
+        // Block level equations should be wrapped in a paragraph element
+        if (!context.isInline()) {
+            result = new ParagraphBlock(Collections.<Block> singletonList(result));
+        }
         return Collections.singletonList(result);
     }
 
@@ -149,18 +153,13 @@ public class EquationMacro extends AbstractMacro<EquationMacroParameters>
             String imageName = renderer.process(equation, inline, fontSize, imageType);
             String url = this.dab.getURL(null, "tex", null, null) + "/" + imageName;
             Image image = new URLImage(url);
-            Block result = new ImageBlock(image, false);
+            ImageBlock result = new ImageBlock(image, false);
             // Set the alternative text for the image to be the original equation
-            ((ImageBlock) result).setParameter("alt", equation);
-            // Block level equations should be wrapped in a paragraph element
-            if (!inline) {
-                result = new ParagraphBlock(Collections.<Block> singletonList(result));
-            }
+            result.setParameter("alt", equation);
             return result;
         } catch (IOException ex) {
-            LOG.error("Failed to render equation", ex);
+            throw new ComponentLookupException("Failed to render equation using [" + rendererHint + "] renderer");
         }
-        return null;
     }
 
     /**

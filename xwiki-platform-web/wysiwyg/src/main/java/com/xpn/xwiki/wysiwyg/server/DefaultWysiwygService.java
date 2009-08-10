@@ -41,6 +41,7 @@ import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
@@ -120,7 +121,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private HTMLCleaner getHTMLCleaner()
     {
-        return (HTMLCleaner) Utils.getComponent(HTMLCleaner.class);
+        return Utils.getComponent(HTMLCleaner.class);
     }
 
     /**
@@ -129,7 +130,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private HTMLConverter getHTMLConverter(String syntax)
     {
-        return (HTMLConverter) Utils.getComponent(HTMLConverter.class);
+        return Utils.getComponent(HTMLConverter.class);
     }
 
     /**
@@ -137,7 +138,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     private DocumentAccessBridge getDocumentAccessBridge()
     {
-        return (DocumentAccessBridge) Utils.getComponent(DocumentAccessBridge.class);
+        return Utils.getComponent(DocumentAccessBridge.class);
     }
 
     /**
@@ -179,18 +180,18 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     {
         try {
             // Parse
-            Parser parser = (Parser) Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
+            Parser parser = Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
             XDOM xdom = parser.parse(new StringReader(cleanHTML(html)));
 
             // Execute macros
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
-            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.class);
+            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+            TransformationManager txManager = Utils.getComponent(TransformationManager.class);
             txManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
             BlockRenderer renderer =
-                (BlockRenderer) Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
+                Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
             renderer.render(xdom, printer);
 
             return printer.toString();
@@ -209,7 +210,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         org.xwiki.xml.html.HTMLCleaner cleaner =
-            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
+            Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
         HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
         configuration.setParameters(cleaningParams);
         org.w3c.dom.Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
@@ -224,7 +225,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     public String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException
     {
-        OfficeImporter officeImporter = (OfficeImporter) Utils.getComponent(OfficeImporter.class);
+        OfficeImporter officeImporter = Utils.getComponent(OfficeImporter.class);
         XWikiContext context = getXWikiContext();
         try {
             List<XWikiAttachment> attachments = context.getWiki().getDocument(pageName, context).getAttachmentList();
@@ -474,7 +475,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         String queryString = StringUtils.isEmpty(revision) ? null : "rev=" + revision;
         DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
         // get the url to the targeted document from the bridge
-        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        DocumentNameSerializer serializer = Utils.getComponent(DocumentNameSerializer.class);
         String pageReference = serializer.serialize(docName);
         String pageURL = getDocumentAccessBridge().getURL(pageReference, VIEW_ACTION, queryString, anchor);
 
@@ -507,9 +508,9 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         // clean attachment filename to be synchronized with all attachment operations
         String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
         DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        DocumentNameSerializer serializer = Utils.getComponent(DocumentNameSerializer.class);
         String docReference = serializer.serialize(docName);
-        XWikiDocument doc = null;
+        XWikiDocument doc;
         try {
             doc = context.getWiki().getDocument(docReference, context);
         } catch (XWikiException e) {
@@ -628,9 +629,9 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         XWikiContext context = getXWikiContext();
         List<Attachment> attachments = new ArrayList<Attachment>();
         DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-        DocumentNameSerializer serializer = (DocumentNameSerializer) Utils.getComponent(DocumentNameSerializer.class);
+        DocumentNameSerializer serializer = Utils.getComponent(DocumentNameSerializer.class);
         String docReference = serializer.serialize(docName);
-        XWikiDocument doc = null;
+        XWikiDocument doc;
         try {
             doc = context.getWiki().getDocument(docReference, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
@@ -655,9 +656,10 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public MacroDescriptor getMacroDescriptor(String macroName, String syntaxId) throws XWikiGWTException
     {
         try {
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
-            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.class);
-            Macro< ? > macro = manager.getMacro(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId));
+            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+            MacroManager manager = Utils.getComponentManager().lookup(MacroManager.class);
+            Macro< ? > macro =
+                manager.getMacro(new MacroId(macroName, syntaxFactory.createSyntaxFromIdString(syntaxId)));
             org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
 
             ParameterDescriptor contentDescriptor = null;
@@ -722,9 +724,15 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     public List<String> getMacros(String syntaxId) throws XWikiGWTException
     {
         try {
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
-            MacroManager manager = (MacroManager) Utils.getComponentManager().lookup(MacroManager.class);
-            return new ArrayList<String>(manager.getMacroNames(syntaxFactory.createSyntaxFromIdString(syntaxId)));
+            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+            MacroManager manager = Utils.getComponentManager().lookup(MacroManager.class);
+
+            List<String> result = new ArrayList<String>();
+            for (MacroId macroId :  manager.getMacroIds(syntaxFactory.createSyntaxFromIdString(syntaxId))) {
+                result.add(macroId.getId());
+            }
+
+            return result;
         } catch (Throwable t) {
             LOG.error("Exception while retrieving the list of available macros.", t);
             throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);

@@ -72,6 +72,22 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.bridge.DocumentName)
+     */
+    public DocumentModelBridge getDocument(DocumentName documentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument doc = new XWikiDocument();
+        doc.setDatabase(documentName.getWiki());
+        doc.setSpace(documentName.getSpace());
+        doc.setName(documentName.getPage());
+
+        return xcontext.getWiki().getDocument(doc, xcontext);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#getDocumentName(String)
      */
     public DocumentName getDocumentName(String documentName)
@@ -91,8 +107,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     {
         XWikiDocument currentDocument = getContext().getDoc();
 
-        return currentDocument == null ? null : new DocumentName(currentDocument.getWikiName(), currentDocument
-            .getSpaceName(), currentDocument.getPageName());
+        return currentDocument == null ? null : new DocumentName(currentDocument.getWikiName(),
+            currentDocument.getSpaceName(), currentDocument.getPageName());
     }
 
     /**
@@ -250,8 +266,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<Object> result;
         try {
             XWikiContext xcontext = getContext();
-            result = new ArrayList<Object>(
-                xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).getFieldList());
+            result =
+                new ArrayList<Object>(
+                    xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).getFieldList());
         } catch (Exception ex) {
             result = Collections.emptyList();
         }
@@ -312,8 +329,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWiki().getDocument(documentName, xcontext).getAttachment(attachmentName)
-            .getContent(xcontext);
+        return xcontext.getWiki().getDocument(documentName, xcontext).getAttachment(attachmentName).getContent(xcontext);
     }
 
     /**
@@ -340,7 +356,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         attachment.setDoc(doc);
         doc.setAuthor(getCurrentUser());
         if (doc.isNew()) {
-           doc.setCreator(getCurrentUser()); 
+            doc.setCreator(getCurrentUser());
         }
         doc.saveAttachmentContent(attachment, xcontext);
     }
@@ -457,7 +473,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiDocument.backupContext(backupObjects, xcontext);
         xcontext.getWiki().getDocument(documentName, xcontext).setAsContextDoc(xcontext);
     }
-    
+
     /**
      * Utility method for checking access rights of the current user on a target document.
      * 
@@ -477,7 +493,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         }
         return hasRight;
     }
-    
+
     /**
      * Utility method for saving an {@link XWikiDocument}. This method takes care of setting authors and creators
      * appropriately.
@@ -489,10 +505,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     private void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit) throws Exception
     {
-        doc.setAuthor(getCurrentUser()); 
+        doc.setAuthor(getCurrentUser());
         if (doc.isNew()) {
             doc.setCreator(getCurrentUser());
-        }           
+        }
         getContext().getWiki().saveDocument(doc, comment, isMinorEdit, getContext());
     }
 }

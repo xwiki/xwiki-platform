@@ -1333,7 +1333,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
-    private XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String server = null, database = null;
         try {

@@ -242,8 +242,7 @@ public class Utils
             fileis.close();
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",
-                e);
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
         }
 
         return data;
@@ -283,10 +282,10 @@ public class Utils
 
     /**
      * Append request parameters from the specified String to the specified Map. It is presumed that the specified Map
-     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION NOTE</strong>:
-     * URL decoding is performed individually on the parsed name and value elements, rather than on the entire query
-     * string ahead of time, to properly deal with the case where the name or value includes an encoded "=" or "&"
-     * character that would otherwise be interpreted as a delimiter.
+     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION
+     * NOTE</strong>: URL decoding is performed individually on the parsed name and value elements, rather than on the
+     * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded "="
+     * or "&" character that would otherwise be interpreted as a delimiter.
      * 
      * @param data Input string containing request parameters
      * @throws IllegalArgumentException if the data is malformed <p/> Code borrowed from Apache Tomcat 5.0
@@ -317,11 +316,11 @@ public class Utils
 
     /**
      * Append request parameters from the specified String to the specified Map. It is presumed that the specified Map
-     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION NOTE</strong>:
-     * URL decoding is performed individually on the parsed name and value elements, rather than on the entire query
-     * string ahead of time, to properly deal with the case where the name or value includes an encoded "=" or "&"
-     * character that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is modified by this
-     * method. Caller beware.
+     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION
+     * NOTE</strong>: URL decoding is performed individually on the parsed name and value elements, rather than on the
+     * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded "="
+     * or "&" character that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is modified by
+     * this method. Caller beware.
      * 
      * @param data Input string containing request parameters
      * @param encoding Encoding to use for converting hex
@@ -528,11 +527,11 @@ public class Utils
             try {
                 component = componentManager.lookup(role, hint);
             } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to load component [" + role .getName() 
-                    + "] for hint [" + hint + "]", e);
+                throw new RuntimeException("Failed to load component [" + role.getName() + "] for hint [" + hint + "]",
+                    e);
             }
         } else {
-            throw new RuntimeException("Component manager has not been initialized before lookup for [" 
+            throw new RuntimeException("Component manager has not been initialized before lookup for ["
                 + role.getName() + "] for hint [" + hint + "]");
         }
 

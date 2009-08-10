@@ -79,7 +79,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
      */
     public Set<String> getMacroCategories(final Syntax syntax) throws MacroLookupException
     {
-        Set<String> categories = getMacroNamesByCategory(new MacroMatcher() {
+        Set<String> categories = getMacroIdsByCategory(new MacroMatcher() {
             public boolean match(MacroId macroId)
             {
                 // True if the macroId has no syntax or if it has one it has to match the passed syntax
@@ -106,7 +106,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
      */
     public Set<MacroId> getMacroIds(String category, final Syntax syntax) throws MacroLookupException
     {
-        Set<MacroId> macros = getMacroNamesByCategory(new MacroMatcher() {
+        Set<MacroId> macros = getMacroIdsByCategory(new MacroMatcher() {
             public boolean match(MacroId macroId)
             {
                 // True if the macroId has no syntax or if it has one it has to match the passed syntax
@@ -120,7 +120,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
      * @param matcher a macro name matcher to be able to filter macros, used to filter macros for a given syntax
      * @return macro names grouped by category, including the 'null' macro category.
      */
-    private Map<String, Set<MacroId>> getMacroNamesByCategory(MacroMatcher matcher) throws MacroLookupException
+    private Map<String, Set<MacroId>> getMacroIdsByCategory(MacroMatcher matcher) throws MacroLookupException
     {
         Map<String, Set<MacroId>> result = new HashMap<String, Set<MacroId>>();
 

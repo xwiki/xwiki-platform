@@ -342,13 +342,13 @@ public interface Listener extends LinkListener, ImageListener
     /**
      * A {@link org.xwiki.rendering.macro.Macro} by itself on a line (ie not inside another Block).
      * 
-     * @param name the macro name
+     * @param id the macro id (eg "toc" for the TOC macro)
      * @param macroParameters the macro parameters
      * @param content the macro content
      * @param isInline if true the macro is located in a inline content (like paragraph, etc.)
      * @since 1.6M2
      */
-    void onMacro(String name, Map<String, String> macroParameters, String content, boolean isInline);
+    void onMacro(String id, Map<String, String> macroParameters, String content, boolean isInline);
 
     /**
      * A word. Note that sentences ar broken into different events: word events, special symbols events, space events,

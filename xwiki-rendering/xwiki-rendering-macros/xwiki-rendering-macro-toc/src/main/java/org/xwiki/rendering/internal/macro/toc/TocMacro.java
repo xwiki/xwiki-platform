@@ -73,7 +73,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      */
     public TocMacro()
     {
-        super(DESCRIPTION, TocMacroParameters.class);
+        super("Table Of Contents", DESCRIPTION, TocMacroParameters.class);
 
         // Make sure this macro is executed as one of the last macros to be executed since
         // other macros can generate headers which need to be taken into account by the TOC

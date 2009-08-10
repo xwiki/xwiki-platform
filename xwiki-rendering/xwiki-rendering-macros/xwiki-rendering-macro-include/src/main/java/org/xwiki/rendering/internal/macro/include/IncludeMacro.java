@@ -84,7 +84,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     public IncludeMacro()
     {
-        super(DESCRIPTION, IncludeMacroParameters.class);        
+        super("Include", DESCRIPTION, IncludeMacroParameters.class);        
         
         // The include macro must execute first since if it runs with the current context it needs to bring
         // all the macros from the included page before the other macros are executed.

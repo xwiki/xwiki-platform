@@ -52,7 +52,7 @@ public class RubyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroParam
      */
     public RubyMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
+        super("Ruby", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
     }
     
     /**

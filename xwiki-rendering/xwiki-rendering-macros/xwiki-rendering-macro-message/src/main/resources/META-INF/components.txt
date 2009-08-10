@@ -1,1 +1,3 @@
-org.xwiki.rendering.internal.macro.message.MessageMacro
+org.xwiki.rendering.internal.macro.message.InfoMessageMacro
+org.xwiki.rendering.internal.macro.message.WarningMessageMacro
+org.xwiki.rendering.internal.macro.message.ErrorMessageMacro

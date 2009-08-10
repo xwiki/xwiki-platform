@@ -103,7 +103,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
      */
     public HTMLMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), HTMLMacroParameters.class);
+        super("HTML", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), HTMLMacroParameters.class);
     }
 
     /**
@@ -236,7 +236,7 @@ public class HTMLMacro extends AbstractMacro<HTMLMacroParameters>
             // have the chole context and can clean better
             List<MacroBlock> macros = xdom.getChildrenByType(MacroBlock.class, true);
             for (MacroBlock macro : macros) {
-                if (macro.getName().equals("html")) {
+                if (macro.getId().equals("html")) {
                     macro.setParameter("clean", "false");
                 }
             }

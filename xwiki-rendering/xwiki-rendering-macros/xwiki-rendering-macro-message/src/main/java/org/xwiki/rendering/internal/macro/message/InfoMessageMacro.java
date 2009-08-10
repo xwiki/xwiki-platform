@@ -17,37 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.internal.macro.message;
 
+import org.xwiki.component.annotation.Component;
 
 /**
- * Base class for a macro which does not support any parameter.
- * 
+ * Displays an info message.
+ *
  * @version $Id$
- * @since 1.6M1
+ * @since 2.0M3
  */
-public abstract class AbstractNoParameterMacro extends AbstractMacro<Object>
+@Component("info")
+public class InfoMessageMacro extends AbstractMessageMacro
 {
     /**
-     * Create and initialize a descriptor with no parameters.
-     * 
-     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
-     * @since 2.0M3
+     * Create and initialize the descriptor of the macro.
      */
-    public AbstractNoParameterMacro(String name)
+    public InfoMessageMacro()
     {
-        super(name);
-    }
-
-    /**
-     * Create and initialize a descriptor with no parameters.
-     *
-     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
-     * @param description the description of the macro
-     * @since 2.0M3
-     */
-    public AbstractNoParameterMacro(String name, String description)
-    {
-        super(name, description);
+        super("Info Message", "Displays an info message note.");
     }
 }

@@ -34,7 +34,7 @@ public class TestBoxMacro extends AbstractBoxMacro<BoxMacroParameters>
 {
     public TestBoxMacro()
     {
-        super("TestBoxMacro", new DefaultContentDescriptor(), BoxMacroParameters.class);
+        super("Test Box Macro", "Description", new DefaultContentDescriptor(), BoxMacroParameters.class);
     }
 
     /**

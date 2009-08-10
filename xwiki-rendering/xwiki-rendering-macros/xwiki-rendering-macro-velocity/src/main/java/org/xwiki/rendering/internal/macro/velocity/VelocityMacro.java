@@ -70,7 +70,8 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
      */
     public VelocityMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), VelocityMacroParameters.class);
+        super("Velocity", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            VelocityMacroParameters.class);
     }
 
     /**
@@ -86,8 +87,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#evaluate(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see AbstractScriptMacro#evaluate(org.xwiki.rendering.macro.script.ScriptMacroParameters, String, MacroTransformationContext) 
      */
     @Override
     protected String evaluate(VelocityMacroParameters parameters, String content, MacroTransformationContext context)

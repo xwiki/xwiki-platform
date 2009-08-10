@@ -657,9 +657,9 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
      *      java.lang.String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
-        super.onMacro(name, parameters, content, isInline);
+        super.onMacro(id, parameters, content, isInline);
         markNotEmpty();
     }
 

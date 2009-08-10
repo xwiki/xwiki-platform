@@ -62,13 +62,15 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     /**
      * Creates a new box macro.
      * 
+     * @param name the name of the macro
      * @param description string describing this macro.
      * @param contentDescriptor the {@link ContentDescriptor} describing the content of this macro.
      * @param parametersBeanClass class of the parameters bean.
      */
-    protected AbstractBoxMacro(String description, ContentDescriptor contentDescriptor, Class< ? > parametersBeanClass)
+    protected AbstractBoxMacro(String name, String description, ContentDescriptor contentDescriptor,
+        Class< ? > parametersBeanClass)
     {
-        super(description, contentDescriptor, parametersBeanClass);
+        super(name, description, contentDescriptor, parametersBeanClass);
     }
 
     /**

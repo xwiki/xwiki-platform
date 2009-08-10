@@ -35,6 +35,11 @@ import org.xwiki.properties.PropertyDescriptor;
 public abstract class AbstractMacroDescriptor implements MacroDescriptor
 {
     /**
+     * @see #getName() 
+     */
+    private String name;
+
+    /**
      * The description of the macro.
      */
     private String description;
@@ -63,14 +68,17 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     private Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<String, ParameterDescriptor>();
 
     /**
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description the description of the macro.
      * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
      * @param parametersBeanDescriptor the description of the parameters bean or null if there are no parameters for
      *            this macro.
+     * @since 2.0M3
      */
-    public AbstractMacroDescriptor(String description, ContentDescriptor contentDescriptor,
+    public AbstractMacroDescriptor(String name, String description, ContentDescriptor contentDescriptor,
         BeanDescriptor parametersBeanDescriptor)
     {
+        this.name = name;
         this.description = description;
         this.contentDescriptor = contentDescriptor;
         this.parametersBeanDescriptor = parametersBeanDescriptor;
@@ -88,6 +96,17 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
             DefaultParameterDescriptor desc = new DefaultParameterDescriptor(propertyDescriptor);
             this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see MacroDescriptor#getName() 
+     * @since 2.0M3
+     */
+    public String getName()
+    {
+        return this.name;
     }
 
     /**

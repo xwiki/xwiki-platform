@@ -36,6 +36,11 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 public class WikiMacroDescriptor implements MacroDescriptor
 {
     /**
+     * Macro name.
+     */
+    private String name;
+
+    /**
      * Macro description.
      */
     private String description;
@@ -57,19 +62,29 @@ public class WikiMacroDescriptor implements MacroDescriptor
 
     /**
      * Creates a new {@link WikiMacroDescriptor} instance.
-     * 
-     * @param description macro description.
+     *
+     * @param name the macro name 
+     * @param description macro description
      * @param defaultCategory default category under which this macro should be listed.
      * @param contentDescriptor macro content description.
      * @param parameterDescriptors parameter descriptors. 
      */
-    public WikiMacroDescriptor(String description, String defaultCategory, ContentDescriptor contentDescriptor,
-        List<WikiMacroParameterDescriptor> parameterDescriptors)
+    public WikiMacroDescriptor(String name, String description, String defaultCategory,
+        ContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
     {
+        this.name = name;
         this.description = description;
         this.contentDescriptor = contentDescriptor;
         this.parameterDescriptors = parameterDescriptors;
         this.defaultCategory = defaultCategory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getName()
+    {
+        return this.name;
     }
 
     /**

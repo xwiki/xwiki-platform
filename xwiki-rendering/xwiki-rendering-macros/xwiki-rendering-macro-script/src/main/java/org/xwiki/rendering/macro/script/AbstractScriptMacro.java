@@ -64,40 +64,53 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private ParserUtils parserUtils = new ParserUtils();
 
     /**
-     * @param macroDescription the text description of the macro.
+     * @param macroName the name of the macro (eg "groovy")
      */
-    public AbstractScriptMacro(String macroDescription)
+    public AbstractScriptMacro(String macroName)
     {
-        super(macroDescription, ScriptMacroParameters.class);
+        super(macroName, null, ScriptMacroParameters.class);
     }
 
     /**
+     * @param macroName the name of the macro (eg "groovy")
+     * @param macroDescription the text description of the macro.
+     */
+    public AbstractScriptMacro(String macroName, String macroDescription)
+    {
+        super(macroName, macroDescription, ScriptMacroParameters.class);
+    }
+
+    /**
+     * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      * @param contentDescriptor the description of the macro content.
      */
-    public AbstractScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
+    public AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
     {
-        super(macroDescription, contentDescriptor, ScriptMacroParameters.class);
+        super(macroName, macroDescription, contentDescriptor, ScriptMacroParameters.class);
     }
 
     /**
+     * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractScriptMacro(String macroDescription, Class< ? extends ScriptMacroParameters> parametersBeanClass)
-    {
-        super(macroDescription, parametersBeanClass);
-    }
-
-    /**
-     * @param macroDescription the text description of the macro.
-     * @param contentDescriptor the description of the macro content.
-     * @param parametersBeanClass class of the parameters bean for this macro.
-     */
-    public AbstractScriptMacro(String macroDescription, ContentDescriptor contentDescriptor,
+    public AbstractScriptMacro(String macroName, String macroDescription,
         Class< ? extends ScriptMacroParameters> parametersBeanClass)
     {
-        super(macroDescription, contentDescriptor, parametersBeanClass);
+        super(macroName, macroDescription, parametersBeanClass);
+    }
+
+    /**
+     * @param macroName the name of the macro (eg "groovy")
+     * @param macroDescription the text description of the macro.
+     * @param contentDescriptor the description of the macro content.
+     * @param parametersBeanClass class of the parameters bean for this macro.
+     */
+    public AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
+        Class< ? extends ScriptMacroParameters> parametersBeanClass)
+    {
+        super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
     }
 
     /**

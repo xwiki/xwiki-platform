@@ -237,7 +237,7 @@ public class DoxiaGeneratorListener implements Listener
         }
     }
 
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         // Don't do anything since macros have already been transformed so this method
         // should not be called.

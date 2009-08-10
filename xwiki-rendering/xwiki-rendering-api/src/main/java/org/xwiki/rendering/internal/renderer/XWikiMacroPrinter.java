@@ -31,13 +31,13 @@ public class XWikiMacroPrinter
 {
     private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
-    public String print(String name, Map<String, String> parameters, String content)
+    public String print(String id, Map<String, String> parameters, String content)
     {
         StringBuffer buffer = new StringBuffer();
 
         // Print begin macro
         buffer.append("{{");
-        buffer.append(name);
+        buffer.append(id);
 
         // Print parameters
         if (!parameters.isEmpty()) {
@@ -51,7 +51,7 @@ public class XWikiMacroPrinter
         } else {
             buffer.append("}}");
             buffer.append(content);
-            buffer.append("{{/").append(name).append("}}");
+            buffer.append("{{/").append(id).append("}}");
         }
 
         return buffer.toString();

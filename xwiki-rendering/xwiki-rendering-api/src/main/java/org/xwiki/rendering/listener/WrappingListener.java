@@ -261,9 +261,9 @@ public class WrappingListener implements Listener
      * 
      * @see org.xwiki.rendering.listener.Listener#onMacro(java.lang.String, java.util.Map, java.lang.String, boolean)
      */
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
-        this.listener.onMacro(name, parameters, content, isInline);
+        this.listener.onMacro(id, parameters, content, isInline);
     }
 
     /**

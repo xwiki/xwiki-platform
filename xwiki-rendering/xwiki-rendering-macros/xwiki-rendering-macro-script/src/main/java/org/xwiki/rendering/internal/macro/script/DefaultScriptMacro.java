@@ -55,7 +55,8 @@ public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScript
      */
     public DefaultScriptMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), DefaultScriptMacroParameters.class);
+        super("Script", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            DefaultScriptMacroParameters.class);
     }
 
     /**
@@ -70,7 +71,7 @@ public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScript
         String engineName;
 
         if (this.language == null) {
-            String macroName = context.getCurrentMacroBlock().getName().toLowerCase();
+            String macroName = context.getCurrentMacroBlock().getId().toLowerCase();
 
             if (macroName.equals("script")) {
                 engineName = parameters.getLanguage();

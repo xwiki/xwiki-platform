@@ -19,37 +19,30 @@
  */
 package org.xwiki.rendering.internal.macro.message;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.box.BoxMacroParameters;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.component.annotation.Requirement;
+import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
 
 /**
- * Displays a message, which can be an error, a warning or an info note.
+ * Common implementation for info, error and warning macros.
  * 
  * @version $Id$
- * @since 2.0
+ * @since 2.0M3
  */
-@Component(hints = {"info", "warning", "error" })
-public class MessageMacro extends AbstractMacro<Object>
+public abstract class AbstractMessageMacro extends AbstractMacro<Object>
 {
     /**
      * Predefined error message.
      */
     public static final String CONTENT_MISSING_ERROR = "The required content is missing.";
-
-    /**
-     * The description of the macro.
-     */
-    private static final String DESCRIPTION = "Displays a message, which can be an error, a warning or an info note.";
 
     /**
      * Injected by the component manager.
@@ -59,16 +52,19 @@ public class MessageMacro extends AbstractMacro<Object>
 
     /**
      * Create and initialize the descriptor of the macro.
+     *
+     * @param macroName the macro name (eg "Error", "Info", etc)
+     * @param macroDescription the macro description
      */
-    public MessageMacro()
+    public AbstractMessageMacro(String macroName, String macroDescription)
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(true));
+        super(macroName, macroDescription, new DefaultContentDescriptor(true));
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
+     *
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -79,7 +75,7 @@ public class MessageMacro extends AbstractMacro<Object>
 
         BoxMacroParameters boxParameters = new BoxMacroParameters();
 
-        boxParameters.setCssClass(context.getCurrentMacroBlock().getName() + "message");
+        boxParameters.setCssClass(context.getCurrentMacroBlock().getId() + "message");
 
         List<Block> result;
         if (!context.isInline()) {
@@ -93,7 +89,7 @@ public class MessageMacro extends AbstractMacro<Object>
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.rendering.macro.Macro#supportsInlineMode()
      */
     public boolean supportsInlineMode()

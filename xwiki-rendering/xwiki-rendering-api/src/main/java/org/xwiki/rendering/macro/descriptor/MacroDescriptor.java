@@ -30,6 +30,12 @@ import java.util.Map;
 public interface MacroDescriptor
 {
     /**
+     * @return the human-readable name of the macro (eg "Table Of Contents" for the TOC macro).
+     * @since 2.0M3
+     */
+    String getName();
+    
+    /**
      * @return the description of the macro.
      */
     String getDescription();

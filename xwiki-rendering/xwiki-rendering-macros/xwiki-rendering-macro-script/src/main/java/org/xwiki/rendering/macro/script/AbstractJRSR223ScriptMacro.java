@@ -60,41 +60,53 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     private DocumentAccessBridge documentAccessBridge;
 
     /**
-     * @param macroDescription the text description of the macro.
+     * @param macroName the name of the macro (eg "groovy")
      */
-    public AbstractJRSR223ScriptMacro(String macroDescription)
+    public AbstractJRSR223ScriptMacro(String macroName)
     {
-        super(macroDescription, JSR223ScriptMacroParameters.class);
+        super(macroName, null, JSR223ScriptMacroParameters.class);
     }
 
     /**
+     * @param macroName the name of the macro (eg "groovy")
+     * @param macroDescription the text description of the macro.
+     */
+    public AbstractJRSR223ScriptMacro(String macroName, String macroDescription)
+    {
+        super(macroName, macroDescription, JSR223ScriptMacroParameters.class);
+    }
+
+    /**
+     * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      * @param contentDescriptor the description of the macro content.
      */
-    public AbstractJRSR223ScriptMacro(String macroDescription, ContentDescriptor contentDescriptor)
+    public AbstractJRSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
     {
-        super(macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class);
+        super(macroName, macroDescription, contentDescriptor, JSR223ScriptMacroParameters.class);
     }
 
     /**
+     * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractJRSR223ScriptMacro(String macroDescription,
+    public AbstractJRSR223ScriptMacro(String macroName, String macroDescription,
         Class< ? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
-        super(macroDescription, parametersBeanClass);
+        super(macroName, macroDescription, parametersBeanClass);
     }
 
     /**
+     * @param macroName the name of the macro (eg "groovy")
      * @param macroDescription the text description of the macro.
      * @param contentDescriptor the description of the macro content.
      * @param parametersBeanClass class of the parameters bean for this macro.
      */
-    public AbstractJRSR223ScriptMacro(String macroDescription, ContentDescriptor contentDescriptor,
+    public AbstractJRSR223ScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor,
         Class< ? extends JSR223ScriptMacroParameters> parametersBeanClass)
     {
-        super(macroDescription, contentDescriptor, parametersBeanClass);
+        super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
     }
 
     /**
@@ -133,7 +145,7 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
      */
     protected String getScriptEngineName(P parameters, MacroTransformationContext context)
     {
-        return context.getCurrentMacroBlock().getName().toLowerCase();
+        return context.getCurrentMacroBlock().getId().toLowerCase();
     }
 
     /**
@@ -149,8 +161,7 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.script.AbstractScriptMacro#evaluate(java.lang.Object, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext) 
      */
     @Override
     protected String evaluate(P parameters, String content, MacroTransformationContext context)

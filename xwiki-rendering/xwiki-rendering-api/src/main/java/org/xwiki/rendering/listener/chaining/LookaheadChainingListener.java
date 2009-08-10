@@ -608,9 +608,9 @@ public class LookaheadChainingListener extends AbstractChainingListener
      *      java.lang.String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
-        saveEvent(EventType.ON_MACRO, name, parameters, content, isInline);
+        saveEvent(EventType.ON_MACRO, id, parameters, content, isInline);
         firePreviousEvent();
     }
 

@@ -88,7 +88,8 @@ public class EquationMacro extends AbstractMacro<EquationMacroParameters>
      */
     public EquationMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), EquationMacroParameters.class);
+        super("Equation", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            EquationMacroParameters.class);
     }
 
     /**

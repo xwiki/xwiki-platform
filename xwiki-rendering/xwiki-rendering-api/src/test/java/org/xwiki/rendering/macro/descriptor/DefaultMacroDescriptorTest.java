@@ -122,7 +122,7 @@ public class DefaultMacroDescriptorTest extends AbstractRenderingTestCase
         super.setUp();
         BeanManager propertiesManager = getComponentManager().lookup(BeanManager.class);
         macroDescriptor =
-            new DefaultMacroDescriptor("Description", new DefaultContentDescriptor(), propertiesManager
+            new DefaultMacroDescriptor("Name", "Description", new DefaultContentDescriptor(), propertiesManager
                 .getBeanDescriptor(ParametersTests.class));
     }
 

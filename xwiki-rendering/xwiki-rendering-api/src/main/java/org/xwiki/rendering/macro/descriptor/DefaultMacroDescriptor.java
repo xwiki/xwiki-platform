@@ -30,31 +30,46 @@ import org.xwiki.properties.BeanDescriptor;
 public class DefaultMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
-     * @param description the description of the macro.
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
+     * @since 2.0M3
      */
-    public DefaultMacroDescriptor(String description)
+    public DefaultMacroDescriptor(String name)
     {
-        super(description, new DefaultContentDescriptor(), null);       
-    }
-    
-    /**
-     * @param description the description of the macro.
-     * @param contentDescriptor description of the macro content.
-     */
-    public DefaultMacroDescriptor(String description, ContentDescriptor contentDescriptor)
-    {
-        super(description, contentDescriptor, null);
+        this(name, null);
     }
 
     /**
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
+     * @param description the description of the macro.
+     * @since 2.0M3
+     */
+    public DefaultMacroDescriptor(String name, String description)
+    {
+        super(name, description, new DefaultContentDescriptor(), null);       
+    }
+    
+    /**
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
+     * @param description the description of the macro.
+     * @param contentDescriptor description of the macro content.
+     * @since 2.0M3
+     */
+    public DefaultMacroDescriptor(String name, String description, ContentDescriptor contentDescriptor)
+    {
+        super(name, description, contentDescriptor, null);
+    }
+
+    /**
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description the description of the macro.
      * @param contentDescriptor the description of the macro content. null indicate macro does not support content.
      * @param parametersBeanDescriptor the description of the parameters bean.
+     * @since 2.0M3
      */
-    public DefaultMacroDescriptor(String description, ContentDescriptor contentDescriptor,
+    public DefaultMacroDescriptor(String name, String description, ContentDescriptor contentDescriptor,
         BeanDescriptor parametersBeanDescriptor)
     {
-        super(description, contentDescriptor, parametersBeanDescriptor);
+        super(name, description, contentDescriptor, parametersBeanDescriptor);
         
         extractParameterDescriptorMap();
     }    

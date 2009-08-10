@@ -23,12 +23,12 @@ package org.xwiki.rendering;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.xwiki.rendering.internal.macro.message.MessageMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit test for {@link MessageMacro} that cannot be performed with rendering tests.
+ * Unit test for {@link org.xwiki.rendering.internal.macro.message.AbstractMessageMacro} macros (for tests that cannot
+ * be performed with the rendering test framework).
  *
  * @version $Id$
  * @since 2.0M3
@@ -41,11 +41,11 @@ public class MessageMacroTest extends AbstractComponentTestCase
     @Test
     public void testMacroContentDescriptorIsNotNull() throws Exception
     {
-        MessageMacro messageMacro = (MessageMacro) getComponentManager().lookup(Macro.class, "info");
+        Macro messageMacro = getComponentManager().lookup(Macro.class, "info");
         Assert.assertNotNull(messageMacro.getDescriptor().getContentDescriptor());
-        messageMacro = (MessageMacro) getComponentManager().lookup(Macro.class, "warning");
+        messageMacro = getComponentManager().lookup(Macro.class, "warning");
         Assert.assertNotNull(messageMacro.getDescriptor().getContentDescriptor());
-        messageMacro = (MessageMacro) getComponentManager().lookup(Macro.class, "error");
+        messageMacro = getComponentManager().lookup(Macro.class, "error");
         Assert.assertNotNull(messageMacro.getDescriptor().getContentDescriptor());
     }
 }

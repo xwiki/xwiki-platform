@@ -281,8 +281,8 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         }
 
         // Create macro descriptor.
-        MacroDescriptor macroDescriptor =
-            new WikiMacroDescriptor(macroDescription, macroDefaultCategory, contentDescriptor, parameterDescriptors);
+        MacroDescriptor macroDescriptor = new WikiMacroDescriptor(macroName, macroDescription, macroDefaultCategory,
+            contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
         return new DefaultWikiMacro(fullDocumentName, macroName, macroSupportsInlineMode, macroDescriptor, macroCode,

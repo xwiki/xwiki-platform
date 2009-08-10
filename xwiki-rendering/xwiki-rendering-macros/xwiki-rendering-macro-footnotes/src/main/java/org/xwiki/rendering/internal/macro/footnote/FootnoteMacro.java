@@ -55,7 +55,8 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
      */
     public FootnoteMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), FootnoteMacroParameters.class);
+        super("Footnote", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
+            FootnoteMacroParameters.class);
     }
 
     /**
@@ -90,7 +91,7 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
         Block root = context.getXDOM();
         List<MacroBlock> macros = root.getChildrenByType(MacroBlock.class, true);
         for (MacroBlock macro : macros) {
-            if (PutFootnotesMacro.MACRO_NAME.equals(macro.getName())) {
+            if (PutFootnotesMacro.MACRO_NAME.equals(macro.getId())) {
                 return Collections.emptyList();
             }
         }

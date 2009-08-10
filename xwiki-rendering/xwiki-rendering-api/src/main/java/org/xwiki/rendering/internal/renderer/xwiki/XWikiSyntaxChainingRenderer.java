@@ -343,13 +343,13 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
      * @see AbstractChainingPrintRenderer#onMacro(String, java.util.Map, String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         if (!isInline) {
             printEmptyLine();
-            print(getMacroPrinter().print(name, parameters, content));
+            print(getMacroPrinter().print(id, parameters, content));
         } else {
-            getXWikiPrinter().printInlineMacro(getMacroPrinter().print(name, parameters, content));
+            getXWikiPrinter().printInlineMacro(getMacroPrinter().print(id, parameters, content));
         }
     }
 

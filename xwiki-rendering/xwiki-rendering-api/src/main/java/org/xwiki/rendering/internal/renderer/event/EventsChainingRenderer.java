@@ -182,9 +182,9 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
      *      java.lang.String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
-        printMacroData("onMacro", name, parameters, content, isInline);
+        printMacroData("onMacro", id, parameters, content, isInline);
     }
 
     /**

@@ -143,7 +143,7 @@ public class MacroTransformation extends AbstractTransformation
                 // execution result.
                 generateError(macroHolder.macroBlock, "Not an inline macro",
                     "This macro can only be used by itself on a new line");
-                getLogger().debug("The [" + macroHolder.macroBlock.getName() + "] macro doesn't support inline mode.");
+                getLogger().debug("The [" + macroHolder.macroBlock.getId() + "] macro doesn't support inline mode.");
                 return false;
             }
         } else {
@@ -166,9 +166,9 @@ public class MacroTransformation extends AbstractTransformation
                 // The macro will not be executed and we generate an error message instead of the macro
                 // execution result.
                 generateError(macroHolder.macroBlock, "Invalid macro parameters used for macro: "
-                    + macroHolder.macroBlock.getName(), e);
+                    + macroHolder.macroBlock.getId(), e);
                 getLogger().debug(
-                    "Invalid macro parameter for macro [" + macroHolder.macroBlock.getName() + "]. Internal error: ["
+                    "Invalid macro parameter for macro [" + macroHolder.macroBlock.getId() + "]. Internal error: ["
                         + e.getMessage() + "]");
                 return false;
             }
@@ -180,9 +180,9 @@ public class MacroTransformation extends AbstractTransformation
             // The macro will not be executed and we generate an error message instead of the macro
             // execution result.
             // Note: We catch any Exception because we want to never break the whole rendering.
-            generateError(macroHolder.macroBlock, "Failed to execute macro: " + macroHolder.macroBlock.getName(), e);
+            generateError(macroHolder.macroBlock, "Failed to execute macro: " + macroHolder.macroBlock.getId(), e);
             getLogger().debug(
-                "Failed to execute macro [" + macroHolder.macroBlock.getName() + "]. Internal error [" + e.getMessage()
+                "Failed to execute macro [" + macroHolder.macroBlock.getId() + "]. Internal error [" + e.getMessage()
                     + "]");
             return false;
         }
@@ -244,15 +244,15 @@ public class MacroTransformation extends AbstractTransformation
         // 1) Sort the macros by priority to find the highest priority macro to execute
         for (MacroBlock macroBlock : xdom.getChildrenByType(MacroBlock.class, true)) {
             try {
-                Macro< ? > macro = this.macroManager.getMacro(new MacroId(macroBlock.getName(), syntax));
+                Macro< ? > macro = this.macroManager.getMacro(new MacroId(macroBlock.getId(), syntax));
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (MacroLookupException e) {
                 // Macro cannot be found. Generate an error message instead of the macro execution result.
                 // TODO: make it internationalized
-                generateError(macroBlock, "Unknown macro: " + macroBlock.getName(), "The \"" + macroBlock.getName()
+                generateError(macroBlock, "Unknown macro: " + macroBlock.getId(), "The \"" + macroBlock.getId()
                     + "\" macro is not in the list of registered macros. Verify the "
                     + "spelling or contact your administrator.");
-                getLogger().debug("Failed to locate macro [" + macroBlock.getName() + "]. Ignoring it.");
+                getLogger().debug("Failed to locate macro [" + macroBlock.getId() + "]. Ignoring it.");
             }
         }
 
@@ -264,7 +264,7 @@ public class MacroTransformation extends AbstractTransformation
 
     private Block wrapInMacroMarker(MacroBlock macroBlockToWrap, List<Block> newBlocks)
     {
-        return new MacroMarkerBlock(macroBlockToWrap.getName(), macroBlockToWrap
+        return new MacroMarkerBlock(macroBlockToWrap.getId(), macroBlockToWrap
             .getParameters(), macroBlockToWrap.getContent(), newBlocks, macroBlockToWrap.isInline());
     }
 

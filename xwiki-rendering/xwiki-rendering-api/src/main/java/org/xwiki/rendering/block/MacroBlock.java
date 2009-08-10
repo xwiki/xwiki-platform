@@ -32,9 +32,9 @@ import org.xwiki.rendering.listener.Listener;
 public class MacroBlock extends AbstractBlock
 {
     /**
-     * The macro name.
+     * @see #getId
      */
-    private String name;
+    private String id;
 
     /**
      * The macro content for macro that have content. Otherwise it's null.
@@ -47,36 +47,37 @@ public class MacroBlock extends AbstractBlock
     private boolean isInline;
 
     /**
-     * @param name the name of the macro
+     * @param id the id of the macro
      * @param parameters the parameters of the macro
      * @param isInline indicate if the macro is located in a inline content (like paragraph, etc.)
      */
-    public MacroBlock(String name, Map<String, String> parameters, boolean isInline)
+    public MacroBlock(String id, Map<String, String> parameters, boolean isInline)
     {
-        this(name, parameters, null, isInline);
+        this(id, parameters, null, isInline);
     }
 
     /**
-     * @param name the name of the macro
+     * @param id the id of the macro
      * @param parameters the parameters of the macro
      * @param content the content of the macro. Null if the macro does not have content
      * @param isInline indicate if the macro is located in a inline content (like paragraph, etc.)
      */
-    public MacroBlock(String name, Map<String, String> parameters, String content, boolean isInline)
+    public MacroBlock(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         super(parameters);
 
-        this.name = name;
+        this.id = id;
         this.content = content;
         this.isInline = isInline;
     }
 
     /**
-     * @return the macro name.
+     * @return the macro id (eg "toc" for the TOC Macro).
+     * @since 2.0M3
      */
-    public String getName()
+    public String getId()
     {
-        return this.name;
+        return this.id;
     }
 
     /**
@@ -115,6 +116,6 @@ public class MacroBlock extends AbstractBlock
         // Note: We're calling the event to let other listener downstream decide what to do with it.
         // In practice as described above this method will never get called when the whole rendering
         // process is executed. This does get called during our unit tests though.
-        listener.onMacro(getName(), getParameters(), getContent(), isInline());
+        listener.onMacro(getId(), getParameters(), getContent(), isInline());
     }
 }

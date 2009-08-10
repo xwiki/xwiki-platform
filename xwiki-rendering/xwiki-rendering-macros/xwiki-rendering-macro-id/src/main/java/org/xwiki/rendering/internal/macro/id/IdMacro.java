@@ -52,7 +52,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
      */
     public IdMacro()
     {
-        super(DESCRIPTION, IdMacroParameters.class);
+        super("Id", DESCRIPTION, IdMacroParameters.class);
         
         // Set a high priority so that this macro executes before most others.
         setPriority(20);

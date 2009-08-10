@@ -383,10 +383,10 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onMacro(String, Map, String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         this.newLineCount = 0;
-        super.onMacro(name, parameters, content, isInline);
+        super.onMacro(id, parameters, content, isInline);
     }
 
     /**

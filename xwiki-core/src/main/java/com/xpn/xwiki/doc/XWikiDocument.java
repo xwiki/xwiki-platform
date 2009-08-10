@@ -3252,13 +3252,13 @@ public class XWikiDocument implements DocumentModelBridge
                 // play
                 // nice with people migrating from 1.0 to 2.0 syntax
 
-                if (macroBlock.getName().equalsIgnoreCase("include")) {
+                if (macroBlock.getId().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("document");
                     if (documentName.indexOf(".") == -1) {
                         documentName = getSpace() + "." + documentName;
                     }
                     result.add(documentName);
-                } else if (macroBlock.getName().equalsIgnoreCase("velocity")
+                } else if (macroBlock.getId().equalsIgnoreCase("velocity")
                     && !StringUtils.isEmpty(macroBlock.getContent())) {
                     // Try to find matching content inside each velocity macro
                     result.addAll(getIncludedPagesForXWiki10Syntax(macroBlock.getContent(), context));
@@ -4227,7 +4227,7 @@ public class XWikiDocument implements DocumentModelBridge
             for (MacroBlock macroBlock : getXDOM().getChildrenByType(MacroBlock.class, false)) {
                 // TODO: Is there a good way not to hardcode the macro name? The macro itself shouldn't know
                 // its own name since it's a deployment time concern.
-                if ("include".equals(macroBlock.getName())) {
+                if ("include".equals(macroBlock.getId())) {
                     String documentName = macroBlock.getParameter("document");
                     if (documentName != null) {
                         XWikiDocument includedDocument = xwiki.getDocument(documentName, context);

@@ -862,11 +862,11 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
      *      java.lang.String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         this.previousEvent = Event.MACRO;
 
-        super.onMacro(name, parameters, content, isInline);
+        super.onMacro(id, parameters, content, isInline);
     }
 
     private static class ListState

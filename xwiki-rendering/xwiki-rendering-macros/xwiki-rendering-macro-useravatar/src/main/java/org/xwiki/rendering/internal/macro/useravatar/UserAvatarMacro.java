@@ -70,7 +70,7 @@ public class UserAvatarMacro extends AbstractMacro<UserAvatarMacroParameters>
      */
     public UserAvatarMacro()
     {
-        super(DESCRIPTION, UserAvatarMacroParameters.class);
+        super("User Avatar", DESCRIPTION, UserAvatarMacroParameters.class);
     }
 
     /**

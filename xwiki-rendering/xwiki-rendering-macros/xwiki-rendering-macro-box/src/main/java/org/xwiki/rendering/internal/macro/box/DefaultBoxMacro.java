@@ -58,14 +58,13 @@ public class DefaultBoxMacro<P extends BoxMacroParameters> extends AbstractBoxMa
      */
     public DefaultBoxMacro()
     {
-        super(DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), BoxMacroParameters.class);
+        super("Box", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), BoxMacroParameters.class);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.internal.macro.box.AbstractBoxMacro#parseContent(org.xwiki.rendering.macro.box.BoxMacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see AbstractBoxMacro#parseContent(BoxMacroParameters, String, MacroTransformationContext) 
      */
     @Override
     protected List<Block> parseContent(P parameters, String content, MacroTransformationContext context)

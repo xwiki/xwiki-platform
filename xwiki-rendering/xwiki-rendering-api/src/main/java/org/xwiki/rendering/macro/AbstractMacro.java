@@ -43,6 +43,11 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     protected BeanManager beanManager;
 
     /**
+     * The human-readable macro name (eg "Table of Contents" for the TOC macro).
+     */
+    private String name;
+
+    /**
      * Macro description used to generate the macro descriptor.
      */
     private String description;
@@ -74,45 +79,66 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
 
     /**
      * Creates a new {@link Macro} instance.
-     * 
-     * @param description a string describing this macro.
+     *
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
+     * @since 2.0M3
      */
-    public AbstractMacro(String description)
+    public AbstractMacro(String name)
     {
-        this(description, null, Object.class);
+        this(name, null);
     }
 
     /**
      * Creates a new {@link Macro} instance.
      * 
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
+     * @param description a string describing this macro.
+     * @since 2.0M3
+     */
+    public AbstractMacro(String name, String description)
+    {
+        this(name, description, null, Object.class);
+    }
+
+    /**
+     * Creates a new {@link Macro} instance.
+     * 
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description a string describing this macro.
      * @param contentDescriptor {@link ContentDescriptor} for this macro.
+     * @since 2.0M3
      */
-    public AbstractMacro(String description, ContentDescriptor contentDescriptor)
+    public AbstractMacro(String name, String description, ContentDescriptor contentDescriptor)
     {
-        this(description, contentDescriptor, Object.class);
+        this(name, description, contentDescriptor, Object.class);
     }
 
     /**
      * Creates a new {@link Macro} instance.
      * 
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description a string describing this macro.
      * @param parametersBeanClass class of the parameters bean of this macro.
+     * @since 2.0M3
      */
-    public AbstractMacro(String description, Class< ? > parametersBeanClass)
+    public AbstractMacro(String name, String description, Class< ? > parametersBeanClass)
     {
-        this(description, null, parametersBeanClass);
+        this(name, description, null, parametersBeanClass);
     }
 
     /**
      * Creates a new {@link Macro} instance.
      * 
+     * @param name the name of the macro (eg "Table Of Contents" for the TOC macro)
      * @param description string describing this macro.
      * @param contentDescriptor the {@link ContentDescriptor} describing the content of this macro.
      * @param parametersBeanClass class of the parameters bean.
+     * @since 2.0M3
      */
-    public AbstractMacro(String description, ContentDescriptor contentDescriptor, Class< ? > parametersBeanClass)
+    public AbstractMacro(String name, String description, ContentDescriptor contentDescriptor,
+        Class< ? > parametersBeanClass)
     {
+        this.name = name;
         this.description = description;
         this.contentDescriptor = contentDescriptor;
         this.parametersBeanClass = parametersBeanClass;
@@ -124,9 +150,9 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
     public void initialize() throws InitializationException
     {
         DefaultMacroDescriptor descriptor =
-            new DefaultMacroDescriptor(description, contentDescriptor, beanManager
-                .getBeanDescriptor(parametersBeanClass));
-        descriptor.setDefaultCategory(defaultCategory);
+            new DefaultMacroDescriptor(this.name, this.description, this.contentDescriptor, this.beanManager
+                .getBeanDescriptor(this.parametersBeanClass));
+        descriptor.setDefaultCategory(this.defaultCategory);
         setDescriptor(descriptor);
     }
 

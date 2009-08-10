@@ -58,11 +58,11 @@ public class AnnotatedXHTMLChainingRenderer extends XHTMLChainingRenderer
      * @see org.xwiki.rendering.renderer.Renderer#onMacro(String, java.util.Map, String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         // Do not do any rendering but we still need to save the macro definition in some hidden XHTML
         // so that the macro can be reconstructed when moving back from XHTML to XDOM.
-        this.macroRenderer.render(getXHTMLWikiPrinter(), name, parameters, content);
+        this.macroRenderer.render(getXHTMLWikiPrinter(), id, parameters, content);
     }
 
     /**

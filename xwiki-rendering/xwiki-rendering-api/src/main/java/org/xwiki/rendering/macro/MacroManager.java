@@ -44,6 +44,7 @@ public interface MacroManager
     /**
      * @return all the available macros whether they are registered for a given syntax or for all syntaxes
      * @throws MacroLookupException error when lookup macros
+     * @since 2.03M
      */
     Set<MacroId> getMacroIds() throws MacroLookupException;
 
@@ -52,6 +53,7 @@ public interface MacroManager
      * @return the available macro ids for the desired syntax (this includes macros registered for all syntaxes and
      *         macros registered only for a given syntax)
      * @throws MacroLookupException error when lookup macros
+     * @since 2.03M
      */
     Set<MacroId> getMacroIds(Syntax syntax) throws MacroLookupException;
 
@@ -59,16 +61,18 @@ public interface MacroManager
      * @param macroId the id of the macro to lookup
      * @return the macro, looked-up first as a macro for the desired syntax identifier (if any is specified in the
      *         MacroId) and then as a macro registered for all syntaxes if not found
-     * @throws MacroLookupException when no macro with such name was found in both the list of macro for the specified
+     * @throws MacroLookupException when no macro with such id was found in both the list of macro for the specified
      *         syntax identifier and for all syntaxes
+     * @since 2.03M
      */
     Macro< ? > getMacro(MacroId macroId) throws MacroLookupException;
 
     /**
      * @param macroId the id of the macro to lookup
-     * @return true if a macro with the given name and for the given syntax can be found (if any is specified in the
-     *         MacroId), false otherwise. Returns false if a macro with the given name exists but has been registered
+     * @return true if a macro with the given id and for the given syntax can be found (if any is specified in the
+     *         MacroId), false otherwise. Returns false if a macro with the given id exists but has been registered
      *         only for all syntaxes
+     * @since 2.03M
      */
     boolean exists(MacroId macroId);
 }

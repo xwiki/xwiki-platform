@@ -404,10 +404,10 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
      *      java.lang.String, boolean)
      */
     @Override
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         this.isTextOnNewLine = false;
-        super.onMacro(name, parameters, content, isInline);
+        super.onMacro(id, parameters, content, isInline);
     }
 
     /**

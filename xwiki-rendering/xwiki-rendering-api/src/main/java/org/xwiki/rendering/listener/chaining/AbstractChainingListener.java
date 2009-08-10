@@ -610,11 +610,11 @@ public abstract class AbstractChainingListener implements ChainingListener
      * 
      * @see ChainingListener#onMacro(String, Map, String, boolean)
      */
-    public void onMacro(String name, Map<String, String> parameters, String content, boolean isInline)
+    public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.onMacro(name, parameters, content, isInline);
+            next.onMacro(id, parameters, content, isInline);
         }
     }
 

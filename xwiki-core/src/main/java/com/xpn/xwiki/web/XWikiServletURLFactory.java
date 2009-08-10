@@ -186,13 +186,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
 
-        if ((querystring != null) && (!querystring.equals(""))) {
+        if (!StringUtils.isEmpty(querystring)) {
             newpath.append("?");
             newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
             // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
-        if ((anchor != null) && (!anchor.equals(""))) {
+        if (!StringUtils.isEmpty(anchor)) {
             newpath.append("#");
             newpath.append(encode(anchor, context));
         }
@@ -385,7 +385,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addName(newpath, name, action, context);
         addFileName(newpath, filename, context);
 
-        if ((querystring != null) && (!querystring.equals(""))) {
+        if (!StringUtils.isEmpty(querystring)) {
             newpath.append("?");
             newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
         }
@@ -424,7 +424,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (recycleId >= 0) {
             qstring += "&rid=" + recycleId;
         }
-        if ((querystring != null) && (!querystring.equals(""))) {
+        if (!StringUtils.isEmpty(querystring)) {
             qstring += "&" + querystring;
         }
         newpath.append("?");
@@ -443,7 +443,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
      * the URL unchanged if it's an external URL.
      * 
      * @param url the URL to convert
-     * @return the converted URL as a string 
+     * @return the converted URL as a string
      * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -462,14 +462,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 // Internal XWiki URL: convert to relative.
                 StringBuffer sbuf = new StringBuffer(url.getPath());
                 String querystring = url.getQuery();
-                if ((querystring != null) && (!querystring.equals(""))) {
+                if (!StringUtils.isEmpty(querystring)) {
                     sbuf.append("?");
                     sbuf.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
                     // sbuf.append(querystring.replaceAll("&","&amp;"));
                 }
 
                 String anchor = url.getRef();
-                if ((anchor != null) && (!anchor.equals(""))) {
+                if (!StringUtils.isEmpty(anchor)) {
                     sbuf.append("#");
                     sbuf.append(anchor);
                 }

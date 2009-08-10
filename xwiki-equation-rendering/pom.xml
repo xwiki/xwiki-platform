@@ -62,6 +62,7 @@
       <groupId>uk.ac.ed.ph.snuggletex</groupId>
       <artifactId>snuggletex-core</artifactId>
       <version>1.1.0</version>
+      <!-- Exclude Saxon, since we're using Xalan -->
       <exclusions>
         <exclusion>
           <groupId>net.sf.saxon</groupId>
@@ -78,6 +79,7 @@
       <groupId>uk.ac.ed.ph.snuggletex</groupId>
       <artifactId>snuggletex-jeuclid</artifactId>
       <version>1.1.0</version>
+      <!-- Exclude Saxon, since we're using Xalan -->
       <exclusions>
         <exclusion>
           <groupId>net.sf.saxon</groupId>
@@ -88,6 +90,13 @@
           <artifactId>saxon9-dom</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <!-- JEuclid needs a XPath implementation. Since we're already using xalan, we should just list it here instead of Saxon -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.5.1</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

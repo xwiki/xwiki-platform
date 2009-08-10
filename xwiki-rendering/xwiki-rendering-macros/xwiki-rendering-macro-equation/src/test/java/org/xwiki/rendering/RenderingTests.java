@@ -45,7 +45,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Equation Macro");
 
-        suite.addTestsFromResource("macromessage1", true);
+        suite.addTestsFromResource("macroequation1", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
@@ -80,16 +80,16 @@ public class RenderingTests extends TestCase
         context.checking(new Expectations()
         {
             {
-                oneOf(mockDocumentAccessBridge).getURL(null, "tex", null, null);
+                atLeast(2).of(mockDocumentAccessBridge).getURL(null, "tex", null, null);
                 will(returnValue("/xwiki/bin/view/Main/"));
 
-                oneOf(mockConfiguration).getRenderer();
+                atLeast(2).of(mockConfiguration).getRenderer();
                 will(returnValue("snuggletex"));
 
-                oneOf(mockImageStorage).get(with(any(String.class)));
-                will(returnValue(false));
+                atLeast(2).of(mockImageStorage).get(with(any(String.class)));
+                will(returnValue(null));
 
-                oneOf(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
+                atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
             }
         });
     }

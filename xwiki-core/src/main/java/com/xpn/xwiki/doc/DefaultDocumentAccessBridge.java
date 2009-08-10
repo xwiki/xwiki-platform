@@ -266,9 +266,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<Object> result;
         try {
             XWikiContext xcontext = getContext();
-            result =
-                new ArrayList<Object>(
-                    xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).getFieldList());
+            result = new ArrayList<Object>(
+                xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).getFieldList());
         } catch (Exception ex) {
             result = Collections.emptyList();
         }
@@ -389,9 +388,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         String attachmentURL;
         try {
-            attachmentURL =
-                xcontext.getWiki().getAttachmentURL(
-                    documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
+            attachmentURL = xcontext.getWiki().getAttachmentURL(
+                documentName == null ? xcontext.getDoc().getFullName() : documentName, attachmentName, xcontext);
         } catch (XWikiException e) {
             // This cannot happen. There's a bug in the definition of XWiki.getAttachmentURL: it says it can generate
             // an exception but in fact no exception is raised in the current implementation.

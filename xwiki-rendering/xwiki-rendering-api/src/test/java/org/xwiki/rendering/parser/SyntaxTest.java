@@ -33,11 +33,14 @@ public class SyntaxTest extends TestCase
     {
         Syntax syntax1 = new Syntax(new SyntaxType("mytype", "My Type"), "1.0");
         Syntax syntax2 = new Syntax(new SyntaxType("mytype", "My Type"), "1.0");
+        Syntax syntax3 = new Syntax(new SyntaxType("mytype", "Still same type"), "1.0");
 
         assertEquals("mytype", syntax1.getType().getId());
         assertEquals("My Type", syntax1.getType().getName());
 
         assertEquals(syntax2, syntax1);
+        // The syntax type name is not part of the equality test.
+        assertEquals(syntax3, syntax1);
     }
 
     public void testNonEquality()

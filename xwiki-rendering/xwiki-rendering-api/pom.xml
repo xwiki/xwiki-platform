@@ -238,6 +238,7 @@
                 <exclude>org/xwiki/rendering/macro/descriptor/MacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/renderer/printer/MonitoringWikiPrinter</exclude>
                 <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude>
+                <exclude>org/xwiki/rendering/macro/MacroManager</exclude>
               </excludes>
             </configuration>
           </execution>

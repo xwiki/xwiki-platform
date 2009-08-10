@@ -43,6 +43,7 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.transformation.AbstractTransformation;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -75,7 +76,7 @@ public class MacroTransformation extends AbstractTransformation
     private MacroManager macroManager;
     
     /**
-     * The {@link BeanManager} component.
+     * Used to populate automatically macros parameters classes with parameters specified in the Macro Block.
      */
     @Requirement
     private BeanManager beanManager;
@@ -243,7 +244,7 @@ public class MacroTransformation extends AbstractTransformation
         // 1) Sort the macros by priority to find the highest priority macro to execute
         for (MacroBlock macroBlock : xdom.getChildrenByType(MacroBlock.class, true)) {
             try {
-                Macro< ? > macro = this.macroManager.getMacro(macroBlock.getName(), syntax);
+                Macro< ? > macro = this.macroManager.getMacro(new MacroId(macroBlock.getName(), syntax));
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (MacroLookupException e) {
                 // Macro cannot be found. Generate an error message instead of the macro execution result.

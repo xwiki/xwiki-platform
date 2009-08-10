@@ -31,20 +31,21 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.internal.configuration.DefaultRenderingConfiguration;
 import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroCategoriesManager;
+import org.xwiki.rendering.macro.MacroCategoryManager;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link MacroCategoriesManager}.
+ * Unit tests for {@link org.xwiki.rendering.macro.MacroCategoryManager}.
  * 
  * @version $Id$
  * @since 2.0M3
  */
-public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
+public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
 {
-    private MacroCategoriesManager macroCategoriesManager;
+    private MacroCategoryManager macroCategoryManager;
     
     private Mockery context = new Mockery();
 
@@ -52,7 +53,7 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.macroCategoriesManager = getComponentManager().lookup(MacroCategoriesManager.class);
+        this.macroCategoryManager = getComponentManager().lookup(MacroCategoryManager.class);
     }
 
     @Test
@@ -62,10 +63,10 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
         // package and for 4 of them a "Test" category has been set...
         DefaultRenderingConfiguration configuration =
             (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory("testcontentmacro", "Content");
-        configuration.addMacroCategory("testsimplemacro", "Simple");
+        configuration.addMacroCategory(new MacroId("testcontentmacro"), "Content");
+        configuration.addMacroCategory(new MacroId("testsimplemacro"), "Simple");
 
-        Set<String> macroCategories = this.macroCategoriesManager.getMacroCategories();
+        Set<String> macroCategories = this.macroCategoryManager.getMacroCategories();
 
         // Check for a default category.
         Assert.assertTrue(macroCategories.contains("Test"));
@@ -83,7 +84,6 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
     {        
         // Create a mock macro.
         final Macro mockMacro = context.mock(Macro.class);
-        // getDescriptor() is invoked during the process.
         this.context.checking(new Expectations(){{
             allowing(mockMacro).getDescriptor();
             will(returnValue(new DefaultMacroDescriptor("Test macro")));
@@ -98,26 +98,25 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
         // Override the macro category for this macro. 
         DefaultRenderingConfiguration configuration =
             (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory("mytestmacro", "Test");
+        configuration.addMacroCategory(new MacroId("mytestmacro"), "Test");
         
         // Check whether our macro is in the correct category.
-        Set<String> macroNames = this.macroCategoriesManager.getMacroNames("Test");        
-        Assert.assertTrue(macroNames.contains("mytestmacro"));        
+        Set<MacroId> macroIds = this.macroCategoryManager.getMacroIds("Test");
+        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro")));
         
         // This macro should be registered for all syntaxes.
-        macroNames = this.macroCategoriesManager.getMacroNames("Test", Syntax.JSPWIKI_1_0);
-        Assert.assertTrue(macroNames.contains("mytestmacro"));
+        macroIds = this.macroCategoryManager.getMacroIds("Test", Syntax.JSPWIKI_1_0);
+        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro")));
         
         // Finally, unregister the test macro.
         getComponentManager().unregisterComponent(Macro.class, "mytestmacro");
     }
     
     @Test
-    public void testGetMacroNamesWithSyntaxSpecificMacros() throws Exception
+    public void testGetMacroIdsWithSyntaxSpecificMacros() throws Exception
     {
         // Create a mock macro.
         final Macro mockMacro = context.mock(Macro.class);
-        // getDescriptor() is invoked during the process.
         this.context.checking(new Expectations(){{
             allowing(mockMacro).getDescriptor();
             will(returnValue(new DefaultMacroDescriptor("Test macro")));
@@ -132,15 +131,15 @@ public class DefaultMacroCategoriesManagerTest extends AbstractComponentTestCase
         // Override the macro category for this macro. 
         DefaultRenderingConfiguration configuration =
             (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory("mytestmacro/xwiki/2.0", "Test");
+        configuration.addMacroCategory(new MacroId("mytestmacro", Syntax.XWIKI_2_0), "Test");
                 
         // Make sure our macro is put into the correct category & registered under correct syntax.
-        Set<String> macrosNames = this.macroCategoriesManager.getMacroNames("Test");
-        Assert.assertTrue(macrosNames.contains("mytestmacro"));       
-        macrosNames = this.macroCategoriesManager.getMacroNames("Test", Syntax.XWIKI_2_0);
-        Assert.assertTrue(macrosNames.contains("mytestmacro"));
-        macrosNames = this.macroCategoriesManager.getMacroNames("Test", Syntax.JSPWIKI_1_0);
-        Assert.assertTrue(!macrosNames.contains("mytestmacro"));
+        Set<MacroId> macroIds = this.macroCategoryManager.getMacroIds("Test");
+        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro", Syntax.XWIKI_2_0)));
+        macroIds = this.macroCategoryManager.getMacroIds("Test", Syntax.XWIKI_2_0);
+        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro", Syntax.XWIKI_2_0)));
+        macroIds = this.macroCategoryManager.getMacroIds("Test", Syntax.JSPWIKI_1_0);
+        Assert.assertFalse(macroIds.contains(new MacroId("mytestmacro")));
         
         // Finally, unregister the test macro.
         getComponentManager().unregisterComponent(Macro.class, "mytestmacro/xwiki/2.0");

@@ -21,6 +21,7 @@ package org.xwiki.rendering.internal.configuration;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.macro.MacroId;
 
 import java.util.Properties;
 
@@ -74,13 +75,13 @@ public class DefaultRenderingConfiguration implements RenderingConfiguration
     }
 
     /**
-     * @param macroName the id of the macro for which to set a category (eg "toc" for the TOC Macro)
+     * @param macroId the id of the macro for which to set a category
      * @param category the category name to set
      */
-    public void addMacroCategory(String macroName, String category)
+    public void addMacroCategory(MacroId macroId, String category)
     {
         // This method is useful for those using the XWiki Rendering in standalone mode since it allows the rendering
         // to work even without a configuration store.
-        this.macroCategories.setProperty(macroName, category);
+        this.macroCategories.setProperty(macroId.toString(), category);
     }
 }

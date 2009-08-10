@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
@@ -81,12 +82,12 @@ public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
         wikiMacroManager.registerWikiMacro(docName, wikiMacro);
         assertTrue(wikiMacroManager.hasWikiMacro(docName));
 
-        Macro< ? > registeredMacro = macroManager.getMacro("testwikimacro");
+        Macro< ? > registeredMacro = macroManager.getMacro(new MacroId("testwikimacro"));
         assertEquals(0, registeredMacro.compareTo(wikiMacro));
 
         wikiMacroManager.unregisterWikiMacro(docName);
         assertTrue(!wikiMacroManager.hasWikiMacro(docName));
 
-        assertTrue(!macroManager.exists("testwikimacro"));
+        assertTrue(!macroManager.exists(new MacroId("testwikimacro")));
     }
 }

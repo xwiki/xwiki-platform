@@ -33,4 +33,5 @@ org.xwiki.rendering.internal.renderer.tex.TexRendererFactory
 org.xwiki.rendering.internal.renderer.tex.TexRenderer
 org.xwiki.rendering.internal.renderer.tex.TexBlockRenderer
 org.xwiki.rendering.internal.converter.DefaultConverter
-org.xwiki.rendering.internal.macro.DefaultMacroCategoriesManager
+org.xwiki.rendering.internal.macro.DefaultMacroCategoryManager
+org.xwiki.rendering.internal.macro.DefaultMacroIdFactory

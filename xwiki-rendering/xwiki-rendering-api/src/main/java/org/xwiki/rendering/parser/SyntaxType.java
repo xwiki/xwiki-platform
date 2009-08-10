@@ -120,9 +120,9 @@ public class SyntaxType
     {
         // Random number. See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this
         // algorithm.
+        // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's identity
         int hash = 7;
         hash = 31 * hash + (null == getId() ? 0 : getId().hashCode());
-        hash = 31 * hash + (null == getName() ? 0 : getName().hashCode());
         return hash;
     }
 
@@ -145,9 +145,8 @@ public class SyntaxType
             } else {
                 // object must be Syntax at this point
                 SyntaxType syntaxType = (SyntaxType) object;
-                result = (getId() == syntaxType.getId() || (getId() != null && getId().equals(syntaxType.getId())))
-                    && (getName() == syntaxType.getName() || (getName() != null && getName().equals(
-                        syntaxType.getName())));
+                // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's identity
+                result = (getId() == syntaxType.getId() || (getId() != null && getId().equals(syntaxType.getId())));
             }
         }
         return result;

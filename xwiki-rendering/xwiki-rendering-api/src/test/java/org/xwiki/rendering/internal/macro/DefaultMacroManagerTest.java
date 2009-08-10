@@ -30,6 +30,7 @@ import org.xwiki.rendering.internal.transformation.TestSimpleMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -47,7 +48,7 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
 
     private Mock mockComponentManager;
 
-    private DefaultMacroManager source;
+    private DefaultMacroManager macroManager;
     
     private SyntaxFactory syntaxFactory;
 
@@ -64,41 +65,41 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
         this.mockLogger = mock(Logger.class);
         this.mockComponentManager = mock(ComponentManager.class);
 
-        this.source = (DefaultMacroManager) getComponentManager().lookup(MacroManager.class);
+        this.macroManager = (DefaultMacroManager) getComponentManager().lookup(MacroManager.class);
         this.syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
-        this.source.enableLogging((Logger) this.mockLogger.proxy());
+        this.macroManager.enableLogging((Logger) this.mockLogger.proxy());
     }
 
     public void testMacroExists()
     {
-        assertTrue(this.source.exists("testsimplemacro"));
+        assertTrue(this.macroManager.exists(new MacroId("testsimplemacro")));
     }
 
     public void testGetExistingMacro() throws Exception
     {
-        this.source.getMacro("testsimplemacro");
+        assertNotNull(this.macroManager.getMacro(new MacroId("testsimplemacro")));
     }
 
     public void testGetNotExistingMacro()
     {
         try {
-            this.source.getMacro("notregisteredmacro");
+            this.macroManager.getMacro(new MacroId("notregisteredmacro"));
             fail("Expected a macro lookup exception when looking for not registered macro");
-        } catch (MacroLookupException e) {
+        } catch (MacroLookupException expected) {
+            assertEquals("No macro [notregisteredmacro] could be found.", expected.getMessage());
         }
     }
 
     public void testSyntaxSpecificMacroExistsWhenMacroIsRegisteredForAllSyntaxes()
     {
-        assertFalse(this.source.exists("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0")));
+        assertFalse(this.macroManager.exists(new MacroId("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"))));
     }
 
     public void testGetExistingMacroForASpecificSyntaxWhenMacroIsRegisteredForAllSyntaxes() throws Exception
     {
-        this.source.getMacro("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertNotNull(this.macroManager.getMacro(new MacroId("testsimplemacro", new Syntax(SyntaxType.XWIKI, "2.0"))));
     }
 
-    @SuppressWarnings("unchecked")
     public void testMacroRegisteredForAGivenSyntaxOnly() throws Exception
     {
         Macro< ? > macro = new TestSimpleMacro();
@@ -106,37 +107,36 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
         descriptor.setRole(Macro.class);
         descriptor.setRoleHint("macro/xwiki/2.0");
         getComponentManager().registerComponent(descriptor, macro);
-        
-        assertFalse(this.source.exists("macro"));
-        assertTrue(this.source.exists("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
 
-        Macro< ? > macroResult = this.source.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertFalse(this.macroManager.exists(new MacroId("macro")));
+        assertTrue(this.macroManager.exists(new MacroId("macro", new Syntax(SyntaxType.XWIKI, "2.0"))));
+
+        Macro< ? > macroResult = this.macroManager.getMacro(new MacroId("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
         assertSame(macro, macroResult);
     }
 
-    @SuppressWarnings("unchecked")
     public void testMacroRegisteredForAGivenSyntaxOverridesMacroRegisteredForAllSyntaxes() throws Exception
     {
         Macro< ? > macro1 = new TestSimpleMacro();
         Macro< ? > macro2 = new TestSimpleMacro();
-        
+
         DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
         descriptor.setRole(Macro.class);
         descriptor.setRoleHint("macro");
         getComponentManager().registerComponent(descriptor, macro1);
-        
+
         descriptor = new DefaultComponentDescriptor<Macro>();
         descriptor.setRole(Macro.class);
         descriptor.setRoleHint("macro/xwiki/2.0");
         getComponentManager().registerComponent(descriptor, macro2);
-        
-        assertTrue(this.source.exists("macro"));
-        assertTrue(this.source.exists("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
 
-        Macro< ? > macroResult1 = this.source.getMacro("macro", new Syntax(SyntaxType.XWIKI, "2.0"));
+        assertTrue(this.macroManager.exists(new MacroId("macro")));
+        assertTrue(this.macroManager.exists(new MacroId("macro", new Syntax(SyntaxType.XWIKI, "2.0"))));
+
+        Macro< ? > macroResult1 = this.macroManager.getMacro(new MacroId("macro", new Syntax(SyntaxType.XWIKI, "2.0")));
         assertSame(macro2, macroResult1);
 
-        Macro< ? > macroResult2 = this.source.getMacro("macro");
+        Macro< ? > macroResult2 = this.macroManager.getMacro(new MacroId("macro"));
         assertSame(macro1, macroResult2);
     }
 
@@ -147,7 +147,7 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
     {
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/invalidsyntax", "dummy")));
-        ReflectionUtils.setFieldValue(this.source, "componentManager", this.mockComponentManager.proxy());
+        ReflectionUtils.setFieldValue(this.macroManager, "componentManager", this.mockComponentManager.proxy());
 
         // Verify that when a Macro has an invalid hint it's logged as a warning.
         this.mockLogger.expects(once()).method("warn").with(
@@ -155,8 +155,7 @@ public class DefaultMacroManagerTest extends AbstractRenderingTestCase
                 + "[macro/invalidsyntax]. The hint should contain either the macro name only or the macro name "
                 + "followed by the syntax for which it is valid. In that case the macro name should be followed by "
                 + "a \"/\" followed by the syntax name followed by another \"/\" followed by the syntax version. "
-                + "This macro will not be available in the system."));
-        this.source.getMacroNames(syntaxFactory.createSyntaxFromIdString("macro/xwiki/2.0"));
+                + "For example \"html/xwiki/2.0\". This macro will not be available in the system."));
+        this.macroManager.getMacroIds(syntaxFactory.createSyntaxFromIdString("macro/xwiki/2.0"));
     }
-
 }

@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.macro;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashSet;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -31,9 +31,10 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
+import org.xwiki.rendering.macro.MacroId;
+import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxFactory;
 
 /**
  * Default {@link MacroManager} implementation, retrieves all {@link Macro} implementations that are registered against
@@ -46,11 +47,10 @@ import org.xwiki.rendering.parser.SyntaxFactory;
 public class DefaultMacroManager extends AbstractLogEnabled implements MacroManager
 {
     /**
-     * Allows transforming a syntax specified as text into a {@link Syntax} object. Injected by the component manager
-     * subsystem.
+     * Allows transforming a macro id specified as text into a {@link MacroId} object.
      */
     @Requirement
-    private SyntaxFactory syntaxFactory;
+    private MacroIdFactory macroIdFactory;
 
     /**
      * The component manager we use to lookup macro implementations registered as components.
@@ -60,13 +60,22 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.MacroManager#getMacroNames(Syntax)
+     *
+     * @see org.xwiki.rendering.macro.MacroManager#getMacroIds()
      */
-    @SuppressWarnings("unchecked")
-    public Set<String> getMacroNames(Syntax syntax) throws MacroLookupException
+    public Set<MacroId> getMacroIds() throws MacroLookupException
     {
-        Set<String> result = new TreeSet<String>();
+        return getMacroIds(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.MacroManager#getMacroIds(Syntax)
+     */
+    public Set<MacroId> getMacroIds(Syntax syntax) throws MacroLookupException
+    {
+        Set<MacroId> result = new HashSet<MacroId>();
 
         // Lookup all registered macros
         Map<String, Macro> allMacros;
@@ -78,35 +87,21 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
 
         // Loop through all the macros and filter those macros that will work with the given syntax.
         for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
-            // Verify if we have a syntax specified.
-            String[] hintParts = entry.getKey().split("/");
-            if (hintParts.length == 3) {
-                // We've found a macro registered for a given syntax
-                String syntaxAsString = hintParts[1] + "/" + hintParts[2];
-                String macroName = hintParts[0];
-                Syntax macroSyntax;
-                try {
-                    macroSyntax = this.syntaxFactory.createSyntaxFromIdString(syntaxAsString);
-                } catch (ParseException e) {
-                    throw new MacroLookupException("Failed to initialize Macro [" + macroName
-                        + "] due to an invalid Syntax [" + syntaxAsString + "]", e);
-                }
-                if (macroSyntax.equals(syntax)) {
-                    result.add(macroName);
-                }
-            } else if (hintParts.length == 1) {
-                // We've found a macro registered for all syntaxes
-                result.add(hintParts[0]);
-            } else {
-                // We ignore invalid macro descriptors but log it as warning.
-                getLogger()
-                    .warn(
-                        "Invalid Macro descriptor format for hint ["
-                            + entry.getKey()
-                            + "]. The hint should contain either the macro name only or the macro name followed by "
-                            + "the syntax for which it is valid. In that case the macro name should be followed by a "
-                            + "\"/\" followed by the syntax name followed by another \"/\" followed by the syntax version. "
-                            + "This macro will not be available in the system.");
+            MacroId macroId;
+            try {
+                macroId = this.macroIdFactory.createMacroId(entry.getKey());
+            } catch (ParseException e) {
+                // One of the macros is registered against the component manager with an invalid macro id, ignore it
+                // but log a warning.
+                getLogger().warn("Invalid Macro descriptor format for hint [" + entry.getKey()
+                    + "]. The hint should contain either the macro name only or the macro name followed by "
+                    + "the syntax for which it is valid. In that case the macro name should be followed by a "
+                    + "\"/\" followed by the syntax name followed by another \"/\" followed by the syntax version. "
+                    + "For example \"html/xwiki/2.0\". This macro will not be available in the system.");
+                continue;
+            }
+            if (syntax == null || macroId.getSyntax() == null || syntax == macroId.getSyntax()) {
+                result.add(macroId);
             }
         }
 
@@ -116,21 +111,20 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.MacroManager#getMacro(java.lang.String, org.xwiki.rendering.parser.Syntax)
+     * @see org.xwiki.rendering.macro.MacroManager#getMacro(org.xwiki.rendering.macro.MacroId) 
      */
-    public Macro< ? > getMacro(String macroName, Syntax syntax) throws MacroLookupException
+    public Macro< ? > getMacro(MacroId macroId) throws MacroLookupException
     {
-        // First search for a macro registered for the given syntax.
-        String macroHint = macroName + "/" + syntax.toIdString();
+        // First search for a macro registered for the passed macro id.
+        String macroHint = macroId.toString();
         try {
-            return componentManager.lookup(Macro.class, macroHint);
+            return this.componentManager.lookup(Macro.class, macroHint);
         } catch (ComponentLookupException ex1) {
-            // Now search for a macro registered for all syntaxes.
+            // Now search explicitly for a macro registered for all syntaxes.
             try {
-                return componentManager.lookup(Macro.class, macroName);
+                return this.componentManager.lookup(Macro.class, macroId.getId());
             } catch (ComponentLookupException ex2) {
-                throw new MacroLookupException(String.format("No macro named [%s] is available for syntax [%s].",
-                    macroName, syntax.toIdString()));
+                throw new MacroLookupException(String.format("No macro [%s] could be found.", macroId.toString()));
             }
         }
     }
@@ -138,44 +132,14 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.MacroManager#getMacro(java.lang.String)
+     * @see org.xwiki.rendering.macro.MacroManager#exists(org.xwiki.rendering.macro.MacroId)
      */
-    public Macro< ? > getMacro(String macroName) throws MacroLookupException
+    public boolean exists(MacroId macroId)
     {
-        try {
-            return componentManager.lookup(Macro.class, macroName);
-        } catch (ComponentLookupException ex) {
-            throw new MacroLookupException(String.format("No macro named [%s] can be found.", macroName));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.MacroManager#exists(java.lang.String, org.xwiki.rendering.parser.Syntax)
-     */
-    public boolean exists(String macroName, Syntax syntax)
-    {
-        String macroHint = macroName + "/" + syntax.toIdString();
+        String macroHint = macroId.toString();
         boolean hasMacro = true;
         try {
-            componentManager.lookup(Macro.class, macroHint);
-        } catch (ComponentLookupException ex) {
-            hasMacro = false;
-        }
-        return hasMacro;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.MacroManager#exists(java.lang.String)
-     */
-    public boolean exists(String macroName)
-    {
-        boolean hasMacro = true;
-        try {
-            componentManager.lookup(Macro.class, macroName);
+            this.componentManager.lookup(Macro.class, macroHint);
         } catch (ComponentLookupException ex) {
             hasMacro = false;
         }

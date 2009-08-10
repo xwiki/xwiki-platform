@@ -33,7 +33,7 @@ import org.xwiki.rendering.parser.Syntax;
  * @since 2.0M3
  */
 @ComponentRole
-public interface MacroCategoriesManager
+public interface MacroCategoryManager
 {
     /**
      * Returns all the macro categories currently available in the system. Macros that don't have default or overridden
@@ -46,9 +46,9 @@ public interface MacroCategoriesManager
     Set<String> getMacroCategories() throws MacroLookupException;
 
     /**
-     * Returns all the macro categories currently available in the system for macros registered for a given syntax.
-     * Macros that don't have default or overridden categories are not included and thus clients should be aware that
-     * there can be macros in the system which do not belong to any category.
+     * Returns all the macro categories currently available in the system for macros registered for a given syntax
+     * and for all syntaxes. Macros that don't have default or overridden categories are not included and thus clients
+     * should be aware that there can be macros in the system which do not belong to any category.
      *
      * @param syntax the syntax to filter the macros by syntax.
      * @return the macro categories available for the given syntax
@@ -58,19 +58,19 @@ public interface MacroCategoriesManager
 
     /**
      * @param category name of the category or null.
-     * @return names of all the macros belonging to the given category or if the category parameter is null, names of
+     * @return ids of all the macros belonging to the given category or if the category parameter is null, ids of
      *         all the macros which do not belong to any category.
      * @throws MacroLookupException error when lookup macros
      */
-    Set<String> getMacroNames(String category) throws MacroLookupException;
+    Set<MacroId> getMacroIds(String category) throws MacroLookupException;
 
     /**
      * @param category name of the category or null.
      * @param syntax the syntax to filter the macros by syntax.
-     * @return names of all the macros belonging to the given category (and registered for the given syntax) or if the
-     *         category parameter is null, names of all the macros which do not belong to any category (and registered
+     * @return ids of all the macros belonging to the given category (and registered for the given syntax) or if the
+     *         category parameter is null, ids of all the macros which do not belong to any category (and registered
      *         for the given syntax).
      * @throws MacroLookupException error when lookup macros
      */
-    Set<String> getMacroNames(String category, Syntax syntax) throws MacroLookupException;
+    Set<MacroId> getMacroIds(String category, Syntax syntax) throws MacroLookupException;
 }

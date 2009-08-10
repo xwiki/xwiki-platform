@@ -28,6 +28,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.internal.DefaultObservationManager;
 
@@ -165,5 +166,25 @@ public class ObservationManagerTest
         this.manager.addListener(listener1);
         this.manager.addListener(listener2);
         this.manager.notify(notifyEvent, null);
+    }
+    
+    /**
+     * Verify that we can register a listener to receive any kind of event using AllEvent event type.
+     */
+    @Test
+    public void testRegisterListenerForAllEvents()
+    {
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Event event = this.context.mock(Event.class);
+        
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(AllEvent.ALLEVENT)));
+            oneOf(listener).onEvent(event, "some source", "some data");
+        }});
+        
+        this.manager.addListener(listener);
+        Assert.assertSame(listener, this.manager.getListener("mylistener"));
+        this.manager.notify(event, "some source", "some data");
     }
 }

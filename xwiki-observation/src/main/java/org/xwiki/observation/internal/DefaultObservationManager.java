@@ -21,6 +21,7 @@
 package org.xwiki.observation.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 
 /**
@@ -218,16 +220,35 @@ public class DefaultObservationManager implements ObservationManager, Initializa
         // Find all listeners for this event
         Map<String, RegisteredListener> regListeners = this.listenersByEvent.get(event.getClass());
         if (regListeners != null) {
-            for (RegisteredListener regListener : regListeners.values()) {
-                // Verify that one of the events matches and send the first matching event
-                for (Event listenerEvent : regListener.events) {
-                    if (listenerEvent.matches(event))
-                    {
-                        regListener.listener.onEvent(event, source, data);
-                        
-                        // Only send the first matching event since the listener should only be called once per event.
-                        break;
-                    }
+            notify(regListeners.values(), event, source, data);
+        }
+
+        // Find listener listening all events
+        Map<String, RegisteredListener> allEventRegListeners = this.listenersByEvent.get(AllEvent.class);
+        if (allEventRegListeners != null) {
+            notify(allEventRegListeners.values(), event, source, data);
+        }
+    }
+
+    /**
+     * Call the provided listeners matching the passed Event. 
+     * The definition of <em>source</em> and <em>data</em> is purely up to the communicating classes.
+     * 
+     * @param listeners the listeners to notify
+     * @param event the event to pass to the registered listeners
+     * @param source the source of the event (or <code>null</code>)
+     * @param data the additional data related to the event (or <code>null</code>)
+     */
+    private void notify(Collection<RegisteredListener> listeners, Event event, Object source, Object data)
+    {
+        for (RegisteredListener listener : listeners) {
+            // Verify that one of the events matches and send the first matching event
+            for (Event listenerEvent : listener.events) {
+                if (listenerEvent.matches(event)) {
+                    listener.listener.onEvent(event, source, data);
+
+                    // Only send the first matching event since the listener should only be called once per event.
+                    break;
                 }
             }
         }

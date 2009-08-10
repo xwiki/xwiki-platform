@@ -521,9 +521,9 @@ public class Utils
      * @param hint a value to differentiate different component implementations for the same role
      * @return the component's instance
      */
-    public static Object getComponent(Class< ? > role, String hint)
+    public static <T> T getComponent(Class<T> role, String hint)
     {
-        Object component = null;
+        T component = null;
         if (componentManager != null) {
             try {
                 component = componentManager.lookup(role, hint);
@@ -545,7 +545,7 @@ public class Utils
      * @param role the class (aka role) that the component implements
      * @return the component's instance
      */
-    public static Object getComponent(Class< ? > role)
+    public static <T> T getComponent(Class<T> role)
     {
         return getComponent(role, "default");
     }
@@ -556,7 +556,7 @@ public class Utils
      * @return all components implementing the passed role
      * @since 2.0M3
      */
-    public static <T> List<T> getComponentList(Class< T > role)
+    public static <T> List<T> getComponentList(Class<T> role)
     {
         List<T> components;
         if (componentManager != null) {

@@ -70,10 +70,7 @@ public final class MathTranEquationRenderer extends AbstractEquationRenderer imp
     protected ImageData renderImage(String equation, boolean inline, EquationRenderer.FontSize size,
         EquationRenderer.Type type) throws IllegalArgumentException, IOException
     {
-        // TODO: What does this do?
-        // equation = "\\displaystyle " + equation;
-
-        String encodedEquation = URLEncoder.encode(equation, "UTF-8");
+        String encodedEquation = URLEncoder.encode((inline ? "" : "\\displaystyle") + equation, "UTF-8");
         GetMethod method =
             new GetMethod(MATHTRAN_BASE_URL + "D=" + Math.max(size.ordinal() - 3, 0) + "&tex=" + encodedEquation);
         method.setRequestHeader("accept", type.getMimetype());

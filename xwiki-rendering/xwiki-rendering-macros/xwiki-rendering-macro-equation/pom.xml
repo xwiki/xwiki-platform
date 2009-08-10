@@ -48,8 +48,6 @@
           <includes>
             <include>**/RenderingTests.java</include>
           </includes>
-          <!-- Disable tests for the moment. -->
-          <skipTests>true</skipTests>
         </configuration>
       </plugin>
       <plugin>

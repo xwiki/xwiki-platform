@@ -23,15 +23,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki-core-parent</artifactId>
+    <groupId>org.xwiki.platform</groupId>
+    <artifactId>xwiki-core-formula</artifactId>
     <version>2.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-formula-rendering</artifactId>
-  <name>XWiki Platform - Core - Mathematica formulas rendering</name>
+  <artifactId>xwiki-core-formula-renderer</artifactId>
+  <name>XWiki Platform - Core - Renderer for mathematical formulae</name>
   <packaging>jar</packaging>
-  <description>XWiki component for rendering mathematical formulas into images</description>
+  <description>XWiki component for rendering mathematical formulae into images</description>
   <dependencies>
     <!-- Apache commons, helper libraries for keeping the code small -->
     <dependency>
@@ -116,6 +116,7 @@
     </plugins>
   </build>
   <repositories>
+    <!-- SnuggleTeX repository -->
     <repository>
       <id>www.ph.ed.ac.uk-releases</id>
       <url>http://www.ph.ed.ac.uk/maven2</url>

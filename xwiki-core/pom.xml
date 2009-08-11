@@ -741,7 +741,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-formula-rendering</artifactId>
+      <artifactId>xwiki-core-formula-renderer</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

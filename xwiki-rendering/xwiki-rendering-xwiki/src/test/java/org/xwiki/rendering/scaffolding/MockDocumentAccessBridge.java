@@ -47,7 +47,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      */
     public static ComponentDescriptor<DocumentAccessBridge> getComponentDescriptor()
     {
-        DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor = 
+        DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
 
         componentDescriptor.setRole(DocumentAccessBridge.class);
@@ -164,7 +164,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -302,6 +302,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getDocument(String)
      */
     public DocumentModelBridge getDocument(String documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.bridge.DocumentName)
+     */
+    public DocumentModelBridge getDocument(DocumentName documentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }

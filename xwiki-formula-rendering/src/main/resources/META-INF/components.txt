@@ -1,4 +1,4 @@
-org.xwiki.equation.internal.CacheImageStorage
-org.xwiki.equation.internal.NativeFormulaRenderer
-org.xwiki.equation.internal.SnuggleTexFormulaRenderer
-org.xwiki.equation.internal.MathTranFormulaRenderer
+org.xwiki.formula.internal.CacheImageStorage
+org.xwiki.formula.internal.NativeFormulaRenderer
+org.xwiki.formula.internal.SnuggleTexFormulaRenderer
+org.xwiki.formula.internal.MathTranFormulaRenderer

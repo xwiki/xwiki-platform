@@ -45,6 +45,16 @@ public interface DocumentAccessBridge
     DocumentModelBridge getDocument(String documentName) throws Exception;
 
     /**
+     * Get the document object associated with the passed document name.
+     * 
+     * @param documentName the name of the document to find
+     * @return the document object matching the passed document name
+     * @throws Exception when the storage cannot be accessed
+     * @since 2.0M3
+     */
+    DocumentModelBridge getDocument(DocumentName documentName) throws Exception;
+    
+    /**
      * Get the different parts of a document name (wiki, space, page).
      * 
      * @param documentName the name of the document for which to return name information

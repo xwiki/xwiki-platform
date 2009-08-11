@@ -182,7 +182,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         throw new RuntimeException("Not implemented");
     }
 
-    /**    
+    /**
      * {@inheritDoc}
      */
     public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
@@ -296,6 +296,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.bridge.DocumentName)
+     */
+    public DocumentModelBridge getDocument(DocumentName documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#getDocumentName(String)
      */
     public DocumentName getDocumentName(String documentName)
@@ -307,7 +317,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
-    
+
     /**
      * {@inheritDoc}
      * 

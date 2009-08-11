@@ -425,6 +425,14 @@ public class XWikiContext extends Hashtable<Object, Object>
         return this.classCache.get(name);
     }
 
+    /**
+     * Empty the class cache.
+     */
+    public void flushClassCache()
+    {
+        this.classCache.clear();
+    }
+
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addDocumentArchive(String key, XWikiDocumentArchive obj)
     {
@@ -435,6 +443,14 @@ public class XWikiContext extends Hashtable<Object, Object>
     public XWikiDocumentArchive getDocumentArchive(String key)
     {
         return this.archiveCache.get(key);
+    }
+
+    /**
+     * Empty the archive cache.
+     */
+    public void flushArchiveCache()
+    {
+        this.archiveCache.clear();
     }
 
     public void setLinksAction(String action)

@@ -45,14 +45,14 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      */
     public static ComponentDescriptor<DocumentAccessBridge> getComponentDescriptor()
     {
-        DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor = 
+        DefaultComponentDescriptor<DocumentAccessBridge> componentDescriptor =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         componentDescriptor.setRole(DocumentAccessBridge.class);
         componentDescriptor.setRoleHint("default");
         componentDescriptor.setImplementation(MockDocumentAccessBridge.class);
         return componentDescriptor;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -113,6 +113,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      */
     public DocumentModelBridge getDocument(String arg0) throws Exception
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.bridge.DocumentName)
+     */
+    public DocumentModelBridge getDocument(DocumentName documentName) throws Exception
     {
         return null;
     }

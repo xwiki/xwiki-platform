@@ -609,7 +609,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-chart</artifactId>
+      <artifactId>xwiki-core-chart-renderer</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <!-- XWiki rendering macros -->

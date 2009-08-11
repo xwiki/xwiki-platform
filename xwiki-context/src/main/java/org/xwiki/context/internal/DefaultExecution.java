@@ -64,7 +64,8 @@ public class DefaultExecution implements Execution
      */
     public ExecutionContext getContext()
     {
-        return this.context.get().peek();
+        Stack<ExecutionContext> stack = this.context.get();
+        return stack == null ? null : stack.peek();
     }
 
     /**

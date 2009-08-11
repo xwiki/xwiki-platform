@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <artifactId>xwiki-core-parent</artifactId>
+    <version>2.0-SNAPSHOT</version>
+  </parent>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-core-formula-rendering</artifactId>
+  <name>XWiki Platform - Core - Mathematica formulas rendering</name>
+  <packaging>jar</packaging>
+  <description>XWiki component for rendering mathematical formulas into images</description>
+  <dependencies>
+    <!-- Apache commons, helper libraries for keeping the code small -->
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+    </dependency>
+    <!-- Other XWiki modules -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-cache-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component-default</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <!-- SnuggleTeX is a LaTeX to XHTML+MathML converter, which can be combined with JEuclid to transform equations into images -->
+    <dependency>
+      <groupId>uk.ac.ed.ph.snuggletex</groupId>
+      <artifactId>snuggletex-core</artifactId>
+      <version>1.1.0</version>
+      <!-- Exclude Saxon, since we're using Xalan -->
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9-dom</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- JEuclid transforms MathML content to raster images -->
+    <dependency>
+      <groupId>uk.ac.ed.ph.snuggletex</groupId>
+      <artifactId>snuggletex-jeuclid</artifactId>
+      <version>1.1.0</version>
+      <!-- Exclude Saxon, since we're using Xalan -->
+      <exclusions>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>net.sf.saxon</groupId>
+          <artifactId>saxon9-dom</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- JEuclid needs a XPath implementation. Since we're already using xalan, we should just list it here instead of Saxon -->
+    <dependency>
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.5.1</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Checkstyle keeps the code clean -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>www.ph.ed.ac.uk-releases</id>
+      <url>http://www.ph.ed.ac.uk/maven2</url>
+    </repository>
+  </repositories>
+</project>

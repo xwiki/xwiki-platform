@@ -1,2 +1,0 @@
-org.xwiki.rendering.internal.macro.equation.EquationMacro
-org.xwiki.rendering.internal.macro.equation.DefaultEquationMacroConfiguration

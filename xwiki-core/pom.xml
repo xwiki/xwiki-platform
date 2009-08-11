@@ -644,7 +644,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-equation</artifactId>
+      <artifactId>xwiki-core-rendering-macro-formula</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
@@ -741,7 +741,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-equation-rendering</artifactId>
+      <artifactId>xwiki-core-formula-rendering</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

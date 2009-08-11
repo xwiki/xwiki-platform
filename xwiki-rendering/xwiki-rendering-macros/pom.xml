@@ -128,7 +128,7 @@
     <module>xwiki-rendering-macro-footnotes</module>
     <module>xwiki-rendering-macro-wikibridge</module>
     <module>xwiki-rendering-macro-ruby</module>
-    <module>xwiki-rendering-macro-equation</module>
+    <module>xwiki-rendering-macro-formula</module>
   </modules>
 </project>
        

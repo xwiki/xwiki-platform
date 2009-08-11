@@ -1,4 +1,0 @@
-org.xwiki.equation.internal.CacheImageStorage
-org.xwiki.equation.internal.NativeEquationRenderer
-org.xwiki.equation.internal.SnuggleTexEquationRenderer
-org.xwiki.equation.internal.MathTranEquationRenderer

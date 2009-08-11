@@ -103,6 +103,6 @@
     <module>xwiki-refactoring</module>
     <module>xwiki-chart</module>
     <module>xwiki-properties</module>
-    <module>xwiki-equation-rendering</module>
+    <module>xwiki-formula-rendering</module>
   </modules>
 </project>

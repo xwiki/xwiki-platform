@@ -23,16 +23,16 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.equation.ImageData;
-import org.xwiki.equation.ImageStorage;
+import org.xwiki.formula.ImageData;
+import org.xwiki.formula.ImageStorage;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.Util;
 
 /**
- * Returns rendered mathematical equations to the client. The equations are images rendered by the
- * {@link org.xwiki.equation.EquationRenderer} component, and stored inside an {@link ImageStorage}.
+ * Returns rendered mathematical formulae to the client. The formulae are images rendered by the
+ * {@link org.xwiki.formula.FormulaRenderer} component, and stored inside an {@link ImageStorage}.
  * 
  * @version $Id$
  * @since 2.0M3

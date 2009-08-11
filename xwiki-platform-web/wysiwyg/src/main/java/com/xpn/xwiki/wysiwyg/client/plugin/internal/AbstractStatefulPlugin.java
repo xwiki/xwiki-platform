@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.MouseListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -33,8 +34,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public abstract class AbstractStatefulPlugin extends AbstractPlugin implements Updatable, MouseListener,
-    KeyboardListener, CommandListener
+public abstract class AbstractStatefulPlugin extends AbstractPlugin implements Updatable, MouseUpHandler, KeyUpHandler,
+    CommandListener
 {
     /**
      * Schedules updates and executes only the most recent one.
@@ -44,53 +45,13 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseDown(Widget, int, int)
+     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
      */
-    public void onMouseDown(Widget sender, int x, int y)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseEnter(Widget)
-     */
-    public void onMouseEnter(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseLeave(Widget)
-     */
-    public void onMouseLeave(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseMove(Widget, int, int)
-     */
-    public void onMouseMove(Widget sender, int x, int y)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseUp(Widget, int, int)
-     */
-    public void onMouseUp(Widget sender, int x, int y)
+    public void onMouseUp(MouseUpEvent event)
     {
         // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
         // selection are in different DOM nodes the click events are not triggered.
-        if (sender == getTextArea()) {
+        if (event.getSource() == getTextArea()) {
             updater.deferUpdate();
         }
     }
@@ -98,31 +59,11 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyUp(KeyUpEvent event)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
-     */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        if (sender == getTextArea()) {
+        if (event.getSource() == getTextArea()) {
             updater.deferUpdate();
         }
     }
@@ -158,5 +99,28 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
     public boolean canUpdate()
     {
         return getTextArea().isAttached() && getTextArea().isEnabled();
+    }
+
+    /**
+     * Registers the rich text area handlers required to update the state of the plug-in.
+     */
+    protected void registerTextAreaHandlers()
+    {
+        saveRegistration(getTextArea().addMouseUpHandler(this));
+        saveRegistration(getTextArea().addKeyUpHandler(this));
+        getTextArea().getCommandManager().addCommandListener(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractPlugin#destroy()
+     */
+    public void destroy()
+    {
+        // This should fail silently if we weren't listening to command events.
+        getTextArea().getCommandManager().removeCommandListener(this);
+
+        super.destroy();
     }
 }

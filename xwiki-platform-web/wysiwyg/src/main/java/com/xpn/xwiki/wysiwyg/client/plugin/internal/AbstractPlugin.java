@@ -22,10 +22,12 @@ package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.HandlerRegistrationCollection;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
@@ -61,6 +63,11 @@ public abstract class AbstractPlugin implements Plugin
      * The list of user interface extensions provided by this plugin.
      */
     private final List<UIExtension> uiExtensions = new ArrayList<UIExtension>();
+
+    /**
+     * The collection of handler registrations used by this plug-in.
+     */
+    private final HandlerRegistrationCollection registrations = new HandlerRegistrationCollection();
 
     /**
      * @return {@link #config}
@@ -101,7 +108,7 @@ public abstract class AbstractPlugin implements Plugin
         this.textArea = textArea;
         this.config = config;
     }
-    
+
     /**
      * @return {@link #textArea}
      */
@@ -121,6 +128,27 @@ public abstract class AbstractPlugin implements Plugin
     }
 
     /**
+     * Saves a handler registration in order for the handler to be automatically removed when the plug-in is destroyed.
+     * 
+     * @param registration the handler registration to be saved
+     */
+    protected void saveRegistration(HandlerRegistration registration)
+    {
+        registrations.add(registration);
+    }
+
+    /**
+     * Saves a list of handler registrations in order for the handlers to be automatically removed when the plug-in is
+     * destroyed.
+     * 
+     * @param registrations the list of handler registrations to be saved
+     */
+    protected void saveRegistrations(List<HandlerRegistration> registrations)
+    {
+        registrations.addAll(registrations);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see Plugin#destroy()
@@ -131,5 +159,6 @@ public abstract class AbstractPlugin implements Plugin
         textArea = null;
         config = null;
         uiExtensions.clear();
+        registrations.removeHandlers();
     }
 }

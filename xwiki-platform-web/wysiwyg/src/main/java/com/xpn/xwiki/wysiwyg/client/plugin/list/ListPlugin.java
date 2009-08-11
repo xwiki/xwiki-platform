@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
+public class ListPlugin extends AbstractStatefulPlugin implements ClickHandler
 {
     /**
      * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
@@ -80,9 +80,7 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             .ul());
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addMouseListener(this);
-            getTextArea().addKeyboardListener(this);
-            getTextArea().getCommandManager().addCommandListener(this);
+            registerTextAreaHandlers();
             getUIExtensionList().add(toolBarExtension);
 
             // Initialize the behavior adjuster and set it up with this text area
@@ -91,7 +89,9 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
             // fake a reset command to handle the loaded document
             behaviorAdjuster.onCommand(getTextArea().getCommandManager(), new Command("reset"), null);
             // add key listener to the rta
-            getTextArea().addKeyboardListener(behaviorAdjuster);
+            saveRegistration(getTextArea().addKeyDownHandler(behaviorAdjuster));
+            saveRegistration(getTextArea().addKeyUpHandler(behaviorAdjuster));
+            saveRegistration(getTextArea().addKeyPressHandler(behaviorAdjuster));
             getTextArea().getCommandManager().addCommandListener(behaviorAdjuster);
         }
     }
@@ -107,7 +107,8 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
     private void addFeature(String name, Command command, Image image, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            ToggleButton button = new ToggleButton(image, this);
+            ToggleButton button = new ToggleButton(image);
+            saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -123,21 +124,15 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
     {
         for (ToggleButton button : buttons.keySet()) {
             button.removeFromParent();
-            button.removeClickListener(this);
         }
         buttons.clear();
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeMouseListener(this);
-            getTextArea().removeKeyboardListener(this);
-            getTextArea().getCommandManager().removeCommandListener(this);
-            toolBarExtension.clearFeatures();
-            // if a behaviorAdjuster was created and attached, remove it
-            if (behaviorAdjuster != null) {
-                getTextArea().removeKeyboardListener(behaviorAdjuster);
-                getTextArea().getCommandManager().removeCommandListener(behaviorAdjuster);
-                behaviorAdjuster = null;
-            }
+        toolBarExtension.clearFeatures();
+
+        // if a behaviorAdjuster was created and attached, remove it
+        if (behaviorAdjuster != null) {
+            getTextArea().getCommandManager().removeCommandListener(behaviorAdjuster);
+            behaviorAdjuster = null;
         }
 
         super.destroy();
@@ -146,12 +141,12 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        Command command = buttons.get(sender);
-        if (command != null && ((FocusWidget) sender).isEnabled()) {
+        Command command = buttons.get(event.getSource());
+        if (command != null && ((FocusWidget) event.getSource()).isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }

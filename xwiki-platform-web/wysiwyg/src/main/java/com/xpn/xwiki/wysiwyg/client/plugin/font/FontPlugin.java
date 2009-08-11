@@ -24,7 +24,8 @@ import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Style;
 
-import com.google.gwt.user.client.ui.ChangeListener;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,7 +43,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InlineStyleExecutabl
  * 
  * @version $Id$
  */
-public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
+public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
 {
     /**
      * The list of default font names.
@@ -88,9 +89,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
             DEFAULT_FONT_SIZES);
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addMouseListener(this);
-            getTextArea().addKeyboardListener(this);
-            getTextArea().getCommandManager().addCommandListener(this);
+            registerTextAreaHandlers();
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -110,7 +109,7 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
             picker.setTitle(title);
-            picker.addChangeListener(this);
+            saveRegistration(picker.addChangeHandler(this));
 
             String[] values = getConfig().getParameter(parameter, defaultValues).split("\\s*,\\s*");
             for (int i = 0; i < values.length; i++) {
@@ -131,16 +130,10 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     {
         for (Picker picker : pickers.keySet()) {
             ((Widget) picker).removeFromParent();
-            picker.removeChangeListener(this);
         }
         pickers.clear();
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeMouseListener(this);
-            getTextArea().removeKeyboardListener(this);
-            getTextArea().getCommandManager().removeCommandListener(this);
-            toolBarExtension.clearFeatures();
-        }
+        toolBarExtension.clearFeatures();
 
         super.destroy();
     }
@@ -148,14 +141,14 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChangeListener#onChange(Widget)
+     * @see ChangeHandler#onChange(ChangeEvent)
      */
-    public void onChange(Widget sender)
+    public void onChange(ChangeEvent event)
     {
-        Command command = pickers.get(sender);
-        if (command != null && ((FocusWidget) sender).isEnabled()) {
+        Command command = pickers.get(event.getSource());
+        if (command != null && ((FocusWidget) event.getSource()).isEnabled()) {
             getTextArea().setFocus(true);
-            getTextArea().getCommandManager().execute(command, ((Picker) sender).getSelectedValue());
+            getTextArea().getCommandManager().execute(command, ((Picker) event.getSource()).getSelectedValue());
         }
     }
 

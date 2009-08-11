@@ -58,13 +58,12 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
     /**
      * {@inheritDoc}
      * 
-     * @see BehaviorAdjuster#navigateOutsideTableCell(boolean)
+     * @see BehaviorAdjuster#navigateOutsideTableCell(Event, boolean)
      */
-    protected void navigateOutsideTableCell(boolean before)
+    protected void navigateOutsideTableCell(Event event, boolean before)
     {
-        super.navigateOutsideTableCell(before);
+        super.navigateOutsideTableCell(event, before);
 
-        Event event = getTextArea().getCurrentEvent();
         if (!event.isCancelled()) {
             return;
         }
@@ -96,9 +95,7 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
                 Node leaf = left ? domUtils.getPreviousNode(range) : domUtils.getNextNode(range);
                 if (leaf != null && BUTTON.equalsIgnoreCase(leaf.getNodeName())) {
                     // Pressing delete before or backspace after a button element places the caret inside that element.
-                    // We have to avoid this Mozilla bug. Let's prevent the default delete behavior and manually remove
-                    // the button.
-                    getTextArea().getCurrentEvent().xPreventDefault();
+                    // We have to avoid this Mozilla bug. Let's manually remove the button.
                     leaf.getParentNode().removeChild(leaf);
                     return true;
                 }
@@ -111,12 +108,15 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
      * {@inheritDoc}<br/>
      * NOTE: Fixes the issue with delete before a button element.
      * 
-     * @see BehaviorAdjuster#onDelete()
+     * @see BehaviorAdjuster#onDelete(Event)
      */
-    protected void onDelete()
+    protected void onDelete(Event event)
     {
-        if (!deleteButton(false)) {
-            super.onDelete();
+        if (deleteButton(false)) {
+            // Prevent the default browser behavior if the button has been deleted.
+            event.xPreventDefault();
+        } else {
+            super.onDelete(event);
         }
     }
 
@@ -124,12 +124,15 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
      * {@inheritDoc}<br/>
      * NOTE: Fixes the issue with backspace after a button element.
      * 
-     * @see BehaviorAdjuster#onBackSpace()
+     * @see BehaviorAdjuster#onBackSpace(Event)
      */
-    protected void onBackSpace()
+    protected void onBackSpace(Event event)
     {
-        if (!deleteButton(true)) {
-            super.onBackSpace();
+        if (deleteButton(true)) {
+            // Prevent the default browser behavior if the button has been deleted.
+            event.xPreventDefault();
+        } else {
+            super.onBackSpace(event);
         }
     }
 
@@ -137,14 +140,13 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
      * {@inheritDoc}<br/>
      * NOTE: Fixes the issue with button elements not being selected on mouse down.
      * 
-     * @see BehaviorAdjuster#onBeforeMouseDown()
+     * @see BehaviorAdjuster#onBeforeMouseDown(Event)
      */
-    protected void onBeforeMouseDown()
+    protected void onBeforeMouseDown(Event event)
     {
-        super.onBeforeMouseDown();
+        super.onBeforeMouseDown(event);
 
-        Event event = getTextArea().getCurrentEvent();
-        Node target = event.getTarget();
+        Node target = (Node) event.getEventTarget().cast();
         // A button should be selected on mouse down.
         if (BUTTON.equalsIgnoreCase(target.getNodeName())) {
             Range range = getTextArea().getDocument().createRange();

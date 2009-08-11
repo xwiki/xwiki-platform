@@ -22,15 +22,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormHandler;
-import com.google.gwt.user.client.ui.FormSubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormSubmitEvent;
 import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
@@ -42,7 +41,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
  * 
  * @version $Id$
  */
-public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<String>, ClickListener, FormHandler
+public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<String>, ClickHandler,
+    SubmitCompleteHandler
 {
     /**
      * 'loading' style name.
@@ -125,10 +125,12 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
 
     /**
      * {@inheritDoc}
+     * 
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == buttonPanel.getImportButton()) {
+        if (event.getSource() == buttonPanel.getImportButton()) {
             WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
             String htmlPaste = clipboardImportTab.getHtmlPaste();
             if (clipboardImportTab.isVisible() && !htmlPaste.trim().equals("")) {
@@ -138,7 +140,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
                 startProgress();
                 fileImportTab.sumbit();
             }
-        } else if (sender == buttonPanel.getCancelButton()) {
+        } else if (event.getSource() == buttonPanel.getCancelButton()) {
             hide();
         }
     }
@@ -151,7 +153,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     private Map<String, String> getCleaningParams()
     {
         Map<String, String> params = new HashMap<String, String>();
-        if (buttonPanel.getFilterStylesCheckBox().isChecked()) {
+        if (buttonPanel.getFilterStylesCheckBox().getValue()) {
             params.put("filterStyles", "strict");
         }
         // For Office2007: Office2007 generates an xhtml document (when copied) which has attributes and tags of
@@ -216,16 +218,10 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
 
     /**
      * {@inheritDoc}
+     * 
+     * @see SubmitCompleteHandler#onSubmitComplete(SubmitCompleteEvent)
      */
-    public void onSubmit(FormSubmitEvent event)
-    {
-        // Do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onSubmitComplete(FormSubmitCompleteEvent event)
+    public void onSubmitComplete(SubmitCompleteEvent event)
     {
         WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
         wysiwygService.officeToXHTML(fullPageName, getCleaningParams(), this);

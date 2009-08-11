@@ -61,6 +61,7 @@ public class SymbolCell extends FlowPanel
         this.symbol = symbol;
         getElement().setInnerHTML(symbol);
         addStyleName(NORMAL_STYLE_NAME);
+
         sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
     }
 
@@ -69,12 +70,15 @@ public class SymbolCell extends FlowPanel
      */
     public String getSymbol()
     {
-        if (selected) {
-            selected = false;
-            return symbol;
-        } else {
-            return null;
-        }
+        return symbol;
+    }
+
+    /**
+     * @return {@link #selected}
+     */
+    public boolean isSelected()
+    {
+        return selected;
     }
 
     /**

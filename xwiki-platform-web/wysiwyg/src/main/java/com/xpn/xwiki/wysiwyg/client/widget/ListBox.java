@@ -20,15 +20,22 @@
 package com.xpn.xwiki.wysiwyg.client.widget;
 
 import com.google.gwt.dom.client.Element;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ChangeListenerCollection;
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -36,17 +43,13 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public class ListBox extends Composite implements SourcesChangeEvents, ClickListener, KeyboardListener
+public class ListBox extends Composite implements HasSelectionHandlers<ListItem>, ClickHandler, KeyDownHandler,
+    KeyPressHandler, KeyUpHandler
 {
     /**
      * The list of items from which we can choose one.
      */
     private final FlowPanel list = new FlowPanel();
-
-    /**
-     * The list of registered change listeners.
-     */
-    private final ChangeListenerCollection changeListeners = new ChangeListenerCollection();
 
     /**
      * The currently selected item; {@code null} if no item is selected.
@@ -68,8 +71,10 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     public ListBox()
     {
         FocusPanel panel = new FocusPanel(list);
-        panel.addClickListener(this);
-        panel.addKeyboardListener(this);
+        panel.addClickHandler(this);
+        panel.addKeyDownHandler(this);
+        panel.addKeyPressHandler(this);
+        panel.addKeyUpHandler(this);
 
         initWidget(panel);
         setStylePrimaryName("xListBox");
@@ -123,21 +128,11 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesChangeEvents#addChangeListener(ChangeListener)
+     * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
      */
-    public void addChangeListener(ChangeListener listener)
+    public HandlerRegistration addSelectionHandler(SelectionHandler<ListItem> handler)
     {
-        changeListeners.add(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesChangeEvents#removeChangeListener(ChangeListener)
-     */
-    public void removeChangeListener(ChangeListener listener)
-    {
-        changeListeners.remove(listener);
+        return addHandler(handler, SelectionEvent.getType());
     }
 
     /**
@@ -164,19 +159,19 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
                 selectedItem.setSelected(true);
                 selectedItem.getElement().scrollIntoView();
             }
-            changeListeners.fireChange(this);
+            SelectionEvent.fire(this, selectedItem);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == getWidget()) {
-            setSelectedItem(findItem(Event.getCurrentEvent().getTarget()));
+        if (event.getSource() == getWidget()) {
+            setSelectedItem(findItem(Element.as(event.getNativeEvent().getEventTarget())));
         }
     }
 
@@ -199,14 +194,13 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyDown(KeyDownEvent event)
     {
-        if (sender == getWidget()) {
+        if (event.getSource() == getWidget()) {
             ignoreNextKeyPress = true;
-            Event event = Event.getCurrentEvent();
-            if (updateSelectedItem(event.getKeyCode())) {
+            if (updateSelectedItem(event.getNativeKeyCode())) {
                 event.preventDefault();
             }
         }
@@ -215,14 +209,13 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        if (sender == getWidget()) {
+        if (event.getSource() == getWidget()) {
             if (!ignoreNextKeyPress) {
-                Event event = Event.getCurrentEvent();
-                if (updateSelectedItem(event.getKeyCode())) {
+                if (updateSelectedItem(event.getNativeEvent().getKeyCode())) {
                     event.preventDefault();
                 }
             }
@@ -233,9 +226,9 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
+     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
      */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
+    public void onKeyUp(KeyUpEvent event)
     {
         ignoreNextKeyPress = false;
     }
@@ -250,16 +243,16 @@ public class ListBox extends Composite implements SourcesChangeEvents, ClickList
     {
         ListItem oldItem = selectedItem;
         switch (keyCode) {
-            case KeyboardListener.KEY_UP:
+            case KeyCodes.KEY_UP:
                 selectPreviousItem();
                 break;
-            case KeyboardListener.KEY_DOWN:
+            case KeyCodes.KEY_DOWN:
                 selectNextItem();
                 break;
-            case KeyboardListener.KEY_HOME:
+            case KeyCodes.KEY_HOME:
                 selectFirstItem();
                 break;
-            case KeyboardListener.KEY_END:
+            case KeyCodes.KEY_END:
                 selectLastItem();
                 break;
             default:

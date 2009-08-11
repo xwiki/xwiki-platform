@@ -19,40 +19,27 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.ClickListenerCollection;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasSelectionHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Grid;
-import com.google.gwt.user.client.ui.SourcesClickEvents;
-import com.google.gwt.user.client.ui.SourcesTableEvents;
-import com.google.gwt.user.client.ui.TableListener;
+import com.google.gwt.user.client.ui.HTMLTable.Cell;
 
 /**
  * A set of colors from which the user can choose one by clicking.
  * 
  * @version $Id$
  */
-public class ColorPalette extends Composite implements SourcesClickEvents, TableListener
+public class ColorPalette extends Composite implements HasSelectionHandlers<String>, ClickHandler
 {
-    /**
-     * The list of click listeners that are notified whenever one of the colors form the palette is clicked.
-     */
-    private final ClickListenerCollection clickListeners = new ClickListenerCollection();
-
     /**
      * The selected cell in the color grid that make up the palette.
      */
     private ColorCell selectedCell;
-
-    /**
-     * The array of color codes used to fill the color grid.
-     */
-    private final String[] colors;
-
-    /**
-     * The maximum number of columns the color grid can have.
-     */
-    private final int columnCount;
 
     /**
      * Creates a new color palette using the specified color codes to fill the color grid.
@@ -67,10 +54,8 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
         colorGrid.setBorderWidth(0);
         colorGrid.setCellPadding(0);
         colorGrid.setCellSpacing(0);
-        colorGrid.addTableListener(this);
+        colorGrid.addClickHandler(this);
 
-        this.colors = colors;
-        this.columnCount = columnCount;
         for (int i = 0; i < colors.length; i++) {
             colorGrid.setWidget(i / columnCount, i % columnCount, new ColorCell(colors[i]));
         }
@@ -81,25 +66,15 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesClickEvents#addClickListener(com.google.gwt.user.client.ui.ClickListener)
+     * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
      */
-    public void addClickListener(ClickListener listener)
+    public HandlerRegistration addSelectionHandler(SelectionHandler<String> handler)
     {
-        clickListeners.add(listener);
+        return addHandler(handler, SelectionEvent.getType());
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesClickEvents#removeClickListener(ClickListener)
-     */
-    public void removeClickListener(ClickListener listener)
-    {
-        clickListeners.remove(listener);
-    }
-
-    /**
-     * @return the color grid that makes up this palette.
+     * @return the color grid that makes up this palette
      */
     protected Grid getColorGrid()
     {
@@ -109,31 +84,34 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
     /**
      * {@inheritDoc}
      * 
-     * @see TableListener#onCellClicked(SourcesTableEvents, int, int)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onCellClicked(SourcesTableEvents sender, int row, int column)
+    public void onClick(ClickEvent event)
     {
-        if (sender == getColorGrid()) {
-            setSelectedCell(row, column);
-            clickListeners.fireClick(this);
+        if (event.getSource() == getColorGrid()) {
+            Cell cell = getColorGrid().getCellForEvent(event);
+            if (cell != null) {
+                setSelectedCell((ColorCell) getColorGrid().getWidget(cell.getRowIndex(), cell.getCellIndex()));
+                SelectionEvent.fire(this, getSelectedColor());
+            }
         }
     }
 
     /**
-     * Selects a color in the color grid by its row/column indexes.
+     * Selects a color in the color grid.
      * 
-     * @param row the row where the color is placed
-     * @param column the column where the color is placed
+     * @param cell the color cell to be selected
      */
-    private void setSelectedCell(int row, int column)
+    private void setSelectedCell(ColorCell cell)
     {
-        ColorCell wantedCell = (ColorCell) getColorGrid().getWidget(row, column);
-        if (selectedCell != wantedCell) {
+        if (selectedCell != cell) {
             if (selectedCell != null) {
                 selectedCell.setSelected(false);
             }
-            selectedCell = wantedCell;
-            selectedCell.setSelected(true);
+            selectedCell = cell;
+            if (selectedCell != null) {
+                selectedCell.setSelected(true);
+            }
         }
     }
 
@@ -152,15 +130,17 @@ public class ColorPalette extends Composite implements SourcesClickEvents, Table
      */
     public void setSelectedColor(String color)
     {
-        for (int i = 0; i < colors.length; i++) {
-            if (colors[i].equals(color)) {
-                setSelectedCell(i / columnCount, i % columnCount);
-                return;
+        if (color != null) {
+            for (int i = 0; i < getColorGrid().getRowCount(); i++) {
+                for (int j = 0; j < getColorGrid().getColumnCount(); j++) {
+                    ColorCell cell = (ColorCell) getColorGrid().getWidget(i, j);
+                    if (cell.getColor().equals(color)) {
+                        setSelectedCell(cell);
+                        return;
+                    }
+                }
             }
         }
-        if (selectedCell != null) {
-            selectedCell.setSelected(false);
-            selectedCell = null;
-        }
+        setSelectedCell(null);
     }
 }

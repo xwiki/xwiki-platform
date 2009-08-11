@@ -23,9 +23,11 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RadioButton;
@@ -44,18 +46,18 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * 
  * @version $Id$
  */
-public class ImageConfigWizardStep implements WizardStep, KeyboardListener, SourcesNavigationEvents
+public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, SourcesNavigationEvents
 {
     /**
      * The style for the information labels.
      */
     private static final String INFO_LABEL_STYLE = "xInfoLabel";
-    
+
     /**
      * The style for the help labels.
      */
     private static final String HELP_LABEL_STYLE = "xHelpLabel";
-    
+
     /**
      * The image data to be edited by this wizard step.
      */
@@ -109,15 +111,15 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     private Panel getSizePanel()
     {
         widthBox = new TextBox();
-        widthBox.addKeyboardListener(this);
+        widthBox.addKeyPressHandler(this);
         heightBox = new TextBox();
-        heightBox.addKeyboardListener(this);
+        heightBox.addKeyPressHandler(this);
         FlowPanel sizePanel = new FlowPanel();
         sizePanel.addStyleName("xSizePanel");
         Label widthLabel = new Label(Strings.INSTANCE.imageWidthLabel());
         widthLabel.setStyleName(INFO_LABEL_STYLE);
         Label widthHelpLabel = new Label(Strings.INSTANCE.imageWidthHelpLabel());
-        widthHelpLabel.setStyleName(HELP_LABEL_STYLE);        
+        widthHelpLabel.setStyleName(HELP_LABEL_STYLE);
         sizePanel.add(widthLabel);
         sizePanel.add(widthHelpLabel);
         sizePanel.add(widthBox);
@@ -138,7 +140,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     private Panel getAltTextPanel()
     {
         altTextBox = new TextBox();
-        altTextBox.addKeyboardListener(this);
+        altTextBox.addKeyPressHandler(this);
         Label altTextLabel = new Label(Strings.INSTANCE.imageAltTextLabel());
         altTextLabel.setStyleName(INFO_LABEL_STYLE);
         Label altTextHelpLabel = new Label(Strings.INSTANCE.imageAltTextHelpLabel());
@@ -181,13 +183,13 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         alignmentOptions = new ArrayList<RadioButton>();
         RadioButton leftRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignLeftLabel());
         leftRadio.setFormValue(ImageConfig.ImageAlignment.LEFT.toString());
-        leftRadio.addKeyboardListener(this);
+        leftRadio.addKeyPressHandler(this);
         RadioButton centerRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignCenterLabel());
         centerRadio.setFormValue(ImageConfig.ImageAlignment.CENTER.toString());
-        centerRadio.addKeyboardListener(this);
+        centerRadio.addKeyPressHandler(this);
         RadioButton rightRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignRightLabel());
         rightRadio.setFormValue(ImageConfig.ImageAlignment.RIGHT.toString());
-        rightRadio.addKeyboardListener(this);
+        rightRadio.addKeyPressHandler(this);
         alignmentOptions.add(leftRadio);
         alignmentOptions.add(centerRadio);
         alignmentOptions.add(rightRadio);
@@ -214,13 +216,13 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         vAlignPanel.add(vAlignHelpLabel);
         RadioButton topRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignTopLabel());
         topRadio.setFormValue(ImageConfig.ImageAlignment.TOP.toString());
-        topRadio.addKeyboardListener(this);
+        topRadio.addKeyPressHandler(this);
         RadioButton middleRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignMiddleLabel());
         middleRadio.setFormValue(ImageConfig.ImageAlignment.MIDDLE.toString());
-        middleRadio.addKeyboardListener(this);
+        middleRadio.addKeyPressHandler(this);
         RadioButton bottomRadio = new RadioButton(alignRadioGroup, Strings.INSTANCE.imageAlignBottomLabel());
         bottomRadio.setFormValue(ImageConfig.ImageAlignment.BOTTOM.toString());
-        bottomRadio.addKeyboardListener(this);
+        bottomRadio.addKeyPressHandler(this);
         alignmentOptions.add(topRadio);
         alignmentOptions.add(middleRadio);
         alignmentOptions.add(bottomRadio);
@@ -237,7 +239,7 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
     public ImageConfig.ImageAlignment getSelectedAlignment()
     {
         for (RadioButton rb : alignmentOptions) {
-            if (rb.isChecked()) {
+            if (rb.getValue()) {
                 return ImageConfig.ImageAlignment.valueOf(rb.getFormValue());
             }
         }
@@ -254,9 +256,9 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
         String alignValue = alignment != null ? alignment.toString() : "";
         for (RadioButton rb : alignmentOptions) {
             if (rb.getFormValue().equals(alignValue)) {
-                rb.setChecked(true);
+                rb.setValue(true);
             } else {
-                rb.setChecked(false);
+                rb.setValue(false);
             }
         }
     }
@@ -380,28 +382,14 @@ public class ImageConfigWizardStep implements WizardStep, KeyboardListener, Sour
 
     /**
      * {@inheritDoc}
+     * 
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        if (keyCode == KEY_ENTER) {
+        if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
             // fire the event for the default direction
             navigationListeners.fireNavigationEvent(getDefaultDirection());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        // nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
-    {
-        // nothing
     }
 }

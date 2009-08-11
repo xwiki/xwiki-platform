@@ -19,15 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
@@ -61,11 +58,6 @@ public class HistoryPlugin extends AbstractPlugin implements ClickHandler
     private final Map<PushButton, Command> buttons = new HashMap<PushButton, Command>();
 
     /**
-     * The list of handler registrations used by this plug-in.
-     */
-    private final List<HandlerRegistration> registrations = new ArrayList<HandlerRegistration>();
-
-    /**
      * Associates commands to shortcut keys.
      */
     private final ShortcutKeyManager shortcutKeyManager = new ShortcutKeyManager();
@@ -93,7 +85,7 @@ public class HistoryPlugin extends AbstractPlugin implements ClickHandler
         addFeature("redo", Command.REDO, Images.INSTANCE.redo().createImage(), Strings.INSTANCE.redo(), 'Y');
 
         if (toolBarExtension.getFeatures().length > 0) {
-            registrations.addAll(shortcutKeyManager.addHandlers(getTextArea()));
+            saveRegistrations(shortcutKeyManager.addHandlers(getTextArea()));
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -111,7 +103,7 @@ public class HistoryPlugin extends AbstractPlugin implements ClickHandler
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
             PushButton button = new PushButton(image);
-            registrations.add(button.addClickHandler(this));
+            saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -137,10 +129,6 @@ public class HistoryPlugin extends AbstractPlugin implements ClickHandler
         if (toolBarExtension.getFeatures().length > 0) {
             shortcutKeyManager.clear();
             toolBarExtension.clearFeatures();
-        }
-
-        for (int i = 0; i < registrations.size(); i++) {
-            registrations.get(i).removeHandler();
         }
 
         super.destroy();

@@ -25,11 +25,18 @@ import java.util.List;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.ui.KeyboardListener;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -43,7 +50,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
+public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPressHandler, CommandListener
 {
     /**
      * List item element name.
@@ -157,8 +164,9 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
      * </ul>
      * 
      * @param li the list item in which the delete key is hit
+     * @param event the native event that was fired
      */
-    protected void onDelete(Element li)
+    protected void onDelete(Element li, Event event)
     {
         // check if we're at the end of the list item and, if so, move the next list item into this one
         Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
@@ -179,7 +187,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
         if (nextLeaf == null) {
             // don't allow delete in the last list item in the document, because it could lead to deleting the list
             // item, depending on the browser.
-            getTextArea().getCurrentEvent().xPreventDefault();
+            event.xPreventDefault();
             return;
         }
         // get first li ancestor of nextLeaf
@@ -193,7 +201,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
             if (nextLeaf == null) {
                 // if there is no other leaf after the placeholder, don't allow to delete the placeholder: this would
                 // lead to deleting the whole item, and if it's the last in the document, we don't want that.
-                getTextArea().getCurrentEvent().xPreventDefault();
+                event.xPreventDefault();
                 return;
             }
             nextLeafAncestorLi = (Element) DOMUtils.getInstance().getFirstAncestor(nextLeaf, LIST_ITEM_TAG);
@@ -207,7 +215,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
             // execute the delete
             executeDelete(getReferenceNode(endContainer, li, nextLeafAncestorLi), nextLeafAncestorLi,
                 nextEmptyItemPlacehodlerLeaf, range);
-            getTextArea().getCurrentEvent().xPreventDefault();
+            event.xPreventDefault();
         }
         // else browser default
     }
@@ -222,8 +230,9 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
      * </ul>
      * 
      * @param li the list item in which the backspace key is hit
+     * @param event the native event that was fired
      */
-    protected void onBackspace(Element li)
+    protected void onBackspace(Element li, Event event)
     {
         // check if we're at the end of the list item and, if so, move the next list item into this one
         Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
@@ -270,7 +279,7 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
             // effectively execute the move
             executeDelete(getReferenceNode(previousLeaf, previousLeafAncestorLi, li), li,
                 previousEmptyItemPlacehodlerLeaf, range);
-            getTextArea().getCurrentEvent().xPreventDefault();
+            event.xPreventDefault();
         }
         // else browser default
     }
@@ -380,11 +389,11 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        dispatchKey(sender, keyCode, modifiers);
+        dispatchKey((Widget) event.getSource(), (Event) event.getNativeEvent());
     }
 
     /**
@@ -394,10 +403,9 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
      * it.
      * 
      * @param sender the sender widget of the key press event
-     * @param keyCode the key code
-     * @param modifiers the modifiers of the key press
+     * @param event the native event that was fired
      */
-    protected void dispatchKey(Widget sender, char keyCode, int modifiers)
+    protected void dispatchKey(Widget sender, Event event)
     {
         if (textArea != sender) {
             return;
@@ -410,12 +418,12 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
             return;
         }
 
-        switch (keyCode) {
-            case KeyboardListener.KEY_DELETE:
-                onDelete((Element) li);
+        switch (event.getKeyCode()) {
+            case KeyCodes.KEY_DELETE:
+                onDelete((Element) li, event);
                 break;
-            case KeyboardListener.KEY_BACKSPACE:
-                onBackspace((Element) li);
+            case KeyCodes.KEY_BACKSPACE:
+                onBackspace((Element) li, event);
                 break;
             default:
                 break;
@@ -425,19 +433,20 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
+     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
      */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
+    public void onKeyUp(KeyUpEvent event)
     {
         // check we're on the right element
-        if (textArea != sender) {
+        if (textArea != event.getSource()) {
             return;
         }
 
         // Execute cleanup after each delete, enter, backspace key
         boolean needsCleanup =
-            (keyCode == KEY_ENTER && (modifiers != MODIFIER_SHIFT)) || keyCode == KEY_DELETE
-                || keyCode == KEY_BACKSPACE;
+            (event.getNativeKeyCode() == KeyCodes.KEY_ENTER && !event.getNativeEvent().getShiftKey())
+                || event.getNativeKeyCode() == KeyCodes.KEY_DELETE
+                || event.getNativeKeyCode() == KeyCodes.KEY_BACKSPACE;
         if (needsCleanup) {
             // Clean the whole document as an operation on a list can impact more than one list (two consecutive lists
             // can be impacted by the same delete)
@@ -450,11 +459,11 @@ public class ListBehaviorAdjuster implements KeyboardListener, CommandListener
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyDown(KeyDownEvent event)
     {
-        // nothing by default
+        // To be overwritten in derived classes.
     }
 
     /**

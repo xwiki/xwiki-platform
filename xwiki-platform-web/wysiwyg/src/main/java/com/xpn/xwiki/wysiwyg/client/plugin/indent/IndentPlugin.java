@@ -22,11 +22,11 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class IndentPlugin extends AbstractPlugin implements ClickListener
+public class IndentPlugin extends AbstractPlugin implements ClickHandler
 {
     /**
      * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
@@ -88,7 +88,8 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
     private void addFeature(String name, Command command, Image image, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            PushButton button = new PushButton(image, this);
+            PushButton button = new PushButton(image);
+            saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -104,7 +105,6 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
     {
         for (PushButton button : buttons.keySet()) {
             button.removeFromParent();
-            button.removeClickListener(this);
         }
         buttons.clear();
 
@@ -116,12 +116,12 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        Command command = buttons.get(sender);
-        if (command != null && ((FocusWidget) sender).isEnabled()) {
+        Command command = buttons.get(event.getSource());
+        if (command != null && ((FocusWidget) event.getSource()).isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }

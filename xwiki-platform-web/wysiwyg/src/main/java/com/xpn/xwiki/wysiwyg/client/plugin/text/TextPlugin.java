@@ -19,17 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.text;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
@@ -64,11 +61,6 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
      * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
      */
     private final Map<ToggleButton, Command> buttons = new HashMap<ToggleButton, Command>();
-
-    /**
-     * The list of handler registrations used by this plug-in.
-     */
-    private final List<HandlerRegistration> registrations = new ArrayList<HandlerRegistration>();
 
     /**
      * User interface extension for the editor tool bar.
@@ -111,10 +103,8 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
         addFeature("teletype", Command.TELETYPE, Images.INSTANCE.teletype().createImage(), Strings.INSTANCE.teletype());
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addKeyboardListener(this);
-            getTextArea().addMouseListener(this);
-            getTextArea().getCommandManager().addCommandListener(this);
-            registrations.addAll(shortcutKeyManager.addHandlers(getTextArea()));
+            registerTextAreaHandlers();
+            saveRegistrations(shortcutKeyManager.addHandlers(getTextArea()));
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -133,7 +123,7 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
         ToggleButton button = null;
         if (getTextArea().getCommandManager().isSupported(command)) {
             button = new ToggleButton(image);
-            registrations.add(button.addClickHandler(this));
+            saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -175,15 +165,8 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
         buttons.clear();
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeMouseListener(this);
-            getTextArea().removeKeyboardListener(this);
-            getTextArea().getCommandManager().removeCommandListener(this);
             shortcutKeyManager.clear();
             toolBarExtension.clearFeatures();
-        }
-
-        for (int i = 0; i < registrations.size(); i++) {
-            registrations.get(i).removeHandler();
         }
 
         super.destroy();

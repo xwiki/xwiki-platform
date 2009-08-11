@@ -20,10 +20,12 @@
 
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
+import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
@@ -34,7 +36,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class WysiwygEditorListener implements TabListener
+public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeSelectionHandler<Integer>
 {
     /**
      * Switch from Wiki to WYSIWYG editor.
@@ -153,40 +155,45 @@ public class WysiwygEditorListener implements TabListener
 
     /**
      * {@inheritDoc}
+     * 
+     * @see BeforeSelectionHandler#onBeforeSelection(BeforeSelectionEvent)
      */
-    public boolean onBeforeTabSelected(SourcesTabEvents sender, int index)
+    public void onBeforeSelection(BeforeSelectionEvent<Integer> event)
     {
-        TabPanel tabPanel = (TabPanel) sender;
-        if (tabPanel.getTabBar().getSelectedTab() == index) {
-            return false;
-        }
-        if (index == WysiwygEditor.WIKI_TAB_INDEX && editor.getRichTextEditor().getTextArea().isEnabled()) {
+        TabPanel tabPanel = (TabPanel) event.getSource();
+        if (tabPanel.getTabBar().getSelectedTab() == event.getItem()) {
+            event.cancel();
+        } else if (event.getItem() == WysiwygEditor.WIKI_TAB_INDEX
+            && editor.getRichTextEditor().getTextArea().isEnabled()) {
             // Notify the plug-ins that the content of the rich text area is about to be submitted.
             // We have to do this before the tabs are actually switched because plug-ins can't access the computed style
             // of the rich text area when it is hidden.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
         }
-        return true;
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see SelectionHandler#onSelection(SelectionEvent)
      */
-    public void onTabSelected(SourcesTabEvents sender, int index)
+    public void onSelection(SelectionEvent<Integer> event)
     {
         editor.setLoading(true);
         WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
         // We test if the RTE textarea is disabled to be sure that the editor is not already being switched.
-        if (index == WysiwygEditor.WYSIWYG_TAB_INDEX && !editor.getRichTextEditor().getTextArea().isEnabled()) {
+        if (event.getSelectedItem() == WysiwygEditor.WYSIWYG_TAB_INDEX
+            && !editor.getRichTextEditor().getTextArea().isEnabled()) {
             wysiwygService.toHTML(editor.getPlainTextEditor().getTextArea().getText(), editor.getConfig().getParameter(
                 SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWysiwygCallback(editor));
         } else {
-            // We test if the RTE textarea is enabled to be sure that the editor is not already being switched.  
-            if (index == WysiwygEditor.WIKI_TAB_INDEX && editor.getRichTextEditor().getTextArea().isEnabled()) {
+            // We test if the RTE textarea is enabled to be sure that the editor is not already being switched.
+            if (event.getSelectedItem() == WysiwygEditor.WIKI_TAB_INDEX
+                && editor.getRichTextEditor().getTextArea().isEnabled()) {
                 // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
                 // Make the request to convert the HTML to Wiki syntax.
-                wysiwygService.fromHTML(editor.getPlainTextEditor().getTextArea().getText(), 
-                    editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), 
+                wysiwygService.fromHTML(editor.getPlainTextEditor().getTextArea().getText(),
+                    editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX),
                     new SwitchToWikiCallback(editor));
             }
         }

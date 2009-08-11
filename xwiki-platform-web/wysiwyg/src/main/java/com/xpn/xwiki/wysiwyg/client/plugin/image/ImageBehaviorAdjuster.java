@@ -22,7 +22,15 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.KeyboardListener;
+import org.xwiki.gwt.dom.client.Event;
+
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -33,14 +41,15 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ImageBehaviorAdjuster implements KeyboardListener
+public class ImageBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPressHandler
 {
     /**
      * The list of allowed keys on image selection.
      */
     private static final List<Integer> ALLOWED_KEYS =
-        Arrays.asList(KEY_DELETE, KEY_BACKSPACE, KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_HOME, KEY_END, KEY_PAGEUP,
-            KEY_PAGEDOWN);
+        Arrays.asList(KeyCodes.KEY_DELETE, KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_LEFT, KeyCodes.KEY_UP,
+            KeyCodes.KEY_RIGHT, KeyCodes.KEY_DOWN, KeyCodes.KEY_HOME, KeyCodes.KEY_END, KeyCodes.KEY_PAGEUP,
+            KeyCodes.KEY_PAGEDOWN);
 
     /**
      * Flag to handle if the current key needs to be blocked or not. Will be set in onKeyDown() for all incoming keys.
@@ -55,15 +64,16 @@ public class ImageBehaviorAdjuster implements KeyboardListener
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyDown(KeyDownEvent event)
     {
         // Test the current input and set the blocking flag.
-        this.blocking = needsBlocking(sender, keyCode, modifiers);
+        this.blocking =
+            needsBlocking((Widget) event.getSource(), event.getNativeKeyCode(), (Event) event.getNativeEvent());
         // If we're blocking this key, prevent the default behavior for this key
         if (this.blocking) {
-            textArea.getCurrentEvent().xPreventDefault();
+            ((Event) event.getNativeEvent()).xPreventDefault();
         }
     }
 
@@ -73,21 +83,21 @@ public class ImageBehaviorAdjuster implements KeyboardListener
      * 
      * @param sender the sender of this key event
      * @param keyCode the code of the key that was pressed
-     * @param modifiers modifier keys that are pressed when this key is pressed
+     * @param event the native event that was fired
      * @return true if the key needs to be blocked by this adjuster, false otherwise.
      */
-    private boolean needsBlocking(Widget sender, char keyCode, int modifiers)
+    private boolean needsBlocking(Widget sender, int keyCode, Event event)
     {
         // Make sure the sender is the listened text area and an image is selected
         if (!(sender == textArea && textArea.getCommandManager().isExecuted(Command.INSERT_IMAGE))) {
             return false;
         }
         // If it's a modified key (ctrl or alt), let it execute
-        if (textArea.getCurrentEvent().getCtrlKey() || textArea.getCurrentEvent().getAltKey()) {
+        if (event.getCtrlKey() || event.getAltKey()) {
             return false;
         }
         // If it's in the defined list of allowed keys, let it execute
-        if (ALLOWED_KEYS.contains((int) keyCode)) {
+        if (ALLOWED_KEYS.contains(keyCode)) {
             return false;
         }
         // block everything else
@@ -97,26 +107,26 @@ public class ImageBehaviorAdjuster implements KeyboardListener
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
         // If we're blocking this key, prevent the default behavior for this key
         if (this.blocking) {
-            textArea.getCurrentEvent().xPreventDefault();
+            ((Event) event.getNativeEvent()).xPreventDefault();
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
+     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
      */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
+    public void onKeyUp(KeyUpEvent event)
     {
         // If we're blocking this key, prevent the default behavior for this key
         if (this.blocking) {
-            textArea.getCurrentEvent().xPreventDefault();
+            ((Event) event.getNativeEvent()).xPreventDefault();
         }
     }
 
@@ -126,5 +136,5 @@ public class ImageBehaviorAdjuster implements KeyboardListener
     public void setTextArea(RichTextArea textArea)
     {
         this.textArea = textArea;
-    }    
+    }
 }

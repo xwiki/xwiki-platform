@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
@@ -28,8 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroDialog;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.SelectMacroDialog;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -38,7 +39,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class MacroPlugin extends AbstractPlugin implements PopupListener
+public class MacroPlugin extends AbstractPlugin implements CloseHandler<CompositeDialogBox>
 {
     /**
      * Rich text area command for refreshing macro output.
@@ -119,14 +120,12 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
         if (editDialog != null) {
             editDialog.hide();
             editDialog.removeFromParent();
-            editDialog.removePopupListener(this);
             editDialog = null;
         }
 
         if (selectDialog != null) {
             selectDialog.hide();
             selectDialog.removeFromParent();
-            selectDialog.removePopupListener(this);
             selectDialog = null;
         }
 
@@ -219,7 +218,7 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     {
         if (editDialog == null) {
             editDialog = new EditMacroDialog(getConfig());
-            editDialog.addPopupListener(this);
+            saveRegistration(editDialog.addCloseHandler(this));
         }
         return editDialog;
     }
@@ -233,7 +232,7 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     {
         if (selectDialog == null) {
             selectDialog = new SelectMacroDialog(getConfig());
-            selectDialog.addPopupListener(this);
+            saveRegistration(selectDialog.addCloseHandler(this));
         }
         return selectDialog;
     }
@@ -241,13 +240,13 @@ public class MacroPlugin extends AbstractPlugin implements PopupListener
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
+    public void onClose(CloseEvent<CompositeDialogBox> event)
     {
-        if (sender == getEditDialog() && !autoClosed) {
+        if (event.getTarget() == getEditDialog() && !event.isAutoClosed()) {
             edit(false);
-        } else if (sender == getSelectDialog() && !autoClosed) {
+        } else if (event.getTarget() == getSelectDialog() && !event.isAutoClosed()) {
             insert(false);
         }
     }

@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * @version $Id$
  */
 public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSelectorWizardStep<T> implements
-    TabListener
+    SelectionHandler<Integer>
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -70,7 +70,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      * The tabbed panel of the wizard step.
      */
     private final TabPanel tabPanel = new TabPanel();
-    
+
     /**
      * The main panel of this wizard step.
      */
@@ -92,7 +92,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
 
         // instantiate the main panel
         mainPanel.addStyleName("xSelectorStep");
-        
+
         tabPanel.addStyleName("xStepsTabs");
 
         // add an empty flow panel for each step to show in the tabs panel
@@ -100,7 +100,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
             tabPanel.add(new FlowPanel(), stepName);
         }
 
-        tabPanel.addTabListener(this);
+        tabPanel.addSelectionHandler(this);
         mainPanel.add(tabPanel);
     }
 
@@ -140,16 +140,18 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
 
     /**
      * {@inheritDoc}
+     * 
+     * @see SelectionHandler#onSelection(SelectionEvent)
      */
-    public void onTabSelected(SourcesTabEvents sender, int tabIndex)
+    public void onSelection(SelectionEvent<Integer> event)
     {
-        if (sender != tabPanel) {
+        if (event.getSource() != tabPanel) {
             return;
         }
         tabPanel.addStyleName(STYLE_LOADING);
 
         // get the step to be prepared and shown
-        String stepName = tabPanel.getTabBar().getTabHTML(tabIndex);
+        String stepName = tabPanel.getTabBar().getTabHTML(event.getSelectedItem());
         final WizardStep stepToShow = getStep(stepName);
 
         final FlowPanel stepPanel = (FlowPanel) tabPanel.getWidget(tabPanel.getDeckPanel().getVisibleWidget());
@@ -191,15 +193,6 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         Label error = new Label(message);
         error.addStyleName(STYLE_ERROR);
         tabPanel.add(error);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex)
-    {
-        // nothing by default
-        return true;
     }
 
     /**

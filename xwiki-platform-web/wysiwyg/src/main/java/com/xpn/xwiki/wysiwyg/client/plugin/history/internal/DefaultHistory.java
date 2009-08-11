@@ -30,8 +30,8 @@ import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.Text;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
@@ -43,7 +43,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class DefaultHistory implements History, KeyboardListener, CommandListener
+public class DefaultHistory implements History, KeyDownHandler, CommandListener
 {
     /**
      * The list of commands that should be ignored, meaning that they shouldn't generate history entries.
@@ -93,7 +93,7 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
         this.capacity = capacity;
 
         this.textArea = textArea;
-        textArea.addKeyboardListener(this);
+        textArea.addKeyDownHandler(this);
         textArea.getCommandManager().addCommandListener(this);
     }
 
@@ -293,37 +293,17 @@ public class DefaultHistory implements History, KeyboardListener, CommandListene
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @see KeyDownHandler#onKeyDown(KeyDownEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyDown(KeyDownEvent event)
     {
-        if (sender == textArea && (modifiers & KeyboardListener.MODIFIER_CTRL) == 0) {
-            KeyboardAction currentKeyboardAction = KeyboardAction.valueOf(keyCode, modifiers);
+        if (event.getSource() == textArea && !event.isControlKeyDown()) {
+            KeyboardAction currentKeyboardAction = KeyboardAction.valueOf(event.getNativeKeyCode());
             if (isEmpty() || currentKeyboardAction != previousKeyboardAction) {
                 save();
             }
             previousKeyboardAction = currentKeyboardAction;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
-     */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        // ignore
     }
 
     /**

@@ -23,17 +23,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Image;
-import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
 /**
  * Wizard to handle the loading and navigation in a list of chained dialogs.
  * 
  * @version $Id$
  */
-public class Wizard implements NavigationListener, PopupListener
+public class Wizard implements NavigationListener, CloseHandler<CompositeDialogBox>
 {
     /**
      * Asynchronous callback adapter to handle the callback fails by displaying the error inside the dialog.
@@ -90,7 +91,7 @@ public class Wizard implements NavigationListener, PopupListener
         // initialize the dialog
         dialog = new WizardDialog(wizardTitle, wizardIcon);
         dialog.addNavigationListener(this);
-        dialog.addPopupListener(this);
+        dialog.addCloseHandler(this);
     }
 
     /**
@@ -318,10 +319,12 @@ public class Wizard implements NavigationListener, PopupListener
 
     /**
      * {@inheritDoc}
+     * 
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
+    public void onClose(CloseEvent<CompositeDialogBox> event)
     {
-        if (sender == dialog) {
+        if (event.getTarget() == dialog) {
             // if the wizard dialog was closed from the close button, cancel the whole wizard
             for (WizardListener wListener : wizardListeners) {
                 wListener.onCancel(this);

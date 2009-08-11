@@ -21,11 +21,13 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.EnumSet;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -44,13 +46,13 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * 
  * @version $Id$
  */
-public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents, KeyboardListener
+public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents, KeyPressHandler
 {
     /**
      * The default style of the link configuration dialog.
      */
     public static final String DEFAULT_STYLE_NAME = "xLinkConfig";
-    
+
     /**
      * The link data to be edited by this wizard step.
      */
@@ -95,7 +97,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         Label helpLabelLabel = new Label(getLabelTextBoxTooltip());
         helpLabelLabel.setStyleName(helpLabelStyle);
         // on enter in the textbox, submit the form
-        labelTextBox.addKeyboardListener(this);
+        labelTextBox.addKeyPressHandler(this);
         labelTextBox.setTitle(getLabelTextBoxTooltip());
         tooltipTextBox.setTitle(getTooltipTextBoxTooltip());
         mainPanel.add(labelLabel);
@@ -107,7 +109,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         Label helpTooltipLabel = new Label(getTooltipTextBoxTooltip());
         helpTooltipLabel.setStyleName(helpLabelStyle);
         // on enter in the textbox, submit the form
-        tooltipTextBox.addKeyboardListener(this);
+        tooltipTextBox.addKeyPressHandler(this);
         mainPanel.add(tooltipLabel);
         mainPanel.add(helpTooltipLabel);
         mainPanel.add(tooltipTextBox);
@@ -131,17 +133,17 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         labelTextBox.setText(linkData.getLabelText());
         labelTextBox.setReadOnly(linkData.isReadOnlyLabel());
         tooltipTextBox.setText(linkData.getTooltip() == null ? "" : linkData.getTooltip());
-        newWindowCheckBox.setChecked(linkData.isOpenInNewWindow());
+        newWindowCheckBox.setValue(linkData.isOpenInNewWindow());
         cb.onSuccess(null);
     }
-    
+
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      */
     public Widget display()
     {
         return mainPanel;
-    }    
+    }
 
     /**
      * @return the mainPanel, to be used by subclasses to display the form defined by this wizard step.
@@ -158,14 +160,14 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     {
         return labelTextBox;
     }
-    
+
     /**
      * @return the {@link LinkConfig} configured by this wizard step
      */
     public LinkConfig getLinkData()
     {
         return linkData;
-    }    
+    }
 
     /**
      * @return the tooltip for label text box
@@ -174,8 +176,8 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     {
         return Strings.INSTANCE.linkConfigLabelTextBoxTooltip();
     }
-    
-    /** 
+
+    /**
      * @return the tooltip for the tooltip text box
      */
     protected String getTooltipTextBoxTooltip()
@@ -200,9 +202,9 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     }
 
     /**
-     * {@inheritDoc}
-     * //FIXME: this will go very wrong if this function validates (and saves) and subclasses don't save and validate,
-     * the data in this superclass will be committed whereas the data in the subclasses not. This can potentially cause
+     * {@inheritDoc}<br/>
+     * FIXME: this will go very wrong if this function validates (and saves) and subclasses don't save and validate, the
+     * data in this superclass will be committed whereas the data in the subclasses not. This can potentially cause
      * trouble when trying to go to previous, we'd go back with partially submitted data in the result. Solution is to
      * skip the super call in the subclasses and do the validation only once, there: if everything passes, commit,
      * otherwise not. Another solution could be that super classes validate first their data and then, if it's fine,
@@ -224,7 +226,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
             // commit the tooltip value
             linkData.setTooltip(getTooltipTextBox().getText());
             // set the link to open in new window according to user input
-            linkData.setOpenInNewWindow(getNewWindowCheckBox().isChecked());
+            linkData.setOpenInNewWindow(getNewWindowCheckBox().getValue());
             async.onSuccess(true);
         }
     }
@@ -246,7 +248,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         // always return the (modified) linkData as result of this dialog
         return linkData;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -254,7 +256,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     {
         // this is the last step in the wizard.
         return null;
-    }    
+    }
 
     /**
      * {@inheritDoc}
@@ -294,7 +296,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     public NavigationDirection getDefaultDirection()
     {
         return NavigationDirection.FINISH;
-    }    
+    }
 
     /**
      * {@inheritDoc}
@@ -314,28 +316,14 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
 
     /**
      * {@inheritDoc}
+     * 
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        if (keyCode == KEY_ENTER) {
+        if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
             // fire the event for the default direction
             navigationListeners.fireNavigationEvent(getDefaultDirection());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        // nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
-    {
-        // nothing
     }
 }

@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.event.logical.shared.HasCloseHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,19 +33,13 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @version $Id$
  */
-public class CompositeDialogBox extends Composite implements SourcesPopupEvents,
-    com.google.gwt.user.client.ui.PopupListener
+public class CompositeDialogBox extends Composite implements HasCloseHandlers<CompositeDialogBox>,
+    CloseHandler<PopupPanel>
 {
     /**
      * The underlying dialog box.
      */
     private final DialogBox dialog;
-
-    /**
-     * The collection of {@link PopupListener} for the wrapped dialog box. We use a custom collection and not the
-     * {@link com.google.gwt.user.client.ui.PopupListener} because the default one exposes our dialog box.
-     */
-    private final PopupListenerCollection popupListeners;
 
     /**
      * Creates a new composite dialog box.
@@ -52,9 +50,7 @@ public class CompositeDialogBox extends Composite implements SourcesPopupEvents,
     public CompositeDialogBox(boolean autoHide, boolean modal)
     {
         dialog = new DialogBox(autoHide, modal);
-        dialog.addPopupListener(this);
-
-        popupListeners = new PopupListenerCollection();
+        dialog.addCloseHandler(this);
     }
 
     /**
@@ -83,13 +79,7 @@ public class CompositeDialogBox extends Composite implements SourcesPopupEvents,
      */
     public void center()
     {
-        // PopupPanel#center calls PopupPanel#hide if the dialog was not showing. We call PopupPanel#show before in
-        // order to avoid this behavior.
-        // @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3007
-        dialog.setVisible(false);
-        dialog.show();
         dialog.center();
-        dialog.setVisible(true);
     }
 
     /**
@@ -105,32 +95,22 @@ public class CompositeDialogBox extends Composite implements SourcesPopupEvents,
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesPopupEvents#addPopupListener(PopupListener)
+     * @see HasCloseHandlers#addCloseHandler(CloseHandler)
      */
-    public void addPopupListener(PopupListener listener)
+    public HandlerRegistration addCloseHandler(CloseHandler<CompositeDialogBox> handler)
     {
-        popupListeners.add(listener);
+        return addHandler(handler, CloseEvent.getType());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesPopupEvents#removePopupListener(PopupListener)
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void removePopupListener(PopupListener listener)
+    public void onClose(CloseEvent<PopupPanel> event)
     {
-        popupListeners.remove(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.google.gwt.user.client.ui.PopupListener#onPopupClosed(PopupPanel, boolean)
-     */
-    public void onPopupClosed(PopupPanel sender, boolean autoClosed)
-    {
-        if (sender == dialog) {
-            popupListeners.firePopupClosed(this, autoClosed);
+        if (event.getSource() == dialog) {
+            CloseEvent.fire(this, this, event.isAutoClosed());
         }
     }
 }

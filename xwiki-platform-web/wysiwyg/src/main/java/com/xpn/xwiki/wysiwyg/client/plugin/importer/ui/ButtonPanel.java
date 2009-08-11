@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Panel;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -52,18 +52,18 @@ public class ButtonPanel extends FlowPanel
     /**
      * Default constructor.
      * 
-     * @param listener {@link ClickListener} for buttons.
+     * @param handler {@link ClickHandler} for buttons.
      */
-    public ButtonPanel(ClickListener listener)
+    public ButtonPanel(ClickHandler handler)
     {
         filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importerFilterStylesCheckBoxCaption());
         add(filterStylesCheckBox);
         importButton = new Button(Strings.INSTANCE.importerImportButtonCaption());
         importButton.addStyleName("xImporterImportButton");
-        importButton.addClickListener(listener);
+        importButton.addClickHandler(handler);
         cancelButton = new Button(Strings.INSTANCE.importerCancelButtonCaption());
         cancelButton.addStyleName("xImporterCancelButton");
-        cancelButton.addClickListener(listener);
+        cancelButton.addClickHandler(handler);
         add(cancelButton);
         add(importButton);
 

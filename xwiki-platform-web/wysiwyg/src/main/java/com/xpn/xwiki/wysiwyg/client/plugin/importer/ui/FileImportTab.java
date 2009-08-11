@@ -22,9 +22,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
@@ -52,10 +52,10 @@ public class FileImportTab extends Composite
     /**
      * Default constructor.
      * 
-     * @param uploadUrl the url to be set for 'action' attribute of the internal form.
-     * @param formHandler the {@link FormHandler} for handling form events.
+     * @param uploadUrl the url to be set for 'action' attribute of the internal form
+     * @param submitCompleteHandler the {@link SubmitCompleteHandler} for handling the form submit complete event
      */
-    public FileImportTab(String uploadUrl, FormHandler formHandler)
+    public FileImportTab(String uploadUrl, SubmitCompleteHandler submitCompleteHandler)
     {
         // Main container panel.
         mainPanel = new FlowPanel();
@@ -65,7 +65,7 @@ public class FileImportTab extends Composite
         infoLabel.setStyleName("xInfoLabel");
         infoLabel.addStyleDependentName("mandatory");
         mainPanel.add(infoLabel);
-        
+
         Label helpLabel = new Label(Strings.INSTANCE.importerFileTabHelpLabel());
         helpLabel.setStyleName("xHelpLabel");
         mainPanel.add(helpLabel);
@@ -78,7 +78,7 @@ public class FileImportTab extends Composite
         fileUpload = new FileUpload();
         fileUpload.setName("filepath");
         formPanel.add(fileUpload);
-        formPanel.addFormHandler(formHandler);
+        formPanel.addSubmitCompleteHandler(submitCompleteHandler);
         mainPanel.add(formPanel);
 
         // Finalize.

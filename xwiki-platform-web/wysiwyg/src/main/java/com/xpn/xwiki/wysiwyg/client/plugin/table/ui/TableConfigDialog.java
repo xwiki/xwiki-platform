@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.ui;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.TextBoxNumberFilter;
@@ -37,7 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
  * 
  * @version $Id$
  */
-public class TableConfigDialog extends ComplexDialogBox implements ClickListener
+public class TableConfigDialog extends ComplexDialogBox implements ClickHandler
 {
     /**
      * Default panel style.
@@ -110,7 +110,7 @@ public class TableConfigDialog extends ComplexDialogBox implements ClickListener
         mainPanel.add(getRowsPanel());
         mainPanel.add(getColsPanel());
         // FIXME : activate table border option when possible
-        //mainPanel.add(getBorderPanel());
+        // mainPanel.add(getBorderPanel());
         mainPanel.add(getHeaderPanel());
         getFooter().add(insertButton);
 
@@ -199,7 +199,7 @@ public class TableConfigDialog extends ComplexDialogBox implements ClickListener
         header.addStyleName(INFO_LABEL_STYLE);
         FlowPanel panel = new FlowPanel();
 
-        header.setChecked(true);
+        header.setValue(true);
         panel.addStyleName(DEFAULT_PANEL_STYLE);
         panel.add(header);
 
@@ -247,7 +247,7 @@ public class TableConfigDialog extends ComplexDialogBox implements ClickListener
      */
     public boolean hasHeader()
     {
-        return header.isChecked();
+        return header.getValue();
     }
 
     /**
@@ -263,11 +263,11 @@ public class TableConfigDialog extends ComplexDialogBox implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == insertButton) {
+        if (event.getSource() == insertButton) {
             // FIXME : check that there's no 0 or "" in one of the 2 inputs.
             canceled = false;
             hide();

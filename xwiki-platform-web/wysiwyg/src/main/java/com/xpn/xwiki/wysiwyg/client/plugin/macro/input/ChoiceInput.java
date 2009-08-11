@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.input;
 
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.ListBox;
 
 /**
@@ -45,7 +46,7 @@ public class ChoiceInput extends AbstractInput
      */
     public void setFocus(boolean focused)
     {
-        ((com.google.gwt.user.client.ui.HasFocus) getWidget()).setFocus(focused);
+        ((Focusable) getWidget()).setFocus(focused);
     }
 
     /**

@@ -79,15 +79,15 @@ public class DefaultWikiMacroManager extends AbstractLogEnabled implements WikiM
     {
         DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
         descriptor.setRole(Macro.class);
-        descriptor.setRoleHint(wikiMacro.getName());
+        descriptor.setRoleHint(wikiMacro.getId());
         try {
             componentManager.registerComponent(descriptor, wikiMacro);
             wikiMacroMap.put(documentName, descriptor);
             getLogger().info(
-                String.format("Macro [%s] in [%s] successfully registered", wikiMacro.getName(), documentName));
+                String.format("Macro [%s] in [%s] successfully registered", wikiMacro.getId(), documentName));
         } catch (ComponentRepositoryException ex) {
             getLogger().error(
-                String.format("Unable to register macro [%s] in [%s]", wikiMacro.getName(), documentName), ex);
+                String.format("Unable to register macro [%s] in [%s]", wikiMacro.getId(), documentName), ex);
         }
     }
 

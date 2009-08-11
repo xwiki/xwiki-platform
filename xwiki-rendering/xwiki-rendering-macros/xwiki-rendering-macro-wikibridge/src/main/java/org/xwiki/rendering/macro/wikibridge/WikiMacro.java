@@ -31,11 +31,11 @@ import org.xwiki.rendering.macro.Macro;
 public interface WikiMacro extends Macro<WikiMacroParameters>
 {
     /**
-     * Returns the name of this {@link WikiMacro}.
+     * Returns the id under which this macro is registered with component manager.
      * 
      * @return name of this wiki macro.
      */
-    String getName();
+    String getId();
     
     /**
      * Returns the name of the document which contains the definition of this {@link WikiMacro}.

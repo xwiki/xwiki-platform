@@ -131,7 +131,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
                     // Check if the user has programming rights before continuing further.
                     if (!docBridge.hasProgrammingRights()) {
                         String errorMessage = "Unable to register macro [%s] due to insufficient privileges";
-                        getLogger().error(String.format(errorMessage, wikiMacro.getName()));
+                        getLogger().error(String.format(errorMessage, wikiMacro.getId()));
                         return;
                     }
 

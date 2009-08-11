@@ -59,6 +59,11 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
      * Constant for representing XWiki.WikiMacroClass xwiki class.
      */
     private static final String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
+    
+    /**
+     * Constant for representing macro id property.
+     */
+    private static final String MACRO_ID_PROPERTY = "id";
 
     /**
      * Constant for representing macro name property.
@@ -192,6 +197,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         }
 
         // Extract macro definition.
+        String macroId = macroDefinition.getStringValue(MACRO_ID_PROPERTY);
         String macroName = macroDefinition.getStringValue(MACRO_NAME_PROPERTY);
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
         String macroDefaultCategory = macroDefinition.getStringValue(MACRO_DEFAULT_CATEGORY_PROPERTY);
@@ -200,6 +206,12 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
         String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
         String macroCode = macroDefinition.getStringValue(MACRO_CODE_PROPERTY);
 
+        // Verify macro id.
+        if (StringUtils.isEmpty(macroId)) {
+            throw new WikiMacroBuilderException(String.format(
+                "Incomplete macro definition in [%s], macro id is empty", fullDocumentName));
+        }
+        
         // Verify macro name.
         if (StringUtils.isEmpty(macroName)) {
             throw new WikiMacroBuilderException(String.format(
@@ -285,7 +297,7 @@ public class DefaultWikiMacroBuilder extends AbstractLogEnabled implements WikiM
             contentDescriptor, parameterDescriptors);
 
         // Create & return the macro.
-        return new DefaultWikiMacro(fullDocumentName, macroName, macroSupportsInlineMode, macroDescriptor, macroCode,
+        return new DefaultWikiMacro(fullDocumentName, macroId, macroSupportsInlineMode, macroDescriptor, macroCode,
             doc.getSyntaxId(), componentManager);
     }
 

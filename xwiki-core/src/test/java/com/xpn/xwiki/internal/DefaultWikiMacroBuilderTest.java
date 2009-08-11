@@ -51,9 +51,10 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
         
         // Build the macro definition document.
         BaseObject obj = new BaseObject();
-        obj.setClassName("XWiki.WikiMacroClass");        
-        obj.setStringValue("name", "testmacro");
-        obj.setStringValue("description", "This is a test macro.");
+        obj.setClassName("XWiki.WikiMacroClass");
+        obj.setStringValue("id", "testmacro");
+        obj.setStringValue("name", "Test Macro");
+        obj.setStringValue("description", "This is a macro used for testing purposes.");
         obj.setStringValue("defaultCategory", "Test");
         obj.setIntValue("supportsInlineMode", 1);
         obj.setStringValue("contentType", "No content");
@@ -77,8 +78,9 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
         
         // Check if the macro was built correctly.
         assertEquals("xwiki:Macros.Test", macro.getDocumentName());
-        assertEquals("testmacro", macro.getName());
-        assertEquals("This is a test macro.", macro.getDescriptor().getDescription());
+        assertEquals("testmacro", macro.getId());
+        assertEquals("Test Macro", macro.getDescriptor().getName());
+        assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
         assertEquals("Test", macro.getDescriptor().getDefaultCategory());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());        

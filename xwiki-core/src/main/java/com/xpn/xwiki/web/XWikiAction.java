@@ -38,10 +38,11 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.context.Execution;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ActionExecutionEvent;
-import org.xwiki.context.Execution;
 import org.xwiki.velocity.VelocityManager;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -52,15 +53,15 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 
 /**
  * <p>
- * Root class for most XWiki actions. It provides a common framework that allows actions to execute
- * just the specific action code, handling the extra activities, such as preparing the context and
- * retrieving the document corresponding to the URL.
+ * Root class for most XWiki actions. It provides a common framework that allows actions to execute just the specific
+ * action code, handling the extra activities, such as preparing the context and retrieving the document corresponding
+ * to the URL.
  * </p>
  * <p>
- * It defines two methods, {@link #action(XWikiContext)} and {@link #render(XWikiContext)}, that
- * should be overridden by specific actions. {@link #action(XWikiContext)} should contain the
- * processing part of the action. {@link #render(XWikiContext)} should return the name of a template
- * that should be rendered, or manually write to the {@link XWikiResponse response} stream.
+ * It defines two methods, {@link #action(XWikiContext)} and {@link #render(XWikiContext)}, that should be overridden by
+ * specific actions. {@link #action(XWikiContext)} should contain the processing part of the action.
+ * {@link #render(XWikiContext)} should return the name of a template that should be rendered, or manually write to the
+ * {@link XWikiResponse response} stream.
  * </p>
  * <p>
  * Serving a request goes through the following phases:
@@ -74,15 +75,13 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
  * <li>Prepare the document objects corresponding to the requested URL</li>
  * <li>Send action pre-notifications to listeners</li>
  * <li>Run the overridden {@link #action(XWikiContext)}</li>
- * <li>If {@link #action(XWikiContext)} returns true, run the overridden
- * {@link #render(XWikiContext)}</li>
- * <li>If {@link #render(XWikiContext)} returned a string (template name), render the template with
- * that name</li>
+ * <li>If {@link #action(XWikiContext)} returns true, run the overridden {@link #render(XWikiContext)}</li>
+ * <li>If {@link #render(XWikiContext)} returned a string (template name), render the template with that name</li>
  * <li>Send action post-notifications to listeners</li>
  * </ul>
  * <p>
- * During this process, also handle specific errors, like when a document does not exist, or the
- * user does not have the right to perform the current action.
+ * During this process, also handle specific errors, like when a document does not exist, or the user does not have the
+ * right to perform the current action.
  * </p>
  */
 public abstract class XWikiAction extends Action
@@ -99,6 +98,7 @@ public abstract class XWikiAction extends Action
      * @throws IOException if an input/output error occurs
      * @throws ServletException if a servlet exception occurs
      */
+    @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest req,
         HttpServletResponse resp) throws Exception
     {
@@ -121,13 +121,13 @@ public abstract class XWikiAction extends Action
 
         return actionForward;
     }
-    
+
     public ActionForward execute(XWikiContext context) throws Exception
     {
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
         String docName = "";
-        
+
         try {
             // Verify that the requested wiki exists
             XWiki xwiki;
@@ -138,8 +138,9 @@ public abstract class XWikiAction extends Action
                 // because we want the ability to redirect somewhere when the wiki asked doesn't exist
                 // (like for example going to a special error page).
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
-                    if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context))
+                    if (!sendGlobalRedirect(context.getResponse(), context.getURL().toString(), context)) {
                         context.getResponse().sendRedirect(context.getWiki().Param("xwiki.virtual.redirect"));
+                    }
                     return null;
                 } else {
                     throw e;
@@ -157,15 +158,14 @@ public abstract class XWikiAction extends Action
                 monitor.startRequest("", context.getAction(), context.getURL());
                 monitor.startTimer("multipart");
             }
-            
+
             // Parses multipart so that params in multipart are available for all actions
             fileupload = Utils.handleMultipart(context.getRequest().getHttpServletRequest(), context);
             if (monitor != null) {
                 monitor.endTimer("multipart");
             }
 
-            XWikiURLFactory urlf =
-                xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
+            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
 
             String sajax = context.getRequest().get("ajax");
@@ -181,10 +181,9 @@ public abstract class XWikiAction extends Action
                 monitor.startTimer("request");
             }
 
-            VelocityManager velocityManager = 
-                (VelocityManager) Utils.getComponent(VelocityManager.class);
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
-            
+
             try {
                 // Prepare documents and put them in the context
                 if (!xwiki.prepareDocuments(context.getRequest(), context, vcontext)) {
@@ -200,8 +199,7 @@ public abstract class XWikiAction extends Action
                     monitor.startTimer("prenotify");
                 }
                 try {
-                    xwiki.getNotificationManager().preverify(context.getDoc(), context.getAction(),
-                        context);
+                    xwiki.getNotificationManager().preverify(context.getDoc(), context.getAction(), context);
                 } catch (Throwable e) {
                     LOG.error("Exception while pre-notifying", e);
                 }
@@ -231,17 +229,14 @@ public abstract class XWikiAction extends Action
                 if (e instanceof IOException) {
                     e =
                         new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                            "Exception while sending response",
+                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response",
                             e);
                 }
 
                 if (!(e instanceof XWikiException)) {
                     e =
-                        new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                            XWikiException.ERROR_XWIKI_UNKNOWN,
-                            "Uncaught exception",
-                            e);
+                        new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
+                            "Uncaught exception", e);
                 }
 
                 try {
@@ -252,12 +247,10 @@ public abstract class XWikiAction extends Action
                         // We don't write any other message, as the connection is broken, anyway.
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
-                        Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception",
-                            "accessdenied"), context);
+                        Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception", "accessdenied"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE) {
-                        Utils.parseTemplate(context.getWiki().Param("xwiki.user_exception",
-                            "userinactive"), context);
+                        Utils.parseTemplate(context.getWiki().Param("xwiki.user_exception", "userinactive"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND) {
                         context.put("message", "attachmentdoesnotexist");
@@ -265,13 +258,11 @@ public abstract class XWikiAction extends Action
                             "attachmentdoesnotexist"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION) {
-                        vcontext.put("message", context.getMessageTool().get(
-                            "platform.core.invalidUrl"));
-                        xwiki.setPhonyDocument(xwiki.getDefaultWeb(context) + "."
-                            + xwiki.getDefaultPage(context), context, vcontext);
+                        vcontext.put("message", context.getMessageTool().get("platform.core.invalidUrl"));
+                        xwiki.setPhonyDocument(xwiki.getDefaultWeb(context) + "." + xwiki.getDefaultPage(context),
+                            context, vcontext);
                         context.getResponse().setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        Utils.parseTemplate(context.getWiki().Param(
-                            "xwiki.invalid_url_exception", "error"), context);
+                        Utils.parseTemplate(context.getWiki().Param("xwiki.invalid_url_exception", "error"), context);
                         return null;
                     }
                     vcontext.put("exp", e);
@@ -308,8 +299,7 @@ public abstract class XWikiAction extends Action
                 // This is the old notification mechanism. It is kept here because it is in a
                 // deprecation stage. It will be removed later.
                 try {
-                    xwiki.getNotificationManager().verify(context.getDoc(), context.getAction(),
-                        context);
+                    xwiki.getNotificationManager().verify(context.getDoc(), context.getAction(), context);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
@@ -318,12 +308,11 @@ public abstract class XWikiAction extends Action
                 // changed in the future, when the whole platform will be written using components
                 // and there won't be a need for the context.
                 try {
-                    ObservationManager om =
-                        (ObservationManager) Utils.getComponent(ObservationManager.class);
+                    ObservationManager om = Utils.getComponent(ObservationManager.class);
                     om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
-                    LOG.error("Cannot send action notifications for document [" + docName
-                        + " using action [" + context.getAction() + "]", ex);
+                    LOG.error("Cannot send action notifications for document [" + docName + " using action ["
+                        + context.getAction() + "]", ex);
                 }
 
                 if (monitor != null) {
@@ -343,25 +332,25 @@ public abstract class XWikiAction extends Action
             }
 
             if (context != null) {
-            
+
                 if (fileupload != null) {
                     fileupload.cleanFileList(context);
                 }
             }
-            
+
             MDC.remove("url");
         }
     }
-    
-    protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, 
-        HttpServletRequest req, HttpServletResponse resp) throws XWikiException, ServletException
+
+    protected XWikiContext initializeXWikiContext(ActionMapping mapping, ActionForm form, HttpServletRequest req,
+        HttpServletResponse resp) throws XWikiException, ServletException
     {
         String action = mapping.getName();
 
         XWikiRequest request = new XWikiServletRequest(req);
         XWikiResponse response = new XWikiServletResponse(resp);
-        XWikiContext context = Utils.prepareContext(action, request, response,
-            new XWikiServletContext(servlet.getServletContext()));
+        XWikiContext context =
+            Utils.prepareContext(action, request, response, new XWikiServletContext(this.servlet.getServletContext()));
 
         // This code is already called by struts.
         // However struts will also set all the parameters of the form data
@@ -385,31 +374,28 @@ public abstract class XWikiAction extends Action
         return context;
     }
 
-    protected void initializeContainerComponent(XWikiContext context)
-        throws ServletException
+    protected void initializeContainerComponent(XWikiContext context) throws ServletException
     {
         // Initialize the Container fields (request, response, session).
         // Note that this is a bridge between the old core and the component architecture.
-        // In the new component architecture we use ThreadLocal to transport the request, 
+        // In the new component architecture we use ThreadLocal to transport the request,
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
-        ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
+        ServletContainerInitializer containerInitializer = Utils.getComponent(ServletContainerInitializer.class);
 
         try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
-                context);
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
             containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize Request/Response or Session", e);
-        }            
+        }
     }
-    
+
     protected void cleanupComponents()
     {
-        Container container = (Container) Utils.getComponent(Container.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        Container container = Utils.getComponent(Container.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         // We must ensure we clean the ThreadLocal variables located in the Container and Execution
         // components as otherwise we will have a potential memory leak.
@@ -418,10 +404,10 @@ public abstract class XWikiAction extends Action
         container.removeSession();
         execution.removeContext();
     }
-    
+
     public String getRealPath(String path)
     {
-        return servlet.getServletContext().getRealPath(path);
+        return this.servlet.getServletContext().getRealPath(path);
     }
 
     // hook
@@ -447,8 +433,8 @@ public abstract class XWikiAction extends Action
                 (!doc.getLanguage().equals(tdoc.getLanguage())) ? doc : context.getWiki()
                     .getDocument(doc, rev, context);
             XWikiDocument rtdoc =
-                (doc.getLanguage().equals(tdoc.getLanguage())) ? rdoc : context.getWiki()
-                    .getDocument(tdoc, rev, context);
+                (doc.getLanguage().equals(tdoc.getLanguage())) ? rdoc : context.getWiki().getDocument(tdoc, rev,
+                    context);
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);
             context.put("doc", rdoc);
@@ -460,16 +446,15 @@ public abstract class XWikiAction extends Action
     }
 
     /**
-     * Send redirection based on a regexp pattern (if any) set at the main wiki level.
-     * To enable this feature you must add xwiki.preferences.redirect=1 to your xwiki.cfg.
-     *
+     * Send redirection based on a regexp pattern (if any) set at the main wiki level. To enable this feature you must
+     * add xwiki.preferences.redirect=1 to your xwiki.cfg.
+     * 
      * @param response the servlet response
-     * @param url      url of the request
-     * @param context  the XWiki context
+     * @param url url of the request
+     * @param context the XWiki context
      * @return true if a redirection has been sent
      */
-    protected boolean sendGlobalRedirect(XWikiResponse response, String url, XWikiContext context)
-            throws Exception
+    protected boolean sendGlobalRedirect(XWikiResponse response, String url, XWikiContext context) throws Exception
     {
         if ("1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
             // Note: This implementation is not performant at all and will slow down the wiki as the number
@@ -502,9 +487,7 @@ public abstract class XWikiAction extends Action
         } catch (IOException e) {
             Object[] args = {page};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION,
-                "Exception while sending redirect to page {0}",
-                e,
+                XWikiException.ERROR_XWIKI_APP_REDIRECT_EXCEPTION, "Exception while sending redirect to page {0}", e,
                 args);
         }
     }

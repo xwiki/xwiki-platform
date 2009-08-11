@@ -22,9 +22,13 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 import org.xwiki.gwt.dom.client.Element;
 
 import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.user.client.ui.LoadListener;
-import com.google.gwt.user.client.ui.LoadListenerCollection;
-import com.google.gwt.user.client.ui.SourcesLoadEvents;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.HasLoadHandlers;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.event.shared.GwtEvent;
+import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
@@ -33,15 +37,16 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * @version $Id$
  */
 public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla implements
-    SourcesLoadEvents
+    HasLoadHandlers
 {
     /**
-     * The collection of load listeners.<br/>
+     * The handler manager used to fire load events. We need it because this class is not a widget and we don't have
+     * access to the rich text area from its implementation.<br/>
      * NOTE: Stop firing load events as soon as GWT provides a way to detect that a rich text area has finished loading.
      * 
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3059
      */
-    private final LoadListenerCollection loadListeners = new LoadListenerCollection();
+    private final HandlerManager handlerManager = new HandlerManager(this);
 
     /**
      * {@inheritDoc}<br/>
@@ -139,28 +144,27 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
     protected void onElementInitialized()
     {
         super.onElementInitialized();
-        // This is a workaround to be able to detect when the rich text area has finished loading. The sender is
-        // <code>null</code> because we don't have access to a widget.
-        loadListeners.fireLoad(null);
+        // We fire a fake load event to notify that the rich text area has finished loading.
+        DomEvent.fireNativeEvent(IFrameElement.as(elem).getContentDocument().createLoadEvent(), this);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesLoadEvents#addLoadListener(LoadListener)
+     * @see HasLoadHandlers#addLoadHandler(LoadHandler)
      */
-    public void addLoadListener(LoadListener listener)
+    public HandlerRegistration addLoadHandler(LoadHandler handler)
     {
-        loadListeners.add(listener);
+        return handlerManager.addHandler(LoadEvent.getType(), handler);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see SourcesLoadEvents#removeLoadListener(LoadListener)
+     * @see HasLoadHandlers#fireEvent(GwtEvent)
      */
-    public void removeLoadListener(LoadListener listener)
+    public void fireEvent(GwtEvent< ? > event)
     {
-        loadListeners.remove(listener);
+        handlerManager.fireEvent(event);
     }
 }

@@ -21,10 +21,12 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -44,7 +46,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
  * 
  * @version $Id$
  */
-public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements ChangeListener
+public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements ChangeHandler
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -122,13 +124,13 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         // hide this selector by default, until we get to update it from the server
         wikiSelector.setVisible(false);
 
-        wikiSelector.addChangeListener(this);
-        spaceSelector.addChangeListener(this);
+        wikiSelector.addChangeHandler(this);
+        spaceSelector.addChangeHandler(this);
 
         Button updateImagesListButton = new Button(Strings.INSTANCE.imageUpdateListButton());
-        updateImagesListButton.addClickListener(new ClickListener()
+        updateImagesListButton.addClickHandler(new ClickHandler()
         {
-            public void onClick(Widget sender)
+            public void onClick(ClickEvent event)
             {
                 initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector
                     .getSelectedSpace(), pageSelector.getSelectedPage(), null));
@@ -293,14 +295,14 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     /**
      * {@inheritDoc}
      * 
-     * @see ChangeListener#onChange(Widget)
+     * @see ChangeHandler#onChange(ChangeEvent)
      */
-    public void onChange(Widget sender)
+    public void onChange(ChangeEvent event)
     {
-        if (sender == pageSelector) {
+        if (event.getSource() == pageSelector) {
             // nothing
         }
-        if (sender == wikiSelector) {
+        if (event.getSource() == wikiSelector) {
             spaceSelector.setWiki(wikiSelector.getSelectedWiki());
             spaceSelector.refreshList(spaceSelector.getSelectedSpace(), new AsyncCallback<List<String>>()
             {
@@ -316,7 +318,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 }
             });
         }
-        if (sender == spaceSelector) {
+        if (event.getSource() == spaceSelector) {
             pageSelector.setWiki(wikiSelector.getSelectedWiki());
             pageSelector.setSpace(spaceSelector.getSelectedSpace());
             pageSelector.refreshList(pageSelector.getSelectedPage());

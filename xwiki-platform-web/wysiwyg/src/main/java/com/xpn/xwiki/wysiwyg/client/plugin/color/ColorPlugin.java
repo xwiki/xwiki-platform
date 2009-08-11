@@ -23,9 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.user.client.ui.PopupListener;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,7 +48,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupListener
+public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHandler<PopupPanel>
 {
     /**
      * The colors available by default on the color palette.
@@ -121,7 +123,8 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     private void addFeature(String name, Command command, Image image, String title)
     {
         if (getTextArea().getCommandManager().isSupported(command)) {
-            PushButton button = new PushButton(image, this);
+            PushButton button = new PushButton(image);
+            saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -138,13 +141,11 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
         if (colorPicker != null) {
             colorPicker.hide();
             colorPicker.removeFromParent();
-            colorPicker.removePopupListener(this);
             colorPicker = null;
         }
 
         for (PushButton button : buttons.keySet()) {
             button.removeFromParent();
-            button.removeClickListener(this);
         }
         buttons.clear();
 
@@ -158,10 +159,11 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
+        Widget sender = (Widget) event.getSource();
         Command command = buttons.get(sender);
         if (command != null) {
             currentCommand = command;
@@ -180,11 +182,11 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(PopupPanel, boolean)
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void onPopupClosed(PopupPanel sender, boolean autoHide)
+    public void onClose(CloseEvent<PopupPanel> event)
     {
-        if (sender == getColorPicker() && !autoHide) {
+        if (event.getSource() == getColorPicker() && !event.isAutoClosed()) {
             String color = getColorPicker().getColor();
             getTextArea().setFocus(true);
             if (color != null) {
@@ -205,7 +207,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
             int columnCount = Integer.parseInt(getConfig().getParameter("colorsPerRow", DEFAULT_COLUMN_COUNT));
 
             colorPicker = new ColorPicker(new ColorPalette(colors, columnCount));
-            colorPicker.addPopupListener(this);
+            saveRegistration(colorPicker.addCloseHandler(this));
         }
         return colorPicker;
     }

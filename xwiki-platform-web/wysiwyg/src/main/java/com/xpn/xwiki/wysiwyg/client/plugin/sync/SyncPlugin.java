@@ -24,24 +24,26 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.RangeFactory;
 import org.xwiki.gwt.dom.client.Selection;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.Element;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.SpanElement;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.PushButton;
+import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
+import com.xpn.xwiki.gwt.api.client.dialog.MessageDialog;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
-import com.xpn.xwiki.wysiwyg.client.diff.PatchFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
@@ -51,14 +53,8 @@ import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.util.Timer;
 import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.gwt.api.client.dialog.MessageDialog;
-import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 
-import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Window;
-
-public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerListener, AsyncCallback<SyncResult>
+public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerListener, AsyncCallback<SyncResult>
 {
     public static final int DEFAULT_SYNC_DELAY = 3000;
 
@@ -103,13 +99,14 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
             return;
         }
 
-        sync = new PushButton(Images.INSTANCE.sync().createImage(), this);
+        sync = new PushButton(Images.INSTANCE.sync().createImage());
+        saveRegistration(sync.addClickHandler(this));
         sync.setTitle(Strings.INSTANCE.sync());
 
         toolBarExtension.addFeature("sync", sync);
         getUIExtensionList().add(toolBarExtension);
 
-        initialContent = (version==0) ? "" : getTextArea().getHTML();
+        initialContent = (version == 0) ? "" : getTextArea().getHTML();
         if (initialContent == null) {
             initialContent = "";
         }
@@ -127,7 +124,6 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
     public void destroy()
     {
         sync.removeFromParent();
-        sync.removeClickListener(this);
         sync = null;
 
         toolBarExtension.clearFeatures();
@@ -142,11 +138,11 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == sync) {
+        if (event.getSource() == sync) {
             onSync();
         }
     }
@@ -174,17 +170,19 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
         try {
             // Compute our revision
             syncedRevision = null;
-            if (version!=0) {
+            if (version != 0) {
 
-                if (sendCursor)
+                if (sendCursor) {
                     insertCursor(getTextArea().getDocument());
-                syncedContent = (version==0) ? "" : getTextArea().getHTML();
-                if (sendCursor)
+                }
+                syncedContent = (version == 0) ? "" : getTextArea().getHTML();
+                if (sendCursor) {
                     removeCursor(getTextArea().getDocument());
-                if ((version>0) && !initialContent.equals(syncedContent)) {
+                }
+                if ((version > 0) && !initialContent.equals(syncedContent)) {
                     try {
                         syncedRevision =
-                                Diff.diff(ToString.stringToArray(initialContent), ToString.stringToArray(syncedContent));
+                            Diff.diff(ToString.stringToArray(initialContent), ToString.stringToArray(syncedContent));
                     } catch (DifferentiationFailedException e) {
                         showErrorAndResetSync(e);
                     }
@@ -195,15 +193,17 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
 
             // Commit our revision and, at the same time, checkout the latest revision
             // If we send -1 then we ask the server to reset it's content to the page content
-            boolean syncReset = ((version==0)&&(getConfig().getParameter("syncReset", "0").equals("1")));
-            WysiwygService.Singleton.getInstance().syncEditorContent(syncedRevision, pageName, version, syncReset, this);
+            boolean syncReset = ((version == 0) && (getConfig().getParameter("syncReset", "0").equals("1")));
+            WysiwygService.Singleton.getInstance()
+                .syncEditorContent(syncedRevision, pageName, version, syncReset, this);
         } catch (Throwable th) {
             debugMessage("error in onSync ");
             showErrorAndResetSync(th);
         }
     }
 
-    private void insertCursor(Document doc) {
+    private void insertCursor(Document doc)
+    {
         try {
             int color = id - 10 * (int) Math.floor(id / 10);
             // insertCursor(element, id, color);
@@ -213,11 +213,9 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
             cursorNode.setAttribute("style", "background-color: #" + color + ";");
             Range range = doc.getSelection().getRangeAt(0);
             try {
-                if (range!=null) {
-                    if (range.getStartContainer().equals(doc)
-                            &&range.getEndContainer().equals(doc)
-                            &&range.getStartOffset()==0
-                            &&range.getEndOffset()==0) {
+                if (range != null) {
+                    if (range.getStartContainer().equals(doc) && range.getEndContainer().equals(doc)
+                        && range.getStartOffset() == 0 && range.getEndOffset() == 0) {
                         debugMessage("Cursor at start.. let's not handle it");
                     } else {
                         debugMessage("Start container: " + range.getStartContainer());
@@ -234,7 +232,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                     debugMessage("Exception: " + e.getMessage());
                     e.printStackTrace();
                     debugMessage(e.toString());
-                    if (range!=null) {
+                    if (range != null) {
                         debugMessage("Start container: " + range.getStartContainer());
                         debugMessage("Start offset: " + range.getStartOffset());
                         debugMessage("End container: " + range.getEndContainer());
@@ -245,7 +243,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                         }
                     }
                     Selection selection = doc.getSelection();
-                    if (selection!=null) {
+                    if (selection != null) {
                         debugMessage("Selection range count: " + selection.getRangeCount());
                     }
                 } catch (Exception e2) {
@@ -259,16 +257,18 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
 
     }
 
-    private void removeCursor(Document doc) {
+    private void removeCursor(Document doc)
+    {
         try {
             Node cursorNode = null;
             NodeList list = doc.getElementsByTagName("span");
-            for (int i=0;i<list.getLength();i++) {
+            for (int i = 0; i < list.getLength(); i++) {
                 Element element = (Element) list.getItem(i);
-                if (element.getId().equals("cursor-" + id))
+                if (element.getId().equals("cursor-" + id)) {
                     cursorNode = element;
+                }
             }
-            if (cursorNode!=null) {
+            if (cursorNode != null) {
                 debugMessage("found cursor element");
                 Node firstNode = null;
                 Node lastNode = null;
@@ -276,12 +276,14 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                 NodeList childs = cursorNode.getChildNodes();
                 // readd all childs of the cursor to the left of the cursor node
                 int nb = childs.getLength();
-                for (int i=nb-1;i>=0;i--) {
+                for (int i = nb - 1; i >= 0; i--) {
                     Node node = childs.getItem(i);
-                    if (i==0)
+                    if (i == 0) {
                         firstNode = node;
-                    if (i==nb-1)
+                    }
+                    if (i == nb - 1) {
                         lastNode = node;
+                    }
                     // we want to insert the node in it's parent before the cursor Node
                     cursorNode.removeChild(node);
                     cursorNode.getParentNode().insertBefore(node, pNode);
@@ -295,14 +297,14 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                 debugMessage("creating new range");
                 Range range = RangeFactory.INSTANCE.createRange(doc);
 
-                if (firstNode!=null) {
+                if (firstNode != null) {
                     debugMessage("set range with first node and last node");
                     range.setStartBefore(firstNode);
                     range.setEndAfter(lastNode);
-                } else if (previousNode!=null){
+                } else if (previousNode != null) {
                     debugMessage("set range with previous node");
                     Node nextNode = previousNode.getNextSibling();
-                    if (nextNode!=null) {
+                    if (nextNode != null) {
                         range.setStart(nextNode, 0);
                     } else {
                         range.setStartAfter(previousNode);
@@ -330,7 +332,6 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
         }
     }
 
-
     /**
      * {@inheritDoc}
      * 
@@ -341,15 +342,19 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
         showErrorAndResetSync(caught);
     }
 
-    private void showErrorAndResetSync(Throwable caught) {
-        showError(caught, new AsyncCallback() {
-         public void onFailure(Throwable throwable) {
-             syncInProgress = false;
-         }
+    private void showErrorAndResetSync(Throwable caught)
+    {
+        showError(caught, new AsyncCallback()
+        {
+            public void onFailure(Throwable throwable)
+            {
+                syncInProgress = false;
+            }
 
-         public void onSuccess(Object o) {
-             syncInProgress = false;
-         }
+            public void onSuccess(Object o)
+            {
+                syncInProgress = false;
+            }
         });
     }
 
@@ -375,14 +380,14 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
             if (newRevision != null) {
                 // We don't have the latest version
                 // We need to take local changes that might have occured
-                if (maintainCursor && (version!=0))
-                 insertCursor(getTextArea().getDocument());
-                String localContent = (version==0) ? "" : getTextArea().getHTML();
+                if (maintainCursor && (version != 0)) {
+                    insertCursor(getTextArea().getDocument());
+                }
+                String localContent = (version == 0) ? "" : getTextArea().getHTML();
 
                 String newHTMLContent = "";
                 try {
-                    newHTMLContent =
-                            ToString.arrayToString(newRevision.patch(ToString.stringToArray(initialContent)));
+                    newHTMLContent = ToString.arrayToString(newRevision.patch(ToString.stringToArray(initialContent)));
                 } catch (Exception e) {
                     debugMessage("Exception while patching initial content: " + e.getMessage());
                     debugMessage("Initial content was: " + initialContent);
@@ -392,13 +397,14 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                 String futureInitialContent = newHTMLContent;
 
                 // we need to compute local changes, including the cursor
-                if ((version!=0) && !localContent.equals(initialContent)) {
+                if ((version != 0) && !localContent.equals(initialContent)) {
                     try {
                         // we need to rework the path to take into account the local content
-                        Revision localRevision = Diff.diff(ToString.stringToArray(initialContent), ToString.stringToArray(localContent));
+                        Revision localRevision =
+                            Diff.diff(ToString.stringToArray(initialContent), ToString.stringToArray(localContent));
                         Revision localRevision2 = SyncTools.relocateRevision(localRevision, newRevision);
                         newHTMLContent =
-                                ToString.arrayToString(localRevision2.patch(ToString.stringToArray(newHTMLContent)));
+                            ToString.arrayToString(localRevision2.patch(ToString.stringToArray(newHTMLContent)));
                     } catch (Exception e) {
                         debugMessage("Exception while applying local revision: " + e.getMessage());
                     }
@@ -409,8 +415,9 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
                 setHTML(newHTMLContent);
 
                 // we should have retrieved the cursor so we need to remove it
-                if ((maintainCursor||sendCursor)&& (version!=0))
-                 removeCursor(getTextArea().getDocument());
+                if ((maintainCursor || sendCursor) && (version != 0)) {
+                    removeCursor(getTextArea().getDocument());
+                }
             } else {
                 // We have the latest version
                 initialContent = syncedContent;
@@ -423,21 +430,22 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
         }
     }
 
-    private void setHTML(String newHTMLContent) {
+    private void setHTML(String newHTMLContent)
+    {
         getTextArea().setHTML(newHTMLContent);
     }
 
-
     /**
-     *
      * @param title
      * @param message
      */
-    public void showDialog(String title, String message, AsyncCallback cb) {
+    public void showDialog(String title, String message, AsyncCallback cb)
+    {
         try {
             MessageDialog messageDialog = new MessageDialog(getWysiwyg(), title, Dialog.BUTTON_CANCEL);
-            if (cb!=null)
+            if (cb != null) {
                 messageDialog.setAsyncCallback(cb);
+            }
             messageDialog.setMessage(message, new String[0]);
             messageDialog.show();
         } catch (Throwable e) {
@@ -446,36 +454,39 @@ public class SyncPlugin extends AbstractPlugin implements ClickListener, TimerLi
         }
 
     }
-    
-    public void showError(Throwable caught, AsyncCallback cb) {
+
+    public void showError(Throwable caught, AsyncCallback< ? > cb)
+    {
         debugMessage("Error should be shown " + caught.getMessage());
         if (caught instanceof XWikiGWTException) {
             debugMessage("Error is XWikiGWTException");
-            XWikiGWTException exp = ((XWikiGWTException)caught);
-            if (exp.getCode()== 9002) {
+            XWikiGWTException exp = ((XWikiGWTException) caught);
+            if (exp.getCode() == 9002) {
                 // This is a login error
                 showDialog(getWysiwyg().getTranslation("appname"), getWysiwyg().getTranslation("login_first"), cb);
-            }
-            else if (exp.getCode()== 9001) {
+            } else if (exp.getCode() == 9001) {
                 // This is a right error
                 showDialog(getWysiwyg().getTranslation("appname"), getWysiwyg().getTranslation("missing_rights"), cb);
-            } else
+            } else {
                 showError("" + exp.getCode(), exp.getFullMessage(), cb);
-        }
-        else {
+            }
+        } else {
             debugMessage("Error is not XWikiGWTException");
-            if (caught!=null)
+            if (caught != null) {
                 caught.printStackTrace();
+            }
             debugMessage("Error is: " + caught.toString());
-            showError("", (caught==null) ? "" : caught.toString(), cb);
+            showError("", (caught == null) ? "" : caught.toString(), cb);
         }
     }
 
-    public void showError(String text, AsyncCallback cb) {
+    public void showError(String text, AsyncCallback< ? > cb)
+    {
         showError("", text, cb);
     }
 
-    public void showError(String code, String text, AsyncCallback cb) {
+    public void showError(String code, String text, AsyncCallback< ? > cb)
+    {
         String[] args = new String[1];
         args[0] = code;
         debugMessage("Error ready to display");

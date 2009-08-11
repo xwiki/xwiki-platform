@@ -53,14 +53,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea
     private final BehaviorAdjuster adjuster = (BehaviorAdjuster) GWT.create(BehaviorAdjuster.class);
 
     /**
-     * The current event triggered on this rich text area. We need to store it because DOM.eventGetCurrentEvent() and
-     * Event.getCurrentEvent() return null for RichTextArea events.
-     * 
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3133
-     */
-    private Event currentEvent;
-
-    /**
      * Creates a new rich text area.
      */
     public RichTextArea()
@@ -136,11 +128,9 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea
         if (!previewEvent(event)) {
             return;
         }
-        currentEvent = event.cast();
-        adjuster.onBeforeBrowserEvent();
+        adjuster.onBeforeBrowserEvent((Event) event);
         super.onBrowserEvent(event);
-        adjuster.onBrowserEvent();
-        currentEvent = null;
+        adjuster.onBrowserEvent((Event) event);
     }
 
     /**
@@ -155,13 +145,4 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea
     /*-{
         return @com.google.gwt.user.client.DOM::previewEvent(Lcom/google/gwt/user/client/Event;)(event);
     }-*/;
-
-    /**
-     * @return the current event triggered on this rich text area.
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3133
-     */
-    public Event getCurrentEvent()
-    {
-        return currentEvent;
-    }
 }

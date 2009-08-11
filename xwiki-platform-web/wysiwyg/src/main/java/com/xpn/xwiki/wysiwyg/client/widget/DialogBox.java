@@ -21,8 +21,13 @@ package com.xpn.xwiki.wysiwyg.client.widget;
 
 import org.xwiki.gwt.dom.client.Style;
 
+import com.google.gwt.dom.client.EventTarget;
+import com.google.gwt.dom.client.NativeEvent;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.Event.NativePreviewEvent;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -40,7 +45,7 @@ import com.xpn.xwiki.wysiwyg.client.util.DragListener;
  * 
  * @version $Id$
  */
-public class DialogBox extends PopupPanel implements DragListener, ClickListener
+public class DialogBox extends PopupPanel implements DragListener, ClickHandler
 {
     /**
      * The style name used when the dialog is dragged.
@@ -133,7 +138,7 @@ public class DialogBox extends PopupPanel implements DragListener, ClickListener
         closeIcon = Images.INSTANCE.close().createImage();
         closeIcon.setTitle(Strings.INSTANCE.close());
         closeIcon.addStyleName("xDialogCloseIcon");
-        closeIcon.addClickListener(this);
+        closeIcon.addClickHandler(this);
 
         captionBar = new FlowPanel();
         captionBar.addStyleName("xDialogCaptionBar");
@@ -233,18 +238,34 @@ public class DialogBox extends PopupPanel implements DragListener, ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see PopupPanel#onEventPreview(Event)
+     * @see PopupPanel#onPreviewNativeEvent(NativePreviewEvent)
      */
-    public boolean onEventPreview(Event event)
+    protected void onPreviewNativeEvent(NativePreviewEvent event)
     {
-        // We need to preventDefault() on mouseDown events (outside of the dialog's content) to keep text from being
-        // selected when it is dragged.
-        if (event.getTypeInt() == Event.ONMOUSEDOWN) {
-            if (caption.getElement().isOrHasChild(event.getTarget())) {
-                event.preventDefault();
-            }
+        // We need to preventDefault() on mouseDown events (outside of the
+        // DialogBox content) to keep text from being selected when it
+        // is dragged.
+        NativeEvent nativeEvent = event.getNativeEvent();
+
+        if (!event.isCanceled() && (event.getTypeInt() == Event.ONMOUSEDOWN) && isCaptionEvent(nativeEvent)) {
+            nativeEvent.preventDefault();
         }
-        return super.onEventPreview(event);
+
+        super.onPreviewNativeEvent(event);
+    }
+
+    /**
+     * @param event a native event
+     * @return {@code true} if the target of the given event is the caption bar or one of its descendants, {@code false}
+     *         otherwise
+     */
+    private boolean isCaptionEvent(NativeEvent event)
+    {
+        EventTarget target = event.getEventTarget();
+        if (Element.is(target)) {
+            return captionBar.getElement().isOrHasChild(Element.as(target));
+        }
+        return false;
     }
 
     /**
@@ -317,11 +338,11 @@ public class DialogBox extends PopupPanel implements DragListener, ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == closeIcon) {
+        if (event.getSource() == closeIcon) {
             hide();
         }
     }

@@ -21,8 +21,12 @@ package com.xpn.xwiki.wysiwyg.client.plugin.list.internal;
 
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Event;
 
 import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster;
 
@@ -64,36 +68,36 @@ public class MozillaListBehaviorAdjuster extends ListBehaviorAdjuster
      * delete key. Therefore, on key down we will store the key that is pressed and on keyPress we handle it. On keyUp,
      * we reset the pressed keycode to the unset value.
      * 
-     * @see ListBehaviorAdjuster#onKeyDown(Widget, char, int)
+     * @see ListBehaviorAdjuster#onKeyDown(KeyDownEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyDown(KeyDownEvent event)
     {
-        keyDownCode = keyCode;
+        keyDownCode = event.getNativeKeyCode();
     }
 
     /**
-     * {@inheritDoc} 
+     * {@inheritDoc}
      * 
-     * @see ListBehaviorAdjuster#onKeyPress(Widget, char, int)
-     * @see MozillaListBehaviorAdjuster#onKeyDown(Widget, char, int)
+     * @see ListBehaviorAdjuster#onKeyPress(KeyPressEvent)
+     * @see MozillaListBehaviorAdjuster#onKeyDown(KeyDownEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
         // just to be sure, although it should have been set on key down
         if (keyDownCode > 0) {
-            dispatchKey(sender, (char) keyDownCode, modifiers);
+            dispatchKey((Widget) event.getSource(), (Event) event.getNativeEvent());
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ListBehaviorAdjuster#onKeyUp(Widget, char, int)
-     * @see MozillaListBehaviorAdjuster#onKeyDown(Widget, char, int)
+     * @see ListBehaviorAdjuster#onKeyUp(KeyUpEvent)
+     * @see MozillaListBehaviorAdjuster#onKeyDown(KeyDownEvent)
      */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
+    public void onKeyUp(KeyUpEvent event)
     {
         keyDownCode = -1;
-        super.onKeyUp(sender, keyCode, modifiers);
+        super.onKeyUp(event);
     }
 }

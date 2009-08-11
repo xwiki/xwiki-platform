@@ -24,11 +24,11 @@ import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Style;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.ToggleButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -47,7 +47,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleExecutable;
  * 
  * @version $Id$
  */
-public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListener
+public class JustifyPlugin extends AbstractStatefulPlugin implements ClickHandler
 {
     /**
      * The association between tool bar buttons and the commands that are executed when these buttons are clicked.
@@ -83,9 +83,7 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
             .justifyFull());
 
         if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().addMouseListener(this);
-            getTextArea().addKeyboardListener(this);
-            getTextArea().getCommandManager().addCommandListener(this);
+            registerTextAreaHandlers();
             getUIExtensionList().add(toolBarExtension);
         }
     }
@@ -117,7 +115,8 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     {
         ToggleButton button = null;
         if (getTextArea().getCommandManager().isSupported(command)) {
-            button = new ToggleButton(image, this);
+            button = new ToggleButton(image);
+            saveRegistration(button.addClickHandler(this));
             button.setTitle(title);
             toolBarExtension.addFeature(name, button);
             buttons.put(button, command);
@@ -134,16 +133,10 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     {
         for (ToggleButton button : buttons.keySet()) {
             button.removeFromParent();
-            button.removeClickListener(this);
         }
         buttons.clear();
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            getTextArea().removeMouseListener(this);
-            getTextArea().removeKeyboardListener(this);
-            getTextArea().getCommandManager().removeCommandListener(this);
-            toolBarExtension.clearFeatures();
-        }
+        toolBarExtension.clearFeatures();
 
         super.destroy();
     }
@@ -151,12 +144,12 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickListen
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        Command command = buttons.get(sender);
-        if (command != null && ((FocusWidget) sender).isEnabled()) {
+        Command command = buttons.get(event.getSource());
+        if (command != null && ((FocusWidget) event.getSource()).isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(command);
         }

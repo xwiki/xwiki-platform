@@ -1,6 +1,6 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.history.internal;
 
-import com.google.gwt.user.client.ui.KeyboardListener;
+import com.google.gwt.event.dom.client.KeyCodes;
 
 /**
  * Types of action the user can do with its keyboard.
@@ -16,21 +16,20 @@ public enum KeyboardAction
     /**
      * The user deletes text.
      */
-    DELETE(new char[] {KeyboardListener.KEY_BACKSPACE, KeyboardListener.KEY_DELETE}),
+    DELETE(new char[] {KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_DELETE}),
     /**
      * The user inserts in-line white space.
      */
-    INSERT_SPACE(new char[] {' ', KeyboardListener.KEY_TAB}),
+    INSERT_SPACE(new char[] {' ', KeyCodes.KEY_TAB}),
     /**
      * The user inserts a new line.
      */
-    INSERT_NEW_LINE(new char[] {KeyboardListener.KEY_ENTER}),
+    INSERT_NEW_LINE(new char[] {KeyCodes.KEY_ENTER}),
     /**
      * The user navigates through the text.
      */
-    MOVE_CARET(new char[] {KeyboardListener.KEY_DOWN, KeyboardListener.KEY_END, KeyboardListener.KEY_HOME,
-        KeyboardListener.KEY_LEFT, KeyboardListener.KEY_PAGEDOWN, KeyboardListener.KEY_PAGEUP,
-        KeyboardListener.KEY_RIGHT, KeyboardListener.KEY_UP});
+    MOVE_CARET(new char[] {KeyCodes.KEY_DOWN, KeyCodes.KEY_END, KeyCodes.KEY_HOME, KeyCodes.KEY_LEFT,
+        KeyCodes.KEY_PAGEDOWN, KeyCodes.KEY_PAGEUP, KeyCodes.KEY_RIGHT, KeyCodes.KEY_UP});
 
     /**
      * The key codes associated with this keyboard action.
@@ -47,10 +46,9 @@ public enum KeyboardAction
 
     /**
      * @param keyCode the code of the key pressed.
-     * @param modifiers specify what other keys were pressed.
      * @return true if this keyboard action matches the pressed keys.
      */
-    private boolean matches(int keyCode, int modifiers)
+    private boolean matches(int keyCode)
     {
         for (char attachedKeyCode : keyCodes) {
             if (keyCode == attachedKeyCode) {
@@ -65,13 +63,12 @@ public enum KeyboardAction
      * found then {@link #INSERT_WORD} is returned.
      * 
      * @param keyCode the code of the key pressed.
-     * @param modifiers specify what other keys were pressed.
      * @return the keyboard action associated with the specified key code and modifiers.
      */
-    public static KeyboardAction valueOf(int keyCode, int modifiers)
+    public static KeyboardAction valueOf(int keyCode)
     {
         for (KeyboardAction action : KeyboardAction.values()) {
-            if (action.matches(keyCode, modifiers)) {
+            if (action.matches(keyCode)) {
                 return action;
             }
         }

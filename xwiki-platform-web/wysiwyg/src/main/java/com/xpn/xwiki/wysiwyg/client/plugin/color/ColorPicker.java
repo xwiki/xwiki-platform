@@ -19,16 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * A popup panel which allows you to pick a color from a color palette by clicking on that color.
  * 
  * @version $Id$
  */
-public class ColorPicker extends PopupPanel implements ClickListener
+public class ColorPicker extends PopupPanel implements SelectionHandler<String>
 {
     /**
      * Creates a new color picker that uses the given color palette.
@@ -41,7 +41,7 @@ public class ColorPicker extends PopupPanel implements ClickListener
 
         addStyleName("xColorPicker");
 
-        palette.addClickListener(this);
+        palette.addSelectionHandler(this);
 
         setWidget(palette);
     }
@@ -49,11 +49,11 @@ public class ColorPicker extends PopupPanel implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see SelectionHandler#onSelection(SelectionEvent)
      */
-    public void onClick(Widget sender)
+    public void onSelection(SelectionEvent<String> event)
     {
-        if (sender == getWidget()) {
+        if (event.getSource() == getWidget()) {
             hide();
         }
     }

@@ -21,9 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image;
 
 import org.xwiki.gwt.dom.client.Element;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
  * 
  * @version $Id$
  */
-public class ImagePlugin extends AbstractPlugin implements ClickListener, WizardListener
+public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardListener
 {
     /**
      * Image toolbar button.
@@ -91,7 +91,8 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
 
         // add the toolbar extension
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_IMAGE)) {
-            imageButton = new PushButton(Images.INSTANCE.image().createImage(), this);
+            imageButton = new PushButton(Images.INSTANCE.image().createImage());
+            saveRegistration(imageButton.addClickHandler(this));
             imageButton.setTitle(Strings.INSTANCE.imageTooltip());
             toolBarExtension.addFeature("image", imageButton);
             getUIExtensionList().add(toolBarExtension);
@@ -113,7 +114,9 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
         // Create an image behavior adjuster for this text area
         behaviorAdjuster = new ImageBehaviorAdjuster();
         behaviorAdjuster.setTextArea(getTextArea());
-        getTextArea().addKeyboardListener(behaviorAdjuster);
+        saveRegistration(getTextArea().addKeyDownHandler(behaviorAdjuster));
+        saveRegistration(getTextArea().addKeyUpHandler(behaviorAdjuster));
+        saveRegistration(getTextArea().addKeyPressHandler(behaviorAdjuster));
     }
 
     /**
@@ -125,7 +128,6 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
     {
         if (imageButton != null) {
             imageButton.removeFromParent();
-            imageButton.removeClickListener(this);
             imageButton = null;
         }
 
@@ -140,11 +142,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
             getTextArea().getDocument().removeInnerHTMLListener(metaDataExtractor);
             metaDataExtractor = null;
         }
-        // If a behavior adjuster was created and setup, remove it
-        if (behaviorAdjuster != null) {
-            getTextArea().removeKeyboardListener(behaviorAdjuster);
-            behaviorAdjuster = null;
-        }
+        behaviorAdjuster = null;
 
         super.destroy();
     }
@@ -152,11 +150,11 @@ public class ImagePlugin extends AbstractPlugin implements ClickListener, Wizard
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == imageButton) {
+        if (event.getSource() == imageButton) {
             onImage();
         }
     }

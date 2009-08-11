@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
@@ -30,7 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
  * 
  * @version $Id$
  */
-public class SymbolPicker extends CompositeDialogBox implements ClickListener
+public class SymbolPicker extends CompositeDialogBox implements SelectionHandler<String>
 {
     /**
      * The default list of symbols.
@@ -324,7 +324,7 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
         getDialog().addStyleName("xSymbolPicker");
 
         symbolPalette = new SymbolPalette(SYMBOLS, SYMBOLS_PER_ROW, SYMBOLS_PER_COL);
-        symbolPalette.addClickListener(this);
+        symbolPalette.addSelectionHandler(this);
 
         initWidget(symbolPalette);
     }
@@ -332,11 +332,11 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see SelectionHandler#onSelection(SelectionEvent)
      */
-    public void onClick(Widget sender)
+    public void onSelection(SelectionEvent<String> event)
     {
-        if (sender == symbolPalette) {
+        if (event.getSource() == symbolPalette) {
             hide();
         }
     }
@@ -347,5 +347,18 @@ public class SymbolPicker extends CompositeDialogBox implements ClickListener
     public String getSymbol()
     {
         return symbolPalette.getSelectedSymbol();
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see CompositeDialogBox#center()
+     */
+    public void center()
+    {
+        // Reset the selected symbol each time the symbol picker is shown.
+        symbolPalette.setSelectedSymbol(null);
+
+        super.center();
     }
 }

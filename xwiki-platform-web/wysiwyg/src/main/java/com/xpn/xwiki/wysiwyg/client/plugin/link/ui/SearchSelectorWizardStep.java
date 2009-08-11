@@ -21,14 +21,16 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -40,8 +42,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
  * 
  * @version $Id$
  */
-public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep implements ClickListener,
-    KeyboardListener
+public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep implements ClickHandler,
+    KeyPressHandler
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -79,8 +81,8 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         searchBox = new TextBox();
         searchBox.setTitle(Strings.INSTANCE.linkWikipageSearchTooltip());
         Button searchButton = new Button(Strings.INSTANCE.linkWikipageSearchButton());
-        searchButton.addClickListener(this);
-        searchBox.addKeyboardListener(this);
+        searchButton.addClickHandler(this);
+        searchBox.addKeyPressHandler(this);
         searchPanel.add(searchBox);
         searchPanel.add(searchButton);
         getMainPanel().insert(searchPanel, getMainPanel().getWidgetIndex(getPagesList()));
@@ -88,8 +90,10 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
 
     /**
      * {@inheritDoc}
+     * 
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
         // set the keyword from the search input
         keyword = searchBox.getText().trim();
@@ -158,29 +162,16 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
 
     /**
      * {@inheritDoc}
+     * 
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        // nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
-    {
-        // if the key is enter in the searchbox, search
-        if (sender == searchBox && keyCode == KEY_ENTER && modifiers == 0) {
+        // if the key is enter in the search box, search
+        if (event.getSource() == searchBox && event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER
+            && !event.isAnyModifierKeyDown()) {
             // should send the correct sender
             onClick(null);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifiers)
-    {
-        // nothing
     }
 }

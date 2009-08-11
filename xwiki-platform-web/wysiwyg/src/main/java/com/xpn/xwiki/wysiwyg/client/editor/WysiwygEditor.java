@@ -25,14 +25,17 @@ import java.util.Map;
 
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.dom.client.TextAreaElement;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.MouseListener;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -58,7 +61,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleWithCssExecutab
  * 
  * @version $Id$
  */
-public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener, CommandListener, LoadListener
+public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, CommandListener, LoadHandler
 {
     /**
      * Iterates through the features placed on the tool bar and enables or disables them by following the syntax
@@ -287,53 +290,13 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     /**
      * {@inheritDoc}
      * 
-     * @see MouseListener#onMouseDown(Widget, int, int)
+     * @see MouseUpHandler#onMouseUp(MouseUpEvent)
      */
-    public void onMouseDown(Widget sender, int x, int y)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseEnter(Widget)
-     */
-    public void onMouseEnter(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseLeave(Widget)
-     */
-    public void onMouseLeave(Widget sender)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseMove(Widget, int, int)
-     */
-    public void onMouseMove(Widget sender, int x, int y)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see MouseListener#onMouseUp(Widget, int, int)
-     */
-    public void onMouseUp(Widget sender, int x, int y)
+    public void onMouseUp(MouseUpEvent event)
     {
         // We listen to mouse up events instead of clicks because if the user selects text and the end points of the
         // selection are in different DOM nodes the click events are not triggered.
-        if (sender == richTextEditor.getTextArea()) {
+        if (event.getSource() == richTextEditor.getTextArea()) {
             updater.deferUpdate();
         }
     }
@@ -341,31 +304,11 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     /**
      * {@inheritDoc}
      * 
-     * @see KeyboardListener#onKeyDown(Widget, char, int)
+     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifier)
+    public void onKeyUp(KeyUpEvent event)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyPress(Widget, char, int)
-     */
-    public void onKeyPress(Widget sender, char keyCode, int modifier)
-    {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see KeyboardListener#onKeyUp(Widget, char, int)
-     */
-    public void onKeyUp(Widget sender, char keyCode, int modifier)
-    {
-        if (sender == richTextEditor.getTextArea()) {
+        if (event.getSource() == richTextEditor.getTextArea()) {
             updater.deferUpdate();
         }
     }
@@ -396,21 +339,11 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     /**
      * {@inheritDoc}
      * 
-     * @see LoadListener#onError(Widget)
+     * @see LoadHandler#onLoad(LoadEvent)
      */
-    public void onError(Widget sender)
+    public void onLoad(LoadEvent event)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadListener#onLoad(Widget)
-     */
-    public void onLoad(Widget sender)
-    {
-        if (sender == richTextEditor) {
+        if (event.getSource() == richTextEditor) {
             initRichTextArea();
             loadPlugins();
             initEditor();
@@ -491,7 +424,8 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
             tabs.selectTab(WIKI_TAB_INDEX);
         }
 
-        tabs.addTabListener(listener);
+        tabs.addBeforeSelectionHandler(listener);
+        tabs.addSelectionHandler(listener);
 
         return tabs;
     }
@@ -637,9 +571,9 @@ public class WysiwygEditor implements Updatable, MouseListener, KeyboardListener
     {
         if (richTextEditor == null) {
             richTextEditor = new RichTextEditor();
-            richTextEditor.addLoadListener(this);
-            richTextEditor.getTextArea().addMouseListener(this);
-            richTextEditor.getTextArea().addKeyboardListener(this);
+            richTextEditor.addLoadHandler(this);
+            richTextEditor.getTextArea().addMouseUpHandler(this);
+            richTextEditor.getTextArea().addKeyUpHandler(this);
             richTextEditor.getTextArea().getCommandManager().addCommandListener(this);
             IFrameElement.as(richTextEditor.getTextArea().getElement()).setSrc(
                 config.getParameter("inputURL", "about:blank"));

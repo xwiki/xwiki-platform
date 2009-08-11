@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
@@ -142,9 +142,9 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
                 previousLabel = Strings.INSTANCE.wizardPrevious();
             }
             Button previousButton = new Button(previousLabel);
-            previousButton.addClickListener(new ClickListener()
+            previousButton.addClickHandler(new ClickHandler()
             {
-                public void onClick(Widget sender)
+                public void onClick(ClickEvent event)
                 {
                     navigationListeners.fireNavigationEvent(NavigationDirection.PREVIOUS);
                 }
@@ -182,9 +182,9 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
             buttonLabel = defaultLabel;
         }
         Button button = new Button(buttonLabel);
-        button.addClickListener(new ClickListener()
+        button.addClickHandler(new ClickHandler()
         {
-            public void onClick(Widget sender)
+            public void onClick(ClickEvent event)
             {
                 navigationListeners.fireNavigationEvent(direction);
             }

@@ -19,14 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.HasLoadHandlers;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.LoadListener;
-import com.google.gwt.user.client.ui.LoadListenerCollection;
-import com.google.gwt.user.client.ui.SourcesLoadEvents;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
@@ -37,7 +39,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class RichTextEditor extends Composite implements SourcesLoadEvents, LoadListener
+public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHandler
 {
     /**
      * The menu bar.
@@ -60,19 +62,14 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Load
     protected final FlowPanel container;
 
     /**
-     * The list of listeners that are notified when the UI is loaded.
-     */
-    private final LoadListenerCollection loadListeners = new LoadListenerCollection();
-
-    /**
      * Creates a new rich text editor.
      */
     public RichTextEditor()
     {
         textArea = new RichTextArea();
         // Workaround till GWT provides a way to detect when the rich text area has finished loading.
-        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof SourcesLoadEvents) {
-            ((SourcesLoadEvents) textArea.getBasicFormatter()).addLoadListener(this);
+        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof HasLoadHandlers) {
+            ((HasLoadHandlers) textArea.getBasicFormatter()).addLoadHandler(this);
         }
 
         container = new FlowPanel();
@@ -120,19 +117,19 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Load
     {
         return container;
     }
-        
+
     /**
-     * Set the editor loading state. While in loading state a spinner will be displayed. 
+     * Set the editor loading state. While in loading state a spinner will be displayed.
      * 
      * @param loading true to display the editor in loading mode, false to remove the loading mode.
      */
     public void setLoading(boolean loading)
-    {        
+    {
         if (loading) {
             container.addStyleName(WysiwygEditor.STYLE_NAME_LOADING);
             textArea.addStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
         } else {
-            container.removeStyleName(WysiwygEditor.STYLE_NAME_LOADING);            
+            container.removeStyleName(WysiwygEditor.STYLE_NAME_LOADING);
             textArea.removeStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
         }
     }
@@ -144,18 +141,16 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Load
      */
     protected void onLoad()
     {
-        if (textArea.getBasicFormatter() == null 
-                || !(textArea.getBasicFormatter() instanceof SourcesLoadEvents)) {
+        if (textArea.getBasicFormatter() == null || !(textArea.getBasicFormatter() instanceof HasLoadHandlers)) {
             // We defer the notification in order to allow the rich text area to complete its initialization.
             DeferredCommand.addCommand(new Command()
             {
                 public void execute()
                 {
                     try {
-                        loadListeners.fireLoad(RichTextEditor.this);
+                        DomEvent.fireNativeEvent(Document.get().createLoadEvent(), RichTextEditor.this);
                     } catch (Throwable t) {
-                        Console.getInstance().error(t, RichTextEditor.class.getName(),
-                            LoadListenerCollection.class.getName());
+                        Console.getInstance().error(t, RichTextEditor.class.getName(), HasLoadHandlers.class.getName());
                     }
                 }
             });
@@ -165,40 +160,20 @@ public class RichTextEditor extends Composite implements SourcesLoadEvents, Load
     /**
      * {@inheritDoc}
      * 
-     * @see LoadListener#onLoad(Widget)
+     * @see LoadHandler#onLoad(LoadEvent)
      */
-    public void onLoad(Widget sender)
+    public void onLoad(LoadEvent event)
     {
-        loadListeners.fireLoad(this);
+        DomEvent.fireNativeEvent(event.getNativeEvent(), this);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see LoadListener#onError(Widget)
+     * @see HasLoadHandlers#addLoadHandler(LoadHandler)
      */
-    public void onError(Widget sender)
+    public HandlerRegistration addLoadHandler(LoadHandler handler)
     {
-        loadListeners.fireError(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesLoadEvents#addLoadListener(LoadListener)
-     */
-    public void addLoadListener(LoadListener listener)
-    {
-        loadListeners.add(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see SourcesLoadEvents#removeLoadListener(LoadListener)
-     */
-    public void removeLoadListener(LoadListener listener)
-    {
-        loadListeners.remove(listener);
+        return addHandler(handler, LoadEvent.getType());
     }
 }

@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list.internal;
 
+import org.xwiki.gwt.dom.client.Event;
+
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster;
 
@@ -33,20 +37,20 @@ public class IEListBehaviorAdjuster extends ListBehaviorAdjuster
      * {@inheritDoc}. Internet explorer receives the special keys on key down, not on key pressed, so we'll override the
      * key press handling and move the handling in this function.
      * 
-     * @see ListBehaviorAdjuster#onKeyDown(Widget, char, int)
+     * @see ListBehaviorAdjuster#onKeyDown(KeyDownEvent)
      */
-    public void onKeyDown(Widget sender, char keyCode, int modifiers)
+    public void onKeyDown(KeyDownEvent event)
     {
-        dispatchKey(sender, keyCode, modifiers);
+        dispatchKey((Widget) event.getSource(), (Event) event.getNativeEvent());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ListBehaviorAdjuster#onKeyPress(Widget, char, int)
+     * @see ListBehaviorAdjuster#onKeyPress(KeyPressEvent)
      */
-    public void onKeyPress(Widget sender, char keyCode, int modifiers)
+    public void onKeyPress(KeyPressEvent event)
     {
-        // nothing
+        // Prevent the behavior from the base class.
     }
 }

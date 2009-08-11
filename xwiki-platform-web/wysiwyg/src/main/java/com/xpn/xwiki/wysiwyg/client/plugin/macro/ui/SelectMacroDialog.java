@@ -22,12 +22,13 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -43,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
  * 
  * @version $Id$
  */
-public class SelectMacroDialog extends ComplexDialogBox implements ClickListener, ChangeListener
+public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler, SelectionHandler<ListItem>
 {
     /**
      * The button that selects the chosen macro.
@@ -90,10 +91,10 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
         getHeader().add(new Label(Strings.INSTANCE.macroInsertDialogTitle()));
 
         macroList = new ListBox();
-        macroList.addChangeListener(this);
+        macroList.addSelectionHandler(this);
 
         select = new Button(Strings.INSTANCE.select());
-        select.addClickListener(this);
+        select.addClickHandler(this);
         getFooter().add(select);
     }
 
@@ -108,11 +109,11 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == select) {
+        if (event.getSource() == select) {
             setCanceled(false);
             hide();
         }
@@ -246,11 +247,11 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChangeListener#onChange(Widget)
+     * @see SelectionHandler#onSelection(SelectionEvent)
      */
-    public void onChange(Widget sender)
+    public void onSelection(SelectionEvent<ListItem> event)
     {
-        if (sender == macroList) {
+        if (event.getSource() == macroList) {
             select.setEnabled(macroList.getSelectedItem() != null);
         }
     }

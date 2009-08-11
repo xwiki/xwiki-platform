@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
  * 
  * @version $Id$
  */
-public class EditMacroDialog extends ComplexDialogBox implements ClickListener
+public class EditMacroDialog extends ComplexDialogBox implements ClickHandler
 {
     /**
      * The call-back used by the edit dialog to be notified when a macro descriptor is being received from the server.
@@ -141,7 +141,7 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
         getHeader().add(title);
 
         apply = new Button(Strings.INSTANCE.apply());
-        apply.addClickListener(this);
+        apply.addClickHandler(this);
         getFooter().add(apply);
     }
 
@@ -230,11 +230,11 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == apply && validate()) {
+        if (event.getSource() == apply && validate()) {
             setCanceled(false);
             updateMacroCall();
             hide();

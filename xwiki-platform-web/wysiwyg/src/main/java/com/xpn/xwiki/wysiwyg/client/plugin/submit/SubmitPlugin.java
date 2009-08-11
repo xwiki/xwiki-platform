@@ -24,8 +24,8 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.user.client.ui.FocusListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.BlurEvent;
+import com.google.gwt.event.dom.client.BlurHandler;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatelessUIExtension;
@@ -45,7 +45,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class SubmitPlugin extends AbstractPlugin implements FocusListener, CommandListener
+public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener
 {
     /**
      * The name attribute, used by HTML form elements to pass data to the server when the form is submitted.
@@ -137,7 +137,7 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
                 hookSubmitEvent(form);
             }
 
-            getTextArea().addFocusListener(this);
+            saveRegistration(getTextArea().addBlurHandler(this));
             getTextArea().getCommandManager().addCommandListener(this);
         }
     }
@@ -157,7 +157,6 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
             rootExtension.clearFeatures();
         }
 
-        getTextArea().removeFocusListener(this);
         getTextArea().getCommandManager().removeCommandListener(this);
 
         super.destroy();
@@ -202,21 +201,11 @@ public class SubmitPlugin extends AbstractPlugin implements FocusListener, Comma
     /**
      * {@inheritDoc}
      * 
-     * @see FocusListener#onFocus(Widget)
+     * @see BlurHandler#onBlur(BlurEvent)
      */
-    public void onFocus(Widget sender)
+    public void onBlur(BlurEvent event)
     {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see FocusListener#onLostFocus(Widget)
-     */
-    public void onLostFocus(Widget sender)
-    {
-        if (sender == getTextArea()) {
+        if (event.getSource() == getTextArea()) {
             onSubmit();
         }
     }

@@ -19,9 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.separator;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -38,7 +38,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class SeparatorPlugin extends AbstractPlugin implements ClickListener
+public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
 {
     /**
      * The tool bar button used for inserting a new horizontal rule.
@@ -74,7 +74,8 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
         toolBarExtension.addUIExtension(toolBarFocusWidgets);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HORIZONTAL_RULE)) {
-            hr = new PushButton(Images.INSTANCE.hr().createImage(), this);
+            hr = new PushButton(Images.INSTANCE.hr().createImage());
+            saveRegistration(hr.addClickHandler(this));
             hr.setTitle(Strings.INSTANCE.hr());
             toolBarFocusWidgets.addFeature("hr", hr);
         }
@@ -93,7 +94,6 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
     {
         if (hr != null) {
             hr.removeFromParent();
-            hr.removeClickListener(this);
             hr = null;
         }
 
@@ -105,11 +105,11 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == hr && hr.isEnabled()) {
+        if (event.getSource() == hr && hr.isEnabled()) {
             getTextArea().setFocus(true);
             getTextArea().getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE);
         }

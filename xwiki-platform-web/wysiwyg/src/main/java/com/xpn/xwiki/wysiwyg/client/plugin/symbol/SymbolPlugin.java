@@ -19,17 +19,18 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -38,7 +39,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class SymbolPlugin extends AbstractPlugin implements ClickListener, PopupListener
+public class SymbolPlugin extends AbstractPlugin implements ClickHandler, CloseHandler<CompositeDialogBox>
 {
     /**
      * The insert button to be placed on the tool bar.
@@ -65,7 +66,8 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
         super.init(wysiwyg, textArea, config);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
-            insert = new PushButton(Images.INSTANCE.charmap().createImage(), this);
+            insert = new PushButton(Images.INSTANCE.charmap().createImage());
+            saveRegistration(insert.addClickHandler(this));
             insert.setTitle(Strings.INSTANCE.charmap());
 
             toolBarExtension.addFeature("symbol", insert);
@@ -85,20 +87,16 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
     {
         if (insert != null) {
             insert.removeFromParent();
-            insert.removeClickListener(this);
             insert = null;
 
             if (picker != null) {
                 picker.hide();
                 picker.removeFromParent();
-                picker.removePopupListener(this);
                 picker = null;
             }
         }
 
-        if (toolBarExtension.getFeatures().length > 0) {
-            toolBarExtension.clearFeatures();
-        }
+        toolBarExtension.clearFeatures();
 
         super.destroy();
     }
@@ -106,11 +104,11 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
     /**
      * {@inheritDoc}
      * 
-     * @see ClickListener#onClick(Widget)
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == insert) {
+        if (event.getSource() == insert) {
             onSymbols(true);
         }
     }
@@ -118,11 +116,11 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void onPopupClosed(SourcesPopupEvents sender, boolean autoHide)
+    public void onClose(CloseEvent<CompositeDialogBox> event)
     {
-        if (sender == getSymbolPicker() && !autoHide) {
+        if (event.getSource() == getSymbolPicker() && !event.isAutoClosed()) {
             onSymbols(false);
         }
     }
@@ -158,7 +156,7 @@ public class SymbolPlugin extends AbstractPlugin implements ClickListener, Popup
     {
         if (picker == null) {
             picker = new SymbolPicker();
-            picker.addPopupListener(this);
+            saveRegistration(picker.addCloseHandler(this));
         }
         return picker;
     }

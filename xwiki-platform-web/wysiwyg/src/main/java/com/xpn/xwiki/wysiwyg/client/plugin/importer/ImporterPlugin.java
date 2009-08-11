@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -29,8 +31,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImporterDialog;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -39,7 +40,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ImporterPlugin extends AbstractPlugin implements ClickListener, PopupListener
+public class ImporterPlugin extends AbstractPlugin implements ClickHandler, CloseHandler<CompositeDialogBox>
 {
     /**
      * Import button placed on the tool bar.
@@ -64,7 +65,8 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
         super.init(wysiwyg, textArea, config);
 
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_HTML)) {
-            importPushButton = new PushButton(Images.INSTANCE.importer().createImage(), this);
+            importPushButton = new PushButton(Images.INSTANCE.importer().createImage());
+            saveRegistration(importPushButton.addClickHandler(this));
             importPushButton.setTitle(Strings.INSTANCE.importerToolTip());
             toolBarExtension.addFeature("importer", importPushButton);
         }
@@ -81,13 +83,11 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
     {
         if (importPushButton != null) {
             importPushButton.removeFromParent();
-            importPushButton.removeClickListener(this);
             importPushButton = null;
         }
         if (importerDialog != null) {
             importerDialog.hide();
             importerDialog.removeFromParent();
-            importerDialog.removePopupListener(this);
             importerDialog = null;
         }
         if (toolBarExtension.getFeatures().length > 0) {
@@ -98,18 +98,22 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
 
     /**
      * {@inheritDoc}
+     * 
+     * @see ClickHandler#onClick(ClickEvent)
      */
-    public void onClick(Widget sender)
+    public void onClick(ClickEvent event)
     {
-        if (sender == importPushButton) {
+        if (event.getSource() == importPushButton) {
             getImporterDialog().center();
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
+    public void onClose(CloseEvent<CompositeDialogBox> event)
     {
         getTextArea().setFocus(true);
         if (importerDialog.getResult() != null) {
@@ -126,7 +130,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickListener, Pop
             importerDialog =
                 new ImporterDialog(getConfig().getParameter("space", "Main"), getConfig().getParameter("page",
                     "WebHome"));
-            importerDialog.addPopupListener(this);
+            saveRegistration(importerDialog.addCloseHandler(this));
         }
         return importerDialog;
     }

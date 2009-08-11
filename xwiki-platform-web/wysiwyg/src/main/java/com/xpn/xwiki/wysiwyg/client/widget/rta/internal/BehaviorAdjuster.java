@@ -30,10 +30,10 @@ import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.TableCellElement;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.LoadListener;
-import com.google.gwt.user.client.ui.SourcesLoadEvents;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.HasLoadHandlers;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -44,7 +44,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class BehaviorAdjuster implements LoadListener
+public class BehaviorAdjuster implements LoadHandler
 {
     /**
      * The name of the <code>&lt;li&gt;</code> tag.
@@ -93,8 +93,8 @@ public class BehaviorAdjuster implements LoadListener
         }
         this.textArea = textArea;
         // Workaround till GWT provides a way to detect when the rich text area has finished loading.
-        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof SourcesLoadEvents) {
-            ((SourcesLoadEvents) textArea.getBasicFormatter()).addLoadListener(this);
+        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof HasLoadHandlers) {
+            ((HasLoadHandlers) textArea.getBasicFormatter()).addLoadHandler(this);
         }
     }
 
@@ -102,15 +102,15 @@ public class BehaviorAdjuster implements LoadListener
      * Called by the underlying rich text are when user actions trigger browser events, before any registered listener
      * is notified.
      * 
+     * @param event the native event that was fired
      * @see RichTextArea#onBrowserEvent(com.google.gwt.user.client.Event)
      * @see RichTextArea#getCurrentEvent()
      */
-    public void onBeforeBrowserEvent()
+    public void onBeforeBrowserEvent(Event event)
     {
-        Event event = getTextArea().getCurrentEvent();
         switch (event.getTypeInt()) {
             case Event.ONMOUSEDOWN:
-                onBeforeMouseDown();
+                onBeforeMouseDown(event);
                 break;
             default:
                 break;
@@ -121,22 +121,22 @@ public class BehaviorAdjuster implements LoadListener
      * Called by the underlying rich text are when user actions trigger browser events, after all the registered
      * listeners have been notified.
      * 
+     * @param event the native event that was fired
      * @see RichTextArea#onBrowserEvent(com.google.gwt.user.client.Event)
      * @see RichTextArea#getCurrentEvent()
      */
-    public void onBrowserEvent()
+    public void onBrowserEvent(Event event)
     {
-        Event event = getTextArea().getCurrentEvent();
         if (event == null || event.isCancelled()) {
             return;
         }
 
         switch (event.getTypeInt()) {
             case Event.ONKEYDOWN:
-                onKeyDown();
+                onKeyDown(event);
                 break;
             case Event.ONKEYPRESS:
-                onKeyPress();
+                onKeyPress(event);
                 break;
             default:
                 break;
@@ -145,20 +145,21 @@ public class BehaviorAdjuster implements LoadListener
 
     /**
      * Called when a KeyDown event is triggered inside the rich text area.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onKeyDown()
+    protected void onKeyDown(Event event)
     {
-        Event event = getTextArea().getCurrentEvent();
         if (event == null || event.isCancelled()) {
             return;
         }
 
         switch (event.getKeyCode()) {
-            case KeyboardListener.KEY_DOWN:
-                onDownArrow();
+            case KeyCodes.KEY_DOWN:
+                onDownArrow(event);
                 break;
-            case KeyboardListener.KEY_UP:
-                onUpArrow();
+            case KeyCodes.KEY_UP:
+                onUpArrow(event);
                 break;
             default:
                 break;
@@ -167,19 +168,20 @@ public class BehaviorAdjuster implements LoadListener
 
     /**
      * Called when a KeyPress event is triggered inside the rich text area.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onKeyPress()
+    protected void onKeyPress(Event event)
     {
-        Event event = getTextArea().getCurrentEvent();
         switch (event.getKeyCode()) {
-            case KeyboardListener.KEY_TAB:
-                onTab();
+            case KeyCodes.KEY_TAB:
+                onTab(event);
                 break;
-            case KeyboardListener.KEY_DELETE:
-                onDelete();
+            case KeyCodes.KEY_DELETE:
+                onDelete(event);
                 break;
-            case KeyboardListener.KEY_BACKSPACE:
-                onBackSpace();
+            case KeyCodes.KEY_BACKSPACE:
+                onBackSpace(event);
                 break;
             default:
                 break;
@@ -188,8 +190,10 @@ public class BehaviorAdjuster implements LoadListener
 
     /**
      * Overwrites the default rich text area behavior when the Tab key is being pressed.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onTab()
+    protected void onTab(Event event)
     {
         Selection selection = getTextArea().getDocument().getSelection();
         if (selection.getRangeCount() == 0) {
@@ -197,7 +201,7 @@ public class BehaviorAdjuster implements LoadListener
         }
 
         // Prevent the default browser behavior.
-        getTextArea().getCurrentEvent().xPreventDefault();
+        event.xPreventDefault();
 
         // See in which context the tab key has been pressed.
         Range range = selection.getRangeAt(0);
@@ -214,14 +218,14 @@ public class BehaviorAdjuster implements LoadListener
         // Handle the tab key depending on the context.
         switch (index) {
             case 0:
-                onTabInListItem(ancestor);
+                onTabInListItem(event, ancestor);
                 break;
             case 1:
             case 2:
-                onTabInTableCell((TableCellElement) ancestor);
+                onTabInTableCell(event, (TableCellElement) ancestor);
                 break;
             default:
-                onTabDefault();
+                onTabDefault(event);
                 break;
         }
     }
@@ -229,10 +233,12 @@ public class BehaviorAdjuster implements LoadListener
     /**
      * Tab key has been pressed in an ordinary context. If the Shift key was not pressed then the current selection will
      * be replaced by 4 spaces. Otherwise no action will be taken.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onTabDefault()
+    protected void onTabDefault(Event event)
     {
-        if (getTextArea().getCurrentEvent().getShiftKey()) {
+        if (event.getShiftKey()) {
             // Do nothing.
         } else {
             if (getTextArea().getCommandManager().isEnabled(Command.INSERT_HTML)) {
@@ -246,15 +252,16 @@ public class BehaviorAdjuster implements LoadListener
      * Tab key has been pressed inside a list item. If the selection is collapsed at the beginning of a list item then
      * indent or outdent that list item depending on the Shift key. Otherwise use the default behavior for Tab key.
      * 
-     * @param item The list item in which the tab key has been pressed.
+     * @param event the native event that was fired
+     * @param item the list item in which the tab key has been pressed
      */
-    protected void onTabInListItem(Node item)
+    protected void onTabInListItem(Event event, Node item)
     {
         Range range = getTextArea().getDocument().getSelection().getRangeAt(0);
         if (!range.isCollapsed() || !isAtStart(item, range)) {
-            onTabDefault();
+            onTabDefault(event);
         } else {
-            Command command = getTextArea().getCurrentEvent().getShiftKey() ? Command.OUTDENT : Command.INDENT;
+            Command command = event.getShiftKey() ? Command.OUTDENT : Command.INDENT;
             if (getTextArea().getCommandManager().isEnabled(command)) {
                 getTextArea().getCommandManager().execute(command);
             }
@@ -264,13 +271,14 @@ public class BehaviorAdjuster implements LoadListener
     /**
      * Tab key has been pressed inside a table cell.
      * 
+     * @param event the native event that was fired
      * @param cell The table cell in which the tab key has been pressed.
      */
-    protected void onTabInTableCell(TableCellElement cell)
+    protected void onTabInTableCell(Event event, TableCellElement cell)
     {
-        Node nextCell = getTextArea().getCurrentEvent().getShiftKey() ? cell.getPreviousCell() : cell.getNextCell();
+        Node nextCell = event.getShiftKey() ? cell.getPreviousCell() : cell.getNextCell();
         if (nextCell == null) {
-            if (getTextArea().getCurrentEvent().getShiftKey()) {
+            if (event.getShiftKey()) {
                 return;
             } else {
                 getTextArea().getCommandManager().execute(new Command("insertrowafter"));
@@ -312,18 +320,22 @@ public class BehaviorAdjuster implements LoadListener
 
     /**
      * Overwrites the default rich text area behavior when the Down arrow key is being pressed.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onDownArrow()
+    protected void onDownArrow(Event event)
     {
-        navigateOutsideTableCell(false);
+        navigateOutsideTableCell(event, false);
     }
 
     /**
      * Overwrites the default rich text area behavior when the Up arrow key is being pressed.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onUpArrow()
+    protected void onUpArrow(Event event)
     {
-        navigateOutsideTableCell(true);
+        navigateOutsideTableCell(event, true);
     }
 
     /**
@@ -345,12 +357,12 @@ public class BehaviorAdjuster implements LoadListener
      * We can replace the Ctrl with Alt. The idea is to use the Up/Down arrow keys with a modifier. They will work form
      * any table cell.
      * 
+     * @param event the native event that was fired
      * @param before {@code true} to insert a paragraph before the table, {@code false} to insert a paragraph after the
      *            table
      */
-    protected void navigateOutsideTableCell(boolean before)
+    protected void navigateOutsideTableCell(Event event, boolean before)
     {
-        Event event = getTextArea().getCurrentEvent();
         // Navigate only if the Control or Meta modifiers are pressed along with the Up/Down arrow keys.
         if (event.getAltKey() || event.getShiftKey() || !(event.getCtrlKey() ^ event.getMetaKey())) {
             return;
@@ -388,24 +400,30 @@ public class BehaviorAdjuster implements LoadListener
 
     /**
      * Overwrites the default rich text area behavior when the Delete key is being pressed.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onDelete()
+    protected void onDelete(Event event)
     {
         // Nothing here by default. May be overridden by browser specific implementations.
     }
 
     /**
      * Overwrites the default rich text area behavior when the BackSpace key is being pressed.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onBackSpace()
+    protected void onBackSpace(Event event)
     {
         // Nothing here by default. May be overridden by browser specific implementations.
     }
 
     /**
      * Overwrites the default rich text area behavior when the user holds the mouse down inside.
+     * 
+     * @param event the native event that was fired
      */
-    protected void onBeforeMouseDown()
+    protected void onBeforeMouseDown(Event event)
     {
         // Nothing here by default. May be overridden by browser specific implementations.
     }
@@ -413,19 +431,9 @@ public class BehaviorAdjuster implements LoadListener
     /**
      * {@inheritDoc}
      * 
-     * @see LoadListener#onError(Widget)
+     * @see LoadHandler#onLoad(LoadEvent)
      */
-    public void onError(Widget sender)
-    {
-        // Nothing to do upon load error.
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadListener#onLoad(Widget)
-     */
-    public void onLoad(Widget sender)
+    public void onLoad(LoadEvent event)
     {
         adjustDragDrop(textArea.getDocument());
     }

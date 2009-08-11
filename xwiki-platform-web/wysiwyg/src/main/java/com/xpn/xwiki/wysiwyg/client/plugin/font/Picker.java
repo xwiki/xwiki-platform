@@ -19,14 +19,14 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
+import com.google.gwt.event.dom.client.HasChangeHandlers;
 
 /**
  * Generic interface for picking a {@link String} value.
  * 
  * @version $Id$
  */
-public interface Picker extends SourcesChangeEvents
+public interface Picker extends HasChangeHandlers
 {
     /**
      * @return the selected value, or {@code null} is no value has been selected

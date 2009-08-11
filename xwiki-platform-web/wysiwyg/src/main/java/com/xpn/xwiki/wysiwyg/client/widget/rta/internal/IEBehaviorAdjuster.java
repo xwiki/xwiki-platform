@@ -23,8 +23,8 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.LoadEvent;
 
 /**
  * Adjusts the behavior of the rich text area in Internet Explorer browsers.
@@ -36,11 +36,11 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
     /**
      * {@inheritDoc}
      * 
-     * @see BehaviorAdjuster#onLoad(Widget)
+     * @see BehaviorAdjuster#onLoad(LoadEvent)
      */
-    public void onLoad(Widget sender)
+    public void onLoad(LoadEvent event)
     {
-        super.onLoad(sender);
+        super.onLoad(event);
         NativeSelection.ensureSelectionIsPreserved(getTextArea().getDocument());
     }
 
@@ -65,24 +65,23 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
     /**
      * {@inheritDoc}
      * 
-     * @see BehaviorAdjuster#onKeyDown()
+     * @see BehaviorAdjuster#onKeyDown(Event)
      */
-    protected void onKeyDown()
+    protected void onKeyDown(Event event)
     {
-        Event event = getTextArea().getCurrentEvent();
         if (event == null || event.isCancelled()) {
             return;
         }
 
         switch (event.getKeyCode()) {
-            case KeyboardListener.KEY_TAB:
+            case KeyCodes.KEY_TAB:
                 // IE moves the focus when Tab key is down and thus the key press event doesn't get fired. If we block
                 // the key down event then IE doesn't fire key press. We are forced to apply out custom behavior for tab
                 // key now, on key down, and not later, on key press.
-                onTab();
+                onTab(event);
                 break;
             default:
-                super.onKeyDown();
+                super.onKeyDown(event);
                 break;
         }
     }

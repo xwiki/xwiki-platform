@@ -57,7 +57,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         helpUrlLabel.setStyleName("xHelpLabel");
 
         urlTextBox.setTitle(getURLTextBoxTooltip());
-        urlTextBox.addKeyboardListener(this);
+        urlTextBox.addKeyPressHandler(this);
 
         getLabelTextBox().setTitle(getLabelTextBoxTooltip());
 

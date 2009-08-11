@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.input;
 
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HasText;
 import com.google.gwt.user.client.ui.TextBoxBase;
 
@@ -46,7 +47,7 @@ public class TextInput extends AbstractInput
      */
     public void setFocus(boolean focused)
     {
-        ((com.google.gwt.user.client.ui.HasFocus) getWidget()).setFocus(focused);
+        ((Focusable) getWidget()).setFocus(focused);
     }
 
     /**

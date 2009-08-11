@@ -43,9 +43,9 @@ public class TextBoxNumberFilter implements KeyPressHandler
      * @param keyCode char to inspect.
      * @return true if the char needs to be filtered.
      */
-    private boolean isFilteredKey(char keyCode)
+    private boolean isFilteredKey(int keyCode)
     {
-        if (Character.isDigit(keyCode)) {
+        if (Character.isDigit((char) keyCode)) {
             return false;
         }
         for (char c : AUTHORIZED_KEYS) {
@@ -63,7 +63,7 @@ public class TextBoxNumberFilter implements KeyPressHandler
      */
     public void onKeyPress(KeyPressEvent event)
     {
-        if (isFilteredKey(event.getCharCode())) {
+        if (isFilteredKey(event.getNativeEvent().getKeyCode())) {
             // Suppress the current keyboard event.
             ((TextBox) event.getSource()).cancelKey();
         }

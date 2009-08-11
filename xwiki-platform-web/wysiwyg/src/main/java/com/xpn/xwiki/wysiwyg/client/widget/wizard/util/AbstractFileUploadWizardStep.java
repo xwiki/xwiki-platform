@@ -21,17 +21,17 @@ package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 
 import java.util.EnumSet;
 
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FormHandler;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.FormSubmitCompleteEvent;
-import com.google.gwt.user.client.ui.FormSubmitEvent;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
+import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -179,33 +179,33 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
 
     /**
      * {@inheritDoc}
+     * 
+     * @see WizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
-        // compute and set the upload URL
+        // Compute and set the upload URL.
         fileUploadForm.setAction(getUploadURL());
-        // add a form handler dependent on the success async
-        fileUploadForm.addFormHandler(new FormHandler()
+        // Handle the submit complete event on the file upload form.
+        // Note: The registrations array is just a hack to be able to remove the handler from within the handler itself
+        // (otherwise we get the "local variable may not have been initialized" compiler error).
+        final HandlerRegistration[] registrations = new HandlerRegistration[1];
+        registrations[0] = fileUploadForm.addSubmitCompleteHandler(new SubmitCompleteHandler()
         {
-            public void onSubmit(FormSubmitEvent event)
-            {
-                // nothing before form submit
-            }
-
-            public void onSubmitComplete(FormSubmitCompleteEvent event)
+            public void onSubmitComplete(SubmitCompleteEvent event)
             {
                 AbstractFileUploadWizardStep.this.onSubmitComplete(event, async);
-                // and remove itself from the list after all was done
-                fileUploadForm.removeFormHandler(this);
+                // Stop handling the submit complete event on the file upload form.
+                registrations[0].removeHandler();
             }
         });
-        // validate the form field
+        // Validate the form field.
         if (fileUploadInput.getFilename().trim().length() == 0) {
             Window.alert(Strings.INSTANCE.fileUploadNoPathError());
             async.onSuccess(false);
             return;
         }
-        // otherwise continue with submit
+        // Otherwise continue with submit.
         fileUploadForm.submit();
     }
 
@@ -213,11 +213,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      * Handles the submit completion in asynchronous mode, to pass the result of processing the result in the received
      * callback.
      * 
-     * @param event the original {@link FormSubmitCompleteEvent}
+     * @param event the original {@link SubmitCompleteEvent}
      * @param async the callback used to send back the response of form event processing
      * @see {@link #onSubmit}
      */
-    protected void onSubmitComplete(FormSubmitCompleteEvent event, final AsyncCallback<Boolean> async)
+    protected void onSubmitComplete(SubmitCompleteEvent event, final AsyncCallback<Boolean> async)
     {
         // create the link reference
         WysiwygService.Singleton.getInstance().getAttachment(getWiki(), getSpace(), getPage(), extractFileName(),

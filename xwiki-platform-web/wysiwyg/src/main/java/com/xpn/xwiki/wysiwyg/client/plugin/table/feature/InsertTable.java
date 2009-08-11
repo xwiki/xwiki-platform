@@ -26,14 +26,15 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableConfigDialog;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.PopupListener;
-import com.xpn.xwiki.wysiwyg.client.widget.SourcesPopupEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -42,7 +43,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class InsertTable extends AbstractTableFeature implements PopupListener
+public class InsertTable extends AbstractTableFeature implements CloseHandler<CompositeDialogBox>
 {
     /**
      * Feature name.
@@ -74,7 +75,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     {
         if (dialog == null) {
             dialog = new TableConfigDialog();
-            dialog.addPopupListener(this);
+            dialog.addCloseHandler(this);
         }
         return dialog;
     }
@@ -86,7 +87,7 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
      */
     public void showDialog(RichTextArea rta)
     {
-        getDialog().center();     
+        getDialog().center();
     }
 
     /**
@@ -212,12 +213,12 @@ public class InsertTable extends AbstractTableFeature implements PopupListener
     /**
      * {@inheritDoc}
      * 
-     * @see PopupListener#onPopupClosed(SourcesPopupEvents, boolean)
+     * @see CloseHandler#onClose(CloseEvent)
      */
-    public void onPopupClosed(SourcesPopupEvents sender, boolean autoClosed)
+    public void onClose(CloseEvent<CompositeDialogBox> event)
     {
         getPlugin().getTextArea().setFocus(true);
-        if (!autoClosed && !getDialog().isCanceled()) {
+        if (!event.isAutoClosed() && !getDialog().isCanceled()) {
             // Call the command again, passing the insertion configuration as a JSON object.
             getPlugin().getTextArea().getCommandManager().execute(
                 getCommand(),

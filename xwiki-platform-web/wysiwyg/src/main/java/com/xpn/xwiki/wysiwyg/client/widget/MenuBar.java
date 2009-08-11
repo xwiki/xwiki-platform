@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.Element;
@@ -34,6 +35,14 @@ import com.google.gwt.user.client.ui.UIObject;
  */
 public class MenuBar extends com.google.gwt.user.client.ui.MenuBar
 {
+    /**
+     * An empty menu item list. This is temporary used till GWT issue 3884 gets fixed.
+     * 
+     * @see #onBrowserEvent(Event)
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3884
+     */
+    private static final List<com.google.gwt.user.client.ui.MenuItem> EMPTY_LIST = Collections.emptyList();
+
     /**
      * Creates an empty horizontal menu bar.
      */
@@ -100,26 +109,69 @@ public class MenuBar extends com.google.gwt.user.client.ui.MenuBar
     }-*/;
 
     /**
+     * Called when a menu item is being hovered.<br/>
+     * NOTE: This is a hack required because #itemOver(MenuItem, boolean) is package-protected.
+     * 
+     * @param item the menu item being hovered
+     * @param focus {@code true} to focus the specified menu item, {@code false} otherwise
+     */
+    protected native void xItemOver(MenuItem item, boolean focus)
+    /*-{
+        this.@com.google.gwt.user.client.ui.MenuBar::itemOver(Lcom/google/gwt/user/client/ui/MenuItem;Z)(item, focus);
+    }-*/;
+
+    /**
+     * Sets the list of menu items displayed by this menu bar.<br/>
+     * NOTE: This is just a hack required to overcome the fact that the GWT menu bar steals the focus when hovered.
+     * 
+     * @param items the list of {@code MenuItem} objects to be placed on the menu bar
+     * @see #onBrowserEvent(Event)
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3884
+     */
+    protected native void setItems(List<com.google.gwt.user.client.ui.MenuItem> items)
+    /*-{
+        this.@com.google.gwt.user.client.ui.MenuBar::items = items;
+    }-*/;
+
+    /**
      * {@inheritDoc}
      * 
      * @see com.google.gwt.user.client.ui.MenuBar#onBrowserEvent(Event)
      */
     public void onBrowserEvent(Event event)
     {
-        if (!hasParentMenu() && getSelectedItem() != null && event.getTypeInt() == Event.ONMOUSEOVER) {
+        List<com.google.gwt.user.client.ui.MenuItem> items = null;
+        if (!hasParentMenu() && (event.getTypeInt() == Event.ONMOUSEOVER || event.getTypeInt() == Event.ONMOUSEOUT)) {
+            MenuItem item = xFindItem((Element) event.getEventTarget().cast());
             // If the menu bar has no parent (it's a top level menu) then the selected menu item remains selected even
             // after its command has been fired or its sub-menu has been closed. Although this is the correct behavior
             // it prevents us from being notified when the selected menu is re-selected (it's command is fired again or
             // it's sub-menu is opened again). See #selectItem(MenuItem) for the reason. To overcome this we listen to
             // MoveOver and re-select the selected menu item.
             // NOTE: This is just a hack required because GWT doesn't offer menu events.
-            MenuItem item = xFindItem((Element) event.getTarget());
-            if (item == getSelectedItem()) {
-                // The mouse is again over the selected item. We have to select it again (even if it's already marked as
-                // selected) just so that registered menu listeners are notified again of the MenuItemSelected event.
+            if (event.getTypeInt() == Event.ONMOUSEOVER && getSelectedItem() != null && item == getSelectedItem()) {
+                // The mouse is again over the selected item. We have to select it again (even if it's already
+                // marked as selected) just so that registered menu listeners are notified again of the
+                // MenuItemSelected event.
                 item.xSetSelectionStyle(true);
             }
+            // The following is just a hack to overcome GWT issue 3884 (MenuBar steals focus when hovered)
+            // http://code.google.com/p/google-web-toolkit/issues/detail?id=3884
+            if (item != null) {
+                // Don't focus the menu items on mouse over if they are on a top menu bar.
+                xItemOver(event.getTypeInt() == Event.ONMOUSEOVER ? item : null, false);
+            }
+            // Make sure the base class doesn't handle this event.
+            items = getItems();
+            // findItem will return null if the list of menu items is empty.
+            setItems(EMPTY_LIST);
         }
+
         super.onBrowserEvent(event);
+
+        if (items != null) {
+            // Restore the list of menu items.
+            setItems(items);
+        }
     }
 }

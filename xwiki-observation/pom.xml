@@ -32,6 +32,6 @@
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-observation</artifactId>
   <name>XWiki Platform - Core - Observation - Parent</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <description>XWiki Platform - Core - Observation - Parent</description>
 </project>

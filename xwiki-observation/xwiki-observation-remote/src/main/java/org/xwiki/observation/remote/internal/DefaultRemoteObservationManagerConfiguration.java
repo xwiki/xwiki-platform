@@ -29,7 +29,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
      */
     public boolean isEnabled()
     {
-        Boolean enabled = this.configurationSource.getProperty("event.remote.enabled", Boolean.class);
+        Boolean enabled = this.configurationSource.getProperty("observation.remote.enabled", Boolean.class);
 
         return enabled != null ? enabled : true;
     }
@@ -42,6 +42,6 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     @SuppressWarnings("unchecked")
     public List<String> getChannels()
     {
-        return this.configurationSource.getProperty("event.remote.channels", List.class);
+        return this.configurationSource.getProperty("observation.remote.channels", List.class);
     }
 }

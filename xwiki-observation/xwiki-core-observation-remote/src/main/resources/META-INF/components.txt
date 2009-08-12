@@ -1,0 +1,7 @@
+org.xwiki.observation.remote.internal.LocalEventListener
+org.xwiki.observation.remote.internal.DefaultRemoteObservationManagerConfiguration
+org.xwiki.observation.remote.internal.DefaultRemoteObservationManagerContext
+org.xwiki.observation.remote.internal.jgroups.DefaultJGroupsReceiver
+org.xwiki.observation.remote.internal.jgroups.JGroupsRemoteObservationManager
+org.xwiki.observation.remote.internal.converter.DefaultEventConverterManager
+org.xwiki.observation.remote.internal.converter.SerializableEventConverter

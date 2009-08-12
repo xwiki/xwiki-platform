@@ -1,0 +1,47 @@
+package org.xwiki.observation.remote.internal;
+
+import java.util.List;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
+
+/**
+ * Provide remote events specific configuration.
+ * 
+ * @version $Id$
+ * @since 2.0M3
+ */
+@Component
+public class DefaultRemoteObservationManagerConfiguration implements RemoteObservationManagerConfiguration
+{
+    /**
+     * USed to access configuration storage.
+     */
+    @Requirement("xwikiproperties")
+    private ConfigurationSource configurationSource;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.remote.RemoteObservationManagerConfiguration#isEnabled()
+     */
+    public boolean isEnabled()
+    {
+        Boolean enabled = this.configurationSource.getProperty("event.remote.enabled", Boolean.class);
+
+        return enabled != null ? enabled : true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.remote.RemoteObservationManagerConfiguration#getChannels()
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getChannels()
+    {
+        return this.configurationSource.getProperty("event.remote.channels", List.class);
+    }
+}

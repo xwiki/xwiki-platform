@@ -356,30 +356,35 @@ Object.extend(XWiki, {
   /**
    * Insert a link to section edit into level 1 and 2 headings.
    */
-  insertSectionEditLinks: function() { 
-      
-      // Insert links only in view mode and for xwiki/2.0 documents.      
+  insertSectionEditLinks: function() {
+      // Insert links only in view mode and for xwiki/2.0 documents.
       if (XWiki.docsyntax == "xwiki/2.0" && XWiki.contextaction == "view") {
-          
+
           // Section count starts at one, not zero.
           var sectioncount = 1;
 
+          // We can't use element.select() since it does not keep the order of the elements in the flow.
+          var nodes = $("xwikicontent").childNodes;
+
           // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
-          $('xwikicontent').select('h1:not([class~=wikigeneratedheader])',
-              'h2:not([class~=wikigeneratedheader])').each(function(header) {
-              
-              var editspan = document.createElement("SPAN");
-              var editlink = document.createElement("A");
+          for (var i = 0; i < nodes.length; i++) {
+              var node = $(nodes[i]);
 
-              editlink.href = window.docediturl + "?section=" + sectioncount;
-              editlink.style.textDecoration = "none";
-              editlink.innerHTML = "$msg.get('edit')";
-              editspan.className = "edit_section";
+              if ((node.nodeName == "H1" || node.nodeName == "H2") 
+                      && node.className.include("wikigeneratedheader") == false) {
+                  var editspan = document.createElement("SPAN");
+                  var editlink = document.createElement("A");
 
-              editspan.appendChild(editlink);
-              header.insert( { 'after': editspan } );
-              sectioncount++;
-          });
+                  editlink.href = window.docediturl + "?section=" + sectioncount;
+                  editlink.style.textDecoration = "none";
+                  editlink.innerHTML = "$msg.get('edit')";
+                  editspan.className = "edit_section";
+
+                  editspan.appendChild(editlink);
+                  node.insert( { 'after': editspan } );
+                  sectioncount++;
+              }
+          }
       }
   },
 

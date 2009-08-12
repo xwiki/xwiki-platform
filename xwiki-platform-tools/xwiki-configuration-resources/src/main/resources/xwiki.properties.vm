@@ -118,3 +118,16 @@
 #-#   velocity.properties = velocimacro.permissions.allow.inline.local.scope = true
 #-#   velocity.properties = runtime.introspector.uberspect = org.xwiki.velocity.introspection.ChainingUberspector
 #-#   velocity.properties = runtime.introspector.uberspect.chainClasses = org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector
+
+#-------------------------------------------------------------------------------------
+# Events distribution
+#-------------------------------------------------------------------------------------
+
+#-# [Since 2.0M3]
+#-# Indicate if the network distribution module is enabled or not
+# observation.remote.enabled = false
+
+#-# [Since 2.0M3]
+#-# The initial list of events communication channels to start.
+#-# For JGroups, the identifiers matches the files names in observation/remote/jgroups/ with a ".xml" extension
+#-# Example: observation.remote.channels = public.xml, cluster.xml

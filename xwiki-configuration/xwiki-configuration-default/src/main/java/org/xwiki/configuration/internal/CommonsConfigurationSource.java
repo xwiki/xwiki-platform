@@ -22,7 +22,6 @@ package org.xwiki.configuration.internal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.apache.commons.configuration.Configuration;
@@ -84,7 +83,8 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        T result;
+        T result = null;
+
         try {
             if (String.class.getName().equals(valueClass.getName())) {
                 result = (T) this.configuration.getString(key);
@@ -94,8 +94,6 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
                 result = (T) this.configuration.getProperties(key);
             } else if (null != getProperty(key)) {
                 result = this.converterManager.convert(valueClass, getProperty(key));
-            } else {
-                throw new NoSuchElementException("No property named [" + key + "] is set");
             }
         } catch (org.apache.commons.configuration.ConversionException e) {
             throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["
@@ -104,6 +102,7 @@ public class CommonsConfigurationSource extends AbstractLogEnabled implements Co
             throw new org.xwiki.configuration.ConversionException("Key [" + key + "] is not of type ["
                 + valueClass.getName() + "]", e);
         }
+
         return result;
     }
 

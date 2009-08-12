@@ -21,7 +21,6 @@ package org.xwiki.configuration.internal;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 
 import org.apache.commons.configuration.BaseConfiguration;
@@ -106,10 +105,10 @@ public class CommonsConfigurationSourceTest extends AbstractComponentTestCase
         Assert.assertEquals(true, source.getProperty("boolean", Boolean.class));
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void testUnknownBooleanProperty()
     {
-        source.getProperty("unknown", Boolean.class);
+        Assert.assertNull(source.getProperty("unknown", Boolean.class));
     }
 
     @Test

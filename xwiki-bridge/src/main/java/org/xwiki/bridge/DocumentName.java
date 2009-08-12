@@ -19,14 +19,22 @@
  */
 package org.xwiki.bridge;
 
+import java.io.Serializable;
+
 /**
  * Represents a document name (wiki, space and page names).
  * 
  * @version $Id$
  * @since 1.8RC2
  */
-public class DocumentName
+public class DocumentName implements Serializable
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
     /**
      * @see #getWiki()
      */
@@ -104,9 +112,11 @@ public class DocumentName
         } else if (obj instanceof DocumentName) {
             DocumentName documentName = (DocumentName) obj;
 
-            equals = (documentName.getWiki() == null ? getWiki() == null : documentName.getWiki().equals(getWiki()))
-                && (documentName.getSpace() == null ? getSpace() == null : documentName.getSpace().equals(getSpace()))
-                && (documentName.getPage() == null ? getPage() == null : documentName.getPage().equals(getPage()));
+            equals =
+                (documentName.getWiki() == null ? getWiki() == null : documentName.getWiki().equals(getWiki()))
+                    && (documentName.getSpace() == null ? getSpace() == null : documentName.getSpace().equals(
+                        getSpace()))
+                    && (documentName.getPage() == null ? getPage() == null : documentName.getPage().equals(getPage()));
         }
 
         return equals;

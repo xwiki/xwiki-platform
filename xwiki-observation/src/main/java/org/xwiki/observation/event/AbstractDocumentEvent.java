@@ -20,6 +20,8 @@
  */
 package org.xwiki.observation.event;
 
+import java.io.Serializable;
+
 import org.xwiki.observation.event.filter.AlwaysMatchingEventFilter;
 import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.observation.event.filter.FixedNameEventFilter;
@@ -29,8 +31,14 @@ import org.xwiki.observation.event.filter.FixedNameEventFilter;
  * 
  * @version $Id$
  */
-public abstract class AbstractDocumentEvent implements Event
+public abstract class AbstractDocumentEvent implements Event, Serializable
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
     /** A filter for comparing document names, used in {@link #matches(Object)}. */
     private EventFilter eventFilter;
 

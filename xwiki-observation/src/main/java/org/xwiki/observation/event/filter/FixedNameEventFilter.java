@@ -20,13 +20,21 @@
  */
 package org.xwiki.observation.event.filter;
 
+import java.io.Serializable;
+
 /**
  * An {@link EventFilter} that matches exactly one document name.
  * 
  * @version $Id$
  */
-public class FixedNameEventFilter implements EventFilter
+public class FixedNameEventFilter implements EventFilter, Serializable
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
     /** The name of the matched document. */
     private String filter;
 

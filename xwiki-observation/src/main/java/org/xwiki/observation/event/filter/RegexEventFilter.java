@@ -20,6 +20,7 @@
  */
 package org.xwiki.observation.event.filter;
 
+import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,8 +29,14 @@ import java.util.regex.Pattern;
  * 
  * @version $Id$
  */
-public class RegexEventFilter implements EventFilter
+public class RegexEventFilter implements EventFilter, Serializable
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
     /** The regular expression, as a string. */
     private String filter;
 

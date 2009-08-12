@@ -30,6 +30,12 @@ import org.xwiki.observation.event.filter.EventFilter;
 public class DocumentDeleteEvent extends AbstractDocumentEvent
 {
     /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * Constructor initializing the event filter with an
      * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
      * other document delete event.

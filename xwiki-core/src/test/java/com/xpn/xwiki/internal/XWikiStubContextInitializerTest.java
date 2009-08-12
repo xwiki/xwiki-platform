@@ -55,24 +55,25 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
 
         assertSame(xcontext, context.getProperty("xwikicontext"));
 
+        final ExecutionContext daemonContext = new ExecutionContext();
+
         Thread thread = new Thread(new Runnable()
         {
             public void run()
             {
-                ExecutionContext context = new ExecutionContext();
-
                 try {
-                    executionContextManager.initialize(context);
+                    executionContextManager.initialize(daemonContext);
                 } catch (ExecutionContextException e) {
                     fail("Failed to initialize execution context: " + e.getStackTrace());
                 }
-
-                XWikiContext xcontext = (XWikiContext) context.getProperty("xwikicontext");
-                assertNotNull(xcontext);
-                assertEquals("value", xcontext.get("key"));
             }
         });
 
         thread.join();
+
+        XWikiContext daemonXcontext = (XWikiContext) daemonContext.getProperty("xwikicontext");
+        assertNotNull(xcontext);
+        assertNotSame(xcontext, daemonXcontext);
+        assertEquals("value", xcontext.get("key"));
     }
 }

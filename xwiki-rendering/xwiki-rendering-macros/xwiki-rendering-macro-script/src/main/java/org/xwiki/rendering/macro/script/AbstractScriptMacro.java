@@ -59,6 +59,13 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private ComponentManager componentManager;
 
     /**
+     * Used to parse the result of the script execution into a XDOM object when the macro is configured by the user
+     * to not interpret wiki syntax.
+     */
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
+
+    /**
      * Used to clean result of the parser syntax.
      */
     private ParserUtils parserUtils = new ParserUtils();
@@ -169,7 +176,13 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 this.parserUtils.removeTopLevelParagraph(result);
             }
         } else {
-            result = this.parserUtils.parsePlainText(content);
+            try {
+                result = this.plainTextParser.parse(new StringReader(content)).getChildren();
+            } catch (ParseException e) {
+                // This shouldn't happen since the parser cannot throw an exception since the source is a memory
+                // String.
+                throw new MacroExecutionException("Failed to parse link label as plain text", e);
+            }
 
             if (!context.isInline()) {
                 result = Collections.<Block> singletonList(new ParagraphBlock(result));

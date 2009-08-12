@@ -24,11 +24,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.io.StringReader;
 
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
-import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ParseException;
 
 /**
  * Used to filter plain text blocks.
@@ -46,9 +48,9 @@ public class PlainTextBlockFilter implements BlockFilter
             SpecialSymbolBlock.class));
 
     /**
-     * Used to generate link label from link reference.
+     * A parser that knows how to parse plain text; this is used to transform link labels into plain text.
      */
-    private ParserUtils parseUtils = new ParserUtils();
+    private Parser plainTextParser;
 
     /**
      * Generate link label.
@@ -56,10 +58,13 @@ public class PlainTextBlockFilter implements BlockFilter
     private LinkLabelGenerator linkLabelGenerator;
 
     /**
+     * @param plainTextParser a plain text parser used to transform link labels into plain text
      * @param linkLabelGenerator generate link label.
+     * @since 2.0M3
      */
-    public PlainTextBlockFilter(LinkLabelGenerator linkLabelGenerator)
+    public PlainTextBlockFilter(Parser plainTextParser, LinkLabelGenerator linkLabelGenerator)
     {
+        this.plainTextParser = plainTextParser;
         this.linkLabelGenerator = linkLabelGenerator;
     }
 
@@ -74,10 +79,18 @@ public class PlainTextBlockFilter implements BlockFilter
             return Collections.singletonList(block);
         } else if (block.getClass() == LinkBlock.class && block.getChildren().size() == 0) {
             Link link = ((LinkBlock) block).getLink();
-            if (link.getType() == LinkType.DOCUMENT) {
-                return this.parseUtils.parsePlainText(this.linkLabelGenerator.generate(link));
-            } else {
-                return this.parseUtils.parsePlainText(link.getReference());
+
+            try {
+                if (link.getType() == LinkType.DOCUMENT) {
+                    return this.plainTextParser.parse(
+                        new StringReader(this.linkLabelGenerator.generate(link))).getChildren();
+                } else {
+                    return this.plainTextParser.parse(new StringReader(link.getReference())).getChildren();
+                }
+            } catch (ParseException e) {
+                // This shouldn't happen since the parser cannot throw an exception since the source is a memory
+                // String.
+                throw new RuntimeException("Failed to parse link label as plain text", e);
             }
         } else {
             return Collections.emptyList();

@@ -42,6 +42,7 @@ import org.xwiki.rendering.macro.toc.TocMacroParameters;
 import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.parser.Parser;
 
 /**
  * Generate a Table Of Contents based on the document sections.
@@ -61,6 +62,12 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
      * Used to filter the {@link SectionBlock} title to generate the toc anchor.
      */
     private TocBlockFilter tocBlockFilter;
+
+    /**
+     * A parser that knows how to parse plain text; this is used to transform link labels into plain text.
+     */
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
 
     /**
      * Generate link label.
@@ -89,7 +96,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     public void initialize() throws InitializationException
     {
         super.initialize();
-        this.tocBlockFilter = new TocBlockFilter(linkLabelGenerator);
+        this.tocBlockFilter = new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator);
     }
 
     /**

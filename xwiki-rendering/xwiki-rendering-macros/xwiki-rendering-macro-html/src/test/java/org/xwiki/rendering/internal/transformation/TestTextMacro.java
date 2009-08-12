@@ -20,18 +20,23 @@
 package org.xwiki.rendering.internal.transformation;
 
 import java.util.List;
+import java.io.StringReader;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ParseException;
 
 @Component("testtextmacro")
 public class TestTextMacro extends AbstractNoParameterMacro
 {
-    private ParserUtils parserUtils = new ParserUtils();
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
 
     public TestTextMacro()
     {
@@ -57,6 +62,12 @@ public class TestTextMacro extends AbstractNoParameterMacro
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return this.parserUtils.parsePlainText(content);
+        try {
+            return this.plainTextParser.parse(new StringReader(content)).getChildren();
+        } catch (ParseException e) {
+            // This shouldn't happen since the parser cannot throw an exception since the source is a memory
+            // String.
+            throw new RuntimeException("Failed to execute testextmacro", e);
+        }
     }
 }

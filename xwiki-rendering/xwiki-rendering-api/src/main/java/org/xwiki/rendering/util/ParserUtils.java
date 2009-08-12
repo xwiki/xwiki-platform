@@ -19,16 +19,10 @@
  */
 package org.xwiki.rendering.util;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.rendering.block.SpecialSymbolBlock;
-import org.xwiki.rendering.block.WordBlock;
 
 /**
  * Methods for helping in parsing.
@@ -38,61 +32,6 @@ import org.xwiki.rendering.block.WordBlock;
  */
 public class ParserUtils
 {
-    /**
-     * The characters which are considered as "special" symbols for {@link SpecialSymbolBlock}.
-     */
-    private static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
-
-    /**
-     * Parse a simple non wiki string to be able to insert it in the XDOM.
-     * 
-     * @param text the text to parse (pure text)
-     * @return the list of {@link Block} ({@link WordBlock}, {@link SpaceBlock}, {@link NewLineBlock},
-     *         {@link SpecialSymbolBlock}).
-     * @since 1.7
-     */
-    public List<Block> parsePlainText(String text)
-    {
-        List<Block> blockList = new ArrayList<Block>();
-        StringBuffer word = new StringBuffer();
-        for (int i = 0; i < text.length(); ++i) {
-            char c = text.charAt(i);
-
-            if (c == '\n') {
-                if (word.length() > 0) {
-                    blockList.add(new WordBlock(word.toString()));
-                }
-                blockList.add(NewLineBlock.NEW_LINE_BLOCK);
-
-                word.setLength(0);
-            } else if (c == '\r') {
-                // Do nothing, skip it
-            } else if (c == ' ') {
-                if (word.length() > 0) {
-                    blockList.add(new WordBlock(word.toString()));
-                }
-                blockList.add(SpaceBlock.SPACE_BLOCK);
-
-                word.setLength(0);
-            } else if (SPECIALSYMBOL_PATTERN.matcher(String.valueOf(c)).matches()) {
-                if (word.length() > 0) {
-                    blockList.add(new WordBlock(word.toString()));
-                }
-                blockList.add(new SpecialSymbolBlock(c));
-
-                word.setLength(0);
-            } else {
-                word.append(c);
-            }
-        }
-
-        if (word.length() > 0) {
-            blockList.add(new WordBlock(word.toString()));
-        }
-
-        return blockList;
-    }
-
     /**
      * Removes any top level paragraph since for example for the following use case we don't want an extra paragraph
      * block: <code>= hello {{velocity}}world{{/velocity}}</code>.

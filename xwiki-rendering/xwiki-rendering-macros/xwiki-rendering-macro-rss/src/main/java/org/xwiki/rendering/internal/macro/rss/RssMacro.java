@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.macro.rss;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.io.StringReader;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -42,8 +43,9 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
 import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.util.ParserUtils;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -79,10 +81,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     @Requirement
     private SkinAccessBridge skinAccessBridge;
     
-    /** 
-     * Needed to parse the ordinary text. 
+    /**
+     * Needed to parse the ordinary text.
      */
-    private ParserUtils parserUtils = new ParserUtils();
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
 
     /**
      * Create a Feed object from a feed specified as a URL.
@@ -149,7 +152,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         List<Block> titleBlocks;
 
         if (feed.getLink() == null) {
-            titleBlocks = this.parserUtils.parsePlainText(feed.getTitle());
+            titleBlocks = parsePlainText(feed.getTitle());
         } else {
             // Title link.
             Link titleLink = new Link();
@@ -157,8 +160,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             titleLink.setType(LinkType.URI);
             
             // Title text link.
-            Block titleTextLinkBlock =
-                    new LinkBlock(this.parserUtils.parsePlainText(feed.getTitle()), titleLink, true);
+            Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleLink, true);
             
             // Rss icon.
             String imagePath = skinAccessBridge.getSkinFile("icons/black-rss.png");
@@ -200,7 +202,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             Link titleLink = new Link();
             titleLink.setType(LinkType.URI);
             titleLink.setReference(entry.getLink());
-            Block titleBlock = new LinkBlock(this.parserUtils.parsePlainText(entry.getTitle()), titleLink, true);
+            Block titleBlock = new LinkBlock(parsePlainText(entry.getTitle()), titleLink, true);
             ParagraphBlock paragraphTitleBlock = new ParagraphBlock(Collections.singletonList(titleBlock));
             paragraphTitleBlock.setParameter(CLASS_ATTRIBUTE, "rssitemtitle");
             parentBlock.addChild(paragraphTitleBlock);
@@ -225,5 +227,23 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     protected void setFeedFactory(RomeFeedFactory romeFeedFactory)
     {
         this.romeFeedFactory = romeFeedFactory;
+    }
+
+    /**
+     * Convenience method to not have to handle exceptions in several places.
+     *
+     * @param content the content to parse as plain text
+     * @return the parsed Blocks
+     * @since 2.0M3
+     */
+    private List<Block> parsePlainText(String content)
+    {
+        try {
+            return this.plainTextParser.parse(new StringReader(content)).getChildren();
+        } catch (ParseException e) {
+            // This shouldn't happen since the parser cannot throw an exception since the source is a memory
+            // String.
+            throw new RuntimeException("Failed to parse [" + content + "] as plain text", e);
+        }
     }
 }

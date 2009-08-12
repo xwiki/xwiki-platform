@@ -1,3 +1,4 @@
+org.xwiki.rendering.internal.parser.PlainTextParser
 org.xwiki.rendering.internal.parser.GenericLinkParser
 org.xwiki.rendering.internal.parser.XWikiLinkParser
 org.xwiki.rendering.internal.parser.GenericImageParser

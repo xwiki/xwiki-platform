@@ -23,12 +23,15 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.io.StringReader;
 
 import org.python.core.PyNone;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ParseException;
 
 /**
  * Transforms Pygments tokens into XWiki Rendering blocks. This class is overwritten in python an methods are called
@@ -50,6 +53,19 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     private ParserUtils parserUtils = new ParserUtils();
 
     /**
+     * Used to parse Pygment token values into blocks.
+     */
+    private Parser plainTextParser;
+
+    /**
+     * @param plainTextParser the parser we'll use to parse Pygment token values into blocks 
+     */
+    public BlocksGeneratorPygmentsListener(Parser plainTextParser)
+    {
+        this.plainTextParser = plainTextParser;
+    }
+
+    /**
      * @return the highlighted result block.
      */
     public List<Block> getBlocks()
@@ -69,7 +85,14 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
             return;
         }
 
-        List<Block> blockList = this.parserUtils.parsePlainText(value);
+        List<Block> blockList;
+        try {
+            blockList = this.plainTextParser.parse(new StringReader(value)).getChildren();
+        } catch (ParseException e) {
+            // This shouldn't happen since the parser cannot throw an exception since the source is a memory
+            // String.
+            throw new RuntimeException("Failed to parse [" + value + "] as plain text.", e);
+        }
 
         if (!blockList.isEmpty()) {
             String styleParameter = formatStyle(style);

@@ -36,6 +36,7 @@ import org.python.core.PyObject;
 import org.python.core.PyUnicode;
 import org.python.util.PythonInterpreter;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
@@ -45,6 +46,7 @@ import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.parser.Parser;
 
 /**
  * Highlight provided source using Pygments.
@@ -127,6 +129,12 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private PythonInterpreter pythonInterpreter;
 
     /**
+     * Used to parse Pygment token values into blocks.
+     */
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.component.phase.Initializable#initialize()
@@ -167,7 +175,7 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     public List<Block> highlight(String syntaxId, Reader source) throws ParseException
     {
         PythonInterpreter interpreter = getPythonInterpreter();
-        BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener();
+        BlocksGeneratorPygmentsListener listener = new BlocksGeneratorPygmentsListener(this.plainTextParser);
 
         String code;
         try {

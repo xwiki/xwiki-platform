@@ -25,6 +25,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.PlainTextBlockFilter;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.parser.Parser;
 
 /**
  * Used to filter the {@link HeaderBlock} title to generate the toc anchor.
@@ -35,11 +36,13 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
 public class TocBlockFilter extends PlainTextBlockFilter
 {
     /**
+     * @param plainTextParser a plain text parser used to transform link labels into plain text
      * @param linkLabelGenerator generate link label.
+     * @since 2.0M3
      */
-    public TocBlockFilter(LinkLabelGenerator linkLabelGenerator)
+    public TocBlockFilter(Parser plainTextParser, LinkLabelGenerator linkLabelGenerator)
     {
-        super(linkLabelGenerator);
+        super(plainTextParser, linkLabelGenerator);
     }
 
     /**

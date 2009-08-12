@@ -234,6 +234,8 @@
                 <exclude>org/xwiki/rendering/macro/AbstractMacro</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/AbstractMacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/DefaultMacroDescriptor</exclude>
+                <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
+                <exclude>org/xwiki/rendering/util/ParserUtils</exclude>
               </excludes>
             </configuration>
           </execution>

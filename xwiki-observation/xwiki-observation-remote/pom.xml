@@ -31,9 +31,9 @@
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-observation-remote</artifactId>
-  <name>XWiki Platform - Core - Observation Remote</name>
+  <name>XWiki Platform - Core - Observation - Remote</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Observation Remote</description>
+  <description>XWiki Platform - Core - Observation - Remote</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

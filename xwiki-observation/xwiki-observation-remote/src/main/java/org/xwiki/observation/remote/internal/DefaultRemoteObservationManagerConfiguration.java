@@ -31,7 +31,7 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     {
         Boolean enabled = this.configurationSource.getProperty("observation.remote.enabled", Boolean.class);
 
-        return enabled != null ? enabled : true;
+        return enabled != null ? enabled : false;
     }
 
     /**

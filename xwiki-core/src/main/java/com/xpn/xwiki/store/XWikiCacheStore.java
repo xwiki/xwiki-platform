@@ -21,8 +21,10 @@
 
 package com.xpn.xwiki.store;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.Cache;
@@ -30,6 +32,13 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentDeleteEvent;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -37,6 +46,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * A proxy store implementation that caches Documents when they are first fetched and subsequently return them from a
@@ -44,7 +54,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * 
  * @version $Id$
  */
-public class XWikiCacheStore implements XWikiCacheStoreInterface
+public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
 {
     private static final Log log = LogFactory.getLog(XWikiCacheStore.class);
 
@@ -58,10 +68,45 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
 
     private int pageExistCacheCapacity = 10000;
 
+    /**
+     * Used to know if a received event is a local or remote one.
+     */
+    private RemoteObservationManagerContext remoteObservationManagerContext;
+
+    /**
+     * Used to register XWikiCacheStore to receive documents events.
+     */
+    private ObservationManager observationManager;
+
     public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) throws XWikiException
     {
         setStore(store);
         initCache(context);
+
+        // register XWikiCacheStore as listener to remote document events
+        this.remoteObservationManagerContext = Utils.getComponent(RemoteObservationManagerContext.class);
+        this.observationManager = Utils.getComponent(ObservationManager.class);
+        this.observationManager.addListener(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getName()
+     */
+    public String getName()
+    {
+        return "XWikiCacheStore";
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return Arrays.<Event> asList(new DocumentSaveEvent(), new DocumentUpdateEvent(), new DocumentDeleteEvent());
     }
 
     public synchronized void initCache(XWikiContext context) throws XWikiException
@@ -158,6 +203,33 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
+     */
+    public void onEvent(Event event, Object source, Object data)
+    {
+        // only react to remote events since local actions are already taken into account
+        if (this.remoteObservationManagerContext.isRemoteState()) {
+            XWikiDocument doc = (XWikiDocument) source;
+            XWikiContext context = (XWikiContext) data;
+
+            String key = getKey(doc, context);
+
+            synchronized (key) {
+                getCache().remove(key);
+                getPageExistCache().remove(key);
+            }
+        }
+    }
+
+    public String getKey(XWikiDocument doc)
+    {
+        return getKey(doc.getWikiName(), doc.getFullName(), doc.getLanguage());
+    }
+
     public String getKey(XWikiDocument doc, XWikiContext context)
     {
         return getKey(doc.getFullName(), doc.getLanguage(), context);
@@ -165,12 +237,14 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
 
     public String getKey(String fullName, String language, XWikiContext context)
     {
-        String db = context.getDatabase();
-        if (db == null) {
-            db = "";
-        }
-        String key = db + ":" + fullName;
-        if ("".equals(language)) {
+        return getKey(context.getDatabase(), fullName, language);
+    }
+
+    public String getKey(String wiki, String fullName, String language)
+    {
+        String key = (wiki == null ? "" : wiki) + ":" + fullName;
+
+        if (StringUtils.isEmpty(language)) {
             return key;
         } else {
             return key + ":" + language;

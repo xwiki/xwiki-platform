@@ -19,3 +19,5 @@ com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore
 com.xpn.xwiki.internal.ComponentManagerBridgeEventListener
 com.xpn.xwiki.internal.DefaultWikiMacroBuilder
 com.xpn.xwiki.internal.DefaultWikiMacroInitializer
+com.xpn.xwiki.internal.XWikiStubContextInitializer
+com.xpn.xwiki.internal.DefaultXWikiStubContextProvider

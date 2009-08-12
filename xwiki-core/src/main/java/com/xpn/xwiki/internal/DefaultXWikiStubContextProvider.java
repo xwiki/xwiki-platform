@@ -37,8 +37,10 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host
         XWikiServletRequestStub dummy = new XWikiServletRequestStub();
-        dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
-        dummy.setScheme(context.getRequest().getScheme());
+        if (context.getRequest() != null) {
+            dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
+            dummy.setScheme(context.getRequest().getScheme());
+        }
         XWikiServletRequest request = new XWikiServletRequest(dummy);
         this.stubContext.setRequest(request);
 

@@ -30,7 +30,7 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
-  <artifactId>xwiki-core-observation</artifactId>
+  <artifactId>xwiki-core-observation-local</artifactId>
   <name>XWiki Platform - Core - Observation</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Observation</description>

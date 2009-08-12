@@ -68,7 +68,7 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
     /**
      * Relative path where to find jgroups channels configurations.
      */
-    public static final String CONFIGURATION_PATH = "event/remote/jgroups/";
+    public static final String CONFIGURATION_PATH = "observation/remote/jgroups/";
 
     /**
      * Access {@link RemoteObservationManager} configuration.

@@ -3,6 +3,7 @@ package org.xwiki.observation.remote.internal;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
@@ -33,7 +34,9 @@ public class DefaultRemoteObservationManagerContext implements RemoteObservation
      */
     public boolean isRemoteState()
     {
-        return this.execution.getContext().getProperty(REMOTESTATE) == Boolean.TRUE;
+        ExecutionContext context = this.execution.getContext();
+
+        return context != null && context.getProperty(REMOTESTATE) == Boolean.TRUE;
     }
 
     /**

@@ -60,4 +60,12 @@ public class AbstractComponentTestCase
     {
         return this.initializer.getComponentManager();
     }
+
+    /**
+     * @return a modifiable mock configuration source
+     */
+    public MockConfigurationSource getConfigurationSource()
+    {
+        return this.initializer.getConfigurationSource();
+    }
 }

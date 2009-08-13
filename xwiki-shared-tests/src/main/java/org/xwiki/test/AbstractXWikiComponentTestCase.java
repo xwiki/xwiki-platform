@@ -41,7 +41,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     }
 
     /**
-     * Tests that require fine-grained initializations can override this method and not call super. 
+     * Tests that require fine-grained initializations can override this method and not call super.
      * 
      * @see junit.framework.TestCase#setUp()
      */
@@ -84,5 +84,13 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     public EmbeddableComponentManager getComponentManager() throws Exception
     {
         return this.initializer.getComponentManager();
+    }
+
+    /**
+     * @return a modifiable mock configuration source
+     */
+    public MockConfigurationSource getConfigurationSource()
+    {
+        return this.initializer.getConfigurationSource();
     }
 }

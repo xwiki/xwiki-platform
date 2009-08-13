@@ -42,6 +42,8 @@ public class XWikiComponentInitializer
 {
     private EmbeddableComponentManager componentManager;
 
+    private MockConfigurationSource configurationSource;
+
     /**
      * This method should be called before {@link #initializeExecution()} since some components will require the
      * Container component to be set up (for example to access resource such as the XWikiconfiguration file).
@@ -77,18 +79,18 @@ public class XWikiComponentInitializer
     public void initializeConfigurationSource() throws Exception
     {
         // Register the mock configuration source for different roles so that tests always use the mock
-        ConfigurationSource mockSource = new MockConfigurationSource();
+        this.configurationSource = new MockConfigurationSource();
 
         DefaultComponentDescriptor<ConfigurationSource> descriptor;
 
         descriptor = new DefaultComponentDescriptor<ConfigurationSource>();
         descriptor.setRole(ConfigurationSource.class);
-        getComponentManager().registerComponent(descriptor, mockSource);
+        getComponentManager().registerComponent(descriptor, this.configurationSource);
 
         descriptor = new DefaultComponentDescriptor<ConfigurationSource>();
         descriptor.setRole(ConfigurationSource.class);
         descriptor.setRoleHint("xwikiproperties");
-        getComponentManager().registerComponent(descriptor, mockSource);
+        getComponentManager().registerComponent(descriptor, this.configurationSource);
     }
 
     public void initializeExecution() throws Exception
@@ -131,5 +133,13 @@ public class XWikiComponentInitializer
         }
 
         return this.componentManager;
+    }
+
+    /**
+     * @return a modifiable mock configuration source
+     */
+    public MockConfigurationSource getConfigurationSource()
+    {
+        return configurationSource;
     }
 }

@@ -19,8 +19,11 @@
  */
 package org.xwiki.test;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.xwiki.configuration.ConfigurationSource;
@@ -34,39 +37,57 @@ import org.xwiki.configuration.ConfigurationSource;
  */
 public class MockConfigurationSource implements ConfigurationSource
 {
+    private Map<String, Object> properties = new HashMap<String, Object>();
+
+    public void setProperty(String key, Object value)
+    {
+        this.properties.put(key, value);
+    }
+
+    public void remoteProperty(String key)
+    {
+        this.properties.remove(key);
+    }
+
     public boolean containsKey(String key)
     {
-        return false;
+        return this.properties.containsKey(key);
     }
 
     public List<String> getKeys()
     {
-        return Collections.emptyList();
+        return new ArrayList<String>(this.properties.keySet());
     }
 
     public <T> T getProperty(String key, Class<T> valueClass)
     {
         T result = null;
-        if (List.class.getName().equals(valueClass.getName())) {
-            result = (T) Collections.emptyList();
-        } else if (Properties.class.getName().equals(valueClass.getName())) {
-            result = (T) new Properties();
+
+        if (this.properties.containsKey(key)) {
+            result = (T) this.properties.get(key);
+        } else {
+            if (List.class.getName().equals(valueClass.getName())) {
+                result = (T) Collections.emptyList();
+            } else if (Properties.class.getName().equals(valueClass.getName())) {
+                result = (T) new Properties();
+            }
         }
+
         return result;
     }
 
     public <T> T getProperty(String key, T defaultValue)
     {
-        return defaultValue;
+        return this.properties.containsKey(key) ? (T) this.properties.get(key) : defaultValue;
     }
 
     public <T> T getProperty(String key)
     {
-        return null;
+        return (T) this.properties.get(key);
     }
 
     public boolean isEmpty()
     {
-        return true;
+        return this.properties.isEmpty();
     }
 }

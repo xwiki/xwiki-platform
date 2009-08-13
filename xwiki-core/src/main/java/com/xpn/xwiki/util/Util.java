@@ -109,12 +109,12 @@ public class Util
 
     public Perl5Matcher getMatcher()
     {
-        return matcher;
+        return this.matcher;
     }
 
     public Perl5Util getP5util()
     {
-        return p5util;
+        return this.p5util;
     }
 
     public List<String> getAllMatches(String content, String spattern, int group) throws MalformedPatternException
@@ -122,8 +122,8 @@ public class Util
         List<String> list = new ArrayList<String>();
         PatternMatcherInput input = new PatternMatcherInput(content);
         Pattern pattern = patterns.addPattern(spattern);
-        while (matcher.contains(input, pattern)) {
-            MatchResult result = matcher.getMatch();
+        while (this.matcher.contains(input, pattern)) {
+            MatchResult result = this.matcher.getMatch();
             String smatch = result.group(group);
             list.add(smatch);
         }
@@ -174,8 +174,8 @@ public class Util
 
     /**
      * Create a Map from a string holding a space separated list of key=value pairs. If keys or values must contain
-     * spaces, they can be placed inside quotes, like <code>"this key"="a larger value"</code>. To use a quote as
-     * part of a key/value, use <code>%_Q_%</code>.
+     * spaces, they can be placed inside quotes, like <code>"this key"="a larger value"</code>. To use a quote as part
+     * of a key/value, use <code>%_Q_%</code>.
      * 
      * @param mapString The string that must be parsed.
      * @return A Map containing the keys and values. If a key is defined more than once, the last value is used.
@@ -864,7 +864,7 @@ public class Util
             LOG.debug("Failed load resource [" + resource + "] using a file path");
         }
         try {
-            Container container = (Container) Utils.getComponent(Container.class);
+            Container container = Utils.getComponent(Container.class);
             InputStream res = container.getApplicationContext().getResourceAsStream(resource);
             if (res != null) {
                 return res;

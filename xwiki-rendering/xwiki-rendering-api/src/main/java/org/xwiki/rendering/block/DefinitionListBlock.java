@@ -24,7 +24,7 @@ import org.xwiki.rendering.listener.Listener;
 import java.util.List;
 
 /**
- * Represents a definition list. For exampe in HTML this is the equivalet of &lt;dl&gt;.
+ * Represents a definition list. For example in HTML this is the equivalent of &lt;dl&gt;.
  *
  * @version $Id$
  * @since 1.6M2
@@ -32,8 +32,9 @@ import java.util.List;
 public class DefinitionListBlock extends AbstractFatherBlock implements ListBLock
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * Construct a Definition List block.
+     *
+     * @param childrenBlocks the blocks making the Definition list
      */
     public DefinitionListBlock(List<Block> childrenBlocks)
     {

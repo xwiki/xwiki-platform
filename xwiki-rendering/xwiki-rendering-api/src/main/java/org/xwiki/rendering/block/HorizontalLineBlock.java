@@ -32,8 +32,7 @@ import org.xwiki.rendering.listener.Listener;
 public class HorizontalLineBlock extends AbstractBlock
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractBlock#AbstractBlock()
+     * Construct a Horizontal Line Block with no parameters.
      */
     public HorizontalLineBlock()
     {
@@ -41,8 +40,10 @@ public class HorizontalLineBlock extends AbstractBlock
     }
 
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractBlock#AbstractBlock(Map)
+     * Construct a Horizontal Line Block with parameters.
+     *
+     * @param parameters see {@link org.xwiki.rendering.block.AbstractBlock#getParameter(String)} for more details on
+     *        parameters
      */
     public HorizontalLineBlock(Map<String, String> parameters)
     {

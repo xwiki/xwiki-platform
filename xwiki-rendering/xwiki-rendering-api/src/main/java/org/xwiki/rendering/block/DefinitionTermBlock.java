@@ -32,8 +32,9 @@ import java.util.List;
 public class DefinitionTermBlock extends AbstractFatherBlock
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * Construct a Definition Term block.
+     *
+     * @param childrenBlocks the blocks making the Definition Term
      */
     public DefinitionTermBlock(List<Block> childrenBlocks)
     {

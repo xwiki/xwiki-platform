@@ -34,8 +34,9 @@ import org.xwiki.rendering.listener.Listener;
 public class NumberedListBlock extends AbstractFatherBlock implements ListBLock
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * Construct a Numbered List Block with no parameters.
+     *
+     * @param childrenBlocks the blocks making the list
      */
     public NumberedListBlock(List<Block> childrenBlocks)
     {
@@ -43,8 +44,11 @@ public class NumberedListBlock extends AbstractFatherBlock implements ListBLock
     }
 
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List, java.util.Map)
+     * Construct a Numbered List Block with parameters.
+     *
+     * @param childrenBlocks the blocks making the list
+     * @param parameters see {@link org.xwiki.rendering.block.AbstractBlock#getParameter(String)} for more details on
+     *        parameters
      */
     public NumberedListBlock(List<Block> childrenBlocks, Map<String, String> parameters)
     {

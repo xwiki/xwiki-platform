@@ -34,8 +34,9 @@ import org.xwiki.rendering.listener.Listener;
 public class BulletedListBlock extends AbstractFatherBlock implements ListBLock
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * Construct a Bulleted List Block with no parameters.
+     *
+     * @param childrenBlocks the blocks making the list
      */
     public BulletedListBlock(List<Block> childrenBlocks)
     {
@@ -43,8 +44,11 @@ public class BulletedListBlock extends AbstractFatherBlock implements ListBLock
     }
 
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List, java.util.Map) 
+     * Construct a Bulleted List Block with parameters.
+     *
+     * @param childrenBlocks the blocks making the list
+     * @param parameters see {@link org.xwiki.rendering.block.AbstractBlock#getParameter(String)} for more details on
+     *        parameters
      */
     public BulletedListBlock(List<Block> childrenBlocks, Map<String, String> parameters)
     {

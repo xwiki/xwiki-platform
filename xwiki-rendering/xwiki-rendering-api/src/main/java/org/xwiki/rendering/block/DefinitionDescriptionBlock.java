@@ -32,8 +32,9 @@ import java.util.List;
 public class DefinitionDescriptionBlock extends AbstractFatherBlock
 {
     /**
-     * {@inheritDoc}
-     * @see AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * Construct a Definition Description block.
+     *
+     * @param childrenBlocks the blocks making the description
      */
     public DefinitionDescriptionBlock(List<Block> childrenBlocks)
     {

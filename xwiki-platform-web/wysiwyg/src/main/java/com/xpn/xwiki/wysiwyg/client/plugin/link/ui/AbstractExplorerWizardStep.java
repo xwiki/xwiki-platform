@@ -88,9 +88,9 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         WikiDataSource ds = new WikiDataSource();
         explorer.setDataSource(ds);
         explorer.setDefaultValue(defaultSelection);
-        // strangely enough, this sets the style on the tree wrapper, which contains the input too, even if explorer is
-        // a reference only to the tree
-        explorer.addStyleName("xExplorerPanel");
+        explorer.addStyleName("xExplorer");
+        
+        explorerPanel.addStyleName("xExplorerPanel");
         // we need to add the explorer in a wrapper, since the explorer creates its own wrapper around and adds the
         // input to that wrapper. We use this panel to have a reference to the _whole_ generated UI, since the explorer
         // reference would point only to the grid inside.

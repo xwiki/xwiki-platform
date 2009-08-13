@@ -24,6 +24,10 @@ import org.xwiki.gwt.dom.client.Event;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.HasDoubleClickHandlers;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
@@ -33,7 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
  * 
  * @version $Id$
  */
-public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea
+public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers
 {
     /**
      * @see #setHTML(String)
@@ -145,4 +149,14 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea
     /*-{
         return @com.google.gwt.user.client.DOM::previewEvent(Lcom/google/gwt/user/client/Event;)(event);
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasDoubleClickHandlers#addDoubleClickHandler(DoubleClickHandler)
+     */
+    public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler)
+    {
+        return addDomHandler(handler, DoubleClickEvent.getType());
+    }
 }

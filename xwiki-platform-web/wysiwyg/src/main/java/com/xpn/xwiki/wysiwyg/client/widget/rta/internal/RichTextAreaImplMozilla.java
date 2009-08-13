@@ -167,4 +167,52 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
     {
         handlerManager.fireEvent(event);
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#hookEvents()
+     */
+    protected void hookEvents()
+    {
+        // JSNI doesn't support super.*
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=3507
+        super.hookEvents();
+        // Double click event is not caught by default.
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=3944
+        hookCustomEvents();
+    }
+
+    /**
+     * Hooks custom events.
+     */
+    protected native void hookCustomEvents()
+    /*-{
+        var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
+        elem.contentWindow.addEventListener('dblclick', elem.__gwt_handler, true);
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplMozilla#unhookEvents()
+     */
+    protected void unhookEvents()
+    {
+        // Double click event is not caught by default.
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=3944
+        unhookCustomEvents();
+        // JSNI doesn't support super.*
+        // See http://code.google.com/p/google-web-toolkit/issues/detail?id=3507
+        super.unhookEvents();
+    }
+
+    /**
+     * Unhooks custom events.
+     */
+    protected native void unhookCustomEvents()
+    /*-{
+        var elem = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
+        elem.contentWindow.removeEventListener('dblclick', elem.__gwt_handler, true);
+    }-*/;
 }

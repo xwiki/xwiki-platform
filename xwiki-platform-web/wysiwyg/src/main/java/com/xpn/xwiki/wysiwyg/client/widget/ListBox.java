@@ -19,9 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
+import org.xwiki.gwt.dom.client.Event;
+
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.HasAllKeyHandlers;
+import com.google.gwt.event.dom.client.HasDoubleClickHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -36,15 +43,15 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Displays a list of items allowing us to select one using the mouse or the keyboard.
  * 
+ * @param <T> the data type that can be attached to list items
  * @version $Id$
  */
-public class ListBox extends Composite implements HasSelectionHandlers<ListItem>, ClickHandler, KeyDownHandler,
-    KeyPressHandler, KeyUpHandler
+public class ListBox<T> extends Composite implements HasSelectionHandlers<ListItem<T>>, HasDoubleClickHandlers,
+    HasAllKeyHandlers, ClickHandler, KeyDownHandler, KeyPressHandler, KeyUpHandler
 {
     /**
      * The list of items from which we can choose one.
@@ -54,7 +61,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     /**
      * The currently selected item; {@code null} if no item is selected.
      */
-    private ListItem selectedItem;
+    private ListItem<T> selectedItem;
 
     /**
      * Flag used to avoid updating the selected item on both KeyDown and KeyPress events. This flag is needed because of
@@ -85,10 +92,20 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
      * 
      * @param item the item to be added
      */
-    public void addItem(ListItem item)
+    public void addItem(ListItem<T> item)
     {
         item.setSelected(false);
         list.add(item);
+    }
+
+    /**
+     * @param index a valid list item index
+     * @return the list item at the specified index in this list
+     */
+    @SuppressWarnings("unchecked")
+    public ListItem<T> getItem(int index)
+    {
+        return (ListItem<T>) list.getWidget(index);
     }
 
     /**
@@ -97,7 +114,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
      * @param item the item to be inserted
      * @param beforeIndex the index before which to insert the item
      */
-    public void insertItem(ListItem item, int beforeIndex)
+    public void insertItem(ListItem<T> item, int beforeIndex)
     {
         item.setSelected(false);
         list.insert(item, beforeIndex);
@@ -108,7 +125,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
      * 
      * @param item the list item to be removed
      */
-    public void removeItem(ListItem item)
+    public void removeItem(ListItem<T> item)
     {
         list.remove(item);
         if (item == selectedItem) {
@@ -130,15 +147,55 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
      * 
      * @see HasSelectionHandlers#addSelectionHandler(SelectionHandler)
      */
-    public HandlerRegistration addSelectionHandler(SelectionHandler<ListItem> handler)
+    public HandlerRegistration addSelectionHandler(SelectionHandler<ListItem<T>> handler)
     {
         return addHandler(handler, SelectionEvent.getType());
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see HasDoubleClickHandlers#addDoubleClickHandler(DoubleClickHandler)
+     */
+    public HandlerRegistration addDoubleClickHandler(DoubleClickHandler handler)
+    {
+        return addDomHandler(handler, DoubleClickEvent.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasAllKeyHandlers#addKeyDownHandler(KeyDownHandler)
+     */
+    public HandlerRegistration addKeyDownHandler(KeyDownHandler handler)
+    {
+        return addDomHandler(handler, KeyDownEvent.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasAllKeyHandlers#addKeyPressHandler(KeyPressHandler)
+     */
+    public HandlerRegistration addKeyPressHandler(KeyPressHandler handler)
+    {
+        return addDomHandler(handler, KeyPressEvent.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasAllKeyHandlers#addKeyUpHandler(KeyUpHandler)
+     */
+    public HandlerRegistration addKeyUpHandler(KeyUpHandler handler)
+    {
+        return addDomHandler(handler, KeyUpEvent.getType());
+    }
+
+    /**
      * @return the list item currently selected
      */
-    public ListItem getSelectedItem()
+    public ListItem<T> getSelectedItem()
     {
         return selectedItem;
     }
@@ -148,7 +205,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
      * 
      * @param item the list item to be selected
      */
-    public void setSelectedItem(ListItem item)
+    public void setSelectedItem(ListItem<T> item)
     {
         if (item != selectedItem && (item == null || item.getParent() == list)) {
             if (selectedItem != null) {
@@ -171,21 +228,23 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == getWidget()) {
-            setSelectedItem(findItem(Element.as(event.getNativeEvent().getEventTarget())));
+            setSelectedItem(getItemForEvent(event));
         }
     }
 
     /**
-     * Finds the list item containing the given DOM element.
+     * Finds the list item that is the target of the specified DOM event.
      * 
-     * @param target the DOM element to look for, usually the target of a DOM event
-     * @return the list item if found, {@code null} otherwise
+     * @param event the DOM event that was fired
+     * @return the target list item if found, {@code null} otherwise
      */
-    private ListItem findItem(Element target)
+    public ListItem<T> getItemForEvent(DomEvent< ? > event)
     {
-        for (Widget item : list) {
+        Element target = Element.as(event.getNativeEvent().getEventTarget());
+        for (int i = 0; i < list.getWidgetCount(); i++) {
+            ListItem<T> item = getItem(i);
             if (item.getElement().isOrHasChild(target)) {
-                return (ListItem) item;
+                return item;
             }
         }
         return null;
@@ -200,9 +259,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     {
         if (event.getSource() == getWidget()) {
             ignoreNextKeyPress = true;
-            if (updateSelectedItem(event.getNativeKeyCode())) {
-                event.preventDefault();
-            }
+            updateSelectedItem((Event) event.getNativeEvent());
         }
     }
 
@@ -215,9 +272,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     {
         if (event.getSource() == getWidget()) {
             if (!ignoreNextKeyPress) {
-                if (updateSelectedItem(event.getNativeEvent().getKeyCode())) {
-                    event.preventDefault();
-                }
+                updateSelectedItem((Event) event.getNativeEvent());
             }
             ignoreNextKeyPress = false;
         }
@@ -234,15 +289,14 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     }
 
     /**
-     * Updates the selected item based on the key pressed.
+     * Updates the selected item based on the native keyboard event that was fired.
      * 
-     * @param keyCode the code of the pressed key
-     * @return {@code true} if the selected item has been changed
+     * @param event the native event that was fired
      */
-    protected boolean updateSelectedItem(int keyCode)
+    protected void updateSelectedItem(Event event)
     {
-        ListItem oldItem = selectedItem;
-        switch (keyCode) {
+        ListItem<T> oldItem = selectedItem;
+        switch (event.getKeyCode()) {
             case KeyCodes.KEY_UP:
                 selectPreviousItem();
                 break;
@@ -258,7 +312,10 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
             default:
                 // ignore
         }
-        return oldItem != selectedItem;
+        if (oldItem != selectedItem) {
+            // We have to prevent the default browser behavior which scrolls the list.
+            event.xPreventDefault();
+        }
     }
 
     /**
@@ -268,7 +325,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     {
         int selectedIndex = list.getWidgetIndex(selectedItem);
         if (selectedIndex > 0) {
-            setSelectedItem((ListItem) list.getWidget(selectedIndex - 1));
+            setSelectedItem(getItem(selectedIndex - 1));
         }
     }
 
@@ -279,7 +336,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     {
         int selectedIndex = list.getWidgetIndex(selectedItem);
         if (selectedIndex >= 0 && selectedIndex < list.getWidgetCount() - 1) {
-            setSelectedItem((ListItem) list.getWidget(selectedIndex + 1));
+            setSelectedItem(getItem(selectedIndex + 1));
         }
     }
 
@@ -289,7 +346,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     protected void selectFirstItem()
     {
         if (list.getWidgetCount() > 0) {
-            setSelectedItem((ListItem) list.getWidget(0));
+            setSelectedItem(getItem(0));
         }
     }
 
@@ -299,7 +356,7 @@ public class ListBox extends Composite implements HasSelectionHandlers<ListItem>
     protected void selectLastItem()
     {
         if (list.getWidgetCount() > 0) {
-            setSelectedItem((ListItem) list.getWidget(list.getWidgetCount() - 1));
+            setSelectedItem(getItem(list.getWidgetCount() - 1));
         }
     }
 }

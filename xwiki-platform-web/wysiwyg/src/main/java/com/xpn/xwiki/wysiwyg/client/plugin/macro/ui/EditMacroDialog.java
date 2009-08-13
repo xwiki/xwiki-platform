@@ -89,6 +89,14 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickHandler
     }
 
     /**
+     * The prefix of this dialog's title.<br/>
+     * Use {@link String#format(String, Object...)} as soon as GWT emulates it.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3945
+     */
+    private static final String TITLE_PREFIX = Strings.INSTANCE.macro() + " : ";
+
+    /**
      * The button that triggers the update of the edited macro.
      */
     private final Button apply;
@@ -155,6 +163,9 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickHandler
         // First get the dialog out of the loading state.
         setLoading(false);
 
+        // Update the title of the dialog, this time using the human-readable macro name.
+        title.setText(TITLE_PREFIX + macroDescriptor.getName());
+
         // Display the macro description.
         Label macroDescription = new Label(macroDescriptor.getDescription());
         macroDescription.addStyleName("xMacroDescription");
@@ -213,8 +224,8 @@ public class EditMacroDialog extends ComplexDialogBox implements ClickHandler
         parameterDisplayers.clear();
         contentDisplayer = null;
 
-        // Update the title of the dialog.
-        title.setText("Macro : " + macroCall.getName());
+        // Update the title of the dialog, using the macro id till we receive the macro descriptor.
+        title.setText(TITLE_PREFIX + macroCall.getName());
 
         // Disable the apply button till we receive the macro descriptor from the server.
         apply.setEnabled(false);

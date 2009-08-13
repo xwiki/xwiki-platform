@@ -22,16 +22,22 @@ package com.xpn.xwiki.wysiwyg.client.widget;
 import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
- * An item in a list box. It can contain other widgets not just plain text.
+ * An item in a list box. It can contain other widgets not just plain text and also can have data attached to it.
  * 
+ * @param <T> the data type that can be attached to list items
  * @version $Id$
  */
-public class ListItem extends FlowPanel
+public class ListItem<T> extends FlowPanel
 {
     /**
      * The style name suffix attached to selected list items.
      */
     private static final String DEPENDENT_STYLENAME_SELECTED_ITEM = "selected";
+
+    /**
+     * The data associated with this list item.
+     */
+    private T data;
 
     /**
      * Creates a new list item.
@@ -53,5 +59,23 @@ public class ListItem extends FlowPanel
         } else {
             removeStyleDependentName(DEPENDENT_STYLENAME_SELECTED_ITEM);
         }
+    }
+
+    /**
+     * @return the data assocaited with this list item
+     */
+    public T getData()
+    {
+        return data;
+    }
+
+    /**
+     * Associates a data with this list item.
+     * 
+     * @param data the data to be attached to this list item
+     */
+    public void setData(T data)
+    {
+        this.data = data;
     }
 }

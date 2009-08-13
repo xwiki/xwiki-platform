@@ -24,6 +24,11 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,7 +49,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
  * 
  * @version $Id$
  */
-public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler, SelectionHandler<ListItem>
+public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler, DoubleClickHandler, KeyUpHandler,
+    SelectionHandler<ListItem<String>>
 {
     /**
      * The button that selects the chosen macro.
@@ -52,9 +58,9 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
     private final Button select;
 
     /**
-     * The list box displaying the available macros.
+     * The list box displaying the available macros. Each list item has a macro id associated.
      */
-    private final ListBox macroList;
+    private final ListBox<String> macroList;
 
     /**
      * The object used to configure the dialog.
@@ -90,8 +96,10 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
 
         getHeader().add(new Label(Strings.INSTANCE.macroInsertDialogTitle()));
 
-        macroList = new ListBox();
+        macroList = new ListBox<String>();
         macroList.addSelectionHandler(this);
+        macroList.addDoubleClickHandler(this);
+        macroList.addKeyUpHandler(this);
 
         select = new Button(Strings.INSTANCE.select());
         select.addClickHandler(this);
@@ -114,9 +122,42 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
     public void onClick(ClickEvent event)
     {
         if (event.getSource() == select) {
-            setCanceled(false);
-            hide();
+            submit();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
+     */
+    public void onDoubleClick(DoubleClickEvent event)
+    {
+        if (event.getSource() == macroList && macroList.getSelectedItem() != null) {
+            submit();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see KeyUpHandler#onKeyUp(KeyUpEvent)
+     */
+    public void onKeyUp(KeyUpEvent event)
+    {
+        if (event.getSource() == macroList && event.getNativeKeyCode() == KeyCodes.KEY_ENTER
+            && macroList.getSelectedItem() != null) {
+            submit();
+        }
+    }
+
+    /**
+     * Submits the data from this dialog.
+     */
+    private void submit()
+    {
+        setCanceled(false);
+        hide();
     }
 
     /**
@@ -173,12 +214,9 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
     {
         macroList.clear();
         for (String macro : macros) {
-            Label name = new Label(macro);
-            name.addStyleName("xMacroLabel");
-
-            final ListItem item = new ListItem();
+            final ListItem<String> item = new ListItem<String>();
+            item.setData(macro);
             item.addStyleName("xMacro");
-            item.add(name);
 
             macroList.addItem(item);
 
@@ -192,8 +230,13 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
 
                 public void onSuccess(MacroDescriptor result)
                 {
+                    Label name = new Label(result.getName());
+                    name.addStyleName("xMacroLabel");
+
                     Label description = new Label(result.getDescription());
                     description.addStyleName("xMacroDescription");
+
+                    item.add(name);
                     item.add(description);
                 }
             };
@@ -240,8 +283,7 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
      */
     public String getSelectedMacro()
     {
-        return macroList.getSelectedItem() == null ? null : ((Label) macroList.getSelectedItem().getWidget(0))
-            .getText();
+        return macroList.getSelectedItem() == null ? null : macroList.getSelectedItem().getData();
     }
 
     /**
@@ -249,7 +291,7 @@ public class SelectMacroDialog extends ComplexDialogBox implements ClickHandler,
      * 
      * @see SelectionHandler#onSelection(SelectionEvent)
      */
-    public void onSelection(SelectionEvent<ListItem> event)
+    public void onSelection(SelectionEvent<ListItem<String>> event)
     {
         if (event.getSource() == macroList) {
             select.setEnabled(macroList.getSelectedItem() != null);

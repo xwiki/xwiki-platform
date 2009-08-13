@@ -688,6 +688,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             }
 
             MacroDescriptor result = new MacroDescriptor();
+            result.setName(descriptor.getName());
             result.setDescription(descriptor.getDescription());
             result.setContentDescriptor(contentDescriptor);
             result.setParameterDescriptorMap(parameterDescriptorMap);

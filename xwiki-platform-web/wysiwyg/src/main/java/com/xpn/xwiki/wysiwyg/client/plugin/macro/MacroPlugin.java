@@ -20,6 +20,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
 import com.google.gwt.event.logical.shared.CloseHandler;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -39,7 +41,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class MacroPlugin extends AbstractPlugin implements CloseHandler<CompositeDialogBox>
+public class MacroPlugin extends AbstractPlugin implements CloseHandler<CompositeDialogBox>, DoubleClickHandler
 {
     /**
      * Rich text area command for refreshing macro output.
@@ -105,6 +107,8 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
         getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));
         getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
         getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));
+
+        saveRegistration(getTextArea().addDoubleClickHandler(this));
 
         menuExtension = new MacroMenuExtension(this);
         getUIExtensionList().add(menuExtension.getExtension());
@@ -248,6 +252,18 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
             edit(false);
         } else if (event.getTarget() == getSelectDialog() && !event.isAutoClosed()) {
             insert(false);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
+     */
+    public void onDoubleClick(DoubleClickEvent event)
+    {
+        if (event.getSource() == getTextArea() && getSelector().getMacroCount() == 1) {
+            edit(true);
         }
     }
 }

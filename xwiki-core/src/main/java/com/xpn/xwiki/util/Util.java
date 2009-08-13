@@ -21,12 +21,9 @@
 
 package com.xpn.xwiki.util;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -49,6 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -242,43 +241,22 @@ public class Util
 
     public static String getFileContent(File file) throws IOException
     {
-        return getFileContent(new FileReader(file));
+        return FileUtils.readFileToString(file);
     }
 
     public static String getFileContent(Reader reader) throws IOException
     {
-        StringBuffer content = new StringBuffer();
-        BufferedReader fr = new BufferedReader(reader);
-        String line;
-        line = fr.readLine();
-        while (true) {
-            if (line == null) {
-                fr.close();
-
-                return content.toString();
-            }
-            content.append(line);
-            content.append("\n");
-            line = fr.readLine();
-        }
+        return IOUtils.toString(reader);
     }
 
     public static byte[] getFileContentAsBytes(File file) throws IOException
     {
-        return getFileContentAsBytes(new FileInputStream(file));
+        return FileUtils.readFileToByteArray(file);
     }
 
     public static byte[] getFileContentAsBytes(InputStream is) throws IOException
     {
-        BufferedInputStream bis = new BufferedInputStream(is);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] data = new byte[65536];
-        int nb = 0;
-        while ((nb = bis.read(data)) > 0) {
-            baos.write(data, 0, nb);
-        }
-
-        return baos.toByteArray();
+        return IOUtils.toByteArray(is);
     }
 
     public static boolean contains(String name, String list, String sep)

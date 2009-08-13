@@ -24,8 +24,8 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.wysiwyg.client.widget.MockEventDispatcher;
@@ -561,7 +561,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
 
         // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyCodes.KEY_ENTER);
 
         // Check if the caret is inside a span which is inside paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -602,7 +602,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
 
         // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyCodes.KEY_ENTER);
 
         // Check if the caret is inside a paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -642,7 +642,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
 
         // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyCodes.KEY_ENTER);
 
         // Check if the caret is inside a paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);
@@ -685,7 +685,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
 
         // Type Enter.
         MockEventDispatcher dispatcher = new MockEventDispatcher(rta);
-        dispatcher.keyPress(KeyboardListener.KEY_ENTER);
+        dispatcher.keyPress(KeyCodes.KEY_ENTER);
 
         // Check if the caret is inside a strong element which is inside a paragraph.
         range = rta.getDocument().getSelection().getRangeAt(0);

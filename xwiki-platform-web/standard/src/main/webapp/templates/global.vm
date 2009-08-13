@@ -39,13 +39,13 @@
 #end
 #end
 #if(!$context.action.startsWith("login"))
-#if($isGuest)
-#set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$util.encodeURI($logredir)"))
-      <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get("login")</a>#sep()
-#else
-#set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$util.encodeURI($logredir)"))
-      <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get("logout")</a>#sep()
-#end
+  #if($isGuest)
+    #set($loginurl = $xwiki.getURL('XWiki.XWikiLogin', 'login', "xredirect=$util.encodeURI($xwiki.getRequestURL())"))
+      <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get('login')</a>#sep()
+  #else
+    #set($logouturl = $xwiki.getURL('XWiki.XWikiLogout', 'logout', "xredirect=$util.encodeURI($xwiki.getRequestURL())"))
+      <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get('logout')</a>#sep()
+  #end
 #end
 #if($isGuest && $xwiki.hasAccessLevel("register", "XWiki.XWikiPreferences"))
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))

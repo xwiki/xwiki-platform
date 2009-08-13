@@ -23,11 +23,11 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
+import com.google.gwt.event.dom.client.HasLoadHandlers;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.ui.LoadListener;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SourcesLoadEvents;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**
@@ -35,7 +35,7 @@ import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
  * 
  * @version $Id$
  */
-public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implements LoadListener
+public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implements LoadHandler
 {
     /**
      * The number of milliseconds we delay the test finish. This delay is needed because in some browsers the rich text
@@ -66,8 +66,8 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
         if (rta == null) {
             rta = new RichTextArea();
             // Workaround till GWT provides a way to detect when the rich text area has finished loading.
-            if (rta.getBasicFormatter() != null && rta.getBasicFormatter() instanceof SourcesLoadEvents) {
-                ((SourcesLoadEvents) rta.getBasicFormatter()).addLoadListener(this);
+            if (rta.getBasicFormatter() != null && rta.getBasicFormatter() instanceof HasLoadHandlers) {
+                ((HasLoadHandlers) rta.getBasicFormatter()).addLoadHandler(this);
             }
         }
         RootPanel.get().add(rta);
@@ -76,9 +76,9 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
     /**
      * {@inheritDoc}
      * 
-     * @see LoadListener#onLoad(Widget)
+     * @see LoadHandler#onLoad(LoadEvent)
      */
-    public void onLoad(Widget sender)
+    public void onLoad(LoadEvent event)
     {
         // http://wiki.codetalks.org/wiki/index.php/Docs/Keyboard_navigable_JS_widgets
         // #Use_setTimeout_with_element.focus.28.29_to_set_focus
@@ -89,16 +89,6 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
                 rta.setFocus(true);
             }
         }).schedule(1);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see LoadListener#onError(Widget)
-     */
-    public void onError(Widget sender)
-    {
-        // ignore
     }
 
     /**

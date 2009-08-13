@@ -35,7 +35,7 @@ public class SyntaxType
 
     public static final SyntaxType JSPWIKI = new SyntaxType("jspwiki", "JSPWiki");
 
-    public static final SyntaxType TWIKI = new SyntaxType("TWiki", "TWiki");
+    public static final SyntaxType TWIKI = new SyntaxType("twiki", "TWiki");
 
     public static final SyntaxType XHTML = new SyntaxType("xhtml", "XHTML");
 

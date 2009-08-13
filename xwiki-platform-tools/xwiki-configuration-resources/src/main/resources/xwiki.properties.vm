@@ -32,7 +32,8 @@
 # rendering.linkLabelFormat = %p
 
 #-# [Since 2.0M3]
-#-# Overrides default macro categories.
+#-# Overrides default macro categories (Each macro has a default category already defined, for example
+#-# "presentation" for the Table of Contents Macro).
 #-#
 #-# Ex: To redefine the macro category for the TOC macro so that it'd be in the "My Category" category +
 #-# redefine the category for the Script Macro to be "My Other Category", you'd use:
@@ -44,12 +45,13 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 1.7M1]
-#-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
-#-# cache component.
+#-# The standard cache component implementation to use (can be local or distributed depending on the implementation).
+#-# The default standard cache implementation is JBoss Cache.
 # cache.defaultCache=jbosscache
 
 #-# [Since 1.7M1]
-#-# The cache component to use as local cache component. 
+#-# The local cache implementation to use.
+#-# The default local cache implementation is JBoss Cache.
 # cache.defaultLocalCache=jbosscache/local
 
 #----------------------------------------------------------------------------------
@@ -124,10 +126,15 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 2.0M3]
-#-# Indicate if the network distribution module is enabled or not
+#-# Indicate if the network distribution module is enabled or not.
+#-# By default remote events are disabled.
 # observation.remote.enabled = false
 
 #-# [Since 2.0M3]
-#-# The initial list of events communication channels to start.
-#-# For JGroups, the identifiers matches the files names in observation/remote/jgroups/ with a ".xml" extension
+#-# The list of events communication channels to start when the application starts.
+#-# By default no channel is configured.
+#-#
+#-# The default remote event distribution implementation is using JGroups and you'll need to drop your JGroups channel
+#-# xml files in the WEB-INF/observation/remote/jgroups/ directory. There's a README file in that directory with more
+#-# information.
 #-# Example: observation.remote.channels = public.xml, cluster.xml

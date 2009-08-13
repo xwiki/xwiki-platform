@@ -41,8 +41,20 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class FeedPluginApi extends Api
 {
+    private static final String BLOG_POST_CLASS_NAME = "Blog.BlogPostClass";
+    private static final String BLOG_POST_TEMPLATE_NAME = "Blog.BlogPostTemplate";
+
+    private static final Map BLOG_FIELDS_MAPPING;
+
     public static final String FEED_PLUGIN_EXCEPTION = "FeedPluginException";
 
+    static {
+        BLOG_FIELDS_MAPPING = new HashMap();
+        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_TITLE, "Blog.BlogPostClass_title");
+        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "Blog.BlogPostClass_content");
+        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "Blog.BlogPostClass_category");
+        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
+    }
         private FeedPlugin plugin;
 
         public FeedPluginApi(FeedPlugin plugin, XWikiContext context) {
@@ -578,17 +590,19 @@ public class FeedPluginApi extends Api
 
     private Map fillBlogFeedMetadata(Map metadata)
     {
-        fillDefaultFeedMetadata(metadata);
+        // Make sure that we don't have an immutable Map
+        Map result = new HashMap(metadata);
+        fillDefaultFeedMetadata(result);
         // these strings should be taken from a resource bundle
         String title = "Personal Wiki Blog";
         String description = title;
-        if (!keyHasValue(metadata, "title", "")) {
-            metadata.put("title", title);
+        if (!keyHasValue(result, "title", "")) {
+            result.put("title", title);
         }
-        if (!keyHasValue(metadata, "description", "")) {
-            metadata.put("description", description);
+        if (!keyHasValue(result, "description", "")) {
+            result.put("description", description);
         }
-        return metadata;
+        return result;
     }
 
     /**
@@ -618,7 +632,7 @@ public class FeedPluginApi extends Api
      */
     public SyndFeed getBlogFeed(List list, Map metadata)
     {
-        SyndFeed blogFeed = getArticleFeed(list, fillBlogFeedMetadata(metadata));
+        SyndFeed blogFeed =  getFeed(list, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), Collections.EMPTY_MAP, fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }
@@ -727,14 +741,14 @@ public class FeedPluginApi extends Api
             String category = request.getParameter("category");
             if (category == null || category.equals("")) {
                 query =
-                    ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name<>'XWiki.ArticleClassTemplate' order by doc.creationDate desc";
+                    ", BaseObject as obj where obj.name=doc.fullName and obj.className='" + BLOG_POST_CLASS_NAME + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME + "' order by doc.creationDate desc";
             } else {
                 query =
-                    ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='XWiki.ArticleClass' and obj.name<>'XWiki.ArticleClassTemplate' and obj.id=prop.id.id and prop.id.name='category' and list = '"
+                    ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='" + BLOG_POST_CLASS_NAME + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME + "' and obj.id=prop.id.id and prop.id.name='category' and list = '"
                         + category + "' order by doc.creationDate desc";
             }
         }
-        SyndFeed blogFeed = getArticleFeed(query, count, start, fillBlogFeedMetadata(metadata));
+        SyndFeed blogFeed =  getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), Collections.EMPTY_MAP, fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }

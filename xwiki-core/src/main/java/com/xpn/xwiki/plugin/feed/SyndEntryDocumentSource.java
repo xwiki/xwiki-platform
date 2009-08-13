@@ -44,6 +44,8 @@ import org.xwiki.xml.XMLUtils;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndCategory;
+import com.sun.syndication.feed.synd.SyndCategoryImpl;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -355,8 +357,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         } else if (isVelocityCode(mapping)) {
             description = parseString(mapping, doc, context);
         } else {
-            description = getStringValue(mapping, doc, context);
-            description = context.getDoc().getRenderedContent(description, XWikiDocument.XWIKI10_SYNTAXID, context);
+            description = doc.getRenderedContent(getStringValue(mapping, doc, context), doc.getSyntaxId());
         }
         String contentType = (String) params.get(CONTENT_TYPE);
         int contentLength = ((Number) params.get(CONTENT_LENGTH)).intValue();
@@ -380,13 +381,25 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     protected List getCategories(Document doc, Map params, XWikiContext context) throws XWikiException
     {
         String mapping = (String) params.get(FIELD_CATEGORIES);
+        List categories = null;
         if (mapping == null) {
-            return getDefaultCategories(doc, params, context);
+            categories = getDefaultCategories(doc, params, context);
         } else if (isVelocityCode(mapping)) {
-            return parseList(mapping, doc, context);
+            categories = parseList(mapping, doc, context);
         } else {
-            return getListValue(mapping, doc, context);
+            categories = getListValue(mapping, doc, context);
         }
+        List result = new ArrayList();
+        for(Object category: categories) {
+            if(category instanceof SyndCategory) {
+                result.add(category);
+            } else if(category != null) {
+                SyndCategory scat = new SyndCategoryImpl();
+                scat.setName(category.toString());
+                result.add(scat);
+            }
+        }
+        return result;
     }
 
     protected Date getDefaultPublishedDate(Document doc, Map params, XWikiContext context)

@@ -1,5 +1,6 @@
 package org.xwiki.observation.remote.internal;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.component.annotation.Component;
@@ -42,6 +43,8 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
     @SuppressWarnings("unchecked")
     public List<String> getChannels()
     {
-        return this.configurationSource.getProperty("observation.remote.channels", List.class);
+        List<String> channels = this.configurationSource.getProperty("observation.remote.channels", List.class);
+
+        return channels == null ? Collections.<String> emptyList() : channels;
     }
 }

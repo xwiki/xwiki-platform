@@ -30,6 +30,7 @@ import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.observation.remote.internal.jgroups.JGroupsRemoteObservationManager;
+import org.xwiki.test.MockConfigurationSource;
 import org.xwiki.test.XWikiComponentInitializer;
 
 /**
@@ -75,6 +76,8 @@ public abstract class AbstractROMTestCase
 
         getComponentManager1().lookup(Container.class).setApplicationContext(applicationContext);
         getComponentManager2().lookup(Container.class).setApplicationContext(applicationContext);
+
+        getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
     }
 
     public EmbeddableComponentManager getComponentManager1() throws Exception
@@ -85,5 +88,21 @@ public abstract class AbstractROMTestCase
     public EmbeddableComponentManager getComponentManager2() throws Exception
     {
         return this.initializer2.getComponentManager();
+    }
+
+    /**
+     * @return a modifiable mock configuration source
+     */
+    public MockConfigurationSource getConfigurationSource1()
+    {
+        return this.initializer1.getConfigurationSource();
+    }
+
+    /**
+     * @return a modifiable mock configuration source
+     */
+    public MockConfigurationSource getConfigurationSource2()
+    {
+        return this.initializer2.getConfigurationSource();
     }
 }

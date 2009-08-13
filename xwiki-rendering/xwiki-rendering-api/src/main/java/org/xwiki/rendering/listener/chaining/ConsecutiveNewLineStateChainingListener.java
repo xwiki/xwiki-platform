@@ -37,7 +37,7 @@ import org.xwiki.rendering.parser.Syntax;
 public class ConsecutiveNewLineStateChainingListener extends AbstractChainingListener implements
     StackableChainingListener
 {
-    private int newLineCount = 0;
+    private int newLineCount;
 
     public ConsecutiveNewLineStateChainingListener(ListenerChain listenerChain)
     {

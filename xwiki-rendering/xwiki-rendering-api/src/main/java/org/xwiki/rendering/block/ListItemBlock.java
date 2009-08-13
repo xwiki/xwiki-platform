@@ -32,8 +32,9 @@ import org.xwiki.rendering.listener.Listener;
 public class ListItemBlock extends AbstractFatherBlock
 {
     /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     * Constructs a list item Block.
+     * 
+     * @param childrenBlocks the blocks representing the list item content
      */
     public ListItemBlock(List<Block> childrenBlocks)
     {

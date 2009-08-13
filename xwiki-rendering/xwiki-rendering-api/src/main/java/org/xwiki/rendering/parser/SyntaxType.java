@@ -60,6 +60,17 @@ public class SyntaxType
     private String id;
 
     /**
+     * @param id the technical id of the Syntax type (ex "annotatedxhtml")
+     * @param name the human readable name of the Syntax type (ex "Annotated XHTML")
+     * @since 2.0M3
+     */
+    public SyntaxType(String id, String name)
+    {
+        this.name = name;
+        this.id = id;
+    }
+    
+    /**
      * @return the technical id of the Syntax type (ex "annotatedxhtml")
      * @since 2.0M3
      */
@@ -75,17 +86,6 @@ public class SyntaxType
     public String getName()
     {
         return this.name;
-    }
-
-    /**
-     * @param id the technical id of the Syntax type (ex "annotatedxhtml")
-     * @param name the human readable name of the Syntax type (ex "Annotated XHTML")
-     * @since 2.0M3
-     */
-    public SyntaxType(String id, String name)
-    {
-        this.name = name;
-        this.id = id;
     }
 
     /**
@@ -143,9 +143,10 @@ public class SyntaxType
             if ((object == null) || (object.getClass() != this.getClass())) {
                 result = false;
             } else {
-                // object must be Syntax at this point
+                // Object must be Syntax at this point.
                 SyntaxType syntaxType = (SyntaxType) object;
-                // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's identity
+                // Note that the name isn't part of the hashCode computation since it's not part of the Syntax type's
+                // identity.
                 result = (getId() == syntaxType.getId() || (getId() != null && getId().equals(syntaxType.getId())));
             }
         }

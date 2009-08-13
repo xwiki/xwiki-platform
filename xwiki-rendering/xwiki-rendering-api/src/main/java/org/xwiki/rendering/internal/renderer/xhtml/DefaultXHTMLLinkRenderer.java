@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.renderer.xhtml;
 
-import org.xwiki.rendering.renderer.xhtml.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -37,6 +36,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
+import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.wiki.WikiModel;
 

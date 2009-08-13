@@ -30,8 +30,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * Implementation for Block operations. All blocks should extend this class. Supports the notion of parameters which can
- * be added to a block (see {@link #setParameter(String, Object)} for more details).
+ * Implementation for Block operations. All blocks should extend this class.
+ * Supports the notion of generic parameters which can be added to a block (see {@link #getParameter(String)} for more
+ * details.
  * 
  * @version $Id$
  * @since 1.5M2
@@ -39,7 +40,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public abstract class AbstractBlock implements Block
 {
     /**
-     * Store parameters, see {@link #setParameter(String, Object)} for more explanations on what parameters are.
+     * Store parameters, see {@link #getParameter(String)} for more explanations on what parameters are.
      */
     private Map<String, String> parameters = new LinkedHashMap<String, String>();
 
@@ -233,7 +234,8 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * See {@link #setParameter(String, Object)} for detailed explanations on parameters.
+     * A Parameter is a generic key/value which can be used to add metadata to a block. What is done with the metadata
+     * depends on the Renderer's implementations. For example the XHTML Renderer adds them as Element attributes.
      * 
      * @param name the name of the parameter to return
      * @return the parameter or null if the parameter doesn't exist
@@ -244,7 +246,7 @@ public abstract class AbstractBlock implements Block
     }
 
     /**
-     * Set a parameter on the current block. See {@link #setParameter(String, Object)} for more details.
+     * Set a parameter on the current block. See {@link #getParameter(String)} for more details.
      * 
      * @param name the parameter's name
      * @param value the parameter's value
@@ -258,7 +260,7 @@ public abstract class AbstractBlock implements Block
      * Set several parameters at once.
      * 
      * @param parameters the parameters to set
-     * @see #setParameter(String, Object)
+     * @see #getParameter(String) 
      * @since 1.7M2
      */
     public void setParameters(Map<String, String> parameters)

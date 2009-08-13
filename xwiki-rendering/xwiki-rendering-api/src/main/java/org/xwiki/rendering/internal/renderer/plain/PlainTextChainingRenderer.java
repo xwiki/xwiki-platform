@@ -42,7 +42,12 @@ import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
  */
 public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
 {
-    private boolean isFirstElementRendered = false;
+    /**
+     * New Line character.
+     */
+    private static final String NL = "\n";
+    
+    private boolean isFirstElementRendered;
 
     /**
      * Generate link label.
@@ -92,7 +97,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onNewLine()
     {
-        getPrinter().print("\n");
+        getPrinter().print(NL);
     }
 
     /**
@@ -144,7 +149,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         if (getBlockState().getListDepth() == 1) {
             printEmptyLine();
         } else {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         }
     }
 
@@ -157,7 +162,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void beginListItem()
     {
         if (getBlockState().getListItemIndex() > 0) {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         }
 
         // TODO: maybe add some syntax here like a - or not
@@ -205,7 +210,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onEmptyLines(int count)
     {
-        getPrinter().print(StringUtils.repeat("\n", count));
+        getPrinter().print(StringUtils.repeat(NL, count));
     }
 
     /**
@@ -230,7 +235,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         if (getBlockState().getDefinitionListDepth() == 1 && !getBlockState().isInList()) {
             printEmptyLine();
         } else {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         }
     }
 
@@ -243,7 +248,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void beginDefinitionTerm()
     {
         if (getBlockState().getDefinitionListItemIndex() > 0) {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         }
     }
 
@@ -256,7 +261,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void beginDefinitionDescription()
     {
         if (getBlockState().getDefinitionListItemIndex() > 0) {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         }
     }
 
@@ -269,7 +274,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void beginQuotationLine()
     {
         if (getBlockState().getQuotationLineIndex() > 0) {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         } else {
             printEmptyLine();
         }
@@ -319,7 +324,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     public void beginTableRow(Map<String, String> parameters)
     {
         if (getBlockState().getCellRow() > 0) {
-            getPrinter().print("\n");
+            getPrinter().print(NL);
         }
     }
 
@@ -338,7 +343,7 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     private void printEmptyLine()
     {
         if (this.isFirstElementRendered) {
-            getPrinter().print("\n\n");
+            getPrinter().print(NL + NL);
         } else {
             this.isFirstElementRendered = true;
         }

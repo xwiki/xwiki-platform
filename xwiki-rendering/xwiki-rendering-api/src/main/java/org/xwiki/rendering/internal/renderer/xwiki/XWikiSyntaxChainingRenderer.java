@@ -23,8 +23,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
-import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxImageRenderer;
-import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;

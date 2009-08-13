@@ -19,12 +19,12 @@
  */
 package org.xwiki.rendering.internal.renderer.xwiki;
 
-import org.xwiki.rendering.internal.renderer.*;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 
 /**
  * Logic to render a XWiki Link into XWiki syntax.

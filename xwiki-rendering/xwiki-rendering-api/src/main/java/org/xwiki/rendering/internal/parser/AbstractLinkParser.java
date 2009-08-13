@@ -64,14 +64,6 @@ import org.xwiki.rendering.wiki.WikiModel;
  */
 public abstract class AbstractLinkParser  implements LinkParser
 {
-    // Implementation note: We're not using regex in general in order to provide better error
-    // messages when throwing exceptions. In addition regex makes the code less readable.
-    // FWIW this is the kind of regex that would need to be used:
-    // private static final Pattern LINK_PATTERN = Pattern.compile(
-    // "(?:([^\\|>]*)[\\|>])?([^\\|>]*)(?:@([^\\|>]*))?(?:[\\|>](.*))?");
-    // private static final Pattern REFERENCE_PATTERN = Pattern.compile(
-    // "(mailto:.*|http:.*)|(?:([^?#]*)[?#]?)?(?:([^#]*)[#]?)?(.*)?");
-
     /**
      * URL matching pattern.
      */
@@ -95,6 +87,14 @@ public abstract class AbstractLinkParser  implements LinkParser
      */
     public Link parse(String rawLink)
     {
+        // Implementation note: We're not using regex in general in order to provide better error
+        // messages when throwing exceptions. In addition regex makes the code less readable.
+        // FWIW this is the kind of regex that would need to be used:
+        // private static final Pattern LINK_PATTERN = Pattern.compile(
+        // "(?:([^\\|>]*)[\\|>])?([^\\|>]*)(?:@([^\\|>]*))?(?:[\\|>](.*))?");
+        // private static final Pattern REFERENCE_PATTERN = Pattern.compile(
+        // "(mailto:.*|http:.*)|(?:([^?#]*)[?#]?)?(?:([^#]*)[#]?)?(.*)?");
+
         StringBuffer content = new StringBuffer(rawLink.trim());
 
         Link link = new Link();

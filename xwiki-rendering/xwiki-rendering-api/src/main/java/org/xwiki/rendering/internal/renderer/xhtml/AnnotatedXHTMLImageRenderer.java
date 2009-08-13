@@ -21,7 +21,6 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 
 import java.util.Map;
 import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxImageRenderer;
-import org.xwiki.rendering.internal.renderer.xwiki.XWikiSyntaxLinkRenderer;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLImageRenderer;

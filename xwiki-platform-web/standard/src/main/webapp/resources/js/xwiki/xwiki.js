@@ -1106,3 +1106,27 @@ function BrowserDetect() {
     this.isIE4xMac = (this.isIE4x && this.isMac);
 }
 var browser = new BrowserDetect();
+
+/*
+ * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
+ * 
+ * To activate this behavior on an input element, add the "withTip" classname to it.
+ */
+document.observe('dom:loaded', function() {
+  var onFocus = function() {
+    if (this.value==this.defaultValue) {
+      this.value="";
+    } else {
+      this.select();
+    }
+  }
+  var onBlur = function() {
+    if (this.value=="") {
+      this.value=this.defaultValue;
+    }
+  }
+  $$("input.withTip").each(function(item) {
+    item.observe('focus', onFocus.bindAsEventListener(item));
+    item.observe('blur', onBlur.bindAsEventListener(item));
+  });
+});

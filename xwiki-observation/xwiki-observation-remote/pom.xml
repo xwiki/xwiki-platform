@@ -40,7 +40,7 @@
       <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
-	<dependency>
+	  <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-observation-local</artifactId>
       <version>${pom.version}</version>
@@ -88,7 +88,7 @@
   </dependencies>
   <build>
     <plugins>
-    <plugin>
+      <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>

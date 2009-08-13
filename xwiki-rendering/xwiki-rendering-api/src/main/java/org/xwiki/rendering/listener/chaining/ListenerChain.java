@@ -112,6 +112,13 @@ public class ListenerChain
         return this.nextListeners.indexOf(listenerClass);
     }
 
+    /**
+     * Create a new instance of the passed chaining listener if it's stackable (ie it implements the
+     * {@link org.xwiki.rendering.listener.chaining.StackableChainingListener} interface. This allows creating a
+     * clean state when some sub rendering has to be done with some new state.
+     *
+     * @param listenerClass the listener class for which to create a new instance (if stackable)
+     */
     public void pushListener(Class< ? extends ChainingListener> listenerClass)
     {
         if (StackableChainingListener.class.isAssignableFrom(listenerClass)) {
@@ -120,6 +127,11 @@ public class ListenerChain
         }
     }
 
+    /**
+     * Create new instances of all chaining listeners that are stackable (ie that implement the
+     * {@link org.xwiki.rendering.listener.chaining.StackableChainingListener} interface. This allows creating a
+     * clean state when some sub rendering has to be done with some new state.
+     */
     public void pushAllStackableListeners()
     {
         for (Class< ? extends ChainingListener> listenerClass : this.listeners.keySet()) {
@@ -127,6 +139,10 @@ public class ListenerChain
         }
     }
 
+    /**
+     * Remove all pushed stackable listeners to go back to the previous state
+     * (see {@link #pushAllStackableListeners()}.
+     */
     public void popAllStackableListeners()
     {
         for (Class< ? extends ChainingListener> listenerClass : this.listeners.keySet()) {
@@ -134,6 +150,12 @@ public class ListenerChain
         }
     }
 
+    /**
+     * Remove the last instance corresponding to the passed listener class if it's stackable, in order to go
+     * back to the previous state.
+     *
+     * @param listenerClass the class of the chaining listener to pop
+     */
     public void popListener(Class< ? extends ChainingListener> listenerClass)
     {
         if (StackableChainingListener.class.isAssignableFrom(listenerClass)) {

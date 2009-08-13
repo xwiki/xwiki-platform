@@ -176,7 +176,11 @@ XWiki.Blog = {
     XWiki.Blog.setToolLoadingStatus(this, XWiki.Blog.blogToolsValues.loading);
     new Ajax.Request(this.href, {
       method: "get",
-      onSuccess: XWiki.Blog.onEntryMadeInvisible.bind(this)
+      onSuccess: XWiki.Blog.onEntryMadeInvisible.bind(this),
+      on1223: function(response) {response.request.options.onSuccess(response)},
+      on403: function() {alert("You are not allowed to perform this action")},
+      on401: function() {alert("You have been logged out, please login")},
+      onFailure: function() {alert("Failed to change blog post visibility")}
     });
   },
   makeEntryVisible : function(event) {
@@ -184,7 +188,11 @@ XWiki.Blog = {
     XWiki.Blog.setToolLoadingStatus(this, XWiki.Blog.blogToolsValues.loading);
     new Ajax.Request(this.href, {
       method: "get",
-      onSuccess: XWiki.Blog.onEntryMadeVisible.bind(this)
+      onSuccess: XWiki.Blog.onEntryMadeVisible.bind(this),
+      on1223: function(response) {response.request.options.onSuccess(response)},
+      on403: function() {alert("You are not allowed to perform this action")},
+      on401: function() {alert("You have been logged out, please login")},
+      onFailure: function() {alert("Failed to change blog post visibility")}
     });
   },
   onEntryMadeVisible : function() {

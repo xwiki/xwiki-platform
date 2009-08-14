@@ -176,7 +176,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
 
             return titleBlocks;
         } catch (ParseException e) {
-            throw new MacroExecutionException(e.getMessage(), e);
+            throw new MacroExecutionException("Failed to parse the box's title [" + titleParameter + "]", e);
         }
     }
 

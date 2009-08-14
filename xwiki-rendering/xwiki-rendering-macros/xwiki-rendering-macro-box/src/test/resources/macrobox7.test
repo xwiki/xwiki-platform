@@ -8,10 +8,10 @@
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [box] [width=100px] [something]
-beginGroup [[style]=[width:100px][class]=[box]]
+beginGroup [[class]=[box][style]=[width:100px]]
 beginParagraph
 onWord [something]
 endParagraph
-endGroup [[style]=[width:100px][class]=[box]]
+endGroup [[class]=[box][style]=[width:100px]]
 endMacroMarkerStandalone [box] [width=100px] [something]
 endDocument

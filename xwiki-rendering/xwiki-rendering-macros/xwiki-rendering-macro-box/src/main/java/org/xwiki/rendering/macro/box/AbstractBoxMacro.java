@@ -21,9 +21,9 @@ package org.xwiki.rendering.macro.box;
 
 import java.io.StringReader;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Requirement;
@@ -103,7 +103,10 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         String titleParameter = parameters.getTitle();
         List< ? extends Block> titleBlockList = parameters.getBlockTitle();
 
-        Map<String, String> boxParameters = new HashMap<String, String>();
+        // Use a linked hashmap to keep the parameters in the same order as we create them when they are retrieved
+        // by renderers. This is useful for example in the Event renderer to control the order in which the params
+        // are displayed.
+        Map<String, String> boxParameters = new LinkedHashMap<String, String>();
         String classParameter = parameters.getCssClass();
         String cssClass =
             StringUtils.isEmpty(classParameter) ? getClassProperty() : getClassProperty() + " " + classParameter;

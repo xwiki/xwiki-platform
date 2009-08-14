@@ -47,7 +47,7 @@
     <platform.tool.configuration.version>1.31-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>2.0-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.22-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.25-SNAPSHOT</platform.skin.toucan.version>
+    <platform.skin.toucan.version>1.26-SNAPSHOT</platform.skin.toucan.version>
   </properties>
   <profiles>
     <profile>

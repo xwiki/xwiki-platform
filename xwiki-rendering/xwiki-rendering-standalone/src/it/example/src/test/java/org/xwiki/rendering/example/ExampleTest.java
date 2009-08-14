@@ -34,11 +34,11 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Examples of using the XWiki Rendering API standalone, using the Embedded Component Manager.

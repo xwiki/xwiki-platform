@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default and basic implementation of a chaining listener that knows how to delegate event calls to the next listener

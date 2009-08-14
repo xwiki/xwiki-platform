@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Component interface for managing macro category information. Each rendering macro defines a default category under

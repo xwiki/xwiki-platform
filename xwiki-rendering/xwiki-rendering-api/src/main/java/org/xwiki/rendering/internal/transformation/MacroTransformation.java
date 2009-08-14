@@ -44,7 +44,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.AbstractTransformation;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -103,7 +103,7 @@ public class MacroTransformation extends AbstractTransformation
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.transformation.Transformation#transform(org.xwiki.rendering.block.XDOM ,
-     *      org.xwiki.rendering.parser.Syntax)
+     *      org.xwiki.rendering.syntax.Syntax)
      */
     public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {

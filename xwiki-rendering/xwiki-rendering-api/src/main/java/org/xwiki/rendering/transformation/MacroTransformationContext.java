@@ -22,7 +22,7 @@ package org.xwiki.rendering.transformation;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * The context of the macro transformation process. Contains information such as the current XWiki DOM for the parsed

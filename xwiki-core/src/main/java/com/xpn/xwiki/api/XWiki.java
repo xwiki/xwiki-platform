@@ -30,7 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.query.QueryManager;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

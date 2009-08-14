@@ -42,11 +42,10 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 

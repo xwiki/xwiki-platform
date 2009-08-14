@@ -26,7 +26,7 @@ import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 

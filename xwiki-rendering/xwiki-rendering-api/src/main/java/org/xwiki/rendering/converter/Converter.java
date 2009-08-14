@@ -21,7 +21,7 @@ package org.xwiki.rendering.converter;
 
 import java.io.Reader;
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 
 /**

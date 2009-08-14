@@ -21,7 +21,7 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * A Listener wrapping another Listener.

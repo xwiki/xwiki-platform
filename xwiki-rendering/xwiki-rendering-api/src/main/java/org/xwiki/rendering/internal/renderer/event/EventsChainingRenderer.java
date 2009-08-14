@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 
 /**

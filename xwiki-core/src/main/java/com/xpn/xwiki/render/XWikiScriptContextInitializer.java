@@ -24,7 +24,7 @@ import javax.script.ScriptContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.script.ScriptContextInitializer;
 
 import com.xpn.xwiki.XWikiContext;

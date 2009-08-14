@@ -21,8 +21,8 @@ package org.xwiki.rendering.internal.macro.html;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Create XHTML Renderers for the HTML Macro, see {@link HTMLMacroXHTMLRenderer}.

@@ -20,9 +20,11 @@
 package org.xwiki.rendering.parser;
 
 import junit.framework.TestCase;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
- * Unit tests for {@link Syntax}.
+ * Unit tests for {@link org.xwiki.rendering.syntax.Syntax}.
  *
  * @version $Id$
  * @since 1.5M2

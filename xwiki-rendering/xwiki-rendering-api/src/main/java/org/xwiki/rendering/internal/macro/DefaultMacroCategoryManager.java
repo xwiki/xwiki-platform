@@ -34,7 +34,7 @@ import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default implementation of {@link org.xwiki.rendering.macro.MacroCategoryManager}.
@@ -75,7 +75,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.macro.MacroCategoryManager#getMacroCategories(org.xwiki.rendering.parser.Syntax)
+     * @see org.xwiki.rendering.macro.MacroCategoryManager#getMacroCategories(org.xwiki.rendering.syntax.Syntax)
      */
     public Set<String> getMacroCategories(final Syntax syntax) throws MacroLookupException
     {
@@ -102,7 +102,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.macro.MacroCategoryManager#getMacroIds(String, org.xwiki.rendering.parser.Syntax) 
+     * @see org.xwiki.rendering.macro.MacroCategoryManager#getMacroIds(String, org.xwiki.rendering.syntax.Syntax)
      */
     public Set<MacroId> getMacroIds(String category, final Syntax syntax) throws MacroLookupException
     {

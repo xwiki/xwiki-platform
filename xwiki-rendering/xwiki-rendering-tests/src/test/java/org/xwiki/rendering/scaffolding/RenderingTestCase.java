@@ -20,7 +20,7 @@
 package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.component.manager.ComponentManager;

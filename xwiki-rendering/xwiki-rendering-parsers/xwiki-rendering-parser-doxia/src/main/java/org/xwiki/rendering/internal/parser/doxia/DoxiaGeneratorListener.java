@@ -31,7 +31,7 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.URLImage;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 public class DoxiaGeneratorListener implements Listener
 {

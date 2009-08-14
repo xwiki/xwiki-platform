@@ -237,6 +237,15 @@
                 <exclude>org/xwiki/rendering/macro/descriptor/DefaultMacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
                 <exclude>org/xwiki/rendering/util/ParserUtils</exclude>
+                <exclude>org/xwiki/rendering/block/RawBlock</exclude>
+                <exclude>org/xwiki/rendering/listener/Listener</exclude>
+                <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/*</exclude>
+                <exclude>org/xwiki/rendering/parser/Parser</exclude>
+                <exclude>org/xwiki/rendering/parser/Syntax</exclude>
+                <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
+                <exclude>org/xwiki/rendering/transformation/Transformation</exclude>
+                <exclude>org/xwiki/rendering/transformation/TransformationManager</exclude>
               </excludes>
             </configuration>
           </execution>

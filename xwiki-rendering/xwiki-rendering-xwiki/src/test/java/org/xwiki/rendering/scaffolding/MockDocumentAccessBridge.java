@@ -28,8 +28,8 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the

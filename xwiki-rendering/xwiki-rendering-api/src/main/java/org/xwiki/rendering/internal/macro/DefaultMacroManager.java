@@ -34,7 +34,7 @@ import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Default {@link MacroManager} implementation, retrieves all {@link Macro} implementations that are registered against

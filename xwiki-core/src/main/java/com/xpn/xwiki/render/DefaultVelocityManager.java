@@ -30,7 +30,7 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
-import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;

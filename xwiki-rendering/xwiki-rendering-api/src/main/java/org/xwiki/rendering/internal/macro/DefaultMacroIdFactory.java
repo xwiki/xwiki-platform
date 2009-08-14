@@ -23,8 +23,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.macro.MacroIdFactory;
 import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.parser.ParseException;
 
 /**

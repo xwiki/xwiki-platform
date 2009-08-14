@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.parser;
 
 import org.apache.maven.doxia.module.twiki.TWikiParser;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser;
 
 /**

@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Represents a Macro identifier. This is used when we need to pass a reference of a macro around without having to

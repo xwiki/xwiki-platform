@@ -17,11 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser;
+package org.xwiki.rendering.syntax;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.parser.ParseException;
 
 /**
  * @version $Id$
@@ -33,7 +35,7 @@ public interface SyntaxFactory
     Syntax createSyntaxFromIdString(String syntaxAsIdString) throws ParseException;
 
     /**
-     * @return a list of all Syntaxes for which there's a {@link Parser} available
+     * @return a list of all Syntaxes for which there's a {@link org.xwiki.rendering.parser.Parser} available
      * @deprecated starting with 2.0M3 you should directly lookup the Parser using the Component Manager
      */
     List<Syntax> getAvailableSyntaxes();

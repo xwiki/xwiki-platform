@@ -41,7 +41,7 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.util.ParserUtils;

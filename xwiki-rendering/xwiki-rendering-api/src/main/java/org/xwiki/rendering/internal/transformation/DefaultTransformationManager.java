@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -64,7 +64,7 @@ public class DefaultTransformationManager implements TransformationManager, Init
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.transformation.TransformationManager#performTransformations(org.xwiki.rendering.block.XDOM,
-     *      org.xwiki.rendering.parser.Syntax)
+     *      org.xwiki.rendering.syntax.Syntax)
      */
     public void performTransformations(XDOM dom, Syntax syntax) throws TransformationException
     {

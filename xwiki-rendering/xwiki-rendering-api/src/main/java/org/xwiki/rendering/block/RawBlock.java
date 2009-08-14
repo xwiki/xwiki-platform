@@ -20,7 +20,7 @@
 package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Represents some raw content that shouldn't be parsed or modified and that should be injected as is

@@ -34,7 +34,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**

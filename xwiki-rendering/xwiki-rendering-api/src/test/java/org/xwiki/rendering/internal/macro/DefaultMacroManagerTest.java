@@ -31,9 +31,9 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**

@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.parser;
 
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;

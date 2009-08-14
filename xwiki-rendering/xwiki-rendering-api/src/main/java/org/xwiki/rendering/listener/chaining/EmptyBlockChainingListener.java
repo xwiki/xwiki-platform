@@ -20,7 +20,7 @@
 package org.xwiki.rendering.listener.chaining;
 
 import org.xwiki.rendering.listener.*;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 import java.util.Map;
 import java.util.Stack;
@@ -532,7 +532,7 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, org.xwiki.rendering.parser.Syntax)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, org.xwiki.rendering.syntax.Syntax)
      */
     @Override
     public void onRawText(String text, Syntax syntax)

@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.Set;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Allow retrieving and test the existence of macros. Macros can be available for all syntaxes or only available for

@@ -44,8 +44,8 @@ import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.parser.AbstractHighlightParser;
 import org.xwiki.rendering.parser.HighlightParser;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.parser.Parser;
 
 /**

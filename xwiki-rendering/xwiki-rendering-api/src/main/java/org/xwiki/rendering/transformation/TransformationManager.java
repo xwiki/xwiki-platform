@@ -21,7 +21,7 @@ package org.xwiki.rendering.transformation;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * @version $Id$

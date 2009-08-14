@@ -31,9 +31,9 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * @version $Id$
@@ -56,7 +56,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.parser.SyntaxFactory#createSyntaxFromIdString(java.lang.String)
+     * @see org.xwiki.rendering.syntax.SyntaxFactory#createSyntaxFromIdString(java.lang.String)
      */
     public Syntax createSyntaxFromIdString(String syntaxIdAsString) throws ParseException
     {
@@ -78,7 +78,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.parser.SyntaxFactory#getAvailableSyntaxes()
+     * @see org.xwiki.rendering.syntax.SyntaxFactory#getAvailableSyntaxes()
      * @deprecated starting with 2.0M3 you should directly lookup the Parser using the Component Manager
      */
     public List<Syntax> getAvailableSyntaxes()

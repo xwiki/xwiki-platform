@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.macro;
 
 import org.junit.*;
 import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Unit tests for {@link MacroId}.

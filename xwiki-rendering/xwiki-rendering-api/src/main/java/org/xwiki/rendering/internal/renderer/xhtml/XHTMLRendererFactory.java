@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.xhtml;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Create XHTML Renderers.

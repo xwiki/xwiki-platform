@@ -20,7 +20,7 @@
 package org.xwiki.rendering.internal.renderer.plain;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.internal.renderer.AbstractPrintRendererFactory;
 
 /**

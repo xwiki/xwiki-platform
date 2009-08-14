@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser;
+package org.xwiki.rendering.syntax;
+
+import org.xwiki.rendering.syntax.SyntaxType;
 
 /**
  * Represents a wiki syntax that the user can use to enter wiki content. A syntax is made of two parts: a type

@@ -35,7 +35,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Map XWiki Listener events on to WikiModel events.
@@ -261,7 +261,7 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onRawText(String, Syntax)
+     * @see org.xwiki.rendering.listener.Listener#onRawText(String, org.xwiki.rendering.syntax.Syntax)
      */
     public void onRawText(String text, Syntax syntax)
     {

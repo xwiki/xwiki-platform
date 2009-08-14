@@ -28,7 +28,7 @@ import java.util.Random;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;

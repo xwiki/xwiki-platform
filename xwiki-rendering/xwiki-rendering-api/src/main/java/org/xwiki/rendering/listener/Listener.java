@@ -21,7 +21,7 @@ package org.xwiki.rendering.listener;
 
 import java.util.Map;
 
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Contains callback events called when a document has been parsed and when it needs to be modified or rendered. More

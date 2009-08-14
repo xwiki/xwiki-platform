@@ -26,7 +26,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Indicate if the text being written starts a new line. By text we mean Space, Special Symbol and Words. This is useful
@@ -289,7 +289,7 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, Syntax)
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#onRawText(String, org.xwiki.rendering.syntax.Syntax)
      */
     @Override
     public void onRawText(String text, Syntax syntax)

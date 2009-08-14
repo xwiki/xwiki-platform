@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.renderer.tex;
 
 import org.xwiki.rendering.internal.renderer.*;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Create Plain Text Renderers.

@@ -27,7 +27,7 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
  * Stores events without emitting them back in order to accumulate them and to provide a lookahead feature. The

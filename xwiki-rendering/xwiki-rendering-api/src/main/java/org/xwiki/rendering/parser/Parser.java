@@ -23,8 +23,11 @@ import java.io.Reader;
 
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
+ * Parse content into a XDOM (a tree of {@link org.xwiki.rendering.block.Block}s).
+ *
  * @version $Id$
  * @since 1.5M2
  */
@@ -35,6 +38,12 @@ public interface Parser
      * @return the wiki syntax the parser is implementing
      */
     Syntax getSyntax();
-    
+
+    /**
+     * @param source the content to parse
+     * @return the tree representation of the content as {@link org.xwiki.rendering.block.Block}s
+     * @throws ParseException if the source cannot be read or an unexpected error happens during the parsing. Parsers
+     *         should be written to not generate any error as much as possible.
+     */
     XDOM parse(Reader source) throws ParseException;
 }

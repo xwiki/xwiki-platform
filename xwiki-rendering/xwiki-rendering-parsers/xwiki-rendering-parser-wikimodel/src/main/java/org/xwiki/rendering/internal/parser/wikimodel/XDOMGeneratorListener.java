@@ -558,8 +558,12 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called when WikiModel finds an reference such as a URI located directly in the text (free-standing URI), as
-     * opposed to a link inside wiki link syntax delimiters.
+     * {@inheritDoc}
+     *
+     * <p>Called when WikiModel finds an reference (link or image) such as a URI located directly in the text
+     * (free-standing URI), as opposed to a link/image inside wiki link/image syntax delimiters.</p>
+     *
+     * @see org.wikimodel.wem.IWemListener#onLineBreak()
      */
     public void onReference(String reference)
     {
@@ -578,22 +582,17 @@ public class XDOMGeneratorListener implements IWemListener
 
     private void onReference(String reference, String label, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // If there's no link parser defined, don't handle links...
-        // TODO: Generate some output log
+        // If there's no link parser defined, don't handle links and images...
         if (this.linkParser != null) {
-            Block resultBlock;
             Link link = this.linkParser.parse(reference);
 
-            // If the link failed to be constructed do nothing since parseLink will have wrapped it in an Error Block
-            if (link != null) {
-                // Verify if we have an image or a link. An image is identified by an "image:" uri
-                // The reason we get this event is because WikiModel handles links and images in the same manner.
-                resultBlock = createImageBlock(link, isFreeStandingURI, parameters);
-                if (resultBlock == null) {
-                    resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters);
-                }
-                this.stack.push(resultBlock);
+            // Verify if we have an image or a link. An image is identified by an "image:" uri
+            // The reason we get this event is because WikiModel handles links and images in the same manner.
+            Block resultBlock = createImageBlock(link, isFreeStandingURI, parameters);
+            if (resultBlock == null) {
+                resultBlock = createLinkBlock(link, label, isFreeStandingURI, parameters);
             }
+            this.stack.push(resultBlock);
         }
     }
 

@@ -33,6 +33,7 @@ import java.util.Vector;
  * 
  * @version $Id$
  */
+@Deprecated
 public class XWikiNotificationManager
 {
 

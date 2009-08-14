@@ -24,6 +24,7 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Deprecated
 public interface XWikiActionNotificationInterface {
     public void notify(XWikiNotificationRule rule, XWikiDocument doc, String action, XWikiContext context);
 }

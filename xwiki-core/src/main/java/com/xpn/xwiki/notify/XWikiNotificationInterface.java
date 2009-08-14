@@ -24,6 +24,7 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Deprecated
 public interface XWikiNotificationInterface {
     public static int EVENT_CHANGE = 0;
     public static int EVENT_NEW = 1;

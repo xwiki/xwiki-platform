@@ -41,6 +41,7 @@ import com.xpn.xwiki.objects.BaseProperty;
  * (<tt>null</tt> or empty string), this <tt>PropertyChangedRule</tt> will never notify.</li>
  * </ul>
  */
+@Deprecated
 public class PropertyChangedRule extends DocChangeRule {
     private String className;
     private String propertyName;

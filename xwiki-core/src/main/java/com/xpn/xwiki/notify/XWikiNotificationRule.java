@@ -24,6 +24,7 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Deprecated
 public interface XWikiNotificationRule {
     /**
      * Note: olddoc is null when the document is new and has never been saved

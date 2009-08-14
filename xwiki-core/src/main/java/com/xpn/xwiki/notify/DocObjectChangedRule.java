@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+@Deprecated
 public class DocObjectChangedRule extends DocChangeRule {
     private String className;
 

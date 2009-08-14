@@ -24,6 +24,7 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+@Deprecated
 public class DocChangeRule implements XWikiNotificationRule
 {
     private XWikiDocChangeNotificationInterface target;

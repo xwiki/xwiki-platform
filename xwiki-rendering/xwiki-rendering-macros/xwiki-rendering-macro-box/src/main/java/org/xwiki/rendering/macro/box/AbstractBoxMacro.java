@@ -151,7 +151,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
     }
 
     /**
-     * Renders the box's title.
+     * Renders the box's title (which can contain content in the current syntax).
      * 
      * @param parser the appropriate syntax parser
      * @param titleParameter the title which is going to be parsed
@@ -192,10 +192,10 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         throws MacroExecutionException;
 
     /**
-     * Get the parser of the current wiki syntax.
+     * Get the parser for the current syntax.
      * 
-     * @param context the context of the macro transformation.
-     * @return the parser of the current wiki syntax.
+     * @param context the context of the macro transformation (from which to get the current syntax)
+     * @return the parser for the current syntax
      * @throws MacroExecutionException Failed to find source parser.
      */
     protected Parser getSyntaxParser(MacroTransformationContext context) throws MacroExecutionException
@@ -203,7 +203,8 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
         try {
             return getComponentManager().lookup(Parser.class, context.getSyntax().toIdString());
         } catch (ComponentLookupException e) {
-            throw new MacroExecutionException("Failed to find source parser", e);
+            throw new MacroExecutionException("Failed to find source parser for syntax [" + context.getSyntax()
+                + "]", e);
         }
     }
 

@@ -27,34 +27,34 @@ import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.rendering.block.Block;
 
 /**
- * Parameters for macro box.
+ * Parameters for the Box macro.
  * 
  * @version $Id$
  */
 public class BoxMacroParameters
 {
     /**
-     * Refer to {@link BoxMacroParameters#getCssClass()}.
+     * @see @getClassProperty 
      */
     private String cssClass = StringUtils.EMPTY;
 
     /**
-     * Refer to {@link #getTitle()}.
+     * @see #getTitle()
      */
     private String title = StringUtils.EMPTY;
 
     /**
-     * Refer to {@link #getImage()}.
+     * @see #getImage()
      */
     private String image = StringUtils.EMPTY;
 
     /**
-     * Refer to {@link #getWidth()}.
+     * @see #getWidth()
      */
     private String width = StringUtils.EMPTY;
 
     /**
-     * @return the title to be displayed in the message box. Note that it can be specified using Wiki 2.0 syntax.
+     * @see #getTitle() 
      */
     private List< ? extends Block> blockTitle;
 
@@ -78,7 +78,8 @@ public class BoxMacroParameters
     }
 
     /**
-     * @return the title to be displayed in the message box. Note that it can be specified using Wiki 2.0 syntax.
+     * @return the title to be displayed in the message box. Note that it can contain content in the current syntax
+     *         and that text which will be parsed and rendered as any syntax content
      */
     public String getTitle()
     {
@@ -86,7 +87,7 @@ public class BoxMacroParameters
     }
 
     /**
-     * @param title - refer to {@link #getTitle()}
+     * @param title refer to {@link #getTitle()}
      */
     @PropertyDescription("the title which is to be displayed in the message box")
     public void setTitle(String title)
@@ -104,7 +105,7 @@ public class BoxMacroParameters
     }
 
     /**
-     * @param image - refer to {@link #getImage()}
+     * @param image refer to {@link #getImage()}
      */
     @PropertyDescription("the image which is to be displayed in the message box")
     public void setImage(String image)
@@ -122,7 +123,7 @@ public class BoxMacroParameters
     }
 
     /**
-     * @param cssClass - refer to {@link BoxMacroParameters#getCssClass()}
+     * @param cssClass refer to {@link BoxMacroParameters#getCssClass()}
      */
     @PropertyDescription("A CSS class to add to the box element")
     public void setCssClass(String cssClass)
@@ -139,7 +140,7 @@ public class BoxMacroParameters
     }
 
     /**
-     * @param width - refer to {@link BoxMacroParameters#getWidth()}
+     * @param width refer to {@link BoxMacroParameters#getWidth()}
      */
     @PropertyDescription("An optional width for the box, expressed in px or %")
     public void setWidth(String width)

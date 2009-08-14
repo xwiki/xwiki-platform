@@ -43,6 +43,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrobox4", true);
         suite.addTestsFromResource("macrobox5", true);
         suite.addTestsFromResource("macrobox6", true);
+        suite.addTestsFromResource("macrobox7", true);
 
         return new ComponentManagerTestSetup(suite);
     }

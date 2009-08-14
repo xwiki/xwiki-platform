@@ -1,0 +1,17 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test the width parameter
+.#-----------------------------------------------------
+{{box width="100px"}}something{{/box}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [box] [width=100px] [something]
+beginGroup [[style]=[width:100px][class]=[box]]
+beginParagraph
+onWord [something]
+endParagraph
+endGroup [[style]=[width:100px][class]=[box]]
+endMacroMarkerStandalone [box] [width=100px] [something]
+endDocument

@@ -33,6 +33,7 @@ public class Syntax
 {
     public static final Syntax XHTML_1_0 = new Syntax(SyntaxType.XHTML, "1.0");
     public static final Syntax HTML_4_01 = new Syntax(SyntaxType.HTML, "4.01");
+    public static final Syntax XWIKI_1_0 = new Syntax(SyntaxType.XWIKI, "1.0");
     public static final Syntax XWIKI_2_0 = new Syntax(SyntaxType.XWIKI, "2.0");
     public static final Syntax PLAIN_1_0 = new Syntax(SyntaxType.PLAIN, "1.0");
     public static final Syntax EVENT_1_0 = new Syntax(SyntaxType.EVENT, "1.0");

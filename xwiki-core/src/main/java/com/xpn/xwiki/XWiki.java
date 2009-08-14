@@ -686,8 +686,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Prepare the store
         setConfig(config);
 
-        XWikiStoreInterface basestore =
-            (XWikiStoreInterface) Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint"));
+        XWikiStoreInterface basestore = Utils.getComponent(XWikiStoreInterface.class, Param("xwiki.store.main.hint"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
@@ -701,23 +700,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
             "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-        setAttachmentStore((XWikiAttachmentStoreInterface) Utils.getComponent(XWikiAttachmentStoreInterface.class,
-            Param("xwiki.store.attachment.hint")));
+        setAttachmentStore(Utils.getComponent(XWikiAttachmentStoreInterface.class, Param("xwiki.store.attachment.hint")));
 
-        setVersioningStore((XWikiVersioningStoreInterface) Utils.getComponent(XWikiVersioningStoreInterface.class,
-            Param("xwiki.store.versioning.hint")));
+        setVersioningStore(Utils.getComponent(XWikiVersioningStoreInterface.class, Param("xwiki.store.versioning.hint")));
 
-        setAttachmentVersioningStore((AttachmentVersioningStore) Utils.getComponent(AttachmentVersioningStore.class,
+        setAttachmentVersioningStore(Utils.getComponent(AttachmentVersioningStore.class,
             hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint") : "void"));
 
         if (hasRecycleBin(context)) {
-            setRecycleBinStore((XWikiRecycleBinStoreInterface) Utils.getComponent(XWikiRecycleBinStoreInterface.class,
+            setRecycleBinStore(Utils.getComponent(XWikiRecycleBinStoreInterface.class,
                 Param("xwiki.store.recyclebin.hint")));
         }
 
         if (hasAttachmentRecycleBin(context)) {
-            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(
-                AttachmentRecycleBinStore.class, Param("xwiki.store.attachment.recyclebin.hint")));
+            setAttachmentRecycleBinStore(Utils.getComponent(AttachmentRecycleBinStore.class,
+                Param("xwiki.store.attachment.recyclebin.hint")));
         }
 
         // Run migrations
@@ -776,8 +773,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Save the configured syntaxes
         String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
         this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
-        
-        // Initialize all wiki macros        
+
+        // Initialize all wiki macros
         try {
             WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
             wikiMacroInitializer.init();
@@ -1298,7 +1295,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument newOriginal = doc.getOriginalDocument();
             try {
                 doc.setOriginalDocument(originalDocument);
-                ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.class);
+                ObservationManager om = Utils.getComponent(ObservationManager.class);
                 // Notify listeners about the document change
                 // The first call is for the old notification mechanism. It is kept here because it
                 // is in a deprecation stage. It will be removed later.
@@ -1617,8 +1614,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         try {
             String content = getResourceContent("/templates/" + template);
-            return XWikiVelocityRenderer.evaluate(content, "/templates/" + template, (VelocityContext) context
-                .get("vcontext"), context);
+            return XWikiVelocityRenderer.evaluate(content, "/templates/" + template,
+                (VelocityContext) context.get("vcontext"), context);
         } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Exception while parsing template [" + template + "] from /templates/", e);
@@ -3954,18 +3951,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
         }
+
         getStore().deleteXWikiDoc(doc, context);
+
         try {
             // This is the old notification mechanism. It is kept here because it is in a
             // deprecation stage. It will be removed later.
             getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
                 XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
-            // This is the new notification mechanism, implemented as a Plexus Component.
+
+            // This is the new notification mechanism, implemented as a Component.
             // For the moment we're sending the XWiki context as the data, but this will be
             // changed in the future, when the whole platform will be written using components
             // and there won't be a need for the context. The old version is available using
             // doc.getOriginalDocument()
-            ObservationManager om = (ObservationManager) Utils.getComponent(ObservationManager.class);
+            ObservationManager om = Utils.getComponent(ObservationManager.class);
             if (om != null) {
                 XWikiDocument blankDoc = new XWikiDocument(doc.getSpace(), doc.getName());
                 blankDoc.setOriginalDocument(doc);
@@ -4016,6 +4016,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         StringWriter strwriter = new StringWriter();
         PrintWriter writer = new PrintWriter(strwriter);
         e.printStackTrace(writer);
+
         return strwriter.toString();
     }
 
@@ -4323,6 +4324,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return copyWikiWeb(null, sourceWiki, targetWiki, language, context);
     }
 
+    /**
+     * @deprecated use WikiManager plugin instead
+     */
+    @Deprecated
     public int createNewWiki(String wikiName, String wikiUrl, String wikiAdmin, String baseWikiName,
         String description, String wikilanguage, boolean failOnExist, XWikiContext context) throws XWikiException
     {
@@ -4688,6 +4693,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument userdoc = getDocument(username, context);
             active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
         }
+
         return active;
     }
 
@@ -4759,6 +4765,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 docname = getDocumentNameFromPath(path, context);
             }
         }
+
         return (docname.indexOf(":") < 0) ? context.getDatabase() + ":" + docname : docname;
     }
 
@@ -4822,6 +4829,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiDocument tdoc = doc.getTranslatedDocument(context);
         context.put("tdoc", tdoc);
         vcontext.put("tdoc", tdoc.newDocument(context));
+
         return true;
     }
 
@@ -4889,8 +4897,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     if (isExo()) {
                         try {
                             this.groupService =
-                                (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl")
-                                    .newInstance();
+                                (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl").newInstance();
                         } catch (Exception e2) {
                             e2.printStackTrace();
                         }
@@ -4957,6 +4964,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 }
             }
+
             return this.authService;
         }
     }
@@ -4997,6 +5005,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 }
             }
+
             return this.rightService;
         }
     }
@@ -5013,9 +5022,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         e.printStackTrace();
                         this.statsService = new XWikiStatsServiceImpl();
                     }
+
                     this.statsService.init(context);
                 }
             }
+
             return this.statsService;
         }
     }
@@ -5057,6 +5068,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
             }
         }
+
         return this.urlFactoryService;
     }
 
@@ -5139,6 +5151,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         map.put("MSN", new SearchEngineRule("search.msn.", "s/(^|.*&)q=(.*?)(&.*|$)/$2/"));
         map.put("Yahoo", new SearchEngineRule("search.yahoo.", "s/(^|.*&)p=(.*?)(&.*|$)/$2/"));
         map.put("Voila", new SearchEngineRule("voila.fr", "s/(^|.*&)kw=(.*?)(&.*|$)/$2/"));
+
         return map;
     }
 
@@ -5176,10 +5189,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (getHibernateStore() == null) {
             return false;
         }
+
         return "org.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties().get(
             "dialect"))
-            || "net.sf.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties()
-                .get("dialect"));
+            || "net.sf.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties().get(
+                "dialect"));
     }
 
     public String getFullNameSQL()
@@ -5200,6 +5214,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 this.fullNameSQL = "doc.space||'.'||doc.name";
             }
         }
+
         return this.fullNameSQL;
     }
 
@@ -5260,10 +5275,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     + "</a></span>";
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to get user profile page", e);
+
             if (userdoc != null) {
                 return userdoc.getName();
             }
+
             return user;
         }
     }
@@ -5274,9 +5291,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.authentication.centralized", "0"));
     }
 
@@ -5315,6 +5334,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (format == null) {
             xformat = getXWikiPreference("dateformat", defaultFormat, context);
         }
+
         try {
             DateFormatSymbols formatSymbols = null;
             try {
@@ -5338,6 +5358,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 sdf.setTimeZone(TimeZone.getTimeZone(getUserTimeZone(context)));
             } catch (Exception e) {
             }
+
             return sdf.format(date);
         } catch (Exception e) {
             e.printStackTrace();
@@ -5401,9 +5422,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } else {
             adtype = getXWikiPreference("adtype", "", context);
         }
+
         if (adtype.equals("")) {
             adtype = Param("xwiki.ad.type", "");
         }
+
         return adtype;
     }
 
@@ -5423,9 +5446,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (adclientid.equals("")) {
             adclientid = Param("xwiki.ad.clientid", "");
         }
+
         if (adclientid.equals("")) {
             adclientid = defaultadclientid;
         }
+
         return adclientid;
     }
 
@@ -5448,14 +5473,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (plugin != null) {
             return plugin.getPluginApi(plugin, context);
         }
+
         return null;
     }
-
-    /*
-     * public XWikiExecutionInfo getExecutionInfo(XWikiContext context) { Thread thread = Thread.currentThread();
-     * XWikiExecutionInfo info = getThreadMap().get(thread); if (info==null) { info = new XWikiExecutionInfo(thread,
-     * getRequestURL(context.getRequest())) } }
-     */
 
     /**
      * @return the cache factory.
@@ -5469,15 +5489,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         String cacheHint = Param("xwiki.cache.cachefactory.hint", null);
 
-        if (cacheHint == null) {
-            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.class, "default");
+        if (StringUtils.isEmpty(cacheHint) || Utils.getComponent(CacheFactory.class, cacheHint) == null) {
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
             try {
                 cacheFactory = cacheManager.getCacheFactory();
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to get cache factory component", e);
             }
         } else {
-            cacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.class, cacheHint);
+            cacheFactory = Utils.getComponent(CacheFactory.class, cacheHint);
         }
 
         return cacheFactory;
@@ -5496,14 +5516,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", null);
 
         if (StringUtils.isEmpty(localCacheHint) || Utils.getComponent(CacheFactory.class, localCacheHint) == null) {
-            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.class, "default");
+            CacheManager cacheManager = Utils.getComponent(CacheManager.class);
             try {
                 localCacheFactory = cacheManager.getLocalCacheFactory();
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to get local cache factory component", e);
             }
         } else {
-            localCacheFactory = (CacheFactory) Utils.getComponent(CacheFactory.class, localCacheHint);
+            localCacheFactory = Utils.getComponent(CacheFactory.class, localCacheHint);
         }
 
         return localCacheFactory;
@@ -5543,6 +5563,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // Release any connection resources used by the method
             get.releaseConnection();
         }
+
         return content;
     }
 
@@ -5662,8 +5683,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
         try {
-            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName)
-                .execute();
+            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).execute();
         } catch (QueryException ex) {
             throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
@@ -5671,31 +5691,25 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
     {
+        List<String> list;
+
         try {
             String pattern = "#includeMacros[ ]*\\([ ]*([\"'])(.*?)\\1[ ]*\\)";
-            List<String> list = context.getUtil().getUniqueMatches(content, pattern, 2);
+            list = context.getUtil().getUniqueMatches(content, pattern, 2);
             for (int i = 0; i < list.size(); i++) {
-                try {
-                    String name = list.get(i);
-                    if (name.indexOf(".") == -1) {
-                        list.set(i, defaultweb + "." + name);
-                    }
-                } catch (Exception e) {
-                    // This should never happen
-                    // TODO: log a nice error message instead
-                    e.printStackTrace();
-                    return Collections.emptyList();
+                String name = list.get(i);
+                if (name.indexOf(".") == -1) {
+                    list.set(i, defaultweb + "." + name);
                 }
             }
-
-            return list;
         } catch (Exception e) {
             // This should never happen
-            // TODO: log a nice error message instead
-            e.printStackTrace();
-            // @todo Shouldn't we return an empty list instead!!!!
-            return Collections.emptyList();
+            LOG.error("Failed to extract #includeMacros targets from provided content [" + content + "]", e);
+
+            list = Collections.emptyList();
         }
+
+        return list;
     }
 
     public String getFlash(String url, String width, String height, XWikiContext context)
@@ -5707,6 +5721,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             vcontext.put("width", width);
             vcontext.put("height", height);
             context.put("vcontext", vcontext);
+
             return parseTemplate("flash.vm", context);
         } finally {
             context.put("vcontext", vorigcontext);
@@ -5740,6 +5755,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
             deleteDocument(tdoc, totrash, context);
         }
+
         deleteDocument(doc, context);
     }
 
@@ -5763,9 +5779,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.backlinks", "0"));
     }
 
@@ -5775,9 +5793,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.tags", "0"));
     }
 
@@ -5794,7 +5814,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getDefaultWeb(XWikiContext context)
     {
         String dweb = getXWikiPreference("defaultweb", "", context);
-        if ("".equals(dweb)) {
+        if (StringUtils.isEmpty(dweb)) {
             return Param("xwiki.defaultweb", "Main");
         } else {
             return dweb;
@@ -5807,9 +5827,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.usedefaultweb", "0"));
     }
 
@@ -5821,6 +5843,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } else if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.showviewaction", "1"));
     }
 
@@ -5830,16 +5853,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.usedefaultaction", "0"));
     }
 
     public String getDefaultPage(XWikiContext context)
     {
         String dweb = getXWikiPreference("defaultpage", "", context);
-        if ("".equals(dweb)) {
+        if (StringUtils.isEmpty(dweb)) {
             return Param("xwiki.defaultpage", "WebHome");
         } else {
             return dweb;
@@ -5852,9 +5877,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.editcomment", "0"));
     }
 
@@ -5864,9 +5891,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.editcomment.hidden", "0"));
     }
 
@@ -5876,9 +5905,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.editcomment.suggested", "0"));
     }
 
@@ -5888,9 +5919,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.editcomment.mandatory", "0"));
     }
 
@@ -5903,9 +5936,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if ("1".equals(bl)) {
             return true;
         }
+
         if ("0".equals(bl)) {
             return false;
         }
+
         return "1".equals(Param("xwiki.minoredit", "1"));
     }
 
@@ -5940,10 +5975,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument delDoc = context.getWiki().getDocument(newFullName, context);
             context.getWiki().deleteDocument(delDoc, context);
         }
+
         XWikiDocument renamedDoc = doc.copyDocument(newFullName, context);
         saveDocument(renamedDoc, context);
         renamedDoc.saveAllAttachments(context);
         deleteDocument(doc, context);
+
         return renamedDoc;
     }
 
@@ -5963,6 +6000,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (bclass != null) {
             return bclass;
         }
+
         return getDocument(fullName, context).getxWikiClass();
     }
 
@@ -5972,9 +6010,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (pref.equals("---")) {
             pref = getWebPreference("editor", context);
         }
+
         if (pref.equals("")) {
             pref = Param("xwiki.editor", "");
         }
+
         return pref.toLowerCase();
     }
 
@@ -6014,6 +6054,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         Object prevParentClassLoader = context.get("parentclassloader");
         try {
             context.put("parentclassloader", pcl);
+
             return parseGroovyFromString(script, context);
         } finally {
             if (prevParentClassLoader == null) {
@@ -6046,6 +6087,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         macrosmapping += "\r\n" + xwiki.getXWikiPreference("macros_mapping", "", context);
+
         return macrosmapping;
     }
 
@@ -6055,6 +6097,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         Map<String, String[]> map = Util.getObject(context.getRequest(), className);
         BaseClass bclass = context.getWiki().getClass(className, context);
         BaseObject newobject = (BaseObject) bclass.fromMap(map, context);
+
         return newobject;
     }
 
@@ -6064,6 +6107,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             && context.getWiki().getXWikiPreference("convertmail", context).length() > 0) {
             return context.getWiki().getXWikiPreference("convertmail", "0", context);
         }
+
         return context.getWiki().Param("xwiki.authentication.convertemail", "0");
     }
 
@@ -6072,6 +6116,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (username == null) {
             return null;
         }
+
         if (getConvertingUserNameType(context).equals("1") && (username.indexOf("@") != -1)) {
             String id = "" + username.hashCode();
             id = id.replaceAll("-", "");
@@ -6081,6 +6126,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     "" + username.charAt(0) + username.substring(i1 + 1, i1 + 2)
                         + username.charAt(username.length() - 1) + id;
             }
+
             return id;
         } else if (getConvertingUserNameType(context).equals("2")) {
             return username.replaceAll("[\\.\\@]", "_");
@@ -6147,15 +6193,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         temp = temp.replaceAll("[\u00d1\u0143\u0145\u0147\u014a\u01f8]", "N");
         temp = temp.replaceAll("[\u00f1\u0144\u0146\u0148\u0149\u014b\u01f9\u0235]", "n");
         temp =
-            temp
-                .replaceAll(
-                    "[\u00d2\u00d3\u00d4\u00d5\u00d6\u00d8\u014c\u014e\u0150\u01d1\u01ea\u01ec\u01fe\u020c\u020e\u022a\u022c\u022e\u0230]",
-                    "O");
+            temp.replaceAll(
+                "[\u00d2\u00d3\u00d4\u00d5\u00d6\u00d8\u014c\u014e\u0150\u01d1\u01ea\u01ec\u01fe\u020c\u020e\u022a\u022c\u022e\u0230]",
+                "O");
         temp =
-            temp
-                .replaceAll(
-                    "[\u00f2\u00f3\u00f4\u00f5\u00f6\u00f8\u014d\u014f\u0151\u01d2\u01eb\u01ed\u01ff\u020d\u020f\u022b\u022d\u022f\u0231]",
-                    "o");
+            temp.replaceAll(
+                "[\u00f2\u00f3\u00f4\u00f5\u00f6\u00f8\u014d\u014f\u0151\u01d2\u01eb\u01ed\u01ff\u020d\u020f\u022b\u022d\u022f\u0231]",
+                "o");
         temp = temp.replaceAll("[\u0156\u0158\u0210\u0212]", "R");
         temp = temp.replaceAll("[\u0157\u0159\u0211\u0213]", "r");
         temp = temp.replaceAll("[\u015a\u015c\u015e\u0160\u0218]", "S");
@@ -6163,15 +6207,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         temp = temp.replaceAll("[\u00de\u0162\u0164\u0166\u021a]", "T");
         temp = temp.replaceAll("[\u00fe\u0163\u0165\u0167\u021b\u0236]", "t");
         temp =
-            temp
-                .replaceAll(
-                    "[\u00d9\u00da\u00db\u00dc\u0168\u016a\u016c\u016e\u0170\u0172\u01d3\u01d5\u01d7\u01d9\u01db\u0214\u0216]",
-                    "U");
+            temp.replaceAll(
+                "[\u00d9\u00da\u00db\u00dc\u0168\u016a\u016c\u016e\u0170\u0172\u01d3\u01d5\u01d7\u01d9\u01db\u0214\u0216]",
+                "U");
         temp =
-            temp
-                .replaceAll(
-                    "[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]",
-                    "u");
+            temp.replaceAll(
+                "[\u00f9\u00fa\u00fb\u00fc\u0169\u016b\u016d\u016f\u0171\u0173\u01d4\u01d6\u01d8\u01da\u01dc\u0215\u0217]",
+                "u");
         temp = temp.replaceAll("/[\u0174]", "W");
         temp = temp.replaceAll("[\u0175]", "w");
         temp = temp.replaceAll("[\u00dd\u0176\u0178\u0232]", "Y");
@@ -6195,6 +6237,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (name.length() > 250) {
             name = name.substring(0, 250);
         }
+
         return name;
 
     }
@@ -6202,6 +6245,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getUniquePageName(String space, XWikiContext context)
     {
         String pageName = generateRandomString(16);
+
         return getUniquePageName(space, pageName, context);
     }
 
@@ -6213,8 +6257,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             while (exists(space + "." + pageName + "_" + i, context)) {
                 i++;
             }
+
             return pageName + "_" + i;
         }
+
         return pageName;
     }
 
@@ -6237,6 +6283,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (criteria == null) {
             criteria = new XWikiCriteria();
         }
+
         if (pclass == null) {
             return "";
         } else {
@@ -6257,6 +6304,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (query == null) {
             query = new XWikiQuery();
         }
+
         return bclass.displaySearchColumns(className + "_" + prefix, query, context);
     }
 
@@ -6317,6 +6365,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             }
         }
+
         result += StringUtils.join(headerColumns.toArray(), " | ") + "\r\n";
         for (String docname : list) {
             List<String> rowColumns = new ArrayList<String>();
@@ -6336,6 +6385,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             result += StringUtils.join(rowColumns.toArray(), " | ") + "\r\n";
         }
+
         result += "{table}\r\n";
 
         return result;
@@ -6375,6 +6425,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String parseMessage(String id, XWikiContext context)
     {
         XWikiMessageTool msg = context.getMessageTool();
+
         return parseContent(msg.get(id), context);
     }
 
@@ -6384,6 +6435,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (message == null) {
             return null;
         }
+
         return parseMessage(message, context);
     }
 
@@ -6563,11 +6615,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 } else {
                     workDir.mkdir();
+
                     return workDir;
                 }
             } catch (Exception e) {
-                workDir = null;
                 LOG.warn("xwiki.work.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
+
+                workDir = null;
             }
         }
 
@@ -6576,9 +6630,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
          */
 
         // No choices left, retreiving the temp directory
-        workDir = this.getTempDirectory(context);
+        this.workDir = this.getTempDirectory(context);
 
-        return workDir;
+        return this.workDir;
     }
 
     public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException
@@ -6607,6 +6661,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     toDelete.add(attach);
                 }
             }
+
             for (XWikiAttachment newAttach : toDelete) {
                 rolledbackAttachList.remove(newAttach);
             }
@@ -6697,6 +6752,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         params.add(rev);
 
         saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", params), context);
+
         return rolledbackDoc;
     }
 
@@ -6713,7 +6769,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public String getDefaultDocumentSyntax()
     {
-        return ((CoreConfiguration) Utils.getComponent(CoreConfiguration.class)).getDefaultDocumentSyntax();
+        return Utils.getComponent(CoreConfiguration.class).getDefaultDocumentSyntax();
     }
 
     /**

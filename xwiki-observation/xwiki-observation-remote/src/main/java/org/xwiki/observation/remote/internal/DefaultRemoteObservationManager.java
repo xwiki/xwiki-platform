@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.observation.remote.internal.jgroups;
+package org.xwiki.observation.remote.internal;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -48,7 +48,7 @@ import org.xwiki.observation.remote.converter.EventConverterManager;
  * @since 2.0M3
  */
 @Component
-public class JGroupsRemoteObservationManager extends AbstractLogEnabled implements RemoteObservationManager,
+public class DefaultRemoteObservationManager extends AbstractLogEnabled implements RemoteObservationManager,
     Initializable
 {
     /**

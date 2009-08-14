@@ -161,7 +161,7 @@ public abstract class AbstractBoxMacro<P extends BoxMacroParameters> extends Abs
      * @return the parsing result
      * @throws MacroExecutionException if the parsing fails
      */
-    private static List<Block> parseTitle(Parser parser, String titleParameter) throws MacroExecutionException
+    private List<Block> parseTitle(Parser parser, String titleParameter) throws MacroExecutionException
     {
         try {
             List<Block> titleBlocks = parser.parse(new StringReader(titleParameter)).getChildren();

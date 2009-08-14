@@ -3,5 +3,6 @@ org.xwiki.observation.remote.internal.DefaultRemoteObservationManagerConfigurati
 org.xwiki.observation.remote.internal.DefaultRemoteObservationManagerContext
 org.xwiki.observation.remote.internal.jgroups.DefaultJGroupsReceiver
 org.xwiki.observation.remote.internal.jgroups.JGroupsRemoteObservationManager
+org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter
 org.xwiki.observation.remote.internal.converter.DefaultEventConverterManager
 org.xwiki.observation.remote.internal.converter.SerializableEventConverter

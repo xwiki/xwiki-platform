@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
-import org.xwiki.observation.remote.internal.jgroups.JGroupsRemoteObservationManager;
+import org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter;
 import org.xwiki.test.MockConfigurationSource;
 import org.xwiki.test.XWikiComponentInitializer;
 
@@ -65,7 +65,7 @@ public abstract class AbstractROMTestCase
             public InputStream getResourceAsStream(String resourceName)
             {
                 return this.getClass().getClassLoader().getResourceAsStream(
-                    resourceName.substring(("/WEB-INF/" + JGroupsRemoteObservationManager.CONFIGURATION_PATH).length()));
+                    resourceName.substring(("/WEB-INF/" + JGroupsNetworkAdapter.CONFIGURATION_PATH).length()));
             }
 
             public URL getResource(String resourceName) throws MalformedURLException

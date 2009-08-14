@@ -47,4 +47,14 @@ public class DefaultRemoteObservationManagerConfiguration implements RemoteObser
 
         return channels == null ? Collections.<String> emptyList() : channels;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.remote.RemoteObservationManagerConfiguration#getNetworkAdapter()
+     */
+    public String getNetworkAdapter()
+    {
+        return this.configurationSource.getProperty("observation.remote.networkadapter", "jgroups");
+    }
 }

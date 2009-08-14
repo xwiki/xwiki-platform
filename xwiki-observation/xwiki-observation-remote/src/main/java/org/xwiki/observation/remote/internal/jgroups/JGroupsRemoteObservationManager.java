@@ -20,19 +20,6 @@
  */
 package org.xwiki.observation.remote.internal.jgroups;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.jgroups.ChannelException;
-import org.jgroups.JChannel;
-import org.jgroups.Message;
-import org.jgroups.Receiver;
-import org.jgroups.conf.ConfiguratorFactory;
-import org.jgroups.conf.ProtocolStackConfigurator;
-import org.jgroups.conf.XmlConfigurator;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -40,20 +27,19 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.container.Container;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.LocalEventData;
+import org.xwiki.observation.remote.NetworkAdapter;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteEventException;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerConfiguration;
 import org.xwiki.observation.remote.converter.EventConverterManager;
-import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
 
 /**
  * JGoups based {@link RemoteObservationManager}. It's also the default implementation for now.
@@ -66,21 +52,10 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
     Initializable
 {
     /**
-     * Relative path where to find jgroups channels configurations.
-     */
-    public static final String CONFIGURATION_PATH = "observation/remote/jgroups/";
-
-    /**
      * Access {@link RemoteObservationManager} configuration.
      */
     @Requirement
     private RemoteObservationManagerConfiguration configuration;
-
-    /**
-     * Used to lookup the receiver corresponding to the channel identifier.
-     */
-    @Requirement
-    private ComponentManager componentManager;
 
     /**
      * Used to convert local event from and to remote event.
@@ -113,15 +88,15 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
     private ExecutionContextManager executionContextManager;
 
     /**
-     * The container used to access configuration files.
+     * Used to lookup the network adapter.
      */
     @Requirement
-    private Container container;
+    private ComponentManager componentManager;
 
     /**
-     * The network channels.
+     * The network adapter to use to actually send and receive network messages.
      */
-    private Map<String, JChannel> channels = new HashMap<String, JChannel>();
+    private NetworkAdapter networkAdapter;
 
     /**
      * {@inheritDoc}
@@ -130,6 +105,14 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
      */
     public void initialize() throws InitializationException
     {
+        try {
+            String networkAdapterHint = this.configuration.getNetworkAdapter();
+            this.networkAdapter = this.componentManager.lookup(NetworkAdapter.class, networkAdapterHint);
+        } catch (ComponentLookupException e) {
+            throw new InitializationException("Failed to initialize network adapter ["
+                + this.configuration.getNetworkAdapter() + "]", e);
+        }
+
         // start configured channels
         for (String channelId : this.configuration.getChannels()) {
             try {
@@ -157,16 +140,7 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
 
         // if remote event data is not filled it mean the message should not be sent to the network
         if (remoteEvent != null) {
-            Message message = new Message(null, null, remoteEvent);
-
-            // Send message to jgroups channels
-            for (Map.Entry<String, JChannel> entry : this.channels.entrySet()) {
-                try {
-                    entry.getValue().send(message);
-                } catch (Exception e) {
-                    getLogger().error("Fail to send message to the channel [" + entry.getKey() + "]", e);
-                }
-            }
+            this.networkAdapter.send(remoteEvent);
         }
     }
 
@@ -201,20 +175,7 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
      */
     public void startChannel(String channelId) throws RemoteEventException
     {
-        if (this.channels.containsKey(channelId)) {
-            throw new RemoteEventException(MessageFormat.format("Channel [{0}] already started", channelId));
-        }
-
-        JChannel channel;
-        try {
-            channel = createChannel(channelId);
-            channel.connect("event");
-            this.channels.put(channelId, channel);
-        } catch (Exception e) {
-            throw new RemoteEventException("Failed to create channel [" + channelId + "]", e);
-        }
-
-        getLogger().info(MessageFormat.format("Channel [{0}] started", channelId));
+        this.networkAdapter.startChannel(channelId);
     }
 
     /**
@@ -224,79 +185,7 @@ public class JGroupsRemoteObservationManager extends AbstractLogEnabled implemen
      */
     public void stopChannel(String channelId) throws RemoteEventException
     {
-        JChannel channel = this.channels.get(channelId);
-
-        if (channel == null) {
-            throw new RemoteEventException(MessageFormat.format("Channel [{0}] is not started", channelId));
-        }
-
-        channel.close();
-
-        this.channels.remove(channelId);
-
-        getLogger().info(MessageFormat.format("Channel [{0}] stoped", channelId));
-    }
-
-    /**
-     * Create a new channel.
-     * 
-     * @param channelId the identifier of the channel to create
-     * @return the new channel
-     * @throws ComponentLookupException failed to get default {@link JGroupsReceiver}
-     * @throws ChannelException failed to create channel
-     */
-    private JChannel createChannel(String channelId) throws ComponentLookupException, ChannelException
-    {
-        // load configuration
-        ProtocolStackConfigurator channelConf;
-        try {
-            channelConf = loadChannelConfiguration(channelId);
-        } catch (IOException e) {
-            throw new ChannelException("Failed to load configuration for the channel [" + channelId + "]", e);
-        }
-
-        // get Receiver
-        Receiver channelReceiver;
-        try {
-            channelReceiver = this.componentManager.lookup(JGroupsReceiver.class, channelId);
-        } catch (ComponentLookupException e) {
-            channelReceiver = this.componentManager.lookup(JGroupsReceiver.class);
-        }
-
-        // create channel
-        JChannel channel = new JChannel(channelConf);
-        channel.setReceiver(channelReceiver);
-
-        return channel;
-    }
-
-    /**
-     * Load channel configuration.
-     * 
-     * @param channelId the identifier of the channel
-     * @return the channel configuration
-     * @throws IOException failed to load configuration file
-     * @throws ChannelException failed to creation channel configuration
-     */
-    private ProtocolStackConfigurator loadChannelConfiguration(String channelId) throws IOException, ChannelException
-    {
-        ProtocolStackConfigurator configurator = null;
-
-        String path = "/WEB-INF/" + CONFIGURATION_PATH + channelId + ".xml";
-
-        InputStream is = this.container.getApplicationContext().getResourceAsStream(path);
-
-        if (is != null) {
-            configurator = XmlConfigurator.getInstance(is);
-        } else {
-            getLogger().warn(
-                "Can't find a configuration for channel [" + channelId + "] at [" + path + "]. Using "
-                    + JChannel.DEFAULT_PROTOCOL_STACK + " JGRoups default configuration.");
-
-            configurator = ConfiguratorFactory.getStackConfigurator(JChannel.DEFAULT_PROTOCOL_STACK);
-        }
-
-        return configurator;
+        this.networkAdapter.stopChannel(channelId);
     }
 
     /**

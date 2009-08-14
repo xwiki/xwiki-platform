@@ -92,11 +92,6 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <excludes>
-            **/JGroupsRemoteObservationManager.java,
-          </excludes>
-        </configuration>
       </plugin>
     </plugins>
   </build>

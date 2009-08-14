@@ -42,4 +42,9 @@ public interface RemoteObservationManagerConfiguration
      * @return the channels to start at init
      */
     List<String> getChannels();
+
+    /**
+     * @return the identifier of the network adapter implementation to use to actually send and receive network messages
+     */
+    String getNetworkAdapter();
 }

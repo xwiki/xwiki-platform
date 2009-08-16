@@ -74,13 +74,14 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
         this.newLineCount = 0;
-        super.endDefinitionList();
+        super.endDefinitionList(parameters);
     }
 
     /**

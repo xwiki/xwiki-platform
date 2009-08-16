@@ -124,9 +124,10 @@ public interface Listener extends LinkListener, ImageListener
     /**
      * Start of a definition list. For example in HTML this is the equivalent of &lt;dl&gt;.
      * 
-     * @since 1.6M2
+     * @param parameters a generic list of parameters for the list. Example: "style"/"background-color: blue"
+     * @since 2.0RC1
      */
-    void beginDefinitionList();
+    void beginDefinitionList(Map<String, String> parameters);
 
     /**
      * End of a list.
@@ -140,9 +141,10 @@ public interface Listener extends LinkListener, ImageListener
     /**
      * End of a definition list. For example in HTML this is the equivalent of &lt;/dl&gt;.
      * 
-     * @since 1.6M2
+     * @param parameters a generic list of parameters for the list. Example: "style"/"background-color: blue"
+     * @since 2.0RC1
      */
-    void endDefinitionList();
+    void endDefinitionList(Map<String, String> parameters);
 
     /**
      * Start of a list item.

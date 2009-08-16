@@ -310,10 +310,11 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, boolean, java.util.Map) 
      */
-    public void onVerbatimInline(String protectedString)
+    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {
+        // TODO: Handle parameters
         this.sink.verbatim(false);
         this.sink.rawText(protectedString);
         this.sink.verbatim_();
@@ -322,33 +323,24 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, Map, boolean)
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
+    public void beginDefinitionList(Map<String, String> parameters)
     {
         // TODO: Handle parameters
-        onVerbatimInline(protectedString);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
-     * @since 1.6M2
-     */
-    public void beginDefinitionList()
-    {
         this.sink.definitionList();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
-     * @since 1.6M2
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
+        // TODO: Handle parameters
         this.sink.definitionList_();
     }
 
@@ -520,16 +512,5 @@ public class DoxiaGeneratorListener implements Listener
             this.sink.figureGraphics(((URLImage) image).getURL());
         }
         this.sink.figure_();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.Listener#onError(String, String)
-     * @since 1.7M3
-     */
-    public void onError(String message, String description)
-    {
-        // Nothing to do since Doxia doesn't support the notion of Error events.
     }
 }

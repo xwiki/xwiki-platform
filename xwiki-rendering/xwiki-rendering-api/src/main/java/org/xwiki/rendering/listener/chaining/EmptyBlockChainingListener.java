@@ -19,8 +19,12 @@
  */
 package org.xwiki.rendering.listener.chaining;
 
-import org.xwiki.rendering.listener.*;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.listener.Image;
 
 import java.util.Map;
 import java.util.Stack;
@@ -75,14 +79,15 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList()
+     * @see AbstractChainingListener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
         markNotEmpty();
         startContainerBlock();
-        super.beginDefinitionList();
+        super.beginDefinitionList(parameters);
     }
 
     /**
@@ -324,12 +329,13 @@ public class EmptyBlockChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList()
+     * @see AbstractChainingListener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
-        super.endDefinitionList();
+        super.endDefinitionList(parameters);
         stopContainerBlock();
     }
 

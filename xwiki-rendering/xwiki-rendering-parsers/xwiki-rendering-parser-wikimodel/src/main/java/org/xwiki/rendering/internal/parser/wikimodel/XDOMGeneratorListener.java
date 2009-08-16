@@ -266,7 +266,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endDefinitionList(WikiParameters params)
     {
-        this.stack.push(new DefinitionListBlock(generateListFromStack()));
+        this.stack.push(new DefinitionListBlock(generateListFromStack(), convertParameters(params)));
     }
 
     public void endDefinitionTerm()

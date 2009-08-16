@@ -90,12 +90,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_DEFINITION_LIST);
+        saveEvent(EventType.BEGIN_DEFINITION_LIST, parameters);
         firePreviousEvent();
     }
 
@@ -323,12 +324,13 @@ public class LookaheadChainingListener extends AbstractChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_DEFINITION_LIST);
+        saveEvent(EventType.END_DEFINITION_LIST, parameters);
         firePreviousEvent();
     }
 

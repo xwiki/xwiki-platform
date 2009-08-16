@@ -19,13 +19,13 @@
  */
 package org.xwiki.rendering.internal.renderer.tex;
 
-import org.xwiki.rendering.renderer.*;
 import org.wikimodel.wem.tex.TexSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelGeneratorListener;
 import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelPrinterAdapter;
 

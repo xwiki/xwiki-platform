@@ -75,13 +75,14 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#beginDefinitionList()
+     * @see ChainingListener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.beginDefinitionList();
+            next.beginDefinitionList(parameters);
         }
     }
 
@@ -322,13 +323,14 @@ public abstract class AbstractChainingListener implements ChainingListener
     /**
      * {@inheritDoc}
      * 
-     * @see ChainingListener#endDefinitionList()
+     * @see ChainingListener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
         ChainingListener next = getListenerChain().getNextListener(getClass());
         if (next != null) {
-            next.endDefinitionList();
+            next.endDefinitionList(parameters);
         }
     }
 

@@ -563,16 +563,18 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
         if (getBlockState().getDefinitionListDepth() == 1 && !getBlockState().isInList()) {
             printEmptyLine();
         } else {
             getPrinter().print("\n");
         }
+        printParameters(parameters);
     }
 
     /**

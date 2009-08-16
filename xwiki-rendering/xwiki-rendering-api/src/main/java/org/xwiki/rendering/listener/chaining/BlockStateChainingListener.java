@@ -266,14 +266,15 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1 
      */
     @Override
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
         this.definitionListDepth.push(new DefinitionListState());
 
-        super.beginDefinitionList();
+        super.beginDefinitionList(parameters);
     }
 
     /**
@@ -476,12 +477,13 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList()
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
-        super.endDefinitionList();
+        super.endDefinitionList(parameters);
 
         this.definitionListDepth.pop();
 

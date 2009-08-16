@@ -88,7 +88,7 @@ public enum EventType
     BEGIN_DEFINITION_LIST {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.beginDefinitionList();
+            listener.beginDefinitionList((Map<String, String>) eventParameters[0]);
         }
 
         @Override
@@ -102,7 +102,7 @@ public enum EventType
     END_DEFINITION_LIST {
         void fireEvent(Listener listener, Object[] eventParameters)
         {
-            listener.endDefinitionList();
+            listener.endDefinitionList((Map<String, String>) eventParameters[0]);
         }
     },
     BEGIN_DEFINITION_TERM {

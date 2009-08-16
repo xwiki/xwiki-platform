@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.renderer.wikimodel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 
 import org.wikimodel.wem.IWemConstants;
 import org.wikimodel.wem.IWemListener;
@@ -307,23 +306,23 @@ public class WikiModelGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
-     * @since 1.6M2
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
-        this.wikimodelListener.beginDefinitionList(createWikiParameters(Collections.<String, String> emptyMap()));
+        this.wikimodelListener.beginDefinitionList(createWikiParameters(parameters));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
-     * @since 1.6M2
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
-        this.wikimodelListener.endDefinitionList(createWikiParameters(Collections.<String, String> emptyMap()));
+        this.wikimodelListener.endDefinitionList(createWikiParameters(parameters));
     }
 
     /**

@@ -1,0 +1,39 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test parametrized definition lists
+.#-----------------------------------------------------
+(% param="value" %)
+; title
+: definition
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginDefinitionList [[param]=[value]]
+beginDefinitionTerm
+onWord [title]
+endDefinitionTerm
+beginDefinitionDescription
+onWord [definition]
+endDefinitionDescription
+endDefinitionList [[param]=[value]]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<dl param="value"><dt>title</dt><dd>definition</dd></dl>
+.#-----------------------------------------------------
+.expect|xwiki/2.0
+.#-----------------------------------------------------
+(% param="value" %)
+; title
+: definition
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<dl param="value"><dt>title</dt><dd>definition</dd></dl>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+title
+definition

@@ -359,23 +359,23 @@ public class WrappingListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
-     * @since 1.6M2
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
-        this.listener.beginDefinitionList();
+        this.listener.beginDefinitionList(parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
-     * @since 1.6M2
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
-        this.listener.endDefinitionList();
+        this.listener.endDefinitionList(parameters);
     }
 
     /**

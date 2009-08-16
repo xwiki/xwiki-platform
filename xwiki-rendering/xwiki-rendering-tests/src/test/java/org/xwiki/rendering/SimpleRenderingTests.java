@@ -150,6 +150,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("list/definitionlist4", false);
         suite.addTestsFromResource("list/definitionlist5", false);
         suite.addTestsFromResource("list/definitionlist6", false);
+        suite.addTestsFromResource("list/definitionlist7", false);
 
         // Sections
         suite.addTestsFromResource("section/section1", false);

@@ -33,7 +33,6 @@ import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener.Event;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
@@ -123,7 +122,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginGroup(Map)
+     * @see AbstractChainingPrintRenderer#beginGroup(Map)
      */
     @Override
     public void beginGroup(Map<String, String> parameters)
@@ -136,7 +135,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endGroup(Map)
+     * @see AbstractChainingPrintRenderer#endGroup(Map)
      */
     @Override
     public void endGroup(Map<String, String> parameters)
@@ -147,7 +146,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginFormat(Format, Map)
+     * @see AbstractChainingPrintRenderer#beginFormat(Format, java.util.Map)
      */
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
@@ -183,7 +182,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endFormat(Format, Map)
+     * @see AbstractChainingPrintRenderer#endFormat(Format, Map)
      */
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
@@ -219,7 +218,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginParagraph(java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginParagraph(java.util.Map)
      */
     @Override
     public void beginParagraph(Map<String, String> parameters)
@@ -230,7 +229,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endParagraph(java.util.Map)
+     * @see AbstractChainingPrintRenderer#endParagraph(java.util.Map)
      */
     @Override
     public void endParagraph(Map<String, String> parameters)
@@ -241,7 +240,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#onNewLine()
+     * @see AbstractChainingPrintRenderer#onNewLine()
      */
     @Override
     public void onNewLine()
@@ -252,7 +251,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginLink(Link, boolean, Map)
+     * @see AbstractChainingPrintRenderer#beginLink(Link, boolean, Map)
      */
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -267,7 +266,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endLink(Link, boolean, Map)
+     * @see AbstractChainingPrintRenderer#endLink(Link, boolean, Map)
      */
     @Override
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -279,7 +278,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginHeader(HeaderLevel, String, Map)
+     * @see AbstractChainingPrintRenderer#beginHeader(HeaderLevel, String, Map)
      */
     @Override
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -316,7 +315,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endHeader(HeaderLevel, String, Map)
+     * @see AbstractChainingPrintRenderer#endHeader(HeaderLevel, String, Map)
      */
     @Override
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -328,7 +327,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onWord(String)
+     * @see AbstractChainingPrintRenderer#onWord(String)
      */
     @Override
     public void onWord(String word)
@@ -339,7 +338,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onSpace()
+     * @see AbstractChainingPrintRenderer#onSpace()
      */
     @Override
     public void onSpace()
@@ -362,7 +361,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
@@ -377,7 +376,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#beginListItem()
+     * @see AbstractChainingPrintRenderer#beginListItem()
      */
     @Override
     public void beginListItem()
@@ -388,7 +387,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map)
+     * @see AbstractChainingPrintRenderer#endList(org.xwiki.rendering.listener.ListType, java.util.Map)
      */
     @Override
     public void endList(ListType listType, Map<String, String> parameters)
@@ -403,7 +402,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#endListItem()
+     * @see AbstractChainingPrintRenderer#endListItem()
      */
     @Override
     public void endListItem()
@@ -414,7 +413,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onId(String)
+     * @see AbstractChainingPrintRenderer#onId(String)
      */
     @Override
     public void onId(String name)
@@ -433,7 +432,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine(Map)
+     * @see AbstractChainingPrintRenderer#onHorizontalLine(Map)
      */
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
@@ -444,7 +443,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onVerbatim(String, boolean, Map)
+     * @see AbstractChainingPrintRenderer#onVerbatim(String, boolean, Map)
      */
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
@@ -468,7 +467,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
+     * @see AbstractChainingPrintRenderer#onEmptyLines(int)
      */
     @Override
     public void onEmptyLines(int count)
@@ -486,21 +485,23 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @see AbstractChainingPrintRenderer#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
-        getXHTMLWikiPrinter().printXMLStartElement("dl");
+        getXHTMLWikiPrinter().printXMLStartElement("dl", parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @see AbstractChainingPrintRenderer#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
         getXHTMLWikiPrinter().printXMLEndElement("dl");
     }
@@ -508,7 +509,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     * @see AbstractChainingPrintRenderer#beginDefinitionTerm()
      */
     @Override
     public void beginDefinitionTerm()
@@ -519,7 +520,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     * @see AbstractChainingPrintRenderer#beginDefinitionDescription()
      */
     @Override
     public void beginDefinitionDescription()
@@ -530,7 +531,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     * @see AbstractChainingPrintRenderer#endDefinitionTerm()
      */
     @Override
     public void endDefinitionTerm()
@@ -541,7 +542,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
+     * @see AbstractChainingPrintRenderer#endDefinitionDescription()
      */
     @Override
     public void endDefinitionDescription()
@@ -552,7 +553,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginQuotation(java.util.Map)
      */
     @Override
     public void beginQuotation(Map<String, String> parameters)
@@ -563,7 +564,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     * @see AbstractChainingPrintRenderer#endQuotation(java.util.Map)
      */
     @Override
     public void endQuotation(Map<String, String> parameters)
@@ -574,7 +575,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @see AbstractChainingPrintRenderer#beginQuotationLine()
      */
     @Override
     public void beginQuotationLine()
@@ -589,7 +590,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginTable(java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginTable(java.util.Map)
      */
     @Override
     public void beginTable(Map<String, String> parameters)
@@ -600,7 +601,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginTableRow(java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginTableRow(java.util.Map)
      */
     @Override
     public void beginTableRow(Map<String, String> parameters)
@@ -611,7 +612,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginTableCell(java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginTableCell(java.util.Map)
      */
     @Override
     public void beginTableCell(Map<String, String> parameters)
@@ -622,7 +623,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#beginTableHeadCell(java.util.Map)
+     * @see AbstractChainingPrintRenderer#beginTableHeadCell(java.util.Map)
      */
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
@@ -633,7 +634,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endTable(java.util.Map)
+     * @see AbstractChainingPrintRenderer#endTable(java.util.Map)
      */
     @Override
     public void endTable(Map<String, String> parameters)
@@ -644,7 +645,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endTableRow(java.util.Map)
+     * @see AbstractChainingPrintRenderer#endTableRow(java.util.Map)
      */
     @Override
     public void endTableRow(Map<String, String> parameters)
@@ -655,7 +656,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endTableCell(java.util.Map)
+     * @see AbstractChainingPrintRenderer#endTableCell(java.util.Map)
      */
     @Override
     public void endTableCell(Map<String, String> parameters)
@@ -666,7 +667,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#endTableHeadCell(java.util.Map)
+     * @see AbstractChainingPrintRenderer#endTableHeadCell(java.util.Map)
      */
     @Override
     public void endTableHeadCell(Map<String, String> parameters)
@@ -677,7 +678,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
+     * @see AbstractChainingPrintRenderer#onImage(org.xwiki.rendering.listener.Image, boolean, Map)
      */
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
@@ -691,7 +692,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onRawText(String, Syntax)
+     * @see AbstractChainingPrintRenderer#onRawText(String, Syntax)
      */
     @Override
     public void onRawText(String text, Syntax syntax)

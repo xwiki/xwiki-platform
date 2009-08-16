@@ -395,23 +395,25 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginDefinitionList()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void beginDefinitionList()
+    public void beginDefinitionList(Map<String, String> parameters)
     {
-        getPrinter().println("beginDefinitionList");
+        getPrinter().println("beginDefinitionList" + serializeParameters(parameters));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endDefinitionList()
+     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#endDefinitionList(java.util.Map)
+     * @since 2.0RC1
      */
     @Override
-    public void endDefinitionList()
+    public void endDefinitionList(Map<String, String> parameters)
     {
-        getPrinter().println("endDefinitionList");
+        getPrinter().println("endDefinitionList" + serializeParameters(parameters));
     }
 
     /**

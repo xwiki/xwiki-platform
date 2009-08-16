@@ -22,6 +22,7 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a definition list. For example in HTML this is the equivalent of &lt;dl&gt;.
@@ -32,7 +33,7 @@ import java.util.List;
 public class DefinitionListBlock extends AbstractFatherBlock implements ListBLock
 {
     /**
-     * Construct a Definition List block.
+     * Construct a Definition List block with no parameters.
      *
      * @param childrenBlocks the blocks making the Definition list
      */
@@ -42,12 +43,24 @@ public class DefinitionListBlock extends AbstractFatherBlock implements ListBLoc
     }
 
     /**
+     * Construct a Definition List Block with parameters.
+     *
+     * @param childrenBlocks the blocks making the Definition list
+     * @param parameters see {@link org.xwiki.rendering.block.AbstractBlock#getParameter(String)} for more details on
+     *        parameters
+     */
+    public DefinitionListBlock(List<Block> childrenBlocks, Map<String, String> parameters)
+    {
+        super(childrenBlocks, parameters);
+    }
+
+    /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
-        listener.beginDefinitionList();
+        listener.beginDefinitionList(getParameters());
     }
 
     /**
@@ -56,6 +69,6 @@ public class DefinitionListBlock extends AbstractFatherBlock implements ListBLoc
      */
     public void after(Listener listener)
     {
-        listener.endDefinitionList();
+        listener.endDefinitionList(getParameters());
     }
 }

@@ -128,7 +128,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
             String params = m.group(3);
             String allcontent = m.group(0);
 
-            XWikiVirtualMacro macro = (XWikiVirtualMacro) this.macros_mappings.get(macroname);
+            XWikiVirtualMacro macro = this.macros_mappings.get(macroname);
             if ((macro != null) && (macro.isSingleLine())) {
                 result.append(context.getWiki().getRenderingEngine().convertSingleLine(macroname, params, allcontent,
                     macro, context));
@@ -158,7 +158,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
             String data = m.group(4);
             String allcontent = m.group(0);
 
-            XWikiVirtualMacro macro = (XWikiVirtualMacro) this.macros_mappings.get(macroname);
+            XWikiVirtualMacro macro = this.macros_mappings.get(macroname);
             if ((macro != null) && (macro.isMultiLine())) {
                 result.append(context.getWiki().getRenderingEngine().convertMultiLine(macroname, params, data,
                     allcontent, macro, context));

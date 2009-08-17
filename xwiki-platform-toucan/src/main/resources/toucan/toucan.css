@@ -155,9 +155,10 @@ a img {
     margin: 0;
 }
 
-tt, tt * {
+tt, tt *, tt tt.wikimodel-verbatim {
     font-family: monospace;
 }
+
 
 tt.wikimodel-verbatim {
     font-family: sans-serif;

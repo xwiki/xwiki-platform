@@ -338,18 +338,26 @@ XWiki.widgets.LiveTable = Class.create({
          el.addClassName('desc');
       }
       Event.observe(el, "click", function(event) {
-         if (event.element().hasClassName("selected")) { // Sort column already selected. Change direction
-            var direction = event.element().hasClassName("asc") ? "asc" : "desc";
+         var elem = event.element();
+         if (!elem.hasClassName('sortable')) {
+            elem = elem.up('th.sortable');
+         }
+         if (elem == null) {
+            // This should never happen in real life, but better safe than sorry...
+            return;
+         }
+         if (elem.hasClassName("selected")) { // Sort column already selected. Change direction
+            var direction = elem.hasClassName("asc") ? "asc" : "desc";
             var newDirection = direction == "asc" ? "desc" : "asc";
-            event.element().removeClassName(direction);
-            event.element().addClassName(newDirection);
+            elem.removeClassName(direction);
+            elem.addClassName(newDirection);
          }
          else { // sort column was not selected, do not change direction, just column
             if (self.selectedColumn){
               self.selectedColumn.removeClassName("selected");
             }
-            event.element().addClassName("selected");
-            self.selectedColumn = event.element();
+            elem.addClassName("selected");
+            self.selectedColumn = elem;
          }
          self.totalRows = -1; //reset
          self.showRows(1, self.limit);

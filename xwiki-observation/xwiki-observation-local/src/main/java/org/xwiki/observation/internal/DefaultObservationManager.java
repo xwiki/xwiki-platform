@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
@@ -44,7 +45,7 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  */
 @Component
-public class DefaultObservationManager implements ObservationManager, Initializable
+public class DefaultObservationManager extends AbstractLogEnabled implements ObservationManager, Initializable
 {
     /**
      * Registered listeners indexed on Event classes so that it's fast to find all the listeners
@@ -245,7 +246,13 @@ public class DefaultObservationManager implements ObservationManager, Initializa
             // Verify that one of the events matches and send the first matching event
             for (Event listenerEvent : listener.events) {
                 if (listenerEvent.matches(event)) {
-                    listener.listener.onEvent(event, source, data);
+                    try {
+                        listener.listener.onEvent(event, source, data);
+                    } catch (Exception e) {
+                        // protect from bad listeners
+                        getLogger().error("Fail to send event [" + event + "] to listener [" + listener.listener + "]",
+                            e);
+                    }
 
                     // Only send the first matching event since the listener should only be called once per event.
                     break;

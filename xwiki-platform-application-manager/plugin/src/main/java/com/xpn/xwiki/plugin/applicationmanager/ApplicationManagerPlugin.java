@@ -20,23 +20,33 @@
 
 package com.xpn.xwiki.plugin.applicationmanager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.notify.DocChangeRule;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
 
 /**
  * Entry point of the Application Manager plugin.
  * 
  * @version $Id: $
  */
-public class ApplicationManagerPlugin extends XWikiDefaultPlugin
+public class ApplicationManagerPlugin extends XWikiDefaultPlugin implements EventListener
 {
     /**
      * Identifier of Application Manager plugin.
@@ -51,9 +61,20 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     protected static final Log LOG = LogFactory.getLog(ApplicationManagerPlugin.class);
 
     /**
-     * Notification rule on document create or modify.
+     * The events matchers.
      */
-    private DocChangeRule docChangeRule;
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentUpdateEvent());
+            add(new DocumentSaveEvent());
+        }
+    };
+
+    /**
+     * Protected API for managing applications.
+     */
+    private ApplicationManager applicationManager;
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -72,16 +93,25 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return EVENTS;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
      */
     @Override
     public void init(XWikiContext context)
     {
-        if (docChangeRule == null) {
-            docChangeRule = new DocChangeRule(ApplicationManager.getInstance());
-        }
+        this.applicationManager = new ApplicationManager(ApplicationManagerMessageTool.getDefault(context));
 
-        context.getWiki().getNotificationManager().addGeneralRule(docChangeRule);
+        // register for documents modifications events
+        Utils.getComponent(ObservationManager.class).addListener(this);
 
         String database = context.getDatabase();
         try {
@@ -89,9 +119,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
                 context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
             context.setDatabase(context.getMainXWiki());
-            ApplicationManager.getInstance().updateAllApplicationTranslation(
-                ApplicationManagerMessageTool.getDefault(context).get(
-                    ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS), context);
+            this.applicationManager.updateAllApplicationTranslation(context);
         } catch (XWikiException e) {
             LOG.error(ApplicationManagerMessageTool.getDefault(context).get(
                 ApplicationManagerMessageTool.LOG_REFRESHALLTRANSLATIONS), e);
@@ -103,12 +131,22 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
      */
-    @Override
-    public void flushCache(XWikiContext context)
+    public void onEvent(Event event, Object source, Object data)
     {
-        context.getWiki().getNotificationManager().removeGeneralRule(docChangeRule);
+        XWikiDocument document = (XWikiDocument) source;
+        XWikiContext context = (XWikiContext) data;
+
+        try {
+            if (XWikiApplicationClass.isApplication(document)) {
+                this.applicationManager.updateApplicationsTranslation(document, context);
+            }
+        } catch (XWikiException e) {
+            LOG.error(ApplicationManagerMessageTool.getDefault(context).get(
+                ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS, document.getFullName()), e);
+        }
     }
 
     /**

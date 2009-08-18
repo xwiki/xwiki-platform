@@ -29,11 +29,18 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.jfree.util.Log;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentDeleteEvent;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
@@ -42,22 +49,19 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.DocChangeRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Default implementation of {@link XWikiGroupService} users and groups manager.
  * 
  * @version $Id$
  */
-public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeNotificationInterface
+public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 {
     /**
      * Name of the "XWiki.XWikiGroups" class without the space name.
@@ -109,12 +113,24 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
 
+    private static final String NAME = "groupservice";
+
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentSaveEvent());
+            add(new DocumentUpdateEvent());
+            add(new DocumentDeleteEvent());
+        }
+    };
+
     protected Cache<List<String>> groupCache;
 
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException
     {
         initCache(context);
-        xwiki.getNotificationManager().addGeneralRule(new DocChangeRule(this));
+
+        Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
     public synchronized void initCache(XWikiContext context) throws XWikiException
@@ -173,9 +189,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 if (list == null) {
                     try {
                         list =
-                            context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
-                                .bindValue("username", username).bindValue("shortname", shortname).bindValue(
-                                    "veryshortname", veryshortname).execute();
+                            context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser").bindValue(
+                                "username", username).bindValue("shortname", shortname).bindValue("veryshortname",
+                                veryshortname).execute();
                     } catch (QueryException ex) {
                         throw new XWikiException(0, 0, ex.getMessage(), ex);
                     }
@@ -376,27 +392,40 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         }
     }
 
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getName()
+     */
+    public String getName()
     {
-        try {
-            if (event == XWikiNotificationInterface.EVENT_CHANGE) {
-                boolean flushCache = false;
+        return NAME;
+    }
 
-                if ((olddoc != null) && (olddoc.getObjects("XWiki.XWikiGroups") != null)) {
-                    flushCache = true;
-                }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return EVENTS;
+    }
 
-                if ((newdoc != null) && (newdoc.getObjects("XWiki.XWikiGroups") != null)) {
-                    flushCache = true;
-                }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
+     */
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiDocument document = (XWikiDocument) source;
+        XWikiDocument oldDocument = document.getOriginalDocument();
 
-                if (flushCache) {
-                    flushCache();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        // if there is any chance some group changed, flush the group cache
+        if (document.getObject(CLASS_XWIKIGROUPS) != null || oldDocument.getObject(CLASS_XWIKIGROUPS) != null) {
+            flushCache();
         }
     }
 
@@ -579,10 +608,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
             try {
                 groups =
-                    context.getWiki().getStore().getQueryManager()
-                        .createQuery(
-                            "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS)
-                                + "]/@fullName", Query.XPATH).setLimit(nb).setOffset(start).execute();
+                    context.getWiki().getStore().getQueryManager().createQuery(
+                        "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName",
+                        Query.XPATH).setLimit(nb).setOffset(start).execute();
             } catch (QueryException ex) {
                 throw new XWikiException(0, 0, ex.getMessage(), ex);
             }

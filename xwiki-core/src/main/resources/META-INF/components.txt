@@ -21,3 +21,5 @@ com.xpn.xwiki.internal.DefaultWikiMacroBuilder
 com.xpn.xwiki.internal.DefaultWikiMacroInitializer
 com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.DefaultXWikiStubContextProvider
+com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
+com.xpn.xwiki.internal.observation.remote.converter.ActionExecutionEventConverter

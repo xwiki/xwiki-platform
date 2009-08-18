@@ -173,9 +173,6 @@ public class XWikiNotificationManager
 
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context)
     {
-        // Call the document notification function itself..
-        newdoc.notify(null, newdoc, olddoc, event, context);
-
         // Call rules explicitly for any actions of this document
         Vector<XWikiNotificationRule> vnamedrules;
         String name = newdoc.getFullName();

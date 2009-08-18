@@ -42,6 +42,18 @@
       <when-property-is name="user.agent" value="gecko"/>
     </any>
   </replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplSafari">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="safari"/>
+    </any>
+  </replace-with>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplOpera">
+    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="opera"/>
+    </any>
+  </replace-with>
 
   <!-- BehaviorAdjuster -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster">

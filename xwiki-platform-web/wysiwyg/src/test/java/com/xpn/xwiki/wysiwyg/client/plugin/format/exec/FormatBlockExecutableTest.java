@@ -91,7 +91,6 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
         assertEquals("", rta.getHTML());
         assertTrue(executable.execute(rta, H1));
         assertEquals("<h1></h1>", clean(rta.getHTML()));
-        assertFalse(getBody().getFirstChild().hasChildNodes());
         assertTrue(new InsertHTMLExecutable().execute(rta, "title 1"));
         assertEquals("<h1>title 1</h1>", clean(rta.getHTML()));
         assertEquals(H1, executable.getParameter(rta));

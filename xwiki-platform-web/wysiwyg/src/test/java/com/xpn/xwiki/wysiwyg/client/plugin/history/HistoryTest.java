@@ -25,6 +25,7 @@ import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.RedoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
+import com.xpn.xwiki.wysiwyg.client.plugin.text.exec.BoldExecutable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -47,6 +48,7 @@ public class HistoryTest extends AbstractRichTextAreaTest
         History history = new DefaultHistory(rta, 10);
         rta.getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(history));
         rta.getCommandManager().registerCommand(Command.REDO, new RedoExecutable(history));
+        rta.getCommandManager().registerCommand(Command.BOLD, new BoldExecutable());
     }
 
     /**

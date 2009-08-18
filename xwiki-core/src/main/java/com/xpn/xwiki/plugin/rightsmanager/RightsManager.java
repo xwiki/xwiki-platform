@@ -30,12 +30,14 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.DocumentDeleteEvent;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -44,6 +46,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.AllowDeny;
 import com.xpn.xwiki.plugin.rightsmanager.utils.LevelTree;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Hidden toolkit use by the plugin API that make all the plugin's actions.
@@ -51,7 +54,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
  * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2 (public since 1.4M1)
  */
-public final class RightsManager implements XWikiDocChangeNotificationInterface
+public final class RightsManager implements EventListener
 {
     /**
      * Name of the default space where users and groups are stored.
@@ -127,6 +130,17 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * Symbol use in HQL "like" command that means "all characters".
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
+
+    // ////////////////////////////////////////////////////////////////////////////
+
+    private static final String NAME = "rightsmanager";
+
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentDeleteEvent());
+        }
+    };
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -220,24 +234,47 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int, com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.observation.EventListener#getName()
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
+    public String getName()
     {
-        if (newdoc == null || newdoc.isNew()) {
-            String userOrGroupWiki = olddoc.getDatabase();
-            String userOrGroupSpace = olddoc.getSpace();
-            String userOrGroupName = olddoc.getName();
+        return NAME;
+    }
 
-            if (olddoc.getObject("XWiki.XWikiUsers") != null) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return EVENTS;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
+     */
+    public void onEvent(Event event, Object source, Object data)
+    {
+        // Only take into account local events
+        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
+            XWikiDocument document = ((XWikiDocument) source).getOriginalDocument();
+            XWikiContext context = (XWikiContext) data;
+
+            String userOrGroupWiki = document.getDatabase();
+            String userOrGroupSpace = document.getSpace();
+            String userOrGroupName = document.getName();
+
+            if (document.getObject("XWiki.XWikiUsers") != null) {
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
                 } catch (XWikiException e) {
                     LOG.warn("Error when cleaning for deleted user", e);
                 }
-            } else if (olddoc.getObject("XWiki.XWikiGroups") != null) {
+            } else if (document.getObject("XWiki.XWikiGroups") != null) {
                 try {
                     cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
                 } catch (XWikiException e) {
@@ -245,7 +282,6 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                 }
             }
         }
-
     }
 
     // Groups and users management

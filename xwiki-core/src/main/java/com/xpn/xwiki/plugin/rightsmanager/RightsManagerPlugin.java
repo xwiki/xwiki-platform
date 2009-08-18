@@ -20,13 +20,14 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
-import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.XWikiContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.observation.ObservationManager;
 
 /**
  * Entry point of the Rights Manager plugin.
@@ -47,11 +48,6 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
      * The logging tool.
      */
     protected static final Log LOG = LogFactory.getLog(RightsManagerPlugin.class);
-
-    /**
-     * Notification rule on document delete.
-     */
-    private DocChangeRule docChangeRule;
 
     // ////////////////////////////////////////////////////////////////////////////
 
@@ -75,11 +71,7 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
     @Override
     public void init(XWikiContext context)
     {
-        if (docChangeRule == null) {
-            docChangeRule = new DocChangeRule(RightsManager.getInstance());
-        }
-
-        context.getWiki().getNotificationManager().addGeneralRule(docChangeRule);
+        Utils.getComponent(ObservationManager.class).addListener(RightsManager.getInstance());
     }
 
     /**

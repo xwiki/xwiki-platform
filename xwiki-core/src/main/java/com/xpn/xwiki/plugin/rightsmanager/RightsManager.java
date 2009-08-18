@@ -133,8 +133,14 @@ public final class RightsManager implements EventListener
 
     // ////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * The name of the listener.
+     */
     private static final String NAME = "rightsmanager";
 
+    /**
+     * The events to match.
+     */
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {

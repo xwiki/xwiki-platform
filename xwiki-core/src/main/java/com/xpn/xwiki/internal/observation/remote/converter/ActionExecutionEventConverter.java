@@ -27,9 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.observation.event.DocumentDeleteEvent;
-import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -38,25 +36,24 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Convert all document event to remote events and back to local events.
+ * Convert and filter action events for the network.
  * <p>
- * It also make sure the context contains the proper information like the user or the wiki.
+ * Currently only "upload" action is send (for attachments modifications).
  * 
+ * @todo make the list of actions to send configurable
  * @version $Id$
- * @since 2.0M3
+ * @since 2.0RC1
  */
-@Component("document")
-public class DocumentEventConverter extends AbstractXWikiEventConverter
+@Component("action")
+public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
 {
     /**
      * The events supported by this converter.
      */
-    private Set<Class< ? extends Event>> events = new HashSet<Class< ? extends Event>>()
+    private Set<String> actions = new HashSet<String>()
     {
         {
-            add(DocumentDeleteEvent.class);
-            add(DocumentSaveEvent.class);
-            add(DocumentUpdateEvent.class);
+            add("upload");
         }
     };
 
@@ -68,20 +65,24 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
      */
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (this.events.contains(localEvent.getEvent())) {
-            HashMap<String, Serializable> remoteData = new HashMap<String, Serializable>();
+        if (localEvent.getEvent() instanceof ActionExecutionEvent) {
+            ActionExecutionEvent event = (ActionExecutionEvent) localEvent.getEvent();
 
-            // serialize document
-            serializeXWikiDocument((XWikiDocument) localEvent.getSource(), remoteData);
+            if (this.actions.contains(event.getActionName())) {
+                HashMap<String, Serializable> remoteData = new HashMap<String, Serializable>();
 
-            // save some context informations
-            serializeXWikiContext((XWikiContext) localEvent.getData(), remoteData);
+                // serialize document
+                serializeXWikiDocument((XWikiDocument) localEvent.getSource(), remoteData);
 
-            // fill the remote event
-            remoteEvent.setEvent((Serializable) localEvent.getEvent());
-            remoteEvent.setData(remoteData);
+                // save some context informations
+                serializeXWikiContext((XWikiContext) localEvent.getData(), remoteData);
 
-            return true;
+                // fill the remote event
+                remoteEvent.setEvent((Serializable) localEvent.getEvent());
+                remoteEvent.setData(remoteData);
+
+                return true;
+            }
         }
 
         return false;
@@ -95,7 +96,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
      */
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (this.events.contains(remoteEvent.getEvent())) {
+        if (remoteEvent.getEvent() instanceof ActionExecutionEvent) {
             Map<String, Serializable> remoteData = (Map<String, Serializable>) remoteEvent.getData();
 
             // set some context information

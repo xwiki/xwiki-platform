@@ -1276,7 +1276,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // originalDocument is null are rare (specifically when the XWikiDocument object is
             // manually constructed, and not obtained using the API).
             if (originalDocument == null) {
-                originalDocument = new XWikiDocument(doc.getSpace(), doc.getName());
+                originalDocument = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
             }
 
             // Notify listeners about the document change
@@ -1332,29 +1332,30 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public XWikiDocument getDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String server = null, database = null;
+        String database = context.getDatabase();
         try {
-            server = doc.getDatabase();
-
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
+            if (doc.getDatabase() != null) {
+                context.setDatabase(doc.getDatabase());
             }
 
             return getStore().loadXWikiDoc(doc, context);
         } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
+            context.setDatabase(database);
         }
     }
 
     public XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException
     {
         XWikiDocument newdoc;
+
+        String database = context.getDatabase();
         try {
+            if (doc.getDatabase() != null) {
+                context.setDatabase(doc.getDatabase());
+            }
+
             if ((revision == null) || revision.equals("")) {
-                newdoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                newdoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
             } else if (revision.equals(doc.getVersion())) {
                 newdoc = doc;
             } else {
@@ -1366,7 +1367,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             } else {
                 throw e;
             }
+        } finally {
+            context.setDatabase(database);
         }
+
         return newdoc;
     }
 
@@ -3946,7 +3950,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
-        getNotificationManager().preverify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
+        getNotificationManager().preverify(doc, new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName()),
             XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context, true);
@@ -3957,7 +3961,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             // This is the old notification mechanism. It is kept here because it is in a
             // deprecation stage. It will be removed later.
-            getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
+            getNotificationManager().verify(new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName()), doc,
                 XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
 
             // This is the new notification mechanism, implemented as a Component.
@@ -3967,7 +3971,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // doc.getOriginalDocument()
             ObservationManager om = Utils.getComponent(ObservationManager.class);
             if (om != null) {
-                XWikiDocument blankDoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                XWikiDocument blankDoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
                 blankDoc.setOriginalDocument(doc);
                 om.notify(new DocumentDeleteEvent(doc.getWikiName() + ":" + doc.getFullName()), blankDoc, context);
             }

@@ -20,6 +20,8 @@
  */
 package org.xwiki.observation.event;
 
+import java.io.Serializable;
+
 /**
  * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
  * specific event corresponds to only one {@link #actionName action type}.
@@ -27,8 +29,14 @@ package org.xwiki.observation.event;
  * @todo use the enumerated Action class when it's implemented...
  * @version $Id$
  */
-public class ActionExecutionEvent implements Event
+public class ActionExecutionEvent implements Event, Serializable
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
     /** The name of the executed action. */
     private String actionName;
 

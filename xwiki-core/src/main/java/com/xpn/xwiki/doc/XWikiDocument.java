@@ -106,7 +106,6 @@ import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -182,7 +181,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     private Date creationDate;
 
-    private Version version;
+    protected Version version;
 
     private long id = 0;
 
@@ -192,7 +191,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String template;
 
-    private String language;
+    protected String language;
 
     private String defaultLanguage;
 
@@ -384,7 +383,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setVersion(String version)
     {
-        if (version != null && !"".equals(version)) {
+        if (!StringUtils.isEmpty(version)) {
             this.version = new Version(version);
         }
     }
@@ -2141,15 +2140,6 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
         setContentDirty(true);
-    }
-
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
-    {
-        // Do nothing for the moment..
-        // A useful thing here would be to look at any instances of a Notification Object
-        // with email addresses and send an email to warn that the document has been modified..
-
     }
 
     /**

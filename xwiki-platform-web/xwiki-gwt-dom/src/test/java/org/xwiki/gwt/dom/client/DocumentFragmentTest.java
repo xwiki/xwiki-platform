@@ -31,12 +31,12 @@ public class DocumentFragmentTest extends AbstractDOMTest
      */
     public void testGetInnerHTML()
     {
-        DocumentFragment df = ((Document) Document.get()).createDocumentFragment();
+        DocumentFragment df = getDocument().createDocumentFragment();
 
-        Element element = Document.get().createDelElement().cast();
+        Element element = getDocument().createDelElement().cast();
         element.setInnerHTML("a<!--x-->b<em>c</em>d");
 
-        Text text = Document.get().createTextNode("#").cast();
+        Text text = getDocument().createTextNode("#").cast();
 
         df.appendChild(element);
         df.appendChild(text);
@@ -49,12 +49,12 @@ public class DocumentFragmentTest extends AbstractDOMTest
      */
     public void testGetInnerText()
     {
-        DocumentFragment df = ((Document) Document.get()).createDocumentFragment();
+        DocumentFragment df = getDocument().createDocumentFragment();
 
-        Element element = Document.get().createDelElement().cast();
+        Element element = getDocument().createDelElement().cast();
         element.setInnerHTML("d<!--c-->b<em>x</em>a");
 
-        Text text = Document.get().createTextNode("%").cast();
+        Text text = getDocument().createTextNode("%").cast();
 
         df.appendChild(element);
         df.appendChild(text);

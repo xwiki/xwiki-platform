@@ -44,10 +44,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testNextThrows()
     {
-        Document doc = Document.get().cast();
-        DivElement container = doc.createDivElement();
-        doc.getBody().appendChild(container);
-        Iterator<Node> it = doc.getIterator(doc);
+        Iterator<Node> it = getDocument().getIterator(getDocument());
         for (; it.hasNext();) {
             it.next();
         }
@@ -64,12 +61,8 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testRemoveNotImplemented()
     {
-        Document doc = Document.get().cast();
-
-        DivElement container = doc.createDivElement();
-        container.setInnerHTML("<strong>aa</strong><em>bb</em>");
-        doc.getBody().appendChild(container);
-        Iterator<Node> it = doc.getIterator(container);
+        getContainer().setInnerHTML("<strong>aa</strong><em>bb</em>");
+        Iterator<Node> it = getDocument().getIterator(getContainer());
         it.next();
         try {
             it.remove();
@@ -84,12 +77,11 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testDocumentElement()
     {
-        Document doc = Document.get().cast();
         List<Node> foundNodes = new ArrayList<Node>();
-        for (Iterator<Node> it = doc.getIterator(doc); it.hasNext();) {
+        for (Iterator<Node> it = getDocument().getIterator(getDocument()); it.hasNext();) {
             foundNodes.add(it.next());
         }
-        assertTrue(foundNodes.contains(doc.getBody()));
+        assertTrue(foundNodes.contains(getDocument().getBody()));
     }
 
     /**
@@ -97,16 +89,11 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testEmptyElement()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement container = doc.createDivElement();
-        doc.getBody().appendChild(container);
-
         // setup expected
         List<Node> expected = new ArrayList<Node>();
-        expected.add(container);
+        expected.add(getContainer());
 
-        assertSame(expected, doc.getIterator(container));
+        assertSame(expected, getDocument().getIterator(getContainer()));
     }
 
     /**
@@ -115,15 +102,14 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
     public void testEmptyText()
     {
         // setup document
-        Document doc = Document.get().cast();
-        Node text = doc.createTextNode("tim");
-        doc.getBody().appendChild(text);
+        Node text = getDocument().createTextNode("tim");
+        getContainer().appendChild(text);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(text);
 
-        assertSame(expected, doc.getIterator(text));
+        assertSame(expected, getDocument().getIterator(text));
     }
 
     /**
@@ -132,16 +118,14 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
     public void testCommentAsRoot()
     {
         // setup document
-        Document doc = Document.get().cast();
-        Node commentNode = doc.createComment("xwikirox");
-
-        doc.getBody().appendChild(commentNode);
+        Node commentNode = getDocument().createComment("xwikirox");
+        getContainer().appendChild(commentNode);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
         expected.add(commentNode);
 
-        assertSame(expected, doc.getIterator(commentNode));
+        assertSame(expected, getDocument().getIterator(commentNode));
     }
 
     /**
@@ -149,20 +133,14 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testOnlyTextChildren()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        Node startContainer = doc.createDivElement();
-        Node oneText = doc.createTextNode("one");
-        Node twoText = doc.createTextNode("two");
-        Node threeText = doc.createTextNode("three");
+        Node startContainer = getDocument().createDivElement();
+        Node oneText = getDocument().createTextNode("one");
+        Node twoText = getDocument().createTextNode("two");
+        Node threeText = getDocument().createTextNode("three");
         startContainer.appendChild(oneText);
         startContainer.appendChild(twoText);
         startContainer.appendChild(threeText);
-        emptyContainer.appendChild(startContainer);
+        getContainer().appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
@@ -171,7 +149,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
         expected.add(twoText);
         expected.add(threeText);
 
-        assertSame(expected, doc.getIterator(startContainer));
+        assertSame(expected, getDocument().getIterator(startContainer));
     }
 
     /**
@@ -179,20 +157,14 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testElementChildren()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        Node startContainer = doc.createDivElement();
-        Node johnText = doc.createTextNode("john");
-        Node doeText = doc.createTextNode("doe");
-        DivElement cargo = doc.createDivElement();
+        Node startContainer = getDocument().createDivElement();
+        Node johnText = getDocument().createTextNode("john");
+        Node doeText = getDocument().createTextNode("doe");
+        DivElement cargo = getDocument().createDivElement();
         startContainer.appendChild(johnText);
         startContainer.appendChild(cargo);
         startContainer.appendChild(doeText);
-        emptyContainer.appendChild(startContainer);
+        getContainer().appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
@@ -201,7 +173,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
         expected.add(cargo);
         expected.add(doeText);
 
-        assertSame(expected, doc.getIterator(startContainer));
+        assertSame(expected, getDocument().getIterator(startContainer));
     }
 
     /**
@@ -209,22 +181,16 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testElementSubtreeRight()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        Node startContainer = doc.createDivElement();
-        Node fooText = doc.createTextNode("foo");
-        Node barText = doc.createTextNode("bar");
-        Node far = doc.createComment("far");
-        DivElement cargo = doc.createDivElement();
+        Node startContainer = getDocument().createDivElement();
+        Node fooText = getDocument().createTextNode("foo");
+        Node barText = getDocument().createTextNode("bar");
+        Node far = getDocument().createComment("far");
+        DivElement cargo = getDocument().createDivElement();
         startContainer.appendChild(fooText);
         startContainer.appendChild(cargo);
         cargo.appendChild(barText);
         cargo.appendChild(far);
-        emptyContainer.appendChild(startContainer);
+        getContainer().appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
@@ -234,7 +200,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
         expected.add(barText);
         expected.add(far);
 
-        assertSame(expected, doc.getIterator(startContainer));
+        assertSame(expected, getDocument().getIterator(startContainer));
     }
 
     /**
@@ -242,22 +208,16 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testElementSubtreeLeft()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        Node startContainer = doc.createDivElement();
-        Node xText = doc.createTextNode("xw");
-        Node wikiText = doc.createTextNode("ikio");
-        Node us = doc.createComment("us");
-        DivElement cargo = doc.createDivElement();
+        Node startContainer = getDocument().createDivElement();
+        Node xText = getDocument().createTextNode("xw");
+        Node wikiText = getDocument().createTextNode("ikio");
+        Node us = getDocument().createComment("us");
+        DivElement cargo = getDocument().createDivElement();
         startContainer.appendChild(cargo);
         cargo.appendChild(wikiText);
         cargo.appendChild(us);
         startContainer.appendChild(xText);
-        emptyContainer.appendChild(startContainer);
+        getContainer().appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
@@ -267,7 +227,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
         expected.add(us);
         expected.add(xText);
 
-        assertSame(expected, doc.getIterator(startContainer));
+        assertSame(expected, getDocument().getIterator(startContainer));
     }
 
     /**
@@ -275,22 +235,16 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testElementSubtreeMiddle()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        Node startContainer = doc.createDivElement();
-        Node aliceText = doc.createTextNode("alice");
-        Node bobText = doc.createTextNode("bob");
-        Node come = doc.createComment("come");
-        DivElement cargo = doc.createDivElement();
+        Node startContainer = getDocument().createDivElement();
+        Node aliceText = getDocument().createTextNode("alice");
+        Node bobText = getDocument().createTextNode("bob");
+        Node come = getDocument().createComment("come");
+        DivElement cargo = getDocument().createDivElement();
         startContainer.appendChild(come);
         startContainer.appendChild(cargo);
         cargo.appendChild(bobText);
         startContainer.appendChild(aliceText);
-        emptyContainer.appendChild(startContainer);
+        getContainer().appendChild(startContainer);
 
         // setup expected
         List<Node> expected = new ArrayList<Node>();
@@ -300,7 +254,7 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
         expected.add(bobText);
         expected.add(aliceText);
 
-        assertSame(expected, doc.getIterator(startContainer));
+        assertSame(expected, getDocument().getIterator(startContainer));
     }
 
     /**
@@ -308,40 +262,34 @@ public class DepthFirstPreOrderIteratorTest extends AbstractDOMTest
      */
     public void testWikiLinkSubtree()
     {
-        // setup document
-        Document doc = Document.get().cast();
-        DivElement emptyContainer = doc.createDivElement();
-        doc.getBody().appendChild(emptyContainer);
-
-        // do setup in the empty container
-        Node startContainer = doc.createDivElement();
-        Node preambleText = doc.createTextNode("our");
+        Node startContainer = getDocument().createDivElement();
+        Node preambleText = getDocument().createTextNode("our");
         startContainer.appendChild(preambleText);
-        Node startWikiLinkComment = doc.createComment("startwikilink:Ref.erence");
+        Node startWikiLinkComment = getDocument().createComment("startwikilink:Ref.erence");
         startContainer.appendChild(startWikiLinkComment);
-        SpanElement wrappingSpan = doc.createSpanElement();
+        SpanElement wrappingSpan = getDocument().createSpanElement();
         startContainer.appendChild(wrappingSpan);
-        AnchorElement anchor = doc.createAnchorElement();
+        AnchorElement anchor = getDocument().createAnchorElement();
         wrappingSpan.appendChild(anchor);
-        Node labelPreamble = doc.createTextNode("x");
+        Node labelPreamble = getDocument().createTextNode("x");
         anchor.appendChild(labelPreamble);
-        Element boldWiki = doc.createElement("strong");
+        Element boldWiki = getDocument().createElement("strong");
         anchor.appendChild(boldWiki);
-        Node labelBoldWiki = doc.createTextNode("wiki");
+        Node labelBoldWiki = getDocument().createTextNode("wiki");
         boldWiki.appendChild(labelBoldWiki);
-        Node stopWikiLinkComment = doc.createComment("stopwikilink");
+        Node stopWikiLinkComment = getDocument().createComment("stopwikilink");
         startContainer.appendChild(stopWikiLinkComment);
-        Node endText = doc.createTextNode("rox");
+        Node endText = getDocument().createTextNode("rox");
         startContainer.appendChild(endText);
 
-        emptyContainer.appendChild(startContainer);
+        getContainer().appendChild(startContainer);
 
         // setup expected
         List<Node> expected =
             Arrays.asList(new Node[] {startContainer, preambleText, startWikiLinkComment, wrappingSpan, anchor,
                 labelPreamble, boldWiki, labelBoldWiki, stopWikiLinkComment, endText});
 
-        assertSame(expected, doc.getIterator(startContainer));
+        assertSame(expected, getDocument().getIterator(startContainer));
     }
 
     /**

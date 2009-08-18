@@ -50,6 +50,7 @@ public class DOMTestSuite extends GWTTestSuite
         suite.addTestSuite(ElementTest.class);
         suite.addTestSuite(TextTest.class);
         suite.addTestSuite(RangeTest.class);
+        suite.addTestSuite(SelectionTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
         suite.addTestSuite(IESelectionTest.class);

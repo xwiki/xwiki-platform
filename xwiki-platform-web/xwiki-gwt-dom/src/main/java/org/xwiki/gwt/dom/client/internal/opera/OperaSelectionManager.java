@@ -17,42 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.dom.client;
+package org.xwiki.gwt.dom.client.internal.opera;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.dom.client.SelectionManager;
+import org.xwiki.gwt.dom.client.internal.mozilla.NativeSelection;
 
 /**
- * Unit tests for {@link Document}.
+ * Implements {@link SelectionManager} for Firefox prior to version 3.0.
  * 
  * @version $Id$
  */
-public class DocumentTest extends AbstractDOMTest
+public class OperaSelectionManager implements SelectionManager
 {
     /**
-     * Unit test for {@link Document#fireInnerHTMLChange(Element)}.
+     * {@inheritDoc}
+     * 
+     * @see SelectionManager#getSelection(Document)
      */
-    public void testFireInnerHTMLChange()
+    public Selection getSelection(Document document)
     {
-        final List<Element> elements = new ArrayList<Element>();
-        InnerHTMLListener listener = new InnerHTMLListener()
-        {
-            public void onInnerHTMLChange(Element element)
-            {
-                elements.add(element);
-            }
-        };
-
-        Element element = getDocument().createDivElement().cast();
-        element.xSetInnerHTML("1");
-
-        getDocument().addInnerHTMLListener(listener);
-        element.xSetInnerHTML("2");
-
-        getDocument().removeInnerHTMLListener(listener);
-        element.xSetInnerHTML("3");
-
-        assertEquals(1, elements.size());
-        assertEquals(element, elements.get(0));
+        return new OperaSelection(NativeSelection.getInstance(document));
     }
 }

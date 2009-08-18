@@ -33,11 +33,6 @@ import com.google.gwt.dom.client.SpanElement;
 public class DOMUtilsTest extends AbstractDOMTest
 {
     /**
-     * The DOM element in which we run the tests.
-     */
-    private Element container;
-
-    /**
      * The collection of DOM utility methods being tested.
      */
     private DOMUtils domUtils;
@@ -54,21 +49,6 @@ public class DOMUtilsTest extends AbstractDOMTest
         if (domUtils == null) {
             domUtils = DOMUtils.getInstance();
         }
-
-        container = ((Document) Document.get()).xCreateDivElement().cast();
-        Document.get().getBody().appendChild(container);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractDOMTest#gwtTearDown()
-     */
-    protected void gwtTearDown() throws Exception
-    {
-        super.gwtTearDown();
-
-        container.getParentNode().removeChild(container);
     }
 
     /**
@@ -76,11 +56,11 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetTextRange()
     {
-        container.setInnerHTML("x<a href=\"http://www.xwiki.org\"><strong>a</strong>b<em>cd</em></a>y");
+        getContainer().setInnerHTML("x<a href=\"http://www.xwiki.org\"><strong>a</strong>b<em>cd</em></a>y");
 
-        Range range = ((Document) container.getOwnerDocument()).createRange();
-        range.setStart(container, 1);
-        range.setEnd(container, 2);
+        Range range = getDocument().createRange();
+        range.setStart(getContainer(), 1);
+        range.setEnd(getContainer(), 2);
 
         Range textRange = domUtils.getTextRange(range);
 
@@ -98,11 +78,11 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetTextRangeFromARangeEndingInAComment()
     {
-        container.setInnerHTML("a<!--xy-->");
+        getContainer().setInnerHTML("a<!--xy-->");
 
-        Range range = ((Document) container.getOwnerDocument()).createRange();
-        range.setStart(container.getFirstChild(), container.getFirstChild().getNodeValue().length());
-        range.setEnd(container.getLastChild(), container.getLastChild().getNodeValue().length());
+        Range range = getDocument().createRange();
+        range.setStart(getContainer().getFirstChild(), getContainer().getFirstChild().getNodeValue().length());
+        range.setEnd(getContainer().getLastChild(), getContainer().getLastChild().getNodeValue().length());
 
         Range textRange = domUtils.getTextRange(range);
 
@@ -120,9 +100,10 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetFirstAncestor()
     {
-        container.setInnerHTML("<div>our<!--startwikilink:Reference--><span class=\"wikilink\">"
-            + "<a>x<strong>wiki</strong></a></span><!--stopwikilink-->rox</div>");
-        Node wrappingSpan = container.getFirstChild().getChildNodes().getItem(2);
+        getContainer().setInnerHTML(
+            "<div>our<!--startwikilink:Reference--><span class=\"wikilink\">"
+                + "<a>x<strong>wiki</strong></a></span><!--stopwikilink-->rox</div>");
+        Node wrappingSpan = getContainer().getFirstChild().getChildNodes().getItem(2);
         Node anchor = wrappingSpan.getFirstChild();
         Node boldWiki = anchor.getChildNodes().getItem(1);
         Node labelBoldWiki = boldWiki.getFirstChild();
@@ -142,8 +123,8 @@ public class DOMUtilsTest extends AbstractDOMTest
         assertSame("The anchor is not an anhor ancestor of itself", anchor, domUtils.getFirstAncestor(anchor,
             anchorTagName));
         // check div ancestor search stops at startContainer
-        assertSame("Div ancestor search for the anchor does not stop at first div", container.getFirstChild(), DOMUtils
-            .getInstance().getFirstAncestor(anchor, container.getTagName()));
+        assertSame("Div ancestor search for the anchor does not stop at first div", getContainer().getFirstChild(),
+            DOMUtils.getInstance().getFirstAncestor(anchor, getContainer().getTagName()));
         // check that the anchor is the first ancestor with tag name a or span of the text inside the strong element
         assertSame("Anchor or span ancestor search does not stop at first anchor", anchor, domUtils.getFirstAncestor(
             labelBoldWiki, anchorTagName, spanTagName));
@@ -163,16 +144,17 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetFirstDescendant()
     {
-        container.setInnerHTML("<div>my<!--startwikilink:Reference--><span class=\"wikilink\">"
-            + "<a>x<span>wiki</span></a></span><!--stopwikilink-->rules</div>");
-        Node wrappingSpan = container.getFirstChild().getChildNodes().getItem(2);
+        getContainer().setInnerHTML(
+            "<div>my<!--startwikilink:Reference--><span class=\"wikilink\">"
+                + "<a>x<span>wiki</span></a></span><!--stopwikilink-->rules</div>");
+        Node wrappingSpan = getContainer().getFirstChild().getChildNodes().getItem(2);
         Node anchor = wrappingSpan.getFirstChild();
-        Node preambleText = container.getFirstChild().getFirstChild();
+        Node preambleText = getContainer().getFirstChild().getFirstChild();
         String anchorTagName = anchor.getNodeName();
 
         // check anchor shows up as descendant of startContainer
         assertSame("Anchor does not show up as descendant of startContainer", anchor, domUtils.getFirstDescendant(
-            container.getFirstChild(), anchorTagName));
+            getContainer().getFirstChild(), anchorTagName));
         // check anchor shows up as descendant of itself
         assertSame("Anchor does not show up as descendant of itself", anchor, domUtils.getFirstDescendant(anchor,
             anchorTagName));
@@ -181,7 +163,7 @@ public class DOMUtilsTest extends AbstractDOMTest
             "strong"));
         // check the first span descendant stops at the wrapping span
         assertSame("The first span descendant does not stop at the wrapping span", wrappingSpan, domUtils
-            .getFirstDescendant(container, wrappingSpan.getNodeName()));
+            .getFirstDescendant(getContainer(), wrappingSpan.getNodeName()));
         // check there is no anchor descendant of a text
         assertNull("There is an anchor descendant of a text", domUtils.getFirstDescendant(preambleText, anchorTagName));
     }
@@ -191,14 +173,14 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetAncestors()
     {
-        container.setInnerHTML("<em>x</em>");
+        getContainer().setInnerHTML("<em>x</em>");
         List<Node> ancestors = new ArrayList<Node>();
-        ancestors.add(container.getFirstChild().getFirstChild());
-        ancestors.add(container.getFirstChild());
-        ancestors.add(container);
-        ancestors.add(container.getOwnerDocument().getBody());
-        ancestors.add(((Document) container.getOwnerDocument()).getDocumentElement());
-        ancestors.add(container.getOwnerDocument());
+        ancestors.add(getContainer().getFirstChild().getFirstChild());
+        ancestors.add(getContainer().getFirstChild());
+        ancestors.add(getContainer());
+        ancestors.add(getDocument().getBody());
+        ancestors.add(getDocument().getDocumentElement());
+        ancestors.add(getDocument());
         assertEquals(ancestors, domUtils.getAncestors(ancestors.get(0)));
     }
 
@@ -207,9 +189,9 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNearestCommonAncestor()
     {
-        container.setInnerHTML("<em>x</em>y<del>z</del>");
-        assertEquals(container, domUtils.getNearestCommonAncestor(container.getFirstChild().getFirstChild(), container
-            .getLastChild().getFirstChild()));
+        getContainer().setInnerHTML("<em>x</em>y<del>z</del>");
+        assertEquals(getContainer(), domUtils.getNearestCommonAncestor(getContainer().getFirstChild().getFirstChild(),
+            getContainer().getLastChild().getFirstChild()));
     }
 
     /**
@@ -217,16 +199,16 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testCloneNodeContents()
     {
-        container.setInnerHTML("xwiki<span><em>$</em><ins>#</ins></span>");
+        getContainer().setInnerHTML("xwiki<span><em>$</em><ins>#</ins></span>");
 
-        DocumentFragment contents = domUtils.cloneNodeContents(container.getFirstChild(), 0, 2);
+        DocumentFragment contents = domUtils.cloneNodeContents(getContainer().getFirstChild(), 0, 2);
         assertEquals(1, contents.getChildNodes().getLength());
         assertEquals("xw", contents.getInnerHTML());
 
-        contents = domUtils.cloneNodeContents(container.getFirstChild(), 5, 5);
+        contents = domUtils.cloneNodeContents(getContainer().getFirstChild(), 5, 5);
         assertEquals(0, contents.getChildNodes().getLength());
 
-        contents = domUtils.cloneNodeContents(container.getLastChild(), 0, 2);
+        contents = domUtils.cloneNodeContents(getContainer().getLastChild(), 0, 2);
         assertEquals(2, contents.getChildNodes().getLength());
         assertEquals("<em>$</em><ins>#</ins>", contents.getInnerHTML().toLowerCase());
     }
@@ -236,14 +218,14 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testCloneNodeBetweenOffsets()
     {
-        container.setInnerHTML("toucan<span><em>+</em><ins>-</ins></span>");
-        assertEquals("an", domUtils.cloneNode(container.getFirstChild(), 4, 6).getNodeValue());
-        assertEquals("", domUtils.cloneNode(container.getFirstChild(), 0, 0).getNodeValue());
+        getContainer().setInnerHTML("toucan<span><em>+</em><ins>-</ins></span>");
+        assertEquals("an", domUtils.cloneNode(getContainer().getFirstChild(), 4, 6).getNodeValue());
+        assertEquals("", domUtils.cloneNode(getContainer().getFirstChild(), 0, 0).getNodeValue());
 
-        Element clone = domUtils.cloneNode(container.getLastChild(), 1, 2).cast();
+        Element clone = domUtils.cloneNode(getContainer().getLastChild(), 1, 2).cast();
         assertEquals("<ins>-</ins>", clone.getInnerHTML().toLowerCase());
 
-        clone = domUtils.cloneNode(container.getLastChild(), 0, 0).cast();
+        clone = domUtils.cloneNode(getContainer().getLastChild(), 0, 0).cast();
         assertEquals("<span></span>", clone.getString().toLowerCase());
     }
 
@@ -252,10 +234,10 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetLength()
     {
-        container.setInnerHTML("xwiki<strong></strong><ins>x<del>y</del>z</ins>");
-        assertEquals(5, domUtils.getLength(container.getFirstChild()));
-        assertEquals(0, domUtils.getLength(container.getChildNodes().getItem(1)));
-        assertEquals(3, domUtils.getLength(container.getLastChild()));
+        getContainer().setInnerHTML("xwiki<strong></strong><ins>x<del>y</del>z</ins>");
+        assertEquals(5, domUtils.getLength(getContainer().getFirstChild()));
+        assertEquals(0, domUtils.getLength(getContainer().getChildNodes().getItem(1)));
+        assertEquals(3, domUtils.getLength(getContainer().getLastChild()));
     }
 
     /**
@@ -263,14 +245,15 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testCloneNodeLeftRight()
     {
-        container.setInnerHTML("abc");
-        assertEquals("ab", domUtils.cloneNode(container.getFirstChild(), 2, true).getNodeValue());
-        assertEquals("c", domUtils.cloneNode(container.getFirstChild(), 2, false).getNodeValue());
+        getContainer().setInnerHTML("abc");
+        assertEquals("ab", domUtils.cloneNode(getContainer().getFirstChild(), 2, true).getNodeValue());
+        assertEquals("c", domUtils.cloneNode(getContainer().getFirstChild(), 2, false).getNodeValue());
 
-        container.setInnerHTML("a<!--x--><em>b</em>");
+        getContainer().setInnerHTML("a<!--x--><em>b</em>");
 
-        assertEquals("a<!--x-->", ((Element) domUtils.cloneNode(container, 2, true)).getInnerHTML().toLowerCase());
-        assertEquals("<em>b</em>", ((Element) domUtils.cloneNode(container, 2, false)).getInnerHTML().toLowerCase());
+        assertEquals("a<!--x-->", ((Element) domUtils.cloneNode(getContainer(), 2, true)).getInnerHTML().toLowerCase());
+        assertEquals("<em>b</em>", ((Element) domUtils.cloneNode(getContainer(), 2, false)).getInnerHTML()
+            .toLowerCase());
     }
 
     /**
@@ -278,15 +261,16 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testCloneNodeUpwards()
     {
-        container.setInnerHTML("<em><ins>abc<del>d</del></ins></em>e");
+        getContainer().setInnerHTML("<em><ins>abc<del>d</del></ins></em>e");
 
         Element clone =
-            domUtils.cloneNode(container.getParentNode(), container.getFirstChild().getFirstChild().getFirstChild(), 2,
-                false).cast();
+            domUtils.cloneNode(getContainer().getParentNode(),
+                getContainer().getFirstChild().getFirstChild().getFirstChild(), 2, false).cast();
         assertEquals("<em><ins>c<del>d</del></ins></em>e", clone.getInnerHTML().toLowerCase());
 
         clone =
-            domUtils.cloneNode(container.getParentNode(), container.getFirstChild().getFirstChild(), 1, true).cast();
+            domUtils.cloneNode(getContainer().getParentNode(), getContainer().getFirstChild().getFirstChild(), 1, true)
+                .cast();
         assertEquals("<em><ins>abc</ins></em>", clone.getInnerHTML().toLowerCase());
     }
 
@@ -295,10 +279,10 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetChild()
     {
-        container.setInnerHTML("%<strong>@<em>^</em></strong>");
-        assertEquals(container.getFirstChild(), domUtils.getChild(container, container.getFirstChild()));
-        assertEquals(container.getLastChild(), domUtils.getChild(container, container.getLastChild().getLastChild()
-            .getFirstChild()));
+        getContainer().setInnerHTML("%<strong>@<em>^</em></strong>");
+        assertEquals(getContainer().getFirstChild(), domUtils.getChild(getContainer(), getContainer().getFirstChild()));
+        assertEquals(getContainer().getLastChild(), domUtils.getChild(getContainer(), getContainer().getLastChild()
+            .getLastChild().getFirstChild()));
     }
 
     /**
@@ -306,13 +290,13 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testDeleteNodeContentsBetweenOffsets()
     {
-        container.setInnerHTML("foo");
-        domUtils.deleteNodeContents(container.getFirstChild(), 1, 2);
-        assertEquals("fo", container.getInnerHTML());
+        getContainer().setInnerHTML("foo");
+        domUtils.deleteNodeContents(getContainer().getFirstChild(), 1, 2);
+        assertEquals("fo", getContainer().getInnerHTML());
 
-        container.setInnerHTML("<em>1</em>2<!--3-->");
-        domUtils.deleteNodeContents(container, 1, 2);
-        assertEquals("<em>1</em><!--3-->", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<em>1</em>2<!--3-->");
+        domUtils.deleteNodeContents(getContainer(), 1, 2);
+        assertEquals("<em>1</em><!--3-->", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -320,17 +304,17 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testDeleteNodeContentsLeftRight()
     {
-        container.setInnerHTML("foo<del></del>bar");
-        domUtils.deleteNodeContents(container.getFirstChild(), 2, true);
-        assertEquals("o<del></del>bar", container.getInnerHTML().toLowerCase());
-        domUtils.deleteNodeContents(container.getLastChild(), 0, false);
-        assertEquals("o<del></del>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("foo<del></del>bar");
+        domUtils.deleteNodeContents(getContainer().getFirstChild(), 2, true);
+        assertEquals("o<del></del>bar", getContainer().getInnerHTML().toLowerCase());
+        domUtils.deleteNodeContents(getContainer().getLastChild(), 0, false);
+        assertEquals("o<del></del>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<ins>1</ins><!--2-->3");
-        domUtils.deleteNodeContents(container, 1, true);
-        assertEquals("<!--2-->3", container.getInnerHTML());
-        domUtils.deleteNodeContents(container, 1, false);
-        assertEquals("<!--2-->", container.getInnerHTML());
+        getContainer().setInnerHTML("<ins>1</ins><!--2-->3");
+        domUtils.deleteNodeContents(getContainer(), 1, true);
+        assertEquals("<!--2-->3", getContainer().getInnerHTML());
+        domUtils.deleteNodeContents(getContainer(), 1, false);
+        assertEquals("<!--2-->", getContainer().getInnerHTML());
     }
 
     /**
@@ -338,11 +322,11 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testDeleteSiblings()
     {
-        container.setInnerHTML("1<strong>2</strong><!--3-->");
-        domUtils.deleteSiblings(container.getFirstChild(), true);
-        assertEquals(3, container.getChildNodes().getLength());
-        domUtils.deleteSiblings(container.getFirstChild(), false);
-        assertEquals("1", container.getInnerHTML());
+        getContainer().setInnerHTML("1<strong>2</strong><!--3-->");
+        domUtils.deleteSiblings(getContainer().getFirstChild(), true);
+        assertEquals(3, getContainer().getChildNodes().getLength());
+        domUtils.deleteSiblings(getContainer().getFirstChild(), false);
+        assertEquals("1", getContainer().getInnerHTML());
     }
 
     /**
@@ -350,15 +334,15 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testDeleteNodeContentsUpwards()
     {
-        container.setInnerHTML("<span>x<em>y<!--z--><del>wiki</del></em></span>");
-        domUtils.deleteNodeContents(container, container.getFirstChild().getChildNodes().getItem(1).getChildNodes()
-            .getItem(2).getFirstChild(), 2, true);
-        assertEquals("<span><em><del>ki</del></em></span>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<span>x<em>y<!--z--><del>wiki</del></em></span>");
+        domUtils.deleteNodeContents(getContainer(), getContainer().getFirstChild().getChildNodes().getItem(1)
+            .getChildNodes().getItem(2).getFirstChild(), 2, true);
+        assertEquals("<span><em><del>ki</del></em></span>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<span><em><del>wiki</del><!--z-->y</em>x</span>");
-        domUtils.deleteNodeContents(container, container.getFirstChild().getFirstChild().getFirstChild()
+        getContainer().setInnerHTML("<span><em><del>wiki</del><!--z-->y</em>x</span>");
+        domUtils.deleteNodeContents(getContainer(), getContainer().getFirstChild().getFirstChild().getFirstChild()
             .getFirstChild(), 1, false);
-        assertEquals("<span><em><del>w</del></em></span>", container.getInnerHTML().toLowerCase());
+        assertEquals("<span><em><del>w</del></em></span>", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -366,17 +350,17 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testSplitNodeAtOffset()
     {
-        container.setInnerHTML("xwiki");
-        Node rightNode = domUtils.splitNode(container.getFirstChild(), 3);
-        assertEquals(container.getLastChild(), rightNode);
-        assertEquals(2, container.getChildNodes().getLength());
-        assertEquals("xwi", container.getFirstChild().getNodeValue());
-        assertEquals("ki", container.getLastChild().getNodeValue());
+        getContainer().setInnerHTML("xwiki");
+        Node rightNode = domUtils.splitNode(getContainer().getFirstChild(), 3);
+        assertEquals(getContainer().getLastChild(), rightNode);
+        assertEquals(2, getContainer().getChildNodes().getLength());
+        assertEquals("xwi", getContainer().getFirstChild().getNodeValue());
+        assertEquals("ki", getContainer().getLastChild().getNodeValue());
 
-        container.setInnerHTML("q<span><!--x--><em>w</em>e</span>rty");
-        rightNode = domUtils.splitNode(container.getChildNodes().getItem(1), 0);
+        getContainer().setInnerHTML("q<span><!--x--><em>w</em>e</span>rty");
+        rightNode = domUtils.splitNode(getContainer().getChildNodes().getItem(1), 0);
         assertEquals("<span><!--x--><em>w</em>e</span>", Element.as(rightNode).getString().toLowerCase());
-        assertEquals("q<span></span><span><!--x--><em>w</em>e</span>rty", container.getInnerHTML().toLowerCase());
+        assertEquals("q<span></span><span><!--x--><em>w</em>e</span>rty", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -384,13 +368,13 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testSplitNodeUpwards()
     {
-        container.setInnerHTML("u<del>v<strong><ins><!--x-->y</ins>z</strong><em>a</em></del>b");
+        getContainer().setInnerHTML("u<del>v<strong><ins><!--x-->y</ins>z</strong><em>a</em></del>b");
         Node rightNode =
-            domUtils.splitNode(container, container.getChildNodes().getItem(1).getChildNodes().getItem(1)
+            domUtils.splitNode(getContainer(), getContainer().getChildNodes().getItem(1).getChildNodes().getItem(1)
                 .getFirstChild(), 1);
         assertEquals("<ins>y</ins>", Element.as(rightNode).getString().toLowerCase());
         assertEquals("u<del>v<strong><ins><!--x--></ins></strong></del>"
-            + "<del><strong><ins>y</ins>z</strong><em>a</em></del>b", container.getInnerHTML().toLowerCase());
+            + "<del><strong><ins>y</ins>z</strong><em>a</em></del>b", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -401,12 +385,12 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testSplitNodeUpwardsAtTheBeginningOfAParagraph()
     {
-        container.setInnerHTML("<p>test</p>");
-        Node rightNode = domUtils.splitNode(container, container.getFirstChild().getFirstChild(), 0);
+        getContainer().setInnerHTML("<p>test</p>");
+        Node rightNode = domUtils.splitNode(getContainer(), getContainer().getFirstChild().getFirstChild(), 0);
         assertEquals("test", rightNode.getNodeValue());
         // I think it's normal to have the empty paragraph. We just have to make sure it is editable.
-        assertEquals("<p></p><p>test</p>", container.getInnerHTML().toLowerCase().replaceAll("[\r\n\t]+", ""));
-        assertEquals(1, container.getFirstChild().getChildNodes().getLength());
+        assertEquals("<p></p><p>test</p>", getContainer().getInnerHTML().toLowerCase().replaceAll("[\r\n\t]+", ""));
+        assertEquals(1, getContainer().getFirstChild().getChildNodes().getLength());
     }
 
     /**
@@ -414,11 +398,11 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testIsFlowContainer()
     {
-        container.setInnerHTML("<ul><li>foo</li></ul>");
-        assertTrue(domUtils.isFlowContainer(container));
-        assertFalse(domUtils.isFlowContainer(container.getFirstChild()));
-        assertTrue(domUtils.isFlowContainer(container.getFirstChild().getFirstChild()));
-        assertFalse(domUtils.isFlowContainer(container.getFirstChild().getFirstChild().getFirstChild()));
+        getContainer().setInnerHTML("<ul><li>foo</li></ul>");
+        assertTrue(domUtils.isFlowContainer(getContainer()));
+        assertFalse(domUtils.isFlowContainer(getContainer().getFirstChild()));
+        assertTrue(domUtils.isFlowContainer(getContainer().getFirstChild().getFirstChild()));
+        assertFalse(domUtils.isFlowContainer(getContainer().getFirstChild().getFirstChild().getFirstChild()));
     }
 
     /**
@@ -426,8 +410,9 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNearestFlowContainer()
     {
-        container.setInnerHTML("x<del>y</del>z");
-        assertEquals(container, domUtils.getNearestFlowContainer(container.getChildNodes().getItem(1).getFirstChild()));
+        getContainer().setInnerHTML("x<del>y</del>z");
+        assertEquals(getContainer(), domUtils.getNearestFlowContainer(getContainer().getChildNodes().getItem(1)
+            .getFirstChild()));
     }
 
     /**
@@ -435,19 +420,19 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testInsertAt()
     {
-        container.xSetInnerHTML("<!--x-->y<em>z</em>");
+        getContainer().xSetInnerHTML("<!--x-->y<em>z</em>");
 
-        Text text = container.getOwnerDocument().createTextNode(":").cast();
-        domUtils.insertAt(container, text, container.getChildNodes().getLength());
-        assertEquals("<!--x-->y<em>z</em>:", container.getInnerHTML().toLowerCase());
+        Text text = getDocument().createTextNode(":").cast();
+        domUtils.insertAt(getContainer(), text, getContainer().getChildNodes().getLength());
+        assertEquals("<!--x-->y<em>z</em>:", getContainer().getInnerHTML().toLowerCase());
 
-        text = container.getOwnerDocument().createTextNode("{").cast();
-        domUtils.insertAt(container, text, 0);
-        assertEquals("{<!--x-->y<em>z</em>:", container.getInnerHTML().toLowerCase());
+        text = getDocument().createTextNode("{").cast();
+        domUtils.insertAt(getContainer(), text, 0);
+        assertEquals("{<!--x-->y<em>z</em>:", getContainer().getInnerHTML().toLowerCase());
 
-        text = container.getOwnerDocument().createTextNode("}").cast();
-        domUtils.insertAt(container, text, 2);
-        assertEquals("{<!--x-->}y<em>z</em>:", container.getInnerHTML().toLowerCase());
+        text = getDocument().createTextNode("}").cast();
+        domUtils.insertAt(getContainer(), text, 2);
+        assertEquals("{<!--x-->}y<em>z</em>:", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -455,13 +440,13 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetFarthestInlineAncestor()
     {
-        container.xSetInnerHTML("#<em>$</em>#");
+        getContainer().xSetInnerHTML("#<em>$</em>#");
 
-        assertEquals(container.getChildNodes().getItem(1), domUtils.getFarthestInlineAncestor(container.getChildNodes()
-            .getItem(1).getFirstChild()));
-        assertEquals(container.getChildNodes().getItem(1), domUtils.getFarthestInlineAncestor(container.getChildNodes()
-            .getItem(1)));
-        assertNull(domUtils.getFarthestInlineAncestor(container));
+        assertEquals(getContainer().getChildNodes().getItem(1), domUtils.getFarthestInlineAncestor(getContainer()
+            .getChildNodes().getItem(1).getFirstChild()));
+        assertEquals(getContainer().getChildNodes().getItem(1), domUtils.getFarthestInlineAncestor(getContainer()
+            .getChildNodes().getItem(1)));
+        assertNull(domUtils.getFarthestInlineAncestor(getContainer()));
     }
 
     /**
@@ -469,27 +454,27 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetRangeFirstAndLastLeaf()
     {
-        container.xSetInnerHTML("ab<em>c</em><del><strong>d</strong></del><ins>e</ins>f");
-        Range range = ((Document) container.getOwnerDocument()).createRange();
+        getContainer().xSetInnerHTML("ab<em>c</em><del><strong>d</strong></del><ins>e</ins>f");
+        Range range = getDocument().createRange();
 
-        range.setStart(container.getFirstChild(), 1);
+        range.setStart(getContainer().getFirstChild(), 1);
         range.collapse(true);
-        assertEquals(container.getFirstChild(), domUtils.getFirstLeaf(range));
-        assertEquals(container.getFirstChild(), domUtils.getLastLeaf(range));
+        assertEquals(getContainer().getFirstChild(), domUtils.getFirstLeaf(range));
+        assertEquals(getContainer().getFirstChild(), domUtils.getLastLeaf(range));
 
-        range.setEnd(container.getFirstChild(), 2);
-        assertEquals(container.getFirstChild(), domUtils.getFirstLeaf(range));
-        assertEquals(container.getFirstChild(), domUtils.getLastLeaf(range));
+        range.setEnd(getContainer().getFirstChild(), 2);
+        assertEquals(getContainer().getFirstChild(), domUtils.getFirstLeaf(range));
+        assertEquals(getContainer().getFirstChild(), domUtils.getLastLeaf(range));
 
-        range.setEnd(container.getLastChild(), 1);
-        assertEquals(container.getFirstChild(), domUtils.getFirstLeaf(range));
-        assertEquals(container.getLastChild(), domUtils.getLastLeaf(range));
+        range.setEnd(getContainer().getLastChild(), 1);
+        assertEquals(getContainer().getFirstChild(), domUtils.getFirstLeaf(range));
+        assertEquals(getContainer().getLastChild(), domUtils.getLastLeaf(range));
 
-        range.setStart(container.getChildNodes().getItem(1), 1);
-        range.setEnd(container.getChildNodes().getItem(3), 0);
+        range.setStart(getContainer().getChildNodes().getItem(1), 1);
+        range.setEnd(getContainer().getChildNodes().getItem(3), 0);
         Node lastLeaf = domUtils.getLastLeaf(range);
         assertEquals(lastLeaf, domUtils.getFirstLeaf(range));
-        assertEquals(container.getChildNodes().getItem(2).getFirstChild().getFirstChild(), lastLeaf);
+        assertEquals(getContainer().getChildNodes().getItem(2).getFirstChild().getFirstChild(), lastLeaf);
 
         range.collapse(true);
         assertNull(domUtils.getFirstLeaf(range));
@@ -501,10 +486,10 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testDetach()
     {
-        container.setInnerHTML("1<span>2</span>3");
-        Node node = container.getChildNodes().getItem(1);
+        getContainer().setInnerHTML("1<span>2</span>3");
+        Node node = getContainer().getChildNodes().getItem(1);
         domUtils.detach(node);
-        assertEquals("13", container.getInnerHTML());
+        assertEquals("13", getContainer().getInnerHTML());
         // IE fails because orphan nodes that have been created with the innerHTML property are attached to a document
         // fragment.
         assertNull(node.getParentNode());
@@ -538,23 +523,23 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNormalizedNodeIndex()
     {
-        container.appendChild(Document.get().createTextNode("void"));
-        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getFirstChild()));
+        getContainer().appendChild(getDocument().createTextNode("void"));
+        assertEquals(0, domUtils.getNormalizedNodeIndex(getContainer().getFirstChild()));
 
-        container.getFirstChild().setNodeValue("");
-        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getFirstChild()));
+        getContainer().getFirstChild().setNodeValue("");
+        assertEquals(0, domUtils.getNormalizedNodeIndex(getContainer().getFirstChild()));
 
-        container.appendChild(Document.get().createSpanElement());
-        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getLastChild()));
+        getContainer().appendChild(getDocument().createSpanElement());
+        assertEquals(0, domUtils.getNormalizedNodeIndex(getContainer().getLastChild()));
 
-        container.getFirstChild().setNodeValue("null");
-        assertEquals(1, domUtils.getNormalizedNodeIndex(container.getLastChild()));
+        getContainer().getFirstChild().setNodeValue("null");
+        assertEquals(1, domUtils.getNormalizedNodeIndex(getContainer().getLastChild()));
 
-        container.appendChild(Document.get().createTextNode("int"));
-        assertEquals(2, domUtils.getNormalizedNodeIndex(container.getLastChild()));
+        getContainer().appendChild(getDocument().createTextNode("int"));
+        assertEquals(2, domUtils.getNormalizedNodeIndex(getContainer().getLastChild()));
 
-        Element.as(container.getChildNodes().getItem(1)).setAttribute(Element.META_DATA_ATTR, "");
-        assertEquals(0, domUtils.getNormalizedNodeIndex(container.getLastChild()));
+        Element.as(getContainer().getChildNodes().getItem(1)).setAttribute(Element.META_DATA_ATTR, "");
+        assertEquals(0, domUtils.getNormalizedNodeIndex(getContainer().getLastChild()));
     }
 
     /**
@@ -562,22 +547,22 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNormalizedChildCount()
     {
-        assertEquals(0, domUtils.getNormalizedChildCount(container));
+        assertEquals(0, domUtils.getNormalizedChildCount(getContainer()));
 
-        container.appendChild(Document.get().createTextNode(""));
-        assertEquals(0, domUtils.getNormalizedChildCount(container));
+        getContainer().appendChild(getDocument().createTextNode(""));
+        assertEquals(0, domUtils.getNormalizedChildCount(getContainer()));
 
-        container.getFirstChild().setNodeValue("double");
-        assertEquals(1, domUtils.getNormalizedChildCount(container));
+        getContainer().getFirstChild().setNodeValue("double");
+        assertEquals(1, domUtils.getNormalizedChildCount(getContainer()));
 
-        container.appendChild(Document.get().createSpanElement());
-        assertEquals(2, domUtils.getNormalizedChildCount(container));
+        getContainer().appendChild(getDocument().createSpanElement());
+        assertEquals(2, domUtils.getNormalizedChildCount(getContainer()));
 
-        Element.as(container.getLastChild()).setAttribute(Element.META_DATA_ATTR, "");
-        assertEquals(1, domUtils.getNormalizedChildCount(container));
+        Element.as(getContainer().getLastChild()).setAttribute(Element.META_DATA_ATTR, "");
+        assertEquals(1, domUtils.getNormalizedChildCount(getContainer()));
 
-        container.getFirstChild().setNodeValue("");
-        assertEquals(0, domUtils.getNormalizedChildCount(container));
+        getContainer().getFirstChild().setNodeValue("");
+        assertEquals(0, domUtils.getNormalizedChildCount(getContainer()));
     }
 
     /**
@@ -586,8 +571,8 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNextLeafRangeAroundEmptyElement()
     {
-        container.setInnerHTML("our<span>xwiki<strong></strong></span><br />");
-        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        getContainer().setInnerHTML("our<span>xwiki<strong></strong></span><br />");
+        SpanElement wrappingSpan = (SpanElement) getContainer().getChildNodes().getItem(1);
 
         Range range = null;
         Node textElement = wrappingSpan.getFirstChild();
@@ -595,26 +580,26 @@ public class DOMUtilsTest extends AbstractDOMTest
         Element brElement = (Element) wrappingSpan.getNextSibling();
 
         // test that the empty strong element is found as next leaf of a selection xw|ik|i
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(textElement, 2);
         range.setEnd(textElement, 4);
         assertEquals(strongEmptyElement, domUtils.getNextLeaf(range));
 
         // test that the empty strong element is found as next leaf of a selection placed in the wrapping span at
         // position 1
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(wrappingSpan, 1);
         range.setEnd(wrappingSpan, 1);
         assertEquals(strongEmptyElement, domUtils.getNextLeaf(range));
 
         // test that the br element is found as next leaf of a selection placed at the end of the wrapping span
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(wrappingSpan, 2);
         range.setEnd(wrappingSpan, 2);
         assertEquals(brElement, domUtils.getNextLeaf(range));
 
         // test that the br element is found as next leaf of a selection that ends inside the strong empty element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(textElement, 4);
         range.setEnd(strongEmptyElement, 0);
         assertEquals(brElement, domUtils.getNextLeaf(range));
@@ -626,8 +611,8 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNextLeafRangeWhenSelectionIsInLastChild()
     {
-        container.setInnerHTML("our<span>xwiki<strong>a</strong></span><br />");
-        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        getContainer().setInnerHTML("our<span>xwiki<strong>a</strong></span><br />");
+        SpanElement wrappingSpan = (SpanElement) getContainer().getChildNodes().getItem(1);
         Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
         Node insideTextNode = strongElement.getFirstChild();
         Element brElement = (Element) wrappingSpan.getNextSibling();
@@ -635,7 +620,7 @@ public class DOMUtilsTest extends AbstractDOMTest
         Range range = null;
 
         // test the br element is found as next leaf of a selection placed on the text inside the strong element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(insideTextNode, 0);
         range.setEnd(insideTextNode, 1);
         assertEquals(brElement, domUtils.getNextLeaf(range));
@@ -647,31 +632,31 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetNextLeafRangeWhenSelectionIsBeforeTextNode()
     {
-        container.setInnerHTML("our<span>xwiki<strong>r</strong>ox</span>");
-        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        getContainer().setInnerHTML("our<span>xwiki<strong>r</strong>ox</span>");
+        SpanElement wrappingSpan = (SpanElement) getContainer().getChildNodes().getItem(1);
         Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
         Node insideTextNode = strongElement.getFirstChild();
         Node oxText = wrappingSpan.getChildNodes().getItem(2);
-        Node ourText = container.getFirstChild();
+        Node ourText = getContainer().getFirstChild();
         Node xwikiText = wrappingSpan.getFirstChild();
 
         Range range = null;
 
         // test the "ox" text is found as next leaf of a selection placed on the text inside the strong element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(insideTextNode, 0);
         range.setEnd(insideTextNode, 1);
         assertEquals(oxText, domUtils.getNextLeaf(range));
 
         // test that "ox" text is found as next leaf of a non-collapsed selection starting in the our text and ending
         // inside the strong element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(ourText, 1);
         range.setEnd(insideTextNode, 1);
         assertEquals(oxText, domUtils.getNextLeaf(range));
 
         // test that the xwiki text is found as next leaf of a selection placed in the "our" text
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(ourText, 1);
         range.setEnd(ourText, 2);
         assertEquals(xwikiText, domUtils.getNextLeaf(range));
@@ -683,8 +668,8 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetPreviousLeafRangeAroundEmptyElement()
     {
-        container.setInnerHTML("<br /><span><strong></strong>our</span>xwiki");
-        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        getContainer().setInnerHTML("<br /><span><strong></strong>our</span>xwiki");
+        SpanElement wrappingSpan = (SpanElement) getContainer().getChildNodes().getItem(1);
 
         Range range = null;
         Node ourText = wrappingSpan.getChildNodes().getItem(1);
@@ -692,27 +677,27 @@ public class DOMUtilsTest extends AbstractDOMTest
         Element brElement = (Element) wrappingSpan.getPreviousSibling();
 
         // test that the empty strong element is found as previous leaf of a selection o|ur|
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(ourText, 1);
         range.setEnd(ourText, 3);
         assertEquals(strongEmptyElement, domUtils.getPreviousLeaf(range));
 
         // test that the empty strong element is found as previous leaf of a selection placed in the wrapping span at
         // position 1
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(wrappingSpan, 1);
         range.setEnd(wrappingSpan, 1);
         assertEquals(strongEmptyElement, domUtils.getPreviousLeaf(range));
 
         // test that the br element is found as previous leaf of a selection placed at the beginning of the wrapping
         // span
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(wrappingSpan, 0);
         range.setEnd(wrappingSpan, 0);
         assertEquals(brElement, domUtils.getPreviousLeaf(range));
 
         // test that the br element is found as previous leaf of a selection that begins inside the strong empty element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(strongEmptyElement, 0);
         range.setEnd(ourText, 2);
         assertEquals(brElement, domUtils.getPreviousLeaf(range));
@@ -724,8 +709,8 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetPreviousLeafRangeWhenSelectionIsInFirstChild()
     {
-        container.setInnerHTML("<br /><span><strong>a</strong>our</span>xwiki");
-        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(1);
+        getContainer().setInnerHTML("<br /><span><strong>a</strong>our</span>xwiki");
+        SpanElement wrappingSpan = (SpanElement) getContainer().getChildNodes().getItem(1);
         Element strongElement = (Element) wrappingSpan.getFirstChild();
         Node insideTextNode = strongElement.getFirstChild();
         Element brElement = (Element) wrappingSpan.getPreviousSibling();
@@ -733,7 +718,7 @@ public class DOMUtilsTest extends AbstractDOMTest
         Range range = null;
 
         // test the br element is found as next leaf of a selection placed on the text inside the strong element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(insideTextNode, 0);
         range.setEnd(insideTextNode, 1);
         assertEquals(brElement, domUtils.getPreviousLeaf(range));
@@ -745,8 +730,8 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetPreviousLeafRangeWhenSelectionIsAfterTextNode()
     {
-        container.setInnerHTML("<span>our<strong>x</strong>wiki</span>rox");
-        SpanElement wrappingSpan = (SpanElement) container.getChildNodes().getItem(0);
+        getContainer().setInnerHTML("<span>our<strong>x</strong>wiki</span>rox");
+        SpanElement wrappingSpan = (SpanElement) getContainer().getChildNodes().getItem(0);
         Element strongElement = (Element) wrappingSpan.getChildNodes().getItem(1);
         Node insideTextNode = strongElement.getFirstChild();
         Node roxText = wrappingSpan.getNextSibling();
@@ -756,19 +741,19 @@ public class DOMUtilsTest extends AbstractDOMTest
         Range range = null;
 
         // test the "our" text is found as previous leaf of a selection placed on the text inside the strong element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(insideTextNode, 0);
         range.setEnd(insideTextNode, 1);
         assertEquals(ourText, domUtils.getPreviousLeaf(range));
 
         // test that "our" text is found as next leaf of a non-collapsed selection starting inside the strong element
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(insideTextNode, 0);
         range.setEnd(wikiText, 2);
         assertEquals(ourText, domUtils.getPreviousLeaf(range));
 
         // test that the wiki text is found as previous leaf of a selection placed "rox" text
-        range = ((Document) container.getOwnerDocument()).createRange();
+        range = getDocument().createRange();
         range.setStart(roxText, 1);
         range.setEnd(roxText, 2);
         assertEquals(wikiText, domUtils.getPreviousLeaf(range));
@@ -782,29 +767,29 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testSplitHTMLNode()
     {
-        container.setInnerHTML("<p><em>a</em>b</p>");
-        domUtils.splitHTMLNode(container, container.getFirstChild().getFirstChild().getFirstChild(), 0);
-        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<p><em>a</em>b</p>");
+        domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getFirstChild().getFirstChild(), 0);
+        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<p><em>b</em>a</p>");
-        domUtils.splitHTMLNode(container, container.getFirstChild().getFirstChild().getFirstChild(), 1);
-        assertEquals("<p><em>b</em></p><p><em></em>a</p>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<p><em>b</em>a</p>");
+        domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getFirstChild().getFirstChild(), 1);
+        assertEquals("<p><em>b</em></p><p><em></em>a</p>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<p><em>x</em>y</p>");
-        domUtils.splitHTMLNode(container, container.getFirstChild().getLastChild(), 1);
-        assertEquals("<p><em>x</em>y</p><p><br></p>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<p><em>x</em>y</p>");
+        domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getLastChild(), 1);
+        assertEquals("<p><em>x</em>y</p><p><br></p>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<p><em>y</em>x</p>");
-        domUtils.splitHTMLNode(container, container.getFirstChild().getLastChild(), 0);
-        assertEquals("<p><em>y</em></p><p>x</p>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<p><em>y</em>x</p>");
+        domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getLastChild(), 0);
+        assertEquals("<p><em>y</em></p><p>x</p>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<p><em>1</em>2</p>");
-        domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 0);
-        assertEquals("<p><em></em><em>1</em>2</p>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<p><em>1</em>2</p>");
+        domUtils.splitHTMLNode(getContainer().getFirstChild(), getContainer().getFirstChild().getFirstChild(), 0);
+        assertEquals("<p><em></em><em>1</em>2</p>", getContainer().getInnerHTML().toLowerCase());
 
-        container.setInnerHTML("<p><em>2</em>1</p>");
-        domUtils.splitHTMLNode(container.getFirstChild(), container.getFirstChild().getFirstChild(), 1);
-        assertEquals("<p><em>2</em><em></em>1</p>", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("<p><em>2</em>1</p>");
+        domUtils.splitHTMLNode(getContainer().getFirstChild(), getContainer().getFirstChild().getFirstChild(), 1);
+        assertEquals("<p><em>2</em><em></em>1</p>", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -812,25 +797,25 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetRangeNextNode()
     {
-        Range range = ((Document) container.getOwnerDocument()).createRange();
+        Range range = getDocument().createRange();
 
-        container.setInnerHTML("<del>deleted</del>");
-        range.setStart(container, 0);
+        getContainer().setInnerHTML("<del>deleted</del>");
+        range.setStart(getContainer(), 0);
         range.collapse(true);
-        assertEquals(container.getFirstChild(), domUtils.getNextNode(range));
+        assertEquals(getContainer().getFirstChild(), domUtils.getNextNode(range));
 
-        range.selectNode(container);
-        container.setInnerHTML("<em><ins></ins></em><del>deleted</del>");
-        range.selectNodeContents(container.getFirstChild().getFirstChild());
-        assertEquals(container.getLastChild(), domUtils.getNextNode(range));
+        range.selectNode(getContainer());
+        getContainer().setInnerHTML("<em><ins></ins></em><del>deleted</del>");
+        range.selectNodeContents(getContainer().getFirstChild().getFirstChild());
+        assertEquals(getContainer().getLastChild(), domUtils.getNextNode(range));
 
-        range.selectNode(container);
-        container.setInnerHTML("<strong>x</strong>y");
-        range.setStart(container.getFirstChild(), 1);
+        range.selectNode(getContainer());
+        getContainer().setInnerHTML("<strong>x</strong>y");
+        range.setStart(getContainer().getFirstChild(), 1);
         range.collapse(true);
-        assertEquals(container.getLastChild(), domUtils.getNextNode(range));
+        assertEquals(getContainer().getLastChild(), domUtils.getNextNode(range));
 
-        Element element = (Element) container.cloneNode(false);
+        Element element = (Element) getContainer().cloneNode(false);
         element.setInnerHTML(":)");
         range.setStart(element.getFirstChild(), 1);
         range.collapse(true);
@@ -842,25 +827,25 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testGetRangePreviousNode()
     {
-        Range range = ((Document) container.getOwnerDocument()).createRange();
+        Range range = getDocument().createRange();
 
-        container.setInnerHTML("<ins>inserted</ins>");
-        range.setStart(container, 1);
+        getContainer().setInnerHTML("<ins>inserted</ins>");
+        range.setStart(getContainer(), 1);
         range.collapse(true);
-        assertEquals(container.getLastChild(), domUtils.getPreviousNode(range));
+        assertEquals(getContainer().getLastChild(), domUtils.getPreviousNode(range));
 
-        range.selectNode(container);
-        container.setInnerHTML("<del>deleted</del><em><ins></ins></em>");
-        range.selectNodeContents(container.getLastChild().getFirstChild());
-        assertEquals(container.getFirstChild(), domUtils.getPreviousNode(range));
+        range.selectNode(getContainer());
+        getContainer().setInnerHTML("<del>deleted</del><em><ins></ins></em>");
+        range.selectNodeContents(getContainer().getLastChild().getFirstChild());
+        assertEquals(getContainer().getFirstChild(), domUtils.getPreviousNode(range));
 
-        range.selectNode(container);
-        container.setInnerHTML("x<strong>y</strong>");
-        range.setStart(container.getLastChild(), 0);
+        range.selectNode(getContainer());
+        getContainer().setInnerHTML("x<strong>y</strong>");
+        range.setStart(getContainer().getLastChild(), 0);
         range.collapse(true);
-        assertEquals(container.getFirstChild(), domUtils.getPreviousNode(range));
+        assertEquals(getContainer().getFirstChild(), domUtils.getPreviousNode(range));
 
-        Element element = (Element) container.cloneNode(false);
+        Element element = (Element) getContainer().cloneNode(false);
         element.setInnerHTML(":(");
         range.setStart(element.getFirstChild(), 1);
         range.collapse(true);
@@ -872,13 +857,13 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testIsOrContainsLineBreak()
     {
-        container.setInnerHTML("a<strong></strong><del>x</del><br/><span><br/></span><em><ins><br/></ins></em>");
+        getContainer().setInnerHTML("a<strong></strong><del>x</del><br/><span><br/></span><em><ins><br/></ins></em>");
         assertFalse(domUtils.isOrContainsLineBreak(null));
-        assertFalse(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(0)));
-        assertFalse(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(1)));
-        assertFalse(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(2)));
-        assertTrue(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(3)));
-        assertTrue(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(4)));
-        assertTrue(domUtils.isOrContainsLineBreak(container.getChildNodes().getItem(5)));
+        assertFalse(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(0)));
+        assertFalse(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(1)));
+        assertFalse(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(2)));
+        assertTrue(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(3)));
+        assertTrue(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(4)));
+        assertTrue(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(5)));
     }
 }

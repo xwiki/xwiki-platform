@@ -59,6 +59,11 @@
     <when-property-is name="user.agent" value="ie6"/>
   </replace-with>
 
+  <replace-with class="org.xwiki.gwt.dom.client.internal.opera.OperaSelectionManager">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
+    <when-property-is name="user.agent" value="opera"/>
+  </replace-with>
+
   <!-- DOMUtils -->
   <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils"/>

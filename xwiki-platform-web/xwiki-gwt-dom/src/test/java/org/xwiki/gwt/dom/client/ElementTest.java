@@ -56,7 +56,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testXGetStringWithoutMetaData()
     {
-        Element element = Document.get().createDivElement().cast();
+        Element element = getDocument().createDivElement().cast();
         element.setInnerHTML("a<!--x--><em r=\"s\"><br/><!--y-->b<del>c</del></em>");
         element.setAttribute("q", "p");
         assertEquals("<div q=\"p\">a<!--x--><em r=\"s\"><br><!--y-->b<del>c</del></em></div>", element.xGetString()
@@ -68,7 +68,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testXGetStringWithMetaData()
     {
-        Element container = Document.get().createDivElement().cast();
+        Element container = getDocument().createDivElement().cast();
         container.xSetInnerHTML("<!--p--><span i=\"j\">" + Element.INNER_HTML_PLACEHOLDER + "</span><!--q-->");
         DocumentFragment metaData = container.extractContents();
 
@@ -87,10 +87,9 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testXGetInnerHTMLWithHTMLSpecialChars()
     {
-        Element element = Document.get().createDivElement().cast();
-        element.appendChild(Document.get().createTextNode("<\"'>&"));
-        element.appendChild(Document.get().createBRElement());
-        assertEquals("&lt;\"'&gt;&amp;<br>", element.xGetInnerHTML().toLowerCase());
+        getContainer().appendChild(getDocument().createTextNode("<\"'>&"));
+        getContainer().appendChild(getDocument().createBRElement());
+        assertEquals("&lt;\"'&gt;&amp;<br>", getContainer().xGetInnerHTML().toLowerCase());
     }
 
     /**
@@ -100,9 +99,8 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testXGetInnerTextWithCommentedText()
     {
-        Element element = Document.get().createDivElement().cast();
-        element.setInnerHTML("x<!--y-->z");
-        assertEquals("xz", element.xGetInnerText());
+        getContainer().setInnerHTML("x<!--y-->z");
+        assertEquals("xz", getContainer().xGetInnerText());
     }
 
     /**
@@ -111,17 +109,16 @@ public class ElementTest extends AbstractDOMTest
     public void testXSetInnerHTMLWithComments()
     {
         String html = "<!--x--><span>y</span><!--z-->";
-        Element element = Document.get().createDivElement().cast();
+        Element element = getDocument().createDivElement().cast();
         element.xSetInnerHTML(html);
         assertEquals(html, element.getInnerHTML().toLowerCase());
 
         DocumentFragment contents = element.extractContents();
         assertEquals(html, contents.getInnerHTML().toLowerCase());
 
-        Element container = Document.get().createDivElement().cast();
-        container.setInnerHTML("ab<em>c</em><ins></ins>ij");
-        DOMUtils.getInstance().insertAt(container, contents, 2);
-        assertEquals("ab<em>c</em>" + html + "<ins></ins>ij", container.getInnerHTML().toLowerCase());
+        getContainer().setInnerHTML("ab<em>c</em><ins></ins>ij");
+        DOMUtils.getInstance().insertAt(getContainer(), contents, 2);
+        assertEquals("ab<em>c</em>" + html + "<ins></ins>ij", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -131,7 +128,7 @@ public class ElementTest extends AbstractDOMTest
     public void testXGetStringOnBlockLevelElements()
     {
         String html = "<h1>header</h1><p>paragraph</p><ul><li>list</li></ul>";
-        Element element = Document.get().createDivElement().cast();
+        Element element = getDocument().createDivElement().cast();
         element.xSetInnerHTML(html);
         assertEquals("<div>" + html + "</div>", element.xGetString().toLowerCase());
     }
@@ -141,10 +138,9 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testXGetStringPreservesWhiteSpacesInCommentNodes()
     {
-        Document document = (Document) Document.get();
-        Element element = document.createDivElement().cast();
+        Element element = getDocument().createDivElement().cast();
         String text = "\na \n b\t\n\tc";
-        element.appendChild(document.createComment(text));
+        element.appendChild(getDocument().createComment(text));
         assertEquals("<div><!--" + text + "--></div>", element.xGetString().toLowerCase());
     }
 
@@ -153,7 +149,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testGetAttributeNames()
     {
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
         String customAttribute = "x";
         element.setAttribute(customAttribute, "y");
         element.setTitle("z");
@@ -180,7 +176,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testGetAttributeNamesExcludesProperties()
     {
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
         assertEquals(0, element.getAttributeNames().length());
 
         String propertyFunc = "xx";
@@ -198,7 +194,7 @@ public class ElementTest extends AbstractDOMTest
     {
         String className = "listItem-selected";
 
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
         assertFalse(element.hasClassName(className));
 
         element.setClassName(className);
@@ -218,7 +214,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testAddClassName()
     {
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
         element.addClassName("macro-selected");
         element.addClassName("macro");
         element.addClassName("macro ");
@@ -231,7 +227,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testRemoveClassName()
     {
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
         element.removeClassName("color");
         assertEquals("", element.getClassName());
 
@@ -250,7 +246,7 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testHasAttribute()
     {
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
 
         assertFalse(element.hasAttribute(CLASS_ATTRIBUTE));
         assertFalse(element.hasAttribute(STYLE_ATTRIBUTE));
@@ -281,12 +277,14 @@ public class ElementTest extends AbstractDOMTest
      */
     public void testXSetAttribute()
     {
-        Element element = Document.get().createSpanElement().cast();
+        Element element = getDocument().createSpanElement().cast();
 
         testXSetXGetAttribute(element, TITLE_ATTRIBUTE, "123");
         testXSetXGetAttribute(element, ID_ATTRIBUTE, "qwe");
         testXSetXGetAttribute(element, CLASS_ATTRIBUTE, "def");
-        testXSetXGetAttribute(element, STYLE_ATTRIBUTE, "font-weight: bold;");
+
+        element.xSetAttribute(STYLE_ATTRIBUTE, "font-weight: bold;");
+        assertEquals("font-weight: bold", element.xGetAttribute(STYLE_ATTRIBUTE).toLowerCase().replace(";", ""));
     }
 
     /**

@@ -20,31 +20,30 @@
 package org.xwiki.gwt.dom.client;
 
 /**
- * Unit tests for {@link Text}.
+ * Unit tests for {@link Selection}.
  * 
  * @version $Id$
  */
-public class TextTest extends AbstractDOMTest
+public class SelectionTest extends AbstractDOMTest
 {
     /**
-     * Unit test for {@link Text#getOffset()}.
+     * This test is mainly for Opera browser which reports a wrong range when the selection ends before an image.
      */
-    public void testGetOffset()
+    public void testEndSelectionBeforeImage()
     {
-        getContainer().setInnerHTML("abc");
-        assertEquals(0, Text.as(getContainer().getFirstChild()).getOffset());
+        getContainer().setInnerHTML("ab<em>cd</em>ef<ins>gh<img/></ins>ij");
 
-        getContainer().appendChild(getDocument().createTextNode(""));
-        assertEquals(getContainer().getFirstChild().getNodeValue().length(), Text.as(getContainer().getLastChild())
-            .getOffset());
+        Range range = getDocument().createRange();
+        range.setStart(getContainer().getChildNodes().getItem(1).getFirstChild(), 1);
+        range.setEndAfter(getContainer().getChildNodes().getItem(3).getFirstChild());
 
-        Element element = getDocument().createSpanElement().cast();
-        getContainer().appendChild(element);
-        getContainer().appendChild(Document.get().createTextNode("xyz"));
-        assertEquals(0, Text.as(getContainer().getLastChild()).getOffset());
+        Selection selection = getDocument().getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        assertEquals("defgh", selection.toString());
 
-        element.setAttribute(Element.META_DATA_ATTR, "");
-        assertEquals(getContainer().getFirstChild().getNodeValue().length(), Text.as(getContainer().getLastChild())
-            .getOffset());
+        range = selection.getRangeAt(0);
+        assertTrue(DOMUtils.getInstance().comparePoints(range.getEndContainer(), range.getEndOffset(),
+            getContainer().getChildNodes().getItem(3), 1) <= 0);
     }
 }

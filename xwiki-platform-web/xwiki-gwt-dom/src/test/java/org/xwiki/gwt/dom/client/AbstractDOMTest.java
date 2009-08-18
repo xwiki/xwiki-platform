@@ -30,6 +30,58 @@ import com.google.gwt.junit.client.GWTTestCase;
 public abstract class AbstractDOMTest extends GWTTestCase
 {
     /**
+     * The document in which we run the tests.
+     */
+    private Document document;
+
+    /**
+     * The DOM element in which we run the tests.
+     */
+    private Element container;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractDOMTest#gwtSetUp()
+     */
+    protected void gwtSetUp() throws Exception
+    {
+        super.gwtSetUp();
+
+        document = Document.get().cast();
+        container = document.xCreateDivElement().cast();
+        document.getBody().appendChild(container);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractDOMTest#gwtTearDown()
+     */
+    protected void gwtTearDown() throws Exception
+    {
+        super.gwtTearDown();
+
+        container.getParentNode().removeChild(container);
+    }
+
+    /**
+     * @return the document in which we run the tests
+     */
+    protected Document getDocument()
+    {
+        return document;
+    }
+
+    /**
+     * @return the DOM element in which we run the tests
+     */
+    protected Element getContainer()
+    {
+        return container;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see GWTTestCase#getModuleName()

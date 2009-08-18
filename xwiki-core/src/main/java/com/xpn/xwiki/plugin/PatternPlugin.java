@@ -21,24 +21,28 @@
 
 package com.xpn.xwiki.plugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.DocObjectChangedRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
-public class PatternPlugin extends XWikiDefaultPlugin implements
-    XWikiDocChangeNotificationInterface
+public class PatternPlugin extends XWikiDefaultPlugin implements EventListener
 {
     Vector<String> patterns = new Vector<String>();
 
@@ -48,16 +52,26 @@ public class PatternPlugin extends XWikiDefaultPlugin implements
 
     WikiSubstitution patternListSubstitution;
 
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentSaveEvent("xwiki:Plugins.PatternPlugin"));
+            add(new DocumentUpdateEvent("xwiki:Plugins.PatternPlugin"));
+        }
+    };
+
     public PatternPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
 
         // register for any modifications of the Plugins.PatternPlugin document..
-        XWiki xwiki = context.getWiki();
-        xwiki.getNotificationManager().addNamedRule("Plugins.PatternPlugin",
-            new DocObjectChangedRule(this, "Plugins.PatternPlugin"));
+        Utils.getComponent(ObservationManager.class).addListener(this);
+    }
 
+    public List<Event> getEvents()
+    {
+        return EVENTS;
     }
 
     public void init(XWikiContext context)
@@ -76,8 +90,7 @@ public class PatternPlugin extends XWikiDefaultPlugin implements
                     }
                     patterns.add(((StringProperty) obj.get("pattern")).getValue().toString());
                     results.add(((StringProperty) obj.get("result")).getValue().toString());
-                    descriptions.add(((StringProperty) obj.get("description")).getValue()
-                        .toString());
+                    descriptions.add(((StringProperty) obj.get("description")).getValue().toString());
                 }
             }
         } catch (Exception e) {
@@ -105,9 +118,9 @@ public class PatternPlugin extends XWikiDefaultPlugin implements
         list.append("<td><strong>Result</strong></td><td><strong>Description</strong></td></tr>");
         for (int i = 0; i < patterns.size(); i++) {
             list.append("<tr><td>");
-            list.append(filter.process((String) patterns.get(i)));
+            list.append(filter.process(patterns.get(i)));
             list.append("</td><td>");
-            list.append(filter.process((String) results.get(i)));
+            list.append(filter.process(results.get(i)));
             list.append("</td><td>");
             list.append(descriptions.get(i));
             list.append("</td></tr>");
@@ -161,10 +174,15 @@ public class PatternPlugin extends XWikiDefaultPlugin implements
         return line;
     }
 
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
-        int event, XWikiContext context)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
+     */
+    public void onEvent(Event event, Object source, Object data)
     {
         // If the PatternPlugin document has been modified we need to reload the patterns
-        init(context);
+        init((XWikiContext) data);
     }
 }

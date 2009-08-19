@@ -302,9 +302,11 @@ span.edit_section {
   color: #888;
 }
 
-.code {
+.code, .code * {
 	font-family: courier, courier new, monospace;
 	white-space: pre;
+}
+.code {
 	margin: 1em 0;
 	padding: 0 1px;
 	overflow: auto;

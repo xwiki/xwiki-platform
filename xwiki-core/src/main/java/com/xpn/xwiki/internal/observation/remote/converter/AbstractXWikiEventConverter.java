@@ -21,6 +21,8 @@
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentName;
@@ -60,65 +62,93 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     @Requirement
     private Execution execution;
 
-    protected void serializeXWikiContext(XWikiContext context, Map<String, Serializable> remoteData)
+    /**
+     * @param context the XWiki context to serialize
+     * @return the serialized version of the context
+     */
+    protected Serializable serializeXWikiContext(XWikiContext context)
     {
-        remoteData.put(CONTEXT_WIKI, context.getDatabase());
-        remoteData.put(CONTEXT_USER, context.getUser());
+        HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
+
+        remoteDataMap.put(CONTEXT_WIKI, context.getDatabase());
+        remoteDataMap.put(CONTEXT_USER, context.getUser());
+
+        return remoteDataMap;
     }
 
-    protected XWikiContext unserializeXWikiContext(Map<String, Serializable> remoteData)
+    /**
+     * @param remoteData the serialized version of the context
+     * @return the XWiki context
+     */
+    protected XWikiContext unserializeXWikiContext(Serializable remoteData)
     {
+        Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
+
         XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-        context.setDatabase((String) remoteData.get(CONTEXT_WIKI));
-        context.setUser((String) remoteData.get(CONTEXT_USER));
+        context.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
+        context.setUser((String) remoteDataMap.get(CONTEXT_USER));
 
         return context;
     }
 
-    protected void serializeXWikiDocument(XWikiDocument document, Map<String, Serializable> remoteData)
+    /**
+     * @param document the document to serialize
+     * @return the serialized version of the document
+     */
+    protected Serializable serializeXWikiDocument(XWikiDocument document)
     {
-        remoteData.put(DOC_NAME, new DocumentName(document.getWikiName(), document.getSpaceName(),
+        HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
+
+        remoteDataMap.put(DOC_NAME, new DocumentName(document.getWikiName(), document.getSpaceName(),
             document.getPageName()));
 
         if (!document.isNew()) {
-            remoteData.put(DOC_VERSION, document.getVersion());
-            remoteData.put(DOC_LANGUAGE, document.getLanguage());
+            remoteDataMap.put(DOC_VERSION, document.getVersion());
+            remoteDataMap.put(DOC_LANGUAGE, document.getLanguage());
         }
 
         XWikiDocument originalDocument = document.getOriginalDocument();
 
         if (!originalDocument.isNew()) {
-            remoteData.put(ORIGDOC_VERSION, originalDocument.getVersion());
-            remoteData.put(ORIGDOC_LANGUAGE, originalDocument.getLanguage());
+            remoteDataMap.put(ORIGDOC_VERSION, originalDocument.getVersion());
+            remoteDataMap.put(ORIGDOC_LANGUAGE, originalDocument.getLanguage());
         }
+
+        return remoteDataMap;
     }
 
-    protected XWikiDocument unserializeDocument(Map<String, Serializable> remoteData)
+    /**
+     * @param remoteData the serialized version of the document
+     * @return the document
+     */
+    protected XWikiDocument unserializeDocument(Serializable remoteData)
     {
-        DocumentName docName = (DocumentName) remoteData.get(DOC_NAME);
+        Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
+
+        DocumentName docName = (DocumentName) remoteDataMap.get(DOC_NAME);
 
         XWikiDocument doc;
-        if (remoteData.get(DOC_VERSION) == null) {
+        if (remoteDataMap.get(DOC_VERSION) == null) {
             doc = new XWikiDocument(docName.getWiki(), docName.getSpace(), docName.getPage());
         } else {
             doc = new LazyXWikiDocument();
             doc.setDatabase(docName.getWiki());
             doc.setSpace(docName.getSpace());
             doc.setName(docName.getPage());
-            doc.setLanguage((String) remoteData.get(DOC_LANGUAGE));
-            doc.setVersion((String) remoteData.get(DOC_VERSION));
+            doc.setLanguage((String) remoteDataMap.get(DOC_LANGUAGE));
+            doc.setVersion((String) remoteDataMap.get(DOC_VERSION));
         }
 
         XWikiDocument origDoc;
-        if (remoteData.get(ORIGDOC_VERSION) == null) {
+        if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
             origDoc = new XWikiDocument(docName.getWiki(), docName.getSpace(), docName.getPage());
         } else {
             origDoc = new LazyXWikiDocument();
             origDoc.setDatabase(docName.getWiki());
             origDoc.setSpace(docName.getSpace());
             origDoc.setName(docName.getPage());
-            origDoc.setLanguage((String) remoteData.get(ORIGDOC_LANGUAGE));
-            origDoc.setVersion((String) remoteData.get(ORIGDOC_VERSION));
+            origDoc.setLanguage((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
+            origDoc.setVersion((String) remoteDataMap.get(ORIGDOC_VERSION));
         }
 
         doc.setOriginalDocument(origDoc);

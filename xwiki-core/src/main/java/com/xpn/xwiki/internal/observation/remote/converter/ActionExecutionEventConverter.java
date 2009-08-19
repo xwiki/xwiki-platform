@@ -21,9 +21,7 @@
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Component;
@@ -69,17 +67,10 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
             ActionExecutionEvent event = (ActionExecutionEvent) localEvent.getEvent();
 
             if (this.actions.contains(event.getActionName())) {
-                HashMap<String, Serializable> remoteData = new HashMap<String, Serializable>();
-
-                // serialize document
-                serializeXWikiDocument((XWikiDocument) localEvent.getSource(), remoteData);
-
-                // save some context informations
-                serializeXWikiContext((XWikiContext) localEvent.getData(), remoteData);
-
                 // fill the remote event
                 remoteEvent.setEvent((Serializable) localEvent.getEvent());
-                remoteEvent.setData(remoteData);
+                remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource()));
+                remoteEvent.setData(serializeXWikiContext((XWikiContext) localEvent.getData()));
 
                 return true;
             }
@@ -97,18 +88,10 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
         if (remoteEvent.getEvent() instanceof ActionExecutionEvent) {
-            Map<String, Serializable> remoteData = (Map<String, Serializable>) remoteEvent.getData();
-
-            // set some context information
-            XWikiContext context = unserializeXWikiContext(remoteData);
-
-            // restore document
-            XWikiDocument document = unserializeDocument(remoteData);
-
             // fill the local event
             localEvent.setEvent((Event) remoteEvent.getEvent());
-            localEvent.setSource(document);
-            localEvent.setData(context);
+            localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
+            localEvent.setData(unserializeXWikiContext(remoteEvent.getData()));
 
             return true;
         }

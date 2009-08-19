@@ -46,15 +46,15 @@ import org.apache.lucene.search.Searcher;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.DocChangeRule;
-import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * A plugin offering support for advanced searches using Lucene, a high performance, open source
@@ -118,10 +118,6 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     private String indexDirs;
 
     private IndexRebuilder indexRebuilder;
-
-    public DocChangeRule docChangeRule = null;
-
-    public XWikiActionRule xwikiActionRule = null;
 
     public LucenePlugin(String name, String className, XWikiContext context)
     {
@@ -502,20 +498,16 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         indexUpdaterThread.start();
         indexRebuilder = new IndexRebuilder(indexUpdater, context);
 
-        docChangeRule = new DocChangeRule(indexUpdater);
-        xwikiActionRule = new XWikiActionRule(indexUpdater);
-
         openSearchers();
 
-        context.getWiki().getNotificationManager().addGeneralRule(docChangeRule);
-        context.getWiki().getNotificationManager().addGeneralRule(xwikiActionRule);
+        Utils.getComponent(ObservationManager.class).addListener(indexUpdater);
+
         LOG.info("lucene plugin initialized.");
     }
 
     public void flushCache(XWikiContext context)
     {
-        context.getWiki().getNotificationManager().removeGeneralRule(xwikiActionRule);
-        context.getWiki().getNotificationManager().removeGeneralRule(docChangeRule);
+        Utils.getComponent(ObservationManager.class).removeListener(indexUpdater.getName());
 
         indexRebuilder = null;
 

@@ -40,23 +40,37 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.FSDirectory;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.event.ActionExecutionEvent;
+import org.xwiki.observation.event.DocumentDeleteEvent;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 
 /**
  * @version $Id: $
  */
-public class IndexUpdater extends AbstractXWikiRunnable 
-    implements XWikiDocChangeNotificationInterface, XWikiActionNotificationInterface
+public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 {
     /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(IndexUpdater.class);
+
+    private static final String NAME = "lucene";
+
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentUpdateEvent());
+            add(new DocumentSaveEvent());
+            add(new DocumentDeleteEvent());
+            add(new ActionExecutionEvent("upload"));
+        }
+    };
 
     /** Milliseconds of sleep between checks for changed documents. */
     private int indexingInterval = 30000;
@@ -509,58 +523,50 @@ public class IndexUpdater extends AbstractXWikiRunnable
         return retval;
     }
 
-    /**
-     * Notification of changes in document content
-     * 
-     * @see com.xpn.xwiki.notify.XWikiNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument,com.xpn.xwiki.doc.XWikiDocument,
-     *      int,com.xpn.xwiki.XWikiContext)
-     */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newDoc, XWikiDocument oldDoc,
-        int event, XWikiContext context)
+    public String getName()
     {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("notify from XWikiDocChangeNotificationInterface, event=" + event
-                + ", newDoc=" + newDoc + " oldDoc=" + oldDoc);
-        }
-
-        try {
-            add(newDoc, context);
-        } catch (Exception e) {
-            LOG.error("error in notify", e);
-        }
+        return NAME;
     }
 
-    /**
-     * Notification of attachment uploads.
-     * 
-     * @see com.xpn.xwiki.notify.XWikiActionNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument,java.lang.String,com.xpn.xwiki.XWikiContext)
-     */
-    public void notify(XWikiNotificationRule arg0, XWikiDocument doc, String action,
-        XWikiContext context)
+    public List<Event> getEvents()
     {
-        if ("upload".equals(action)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("upload action notification for doc " + doc.getName());
-            }
+        return EVENTS;
+    }
 
-            try {
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiDocument document = (XWikiDocument) source;
+        XWikiContext context = (XWikiContext) data;
+
+        try {
+            if (event instanceof ActionExecutionEvent) {
+                // Modified attachement
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("upload action notification for doc " + document.getName());
+                }
+
                 // Retrieve the latest version (with the file just attached)
-                XWikiDocument basedoc = context.getWiki().getDocument(doc.getFullName(), context);
+                XWikiDocument basedoc = context.getWiki().getDocument(document.getFullName(), context);
                 List<XWikiAttachment> attachments = basedoc.getAttachmentList();
                 // find out the most recently changed attachment
                 XWikiAttachment newestAttachment = null;
                 for (XWikiAttachment attachment : attachments) {
-                    if ((newestAttachment == null)
-                        || attachment.getDate().after(newestAttachment.getDate())) {
+                    if ((newestAttachment == null) || attachment.getDate().after(newestAttachment.getDate())) {
                         newestAttachment = attachment;
                     }
                 }
+
                 add(basedoc, newestAttachment, context);
-            } catch (Exception e) {
-                LOG.error("error in notify", e);
+            } else {
+                // Modified document
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("notify from XWikiDocChangeNotificationInterface, event=" + event + ", doc=" + document);
+                }
+
+                add(document, context);
             }
+        } catch (Exception e) {
+            LOG.error("error in notify", e);
         }
     }
 

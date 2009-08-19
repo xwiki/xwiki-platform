@@ -1,0 +1,2 @@
+org.xwiki.rendering.internal.macro.formula.FormulaMacro
+org.xwiki.rendering.internal.macro.formula.DefaultFormulaMacroConfiguration

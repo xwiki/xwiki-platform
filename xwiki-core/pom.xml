@@ -667,6 +667,20 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-footnotes</artifactId>
+      <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-macro-formula</artifactId>
+      <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-macro-html</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
@@ -692,6 +706,11 @@
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-formula-renderer</artifactId>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

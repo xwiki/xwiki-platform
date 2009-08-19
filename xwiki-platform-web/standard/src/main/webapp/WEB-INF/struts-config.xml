@@ -104,6 +104,11 @@
                 name="pdf"
                 scope="request">
         </action>
+        <action path="/tex/"
+                type="com.xpn.xwiki.web.TexAction"
+                name="tex"
+                scope="request">
+        </action>
         <action path="/edit/"
                 type="com.xpn.xwiki.web.EditAction"
                 name="edit"

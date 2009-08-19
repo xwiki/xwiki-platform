@@ -21,7 +21,6 @@
 package com.xpn.xwiki.internal.observation.remote.converter;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

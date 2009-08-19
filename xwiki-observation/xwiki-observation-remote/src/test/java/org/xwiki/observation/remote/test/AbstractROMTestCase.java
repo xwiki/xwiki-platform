@@ -25,10 +25,13 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.After;
 import org.junit.Before;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter;
 import org.xwiki.test.MockConfigurationSource;
 import org.xwiki.test.XWikiComponentInitializer;
@@ -36,7 +39,7 @@ import org.xwiki.test.XWikiComponentInitializer;
 /**
  * Base class to easily emulate two instances of observation manager communicate with each other by network.
  * 
- * @version $Id$
+ * @version $Id: AbstractROMTestCase.java 22739 2009-08-14 10:08:42Z tmortagne $
  */
 public abstract class AbstractROMTestCase
 {
@@ -44,8 +47,12 @@ public abstract class AbstractROMTestCase
 
     private XWikiComponentInitializer initializer2 = new XWikiComponentInitializer();
 
+    private ObservationManager observationManager1;
+
+    private ObservationManager observationManager2;
+
     @Before
-    protected void setUp() throws Exception
+    public void setUp() throws Exception
     {
         this.initializer1.initializeContainer();
         this.initializer1.initializeConfigurationSource();
@@ -78,6 +85,19 @@ public abstract class AbstractROMTestCase
         getComponentManager2().lookup(Container.class).setApplicationContext(applicationContext);
 
         getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
+
+        this.observationManager1 = getComponentManager1().lookup(ObservationManager.class);
+        this.observationManager2 = getComponentManager2().lookup(ObservationManager.class);
+
+        getComponentManager1().lookup(RemoteObservationManager.class).startChannel("tcp1");
+        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        getComponentManager1().lookup(RemoteObservationManager.class).stopChannel("tcp1");
+        getComponentManager2().lookup(RemoteObservationManager.class).stopChannel("tcp2");
     }
 
     public EmbeddableComponentManager getComponentManager1() throws Exception
@@ -104,5 +124,15 @@ public abstract class AbstractROMTestCase
     public MockConfigurationSource getConfigurationSource2()
     {
         return this.initializer2.getConfigurationSource();
+    }
+
+    public ObservationManager getObservationManager1()
+    {
+        return this.observationManager1;
+    }
+
+    public ObservationManager getObservationManager2()
+    {
+        return this.observationManager2;
     }
 }

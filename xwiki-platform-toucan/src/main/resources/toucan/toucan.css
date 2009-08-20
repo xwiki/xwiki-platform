@@ -257,6 +257,9 @@ h1, h2, h3, h4, h5{
     display:block;
     position:relative;
 }
+#xwikicontent h1, #xwikicontent h2, #xwikicontent h3, #xwikicontent h4, #xwikicontent h5 {
+  overflow: hidden;
+}
 
 span.edit_section {
     position: relative;

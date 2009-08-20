@@ -44,6 +44,7 @@ import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
@@ -452,7 +453,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      *      com.xpn.xwiki.XWikiContext)
      */
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
-        List parameterValues, XWikiContext context) throws XWikiException
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, nb, start, parameterValues, context);
     }
@@ -463,7 +464,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, List parameterValues, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocuments(wheresql, parameterValues, context);
@@ -476,7 +477,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      *      java.util.List, com.xpn.xwiki.XWikiContext)
      */
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        int nb, int start, List parameterValues, XWikiContext context) throws XWikiException
+        int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, customMapping, nb, start, parameterValues,
             context);
@@ -488,7 +489,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int, java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List parameterValues,
+    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List< ? > parameterValues,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, nb, start, parameterValues, context);
@@ -501,20 +502,20 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      *      int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
-        boolean checkRight, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException
+        boolean checkRight, int nb, int start, List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocuments(wheresql, distinctbylanguage, customMapping, checkRight, nb, start,
             parameterValues, context);
     }
 
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues,
-        XWikiContext context) throws XWikiException
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
     }
 
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
-        throws XWikiException
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
+        XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
     }
@@ -524,7 +525,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * 
      * @see XWikiStoreInterface#countDocuments(String, List, XWikiContext)
      */
-    public int countDocuments(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+    public int countDocuments(String parametrizedSqlClause, List< ? > parameterValues, XWikiContext context)
         throws XWikiException
     {
         return this.store.countDocuments(parametrizedSqlClause, parameterValues, context);
@@ -545,12 +546,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         this.store.deleteLock(lock, context, bTransaction);
     }
 
-    public List loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadLinks(docId, context, bTransaction);
     }
 
-    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
+        throws XWikiException
     {
         return this.store.loadBacklinks(fullName, context, bTransaction);
     }
@@ -570,7 +572,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * 
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, int nb, int start, XWikiContext context) throws XWikiException
     {
         return this.store.search(sql, nb, start, context);
     }
@@ -581,7 +583,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.lang.Object[][],
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
         throws XWikiException
     {
         return this.store.search(sql, nb, start, whereParams, context);
@@ -593,7 +595,8 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException
+    public <T> List<T> search(String sql, int nb, int start, List< ? > parameterValues, XWikiContext context)
+        throws XWikiException
     {
         return this.store.search(sql, nb, start, parameterValues, context);
     }
@@ -604,12 +607,17 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
      * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int, java.lang.Object[][],
      *      java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List search(String sql, int nb, int start, Object[][] whereParams, List parameterValues, XWikiContext context)
-        throws XWikiException
+    public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List< ? > parameterValues,
+        XWikiContext context) throws XWikiException
     {
         return this.store.search(sql, nb, start, whereParams, parameterValues, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#cleanUp(com.xpn.xwiki.XWikiContext)
+     */
     public synchronized void cleanUp(XWikiContext context)
     {
         this.store.cleanUp(context);
@@ -693,7 +701,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         this.pageExistCache = pageExistCache;
     }
 
-    public List getCustomMappingPropertyList(BaseClass bclass)
+    public List<String> getCustomMappingPropertyList(BaseClass bclass)
     {
         return this.store.getCustomMappingPropertyList(bclass);
     }
@@ -708,7 +716,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         this.store.injectUpdatedCustomMappings(context);
     }
 
-    public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return this.store.getTranslationList(doc, context);
     }

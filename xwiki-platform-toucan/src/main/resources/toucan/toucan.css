@@ -76,7 +76,8 @@ caption, th, td {
 }
 
 blockquote { 
-    padding: 0.3em 0 0 1em;
+  margin: 0.3ex 1em;
+  padding: 0.3ex 1em;
     quotes: none;
     background:#FAFAF6 none repeat scroll 0 0;
     border-left:2px solid #DDDDCC;

@@ -40,7 +40,7 @@ public class TCPROMTest extends AbstractROMTestCase
     {
         super.setUp();
         
-        getConfigurationSource1().setProperty("observation.remote.channels", "tcp1");
+        getConfigurationSource1().setProperty("observation.remote.channels", Arrays.asList("tcp1"));
         getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
     }
     

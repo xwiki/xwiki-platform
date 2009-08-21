@@ -64,6 +64,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Attachment;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -772,6 +773,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, cc, bcc, vcontext, context);
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
+        Document docApi = new Document(doc, context);
+        
         BaseObject obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", language);
         if (obj == null) {
             obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
@@ -797,6 +800,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         mail.setSubject(subject);
         mail.setTextPart(msg);
         mail.setHtmlPart(html);
+        mail.setAttachments(docApi.getAttachmentList());
+        
         try {
             sendMail(mail, context);
             return 0;

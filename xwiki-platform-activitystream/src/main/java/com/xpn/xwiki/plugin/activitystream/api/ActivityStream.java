@@ -86,6 +86,9 @@ public interface ActivityStream
 
     List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
             XWikiContext context) throws ActivityStreamException;
+    
+    List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
+        List<Object> parameterValues, XWikiContext context) throws ActivityStreamException;
 
     List<ActivityEvent> getEvents(boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException;

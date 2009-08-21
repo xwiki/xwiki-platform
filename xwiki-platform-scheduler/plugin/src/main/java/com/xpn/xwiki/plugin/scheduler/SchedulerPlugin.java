@@ -411,6 +411,22 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Trigger a job (execute it now)
+     * 
+     * @param object the non-wrapped XObject Job to be triggered
+     * @param context the XWiki context
+     */
+    public void triggerJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
+    {
+        try {
+            getScheduler().triggerJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+        } catch (SchedulerException e) {
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TRIGGER_JOB,
+                "Error occured while trying to trigger job " + object.getStringValue("jobName"), e);
+        }
+    }
+
+    /**
      * Unschedule the given job
      *
      * @param object the unwrapped XObject job to be unscheduled
@@ -433,6 +449,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * Get Trigger object of the given job
      *
      * @param object the unwrapped XObject to be retrieve the trigger for
+     * @param context the XWiki context
      * @return the trigger object of the given job
      */
     private Trigger getTrigger(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -451,6 +468,20 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         }
 
         return trigger;
+    }
+
+    /**
+     * Give, for a BaseObject job in a {@link JobState#STATE_NORMAL} state, the previous date at which the job has been
+     * executed. Note that this method does not compute a date from the CRON expression, it only returns a date value 
+     * which is set each time the job is executed. If the job has never been fired this method will return null.
+     * 
+     * @param object unwrapped XObject job for which the next fire time will be given
+     * @param context the XWiki context
+     * @return the next Date the job will be fired at, null if the job has never been fired
+     */    
+    public Date getPreviousFireTime(BaseObject object, XWikiContext context) throws SchedulerPluginException
+    {
+        return getTrigger(object, context).getPreviousFireTime();
     }
 
     /**
@@ -501,7 +532,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * @return the default Scheduler instance
      * @throws SchedulerPluginException if the default Scheduler instance failed to be retrieved for any reason. Note
-     * that on the first call the default scheduler is also initialized.
+     *             that on the first call the default scheduler is also initialized.
      */
     private synchronized Scheduler getDefaultSchedulerInstance() throws SchedulerPluginException
     {
@@ -543,9 +574,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Compute a cross-document unique {@link com.xpn.xwiki.objects.BaseObject} id, by concatenating its name (it's
-     * document holder full name, such as "SomeSpace.SomeDoc") and it's instance number inside this document. <p/> The
-     * scheduler uses this unique object id to assure the unicity of jobs
-     *
+     * document holder full name, such as "SomeSpace.SomeDoc") and it's instance number inside this document.
+     * <p/>
+     * The scheduler uses this unique object id to assure the unicity of jobs
+     * 
      * @return a unique String that can identify the object
      */
     private String getObjectUniqueId(BaseObject object, XWikiContext context)

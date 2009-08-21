@@ -254,6 +254,77 @@ public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
             return false;
         }
     }
+    
+    /**
+     * Trigger a XObject job (execute it now).
+     * 
+     * @param object the wrapped XObject Job to be triggered
+     * @return true on success, false on failure.
+     */
+    public boolean triggerJob(Object object)
+    {
+        try {
+            return triggerJob(retrieveBaseObject(object));
+        } catch (Exception e) {
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return false;
+        }
+    }
+
+    /**
+     * Trigger a BaseObject job (execute it now).
+     * 
+     * @param object the BaseObject Job to be triggered
+     * @return true on success, false on failure.
+     */
+    public boolean triggerJob(BaseObject object)
+    {
+        try {
+            getProtectedPlugin().triggerJob(object, this.context);
+            LOG.debug("Trigger Job : " + object.getStringValue("jobName"));
+            return true;
+        } catch (XWikiException e) {
+            this.context.put("error", e.getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Give, for a XObject job in a {@link JobState#STATE_NORMAL} state, the previous date at which the job has been
+     * executed, the fire time is not computed from the CRON expression, this method will return null if the .
+     * 
+     * @param object the wrapped XObject for which to give the fire time
+     * @return the date the job has been executed
+     */
+    public Date getPreviousFireTime(Object object)
+    {
+        try {
+            return getPreviousFireTime(retrieveBaseObject(object));
+        } catch (Exception e) {
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return null;
+        }
+    }
+
+    /**
+     * Give, for a BaseObject job in a {@link JobState#STATE_NORMAL} state, the previous date at which the job has been
+     * executed. Note that this method does not compute a date from the CRON expression, it only returns a date value 
+     * which is set each time the job is executed. If the job has never been fired this method will return null.
+     * 
+     * @param object the BaseObject for which to give the fire time
+     * @return the date the job has been executed
+     */
+    public Date getPreviousFireTime(BaseObject object)
+    {
+        try {
+            return getProtectedPlugin().getPreviousFireTime(object, this.context);
+        } catch (SchedulerPluginException e) {
+            this.context.put("error", e.getMessage());
+            return null;
+        }
+    }
 
     /**
      * Give, for a XObject job in a {@link JobState#STATE_NORMAL} state, the next date at which the job will be

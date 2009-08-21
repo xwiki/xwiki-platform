@@ -205,6 +205,16 @@
     #set($deleteRedirect = $xwiki.getURL($jobObj.getName(),"delete"))
     $response.sendRedirect($deleteRedirect))
   #end
+ #elseif($request.do=="trigger")
+  ##
+  ## Trigger a job (execute it now)
+  ##
+  #set($ok=$scheduler.triggerJob($jobObj))
+  #if($ok==false)
+   #error("$context.get('error')")
+  #else
+   #info("Job ~~$jobObj.get('jobName')~~ *$msg.get('xe.scheduler.triggered')*")
+  #end
  #end
 #end
 1 $msg.get('xe.scheduler')
@@ -235,6 +245,7 @@ $msg.get('xe.scheduler.jobs.name') | $msg.get('xe.scheduler.jobs.status') | $msg
    #set( $ok = $!actions.put("unschedule",$doc.getURL("view","do=unschedule&amp;amp;which=${jobHolder.fullName}")) )
   #end
   #set($ok = $!actions.put("delete",$doc.getURL("view","do=delete&amp;amp;which=${jobHolder.fullName}")) )
+  #set($ok = $!actions.put("trigger",$doc.getURL("view","do=trigger&amp;amp;which=${jobHolder.fullName}")) )
 $job.get("jobName")|$status|$firetime| *$msg.get('xe.scheduler.jobs.infos')* : [view&gt;$jobHolder.fullName] #if($jobHolder.hasAccessLevel("programming")) &lt;a href="${jobHolder.getURL('inline')}"&gt;$msg.get("edit")&lt;/a&gt; #end *$msg.get("job")* : #foreach($action in $actions.keySet()) &lt;a href="${actions.get($action)}"&gt;$action&lt;/a&gt; #end
 
 #end

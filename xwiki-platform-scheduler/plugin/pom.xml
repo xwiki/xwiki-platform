@@ -42,9 +42,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>opensymphony</groupId>
+      <groupId>org.opensymphony.quartz</groupId>
       <artifactId>quartz</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.5</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -60,6 +60,14 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+  <!-- The last versions of quartz (> 1.6.3) are not present on the default maven repositories -->
+  <repositories>
+    <repository>
+      <id>JBOSS</id>
+      <name>JBoss Repository</name>
+      <url>http://repository.jboss.org/maven2/</url>
+    </repository>
+  </repositories>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>

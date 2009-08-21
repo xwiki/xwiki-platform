@@ -36,7 +36,7 @@ public class SchedulerPluginException extends PluginException
 
     protected static final int ERROR_SCHEDULERPLUGIN_RESUME_JOB = 90003;
 
-    protected static final int ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB = 90004;
+    protected static final int ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB = 90004;    
 
     protected static final int ERROR_SCHEDULERPLUGIN_BAD_CRON_EXPRESSION = 90005;
 
@@ -53,6 +53,8 @@ public class SchedulerPluginException extends PluginException
     protected static final int ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB = 90010;
 
     protected static final int ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT = 90011;
+    
+    protected static final int ERROR_SCHEDULERPLUGIN_TRIGGER_JOB = 90012;
 
     public SchedulerPluginException(int code, String message)
     {

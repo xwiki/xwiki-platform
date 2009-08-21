@@ -112,11 +112,10 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
                                     descriptor);
 
                                 if (!componentOverrideClassNames.contains(descriptor.getImplementation().getName())) {
-                                    getLogger().warn(
-                                        "Component [" + existingDescriptor.getImplementation().getName()
-                                            + "] is being overwritten by component ["
-                                            + descriptor.getImplementation().getName()
-                                            + "]. It will not be possible to look it up.");
+                                    getLogger().warn("Component [" + existingDescriptor.getImplementation().getName()
+                                        + "] is being overwritten by component ["
+                                        + descriptor.getImplementation().getName() + "] for Role/Hint [" + roleHint
+                                        + "]. It will not be possible to look it up.");
                                 }
                             }
                         } else {

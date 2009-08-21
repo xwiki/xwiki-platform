@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.remote.test.AbstractROMTestCase;
@@ -34,6 +35,15 @@ public class TCPROMTest extends AbstractROMTestCase
 {
     private Mockery context = new Mockery();
 
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+        
+        getConfigurationSource1().setProperty("observation.remote.channels", "tcp1");
+        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
+    }
+    
     @After
     public void tearDown() throws Exception
     {

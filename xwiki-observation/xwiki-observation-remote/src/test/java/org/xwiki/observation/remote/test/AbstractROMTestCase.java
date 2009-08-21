@@ -25,13 +25,11 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.junit.After;
 import org.junit.Before;
 import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.internal.jgroups.JGroupsNetworkAdapter;
 import org.xwiki.test.MockConfigurationSource;
 import org.xwiki.test.XWikiComponentInitializer;
@@ -85,19 +83,10 @@ public abstract class AbstractROMTestCase
         getComponentManager2().lookup(Container.class).setApplicationContext(applicationContext);
 
         getConfigurationSource1().setProperty("observation.remote.enabled", Boolean.TRUE);
+        getConfigurationSource2().setProperty("observation.remote.enabled", Boolean.TRUE);
 
         this.observationManager1 = getComponentManager1().lookup(ObservationManager.class);
         this.observationManager2 = getComponentManager2().lookup(ObservationManager.class);
-
-        getComponentManager1().lookup(RemoteObservationManager.class).startChannel("tcp1");
-        getComponentManager2().lookup(RemoteObservationManager.class).startChannel("tcp2");
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        getComponentManager1().lookup(RemoteObservationManager.class).stopChannel("tcp1");
-        getComponentManager2().lookup(RemoteObservationManager.class).stopChannel("tcp2");
     }
 
     public EmbeddableComponentManager getComponentManager1() throws Exception

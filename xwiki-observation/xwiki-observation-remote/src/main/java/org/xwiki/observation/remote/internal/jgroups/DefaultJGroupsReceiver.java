@@ -25,6 +25,9 @@ import org.jgroups.Message;
 import org.jgroups.View;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.RemoteObservationManager;
 import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
@@ -37,13 +40,34 @@ import org.xwiki.observation.remote.jgroups.JGroupsReceiver;
  * @since 2.0M3
  */
 @Component
-public class DefaultJGroupsReceiver implements JGroupsReceiver
+public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroupsReceiver
 {
     /**
      * Used to send events for conversion.
      */
-    @Requirement
     private RemoteObservationManager remoteObservationManager;
+
+    /**
+     * Used to lookup for {@link RemoteObservationManager}. To avoid cross dependency issues.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
+    /**
+     * @return the RemoteObservationManager
+     */
+    public RemoteObservationManager getRemoteObservationManager()
+    {
+        if (this.remoteObservationManager == null) {
+            try {
+                this.remoteObservationManager = componentManager.lookup(RemoteObservationManager.class);
+            } catch (ComponentLookupException e) {
+                getLogger().error("Failed to lookup RemoteObservationManager componenent.", e);
+            }
+        }
+
+        return remoteObservationManager;
+    }
 
     /**
      * {@inheritDoc}
@@ -62,7 +86,7 @@ public class DefaultJGroupsReceiver implements JGroupsReceiver
      */
     public void receive(Message msg)
     {
-        this.remoteObservationManager.notify((RemoteEventData) msg.getObject());
+        getRemoteObservationManager().notify((RemoteEventData) msg.getObject());
     }
 
     /**

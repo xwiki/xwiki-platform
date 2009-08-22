@@ -66,7 +66,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
      */
     public boolean toRemote(LocalEventData localEvent, RemoteEventData remoteEvent)
     {
-        if (this.events.contains(localEvent.getEvent())) {
+        if (this.events.contains(localEvent.getEvent().getClass())) {
             // fill the remote event
             remoteEvent.setEvent((Serializable) localEvent.getEvent());
             remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource()));
@@ -86,7 +86,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
      */
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
-        if (this.events.contains(remoteEvent.getEvent())) {
+        if (this.events.contains(remoteEvent.getEvent().getClass())) {
             // fill the local event
             localEvent.setEvent((Event) remoteEvent.getEvent());
             localEvent.setSource(unserializeDocument(remoteEvent.getSource()));

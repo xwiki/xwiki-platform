@@ -26,6 +26,13 @@ else
   JETTY_PORT=8080
 fi
 
+# The port on which to stop Jetty can be passed to this script as the second argument
+if [ -n "$2" ]; then
+  JETTY_STOPPORT=$2
+else
+  JETTY_STOPPORT=8079
+fi
+
 echo Starting Jetty on port $JETTY_PORT ...
 echo Logs are in the $PRGDIR/xwiki.log file
 
@@ -36,6 +43,6 @@ mkdir -p $JETTY_HOME/logs 2>/dev/null
 mkdir -p $JETTY_HOME/work 2>/dev/null
 
 # Specify port and key to stop a running Jetty instance
-JAVA_OPTS="$JAVA_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=8079"
+JAVA_OPTS="$JAVA_OPTS -DSTOP.KEY=xwiki -DSTOP.PORT=$JETTY_STOPPORT"
 
 java $JAVA_OPTS -Dfile.encoding=UTF8 -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar

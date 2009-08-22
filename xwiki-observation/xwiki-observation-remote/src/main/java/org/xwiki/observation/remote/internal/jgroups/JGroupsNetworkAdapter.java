@@ -64,6 +64,8 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
     {
         Message message = new Message(null, null, remoteEvent);
 
+        getLogger().debug("Send JGroups message [" + message + "]");
+
         // Send message to jgroups channels
         for (Map.Entry<String, JChannel> entry : this.channels.entrySet()) {
             try {

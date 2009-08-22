@@ -36,7 +36,6 @@ import java.util.Vector;
 @Deprecated
 public class XWikiNotificationManager
 {
-
     private Vector<XWikiNotificationRule> generalrules = new Vector<XWikiNotificationRule>();
 
     private Map<String, Vector<XWikiNotificationRule>> namedrules =
@@ -64,6 +63,11 @@ public class XWikiNotificationManager
      */
     public void removeGeneralRule(XWikiNotificationRule rule)
     {
+        // TODO: This should be improved since it's impossible to remove a rule if you loose its instance
+        // (since it's an equals on the pointer in memory that is done).
+        // The solution is to implement equals/hashCode in XWikiNotificationRule implementations and introduce
+        // a name for general rules.
+        // That said, this is being phased with the new Observation manager...
         synchronized (generalrules) {
             generalrules.remove(rule);
         }

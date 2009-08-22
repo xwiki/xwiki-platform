@@ -71,9 +71,9 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
                 remoteEvent.setEvent((Serializable) localEvent.getEvent());
                 remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource()));
                 remoteEvent.setData(serializeXWikiContext((XWikiContext) localEvent.getData()));
-
-                return true;
             }
+
+            return true;
         }
 
         return false;

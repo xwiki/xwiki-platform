@@ -220,8 +220,12 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             String key = getKey(doc, context);
 
             synchronized (key) {
-                getCache().remove(key);
-                getPageExistCache().remove(key);
+                if (getCache() != null) {
+                    getCache().remove(key);
+                }
+                if (getPageExistCache() != null) {
+                    getPageExistCache().remove(key);
+                }
             }
         }
     }

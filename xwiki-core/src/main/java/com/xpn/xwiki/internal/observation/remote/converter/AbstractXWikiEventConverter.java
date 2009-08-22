@@ -108,7 +108,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
 
         XWikiDocument originalDocument = document.getOriginalDocument();
 
-        if (!originalDocument.isNew()) {
+        if (originalDocument != null && !originalDocument.isNew()) {
             remoteDataMap.put(ORIGDOC_VERSION, originalDocument.getVersion());
             remoteDataMap.put(ORIGDOC_LANGUAGE, originalDocument.getLanguage());
         }

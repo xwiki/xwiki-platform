@@ -32,6 +32,7 @@ import java.util.Vector;
  * Manages general and named notifications rules.
  * 
  * @version $Id$
+ * @todo there should be some protection so that if a listener fails the other listeners are still called.
  */
 @Deprecated
 public class XWikiNotificationManager

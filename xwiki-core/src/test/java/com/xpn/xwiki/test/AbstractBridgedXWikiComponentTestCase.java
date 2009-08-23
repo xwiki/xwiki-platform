@@ -28,6 +28,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 import com.xpn.xwiki.CoreConfiguration;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -61,6 +62,7 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
         // Bridge with old XWiki Context, required for old code.
         Execution execution = getComponentManager().lookup(Execution.class);
         execution.getContext().setProperty("xwikicontext", this.context);
+        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(this.context);
 
         // Set a simple application context, as some components fail to start without one.
         Container c = getComponentManager().lookup(Container.class);

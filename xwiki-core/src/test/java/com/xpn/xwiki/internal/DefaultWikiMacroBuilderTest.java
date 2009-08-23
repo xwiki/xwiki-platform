@@ -22,15 +22,14 @@ package com.xpn.xwiki.internal;
 
 import org.jmock.Mock;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroBuilder;
-
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
- * Unit test for {@link DefaultWikiMacroBuilder}.
+ * Unit test for {@link DefaultWikiMacroFactory}.
  * 
  * @since 2.0M3
  * @version $Id$
@@ -41,13 +40,13 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
     
     private Mock mockXWiki;
     
-    private WikiMacroBuilder wikiMacroBuilder;
-        
+    private WikiMacroFactory wikiMacroFactory;
+
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.wikiMacroBuilder = getComponentManager().lookup(WikiMacroBuilder.class);
+        this.wikiMacroFactory = getComponentManager().lookup(WikiMacroFactory.class);
         
         // Build the macro definition document.
         BaseObject obj = new BaseObject();
@@ -73,11 +72,10 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
     public void testWikiMacroBuilding() throws Exception
     {
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroBuilder.buildMacro("xwiki:Macros.Test");
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro("xwiki:Macros.Test");
         assertNotNull(macro);
         
         // Check if the macro was built correctly.
-        assertEquals("xwiki:Macros.Test", macro.getDocumentName());
         assertEquals("testmacro", macro.getId());
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());

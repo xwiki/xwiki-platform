@@ -51,17 +51,7 @@ public class DefaultWikiMacroManager extends AbstractLogEnabled implements WikiM
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
      * are deleted.
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, ComponentDescriptor<Macro>> wikiMacroMap;
-
-    /**
-     * Creates a new {@link WikiMacroEventListener} component.
-     */
-    @SuppressWarnings("unchecked")
-    public DefaultWikiMacroManager()
-    {
-        wikiMacroMap = new HashMap<String, ComponentDescriptor<Macro>>();
-    }
+    private Map<String, ComponentDescriptor<Macro>> wikiMacroMap = new HashMap<String, ComponentDescriptor<Macro>>();
 
     /**
      * {@inheritDoc}
@@ -74,7 +64,6 @@ public class DefaultWikiMacroManager extends AbstractLogEnabled implements WikiM
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public void registerWikiMacro(String documentName, WikiMacro wikiMacro)
     {
         DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
@@ -94,7 +83,6 @@ public class DefaultWikiMacroManager extends AbstractLogEnabled implements WikiM
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public void unregisterWikiMacro(String documentName)
     {
         ComponentDescriptor<Macro> macroDescriptor = wikiMacroMap.get(documentName);

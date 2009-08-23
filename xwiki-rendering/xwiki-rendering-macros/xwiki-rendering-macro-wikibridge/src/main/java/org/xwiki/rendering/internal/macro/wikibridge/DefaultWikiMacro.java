@@ -202,7 +202,7 @@ public class DefaultWikiMacro implements WikiMacro
             // it's parameters, otherwise macro will not be able to access it's parameters if the user executing the
             // macro does not have programming rights.
             DocumentAccessBridge docBridge = componentManager.lookup(DocumentAccessBridge.class);
-            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(macroDocument));
+            xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentName()));
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while preparing macro execution environment", ex);
         }

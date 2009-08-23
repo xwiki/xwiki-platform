@@ -34,7 +34,7 @@ public interface WikiMacroManager
      * Registers the given {@link WikiMacro} against ComponentManager and keeps a reference to it for future reference.
      * 
      * @param documentName name of the document which contains the wiki macro.
-     * @param wikiMacro the {@link WikiMacro} instance.
+     * @param wikiMacro the {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance.
      */
     void registerWikiMacro(String documentName, WikiMacro wikiMacro);
 

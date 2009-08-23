@@ -30,8 +30,8 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroBuilder;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroBuilderException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -52,10 +52,10 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     private static final String MAIN_WIKI = "xwiki";
 
     /**
-     * The {@link WikiMacroBuilder} component.
+     * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
     @Requirement
-    private WikiMacroBuilder wikiMacroBuilder;
+    private WikiMacroFactory wikiMacroFactory;
 
     /**
      * The {@link WikiMacroManager} component.
@@ -90,6 +90,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         xcontext.setDatabase(MAIN_WIKI);
 
         // Search for all those documents with macro definitions.
+        // TODO: Use the query manager instead
         String sql =
             "select doc.fullName from XWikiDocument doc, BaseObject obj where doc.fullName=obj.name and obj.className=?";
         List<Object> wikiMacroDocs = null;
@@ -106,9 +107,9 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         for (Object obj : wikiMacroDocs) {
             String wikiMacroDoc = (String) obj;
             try {
-                WikiMacro macro = wikiMacroBuilder.buildMacro(wikiMacroDoc);
+                WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDoc);
                 wikiMacros.put(wikiMacroDoc, macro);
-            } catch (WikiMacroBuilderException ex) {
+            } catch (WikiMacroException ex) {
                 // Just log the exception and skip to the next.
                 getLogger().error(ex.getMessage(), ex);
             }
@@ -116,6 +117,8 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
 
         // Register the wiki macros against WikiMacroManager.
         for (String documentName : wikiMacros.keySet()) {
+            // TODO: Fix this to allow macros to be registered for any wiki
+            // TODO: In addition the main wiki name should never be hardcoded!!
             wikiMacroManager.registerWikiMacro(MAIN_WIKI + ":" + documentName, wikiMacros.get(documentName));
         }
     }

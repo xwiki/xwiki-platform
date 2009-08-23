@@ -17,19 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.macro.wikibridge;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Component interface for defining wiki macro builders.
+ * Create a Wiki Macro object by gathering the Macro metadata from a document. 
  * 
  * @version $Id$
- * @since 2.0M2
+ * @since 2.0RC1
  */
 @ComponentRole
-public interface WikiMacroBuilder
+public interface WikiMacroFactory
 {
     /**
      * Searches the given document for a wiki macro definition.
@@ -37,15 +36,15 @@ public interface WikiMacroBuilder
      * @param documentName name of the document to search for a wiki macro definition.
      * @return true if the given document contains a wiki macro definition, false otherwise.
      */
-    boolean containsMacro(String documentName);
+    boolean containsWikiMacro(String documentName);
     
     /**
      * Tries to build a {@link WikiMacro} if a definition is found on the given document.
      * 
      * @param documentName name of the document on which the macro is defined.
      * @return a {@link WikiMacro} corresponding to the macro definition found.
-     * @throws WikiMacroBuilderException if no macro definition is found or if an error is encountered while building
+     * @throws WikiMacroException if no macro definition is found or if an error is encountered while building
      *             the macro.
      */
-    WikiMacro buildMacro(String documentName) throws WikiMacroBuilderException;
+    WikiMacro createWikiMacro(String documentName) throws WikiMacroException;
 }

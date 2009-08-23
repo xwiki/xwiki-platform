@@ -17,16 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.macro.wikibridge;
 
 /**
- * Exception class used by the {@link WikiMacroBuilder} to indicate exceptional conditions.
+ * Indicate a problem when using the Wiki Macro API.
  * 
  * @version $Id$
- * @since 2.0M2
+ * @since 2.0RC1
  */
-public class WikiMacroBuilderException extends Exception
+public class WikiMacroException extends Exception
 {
     /**
      * Class version.
@@ -34,22 +33,22 @@ public class WikiMacroBuilderException extends Exception
     private static final long serialVersionUID = 8573258491423031831L;
 
     /**
-     * Builds a new {@link WikiMacroBuilderException} with the given error message.
+     * Builds a new {@link WikiMacroException} with the given error message.
      * 
      * @param message error messge.
      */
-    public WikiMacroBuilderException(String message)
+    public WikiMacroException(String message)
     {
         super(message);
     }
 
     /**
-     * Builds a new {@link WikiMacroBuilderException} with the given error message and cause.
+     * Builds a new {@link WikiMacroException} with the given error message and cause.
      * 
      * @param message error message.
      * @param cause cause of error.
      */
-    public WikiMacroBuilderException(String message, Throwable cause)
+    public WikiMacroException(String message, Throwable cause)
     {
         super(message, cause);
     }

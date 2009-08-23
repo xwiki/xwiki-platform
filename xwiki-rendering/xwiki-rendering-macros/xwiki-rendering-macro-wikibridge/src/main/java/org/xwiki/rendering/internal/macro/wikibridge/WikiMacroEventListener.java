@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.internal.macro.wikibridge;
 
 import java.util.ArrayList;
@@ -37,8 +36,8 @@ import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroBuilder;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroBuilderException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 
 /**
@@ -64,10 +63,10 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
     private DocumentNameSerializer docNameSerializer;
 
     /**
-     * The {@link WikiMacroBuilder} component.
+     * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
     @Requirement
-    private WikiMacroBuilder macroBuilder;
+    private WikiMacroFactory macroFactory;
 
     /**
      * The {@link WikiMacroManager} component.
@@ -112,23 +111,29 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
                 }
 
                 // Check whether the given document has a wiki macro defined in it.
-                if (macroBuilder.containsMacro(fullDocumentName)) {
+                if (macroFactory.containsWikiMacro(fullDocumentName)) {
                     // Make sure the wiki macro is defined on the main wiki.
                     if (!fullDocumentName.startsWith("xwiki:")) {
                         getLogger().error("Wiki macro registration from virtual wikis are not allowed");
                         return;
                     }
 
-                    // Attempt to build a wiki macro.
+                    // Attempt to create a wiki macro.
                     WikiMacro wikiMacro = null;
                     try {
-                        wikiMacro = macroBuilder.buildMacro(fullDocumentName);
-                    } catch (WikiMacroBuilderException ex) {
+                        wikiMacro = macroFactory.createWikiMacro(fullDocumentName);
+                    } catch (WikiMacroException ex) {
                         getLogger().error(ex.getMessage());
                         return;
                     }
 
                     // Check if the user has programming rights before continuing further.
+                    // TODO: This is temporary and it's done to prevent users in a farm to be able to create wiki
+                    // macros since they would be visible by all wikis in the farm. In the future this will be
+                    // fixed when we introduce the notion of Realms in the Component Manager. When this happens
+                    // we'll be able to register the macro so it's visible in the current user's realm only and
+                    // offer an admin screen so that admins can promote user-visible macros to wiki-instance-visible
+                    // macros.
                     if (!docBridge.hasProgrammingRights()) {
                         String errorMessage = "Unable to register macro [%s] due to insufficient privileges";
                         getLogger().error(String.format(errorMessage, wikiMacro.getId()));

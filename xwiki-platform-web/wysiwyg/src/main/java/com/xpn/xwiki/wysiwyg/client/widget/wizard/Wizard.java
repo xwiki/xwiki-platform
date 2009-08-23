@@ -137,7 +137,9 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
      */
     protected void initAndDisplayCurrentStep(Object data)
     {
-        dialog.center();
+        if (!dialog.isShowing()) {
+            dialog.center();
+        }
         dialog.setLoading(true);
         currentStep.init(data, new AsyncCallback<Object>()
         {
@@ -178,22 +180,12 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
         if (direction == NavigationDirection.CANCEL || direction == NavigationDirection.PREVIOUS) {
             // call the step's onCancel and check the result
             dialog.setLoading(true);
-            currentStep.onCancel(new AbstractDefaultAsyncCallback<Boolean>()
-            {
-                public void onSuccess(Boolean result)
-                {
-                    if (result) {
-                        // it's ok, take specific actions
-                        if (direction == NavigationDirection.CANCEL) {
-                            onCancel();
-                        } else {
-                            onPrevious();
-                        }
-                    } else {
-                        dialog.setLoading(false);
-                    }
-                }
-            });
+            currentStep.onCancel();
+            if (direction == NavigationDirection.CANCEL) {
+                onCancel();
+            } else {
+                onPrevious();
+            }
         }
 
         if (direction == NavigationDirection.FINISH || direction == NavigationDirection.NEXT) {
@@ -228,7 +220,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
         unloadCurrentStep();
         currentStep = null;
         // hide UIs
-        dialog.hide();
+        hideDialog();
         // notify listeners of cancel
         for (WizardListener wListener : wizardListeners) {
             wListener.onCancel(this);
@@ -290,7 +282,7 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
         Object result = currentStep != null ? currentStep.getResult() : null;
         currentStep = null;
         // hide UIs
-        dialog.hide();
+        hideDialog();
         // fire the listeners
         for (WizardListener wListener : wizardListeners) {
             wListener.onFinish(this, result);
@@ -325,10 +317,22 @@ public class Wizard implements NavigationListener, CloseHandler<CompositeDialogB
     public void onClose(CloseEvent<CompositeDialogBox> event)
     {
         if (event.getTarget() == dialog) {
-            // if the wizard dialog was closed from the close button, cancel the whole wizard
-            for (WizardListener wListener : wizardListeners) {
-                wListener.onCancel(this);
+            if (!dialog.isCanceled()) {
+                // it's a programmatic close, nothing to do
+                return;
+            } else {
+                // it's a user close, do a cancel
+                onDirection(NavigationDirection.CANCEL);
             }
         }
+    }
+
+    /**
+     * Helper function to hide the dialog and mark that it's a programmatic close not a user close.
+     */
+    public void hideDialog()
+    {
+        dialog.setCanceled(false);
+        dialog.hide();
     }
 }

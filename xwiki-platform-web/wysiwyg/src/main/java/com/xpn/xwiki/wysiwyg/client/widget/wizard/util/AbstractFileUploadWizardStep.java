@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 import java.util.EnumSet;
 
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -62,6 +61,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     private final FileUpload fileUploadInput = new FileUpload();
 
     /**
+     * The error label for the file input.
+     */
+    private final Label fileErrorLabel = new Label();
+
+    /**
      * Default constructor.
      */
     public AbstractFileUploadWizardStep()
@@ -83,6 +87,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
             fileHelpLabel.setStyleName("xHelpLabel");
             formPanel.add(fileHelpLabel);
         }
+
+        fileErrorLabel.addStyleName("xFileUploadError");
+        fileErrorLabel.setVisible(false);
+
+        formPanel.add(fileErrorLabel);
         formPanel.add(fileUploadInput);
 
         fileUploadForm.setWidget(formPanel);
@@ -137,6 +146,15 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * {@inheritDoc}
      */
+    public void init(Object data, AsyncCallback< ? > cb)
+    {
+        hideError();
+        cb.onSuccess(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Widget display()
     {
         return mainPanel;
@@ -172,9 +190,8 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        async.onSuccess(true);
     }
 
     /**
@@ -199,9 +216,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
                 registrations[0].removeHandler();
             }
         });
-        // Validate the form field.
+
+        hideError();
+        // validate the form field
         if (fileUploadInput.getFilename().trim().length() == 0) {
-            Window.alert(Strings.INSTANCE.fileUploadNoPathError());
+            displayError(Strings.INSTANCE.fileUploadNoPathError());
             async.onSuccess(false);
             return;
         }
@@ -227,7 +246,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
                 {
                     if (result == null) {
                         // there was a problem with the attachment, call it a failure
-                        Window.alert(Strings.INSTANCE.fileUploadSubmitError());
+                        displayError(Strings.INSTANCE.fileUploadSubmitError());
                         async.onSuccess(false);
                     } else {
                         onAttachmentUploaded(result);
@@ -283,5 +302,24 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     public FileUpload getFileUploadInput()
     {
         return fileUploadInput;
+    }
+
+    /**
+     * Displays the error message and markers for this dialog.
+     * 
+     * @param errorMessage the error message to display.
+     */
+    protected void displayError(String errorMessage)
+    {
+        fileErrorLabel.setText(errorMessage);
+        fileErrorLabel.setVisible(true);
+    }
+
+    /**
+     * Hides the error message and markers for this dialog.
+     */
+    protected void hideError()
+    {
+        fileErrorLabel.setVisible(false);
     }
 }

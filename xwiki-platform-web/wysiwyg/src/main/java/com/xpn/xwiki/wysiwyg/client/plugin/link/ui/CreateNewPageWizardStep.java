@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.EnumSet;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -55,6 +54,11 @@ public class CreateNewPageWizardStep implements WizardStep
     private final TextBox pageNameTextBox = new TextBox();
 
     /**
+     * The label to signal an error on the page name field.
+     */
+    private final Label pageNameErrorLabel = new Label();
+
+    /**
      * Link data handled by this wizard step.
      */
     private LinkConfig linkData;
@@ -77,9 +81,14 @@ public class CreateNewPageWizardStep implements WizardStep
         pageNameLabel.addStyleDependentName("mandatory");
         Label helpPageNameLabel = new Label(Strings.INSTANCE.linkNewPageTextBoxTooltip());
         helpPageNameLabel.setStyleName("xHelpLabel");
+
+        pageNameErrorLabel.addStyleName("xPageNameError");
+        pageNameErrorLabel.setVisible(false);
+
         mainPanel.addStyleName("xLinkToNewPage");
         mainPanel.add(pageNameLabel);
         mainPanel.add(helpPageNameLabel);
+        mainPanel.add(pageNameErrorLabel);
         pageNameTextBox.setTitle(Strings.INSTANCE.linkNewPageTextBoxTooltip());
         mainPanel.add(pageNameTextBox);
     }
@@ -142,15 +151,15 @@ public class CreateNewPageWizardStep implements WizardStep
     public void init(Object data, AsyncCallback< ? > cb)
     {
         linkData = (LinkConfig) data;
+        hideError();
         cb.onSuccess(null);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        async.onSuccess(true);
     }
 
     /**
@@ -158,10 +167,11 @@ public class CreateNewPageWizardStep implements WizardStep
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
+        hideError();
         // get the name of the page from the input
         String newPageName = pageNameTextBox.getText().trim();
         if (StringUtils.isEmpty(newPageName)) {
-            Window.alert(Strings.INSTANCE.linkNewPageError());
+            displayError(Strings.INSTANCE.linkNewPageError());
             async.onSuccess(false);
         } else {
             // call the server to get the page URL and reference
@@ -184,5 +194,24 @@ public class CreateNewPageWizardStep implements WizardStep
                     }
                 });
         }
+    }
+
+    /**
+     * Displays the error message and markers for this dialog.
+     * 
+     * @param errorMessage the error message to display
+     */
+    private void displayError(String errorMessage)
+    {
+        pageNameErrorLabel.setText(errorMessage);
+        pageNameErrorLabel.setVisible(true);
+    }
+
+    /**
+     * Hides the error message and markers for this dialog.
+     */
+    private void hideError()
+    {
+        pageNameErrorLabel.setVisible(false);
     }
 }

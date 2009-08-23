@@ -24,12 +24,6 @@
   text-transform: capitalize;
 }
 
-.xMacroParameterError {
-  font-size: 75%;
-  color: red;
-  margin-bottom: 3px;
-}
-
 .xMacroParameter textarea {
   height: 150px;
 }

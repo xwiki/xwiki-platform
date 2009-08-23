@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.XWikiExplorer;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.ds.WikiDataSource;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
@@ -42,7 +43,12 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     /**
      * The panel to hold the xwiki explorer.
      */
-    private final Panel explorerPanel = new FlowPanel();
+    private final VerticalResizePanel mainPanel = new VerticalResizePanel();
+
+    /**
+     * The label to display the error on submission of the wizard step form.
+     */
+    private final Label errorLabel = new Label();
 
     /**
      * Builds a {@link AbstractExplorerWizardStep} from the passed settings.
@@ -89,12 +95,37 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         explorer.setDataSource(ds);
         explorer.setDefaultValue(defaultSelection);
         explorer.addStyleName("xExplorer");
-        
-        explorerPanel.addStyleName("xExplorerPanel");
+
+        // create a label with the help for this step
+        Label helpLabel = new Label();
+        helpLabel.addStyleName("xHelpLabel");
+        helpLabel.setText(getHelpLabelText());
+        mainPanel.add(helpLabel);
+
+        errorLabel.setText(getDefaultErrorText());
+        errorLabel.setVisible(false);
+        errorLabel.addStyleName("xLinkParameterError");
+        mainPanel.add(errorLabel);
+
+        mainPanel.addStyleName("xExplorerPanel");
         // we need to add the explorer in a wrapper, since the explorer creates its own wrapper around and adds the
         // input to that wrapper. We use this panel to have a reference to the _whole_ generated UI, since the explorer
         // reference would point only to the grid inside.
-        explorerPanel.add(explorer);
+        mainPanel.add(explorer);
+        mainPanel.setExpandingWidget(explorer, true);
+    }
+
+    /**
+     * @return the help message for this explorer step, to be displayed on top of the explorer tree
+     */
+    protected abstract String getHelpLabelText();
+
+    /**
+     * @return the default error message for this wizard step form
+     */
+    protected String getDefaultErrorText()
+    {
+        return "";
     }
 
     /**
@@ -116,7 +147,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      */
     public Widget display()
     {
-        return explorerPanel;
+        return mainPanel;
     }
 
     /**
@@ -125,5 +156,44 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     public XWikiExplorer getExplorer()
     {
         return explorer;
+    }
+
+    /**
+     * @return the error label
+     */
+    public Label getErrorLabel()
+    {
+        return errorLabel;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void init(Object data, AsyncCallback< ? > cb)
+    {
+        hideError();
+        super.init(data, cb);
+    }
+
+    /**
+     * Displays the passed error message and markers in this wizard step.
+     * 
+     * @param errorMessage the error message to print
+     */
+    protected void displayError(String errorMessage)
+    {
+        errorLabel.setText(errorMessage);
+        errorLabel.setVisible(true);
+        mainPanel.refreshHeights();
+    }
+
+    /**
+     * Hides the error messages and markers in this wizard step.
+     */
+    protected void hideError()
+    {
+        errorLabel.setVisible(false);
+        mainPanel.refreshHeights();
     }
 }

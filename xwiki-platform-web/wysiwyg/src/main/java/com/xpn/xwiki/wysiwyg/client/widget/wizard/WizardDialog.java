@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
@@ -100,7 +102,10 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         super.setLoading(loading);
         // show or hide the dialog's main widget (the wizard step widget)
         if (getBody().getWidgetCount() > 0) {
-            getBody().getWidget(0).setVisible(!loading);
+            // use the visibility attribute instead of the setVisible method to have the layout of the dialog on errors
+            // display correctly recomputed, having elements sizes even is the container is not visible
+            getBody().getWidget(0).getElement().getStyle().setProperty(Style.VISIBILITY,
+                !loading ? "visible" : "hidden");
         }
         // toggle buttons state
         for (Button b : buttons) {
@@ -211,5 +216,23 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setCanceled(boolean canceled)
+    {
+        super.setCanceled(canceled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCanceled()
+    {
+        return super.isCanceled();
     }
 }

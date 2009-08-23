@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -37,7 +36,12 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     /**
      * The text box to store the URI of the created link.
      */
-    private TextBox urlTextBox = new TextBox();
+    private final TextBox urlTextBox = new TextBox();
+
+    /**
+     * The label to display the url label for the created link.
+     */
+    private final Label urlErrorLabel = new Label();
 
     /**
      * The main panel of this wizard step.
@@ -51,10 +55,13 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     {
         super();
         Label urlLabel = new Label(getURLLabel());
-        urlLabel.setStyleName("xInfoLabel");
+        urlLabel.setStyleName(INFO_LABEL_STYLE);
         urlLabel.addStyleDependentName("mandatory");
         Label helpUrlLabel = new Label(getURLHelpLabel());
-        helpUrlLabel.setStyleName("xHelpLabel");
+        helpUrlLabel.setStyleName(HELP_LABEL_STYLE);
+
+        urlErrorLabel.addStyleName(ERROR_LABEL_STYLE);
+        urlErrorLabel.setVisible(false);
 
         urlTextBox.setTitle(getURLTextBoxTooltip());
         urlTextBox.addKeyPressHandler(this);
@@ -69,6 +76,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         urlPanel.addStyleName("url");
         urlPanel.add(urlLabel);
         urlPanel.add(helpUrlLabel);
+        urlPanel.add(urlErrorLabel);
         urlPanel.add(urlTextBox);
 
         mainPanel.add(urlPanel);
@@ -138,7 +146,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     {
         // validate this data
         if (urlTextBox.getText().trim().length() == 0) {
-            Window.alert(getErrorMessage());
+            displayURLError(getURLErrorMessage());
             async.onSuccess(false);
         } else {
             String linkUri = buildURL();
@@ -169,7 +177,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     /**
      * @return the error message to be displayed when the user uri is missing.
      */
-    protected abstract String getErrorMessage();
+    protected abstract String getURLErrorMessage();
 
     /**
      * Builds an URL to the external resource to be linked from the user input, adding protocols, parsing user input,
@@ -185,5 +193,27 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     protected String getURLTextBoxTooltip()
     {
         return "";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void hideError()
+    {
+        super.hideError();
+        // hide this dialog's specific errors
+        urlErrorLabel.setVisible(false);
+    }
+
+    /**
+     * Displays the URL error message and markers.
+     * 
+     * @param errorMessage the error message to display
+     */
+    public void displayURLError(String errorMessage)
+    {
+        urlErrorLabel.setText(errorMessage);
+        urlErrorLabel.setVisible(true);
     }
 }

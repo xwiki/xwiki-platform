@@ -21,9 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
@@ -36,6 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.AttachmentPreviewWidget;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
+import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
@@ -73,12 +72,17 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     /**
      * The main panel of this wizard step.
      */
-    private FlowPanel mainPanel = new FlowPanel();
+    private VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
      * The currently edited resource (the currently edited page).
      */
     private ResourceName editedResource;
+
+    /**
+     * The label to signal errors of the list selection in.
+     */
+    private Label errorLabel = new Label();
 
     /**
      * The list of attachments.
@@ -99,8 +103,16 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     {
         this.editedResource = editedResource;
         mainPanel.addStyleName("xAttachmentsSelector");
+        Label helpLabel = new Label(Strings.INSTANCE.linkSelectAttachmentHelpLabel());
+        helpLabel.setStyleName("xHelpLabel");
+        errorLabel.addStyleName("xLinkParameterError");
+        errorLabel.setVisible(false);
+
+        mainPanel.add(helpLabel);
+        mainPanel.add(errorLabel);
         // create an empty attachments list
         mainPanel.add(attachmentsList);
+        mainPanel.setExpandingWidget(attachmentsList, false);
         // put the new attachment option on top
         newOptionOnTop = true;
     }
@@ -111,6 +123,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     @Override
     public void init(final Object data, final AsyncCallback< ? > cb)
     {
+        hideError();
         super.init(data, new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
@@ -219,10 +232,8 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        // nothing special
-        async.onSuccess(true);
     }
 
     /**
@@ -230,11 +241,12 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
+        hideError();
         AttachmentPreviewWidget selectedOption =
             (AttachmentPreviewWidget) (attachmentsList.getSelectedItem() != null ? attachmentsList.getSelectedItem()
                 .getWidget(0) : null);
         if (selectedOption == null) {
-            Window.alert(Strings.INSTANCE.linkNoAttachmentSelectedError());
+            displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());
             async.onSuccess(false);
             return;
         }
@@ -264,5 +276,26 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
             }
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * Displays the error message and markers for this steps form.
+     * 
+     * @param message the error message to display
+     */
+    public void displayError(String message)
+    {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        mainPanel.refreshHeights();
+    }
+
+    /**
+     * Hides the error message and markers.
+     */
+    public void hideError()
+    {
+        errorLabel.setVisible(false);
+        mainPanel.refreshHeights();
     }
 }

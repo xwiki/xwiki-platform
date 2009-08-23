@@ -74,12 +74,9 @@ public interface WizardStep
 
     /**
      * Called before canceling the current wizard step. Here is the point to do all adjustments before the previous
-     * dialog is loaded, in the case of a chained wizard, and compute the result to pass to the previous dialog.
-     * 
-     * @param async asynchronous callback to handle asynchronous nature of this function (in case of communication with
-     *            the server side, for example).
+     * dialogs loaded, in the case of a chained wizard.
      */
-    void onCancel(AsyncCallback<Boolean> async);
+    void onCancel();
 
     // Note: the following functions could be as well moved to a NavigatingWizardStep interface, so that we don't hold
     // navigation responsibilities in the wizard step itself, but for the moment it would be a bit overengineered.

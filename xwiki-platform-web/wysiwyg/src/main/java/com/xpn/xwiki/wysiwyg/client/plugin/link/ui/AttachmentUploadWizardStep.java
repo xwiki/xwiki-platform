@@ -74,10 +74,22 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     /**
      * {@inheritDoc}
      */
-    public void init(Object data, AsyncCallback< ? > cb)
+    public void init(final Object data, final AsyncCallback< ? > cb)
     {
-        linkData = (LinkConfig) data;
-        cb.onSuccess(null);
+        super.init(data, new AsyncCallback<Object>()
+        {
+            public void onSuccess(Object result)
+            {
+                linkData = (LinkConfig) data;
+                cb.onSuccess(null);
+            }
+
+            public void onFailure(Throwable caught)
+            {
+                cb.onFailure(caught);
+            }
+        });
+
     }
 
     /**
@@ -106,7 +118,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
     {
         return linkData.getWiki();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -125,7 +137,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
         // commit the attachment data in the link config
         // commit relative reference
         ResourceName ref = new ResourceName(attach.getReference(), true);
-        // FIXME: move the reference setting logic in a controller        
+        // FIXME: move the reference setting logic in a controller
         linkData.setReference("attach:" + ref.getRelativeTo(editedResource).toString());
         linkData.setUrl(attach.getDownloadUrl());
     }

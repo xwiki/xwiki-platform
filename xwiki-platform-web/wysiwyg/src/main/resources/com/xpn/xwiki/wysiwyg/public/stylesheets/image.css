@@ -35,7 +35,7 @@
   padding-bottom: 1ex;
   margin-top: 5px;
   background-position: left center;
-  background-repeat: no-repeat;  
+  background-repeat: no-repeat;
 }
 
 .xImagesSelector .xListItem-selected {
@@ -46,15 +46,6 @@
   margin-top: 5px;
 }
 
-.xSelectorStep .xImagesSelector {
-  margin-top: 5px;  
-}
-
-.xSelectorStep .xImagesSelector .xListBox {
-  height: 315px;
+.xImagesSelector .xListBox {
   overflow: auto;
-}
-
-.xSelectorStep .xImagesExplorer .xListBox {
-  height: 285px;
 }

@@ -214,10 +214,14 @@ public interface Strings extends Constants
     String linkWikipageSearchButton();
 
     String linkSelectWikipageTitle();
+    
+    String linkSelectWikipageHelpLabel();
 
     String linkNoPageSelectedError();
 
     String linkSelectAttachmentTitle();
+    
+    String linkSelectAttachmentHelpLabel();
 
     String linkAttachmentUploadHelpLabel();
 
@@ -274,6 +278,10 @@ public interface Strings extends Constants
     String imageRemoveImage();
 
     String imageSelectImageTitle();
+    
+    String imageSelectImageHelpLabel();
+    
+    String imageSelectImageLocationHelpLabel();
 
     String imageUploadNewFileLabel();
 

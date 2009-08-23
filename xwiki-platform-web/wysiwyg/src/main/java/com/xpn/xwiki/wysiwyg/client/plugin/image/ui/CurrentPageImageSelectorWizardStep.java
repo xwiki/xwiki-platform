@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.List;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -35,6 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
+import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
@@ -74,7 +74,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     /**
      * The main panel of this wizard step.
      */
-    private FlowPanel mainPanel = new FlowPanel();
+    private VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
      * The currently edited resource (the currently edited page).
@@ -92,6 +92,11 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     private ListBox imageList = new ListBox();
 
     /**
+     * Label to display the selection error in this wizard step.
+     */
+    private final Label errorLabel = new Label();
+
+    /**
      * Specifies whether the new image option should be shown on top or on bottom of the list.
      */
     private boolean newOptionOnTop;
@@ -107,8 +112,18 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         this.editedResource = editedResource;
         this.currentPage = currentPage;
         mainPanel.addStyleName("xImagesSelector");
+
+        Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageHelpLabel());
+        helpLabel.addStyleName("xHelpLabel");
+        mainPanel.add(helpLabel);
+
+        errorLabel.addStyleName("xImageParameterError");
+        errorLabel.setVisible(false);
+        mainPanel.add(errorLabel);
+
         // create an empty images list
         mainPanel.add(imageList);
+        mainPanel.setExpandingWidget(imageList, false);
         // put the new image option on top
         newOptionOnTop = true;
     }
@@ -128,6 +143,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
      */
     public void init(final Object data, final AsyncCallback< ? > cb)
     {
+        hideError();
         super.init(data, new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
@@ -240,10 +256,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        // nothing special
-        async.onSuccess(true);
     }
 
     /**
@@ -251,11 +265,12 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
+        hideError();
         ImagePreviewWidget selectedOption =
             (ImagePreviewWidget) 
                 (imageList.getSelectedItem() != null ? imageList.getSelectedItem().getWidget(0) : null);
         if (selectedOption == null) {
-            Window.alert(Strings.INSTANCE.imageNoImageSelectedError());
+            displayError(Strings.INSTANCE.imageNoImageSelectedError());
             async.onSuccess(false);
             return;
         }
@@ -283,5 +298,26 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
             }
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * Displays the specified error message and error markers for this wizard step.
+     * 
+     * @param message the error message to display
+     */
+    public void displayError(String message)
+    {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        mainPanel.refreshHeights();
+    }
+
+    /**
+     * Hides the error markers for this wizard step.
+     */
+    public void hideError()
+    {
+        errorLabel.setVisible(false);
+        mainPanel.refreshHeights();
     }
 }

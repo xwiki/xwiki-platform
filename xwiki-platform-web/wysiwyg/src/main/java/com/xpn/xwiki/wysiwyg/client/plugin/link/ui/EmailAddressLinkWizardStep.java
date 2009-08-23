@@ -61,9 +61,9 @@ public class EmailAddressLinkWizardStep extends AbstractExternalLinkWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkWizardStep#getErrorMessage()
+     * @see AbstractExternalLinkWizardStep#getURLErrorMessage()
      */
-    protected String getErrorMessage()
+    protected String getURLErrorMessage()
     {
         return Strings.INSTANCE.linkEmailAddressError();
     }

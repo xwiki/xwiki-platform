@@ -186,3 +186,41 @@
 .xMacroParameterLabel-mandatory, .xInfoLabel-mandatory {
   color: #5A1;
 }
+
+.xMacroParameterError, .xLinkParameterError, 
+.xFileUploadError, .xPageNameError, .xImageParameterError {
+  font-size: 75%;
+  color: red;
+  margin-bottom: 3px;
+}
+
+/* Sizes for the top-level containers in the dialogs, those that need to resize to 100% of the dialog content */
+/* without aggregator */
+.xAttachmentsSelector, .xPagesSelector, .xExplorerPanel, 
+.xImagesSelector, .xImagesExplorer {
+  margin-top: 5px;
+  /* Make sure this panel expands to the whole dialog body and stays expanded, on all IEs. width: 
+        100% does not do it, nor default overflow. */
+  width: 459px;
+  overflow: auto;
+  height: 340px;
+}
+
+/* with aggregator */
+.xSelectorAggregatorStep {
+  /* dialog body height minus its border to make sure it fits  well in IE6 too */
+  height: 346px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  /* selector overflow is hidden due to an issue with table sizes in IE: all scrolls are to be handled inside */
+  overflow: hidden;
+  /* make sure this panel expands to the whole dialog and stays there on IE browsers */
+  width: 459px;
+}
+
+.xSelectorAggregatorStep .xAttachmentsSelector, .xSelectorAggregatorStep .xPagesSelector, 
+.xSelectorAggregatorStep .xExplorerPanel, .xSelectorAggregatorStep .xImagesSelector, 
+.xSelectorAggregatorStep .xImagesExplorer {
+  height: 315px;
+}

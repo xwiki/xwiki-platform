@@ -45,11 +45,6 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     SubmitCompleteHandler
 {
     /**
-     * 'loading' style name.
-     */
-    private static final String STYLE_LOADING = "loading";
-
-    /**
      * Container panel.
      */
     private FlowPanel mainPanel;
@@ -171,7 +166,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     {
         tabPanel.setVisible(false);
         enableControls(false);
-        mainPanel.addStyleName(STYLE_LOADING);
+        this.setLoading(true);
     }
 
     /**
@@ -179,7 +174,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
      */
     private void stopProgress()
     {
-        mainPanel.removeStyleName(STYLE_LOADING);
+        this.setLoading(false);
         tabPanel.setVisible(true);
         enableControls(true);
     }

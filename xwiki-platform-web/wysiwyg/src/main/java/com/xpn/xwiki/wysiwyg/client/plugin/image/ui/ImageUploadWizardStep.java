@@ -93,7 +93,7 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
         ResourceName ref = new ResourceName(attach.getReference(), true);
         imageData.setReference(ref.getRelativeTo(editedResource).toString());
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -122,9 +122,20 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
     /**
      * {@inheritDoc}
      */
-    public void init(Object data, AsyncCallback< ? > cb)
+    public void init(final Object data, final AsyncCallback< ? > cb)
     {
-        imageData = (ImageConfig) data;
-        cb.onSuccess(null);
+        super.init(data, new AsyncCallback<Object>()
+        {
+            public void onSuccess(Object result)
+            {
+                imageData = (ImageConfig) data;
+                cb.onSuccess(null);
+            }
+
+            public void onFailure(Throwable caught)
+            {
+                cb.onFailure(caught);
+            }
+        });
     }
 }

@@ -41,9 +41,9 @@ public class WebPageLinkWizardStep extends AbstractExternalLinkWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExternalLinkTab#getErrorMessage()
+     * @see AbstractExternalLinkTab#getURLErrorMessage()
      */
-    protected String getErrorMessage()
+    protected String getURLErrorMessage()
     {
         return Strings.INSTANCE.linkWebPageAddressError();
     }

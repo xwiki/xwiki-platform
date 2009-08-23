@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -34,6 +33,7 @@ import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
+import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
@@ -71,7 +71,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     /**
      * The main panel of this wizard step.
      */
-    private FlowPanel mainPanel = new FlowPanel();
+    private VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
      * The currently edited resource (the currently edited page).
@@ -82,6 +82,11 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
      * The list of pages.
      */
     private ListBox pagesList = new ListBox();
+
+    /**
+     * The label to display the selection error in this wizard step.
+     */
+    private Label errorLabel = new Label();
 
     /**
      * Specifies whether the new attachment option should be shown on top or on bottom of the list.
@@ -97,8 +102,21 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     {
         this.editedResource = editedResource;
         mainPanel.addStyleName("xPagesSelector");
+
+        Label helpLabel = new Label(Strings.INSTANCE.linkSelectWikipageHelpLabel());
+        helpLabel.addStyleName("xHelpLabel");
+
+        errorLabel.setText(Strings.INSTANCE.linkNoPageSelectedError());
+        errorLabel.addStyleName("xLinkParameterError");
+        errorLabel.setVisible(false);
+
+        mainPanel.add(helpLabel);
+        mainPanel.add(errorLabel);
+
         // create an empty pages list
         mainPanel.add(pagesList);
+
+        mainPanel.setExpandingWidget(pagesList, false);
         // put the new attachment option on top
         newOptionOnTop = true;
     }
@@ -117,6 +135,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     @Override
     public void init(final Object data, final AsyncCallback< ? > cb)
     {
+        hideError();
         super.init(data, new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
@@ -199,9 +218,8 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        async.onSuccess(true);
     }
 
     /**
@@ -209,10 +227,11 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
+        hideError();
         PagePreviewWidget selectedOption =
             (PagePreviewWidget) (pagesList.getSelectedItem() != null ? pagesList.getSelectedItem().getWidget(0) : null);
         if (selectedOption == null) {
-            Window.alert(Strings.INSTANCE.linkNoPageSelectedError());
+            displayError(Strings.INSTANCE.linkNoPageSelectedError());
             async.onSuccess(false);
             return;
         }
@@ -257,5 +276,26 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     public FlowPanel getMainPanel()
     {
         return mainPanel;
+    }
+
+    /**
+     * Clears the error message and markers from the UI.
+     */
+    protected void hideError()
+    {
+        errorLabel.setVisible(false);
+        mainPanel.refreshHeights();
+    }
+
+    /**
+     * Displays the passed error message and error markers for this wizard step.
+     * 
+     * @param message the error message to display
+     */
+    protected void displayError(String message)
+    {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+        mainPanel.refreshHeights();
     }
 }

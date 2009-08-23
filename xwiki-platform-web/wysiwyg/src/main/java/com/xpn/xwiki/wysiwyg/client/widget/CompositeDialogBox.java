@@ -113,4 +113,14 @@ public class CompositeDialogBox extends Composite implements HasCloseHandlers<Co
             CloseEvent.fire(this, this, event.isAutoClosed());
         }
     }
+
+    /**
+     * @return {@code true} if this dialog is currently shown, {@code false} otherwise.
+     * 
+     * @see DialogBox#isShowing()
+     */
+    public boolean isShowing()
+    {
+        return dialog.isShowing();
+    }
 }

@@ -85,7 +85,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         searchBox.addKeyPressHandler(this);
         searchPanel.add(searchBox);
         searchPanel.add(searchButton);
-        getMainPanel().insert(searchPanel, getMainPanel().getWidgetIndex(getPagesList()));
+        getMainPanel().insert(searchPanel, 0);
     }
 
     /**

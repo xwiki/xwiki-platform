@@ -24,7 +24,6 @@ import java.util.EnumSet;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -54,6 +53,21 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     public static final String DEFAULT_STYLE_NAME = "xLinkConfig";
 
     /**
+     * The style of the information labels in this form.
+     */
+    public static final String INFO_LABEL_STYLE = "xInfoLabel";
+
+    /**
+     * The style of the description labels in this form.
+     */
+    public static final String HELP_LABEL_STYLE = "xHelpLabel";
+
+    /**
+     * The style of the error labels in this form.
+     */
+    public static final String ERROR_LABEL_STYLE = "xLinkParameterError";
+
+    /**
      * The link data to be edited by this wizard step.
      */
     private LinkConfig linkData;
@@ -68,6 +82,11 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      * The text box where the user will insert the text of the link to create.
      */
     private final TextBox labelTextBox = new TextBox();
+
+    /**
+     * The label to signal the error on the label field of this form.
+     */
+    private final Label labelErrorLabel = new Label();
 
     /**
      * The text box to get the link tooltip.
@@ -89,37 +108,47 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     public LinkConfigWizardStep()
     {
-        String infoLabelStyle = "xInfoLabel";
-        String helpLabelStyle = "xHelpLabel";
-        Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
-        labelLabel.setStyleName(infoLabelStyle);
-        labelLabel.addStyleDependentName("mandatory");
-        Label helpLabelLabel = new Label(getLabelTextBoxTooltip());
-        helpLabelLabel.setStyleName(helpLabelStyle);
-        // on enter in the textbox, submit the form
-        labelTextBox.addKeyPressHandler(this);
-        labelTextBox.setTitle(getLabelTextBoxTooltip());
-        tooltipTextBox.setTitle(getTooltipTextBoxTooltip());
-        mainPanel.add(labelLabel);
-        mainPanel.add(helpLabelLabel);
-        mainPanel.add(getLabelTextBox());
         mainPanel.addStyleName(DEFAULT_STYLE_NAME);
+        setUpLabelField();
         Label tooltipLabel = new Label(Strings.INSTANCE.linkTooltipLabel());
-        tooltipLabel.setStyleName(infoLabelStyle);
+        tooltipLabel.setStyleName(INFO_LABEL_STYLE);
         Label helpTooltipLabel = new Label(getTooltipTextBoxTooltip());
-        helpTooltipLabel.setStyleName(helpLabelStyle);
+        helpTooltipLabel.setStyleName(HELP_LABEL_STYLE);
         // on enter in the textbox, submit the form
         tooltipTextBox.addKeyPressHandler(this);
+        tooltipTextBox.setTitle(getTooltipTextBoxTooltip());
         mainPanel.add(tooltipLabel);
         mainPanel.add(helpTooltipLabel);
         mainPanel.add(tooltipTextBox);
         newWindowCheckBox = new CheckBox(Strings.INSTANCE.linkOpenInNewWindowLabel());
         // just add the style, because we need to be able to still detect this is a checkbox
-        newWindowCheckBox.addStyleName(infoLabelStyle);
+        newWindowCheckBox.addStyleName(INFO_LABEL_STYLE);
         Label helpNewWindowLabel = new Label(Strings.INSTANCE.linkOpenInNewWindowHelpLabel());
-        helpNewWindowLabel.setStyleName(helpLabelStyle);
+        helpNewWindowLabel.setStyleName(HELP_LABEL_STYLE);
         mainPanel.add(newWindowCheckBox);
         mainPanel.add(helpNewWindowLabel);
+    }
+
+    /**
+     * Helper function to setup the label field in this link form.
+     */
+    private void setUpLabelField()
+    {
+        Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
+        labelLabel.setStyleName(INFO_LABEL_STYLE);
+        labelLabel.addStyleDependentName("mandatory");
+        Label helpLabelLabel = new Label(getLabelTextBoxTooltip());
+        helpLabelLabel.setStyleName(HELP_LABEL_STYLE);
+
+        labelErrorLabel.addStyleName(ERROR_LABEL_STYLE);
+        labelErrorLabel.setVisible(false);
+        // on enter in the textbox, submit the form
+        labelTextBox.addKeyPressHandler(this);
+        labelTextBox.setTitle(getLabelTextBoxTooltip());
+        mainPanel.add(labelLabel);
+        mainPanel.add(helpLabelLabel);
+        mainPanel.add(labelErrorLabel);
+        mainPanel.add(getLabelTextBox());
     }
 
     /**
@@ -134,6 +163,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         labelTextBox.setReadOnly(linkData.isReadOnlyLabel());
         tooltipTextBox.setText(linkData.getTooltip() == null ? "" : linkData.getTooltip());
         newWindowCheckBox.setValue(linkData.isOpenInNewWindow());
+        hideError();
         cb.onSuccess(null);
     }
 
@@ -212,9 +242,12 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
+        // first reset all error labels, consider everything's fine
+        hideError();
         // check the label input field
         if (this.labelTextBox.getText().trim().length() == 0) {
-            Window.alert(Strings.INSTANCE.linkNoLabelError());
+            displayLabelError(Strings.INSTANCE.linkNoLabelError());
+            labelErrorLabel.setVisible(true);
             // something is wrong, don't validate
             async.onSuccess(false);
         } else {
@@ -234,10 +267,8 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        // always passes with success
-        async.onSuccess(true);
     }
 
     /**
@@ -325,5 +356,24 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
             // fire the event for the default direction
             navigationListeners.fireNavigationEvent(getDefaultDirection());
         }
+    }
+
+    /**
+     * Display the label error message and markers.
+     * 
+     * @param errorMessage the error message to display.
+     */
+    protected void displayLabelError(String errorMessage)
+    {
+        labelErrorLabel.setText(errorMessage);
+        labelErrorLabel.setVisible(true);
+    }
+
+    /**
+     * Hides the error message and markers for this dialog.
+     */
+    protected void hideError()
+    {
+        labelErrorLabel.setVisible(false);
     }
 }

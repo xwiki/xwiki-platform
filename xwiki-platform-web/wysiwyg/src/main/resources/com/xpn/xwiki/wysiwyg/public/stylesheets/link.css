@@ -3,28 +3,12 @@
   width: 98%;
 }
 
-.xSelectorStep .listGrid, .xExplorer .listGrid {
+.xExplorer .listGrid {
   border: none;
 }
 
-.xSelectorStep .xListBox {
-  height: 315px;
+.xAttachmentsSelector .xListBox, .xPagesSelector .xListBox {
   overflow: auto;
-}
-
-/* selector overflow is hidden due to an issue with table sizes in IE: all scrolls are to be handled inside */
-.xSelectorStep {
-  /* dialog body height minus its border to make sure it fits  well in IE6 too */
-  height: 346px;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  overflow: hidden;
-}
-
-/* Attachments, pages lists */
-.xAttachmentsSelector, .xPagesSelector {
-  margin-top: 5px;
 }
 
 .xAttachmentsSelector .xAttachPreview, .xAttachmentsSelector .xNewFilePreview, 
@@ -34,6 +18,7 @@
   background-position: left center;
   background-repeat: no-repeat;
 }
+
 .xAttachmentsSelector .xAttachPreview {
   background-image: url(../images/attach.gif);
 }
@@ -63,8 +48,4 @@
 .xPagesSearch .xSearchForm {
   height: 25px;
   line-height: 19px;
-}
-
-.xSelectorStep .xPagesSearch .xListBox {
-  height: 290px;
 }

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -50,7 +49,7 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
     public WikiPageExplorerWizardStep(ResourceName editedResource)
     {
         // build a standard selector which shows "Add page" and no attachments.
-        // FIXME: size hardcoding is very bad, remove when a method to control this from CSS will be found 
+        // FIXME: size hardcoding is very bad, remove when a method to control this from CSS will be found
         super(true, false, false, editedResource.toString(), 455, 280);
         this.editedResource = editedResource;
     }
@@ -90,9 +89,8 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        async.onSuccess(true);
     }
 
     /**
@@ -100,11 +98,12 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
+        hideError();
         // should check that the selection is ok according to the desired type and to "commit" it in the link config
         String selectedValue = getExplorer().getValue();
         // selected resource should not be empty
         if (StringUtils.isEmpty(selectedValue) && !getExplorer().isNewPage()) {
-            Window.alert(Strings.INSTANCE.linkNoPageSelectedError());
+            displayError(Strings.INSTANCE.linkNoPageSelectedError());
             async.onSuccess(false);
         } else if (StringUtils.isEmpty(getData().getReference()) || !selectedValue.equals(getData().getReference())) {
             // commit the changes in the config, only if necessary
@@ -128,7 +127,7 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
                 getData().setPage(null);
             }
             // build the link url and reference from the parameters.
-            // FIXME: move the reference setting logic in a controller, along with the async fetching            
+            // FIXME: move the reference setting logic in a controller, along with the async fetching
             WysiwygService.Singleton.getInstance().getPageLink(getExplorer().getSelectedWiki(),
                 getExplorer().getSelectedSpace(), getExplorer().getSelectedPage(), null, null,
                 new AsyncCallback<LinkConfig>()
@@ -150,5 +149,23 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
         } else {
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getDefaultErrorText()
+    {
+        return Strings.INSTANCE.linkNoPageSelectedError();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getHelpLabelText()
+    {
+        return Strings.INSTANCE.linkSelectWikipageHelpLabel();
     }
 }

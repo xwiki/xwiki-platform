@@ -91,7 +91,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         this.editedResource = editedResource;
 
         // instantiate the main panel
-        mainPanel.addStyleName("xSelectorStep");
+        mainPanel.addStyleName("xSelectorAggregatorStep");
 
         tabPanel.addStyleName("xStepsTabs");
 
@@ -352,9 +352,9 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        getCurrentStep().onCancel(async);
+        getCurrentStep().onCancel();
     }
 
     /**

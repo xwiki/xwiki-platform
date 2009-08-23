@@ -302,9 +302,8 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        async.onSuccess(true);
     }
 
     /**

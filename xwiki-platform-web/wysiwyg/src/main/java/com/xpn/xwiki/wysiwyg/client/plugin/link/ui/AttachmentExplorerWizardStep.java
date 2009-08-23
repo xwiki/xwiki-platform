@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -98,10 +97,8 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        // nothing to do here, just return
-        async.onSuccess(true);
     }
 
     /**
@@ -109,10 +106,12 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
      */
     public void onSubmit(final AsyncCallback<Boolean> async)
     {
+        // reset error display
+        hideError();
         // get selected file, get its URL and add it
         String attachment = getExplorer().getSelectedAttachment();
         if (StringUtils.isEmpty(attachment) && !getExplorer().isNewAttachment()) {
-            Window.alert(Strings.INSTANCE.linkNoAttachmentSelectedError());
+            displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());
             async.onSuccess(false);
         } else if (StringUtils.isEmpty(getData().getReference())
             || !getData().getReference().equals(ATTACH_PREFIX + getExplorer().getValue())) {
@@ -133,7 +132,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
                         {
                             if (result == null) {
                                 // there was a problem with getting the attachment, call it a failure.
-                                Window.alert(Strings.INSTANCE.fileGetSubmitError());
+                                displayError(Strings.INSTANCE.fileGetSubmitError());
                                 async.onSuccess(false);
                             } else {
                                 ResourceName ref = new ResourceName(result.getReference(), true);
@@ -152,5 +151,23 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
         } else {
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getHelpLabelText()
+    {
+        return Strings.INSTANCE.linkSelectAttachmentHelpLabel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getDefaultErrorText()
+    {
+        return Strings.INSTANCE.linkNoAttachmentSelectedError();
     }
 }

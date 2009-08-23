@@ -38,6 +38,7 @@ import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.PageSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.SpaceSelector;
+import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.WikiSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
@@ -81,7 +82,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     /**
      * The main panel of this widget.
      */
-    private final FlowPanel mainPanel = new FlowPanel();
+    private final VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
      * The image selector for the currently selected page in this wizard step. This will be instantiated every time the
@@ -101,6 +102,10 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     public ImagesExplorerWizardStep(ResourceName editedResource, boolean displayWikiSelector)
     {
         this.editedResource = editedResource;
+        
+        Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageLocationHelpLabel());
+        helpLabel.addStyleName("xHelpLabel");
+        mainPanel.add(helpLabel);
         // initialize selectors, mainPanel
         mainPanel.addStyleName("xImagesExplorer");
         this.displayWikiSelector = displayWikiSelector;
@@ -332,10 +337,15 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      */
     protected void initAndDisplayCurrentPage(ResourceName resource)
     {
-        pageWizardStep = new CurrentPageImageSelectorWizardStep(resource, editedResource);
-        if (mainPanel.getWidgetCount() > 1) {
-            mainPanel.remove(1);
+        // remove old panel, if any
+        if (pageWizardStep != null) {
+            int pageWizardStepIndex = mainPanel.getWidgetIndex(pageWizardStep.display());
+            if (pageWizardStepIndex > 0) {
+                mainPanel.remove(pageWizardStepIndex);
+            }
         }
+        // create a new pageWizard step
+        pageWizardStep = new CurrentPageImageSelectorWizardStep(resource, editedResource);
         mainPanel.addStyleName(STYLE_LOADING);
         pageWizardStep.init(getData(), new AsyncCallback<Object>()
         {
@@ -343,6 +353,8 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             {
                 mainPanel.removeStyleName(STYLE_LOADING);
                 mainPanel.add(pageWizardStep.display());
+                mainPanel.setExpandingWidget(pageWizardStep.display(), true);
+                mainPanel.refreshHeights();
             };
 
             public void onFailure(Throwable caught)
@@ -402,9 +414,9 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     /**
      * {@inheritDoc}
      */
-    public void onCancel(AsyncCallback<Boolean> async)
+    public void onCancel()
     {
-        pageWizardStep.onCancel(async);
+        pageWizardStep.onCancel();
     }
 
     /**

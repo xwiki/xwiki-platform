@@ -23,6 +23,8 @@ import java.io.StringReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for filtering {@code<p><br/></p>} elements in {@link OpenOfficeHTMLCleaner}.
@@ -35,25 +37,27 @@ public class EmptyLineParagraphOpenOfficeCleaningTest extends AbstractHTMLCleani
     /**
      * The first {@code<p><br/></p>} element in a sequence of such elements should be removed.
      */
+    @Test
     public void testRemoveFirstEmptyLineParagraph()
     {
         String html = header + "<p><br/></p>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList paras = doc.getElementsByTagName("p");
-        assertEquals(0, paras.getLength());
+        Assert.assertEquals(0, paras.getLength());
         NodeList breaks = doc.getElementsByTagName("br");
-        assertEquals(0, breaks.getLength());
+        Assert.assertEquals(0, breaks.getLength());
     }
 
     /**
      * In a sequence of {@code<p><br/></p>} elements, while the first element is removed, rest will be replaced by
      * {@code<br/>} elements.
      */
+    @Test
     public void testReplaceAdditionalEmptyLineParagraphs()
     {
         String html = header + "<p><br/></p><p><br/></p><p><br/></p><p><br/></p>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList breaks = doc.getElementsByTagName("br");
-        assertEquals(3, breaks.getLength());
+        Assert.assertEquals(3, breaks.getLength());
     }
 }

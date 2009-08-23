@@ -27,6 +27,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Miscellaneous cleaning tests for {@link WysiwygHTMLCleaner}.
@@ -39,6 +41,7 @@ public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
     /**
      * Test cleaning of HTML paragraphs with namespaces specified.
      */
+    @Test
     public void testParagraphsWithNamespaces()
     {
         String html = header + "<w:p>paragraph</w:p>" + footer;
@@ -46,26 +49,27 @@ public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
         configuration.setParameters(Collections.singletonMap(HTMLCleanerConfiguration.NAMESPACES_AWARE, "false"));
         Document doc = wysiwygHTMLCleaner.clean(new StringReader(html), configuration);
         NodeList nodes = doc.getElementsByTagName("p");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
     }
 
     /**
      * The source of the images in copy pasted HTML content should be replaces with 'Missing.png' since they can't be
      * uploaded automatically.
      */
+    @Test
     public void testImageFiltering()
     {        
         String html = header + "<img src=\"file://path/to/local/image.png\"/>" + footer;
         Document doc = wysiwygHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("img");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);
         Node startComment = image.getPreviousSibling();
         Node stopComment = image.getNextSibling();
-        assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
-        assertTrue(startComment.getNodeValue().equals("startimage:Missing.png"));
-        assertEquals("Missing.png", image.getAttribute("src"));
-        assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
-        assertTrue(stopComment.getNodeValue().equals("stopimage"));     
+        Assert.assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
+        Assert.assertTrue(startComment.getNodeValue().equals("startimage:Missing.png"));
+        Assert.assertEquals("Missing.png", image.getAttribute("src"));
+        Assert.assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
+        Assert.assertTrue(stopComment.getNodeValue().equals("stopimage"));
     }
 }

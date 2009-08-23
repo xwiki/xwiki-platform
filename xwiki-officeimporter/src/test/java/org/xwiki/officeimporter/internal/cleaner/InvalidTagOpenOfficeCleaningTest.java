@@ -23,6 +23,8 @@ import java.io.StringReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for tag removing in {@link OpenOfficeHTMLCleaner}.
@@ -35,6 +37,7 @@ public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * {@code <style>} tags should be stripped from html content.
      */
+    @Test
     public void testStyleTagRemoving()
     {
         String html =
@@ -42,17 +45,18 @@ public class InvalidTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
                 + "</head><body>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("style");
-        assertEquals(0, nodes.getLength());
+        Assert.assertEquals(0, nodes.getLength());
     }
     
     /**
      * {@code <style>} tags should be stripped from html content.
      */
+    @Test
     public void testScriptTagRemoving()
     {
         String html = header + "<script type=\"text/javascript\">document.write(\"Hello World!\")</script>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("script");
-        assertEquals(0, nodes.getLength());
+        Assert.assertEquals(0, nodes.getLength());
     }
 }

@@ -25,7 +25,10 @@ import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test class for {@link HeadingLevelSplittingCriterion}.
@@ -33,7 +36,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class HeadingLevelSplittingCriterionTest extends AbstractXWikiComponentTestCase
+public class HeadingLevelSplittingCriterionTest extends AbstractComponentTestCase
 {
     /**
      * The {@link Parser} component.
@@ -43,11 +46,14 @@ public class HeadingLevelSplittingCriterionTest extends AbstractXWikiComponentTe
     /**
      * {@inheritDoc}
      */
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
-        xwikiParser = (Parser) getComponentManager().lookup(Parser.class, "xwiki/2.0");
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+
+        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
     }
 
     /**
@@ -55,15 +61,16 @@ public class HeadingLevelSplittingCriterionTest extends AbstractXWikiComponentTe
      * 
      * @throws Exception
      */
+    @Test
     public void testIterateCondition() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Test="));
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {3, 2, 1});
         Block sectionBlock = xdom.getChildren().get(0);
-        assertTrue(!splittingCriterion.shouldIterate(xdom, 0));
-        assertTrue(splittingCriterion.shouldIterate(sectionBlock, 1));
-        assertTrue(splittingCriterion.shouldSplit(sectionBlock, 3));
-        assertTrue(!splittingCriterion.shouldSplit(sectionBlock, 4));
+        Assert.assertTrue(!splittingCriterion.shouldIterate(xdom, 0));
+        Assert.assertTrue(splittingCriterion.shouldIterate(sectionBlock, 1));
+        Assert.assertTrue(splittingCriterion.shouldSplit(sectionBlock, 3));
+        Assert.assertTrue(!splittingCriterion.shouldSplit(sectionBlock, 4));
     }
     
     /**
@@ -71,13 +78,14 @@ public class HeadingLevelSplittingCriterionTest extends AbstractXWikiComponentTe
      * 
      * @throws Exception
      */
+    @Test
     public void testSplitCondition() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Test="));
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {3, 2, 1});
         Block sectionBlock = xdom.getChildren().get(0);
-        assertTrue(splittingCriterion.shouldSplit(sectionBlock, 1));
+        Assert.assertTrue(splittingCriterion.shouldSplit(sectionBlock, 1));
         splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {3, 2});
-        assertTrue(!splittingCriterion.shouldSplit(sectionBlock, 1));
+        Assert.assertTrue(!splittingCriterion.shouldSplit(sectionBlock, 1));
     }
 }

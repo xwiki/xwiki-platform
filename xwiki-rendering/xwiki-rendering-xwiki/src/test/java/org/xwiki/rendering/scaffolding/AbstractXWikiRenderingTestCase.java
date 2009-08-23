@@ -19,32 +19,27 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Before;
+
 /**
  * To be used when testing components that use {@link org.xwiki.rendering.wiki.WikiModel}. 
  * 
  * @version $Id$
  * @since 2.0M1
  */
-public abstract class AbstractXWikiRenderingTestCase extends AbstractRenderingTestCase
+public abstract class AbstractXWikiRenderingTestCase extends AbstractComponentTestCase
 {
-    public AbstractXWikiRenderingTestCase()
-    {
-        super();
-    }
-
-    public AbstractXWikiRenderingTestCase(String testName)
-    {
-        super(testName);
-    }
-
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
+     * @see org.xwiki.test.AbstractComponentTestCase#setUp()
      */
-    @Override
-    protected void registerComponents() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
+        super.setUp();
+        
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         getComponentManager().registerComponent(MockDocumentNameSerializer.getComponentDescriptor());
     }

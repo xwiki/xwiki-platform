@@ -22,6 +22,8 @@ package org.xwiki.rendering.internal.configuration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.scaffolding.AbstractXWikiRenderingTestCase;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.configuration.XWikiRenderingConfiguration}.
@@ -32,12 +34,12 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
 @Component
 public class XWikiRenderingConfigurationTest extends AbstractXWikiRenderingTestCase
 {
+    @Test
     public void testDefaultConfiguration() throws Exception
     {
         RenderingConfiguration configuration = getComponentManager().lookup(RenderingConfiguration.class);
-        assertEquals("%p", configuration.getLinkLabelFormat());
-
-        assertNotNull(configuration.getMacroCategories());
-        assertEquals(0, configuration.getMacroCategories().size());
+        Assert.assertEquals("%p", configuration.getLinkLabelFormat());
+        Assert.assertNotNull(configuration.getMacroCategories());
+        Assert.assertEquals(0, configuration.getMacroCategories().size());
     }
 }

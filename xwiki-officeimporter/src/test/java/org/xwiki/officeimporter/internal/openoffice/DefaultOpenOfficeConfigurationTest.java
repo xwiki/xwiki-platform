@@ -19,9 +19,10 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
+import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for {@link DefaultOpenOfficeConfiguration}.
@@ -29,47 +30,18 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeConfigurationTest extends AbstractRenderingTestCase
+public class DefaultOpenOfficeConfigurationTest extends AbstractHTMLCleaningTest
 {
-    /**
-     * Office importer configuration.
-     */
-    private OpenOfficeConfiguration configuration;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        this.configuration =
-            (OpenOfficeConfiguration) getComponentManager()
-                .lookup(OpenOfficeConfiguration.class, "default");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
-     */
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-    }
-
     /**
      * Test if default configuration values are present.
      */
-    public void testDefaultConfiguration()
+    @Test
+    public void testDefaultConfiguration() throws Exception
     {
-        assertNotNull(configuration.getHomePath());
-        assertNotNull(configuration.getProfilePath());
-        assertTrue(configuration.getMaxTasksPerProcess() > 0);
-        assertTrue(configuration.getTaskExecutionTimeout() > 0);
+        OpenOfficeConfiguration configuration = getComponentManager().lookup(OpenOfficeConfiguration.class, "default");
+        Assert.assertNotNull(configuration.getHomePath());
+        Assert.assertNotNull(configuration.getProfilePath());
+        Assert.assertTrue(configuration.getMaxTasksPerProcess() > 0);
+        Assert.assertTrue(configuration.getTaskExecutionTimeout() > 0);
     }
 }

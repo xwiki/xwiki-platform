@@ -25,6 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for cleaning html tables in {@link OpenOfficeHTMLCleaner}.
@@ -37,19 +39,21 @@ public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * An isolated paragraph inside a table cell item should be replaced with paragraph's content.
      */
+    @Test
     public void testTableCellItemIsolatedParagraphCleaning()
     {
         String html = header + "<table><tr><td><p>Test</p></td></tr></table>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("td");
         Node cellContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
-        assertEquals("Test", cellContent.getNodeValue());
+        Assert.assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
+        Assert.assertEquals("Test", cellContent.getNodeValue());
     }
 
     /**
      * An isolated paragraph inside a table header item should be replaced with paragraph's content.
      */
+    @Test
     public void testTableHeaderItemIsolatedParagraphCleaning()
     {
         String html =
@@ -58,25 +62,27 @@ public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("th");
         Node cellContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
-        assertEquals("Test", cellContent.getNodeValue());
+        Assert.assertEquals(Node.TEXT_NODE, cellContent.getNodeType());
+        Assert.assertEquals("Test", cellContent.getNodeValue());
     }
 
     /**
      * If multiple paragraphs are found inside a table cell item, they should be wrapped in an embedded document.
      */
+    @Test
     public void testTableCellItemMultipleParagraphWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><p>Test</p><p>Test</p></td></tr></table>",
-            "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><p>Test</p><p>Test</p></td></tr></table>", "td"));
     }
 
     /**
      * If multiple paragraphs are found inside a table header item, they should be wrapped in an embedded document.
      */
+    @Test
     public void testTableHeaderItemMultipleParagraphWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration(
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
             "<table><thead><tr><th><p>Test</p><p>Test</p></th></tr></thead>" + "<tbody><tr><td/></tr></tbody></table>",
             "th"));
     }
@@ -84,23 +90,25 @@ public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * If a list is found inside a table cell item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableCellItemInternalListWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><ol><li>item</li></ol></td></tr></table>",
-            "td"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><ul><li>item</li></ul></td></tr></table>",
-            "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><ol><li>item</li></ol></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><ul><li>item</li></ul></td></tr></table>", "td"));
     }
 
     /**
      * If a list is found inside a table header item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableHeaderItemInternalListWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration(
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
             "<table><thead><tr><th><ol><li>item</li></ol></th></tr></thead>" + "<tbody><tr><td/></tr></tbody></table>",
             "th"));
-        assertEquals(true, checkEmbeddedDocumentGeneration(
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
             "<table><thead><tr><th><ul><li>item</li></ul></th></tr></thead>" + "<tbody><tr><td/></tr></tbody></table>",
             "th"));
     }
@@ -108,18 +116,20 @@ public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * If a table is found inside a table cell item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableCellItemInternalTableWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration(
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
             "<table><tr><td><table><tr><td><p>content</p></td></tr></table></td></tr></table>", "td"));
     }
 
     /**
      * If a table is found inside a table header item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableHeaderItemInternalTableWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration(
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
             "<table><thead><tr><th><table><tr><td><p>content</p></td></tr></table></th></tr></thead>"
                 + "<tbody><tr><td/></tr></tbody></table>", "th"));
     }
@@ -127,18 +137,20 @@ public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * If an image is found inside a table cell item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableCellItemInternalImageWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><img src=\"foo.png\"/></td></tr></table>",
-            "td"));
+        Assert.assertEquals(true,
+            checkEmbeddedDocumentGeneration("<table><tr><td><img src=\"foo.png\"/></td></tr></table>", "td"));
     }
 
     /**
      * If an image is found inside a table header item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableHeaderItemInternalImageWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration(
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
             "<table><thead><tr><th><img src=\"foo.png\"/></th></tr></thead>" + "<tbody><tr><td/></tr></tbody></table>",
             "th"));
     }
@@ -146,44 +158,53 @@ public class TableOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * If a heading is found inside a table cell item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableCellItemInternalHeadingWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><h1>Hi</h1></td></tr></table>", "td"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><h2>Hi</h2></td></tr></table>", "td"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><h3>Hi</h3></td></tr></table>", "td"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><h4>Hi</h4></td></tr></table>", "td"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><h5>Hi</h5></td></tr></table>", "td"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><tr><td><h6>Hi</h6></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><h1>Hi</h1></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><h2>Hi</h2></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><h3>Hi</h3></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><h4>Hi</h4></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><h5>Hi</h5></td></tr></table>", "td"));
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration(
+            "<table><tr><td><h6>Hi</h6></td></tr></table>", "td"));
     }
 
     /**
      * If a heading is found inside a table header item, it should be wrapped in an embedded document.
      */
+    @Test
     public void testTableHeaderItemInternalHeadingWrapping()
     {
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h1>Hi</h1></th></tr></thead>"
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h1>Hi</h1></th></tr></thead>"
             + "<tbody><tr><td/></tr></tbody></table>", "th"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h2>Hi</h2></th></tr></thead>"
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h2>Hi</h2></th></tr></thead>"
             + "<tbody><tr><td/></tr></tbody></table>", "th"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h3>Hi</h3></th></tr></thead>"
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h3>Hi</h3></th></tr></thead>"
             + "<tbody><tr><td/></tr></tbody></table>", "th"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h4>Hi</h4></th></tr></thead>"
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h4>Hi</h4></th></tr></thead>"
             + "<tbody><tr><td/></tr></tbody></table>", "th"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h5>Hi</h5></th></tr></thead>"
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h5>Hi</h5></th></tr></thead>"
             + "<tbody><tr><td/></tr></tbody></table>", "th"));
-        assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h6>Hi</h6></th></tr></thead>"
+        Assert.assertEquals(true, checkEmbeddedDocumentGeneration("<table><thead><tr><th><h6>Hi</h6></th></tr></thead>"
             + "<tbody><tr><td/></tr></tbody></table>", "th"));
     }
 
     /**
      * Empty rows should be removed.
      */
+    @Test
     public void testEmptyRowRemoving()
     {
         String html = header + "<table><tbody><tr><td>cell</td></tr><tr></tr></tbody></table>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("tr");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
     }
 
     /**

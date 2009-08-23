@@ -19,10 +19,11 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
+import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for {@link DefaultOpenOfficeManager}.
@@ -30,49 +31,21 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeServerManagerTest extends AbstractRenderingTestCase
+public class DefaultOpenOfficeServerManagerTest extends AbstractHTMLCleaningTest
 {
-    /**
-     * The {@link OpenOfficeManager} component.
-     */
-    private OpenOfficeManager oomanager;
-
-    /**
-     * The {@link OpenOfficeConfiguration} component.
-     */
-    private OpenOfficeConfiguration ooconfig;
-
-    /**
-     * {@inheritDoc}
-     */
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        this.oomanager = (OpenOfficeManager) getComponentManager().lookup(OpenOfficeManager.class);
-        this.ooconfig =
-            (OpenOfficeConfiguration) getComponentManager().lookup(OpenOfficeConfiguration.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
-     */
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-    }
-
     /**
      * Tests the initial status of the oo server manager.
      */
-    public void testInitialStatus()
+    @Test
+    public void testInitialStatus() throws Exception
     {
-        assertEquals(OpenOfficeConfiguration.SERVER_TYPE_INTERNAL, ooconfig.getServerType());
-        assertEquals(8100, ooconfig.getServerPort());
-        assertNotNull(ooconfig.getHomePath());
-        assertNotNull(ooconfig.getProfilePath());
-        assertEquals(OpenOfficeManager.ManagerState.NOT_CONNECTED, oomanager.getState());
+        OpenOfficeManager oomanager = getComponentManager().lookup(OpenOfficeManager.class);
+        OpenOfficeConfiguration ooconfig = getComponentManager().lookup(OpenOfficeConfiguration.class);
+
+        Assert.assertEquals(OpenOfficeConfiguration.SERVER_TYPE_INTERNAL, ooconfig.getServerType());
+        Assert.assertEquals(8100, ooconfig.getServerPort());
+        Assert.assertNotNull(ooconfig.getHomePath());
+        Assert.assertNotNull(ooconfig.getProfilePath());
+        Assert.assertEquals(OpenOfficeManager.ManagerState.NOT_CONNECTED, oomanager.getState());
     }
 }

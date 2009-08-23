@@ -28,7 +28,10 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test case for {@link HeadingNameNamingCriterion}.
@@ -36,7 +39,7 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
+public class HeadingNameNamingCriterionTest extends AbstractComponentTestCase
 {
     /**
      * The {@link Parser} component.
@@ -53,21 +56,15 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
      * 
      * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#setUp()
      */
-    @Override
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
         super.setUp();
 
-        xwikiParser = (Parser) getComponentManager().lookup(Parser.class, "xwiki/2.0");
-        docBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.class, "default");
-    }
-
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
         getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
+
+        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
     }
 
     /**
@@ -75,6 +72,7 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testDocumentNamesGeneration() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Heading="));
@@ -82,28 +80,30 @@ public class HeadingNameNamingCriterionTest extends AbstractRenderingTestCase
             getComponentManager().lookup(BlockRenderer.class, Syntax.XWIKI_2_0.toIdString()), false);
         Block sectionBlock = xdom.getChildren().get(0);
         // Test normal heading-name naming
-        assertEquals("Test.Heading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
+        Assert.assertEquals("Test.Heading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test name clash resolution
-        assertEquals("Test.Heading-1", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
+        Assert.assertEquals("Test.Heading-1", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test heading text cleaning (replacing)
         xdom = xwikiParser.parse(new StringReader("= This-Very.Weird:Heading! ="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals("Test.This-Very-Weird-Heading!", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
+        Assert.assertEquals("Test.This-Very-Weird-Heading!",
+            namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test heading text cleaning (stripping) 
         xdom = xwikiParser.parse(new StringReader("= This?Is@A/Very#Weird~Heading ="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals("Test.ThisIsAVeryWeirdHeading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
+        Assert.assertEquals("Test.ThisIsAVeryWeirdHeading",
+            namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
         // Test page name truncation.
         xdom = xwikiParser.parse(new StringReader("=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
         		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
         		"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals(255, namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())).length());
+        Assert.assertEquals(255, namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())).length());
         // Test fallback operation
-        assertEquals("Test.Test-1", namingCriterion.getDocumentName(xdom));
+        Assert.assertEquals("Test.Test-1", namingCriterion.getDocumentName(xdom));
         // Test fallback operation under empty heading names
         xdom = xwikiParser.parse(new StringReader("=   ="));
         sectionBlock = xdom.getChildren().get(0);
-        assertEquals("Test.Test-2", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
+        Assert.assertEquals("Test.Test-2", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));
     }
 }

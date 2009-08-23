@@ -23,6 +23,8 @@ import java.io.StringReader;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for filtering redundant html tags in {@link OpenOfficeHTMLCleaner}.
@@ -35,6 +37,7 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * Test filtering of those tags which doesn't have any attributes set.
      */
+    @Test
     public void testFilterIfZeroAttributes()
     {
         String htmlTemplate = header + "<p>Test%sRedundant%sFiltering</p>" + footer;
@@ -45,13 +48,14 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             String html = String.format(htmlTemplate, startTag, endTag);
             Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
-            assertEquals(0, nodes.getLength());
+            Assert.assertEquals(0, nodes.getLength());
         }
     }
     
     /**
      * Test filtering of those tags which doesn't have any textual content in them.
      */
+    @Test
     public void testFilterIfNoContent()
     {
         String htmlTemplate = header + "<p>Test%sRedundant%s%s%sFiltering</p>" + footer;
@@ -64,7 +68,7 @@ public class RedundantTagOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
             String html = String.format(htmlTemplate, startTag, endTag, startTag, endTag);
             Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
             NodeList nodes = doc.getElementsByTagName(tag);
-            assertEquals(1, nodes.getLength());
+            Assert.assertEquals(1, nodes.getLength());
         }
     }
 }

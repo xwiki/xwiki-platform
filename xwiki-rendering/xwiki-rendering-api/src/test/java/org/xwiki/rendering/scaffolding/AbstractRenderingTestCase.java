@@ -29,18 +29,13 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
+/**
+ * Offers some APIs to simplify writing Rendering tests.
+ *
+ * @version $Id$
+ */
 public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTestCase
 {
-    public AbstractRenderingTestCase()
-    {
-        super();
-    }
-
-    public AbstractRenderingTestCase(String testName)
-    {
-        super(testName);
-    }
-
     protected void assertBlocks(String expected, List<Block> blocks) throws Exception
     {
         // Assert the result by parsing it through the EventsRenderer to generate easily

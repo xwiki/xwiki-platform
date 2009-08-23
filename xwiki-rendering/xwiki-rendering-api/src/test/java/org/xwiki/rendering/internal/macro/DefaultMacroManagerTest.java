@@ -34,7 +34,7 @@ import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.DefaultMacroManager}.
@@ -42,7 +42,7 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class DefaultMacroManagerTest extends AbstractRenderingTestCase
+public class DefaultMacroManagerTest extends AbstractXWikiComponentTestCase
 {
     private Mock mockLogger;
 

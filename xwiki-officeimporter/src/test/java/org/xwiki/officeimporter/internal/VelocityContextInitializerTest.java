@@ -20,9 +20,11 @@
 package org.xwiki.officeimporter.internal;
 
 import org.apache.velocity.VelocityContext;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityContextInitializer;
+import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test class for various {@link VelocityContextInitializer} implementations.
@@ -30,45 +32,19 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.9RC2
  */
-public class VelocityContextInitializerTest extends AbstractXWikiComponentTestCase
+public class VelocityContextInitializerTest extends AbstractHTMLCleaningTest
 {
-    /**
-     * The {@link VelocityContextFactory} component.
-     */
-    private VelocityContextFactory contextFactory;
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-        this.contextFactory = (VelocityContextFactory) getComponentManager().lookup(VelocityContextFactory.class);        
-    }
-    
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.test.AbstractXWikiComponentTestCase#registerComponents()
-     */
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-    }
-    
     /**
      * Test the presence of velocity bridges.
      * 
      * @throws Exception
      */
+    @Test
     public void testVelocityBridges() throws Exception
     {
-        VelocityContext context = contextFactory.createContext();
-        assertNotNull(context.get("officeimporter"));
-        assertNotNull(context.get("ooconfig"));
-        assertNotNull(context.get("oomanager"));
+        VelocityContext context = getComponentManager().lookup(VelocityContextFactory.class).createContext();
+        Assert.assertNotNull(context.get("officeimporter"));
+        Assert.assertNotNull(context.get("ooconfig"));
+        Assert.assertNotNull(context.get("oomanager"));
     }
 }

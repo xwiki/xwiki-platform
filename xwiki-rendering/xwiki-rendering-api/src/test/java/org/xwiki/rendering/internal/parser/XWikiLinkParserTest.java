@@ -25,14 +25,14 @@ import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.wiki.WikiModel;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class XWikiLinkParserTest extends AbstractRenderingTestCase
+public class XWikiLinkParserTest extends AbstractXWikiComponentTestCase
 {
     public void testParseLinksWhenInWikiMode() throws Exception
     {

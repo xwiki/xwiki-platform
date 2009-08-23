@@ -19,7 +19,9 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test class for {@link OfficeImporterFileStorage}.
@@ -27,28 +29,16 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class OfficeImporterFileStorageTest extends AbstractRenderingTestCase
+public class OfficeImporterFileStorageTest extends AbstractHTMLCleaningTest
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#registerComponents()
-     */
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-    }
-
     /**
      * Test filtering of invalid file name characters.
      */
+    @Test
     public void testInvalidFileNameCharacterFiltering() throws RuntimeException
     {
         OfficeImporterFileStorage storage = new OfficeImporterFileStorage("Temp/\\:*?\"<>|Dir");
-        assertEquals("Temp---------Dir", storage.getTempDir().getName());
+        Assert.assertEquals("Temp---------Dir", storage.getTempDir().getName());
         storage.cleanUp();
     }
 }

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
@@ -34,13 +33,14 @@ import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link MacroTransformation}.
  * 
  * @version $Id$
  */
-public class MacroTransformationTest extends AbstractRenderingTestCase
+public class MacroTransformationTest extends AbstractXWikiComponentTestCase
 {
     private Transformation transformation;
     

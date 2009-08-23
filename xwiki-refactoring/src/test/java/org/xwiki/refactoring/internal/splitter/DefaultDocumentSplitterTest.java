@@ -32,7 +32,10 @@ import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test case for {@link DefaultDocumentSplitter}.
@@ -40,7 +43,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class DefaultDocumentSplitterTest extends AbstractXWikiComponentTestCase
+public class DefaultDocumentSplitterTest extends AbstractComponentTestCase
 {
     /**
      * The {@link Parser} component.
@@ -60,13 +63,16 @@ public class DefaultDocumentSplitterTest extends AbstractXWikiComponentTestCase
     /**
      * {@inheritDoc}
      */
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
-        xwikiParser = (Parser) getComponentManager().lookup(Parser.class, "xwiki/2.0");
-        docBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.class, "default");
-        splitter = (DocumentSplitter) getComponentManager().lookup(DocumentSplitter.class, "default");
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
+
+        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
+        splitter = getComponentManager().lookup(DocumentSplitter.class, "default");
     }
 
     /**
@@ -74,6 +80,7 @@ public class DefaultDocumentSplitterTest extends AbstractXWikiComponentTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testHeadingLevelDocumentSplitting() throws Exception
     {
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(new int[] {4, 1, 3});
@@ -91,7 +98,7 @@ public class DefaultDocumentSplitterTest extends AbstractXWikiComponentTestCase
         buf.append("Some Content\n");
         buf.append("=Topic3=\n");
         buf.append("Some Content\n");
-        assertEquals(6, split("Main.Test", buf.toString(), splittingCriterion, namingCriterion).size());
+        Assert.assertEquals(6, split("Main.Test", buf.toString(), splittingCriterion, namingCriterion).size());
     }
 
     /**

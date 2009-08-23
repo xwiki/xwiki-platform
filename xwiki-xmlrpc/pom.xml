@@ -39,14 +39,6 @@
     <!-- Version of swizzle-confluence dependencie used in XMLRPC modules -->
     <swizzle.swizzle-confluence.version>1.2-20080419</swizzle.swizzle-confluence.version>    
   </properties>  
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <modules>
     <module>xwiki-xmlrpc-model</module>
     <module>xwiki-xmlrpc-client</module>

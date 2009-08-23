@@ -25,6 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for cleaning html links ({@code<a/>} elements) in {@link OpenOfficeHTMLCleaner}.
@@ -37,22 +39,23 @@ public class LinkOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * Test wrapping of html links with xwiki specific xhtml elements so that XHTML parser can recognize them.
      */
+    @Test
     public void testLinkWrapping()
     {
         String html = header + "<a href=\"http://www.xwiki.org\">xwiki</a>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
         Node link = nodes.item(0);
         Element span = (Element) link.getParentNode();
-        assertEquals("span", span.getNodeName());
-        assertEquals("wikiexternallink", span.getAttribute("class"));
+        Assert.assertEquals("span", span.getNodeName());
+        Assert.assertEquals("wikiexternallink", span.getAttribute("class"));
         Node startComment = span.getPreviousSibling();
-        assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
-        assertTrue(startComment.getNodeValue().startsWith("startwikilink"));
+        Assert.assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
+        Assert.assertTrue(startComment.getNodeValue().startsWith("startwikilink"));
         Node stopComment = span.getNextSibling();
-        assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
-        assertTrue(stopComment.getNodeValue().startsWith("stopwikilink"));
+        Assert.assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
+        Assert.assertTrue(stopComment.getNodeValue().startsWith("stopwikilink"));
     }
 
     /**
@@ -61,42 +64,45 @@ public class LinkOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * name="table1">Sheet 1: <em>Hello</em></a></h1>} this is because of the close-before-copy-inside
      * behaviour of default html cleaner. Thus the additional (copy-inside) anchor needs to be ripped off.
      */
+    @Test
     public void testDuplicateAnchorRemoving()
     {
         String html = header + "<a name=\"table1\"/><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
         Element parent = (Element) nodes.item(0).getParentNode();
-        assertEquals("p", parent.getNodeName());
+        Assert.assertEquals("p", parent.getNodeName());
     }
 
     /**
      * Test duplicate anchor filtering with TOC structures. see: http://jira.xwiki.org/jira/browse/XWIKI-3415
      */
+    @Test
     public void testAnchorFilteringWithTOC() throws ClassCastException
     {
         String html = header + "<div>some text<h1><a name=\"Topic1\"/>Topic1</h1></div>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
     }
 
     /**
      * Test wrapping of html anchors with xwiki specific xhtml elements so that XHTML parser can recognize them.
      */
+    @Test
     public void testAnchorWrapping()
     {
         String html = header + "<a name=\"name\"/>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
         Node anchor = nodes.item(0);
         Node beforeComment = anchor.getPreviousSibling();
-        assertEquals(Node.COMMENT_NODE, beforeComment.getNodeType());
-        assertEquals("startmacro:id|-|name=\"name\"|-|", beforeComment.getNodeValue());
+        Assert.assertEquals(Node.COMMENT_NODE, beforeComment.getNodeType());
+        Assert.assertEquals("startmacro:id|-|name=\"name\"|-|", beforeComment.getNodeValue());
         Node afterComment = anchor.getNextSibling();
-        assertEquals(Node.COMMENT_NODE, afterComment.getNodeType());
-        assertEquals("stopmacro", afterComment.getNodeValue());
+        Assert.assertEquals(Node.COMMENT_NODE, afterComment.getNodeType());
+        Assert.assertEquals("stopmacro", afterComment.getNodeValue());
     }
 }

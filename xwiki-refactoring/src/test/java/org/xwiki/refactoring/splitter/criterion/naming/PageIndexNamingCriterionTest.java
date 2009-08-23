@@ -25,7 +25,10 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Test case for {@link PageIndexNamingCriterion}.
@@ -33,7 +36,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
  * @version $Id$
  * @since 1.9M1
  */
-public class PageIndexNamingCriterionTest extends AbstractXWikiComponentTestCase
+public class PageIndexNamingCriterionTest extends AbstractComponentTestCase
 {
     /**
      * The {@link Parser} component.
@@ -48,12 +51,15 @@ public class PageIndexNamingCriterionTest extends AbstractXWikiComponentTestCase
     /**
      * {@inheritDoc}
      */
-    protected void setUp() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
         super.setUp();
-        xwikiParser = (Parser) getComponentManager().lookup(Parser.class, "xwiki/2.0");
-        docBridge = (DocumentAccessBridge) getComponentManager().lookup(DocumentAccessBridge.class, "default");
+
+        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
+
+        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
     }
 
     /**
@@ -61,12 +67,13 @@ public class PageIndexNamingCriterionTest extends AbstractXWikiComponentTestCase
      * 
      * @throws Exception
      */
+    @Test
     public void testDocumentNamesGeneration() throws Exception
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Test="));
         NamingCriterion namingCriterion = new PageIndexNamingCriterion("Main.Test", docBridge);
         for (int i = 1; i < 10; i++) {
-            assertEquals("Main.Test-" + i, namingCriterion.getDocumentName(xdom));
+            Assert.assertEquals("Main.Test-" + i, namingCriterion.getDocumentName(xdom));
         }
     }
 }

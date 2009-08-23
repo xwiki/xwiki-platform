@@ -19,9 +19,11 @@
  */
 package org.xwiki.officeimporter.internal.cleaner;
 
-import org.xwiki.officeimporter.internal.MockDocumentAccessBridge;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.jmock.Mockery;
 
 /**
  * Abstract class for all HTML cleaner tests.
@@ -29,7 +31,7 @@ import org.xwiki.xml.html.HTMLCleaner;
  * @version $Id$
  * @since 1.8M2
  */
-public class AbstractHTMLCleaningTest extends AbstractRenderingTestCase
+public class AbstractHTMLCleaningTest extends AbstractComponentTestCase
 {
     /**
      * Beginning of the test html document.
@@ -51,28 +53,24 @@ public class AbstractHTMLCleaningTest extends AbstractRenderingTestCase
      */
     protected HTMLCleaner wysiwygHTMLCleaner;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-
-        this.openOfficeHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "openoffice");
-        this.wysiwygHTMLCleaner = (HTMLCleaner) getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
-    }
+    protected Mockery context = new Mockery();
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#registerComponents()
      */
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
+        
+        // Document Access Bridge Mock
+        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
+        this.openOfficeHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "openoffice");
+        this.wysiwygHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
     }
 }

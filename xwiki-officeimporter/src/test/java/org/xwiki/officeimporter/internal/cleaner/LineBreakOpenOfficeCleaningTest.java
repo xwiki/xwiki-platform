@@ -25,6 +25,8 @@ import java.util.Collections;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for cleaning html {@code<br/>} elements in {@link OpenOfficeHTMLCleaner}.
@@ -38,6 +40,7 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code <br/>} elements placed next to paragraph elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
+    @Test
     public void testLineBreaksNextToParagraphElements()
     {
         checkLineBreakReplacements("<div><br/><br/><p>para</p></div>", 0, 2);
@@ -49,6 +52,7 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code <br/>} elements placed next to list elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
+    @Test
     public void testLineBreaksNextToListElements()
     {
         checkLineBreakReplacements("<div><br/><br/><ol><li>para</li></ol></div>", 0, 2);
@@ -64,6 +68,7 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code <br/>} elements placed next to html heading elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
+    @Test
     public void testLineBreaksNextToHeadingElements()
     {
         checkLineBreakReplacements("<div><br/><br/><h1>test</h1></div>", 0, 2);
@@ -95,6 +100,7 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code <br/>} elements placed next to html table elements should be converted to {@code<div
      * class="wikikmodel-emptyline"/>} elements.
      */
+    @Test
     public void testLineBreaksNextToTableElements()
     {
         checkLineBreakReplacements("<div><br/><br/><table><tr><td>test</td></tr></table></div>", 0, 2);
@@ -117,8 +123,8 @@ public class LineBreakOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);
         NodeList lineBreaks = doc.getElementsByTagName("br");
-        assertEquals(expectedBrCount, lineBreaks.getLength());
+        Assert.assertEquals(expectedBrCount, lineBreaks.getLength());
         NodeList divs = doc.getElementsByTagName("div");
-        assertEquals(expectedDivCount, divs.getLength());
+        Assert.assertEquals(expectedDivCount, divs.getLength());
     }
 }

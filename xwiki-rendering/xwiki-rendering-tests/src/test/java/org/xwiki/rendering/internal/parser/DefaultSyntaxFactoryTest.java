@@ -19,32 +19,36 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.test.AbstractComponentTestCase;
+import org.junit.Test;
+import org.junit.Assert;
 
-public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
+public class DefaultSyntaxFactoryTest extends AbstractComponentTestCase
 {
+    @Test
     public void testCreateSyntaxFromSyntaxIdString() throws Exception
     {
         SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
 
         Syntax syntax = syntaxFactory.createSyntaxFromIdString("type/version");
-        assertEquals("type", syntax.getType().getId());
-        assertEquals("type", syntax.getType().getName());
-        assertEquals("version", syntax.getVersion());
+        Assert.assertEquals("type", syntax.getType().getId());
+        Assert.assertEquals("type", syntax.getType().getName());
+        Assert.assertEquals("version", syntax.getVersion());
     }
 
+    @Test
     public void testCreateSyntaxFromSyntaxIdStringWhenInvalid() throws Exception
     {
         SyntaxFactory syntaxFactory = getComponentManager().lookup(SyntaxFactory.class);
 
         try {
             syntaxFactory.createSyntaxFromIdString("invalid");
-            fail("Should have thrown an exception");
+            Assert.fail("Should have thrown an exception");
         } catch (ParseException expected) {
-            assertEquals("Invalid Syntax format [invalid]", expected.getMessage());
+            Assert.assertEquals("Invalid Syntax format [invalid]", expected.getMessage());
         }
     }
 }

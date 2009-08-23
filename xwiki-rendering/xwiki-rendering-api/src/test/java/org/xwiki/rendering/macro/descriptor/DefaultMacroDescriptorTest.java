@@ -26,13 +26,14 @@ import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyMandatory;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Validate {@link DefaultMacroDescriptor} and {@link AbstractMacroDescriptor}.
  * 
  * @version $Id$
  */
-public class DefaultMacroDescriptorTest extends AbstractRenderingTestCase
+public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
 {
     public static class ParametersTests
     {

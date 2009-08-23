@@ -24,6 +24,8 @@ import java.io.StringReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * Test case for cleaning html lists in {@link OpenOfficeHTMLCleaner}.
@@ -36,26 +38,28 @@ public class ListOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
     /**
      * If there are leading spaces within the content of a list item ({@code<li/>}) they should be trimmed.
      */
+    @Test
     public void testListItemContentLeadingSpaceTrimming()
     {
         String html = header + "<ol><li> Test</li></ol>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("li");
         Node listContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, listContent.getNodeType());
-        assertEquals("Test", listContent.getNodeValue());
+        Assert.assertEquals(Node.TEXT_NODE, listContent.getNodeType());
+        Assert.assertEquals("Test", listContent.getNodeValue());
     }
     
     /**
      * If there is a leading paragraph inside a list item, it should be replaced with it's content.
      */
+    @Test
     public void testListItemContentIsolatedParagraphCleaning()
     {
         String html = header + "<ol><li><p>Test</p></li></ol>" + footer;
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("li");
         Node listContent = nodes.item(0).getFirstChild();
-        assertEquals(Node.TEXT_NODE, listContent.getNodeType());
-        assertEquals("Test", listContent.getNodeValue());
+        Assert.assertEquals(Node.TEXT_NODE, listContent.getNodeType());
+        Assert.assertEquals("Test", listContent.getNodeValue());
     }
 }

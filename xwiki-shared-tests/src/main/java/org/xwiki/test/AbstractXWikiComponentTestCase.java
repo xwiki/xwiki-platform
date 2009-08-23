@@ -52,7 +52,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         this.initializer.initializeConfigurationSource();
 
         // Put before execution context initialization because it could be needed for some executing context
-        // initializer
+        // initializer.
         registerComponents();
 
         this.initializer.initializeExecution();

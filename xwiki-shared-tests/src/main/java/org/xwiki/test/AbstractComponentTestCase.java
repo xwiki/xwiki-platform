@@ -40,6 +40,11 @@ public class AbstractComponentTestCase
     {
         this.initializer.initializeContainer();
         this.initializer.initializeConfigurationSource();
+
+        // Put before execution context initialization because it could be needed for some executing context
+        // initializer.
+        registerComponents();
+
         this.initializer.initializeExecution();
     }
 
@@ -52,6 +57,14 @@ public class AbstractComponentTestCase
         this.initializer.shutdown();
     }
 
+    /**
+     * Register custom/mock components
+     */
+    protected void registerComponents() throws Exception
+    {
+        // Empty voluntarily. Extending classes can override to provide custom component registration.
+    }
+    
     /**
      * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) which can
      *         then be put in the XWiki Context for testing.

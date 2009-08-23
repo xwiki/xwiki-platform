@@ -27,6 +27,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.Before;
+import org.jmock.Expectations;
 
 /**
  * Test case for cleaning html images in {@link OpenOfficeHTMLCleaner}.
@@ -36,59 +41,77 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
  */
 public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
+    @Before
+    public void setUp() throws Exception
+    {
+        super.setUp();
+
+        final DocumentAccessBridge mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);
+        context.checking(new Expectations() {{
+            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
+                will(returnValue("/bridge/foo.png"));
+        }});
+    }
+
     /**
      * {@code <img/>} links should be wrapped in xwiki specific html elements so that they are recognized by the XHTML
      * parser.
      */
-    public void testImageWrapping()
+    @Test
+    public void testImageWrapping() throws Exception
     {
         String html = header + "<img src=\"foo.png\"/>" + footer;
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
+
         NodeList nodes = doc.getElementsByTagName("img");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);
         Node startComment = image.getPreviousSibling();
         Node stopComment = image.getNextSibling();
-        assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
-        assertTrue(startComment.getNodeValue().equals("startimage:foo.png"));
-        assertEquals("/bridge/foo.png", image.getAttribute("src"));
-        assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
-        assertTrue(stopComment.getNodeValue().equals("stopimage"));
+        Assert.assertEquals(Node.COMMENT_NODE, startComment.getNodeType());
+        Assert.assertTrue(startComment.getNodeValue().equals("startimage:foo.png"));
+        Assert.assertEquals("/bridge/foo.png", image.getAttribute("src"));
+        Assert.assertEquals(Node.COMMENT_NODE, stopComment.getNodeType());
+        Assert.assertTrue(stopComment.getNodeValue().equals("stopimage"));
     }
 
     /**
      * Sometimes images are used inside links. In such cases, both the html link and the image need to be wrapped
      * properly.
      */
+    @Test
     public void testCompoundImageLinkWrapping()
     {
         String html = header + "<a href=\"http://www.xwiki.org\"><img src=\"foo.png\"/></a>" + footer;
         HTMLCleanerConfiguration configuration = this.openOfficeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
+
         Document doc = openOfficeHTMLCleaner.clean(new StringReader(html), configuration);
+
         NodeList nodes = doc.getElementsByTagName("img");
-        assertEquals(1, nodes.getLength());
+        Assert.assertEquals(1, nodes.getLength());
         Element image = (Element) nodes.item(0);
         Node startImageComment = image.getPreviousSibling();
         Node stopImageComment = image.getNextSibling();
-        assertEquals(Node.COMMENT_NODE, startImageComment.getNodeType());
-        assertTrue(startImageComment.getNodeValue().equals("startimage:foo.png"));
-        assertEquals("/bridge/foo.png", image.getAttribute("src"));
-        assertEquals(Node.COMMENT_NODE, stopImageComment.getNodeType());
-        assertTrue(stopImageComment.getNodeValue().equals("stopimage"));
+        Assert.assertEquals(Node.COMMENT_NODE, startImageComment.getNodeType());
+        Assert.assertTrue(startImageComment.getNodeValue().equals("startimage:foo.png"));
+        Assert.assertEquals("/bridge/foo.png", image.getAttribute("src"));
+        Assert.assertEquals(Node.COMMENT_NODE, stopImageComment.getNodeType());
+        Assert.assertTrue(stopImageComment.getNodeValue().equals("stopimage"));
         Element link = (Element) image.getParentNode();
-        assertEquals("a", link.getNodeName());
-        assertEquals("http://www.xwiki.org", link.getAttribute("href"));
+        Assert.assertEquals("a", link.getNodeName());
+        Assert.assertEquals("http://www.xwiki.org", link.getAttribute("href"));
         Element span = (Element) link.getParentNode();
-        assertEquals("span", span.getNodeName());
-        assertEquals("wikiexternallink", span.getAttribute("class"));
+        Assert.assertEquals("span", span.getNodeName());
+        Assert.assertEquals("wikiexternallink", span.getAttribute("class"));
         Node startLinkComment = span.getPreviousSibling();
-        assertEquals(Node.COMMENT_NODE, startLinkComment.getNodeType());
-        assertTrue(startLinkComment.getNodeValue().startsWith("startwikilink"));
+        Assert.assertEquals(Node.COMMENT_NODE, startLinkComment.getNodeType());
+        Assert.assertTrue(startLinkComment.getNodeValue().startsWith("startwikilink"));
         Node stopLinkComment = span.getNextSibling();
-        assertEquals(Node.COMMENT_NODE, stopLinkComment.getNodeType());
-        assertTrue(stopLinkComment.getNodeValue().startsWith("stopwikilink"));
+        Assert.assertEquals(Node.COMMENT_NODE, stopLinkComment.getNodeType());
+        Assert.assertTrue(stopLinkComment.getNodeValue().startsWith("stopwikilink"));
     }
 }

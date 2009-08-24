@@ -188,43 +188,21 @@
             </goals>
             <phase>test</phase>
             <configuration>
-              <comparisonVersion>2.0-milestone-2</comparisonVersion>
+              <comparisonVersion>2.0-milestone-3</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- The excludes below need to be removed when 2.0M3 is released -->
-                <exclude>org/xwiki/rendering/listener/chaining/AbstractChainingListener</exclude>
-                <exclude>org/xwiki/rendering/renderer/EventsRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/PlainTextRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/TexRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/XHTMLRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/XWikiSyntaxRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/PrintRendererFactory</exclude>
-                <exclude>org/xwiki/rendering/renderer/PrintRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/chaining/AbstractChainingPrintRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/DefaultXHTMLImageRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/DefaultXHTMLLinkRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLRendererFactory</exclude>
-                <exclude>org/xwiki/rendering/util/RenderersUtils</exclude>
-                <exclude>org/xwiki/rendering/parser/SyntaxFactory</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLImageRenderer</exclude>
-                <exclude>org/xwiki/rendering/renderer/xhtml/XHTMLLinkRenderer</exclude>
-                <exclude>org/xwiki/rendering/parser/SyntaxType</exclude>
-                <exclude>org/xwiki/rendering/macro/descriptor/MacroDescriptor</exclude>
-                <exclude>org/xwiki/rendering/renderer/printer/MonitoringWikiPrinter</exclude>
-                <exclude>org/xwiki/rendering/configuration/RenderingConfiguration</exclude>
-                <exclude>org/xwiki/rendering/macro/MacroManager</exclude>
-                <exclude>org/xwiki/rendering/block/MacroBlock</exclude>
-                <exclude>org/xwiki/rendering/macro/AbstractMacro</exclude>
-                <exclude>org/xwiki/rendering/macro/descriptor/AbstractMacroDescriptor</exclude>
-                <exclude>org/xwiki/rendering/macro/descriptor/DefaultMacroDescriptor</exclude>
-                <exclude>org/xwiki/rendering/block/PlainTextBlockFilter</exclude>
-                <exclude>org/xwiki/rendering/util/ParserUtils</exclude>
                 <exclude>org/xwiki/rendering/block/RawBlock</exclude>
-                <exclude>org/xwiki/rendering/listener/Listener</exclude>
-                <exclude>org/xwiki/rendering/listener/WrappingListener</exclude>
-                <exclude>org/xwiki/rendering/listener/chaining/*</exclude>
+                <exclude>org/xwiki/rendering/converter/Converter</exclude>
+                <exclude>org/xwiki/rendering/listener/**</exclude>
+                <exclude>org/xwiki/rendering/macro/MacroCategoryManager</exclude>
+                <exclude>org/xwiki/rendering/macro/MacroId</exclude>
+                <exclude>org/xwiki/rendering/macro/MacroManager</exclude>
                 <exclude>org/xwiki/rendering/parser/Parser</exclude>
                 <exclude>org/xwiki/rendering/parser/Syntax</exclude>
+                <exclude>org/xwiki/rendering/parser/SyntaxFactory</exclude>
+                <exclude>org/xwiki/rendering/parser/SyntaxType</exclude>
+                <exclude>org/xwiki/rendering/renderer/PrintRendererFactory</exclude>
                 <exclude>org/xwiki/rendering/transformation/MacroTransformationContext</exclude>
                 <exclude>org/xwiki/rendering/transformation/Transformation</exclude>
                 <exclude>org/xwiki/rendering/transformation/TransformationManager</exclude>

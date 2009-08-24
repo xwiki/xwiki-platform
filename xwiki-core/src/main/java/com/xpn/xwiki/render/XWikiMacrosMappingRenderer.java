@@ -21,22 +21,29 @@
 
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.DocChangeRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChangeNotificationInterface
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.event.filter.FixedNameEventFilter;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+
+public class XWikiMacrosMappingRenderer implements XWikiRenderer, EventListener
 {
     private static final Log log = LogFactory.getLog(XWikiMacrosMappingRenderer.class);
 
@@ -53,6 +60,22 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
     private static final Pattern MULTI_LINE_MACRO_PATTERN =
         Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
 
+    /**
+     * The name of the listener.
+     */
+    private static final String NAME = "XWikiMacrosMappingRenderer";
+
+    /**
+     * The events to match.
+     */
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentUpdateEvent(new FixedNameEventFilter("xwiki:XWiki.XWikiPreferences")));
+            add(new DocumentSaveEvent(new FixedNameEventFilter("xwiki:XWiki.XWikiPreferences")));
+        }
+    };
+
     protected Map<String, String> macros_libraries = null;
 
     protected Map<String, XWikiVirtualMacro> macros_mappings = null;
@@ -62,7 +85,27 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
         loadPreferences(xwiki, context);
 
         // Add a notification rule if the preference property plugin is modified
-        context.getWiki().getNotificationManager().addNamedRule("XWiki.XWikiPreferences", new DocChangeRule(this));
+        Utils.getComponent(ObservationManager.class).addListener(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getName()
+     */
+    public String getName()
+    {
+        return NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return EVENTS;
     }
 
     public void loadPreferences(XWiki xwiki, XWikiContext context)
@@ -213,14 +256,13 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int, com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
+    public void onEvent(Event event, Object source, Object data)
     {
-        if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
-            loadPreferences(context.getWiki(), context);
-        }
+        XWikiContext context = (XWikiContext) data;
+
+        loadPreferences(context.getWiki(), context);
     }
 }

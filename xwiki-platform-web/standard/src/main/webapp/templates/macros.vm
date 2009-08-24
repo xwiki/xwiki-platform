@@ -1493,6 +1493,7 @@ $html
   #if("$!options.callback" != "") #set($callback = $options.callback) #end
   #if("$!options.tagCloud" == "" || $options.tagCloud == false) #set($tagcloud=false) #else #set($tagcloud = true) #end
   #set($classname = "$!options.className")
+  #set($extraparams = "$!options.extraParams")
   ##
   ## Columns informations
   ##
@@ -1515,9 +1516,9 @@ $html
   #if("$!options.url" != "")
     #set($dataurl = $options.url)
   #elseif("$!options.resultPage" != "")
-    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}${classparams}") )
+    #set($dataurl = $xwiki.getURL($options.resultPage,"view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}&$!{extraparams}${classparams}") )
   #else
-    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}${classparams}"))
+    #set($dataurl = $xwiki.getURL("XWiki.LiveTableResults","view","xpage=plain&transprefix=${transprefix}&classname=$!{classname}&collist=${collist2}$!{extraparams}${classparams}"))
   #end
   ##
   ## HTML Table

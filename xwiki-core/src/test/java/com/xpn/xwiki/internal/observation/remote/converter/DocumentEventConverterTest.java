@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.internal.observation.remote.converter;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
@@ -39,6 +44,8 @@ public class DocumentEventConverterTest extends AbstractBridgedXWikiComponentTes
     {
         EventConverterManager eventConverterManager = getComponentManager().lookup(EventConverterManager.class);
 
+        // local -> remote
+
         LocalEventData localEvent = new LocalEventData();
         localEvent.setEvent(new DocumentUpdateEvent("wiki:space.page"));
         localEvent.setSource(new XWikiDocument("wiki", "space", "page"));
@@ -48,6 +55,16 @@ public class DocumentEventConverterTest extends AbstractBridgedXWikiComponentTes
 
         assertFalse(remoteEvent.getSource() instanceof XWikiDocument);
         assertFalse(remoteEvent.getData() instanceof XWikiContext);
+
+        // serialize/unserialize
+        ByteArrayOutputStream sos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(sos);
+        oos.writeObject(remoteEvent);
+        ByteArrayInputStream sis = new ByteArrayInputStream(sos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(sis);
+        remoteEvent = (RemoteEventData) ois.readObject();
+
+        // remote -> local
 
         LocalEventData localEvent2 = eventConverterManager.createLocalEventData(remoteEvent);
 

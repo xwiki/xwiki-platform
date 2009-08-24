@@ -27,7 +27,7 @@ import org.xwiki.rendering.syntax.SyntaxType;
  * For example the XWiki 1.0 syntax, the XWiki 2.0 syntax, the Confluence 1.0 syntax, etc.
  * 
  * @version $Id$
- * @since 1.5M2
+ * @since 2.0RC1
  */
 public class Syntax
 {

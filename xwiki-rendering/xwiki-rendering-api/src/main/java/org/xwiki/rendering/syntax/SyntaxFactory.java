@@ -27,7 +27,7 @@ import org.xwiki.rendering.parser.ParseException;
 
 /**
  * @version $Id$
- * @since 1.5M2
+ * @since 2.0RC1
  */
 @ComponentRole
 public interface SyntaxFactory

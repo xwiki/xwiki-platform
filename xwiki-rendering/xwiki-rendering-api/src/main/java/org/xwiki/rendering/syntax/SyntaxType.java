@@ -21,7 +21,7 @@ package org.xwiki.rendering.syntax;
 
 /**
  * @version $Id$
- * @since 1.7M1
+ * @since 2.0RC1
  */
 public class SyntaxType
 {

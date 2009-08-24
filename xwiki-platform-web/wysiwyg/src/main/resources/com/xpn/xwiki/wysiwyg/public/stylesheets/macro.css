@@ -31,3 +31,17 @@
 .xMacroParameter option {
   text-transform: capitalize;
 }
+
+.xMacroFilter {
+  padding: 2px 0;
+}
+
+.xMacroFilter .xSearchBox {
+  width: 200px;
+}
+
+.xMacroCategoryList {
+  margin-right: 6px;
+  text-transform: capitalize;
+  width: 200px;
+}

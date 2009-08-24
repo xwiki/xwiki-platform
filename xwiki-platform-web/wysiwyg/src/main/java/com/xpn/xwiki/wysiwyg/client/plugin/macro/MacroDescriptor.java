@@ -33,6 +33,11 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class MacroDescriptor implements IsSerializable
 {
     /**
+     * The macro identifier.
+     */
+    private String id;
+
+    /**
      * The human-readable name of the macro (e.g. Table of Contents for ToC macro).
      */
     private String name;
@@ -43,6 +48,11 @@ public class MacroDescriptor implements IsSerializable
     private String description;
 
     /**
+     * The category of the macro.
+     */
+    private String category;
+
+    /**
      * A {@link Map} with descriptors for each parameter supported by the macro. The key is the parameter name.
      */
     private Map<String, ParameterDescriptor> parameterDescriptorMap;
@@ -51,6 +61,24 @@ public class MacroDescriptor implements IsSerializable
      * Describes the content of the macro.
      */
     private ParameterDescriptor contentDescriptor;
+
+    /**
+     * @return the macro identifier
+     */
+    public String getId()
+    {
+        return id;
+    }
+
+    /**
+     * Sets the identifier of the macro.
+     * 
+     * @param id a macro identifier
+     */
+    public void setId(String id)
+    {
+        this.id = id;
+    }
 
     /**
      * @return the human-readable name of the macro (e.g. Table of Contents for ToC macro)
@@ -86,6 +114,24 @@ public class MacroDescriptor implements IsSerializable
     public void setDescription(String description)
     {
         this.description = description;
+    }
+
+    /**
+     * @return the category of the macro
+     */
+    public String getCategory()
+    {
+        return category;
+    }
+
+    /**
+     * Sets the macro category.
+     * 
+     * @param category the macro category
+     */
+    public void setCategory(String category)
+    {
+        this.category = category;
     }
 
     /**

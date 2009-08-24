@@ -119,7 +119,15 @@ public interface Strings extends Constants
 
     String macroInsertDialogTitle();
 
+    String macroInsertActionLabel();
+
     String macroParameterMandatory();
+
+    String macroCategoryAll();
+
+    String macroCategoryOther();
+
+    String macroCategoryUsed();
 
     String ol();
 
@@ -214,13 +222,13 @@ public interface Strings extends Constants
     String linkWikipageSearchButton();
 
     String linkSelectWikipageTitle();
-    
+
     String linkSelectWikipageHelpLabel();
 
     String linkNoPageSelectedError();
 
     String linkSelectAttachmentTitle();
-    
+
     String linkSelectAttachmentHelpLabel();
 
     String linkAttachmentUploadHelpLabel();
@@ -278,9 +286,9 @@ public interface Strings extends Constants
     String imageRemoveImage();
 
     String imageSelectImageTitle();
-    
+
     String imageSelectImageHelpLabel();
-    
+
     String imageSelectImageLocationHelpLabel();
 
     String imageUploadNewFileLabel();
@@ -388,4 +396,6 @@ public interface Strings extends Constants
     String wizardFinish();
 
     String errorServerRequestFailed();
+
+    String quickSearch();
 }

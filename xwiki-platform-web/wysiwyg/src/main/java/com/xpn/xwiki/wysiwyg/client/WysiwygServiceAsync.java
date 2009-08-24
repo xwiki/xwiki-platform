@@ -210,18 +210,17 @@ public interface WysiwygServiceAsync
     /**
      * Makes a request to the server to get the descriptor for the specified macro.
      * 
-     * @param macroName a string representing the name of a macro
-     * @param syntax the string identifier for the storage syntax
+     * @param macroId a macro identifier
+     * @param syntaxId a syntax identifier
      * @param async the call-back to be used for notifying the caller after receiving the response from the server
      */
-    void getMacroDescriptor(String macroName, String syntax, AsyncCallback<MacroDescriptor> async);
+    void getMacroDescriptor(String macroId, String syntaxId, AsyncCallback<MacroDescriptor> async);
 
     /**
-     * Makes a request to the server to get the list of available macros for the specified syntax. The response is the
-     * list of available macro names for the specified syntax.
+     * Makes a request to the server to get all the macro descriptors for the specified syntax.
      * 
-     * @param syntaxId the string identifier for the storage syntax
+     * @param syntaxId a syntax identifier
      * @param async the call-back to be used for notifying the caller after receiving the response from the server
      */
-    void getMacros(String syntaxId, AsyncCallback<List<String>> async);
+    void getMacroDescriptors(String syntaxId, AsyncCallback<List<MacroDescriptor>> async);
 }

@@ -56,16 +56,20 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     private List<String> virtualWikiNamesList;
 
     /**
-     * The cache for macro descriptors. The first key is the syntax identifier and the second is the macro name.
+     * Caches the list of macro descriptors for each syntax.
+     * 
+     * @see #getMacroDescriptors(String, AsyncCallback)
+     * @see #getMacroDescriptor(String, String, AsyncCallback)
      */
-    private final Map<String, Map<String, MacroDescriptor>> macroDescriptorsCache =
-        new HashMap<String, Map<String, MacroDescriptor>>();
+    private final Map<String, List<MacroDescriptor>> macroDescriptorList = new HashMap<String, List<MacroDescriptor>>();
 
     /**
-     * The cache for available macros. The key is the syntax identifier and the value if the list of macro names
-     * available for that syntax.
+     * The cache for macro descriptors. The first key is the syntax identifier and the second is the macro name.
+     * 
+     * @see #getMacroDescriptor(String, String, AsyncCallback)
      */
-    private final Map<String, List<String>> macrosCache = new HashMap<String, List<String>>();
+    private final Map<String, Map<String, MacroDescriptor>> macroDescriptorMap =
+        new HashMap<String, Map<String, MacroDescriptor>>();
 
     /**
      * Creates a new cache proxy for the given service.
@@ -166,7 +170,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     {
         service.getRecentlyModifiedPages(start, count, async);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -275,7 +279,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @see WysiwygServiceAsync#getAttachments(String, String, String, AsyncCallback)
      */
-    public void getAttachments(String wikiName, String spaceName, String pageName, 
+    public void getAttachments(String wikiName, String spaceName, String pageName,
         AsyncCallback<List<Attachment>> async)
     {
         service.getAttachments(wikiName, spaceName, pageName, async);
@@ -286,20 +290,30 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @see WysiwygServiceAsync#getMacroDescriptor(String, String, AsyncCallback)
      */
-    public void getMacroDescriptor(final String macroName, final String syntax,
+    public void getMacroDescriptor(final String macroId, final String syntaxId,
         final AsyncCallback<MacroDescriptor> async)
     {
         // First let's look in the cache.
-        Map<String, MacroDescriptor> macroDescriptorsForSyntax = macroDescriptorsCache.get(syntax);
-        if (macroDescriptorsForSyntax != null) {
-            MacroDescriptor descriptor = macroDescriptorsForSyntax.get(macroName);
+        Map<String, MacroDescriptor> macroDescriptorMapForSyntax = macroDescriptorMap.get(syntaxId);
+        if (macroDescriptorMapForSyntax != null) {
+            MacroDescriptor descriptor = macroDescriptorMapForSyntax.get(macroId);
             if (descriptor != null) {
                 async.onSuccess(descriptor);
                 return;
             }
         }
+        List<MacroDescriptor> macroDescriptorListForSyntax = macroDescriptorList.get(syntaxId);
+        if (macroDescriptorListForSyntax != null) {
+            for (MacroDescriptor descriptor : macroDescriptorListForSyntax) {
+                if (macroId.equals(descriptor.getId())) {
+                    cacheMacroDescriptor(descriptor, syntaxId);
+                    async.onSuccess(descriptor);
+                    return;
+                }
+            }
+        }
         // The macro descriptor wasn't found in the cache. We have to make the request to the server.
-        service.getMacroDescriptor(macroName, syntax, new AsyncCallback<MacroDescriptor>()
+        service.getMacroDescriptor(macroId, syntaxId, new AsyncCallback<MacroDescriptor>()
         {
             public void onFailure(Throwable caught)
             {
@@ -309,12 +323,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
             public void onSuccess(MacroDescriptor result)
             {
                 if (result != null) {
-                    Map<String, MacroDescriptor> macroDescriptorsForSyntax = macroDescriptorsCache.get(syntax);
-                    if (macroDescriptorsForSyntax == null) {
-                        macroDescriptorsForSyntax = new HashMap<String, MacroDescriptor>();
-                        macroDescriptorsCache.put(syntax, macroDescriptorsForSyntax);
-                    }
-                    macroDescriptorsForSyntax.put(macroName, result);
+                    cacheMacroDescriptor(result, syntaxId);
                 }
                 async.onSuccess(result);
             }
@@ -322,29 +331,43 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     }
 
     /**
+     * Caches a macro descriptor.
+     * 
+     * @param descriptor the macro descriptor to be cached
+     * @param syntaxId the syntax for which the macro was defined
+     */
+    private void cacheMacroDescriptor(MacroDescriptor descriptor, String syntaxId)
+    {
+        Map<String, MacroDescriptor> macroDescriptorsForSyntax = macroDescriptorMap.get(syntaxId);
+        if (macroDescriptorsForSyntax == null) {
+            macroDescriptorsForSyntax = new HashMap<String, MacroDescriptor>();
+            macroDescriptorMap.put(syntaxId, macroDescriptorsForSyntax);
+        }
+        macroDescriptorsForSyntax.put(descriptor.getId(), descriptor);
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getMacros(String, AsyncCallback)
+     * @see WysiwygServiceAsync#getMacroDescriptors(String, AsyncCallback)
      */
-    public void getMacros(final String syntaxId, final AsyncCallback<List<String>> async)
+    public void getMacroDescriptors(final String syntaxId, final AsyncCallback<List<MacroDescriptor>> async)
     {
-        // First let's look in the cache.
-        List<String> macros = macrosCache.get(syntaxId);
-        if (macros != null) {
-            async.onSuccess(macros);
+        List<MacroDescriptor> macroDescriptorListForSyntax = macroDescriptorList.get(syntaxId);
+        if (macroDescriptorListForSyntax != null) {
+            async.onSuccess(macroDescriptorListForSyntax);
         } else {
-            // The list of macro names wasn't found in the cache. We have to make the request to the server.
-            service.getMacros(syntaxId, new AsyncCallback<List<String>>()
+            service.getMacroDescriptors(syntaxId, new AsyncCallback<List<MacroDescriptor>>()
             {
                 public void onFailure(Throwable caught)
                 {
                     async.onFailure(caught);
                 }
 
-                public void onSuccess(List<String> result)
+                public void onSuccess(List<MacroDescriptor> result)
                 {
                     if (result != null) {
-                        macrosCache.put(syntaxId, result);
+                        macroDescriptorList.put(syntaxId, result);
                     }
                     async.onSuccess(result);
                 }

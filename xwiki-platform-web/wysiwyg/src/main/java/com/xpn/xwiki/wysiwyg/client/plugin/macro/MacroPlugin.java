@@ -22,17 +22,12 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.InsertExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroDialog;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.SelectMacroDialog;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -41,7 +36,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class MacroPlugin extends AbstractPlugin implements CloseHandler<CompositeDialogBox>, DoubleClickHandler
+public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
 {
     /**
      * Rich text area command for refreshing macro output.
@@ -64,16 +59,6 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
     public static final Command INSERT = new Command("macroInsert");
 
     /**
-     * The dialog used for editing macro parameters and content.
-     */
-    private EditMacroDialog editDialog;
-
-    /**
-     * The dialog used for selecting one of the available macros before insertion.
-     */
-    private SelectMacroDialog selectDialog;
-
-    /**
      * Hides macro meta data and displays macro output in a read only text box.
      */
     private MacroDisplayer displayer;
@@ -82,6 +67,11 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
      * Controls the currently selected macros.
      */
     private MacroSelector selector;
+
+    /**
+     * The wizard used to cast macro spells on the rich text area.
+     */
+    private MacroWizard wizard;
 
     /**
      * Provides a user interface extension to allow users to manipulate macros using the top-level menu of the WYSIWYG
@@ -101,6 +91,7 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
         displayer = GWT.create(MacroDisplayer.class);
         displayer.setTextArea(getTextArea());
         selector = new MacroSelector(displayer);
+        wizard = new MacroWizard(textArea, config);
 
         getTextArea().getCommandManager().registerCommand(REFRESH,
             new RefreshExecutable(getConfig().getParameter("syntax", "xhtml/1.0")));
@@ -121,18 +112,6 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
      */
     public void destroy()
     {
-        if (editDialog != null) {
-            editDialog.hide();
-            editDialog.removeFromParent();
-            editDialog = null;
-        }
-
-        if (selectDialog != null) {
-            selectDialog.hide();
-            selectDialog.removeFromParent();
-            selectDialog = null;
-        }
-
         menuExtension.destroy();
 
         getTextArea().getCommandManager().unregisterCommand(REFRESH);
@@ -146,6 +125,9 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
         displayer.destroy();
         displayer = null;
 
+        wizard.destroy();
+        wizard = null;
+
         super.destroy();
     }
 
@@ -158,101 +140,19 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
     }
 
     /**
-     * Shows the edit macro dialog.
+     * Start the edit macro wizard.
      */
     public void edit()
     {
-        edit(true);
+        wizard.edit();
     }
 
     /**
-     * Either shows the edit macro dialog or applies user changes, depending in the given flag.
-     * 
-     * @param show whether to show the edit macro dialog or apply the changes made using the dialog
-     */
-    private void edit(boolean show)
-    {
-        if (show) {
-            getEditDialog().setMacroCall(new MacroCall(getTextArea().getCommandManager().getStringValue(INSERT)));
-            getEditDialog().center();
-        } else {
-            getTextArea().setFocus(true);
-            if (!getEditDialog().isCanceled()) {
-                getTextArea().getCommandManager().execute(INSERT, getEditDialog().getMacroCall().toString());
-            }
-        }
-    }
-
-    /**
-     * Shows the insert macro dialog.
+     * Start the insert macro wizard.
      */
     public void insert()
     {
-        insert(true);
-    }
-
-    /**
-     * Either shows the select macro dialog or opens the edit macro dialog for the selected macro, depending in the
-     * given flag.
-     * 
-     * @param show whether to show the select macro dialog or the edit macro dialog for the selected macro
-     */
-    private void insert(boolean show)
-    {
-        if (show) {
-            getSelectDialog().center();
-        } else {
-            if (getSelectDialog().isCanceled()) {
-                getTextArea().setFocus(true);
-            } else {
-                MacroCall macroCall = new MacroCall();
-                macroCall.setName(getSelectDialog().getSelectedMacro());
-                getEditDialog().setMacroCall(macroCall);
-                getEditDialog().center();
-            }
-        }
-    }
-
-    /**
-     * We use this method in order to lazy load the edit dialog.
-     * 
-     * @return the dialog used for editing macro parameters and content
-     */
-    private EditMacroDialog getEditDialog()
-    {
-        if (editDialog == null) {
-            editDialog = new EditMacroDialog(getConfig());
-            saveRegistration(editDialog.addCloseHandler(this));
-        }
-        return editDialog;
-    }
-
-    /**
-     * We use this method in order to lazy load the select dialog.
-     * 
-     * @return the dialog used for selecting one of the available macros before insertion
-     */
-    private SelectMacroDialog getSelectDialog()
-    {
-        if (selectDialog == null) {
-            selectDialog = new SelectMacroDialog(getConfig());
-            saveRegistration(selectDialog.addCloseHandler(this));
-        }
-        return selectDialog;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CloseHandler#onClose(CloseEvent)
-     */
-    public void onClose(CloseEvent<CompositeDialogBox> event)
-    {
-        if (event.getTarget() == getEditDialog() && !event.isAutoClosed()) {
-            edit(false);
-        } else if (event.getTarget() == getSelectDialog() && !event.isAutoClosed()) {
-            insert(false);
-        }
+        wizard.insert();
     }
 
     /**
@@ -263,7 +163,7 @@ public class MacroPlugin extends AbstractPlugin implements CloseHandler<Composit
     public void onDoubleClick(DoubleClickEvent event)
     {
         if (event.getSource() == getTextArea() && getSelector().getMacroCount() == 1) {
-            edit(true);
+            edit();
         }
     }
 }

@@ -243,19 +243,18 @@ public interface WysiwygService extends RemoteService
     List<Attachment> getAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException;
 
     /**
-     * @param macroName a string representing the name of a macro
-     * @param syntax the string identifier for the storage syntax
+     * @param macroId a macro identifier
+     * @param syntaxId a syntax identifier
      * @return an object describing the specified macro
      * @throws XWikiGWTException if the descriptor of the specified macro is not found or an exception occurs while
      *             looking for it
      */
-    MacroDescriptor getMacroDescriptor(String macroName, String syntax) throws XWikiGWTException;
+    MacroDescriptor getMacroDescriptor(String macroId, String syntaxId) throws XWikiGWTException;
 
     /**
-     * @param syntaxId the string identifier for the storage syntax
-     * @return the list of available macro names for the specified syntax
-     * @throws XWikiGWTException if an exception is caught while retrieving the list of available macros for the
-     *             specified syntax
+     * @param syntaxId a syntax identifier
+     * @return the list of all the macro descriptors for the specified syntax
+     * @throws XWikiGWTException if an exception is caught while retrieving the macro descriptors
      */
-    List<String> getMacros(String syntaxId) throws XWikiGWTException;
+    List<MacroDescriptor> getMacroDescriptors(String syntaxId) throws XWikiGWTException;
 }

@@ -2,6 +2,7 @@
 @import url('tab.css');
 @import url('menu.css');
 @import url('toolbar.css');
+@import url('widget.css');
 
 @import url('color.css');
 @import url('image.css');
@@ -74,19 +75,4 @@ table.xRichTextEditorTabPanel td {
   border: 0 none;
   width: 100%;
   height: 100%;
-}
-
-.xListBox {
-}
-
-.xListItem {
-}
-
-.xListItem-selected {
-  background-color: #FFA;
-}
-
-.xFontFamilyPicker option {
-  font-size: small !important;
-  text-transform: capitalize;
 }

@@ -82,34 +82,46 @@ public class DefaultMacroCategoryManagerTest extends AbstractComponentTestCase
     @Test
     public void testGetMacroNamesForCategory() throws Exception
     {        
-        // Create a mock macro.
-        final Macro mockMacro = context.mock(Macro.class);
+        // Create two mock macros.
+        final Macro testMacro1 = context.mock(Macro.class, "mock1");
+        final Macro testMacro2 = context.mock(Macro.class, "mock2");
         this.context.checking(new Expectations(){{
-            allowing(mockMacro).getDescriptor();
-            will(returnValue(new DefaultMacroDescriptor("Test macro")));
+            allowing(testMacro1).getDescriptor();
+            will(returnValue(new DefaultMacroDescriptor("Test macro - 1")));
+        }});
+        this.context.checking(new Expectations(){{
+            allowing(testMacro2).getDescriptor();
+            will(returnValue(new DefaultMacroDescriptor("Test macro - 2")));
         }});
         
-        // Register this macro against CM as a macro registered for all syntaxes.
+        // Register these macros against CM as macros registered for all syntaxes.
         DefaultComponentDescriptor<Macro> descriptor = new DefaultComponentDescriptor<Macro>();
         descriptor.setRole(Macro.class);
-        descriptor.setRoleHint("mytestmacro");
-        getComponentManager().registerComponent(descriptor, mockMacro);
+        descriptor.setRoleHint("mytestmacro1");
+        getComponentManager().registerComponent(descriptor, testMacro1);
+        descriptor = new DefaultComponentDescriptor<Macro>();
+        descriptor.setRole(Macro.class);
+        descriptor.setRoleHint("mytestmacro2");
+        getComponentManager().registerComponent(descriptor, testMacro1);
         
-        // Override the macro category for this macro. 
+        // Override default macro categories. 
         DefaultRenderingConfiguration configuration =
             (DefaultRenderingConfiguration) getComponentManager().lookup(RenderingConfiguration.class);
-        configuration.addMacroCategory(new MacroId("mytestmacro"), "Test");
+        configuration.addMacroCategory(new MacroId("mytestmacro1"), "Cat1");
+        configuration.addMacroCategory(new MacroId("mytestmacro2"), "Cat2");
         
-        // Check whether our macro is in the correct category.
-        Set<MacroId> macroIds = this.macroCategoryManager.getMacroIds("Test");
-        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro")));
+        // Check whether our macros are registered under correct categories.
+        Set<MacroId> macroIds = this.macroCategoryManager.getMacroIds("Cat1");
+        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro1")));
+        Assert.assertFalse(macroIds.contains(new MacroId("mytestmacro2")));
         
-        // This macro should be registered for all syntaxes.
-        macroIds = this.macroCategoryManager.getMacroIds("Test", Syntax.JSPWIKI_1_0);
-        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro")));
+        // These macros should be registered for all syntaxes.
+        macroIds = this.macroCategoryManager.getMacroIds("Cat1", Syntax.JSPWIKI_1_0);
+        Assert.assertTrue(macroIds.contains(new MacroId("mytestmacro1")));
         
-        // Finally, unregister the test macro.
-        getComponentManager().unregisterComponent(Macro.class, "mytestmacro");
+        // Finally, unregister test macros.
+        getComponentManager().unregisterComponent(Macro.class, "mytestmacro1");
+        getComponentManager().unregisterComponent(Macro.class, "mytestmacro2");
     }
     
     @Test

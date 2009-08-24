@@ -110,7 +110,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
             public boolean match(MacroId macroId)
             {
                 // True if the macroId has no syntax or if it has one it has to match the passed syntax
-                return syntax == null || macroId.getSyntax() == null || macroId.getSyntax() == syntax;
+                return syntax == null || macroId.getSyntax() == null || macroId.getSyntax().equals(syntax);
             }
         }).get(category);
         return (null != macros) ? Collections.unmodifiableSet(macros) : Collections.<MacroId>emptySet();
@@ -145,7 +145,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
                     ids = new HashSet<MacroId>();
                 }
                 ids.add(macroId);
-                result.put(category, macroIds);
+                result.put(category, ids);
             }
         }
 

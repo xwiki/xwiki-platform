@@ -892,6 +892,9 @@ $fn
   #end
   ## Page numbers start at 1 outside this macro, but for internal computations we use 0-indexed values.
   #set($currentPageNumber = $util.parseInt($request.page) - 1)
+  #if($currentPageNumber < 0)
+    #set($currentPageNumber = 0)
+  #end
   ## The first item to show. Must be >= 0.
   #set($startAt = $itemsPerPage * $currentPageNumber)
   #if($startAt < 0)

@@ -67,8 +67,6 @@ public final class WikiManager
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Hidden constructor of WikiManager only access via getInstance().
-     * 
      * @param messageTool the message tool
      */
     public WikiManager(XWikiPluginMessageTool messageTool)
@@ -696,6 +694,7 @@ public final class WikiManager
                 throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg.get(
                     WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
             }
+
 
             // Install imported documents
             if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {

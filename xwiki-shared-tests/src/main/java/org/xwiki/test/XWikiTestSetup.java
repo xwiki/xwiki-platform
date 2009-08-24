@@ -21,27 +21,26 @@ package org.xwiki.test;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.Commandline;
-import org.apache.tools.ant.taskdefs.ExecTask;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * JUnit TestSetup extension that starts/stops XWiki using a script passed using System Properties. These properties are
  * meant to be passed by the underlying build system. This class is meant to wrap a JUnit TestSuite. For example:
  * 
- * <pre><code>
+ * <pre>
+ * &lt;code&gt;
  * public static Test suite()
  * {
  *     // Create some TestSuite object here
  *     return new XWikiTestSetup(suite);
  * }
- * </code></pre>
- * 
+ * &lt;/code&gt;
+ * </pre>
  * <p>
  * Note: We could start XWiki using Java directly but we're using a script so that we can test the exact same script
  * used by XWiki users who download the standalone distribution.
@@ -51,27 +50,22 @@ import java.net.URL;
  */
 public class XWikiTestSetup extends TestSetup
 {
-    private static final String EXECUTION_DIRECTORY = System.getProperty("xwikiExecutionDirectory");
+    protected static final Log LOG = LogFactory.getLog(XWikiTestSetup.class);
 
-    private static final String START_COMMAND = System.getProperty("xwikiExecutionStartCommand");
-
-    private static final String STOP_COMMAND = System.getProperty("xwikiExecutionStopCommand");
-
-    private static final String PORT = System.getProperty("xwikiPort", "8080");
-
-    private static final boolean DEBUG = System.getProperty("debug", "false").equalsIgnoreCase("true");
-
-    private static final int TIMEOUT_SECONDS = 120;
-
-    private Project project;
+    private List<XWikiExecutor> executors = new ArrayList<XWikiExecutor>();
 
     public XWikiTestSetup(Test test)
     {
+        this(test, 1);
+    }
+
+    public XWikiTestSetup(Test test, int nb)
+    {
         super(test);
 
-        this.project = new Project();
-        this.project.init();
-        this.project.addBuildListener(new AntBuildListener(DEBUG));
+        for (int i = 0; i < nb; ++i) {
+            this.executors.add(new XWikiExecutor(i));
+        }
     }
 
     /**
@@ -82,87 +76,8 @@ public class XWikiTestSetup extends TestSetup
     @Override
     protected void setUp() throws Exception
     {
-        startXWikiInSeparateThread();
-        waitForXWikiToLoad();
-    }
-
-    private void startXWikiInSeparateThread()
-    {
-        Thread startThread = new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try {
-                    startXWiki();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        startThread.start();
-    }
-
-    private void startXWiki() throws Exception
-    {
-        File dir = new File(EXECUTION_DIRECTORY);
-        if (dir.exists()) {
-            ExecTask execTask = (ExecTask) this.project.createTask("exec");
-            execTask.setDir(new File(EXECUTION_DIRECTORY));
-            Commandline commandLine = new Commandline(START_COMMAND);
-            execTask.setCommand(commandLine);
-            execTask.execute();
-        } else {
-            throw new Exception("Invalid directory from where to start XWiki [" + EXECUTION_DIRECTORY + "]");
-        }
-    }
-
-    private Task createStopTask() throws Exception
-    {
-        ExecTask execTask;
-        File dir = new File(EXECUTION_DIRECTORY);
-        if (dir.exists()) {
-            execTask = (ExecTask) this.project.createTask("exec");
-            execTask.setDir(new File(EXECUTION_DIRECTORY));
-            Commandline commandLine = new Commandline(STOP_COMMAND);
-            execTask.setCommand(commandLine);
-        } else {
-            throw new Exception("Invalid directory from where to stop XWiki [" + EXECUTION_DIRECTORY + "]");
-        }
-
-        return execTask;
-    }
-
-    private void waitForXWikiToLoad() throws Exception
-    {
-        // Wait till the main page becomes available which means the server is started fine
-        System.out.println("Checking that XWiki is up and running...");
-        URL url = new URL("http://localhost:" + PORT + "/xwiki/bin/view/Main/WebHome");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        boolean connected = false;
-        boolean timedOut = false;
-        long startTime = System.currentTimeMillis();
-        while (!connected && !timedOut) {
-            try {
-                connection.connect();
-                int responseCode = connection.getResponseCode();
-                if (DEBUG) {
-                    System.out.println("Result of pinging [" + url + "] = [" + responseCode + "], Message = ["
-                        + connection.getResponseMessage() + "]");
-                }
-                // check the http response code is either not an error, either "unauthorized"
-                // (which is the case for products that deny view for guest, for example).
-                connected = (responseCode < 400 || responseCode == 401);
-            } catch (IOException e) {
-                // Do nothing as it simply means the server is not ready yet...
-            }
-            Thread.sleep(100L);
-            timedOut = (System.currentTimeMillis() - startTime > TIMEOUT_SECONDS * 1000L);
-        }
-        if (timedOut) {
-            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds";
-            System.out.println(message);
-            tearDown();
-            throw new RuntimeException(message);
+        for (XWikiExecutor executor : this.executors) {
+            executor.start();
         }
     }
 
@@ -174,7 +89,18 @@ public class XWikiTestSetup extends TestSetup
     @Override
     protected void tearDown() throws Exception
     {
-        // Stop XWiki
-        createStopTask().execute();
+        for (XWikiExecutor executor : this.executors) {
+            executor.stop();
+        }
+    }
+
+    protected XWikiExecutor getXWikiExecutor()
+    {
+        return getXWikiExecutor(0);
+    }
+
+    protected XWikiExecutor getXWikiExecutor(int index)
+    {
+        return this.executors.get(index);
     }
 }

@@ -56,6 +56,7 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
         
         // Set a high priority so that this macro executes before most others.
         setPriority(20);
+        setDefaultCategory(DEFAULT_CATEGORY_NAVIGATION);
     }
 
     /**

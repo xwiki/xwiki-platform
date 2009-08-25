@@ -57,6 +57,7 @@ public class FootnoteMacro extends AbstractMacro<FootnoteMacroParameters>
     {
         super("Footnote", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             FootnoteMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
     /**

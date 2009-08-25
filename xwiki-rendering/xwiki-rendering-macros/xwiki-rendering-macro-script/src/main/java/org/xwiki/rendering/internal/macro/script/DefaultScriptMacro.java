@@ -57,6 +57,7 @@ public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScript
     {
         super("Script", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             DefaultScriptMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**

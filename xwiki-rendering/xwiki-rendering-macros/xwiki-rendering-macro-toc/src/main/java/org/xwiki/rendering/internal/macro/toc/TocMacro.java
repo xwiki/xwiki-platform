@@ -86,6 +86,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
         // other macros can generate headers which need to be taken into account by the TOC
         // macro.
         setPriority(2000);
+        setDefaultCategory(DEFAULT_CATEGORY_NAVIGATION);
     }
 
     /**

@@ -56,6 +56,7 @@ public class GroovyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroPar
     public GroovyMacro()
     {
         super("Groovy", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**

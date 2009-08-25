@@ -36,5 +36,6 @@ public class ErrorMessageMacro extends AbstractMessageMacro
     public ErrorMessageMacro()
     {
         super("Error Message", "Displays an error message note.");
+        setDefaultCategory(DEFAULT_CATEGORY_FORMATTING);
     }
 }

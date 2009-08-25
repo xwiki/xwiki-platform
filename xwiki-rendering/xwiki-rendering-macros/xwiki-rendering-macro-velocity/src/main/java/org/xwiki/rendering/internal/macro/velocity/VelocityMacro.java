@@ -72,6 +72,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     {
         super("Velocity", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             VelocityMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**

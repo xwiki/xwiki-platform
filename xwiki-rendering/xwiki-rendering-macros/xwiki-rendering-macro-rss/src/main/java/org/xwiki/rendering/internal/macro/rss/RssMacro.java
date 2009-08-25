@@ -97,6 +97,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
     public RssMacro()
     {
         super("RSS", DESCRIPTION, RssMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
     /**

@@ -86,6 +86,7 @@ public class PutFootnotesMacro extends AbstractMacro<FootnoteMacroParameters>
     public PutFootnotesMacro()
     {
         super("Put Footnote", DESCRIPTION, FootnoteMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
     /**

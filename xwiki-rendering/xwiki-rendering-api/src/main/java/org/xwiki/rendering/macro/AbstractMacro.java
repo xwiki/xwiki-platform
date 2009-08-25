@@ -37,6 +37,26 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Macro<P>, Initializable
 {
     /**
+     * "Formatting" default macro category.
+     */
+    public static final String DEFAULT_CATEGORY_FORMATTING = "Formatting";
+    
+    /**
+     * "Development" default macro category.
+     */
+    public static final String DEFAULT_CATEGORY_DEVELOPMENT = "Development";
+    
+    /**
+     * "Content" default macro category.
+     */
+    public static final String DEFAULT_CATEGORY_CONTENT = "Content";
+    
+    /**
+     * "Navigation" default macro category.
+     */
+    public static final String DEFAULT_CATEGORY_NAVIGATION = "Navigation";
+    
+    /**
      * The {@link BeanManager} component.
      */
     @Requirement

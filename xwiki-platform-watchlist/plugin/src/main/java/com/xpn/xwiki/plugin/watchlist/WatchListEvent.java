@@ -425,13 +425,13 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(context), context);
                 DiffPluginApi diff = (DiffPluginApi) context.getWiki().getPluginApi("diff", context);
                 StringBuffer result = new StringBuffer();
-                String contentDiff = diff.getDifferencesAsHTML(d1.getContent(), d2.getContent());
                 List<AttachmentDiff> attachDiffs = d2.getAttachmentDiff(d1, d2, context);
                 List<List<ObjectDiff>> objectDiffs = d2.getObjectDiff(d1, d2, context);
                 List<List<ObjectDiff>> classDiffs = d2.getClassDiff(d1, d2, context);
 
-                if (!StringUtils.isBlank(contentDiff)) {
+                if (!d1.getContent().equals(d2.getContent())) {                    
                     Div contentDiv = createDiffDiv("contentDiff");
+                    String contentDiff = diff.getDifferencesAsHTML(d1.getContent(), d2.getContent());
                     contentDiv.addElement(contentDiff);
                     result.append(contentDiv);
                 }

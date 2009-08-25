@@ -34,10 +34,10 @@
   <version>1.17-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <properties>
-    <platform.core.version>1.8.4</platform.core.version>
-    <platform.plugin.scheduler.version>1.9-SNAPSHOT</platform.plugin.scheduler.version>
-    <platform.plugin.lucene.version>1.9-SNAPSHOT</platform.plugin.lucene.version>
+    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
+    <platform.plugin.scheduler.version>1.10-SNAPSHOT</platform.plugin.scheduler.version>
     <platform.plugin.mailsender.version>1.9-SNAPSHOT</platform.plugin.mailsender.version>
+    <platform.plugin.activitystream.version>1.2-SNAPSHOT</platform.plugin.activitystream.version>
   </properties>
   <dependencies>
     <dependency>
@@ -45,7 +45,7 @@
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
-    </dependency>        
+    </dependency>          
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
@@ -60,14 +60,9 @@
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
-      <artifactId>xwiki-plugin-lucene</artifactId>
-      <version>${platform.plugin.lucene.version}</version>
+      <artifactId>xwiki-plugin-activitystream</artifactId>
+      <version>${platform.plugin.activitystream.version}</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>1.4</version>
     </dependency>
   </dependencies>
   <!-- We must configure SCM in each module. For more information see:

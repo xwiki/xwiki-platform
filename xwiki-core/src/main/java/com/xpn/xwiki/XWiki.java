@@ -320,14 +320,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         econtext.setAttribute(xwikiname, xwiki);
                     }
                 }
-            }
-            context.setWiki(xwiki);
-            xwiki.setDatabase(context.getDatabase());
 
-            // initialize stub context here instead of during Execution context initialization because during Execution
-            // context initialization, the XWikiContext is not fully initialized (does not conteain XWiki object) which
-            // make it unusable
-            Utils.getComponent(XWikiStubContextProvider.class).initialize(context);
+                context.setWiki(xwiki);
+
+                // initialize stub context here instead of during Execution context initialization because during
+                // Execution context initialization, the XWikiContext is not fully initialized (does not contains XWiki
+                // object) which make it unusable
+                Utils.getComponent(XWikiStubContextProvider.class).initialize(context);
+            } else {
+                context.setWiki(xwiki);
+            }
+
+            xwiki.setDatabase(context.getDatabase());
 
             return xwiki;
         } catch (Exception e) {

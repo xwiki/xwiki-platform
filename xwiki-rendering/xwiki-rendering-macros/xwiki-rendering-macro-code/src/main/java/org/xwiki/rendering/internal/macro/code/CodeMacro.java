@@ -47,7 +47,12 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     /**
      * The description of the macro.
      */
-    private static final String DESCRIPTION = "";
+    private static final String DESCRIPTION = "Highlights code snippets of various programming languages";
+    
+    /**
+     * Used to indicate that content should not be highlighted.
+     */
+    private static final String LANGUAGE_NONE = "none";
 
     /**
      * The description of the macro content.
@@ -75,7 +80,7 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
     {
         List<Block> result;
         try {
-            if (CodeMacroParameters.LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
+            if (LANGUAGE_NONE.equalsIgnoreCase(parameters.getLanguage())) {
                 result = Collections.<Block> singletonList(new VerbatimBlock(content, context.isInline()));
             } else {
                 result = highlight(parameters, content);

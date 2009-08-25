@@ -29,12 +29,7 @@ import org.xwiki.rendering.macro.box.BoxMacroParameters;
  * @since 1.7RC1
  */
 public class CodeMacroParameters extends BoxMacroParameters
-{
-    /**
-     * Used to indicate that content should not be highlighted.
-     */
-    public static final String LANGUAGE_NONE = "none";
-
+{    
     /**
      * The language identifier.
      */

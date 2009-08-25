@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.block;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -43,9 +42,14 @@ public class PlainTextBlockFilter implements BlockFilter
     /**
      * The set of valid Block classes as toc item content.
      */
-    private static final Set<Class< ? extends Block>> VALID_PLAINTEXT_BLOCKS =
-        new HashSet<Class< ? extends Block>>(Arrays.<Class< ? extends Block>> asList(WordBlock.class, SpaceBlock.class,
-            SpecialSymbolBlock.class));
+    private static final Set<Class< ? extends Block>> VALID_PLAINTEXT_BLOCKS = new HashSet<Class< ? extends Block>>()
+    {
+        {
+            add(WordBlock.class);
+            add(SpaceBlock.class);
+            add(SpecialSymbolBlock.class);
+        }
+    };
 
     /**
      * A parser that knows how to parse plain text; this is used to transform link labels into plain text.
@@ -82,8 +86,7 @@ public class PlainTextBlockFilter implements BlockFilter
 
             try {
                 if (link.getType() == LinkType.DOCUMENT) {
-                    return this.plainTextParser.parse(
-                        new StringReader(this.linkLabelGenerator.generate(link))).getChildren();
+                    return this.plainTextParser.parse(new StringReader(this.linkLabelGenerator.generate(link))).getChildren();
                 } else {
                     return this.plainTextParser.parse(new StringReader(link.getReference())).getChildren();
                 }

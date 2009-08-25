@@ -72,4 +72,13 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/watchlist</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/watchlist</url>
   </scm>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 </project>

@@ -88,9 +88,18 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
     {
         if (this.events.contains(remoteEvent.getEvent().getClass())) {
             // fill the local event
-            localEvent.setEvent((Event) remoteEvent.getEvent());
-            localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
-            localEvent.setData(unserializeXWikiContext(remoteEvent.getData()));
+            XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
+
+            if (context != null) {
+                localEvent.setEvent((Event) remoteEvent.getEvent());
+                localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
+                localEvent.setData(unserializeXWikiContext(remoteEvent.getData()));
+            } else {
+                getLogger().warn(
+                    "Can't get a proper XWikiContext."
+                        + " It generally mean that the wiki has never been fully initialized,"
+                        + " i.e. has never been accesses at least once");
+            }
 
             return true;
         }

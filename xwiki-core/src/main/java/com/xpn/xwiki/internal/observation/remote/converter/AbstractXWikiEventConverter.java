@@ -84,8 +84,11 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
         XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-        context.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
-        context.setUser((String) remoteDataMap.get(CONTEXT_USER));
+
+        if (context != null) {
+            context.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
+            context.setUser((String) remoteDataMap.get(CONTEXT_USER));
+        }
 
         return context;
     }

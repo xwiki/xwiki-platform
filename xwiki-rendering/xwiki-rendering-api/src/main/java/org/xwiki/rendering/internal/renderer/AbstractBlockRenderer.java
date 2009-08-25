@@ -21,8 +21,6 @@ package org.xwiki.rendering.internal.renderer;
 
 import java.util.Collection;
 import java.util.Collections;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
@@ -31,19 +29,17 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 
 /**
  * Common code for BlockRender implementation that uses Print Renderer Factory.
- *
+ * 
  * @version $Id$
  * @since 2.0M3
  */
 public abstract class AbstractBlockRenderer implements BlockRenderer
 {
-    @Requirement
-    private ComponentManager componentManager;
-    
     protected abstract PrintRendererFactory getPrintRendererFactory();
 
     /**
      * {@inheritDoc}
+     * 
      * @see BlockRenderer#render(org.xwiki.rendering.block.Block, org.xwiki.rendering.renderer.printer.WikiPrinter)
      */
     public void render(Block block, WikiPrinter printer)
@@ -53,7 +49,8 @@ public abstract class AbstractBlockRenderer implements BlockRenderer
 
     /**
      * {@inheritDoc}
-     * @see BlockRenderer#render(java.util.Collection, org.xwiki.rendering.renderer.printer.WikiPrinter)  
+     * 
+     * @see BlockRenderer#render(java.util.Collection, org.xwiki.rendering.renderer.printer.WikiPrinter)
      */
     public void render(Collection<Block> blocks, WikiPrinter printer)
     {

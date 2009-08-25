@@ -191,6 +191,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         event.setType(type);
         event.setTitle(title);
         event.setBody(title);
+        event.setVersion(doc.getVersion());
         event.setParams(params);
         addActivityEvent(event, doc, context);
     }

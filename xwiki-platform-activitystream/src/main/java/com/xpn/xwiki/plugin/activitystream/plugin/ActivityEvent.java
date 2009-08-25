@@ -157,7 +157,6 @@ public class ActivityEvent extends Api {
           event.setTitle(title);
     }
 
-
     /**
      * Allows to modify the body of an event
      * This might be useful to control the display or RSS feeds
@@ -165,6 +164,14 @@ public class ActivityEvent extends Api {
     public void setBody(String body) {
     	if (hasProgrammingRights())
             event.setBody(body);
+    }
+    
+    /**
+     * @return The document version on the event
+     */
+    public String getVersion()
+    {
+        return event.getVersion();
     }
 
     /**

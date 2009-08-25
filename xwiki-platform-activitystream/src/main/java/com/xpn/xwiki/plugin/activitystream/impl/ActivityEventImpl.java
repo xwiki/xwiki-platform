@@ -58,6 +58,8 @@ public class ActivityEventImpl implements ActivityEvent
     protected String title;
 
     protected String body = "";
+    
+    protected String version = "";
 
     protected String param1 = "";
 
@@ -159,6 +161,18 @@ public class ActivityEventImpl implements ActivityEvent
     public void setStream(String stream)
     {
         this.stream = stream;
+    }
+    
+    public String getVersion()
+    {
+        return version;
+    }
+    
+    public void setVersion(String version)
+    {
+        if (version != null) {
+            this.version = version;
+        }
     }
 
     public String getParam1()

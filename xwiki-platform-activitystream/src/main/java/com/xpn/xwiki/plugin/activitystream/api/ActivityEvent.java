@@ -184,6 +184,17 @@ public interface ActivityEvent
      * @see #getBody()
      */
     void setBody(String body);
+    
+    /**
+     * @return The document version on the event
+     */
+    String getVersion();
+    
+    /**
+     * @param version Version on this event
+     * @see #getVersion()
+     */
+    void setVersion(String version);
 
     /**
      * @return The first param of the event

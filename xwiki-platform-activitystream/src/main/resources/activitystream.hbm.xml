@@ -48,6 +48,9 @@
 		<property name="body" type="string">
 			<column name="ase_body" length="2000" />
 		</property>
+		<property name="version" type="string">
+            <column name="ase_version" length="30" />
+        </property>
 		<property name="param1" type="string">
 			<column name="ase_param1" length="2000" />
 		</property>

@@ -86,7 +86,8 @@ public class PlainTextBlockFilter implements BlockFilter
 
             try {
                 if (link.getType() == LinkType.DOCUMENT) {
-                    return this.plainTextParser.parse(new StringReader(this.linkLabelGenerator.generate(link))).getChildren();
+                    return this.plainTextParser.parse(
+                        new StringReader(this.linkLabelGenerator.generate(link))).getChildren();
                 } else {
                     return this.plainTextParser.parse(new StringReader(link.getReference())).getChildren();
                 }

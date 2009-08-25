@@ -163,8 +163,8 @@ public class WatchListJob extends AbstractJob implements Job
      */
     private void setPreviousFireTime() throws XWikiException
     {
-        XWikiDocument doc = context.getWiki().getDocument(schedulerJobObject.getName(), context);
-        schedulerJobObject.setDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP, new Date());
+        XWikiDocument doc = context.getWiki().getDocument(watchListJobObject.getName(), context);
+        watchListJobObject.setDateValue(WatchListJobManager.WATCHLIST_JOB_LAST_FIRE_TIME_PROP, new Date());
         context.getWiki().saveDocument(doc, "Updated last fire time", true, context);
     }
 
@@ -212,11 +212,11 @@ public class WatchListJob extends AbstractJob implements Job
     {
         try {
             init(jobContext);
-            
+
             if (watchListJobObject == null) {
                 return;
             }
-            
+
             List<String> subscribers = getSubscribers();
             Date previousFireTime = getPreviousFireTime();
             WatchListEventManager eventMatcher = new WatchListEventManager(previousFireTime, context);
@@ -234,7 +234,8 @@ public class WatchListJob extends AbstractJob implements Job
                 List<String> spaces = plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
                 List<String> documents =
                     plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
-                List<WatchListEvent> matchingEvents = eventMatcher.getMatchingEvents(wikis, spaces, documents);
+                List<WatchListEvent> matchingEvents =
+                    eventMatcher.getMatchingEvents(wikis, spaces, documents, subscriber, context);
 
                 // If events have occurred on at least one element watched by the user, send the email
                 if (matchingEvents.size() > 0) {

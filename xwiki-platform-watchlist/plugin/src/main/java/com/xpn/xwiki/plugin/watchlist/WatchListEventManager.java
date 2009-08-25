@@ -29,15 +29,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPluginApi;
 
 /**
- * Manager for WatchList events.
- * This class allow to store all the events fired during a given interval. It also allows to perform a match between 
- * events and elements watched by a user.
+ * Manager for WatchList events. This class allow to store all the events fired during a given interval. It also allows
+ * to perform a match between events and elements watched by a user.
  * 
  * @version $Id$
  */
@@ -90,9 +90,9 @@ public class WatchListEventManager
                 asApi.searchEvents("act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','")
                     + "')", false, 0, 0, parameters);
 
-            // If the page has been modified several times we wan't to display only one diff, if the page has been 
+            // If the page has been modified several times we wan't to display only one diff, if the page has been
             // delete after update events we want to discard the update events since we won't be able to display diff
-            // from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and 
+            // from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and
             // WatchListEvent#equals(WatchListEvent).
             for (ActivityEvent rawEvent : rawEvents) {
                 WatchListEvent event = new WatchListEvent(rawEvent);
@@ -123,16 +123,27 @@ public class WatchListEventManager
      * @param wikis a list of wikis from which events should match
      * @param spaces a list of spaces from which events should match
      * @param documents a list of documents from which events should match
+     * @param userName notification recipient
+     * @param context the XWiki context
      * @return the list of events matching the given scopes
      */
-    public List<WatchListEvent> getMatchingEvents(List<String> wikis, List<String> spaces, List<String> documents)
+    public List<WatchListEvent> getMatchingEvents(List<String> wikis, List<String> spaces, List<String> documents,
+        String userName, XWikiContext context)
     {
         List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();
 
         for (WatchListEvent event : events) {
             if (wikis.contains(event.getWiki()) || spaces.contains(event.getPrefixedSpace())
                 || documents.contains(event.getPrefixedFullName())) {
-                matchingEvents.add(event);
+                try {
+                    if (context.getWiki().getRightService().hasAccessLevel("view", userName,
+                        event.getPrefixedFullName(), context)) {
+                        matchingEvents.add(event);
+                    }
+                } catch (XWikiException e) {
+                    // We're in a job, we don't throw exceptions
+                    e.printStackTrace();
+                }
             }
         }
 

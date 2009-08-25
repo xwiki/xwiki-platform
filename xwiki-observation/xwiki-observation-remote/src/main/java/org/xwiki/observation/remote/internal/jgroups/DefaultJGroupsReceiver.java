@@ -86,9 +86,11 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
      */
     public void receive(Message msg)
     {
-        getLogger().debug("Received JGroups message [" + msg + "]");
+        RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
 
-        getRemoteObservationManager().notify((RemoteEventData) msg.getObject());
+        getLogger().debug("Received JGroups message [" + remoteEvent + "]");
+
+        getRemoteObservationManager().notify(remoteEvent);
     }
 
     /**

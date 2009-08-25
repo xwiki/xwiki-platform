@@ -112,4 +112,15 @@ public class LocalEventData
     {
         this.data = data;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "event: [" + getEvent() + "], source: [" + getSource() + "], data: [" + getData() + "]";
+    }
 }

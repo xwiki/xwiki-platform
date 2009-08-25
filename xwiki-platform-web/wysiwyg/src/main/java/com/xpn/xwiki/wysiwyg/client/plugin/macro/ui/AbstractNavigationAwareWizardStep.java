@@ -23,6 +23,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
@@ -56,6 +57,17 @@ public abstract class AbstractNavigationAwareWizardStep extends AbstractComposit
     public AbstractNavigationAwareWizardStep(Config config)
     {
         super(config);
+    }
+
+    /**
+     * Creates a new navigation-aware wizard step that uses the given panel to hold its widgets.
+     * 
+     * @param config the object used to configure the newly created wizard step
+     * @param panel the panel where this wizard step will add its widgets
+     */
+    public AbstractNavigationAwareWizardStep(Config config, FlowPanel panel)
+    {
+        super(config, panel);
     }
 
     /**

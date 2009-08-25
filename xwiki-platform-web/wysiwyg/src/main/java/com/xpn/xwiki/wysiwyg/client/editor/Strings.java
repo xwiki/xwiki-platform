@@ -131,6 +131,8 @@ public interface Strings extends Constants
 
     String macroCategoryUsed();
 
+    String macroNoMacroSelected();
+
     String ol();
 
     String outdent();

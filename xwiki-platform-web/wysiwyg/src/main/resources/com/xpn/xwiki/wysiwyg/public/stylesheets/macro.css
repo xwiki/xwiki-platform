@@ -37,11 +37,20 @@
 }
 
 .xMacroFilter .xSearchBox {
-  width: 200px;
+  width: 215px;
 }
 
 .xMacroCategoryList {
   margin-right: 6px;
   text-transform: capitalize;
-  width: 200px;
+  width: 215px;
+}
+
+.xMacroSelector {
+  margin-top: 0;
+  height: 346px;
+}
+
+.xMacroSelector .xListBox {
+  overflow: auto;
 }

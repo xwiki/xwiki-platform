@@ -36,8 +36,6 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.DeferredCommand;
@@ -56,6 +54,7 @@ import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.LabeledTextBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
+import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
@@ -145,7 +144,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * A composite of widgets that allow the user to filter the macros.
      */
-    private class MacroFilter extends Composite implements ChangeHandler, KeyPressHandler
+    private class MacroFilter extends Composite implements ChangeHandler, KeyUpHandler
     {
         /**
          * The list box displaying the available macro categories. The user can filter the macros by category.
@@ -168,7 +167,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
 
             searchBox = new LabeledTextBox(Strings.INSTANCE.quickSearch());
             searchBox.addStyleName("xSearchBox");
-            searchBox.addKeyPressHandler(this);
+            searchBox.addKeyUpHandler(this);
 
             FlowPanel container = new FlowPanel();
             container.addStyleName("xMacroFilter");
@@ -193,9 +192,9 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
         /**
          * {@inheritDoc}
          * 
-         * @see KeyPressHandler#onKeyPress(KeyPressEvent)
+         * @see KeyUpHandler#onKeyUp(KeyUpEvent)
          */
-        public void onKeyPress(KeyPressEvent event)
+        public void onKeyUp(KeyUpEvent event)
         {
             if (event.getSource() == searchBox) {
                 updater.deferUpdate();
@@ -305,6 +304,11 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
     private final MacroFilter macroFilter;
 
     /**
+     * Holds the text displayed after the validation, if this wizard step can't be submitted.
+     */
+    private final Label validationMessage;
+
+    /**
      * The list of navigation listeners. This wizard step generates navigation events when a user chooses a macro by
      * double clicking on it or by pressing the Enter key.
      */
@@ -322,15 +326,23 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      */
     public SelectMacroWizardStep(Config config)
     {
-        super(config);
+        super(config, new VerticalResizePanel());
 
         macroFilter = new MacroFilter();
         getPanel().add(macroFilter);
+
+        validationMessage = new Label(Strings.INSTANCE.macroNoMacroSelected());
+        validationMessage.setVisible(false);
+        validationMessage.addStyleName("xMacroSelectorError");
+        getPanel().add(validationMessage);
 
         macroList = new ListBox<MacroDescriptor>();
         macroList.addDoubleClickHandler(this);
         macroList.addKeyUpHandler(this);
         getPanel().add(macroList);
+
+        getPanel().addStyleName("xMacroSelector");
+        ((VerticalResizePanel) getPanel()).setExpandingWidget(macroList, false);
     }
 
     /**
@@ -379,6 +391,9 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
             // If we have a list of used macros and the current category is CATEGORY_USED then trigger an update.
             if (usedMacroIds != null && CATEGORY_USED.equals(macroFilter.getCategory())) {
                 updater.deferUpdate();
+            } else {
+                // Remove any validation messages.
+                setValid(true);
             }
             initCallback.onSuccess(null);
         } else if (macroDescriptorsCallback == null) {
@@ -422,7 +437,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
-        async.onSuccess(macroList.getSelectedItem() != null);
+        async.onSuccess(validate());
     }
 
     /**
@@ -493,6 +508,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
         }
         List<ListItem<MacroDescriptor>> items = macroListItemsByCategory.get(macroFilter.getCategory());
         macroList.clear();
+        setValid(true);
         String searchText = macroFilter.getSearchText();
         if (searchText != null && searchText.length() > 0) {
             searchText = searchText.toLowerCase();
@@ -570,5 +586,30 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
         }
         // Prevent further updates till this wizard step is not re-initialized.
         usedMacroIds = null;
+    }
+
+    /**
+     * Validates this wizard step, showing error messages near the fields that don't validate.
+     * 
+     * @return {@code true} if this wizard step can be submitted, {@code false} otherwise
+     */
+    private boolean validate()
+    {
+        boolean valid = macroList.getSelectedItem() != null;
+        setValid(valid);
+        return valid;
+    }
+
+    /**
+     * Marks this wizard step as valid or invalid. When the wizard step is invalid a validation message is shown.
+     * 
+     * @param valid {@code true} if the wizard step ca be submitted, {@code false} otherwise
+     */
+    private void setValid(boolean valid)
+    {
+        if (valid == validationMessage.isVisible()) {
+            validationMessage.setVisible(!valid);
+            ((VerticalResizePanel) getPanel()).refreshHeights();
+        }
     }
 }

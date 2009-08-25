@@ -187,8 +187,8 @@
   color: #5A1;
 }
 
-.xMacroParameterError, .xLinkParameterError, 
-.xFileUploadError, .xPageNameError, .xImageParameterError {
+.xMacroParameterError, .xLinkParameterError, .xFileUploadError,
+.xPageNameError, .xImageParameterError, .xMacroSelectorError {
   font-size: 75%;
   color: red;
   margin-bottom: 3px;
@@ -197,7 +197,7 @@
 /* Sizes for the top-level containers in the dialogs, those that need to resize to 100% of the dialog content */
 /* without aggregator */
 .xAttachmentsSelector, .xPagesSelector, .xExplorerPanel, 
-.xImagesSelector, .xImagesExplorer {
+.xImagesSelector, .xImagesExplorer, .xMacroSelector {
   margin-top: 5px;
   /* Make sure this panel expands to the whole dialog body and stays expanded, on all IEs. width: 
         100% does not do it, nor default overflow. */

@@ -44,9 +44,20 @@ public abstract class AbstractCompositeWizardStep extends Composite implements W
      */
     public AbstractCompositeWizardStep(Config config)
     {
+        this(config, new FlowPanel());
+    }
+
+    /**
+     * Creates a new composite wizard step that uses the given panel to hold its widgets.
+     * 
+     * @param config the object used to configure the newly created wizard step
+     * @param panel the panel where this wizard step will add its widgets
+     */
+    public AbstractCompositeWizardStep(Config config, FlowPanel panel)
+    {
         this.config = config;
 
-        initWidget(new FlowPanel());
+        initWidget(panel);
     }
 
     /**

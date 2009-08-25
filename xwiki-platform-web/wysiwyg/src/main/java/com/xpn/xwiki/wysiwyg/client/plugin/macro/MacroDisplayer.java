@@ -117,7 +117,7 @@ public class MacroDisplayer implements InnerHTMLListener
         textArea.getDocument().addInnerHTMLListener(this);
 
         // Display the current macros.
-        display(getStartMacroComments(textArea.getDocument().getBody()));
+        display(getStartMacroCommentNodes(textArea.getDocument().getBody()));
     }
 
     /**
@@ -257,7 +257,7 @@ public class MacroDisplayer implements InnerHTMLListener
      * @return the list of start macro comment nodes for the top level macros under the given subtree (nested macros are
      *         ignored)
      */
-    private List<Node> getStartMacroComments(Node root)
+    private List<Node> getStartMacroCommentNodes(Node root)
     {
         Document document = (Document) root.getOwnerDocument();
         Iterator<Node> iterator = document.getIterator(root);
@@ -428,7 +428,17 @@ public class MacroDisplayer implements InnerHTMLListener
     public void onInnerHTMLChange(Element element)
     {
         if (element.getOwnerDocument() == textArea.getDocument()) {
-            display(getStartMacroComments(element));
+            display(getStartMacroCommentNodes(element));
         }
+    }
+
+    /**
+     * @param container a macro container
+     * @return the serialized macro call (e.g. the value of the start macro comment node) associated with the given
+     *         macro container
+     */
+    public String getSerializedMacroCall(Element container)
+    {
+        return container.getMetaData().getFirstChild().getNodeValue();
     }
 }

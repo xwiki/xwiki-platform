@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
+
+import org.xwiki.gwt.dom.client.Element;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -27,7 +31,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.WizardStepMap;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
@@ -68,9 +71,10 @@ public class MacroWizard implements WizardListener
     private Wizard insertWizard;
 
     /**
-     * The rich text area on which the spells are cast.
+     * The object used to get information about the displayed macros and to access the rich text area on which the
+     * spells are cast.
      */
-    private final RichTextArea textArea;
+    private final MacroDisplayer displayer;
 
     /**
      * The object used to configure this wizard.
@@ -80,12 +84,13 @@ public class MacroWizard implements WizardListener
     /**
      * Creates a new macro wizard.
      * 
-     * @param textArea the rich text area on which the spells are cast
+     * @param displayer the object used to get information about the displayed macros and to access the rich text area
+     *            on which the spells are cast
      * @param config the object used to configure this wizard
      */
-    public MacroWizard(RichTextArea textArea, Config config)
+    public MacroWizard(MacroDisplayer displayer, Config config)
     {
-        this.textArea = textArea;
+        this.displayer = displayer;
         this.config = config;
     }
 
@@ -95,7 +100,8 @@ public class MacroWizard implements WizardListener
      */
     public void edit()
     {
-        getEditWizard().start(EDIT_STEP_NAME, new MacroCall(textArea.getCommandManager().getStringValue(INSERT)));
+        getEditWizard().start(EDIT_STEP_NAME,
+            new MacroCall(displayer.getTextArea().getCommandManager().getStringValue(INSERT)));
     }
 
     /**
@@ -104,7 +110,14 @@ public class MacroWizard implements WizardListener
      */
     public void insert()
     {
-        getInsertWizard().start(SELECT_STEP_NAME, null);
+        // Compute the list of macros inserted in the edited document.
+        List<String> usedMacroIds = new ArrayList<String>();
+        Element root = (Element) displayer.getTextArea().getDocument().getBody().cast();
+        for (Element container : displayer.getMacroContainers(root)) {
+            usedMacroIds.add(new MacroCall(displayer.getSerializedMacroCall(container)).getName());
+        }
+        // Cast the spell.
+        getInsertWizard().start(SELECT_STEP_NAME, usedMacroIds);
     }
 
     /**
@@ -114,7 +127,7 @@ public class MacroWizard implements WizardListener
      */
     public void onCancel(Wizard sender)
     {
-        textArea.setFocus(true);
+        displayer.getTextArea().setFocus(true);
     }
 
     /**
@@ -124,8 +137,8 @@ public class MacroWizard implements WizardListener
      */
     public void onFinish(Wizard sender, Object result)
     {
-        textArea.setFocus(true);
-        textArea.getCommandManager().execute(INSERT, ((MacroCall) result).toString());
+        displayer.getTextArea().setFocus(true);
+        displayer.getTextArea().getCommandManager().execute(INSERT, ((MacroCall) result).toString());
     }
 
     /**

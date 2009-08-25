@@ -123,6 +123,8 @@ public interface Strings extends Constants
 
     String macroParameterMandatory();
 
+    String macroCategories();
+
     String macroCategoryAll();
 
     String macroCategoryOther();

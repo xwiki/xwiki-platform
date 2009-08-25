@@ -66,7 +66,7 @@ public class InsertExecutable extends InsertHTMLExecutable
     public String getParameter(RichTextArea rta)
     {
         if (selector.getMacroCount() > 0) {
-            return selector.getMacro(0).getMetaData().getFirstChild().getNodeValue();
+            return selector.getDisplayer().getSerializedMacroCall(selector.getMacro(0));
         } else {
             return null;
         }

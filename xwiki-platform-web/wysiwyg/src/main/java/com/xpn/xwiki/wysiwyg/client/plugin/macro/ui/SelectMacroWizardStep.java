@@ -27,6 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Element;
+
+import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
@@ -113,7 +117,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
             } else {
                 macroListItemsByCategory = itemsByCategory;
                 macroDescriptorsCallback = null;
-                fillCategoryList();
+                macroFilter.setCategories(macroListItemsByCategory.keySet());
                 if (initCallback != null) {
                     initCallback.onSuccess(null);
                 }
@@ -213,6 +217,45 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
         {
             return searchBox.getValue();
         }
+
+        /**
+         * Fills the drop down list of categories based on the given category set.
+         * 
+         * @param categoryInputSet the set of categories
+         */
+        public void setCategories(Set<String> categoryInputSet)
+        {
+            // The input category set could be immutable so we should use a new set.
+            Set<String> categorySet = new HashSet<String>(categoryInputSet);
+            // All and Used categories should be the first two in the list of options, so don't sort them.
+            categorySet.remove(CATEGORY_ALL);
+            categorySet.remove(CATEGORY_USED);
+
+            // Sort the categories.
+            List<String> categories = new ArrayList<String>();
+            categories.addAll(categorySet);
+            Collections.sort(categories);
+
+            categoryList.clear();
+            categoryList.addItem(Strings.INSTANCE.macroCategoryAll(), CATEGORY_ALL);
+            categoryList.addItem(Strings.INSTANCE.macroCategoryUsed(), CATEGORY_USED);
+            for (String category : categories) {
+                String label = CATEGORY_OTHER.equals(category) ? Strings.INSTANCE.macroCategoryOther() : category;
+                categoryList.addItem(label, category);
+            }
+
+            // Group all real categories (the categories that were sorted).
+            Node select = categoryList.getElement();
+            Element group = ((Document) select.getOwnerDocument()).xCreateElement("optgroup");
+            group.setAttribute("label", Strings.INSTANCE.macroCategories());
+            while (select.getChildNodes().getLength() > 2) {
+                group.appendChild(select.getChildNodes().getItem(2));
+            }
+            select.appendChild(group);
+
+            // Select initially the All category.
+            categoryList.setSelectedIndex(0);
+        }
     }
 
     /**
@@ -245,6 +288,11 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      * The macro list items grouped by category for quick display.
      */
     private Map<String, List<ListItem<MacroDescriptor>>> macroListItemsByCategory;
+
+    /**
+     * The list of macros that have been inserted in the edited document.
+     */
+    private List<String> usedMacroIds;
 
     /**
      * The list box displaying the available macros. Each list item has a macro id associated.
@@ -316,13 +364,22 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      * 
      * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
      */
+    @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > initCallback)
     {
         // Save the initialization call-back to be able to notify the wizard when we're done.
         this.initCallback = initCallback;
 
+        // Save the list of used macros in order to update the corresponding category later, when the user choose it.
+        // Check if the data is a list since this method can be called after a "Back" action.
+        usedMacroIds = data instanceof List ? (List<String>) data : null;
+
         if (macroListItemsByCategory != null) {
             // Macro descriptors have been received.
+            // If we have a list of used macros and the current category is CATEGORY_USED then trigger an update.
+            if (usedMacroIds != null && CATEGORY_USED.equals(macroFilter.getCategory())) {
+                updater.deferUpdate();
+            }
             initCallback.onSuccess(null);
         } else if (macroDescriptorsCallback == null) {
             // There's no pending request for macro descriptors.
@@ -431,16 +488,16 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      */
     public void update()
     {
+        if (usedMacroIds != null && CATEGORY_USED.equals(macroFilter.getCategory())) {
+            updateUsedMacroCategory();
+        }
         List<ListItem<MacroDescriptor>> items = macroListItemsByCategory.get(macroFilter.getCategory());
         macroList.clear();
         String searchText = macroFilter.getSearchText();
         if (searchText != null && searchText.length() > 0) {
             searchText = searchText.toLowerCase();
             for (ListItem<MacroDescriptor> item : items) {
-                MacroDescriptor descriptor = item.getData();
-                if ((descriptor.getName() != null && descriptor.getName().toLowerCase().contains(searchText))
-                    || (descriptor.getDescription() != null && descriptor.getDescription().toLowerCase().contains(
-                        searchText))) {
+                if (macroMatchesSearchQuery(item.getData(), searchText)) {
                     macroList.addItem(item);
                 }
             }
@@ -449,6 +506,19 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
                 macroList.addItem(item);
             }
         }
+    }
+
+    /**
+     * Checks if the name or the description of the specified macro contains the given search text.
+     * 
+     * @param descriptor a macro descriptor
+     * @param searchText the text to look for in the macro descriptor
+     * @return {@code true} if the given macro descriptor matches the specified search query, {@code false} otherwise
+     */
+    private boolean macroMatchesSearchQuery(MacroDescriptor descriptor, String searchText)
+    {
+        return (descriptor.getName() != null && descriptor.getName().toLowerCase().contains(searchText))
+            || (descriptor.getDescription() != null && descriptor.getDescription().toLowerCase().contains(searchText));
     }
 
     /**
@@ -484,28 +554,21 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
     }
 
     /**
-     * Fills the {@link #categoryList}.
+     * Updates the list of used macros in {@link #macroListItemsByCategory} based on {@link #usedMacroIds}.
      */
-    private void fillCategoryList()
+    private void updateUsedMacroCategory()
     {
-        Set<String> categorySet = new HashSet<String>(macroListItemsByCategory.keySet());
-        categorySet.remove(CATEGORY_ALL);
-        categorySet.remove(CATEGORY_USED);
-        categorySet.remove(CATEGORY_OTHER);
-
-        List<String> categories = new ArrayList<String>();
-        categories.addAll(categorySet);
-        Collections.sort(categories);
-
-        macroFilter.categoryList.addItem(Strings.INSTANCE.macroCategoryAll(), CATEGORY_ALL);
-        macroFilter.categoryList.addItem(Strings.INSTANCE.macroCategoryUsed(), CATEGORY_USED);
-        if (macroListItemsByCategory.containsKey(CATEGORY_OTHER)) {
-            macroFilter.categoryList.addItem(Strings.INSTANCE.macroCategoryOther(), CATEGORY_OTHER);
+        List<ListItem<MacroDescriptor>> allItems = macroListItemsByCategory.get(CATEGORY_ALL);
+        List<ListItem<MacroDescriptor>> items = macroListItemsByCategory.get(CATEGORY_USED);
+        items.clear();
+        for (ListItem<MacroDescriptor> item : allItems) {
+            for (String macroId : usedMacroIds) {
+                if (item.getData().getId().equalsIgnoreCase(macroId)) {
+                    items.add(item);
+                }
+            }
         }
-        for (String category : categories) {
-            macroFilter.categoryList.addItem(category);
-        }
-
-        macroFilter.categoryList.setSelectedIndex(0);
+        // Prevent further updates till this wizard step is not re-initialized.
+        usedMacroIds = null;
     }
 }

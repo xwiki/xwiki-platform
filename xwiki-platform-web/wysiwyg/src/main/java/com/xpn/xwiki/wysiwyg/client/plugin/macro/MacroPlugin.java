@@ -91,7 +91,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
         displayer = GWT.create(MacroDisplayer.class);
         displayer.setTextArea(getTextArea());
         selector = new MacroSelector(displayer);
-        wizard = new MacroWizard(textArea, config);
+        wizard = new MacroWizard(displayer, config);
 
         getTextArea().getCommandManager().registerCommand(REFRESH,
             new RefreshExecutable(getConfig().getParameter("syntax", "xhtml/1.0")));

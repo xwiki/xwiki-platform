@@ -27,11 +27,6 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
     private XWikiStubContextProvider stubContextProvider;
 
     /**
-     * Indicate if a valid XWikiContext has already been provided to {@link XWikiStubContextProvider}.
-     */
-    boolean initialized = false;
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.context.ExecutionContextInitializer#initialize(org.xwiki.context.ExecutionContext)
@@ -40,15 +35,15 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
     {
         XWikiContext xcontext = (XWikiContext) context.getProperty("xwikicontext");
 
-        if (!this.initialized) {
-            if (xcontext != null) {
-                // initialize the XWikiStubContextProvider with the context of the first request
-                this.stubContextProvider.initialize(xcontext);
+        if (xcontext == null) {
+            // if the XWikiConetxt is not provided in the Execution context it mean the Execution context is being
+            // initialized by a daemon thread
+            XWikiContext stubContext = stubContextProvider.createStubContext();
 
-                this.initialized = true;
+            if (stubContext != null) {
+                // the stub context has been properly initialized, we inject it in the Execution context
+                context.setProperty("xwikicontext", stubContext);
             }
-        } else if (xcontext == null) {
-            context.setProperty("xwikicontext", this.stubContextProvider.createStubContext());
         }
     }
 }

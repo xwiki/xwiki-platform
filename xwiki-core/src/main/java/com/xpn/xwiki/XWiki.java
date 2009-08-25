@@ -154,6 +154,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.util.MenuSubstitution;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -322,6 +323,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             context.setWiki(xwiki);
             xwiki.setDatabase(context.getDatabase());
+
+            // initialize stub context here instead of during Execution context initialization because during Execution
+            // context initialization, the XWikiContext is not fully initialized (does not conteain XWiki object) which
+            // make it unusable
+            Utils.getComponent(XWikiStubContextProvider.class).initialize(context);
+
             return xwiki;
         } catch (Exception e) {
             e.printStackTrace();

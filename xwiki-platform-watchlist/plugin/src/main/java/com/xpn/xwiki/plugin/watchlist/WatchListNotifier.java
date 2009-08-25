@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -85,6 +86,13 @@ public class WatchListNotifier
             // Invalid email
             return;
         }
+        
+        List<String> modifiedDocuments = new ArrayList<String>();
+        for (WatchListEvent event : events) {
+            if (!modifiedDocuments.contains(event.getPrefixedFullName())) {
+                modifiedDocuments.add(event.getPrefixedFullName());                
+            }
+        }
 
         // Prepare email template (wiki page) context
         VelocityContext vcontext = new VelocityContext();
@@ -95,6 +103,7 @@ public class WatchListNotifier
         vcontext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
         vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
         vcontext.put("msg", context.getMessageTool());
+        vcontext.put("modifiedDocuments", modifiedDocuments);
         vcontext.put("previousFireTime", previousFireTime);        
         vcontext.put("context", new Context(context));
 

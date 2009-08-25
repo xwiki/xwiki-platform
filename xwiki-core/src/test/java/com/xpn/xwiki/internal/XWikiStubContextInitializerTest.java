@@ -23,6 +23,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
@@ -47,6 +48,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
     {
         XWikiContext xcontext = new XWikiContext();
         xcontext.put("key", "value");
+        xcontext.setWiki(new XWiki());
 
         ExecutionContext context = new ExecutionContext();
         context.setProperty("xwikicontext", xcontext);
@@ -69,11 +71,13 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
             }
         });
 
+        thread.run();
         thread.join();
 
         XWikiContext daemonXcontext = (XWikiContext) daemonContext.getProperty("xwikicontext");
-        assertNotNull(xcontext);
+        assertNotNull(daemonXcontext);
         assertNotSame(xcontext, daemonXcontext);
-        assertEquals("value", xcontext.get("key"));
+        assertEquals("value", daemonXcontext.get("key"));
+        assertNotNull(daemonXcontext.getWiki());
     }
 }

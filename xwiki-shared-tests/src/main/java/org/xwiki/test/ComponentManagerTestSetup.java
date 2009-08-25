@@ -34,9 +34,8 @@ import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
- * JUnit Test Setup that initializes the Component Manager. 
- * Test suite that want to initialize the Component manager only once should use this class instead of 
- * {@link AbstractXWikiComponentTestCase}.
+ * JUnit Test Setup that initializes the Component Manager. Test suite that want to initialize the Component manager
+ * only once should use this class instead of {@link AbstractXWikiComponentTestCase}.
  * 
  * @version $Id$
  * @since 2.0M1
@@ -46,13 +45,14 @@ public class ComponentManagerTestSetup extends TestSetup
     private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
     private List<ComponentDescriptor< ? >> componentDescriptors = new ArrayList<ComponentDescriptor< ? >>();
-    
+
     public ComponentManagerTestSetup(TestSuite suite)
     {
         super(suite);
     }
 
-    public ComponentManagerTestSetup(TestSuite suite, List<ComponentDescriptor< ? >> componentDescriptors) throws Exception
+    public ComponentManagerTestSetup(TestSuite suite, List<ComponentDescriptor< ? >> componentDescriptors)
+        throws Exception
     {
         super(suite);
         this.componentDescriptors.addAll(componentDescriptors);
@@ -89,16 +89,16 @@ public class ComponentManagerTestSetup extends TestSetup
     {
         this.initializer.initializeContainer();
         this.initializer.initializeConfigurationSource();
-        
-        // Register defined component descriptors as components 
+
+        // Register defined component descriptors as components
         for (ComponentDescriptor< ? > descriptor : this.componentDescriptors) {
             getComponentManager().registerComponent(descriptor);
         }
 
         this.initializer.initializeExecution();
-        
+
         for (Enumeration<Test> tests = getTest().tests(); tests.hasMoreElements();) {
-            Test test = (Test) tests.nextElement();
+            Test test = tests.nextElement();
             try {
                 Method method = test.getClass().getMethod("setComponentManager", ComponentManager.class);
                 method.invoke(test, this.initializer.getComponentManager());

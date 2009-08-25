@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>XWiki</web>
@@ -12,15 +12,44 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1203938786000</creationDate>
-<date>1205320524000</date>
-<contentUpdateDate>1205320524000</contentUpdateDate>
-<version>4.1</version>
+<date>1203938786000</date>
+<contentUpdateDate>1203938786000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
+<attachment>
+<filename>space.gif</filename>
+<filesize>996</filesize>
+<author>XWiki.Admin</author>
+<date>1251111875000</date>
+<version>1.1</version>
+<comment></comment>
+<content>R0lGODlhEAAQAPeCAP368////v777/788+TJb+PEY9uXO/777v788vTWT/jmlf/89fXbZfLQOe/Qev/9+vrts/7+/dqPOf788fTXVPLluv/+/dyyPvHPafXekf789vv36vnpoe7PcvnppPHScvPTRPvvuerLbO/UlOLDYdmLNPrsrPzz0O/SgPPTR+aydt2ZR/becvvyzOC8WOfPffLUf/PUSf368dunO+7KovjqwvbpyduVP/z01/fji/HQbNuiO/nonPLVgf789+jQhPTdqPz47fbgfPfihf788Pfjhfv36f799PLRO+XIbv/9+P/99vTXV/Tck/XaY+nBc/TbnvjkjvXbaPzyyPjmlPPXhty0QePEYtubO/LTefjlkfrx3tuoO/DLJum5hfPaltutOfXelO7OiPbedtudPPbcbPTYXP7+/P/+/u7PduDCWe/ThfPYjv767/HOMNujO+DAVtyuQNuRPv378/Xgn/v26P368vfhgduuPPHNLtu1PPXZXfbhrPbfdu3Kavz22PvyytmMNP///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAIIALAAAAAAQABAAAAjBAAUJHEiwoMGDCBMSVEOigMMrcIIAmAhgzhmBeiIEQGMhwIYkBEK++FFBoBUfUTLQ4SPgyIAJAg48cCEwjowwTXr4EbEGhYM0HYxcEAimzggxT2wgGICASMwAeARyCaBkyYIBf6gU6SPFDI4ZAt9omBLCBI8cQsrsSQDixA6BZOxA8KBgyBgGTGIgcdMCi0ADbThoucPCCYUUDfJ0AWRA4IotQKB8YVMFRpYPOjDUuCGQhgo5gUKLDl1CgheFqFMHBAA7</content>
+</attachment>
+<attachment>
+<filename>document.gif</filename>
+<filesize>379</filesize>
+<author>XWiki.Admin</author>
+<date>1251111875000</date>
+<version>1.1</version>
+<comment></comment>
+<content>R0lGODlhEAAQANU6APr6+vX19d/f38vLy9TU1Pf39/39/fb29sPDw+Li4sLCwvPz88bGxsjIyOrq6vHx8cDAwLS0tLq6uvT09MXFxezs7Obm5ufn57Gxsc3NzcfHx6+vr729vc7OzsrKyvDw8Ly8vPLy8unp6b6+vtbW1tPT09vb29XV1dnZ2e/v76qqqqWlpe3t7aysrNfX17i4uOPj466urt3d3c/Pz/j4+Pn5+fv7+8nJyczMzPz8/P///wAAAAAAAAAAAAAAAAAAACH5BAEAADoALAAAAAAQABAAAAaYQB0MdysaiwKDbqnD0Wy5qJSmSDJvtklg+0iJcheEVXfLFWqFwuLjyB0mFMGyXINIIhvVSpq7zXNQgDQBDxUOFn1/ORoKIy8RGDEtLIlkfFE2NAcLIZVlOR0eDAgQHCASB56XmDU1NKo5JCUzGQMNDQyvfpZSNjYAwMCwMiYoLicEyVC7n6t8uwM1zlI1OEsJA0faNzgJOkEAOw==</content>
+</attachment>
+<attachment>
+<filename>wiki.gif</filename>
+<filesize>1074</filesize>
+<author>XWiki.Admin</author>
+<date>1251111875000</date>
+<version>1.1</version>
+<comment></comment>
+<content>R0lGODlhEAAQAPfcAGWbYzp/N3LGZWejWqHZmTR8Mdzx2d3x2v3+/ezy653Dvs7jsW65z5zBvWa0zcLbpfz+/KzwtV6nx3eucpDUg7zaoJTPjNPqtarQxECGPHq9cnHFZHS8aVio3XG9bvb69qDXh23bd3amZW2zx3DGhM3nr6nuycnq0c/psLvhpWyrY4vauG22vovI15XMgI3P1W2tZ5HJh7HSsJXT2tXv1dTq0UOGv6/VvZHHekqYx0OEt57Ylk6SwXivzF3TbFKauVyv2rft1Fuv3GKllk3XZUbQamfbdtPtztrt1H3Rc2qpxoLLw4DQqLftwVipnV+pr3rRr4TLtVujyZC/eave3LDXva/fz1aizJ3Fm4DAeczquuj1zV6w0/j892y9wprWkY3qnYPYgVylxVaq4FGUTGWt1rTeoLTaxVGm2szrtWDYpnTHaFC8WcDYv7XPtHqoZqLZmaTIiDN7MGiXWW21zc7kspDShnupZ3mvdWaxzH67c9Lss3LFZm68xmu/YESGQu3z7DuCN8/p0J7gvMfork3ZZmmx17PXmaLYjIDLdWWfgbfj1GqtYJrAfo7ByYrcv4a3cIvL2dbyx53Cs2axeLXemHinubXe1l6bvOLzwKLU1I3AdpDN212oykmLR8fexFen0Fur337Lc73Yotbu0k+cSHvJb/X69cDcpnrGb6HQzn7CvEaHQ/b69dzwvmecZVepe2e8vHXJy5rlv5zY2UuayW+kbd7ywKLim4GzxazXporDhHPegr7gxUKMPZy+gVCNTVOZxp3XlGeWWqDSwHTGZ6bb1d3vvn20ysfq0HHWmoS9fm3EtK/XkqPQkZnBgbfQtrTvtWCwVj/Rd1ebtmzRkKfvsaffzEeMuZrflJLOiXHcev///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAANwALAAAAAAQABAAAAj/ALkJ5GZgR6I1Akx9ITVwIAI4AlJo6XWmii4/2roMhGAH0RYkR6xc0qQKQwwNpwQSAHFLEg1BxqhwauHoBo5l3A5syBQtQpNFtGbQGRElW4lSn4RVSmPNxIkXkRzEUsZrm7M4E0TtwQUmSDIGeWQZKUTEh54HZIq5ChNi1rVOXlaomVaEjYo6GfgcS1JtkAQuwfpAYfYE1oAFgVKhoPBoyRUgQmrZ0PFjiIhRfyw0M0OCiRhQY9DkwEZN0ZRfAGpIu8DBAwspoTrwcEJpGCo50Ljt2nQoyyolhspgYjTn2R0AAj/AgESIWC5kPSy5qPAGWIKBrfD4wjKpgQIZjQoADwDUUGAbW54CBGD1yk3DgAA7</content>
+</attachment>
 <object>
 <class>
 <name>XWiki.Mail</name>
@@ -69,257 +98,105 @@
 <name>XWiki.WatchListMessage</name>
 <number>0</number>
 <className>XWiki.Mail</className>
+<guid>6e7ba94a-fc9c-45ad-8758-9b9a04ce92c1</guid>
 <property>
-<html>##
-## Preamble
-## Since the core does not have getExternal calls for attachments, we need to get the server part manually.
-#set($externalUrl = $doc.getExternalURL())
-#set($idx = $externalUrl.indexOf('/', 8))
-#set($externalUrl = $externalUrl.substring(0, $idx))
-##
-##
-&lt;body style="background-color:#F7F7F7;"&gt;
-&lt;b&gt;Hello $pseudo,&lt;/b&gt;&lt;br/&gt;
-&lt;i&gt;This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :&lt;/i&gt;&lt;br/&gt;
-&lt;br/&gt;
-&lt;table width="100%" style="font-family:arial;font-size:14px;" cellpadding="4" cellspacing="0"&gt;
-&lt;tr style="background-color:$DEDEDE;font-weight:bold;"&gt;
-&lt;td&gt;Page&lt;/td&gt;&lt;td&gt;Informations&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2"&gt;&lt;/td&gt;&lt;/tr&gt;
-## ------------------------------------------
-## Loop over the modified documents
-## ------------------------------------------
-#foreach ($udocname in $documents)
-#set ($identifiedModification = false)
-#set ($udoc = $xwiki.getDocument($udocname))
-#if ($velocityCount % 2 == 0)
-  #set ($color = "#FFF")
-#else
-  #set ($color = "#FFF")
-#end
-## ------------------------------------------
-## 1st line : doc name, last author, etc
-## ------------------------------------------
-&lt;tr style="background-color:${color};"&gt;
-&lt;td style="border-top:1px solid #999999;border-left:1px solid #999999;border-bottom:1px solid #999999;font-weight:bold;"&gt;&lt;a href="${udoc.getExternalURL()}"&gt;$udoc.getDisplayTitle()&lt;/a&gt;&lt;br/&gt;&lt;span style="font-size:10px;"&gt;${udoc.fullName}&lt;/span&gt;&lt;/td&gt;
-&lt;td style="border-top:1px solid #999999;border-right:1px solid #999999;"&gt;
-modified by $xwiki.getLocalUserName($udoc.author, false) on $xwiki.formatDate($udoc.date) #if (!$udoc.getComment().equals("")), comment : $udoc.getComment() #end
-&lt;/td&gt;
-&lt;/tr&gt;
-#if ($interval == 1)
-  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceHoursPeriod(1))
-#elseif ($interval == 2)
-  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceDaysPeriod(1))
-#elseif ($interval == 3)
-  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceWeeksPeriod(1))
-#else
-  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceYearsPeriod(1))
-#end
-#set ($criteria = $xwiki.getCriteriaService().getRevisionCriteriaFactory().createRevisionCriteria($period))
-#set ($ret = $criteria.setRange($xwiki.getCriteriaService().getRangeFactory().createRange(0, 1)))
-#set ($revisions = $udoc.getRevisions($criteria))
-#foreach ($rev in $revisions)
-  #set ($rev1 = $rev)
-#end
-#set ($rev2 = $udoc.getVersion())
-#set($origdoc = $xwiki.getDocument($udoc, $rev1))
-#set($newdoc = $udoc)
-## ------------------------------------------
-## 2nd line : differences
-## ------------------------------------------
-&lt;tr style="background-color:${color};"&gt;
-&lt;td style="background-color:#F7F7F7;"&gt;&lt;/td&gt;
-&lt;td style="border-bottom:1px solid #999999;border-right:1px solid #999999;border-left:1px solid #999999;"&gt;
-## ------------------------------------------
-## Content
-## ------------------------------------------
-##
+<html>Hello $first_name,
+
+This message is sent by XWiki. Here are the documents in your watchlist that have been created, updated or deleted since the last notification ($xwiki.formatDate($previousFireTime, $format)) :
+
+#set($lightGray = "#CCC")
+#set($veryLightGray = "#FDFDFD")
+#set($darkGray = "#333")
+#set($commonHeadingStyle = "margin:0;")
+#set($h1Style = "$commonHeadingStyle")
+#set($h2Style = "$commonHeadingStyle")
+#set($h3Style = "$commonHeadingStyle")
+#set($h4Style = "$commonHeadingStyle;margin-top:2px;margin-bottom:2px;")
+#set($h3BaselineStyle = "font-size:0.8em;color:${darkGray};padding-left:21px;")
+#set($commonDivStyle = "")
+#set($wikiDivStyle = "$commonDivStyle margin-top:16px;")
+#set($spaceDivStyle = "$commonDivStyle margin-left:8px;padding:10px;border-left:solid 1px ${lightGray};")
+#set($documentDivStyle = "$commonDivStyle margin-left:8px;padding:10px;border-left:solid 1px ${lightGray};")
+#set($iconStyle = "width:16px;height:16px;")
+#set($eventStyle = "padding-left:21px;")
+#set($diffStyle = "padding:5px;margin:5px;background-color:$veryLightGray;border-left:solid 4px $lightGray;")
+#set($propDiffStyle = "margin-right:2px;padding:2px;")
+
 #macro(displayhtmldiff $html)
-##set ($html = $html.replaceAll('\&lt;span class="diffremoveword"\&gt;(.*)\&lt;/span\&gt;', '\&lt;span style="font-style:bold;color:red;"\&gt;\&lt;strike\&gt;$1\&lt;/strike\&gt;\&lt;/span\&gt;'))
-#set ($html = $html.replaceAll('class="diffremoveword"', 'style="text-decoration: line-through;color:red;"'))
-#set ($html = $html.replaceAll('class="diffaddword"', 'style="font-weight:bold;color:green;"'))
-$html
+  #set($result = $html.replaceAll('\&lt;div class="diff"\&gt;\&lt;/div\&gt;', "").trim())
+  #set($result = $result.replaceAll('class="diffaddword"', 'style="font-weight:bold;background-color:#99FF99;"'))
+  #set($result = $result.replaceAll('class="diffremoveword"', 'style="text-decoration: line-through;background-color:#FF9999;"'))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_contentDiff", "$diffStyle"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_attachmentDiff", "$diffStyle"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_objectDiff", "$diffStyle"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_classDiff", "$diffStyle"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_objectClassName", "text-decoration:underline; display:block; margin-bottom:0.5em;"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_classClassName", "text-decoration:underline; display:block; margin-bottom:0.5em;"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_propDiffOldValue", "$propDiffStyle background:#FFEDED;"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_propDiffNewValue", "$propDiffStyle background:#EDFFED;"))
+  #set($result = $result.replaceAll("WATCHLIST_STYLE_DIFF_propDiff", "$propDiffStyle"))
+  $result
 #end
-#if($origdoc.get("XWiki.ArticleClass"))
-  ##
-  ## blog article
-  ##
-  #set($ok = $origdoc.use("XWiki.ArticleClass"))
-  #set($origcontent = $!origdoc.getValue("content").trim())
-  #if(!$origcontent)
-    #set($text1 = "")
-  #else
-    #set($text1 = $origcontent)
+
+#set($previousEvent = $util.getNull())
+#set($previousDoc = $util.getNull())
+#foreach ($event in $events)
+  #set($firstEntry = ($previousEvent == $util.getNull()))
+  #set($prefixedFullName = $event.getPrefixedFullName())
+  #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
+  #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
+  #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
+  #if ($newWiki)
+    #if (!$firstEntry) &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; #end
+    &lt;div class="wiki" style="$wikiDivStyle"&gt;
+    &lt;h1 style="$h1Style"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" /&gt; $event.getWiki()&lt;/h1&gt;
   #end
-  #set($ok = $newdoc.use("XWiki.ArticleClass"))
-  #set($newcontent = $!newdoc.getValue("content").trim())
-  #if(!$newcontent)
-    #set($text2 = "")
-  #else
-    #set($text2 = $newcontent)
+  #if ($newSpace)
+    #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/div&gt;&lt;/div&gt; #end
+    &lt;div class="space" style="$spaceDivStyle"&gt;
+    &lt;h2 style="$h2Style"&gt;&lt;img src="cid:space.gif" style="$iconStyle" /&gt; $event.getSpace()&lt;/h2&gt;
   #end
-  #set ($htmlDiff = $xwiki.diff.getDifferencesAsHTML($text1, $text2 ,false))
-  ## !$text1.equals($text2) was failing
-  #if(!$htmlDiff.replaceAll('\&lt;div class="diff"\&gt;\&lt;/div\&gt;', "").trim().equals(""))
-    #set ($identifiedModification = true)
-    &lt;table class="changes-table" width="100%" style="border-color:#CDCDCD;font-family:arial;font-size:12px;text-align:left;"&gt;
-      &lt;tr class="changes-table-title"&gt;
-        &lt;th style="border-bottom:1px solid #000000;"&gt;Content&lt;/th&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          $htmlDiff
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    &lt;/table&gt;
+  #if($newDocument)
+    #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
+    &lt;div class="document" style="$documentDivStyle"&gt;
+    #set($currentDoc = $xwiki.getDocument($prefixedFullName))
+    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" /&gt; $currentDoc.getDisplayTitle()&lt;/h3&gt;
+    &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
-#else
-  ##
-  ## Wiki page
-  ##
-  #set($origcontent = $!origdoc.content.trim())
-  #if(!$origcontent)
-    #set($text1 = "")
-  #else
-    #set($text1 = $origcontent)
-  #end
-  #set($newcontent = $!newdoc.content.trim())
-  #if(!$newcontent)
-    #set($text2 = "")
-  #else
-    #set($text2 = $newcontent)
-  #end
-  #set ($htmlDiff = $xwiki.diff.getDifferencesAsHTML($text1, $text2 ,false).replaceAll('\&lt;div class="diff"\&gt;\&lt;/div\&gt;', "").trim())
-  ## !$text1.equals($text2) was failing
-  #if(!$htmlDiff.equals(""))
-    #set ($identifiedModification = true)
-    &lt;table class="changes-table" width="100%" style="border-color:#CDCDCD;font-family:arial;font-size:12px;text-align:left;"&gt;
-      &lt;tr class="changes-table-title"&gt;
-        &lt;th style="border-bottom:1px solid #000000;"&gt;Content&lt;/th&gt;
-      &lt;/tr&gt;
-      &lt;tr&gt;
-        &lt;td&gt;
-          #displayhtmldiff($htmlDiff)
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    &lt;/table&gt;
-  #end
-#end
-## ------------------------------------------
-## Comments
-## ------------------------------------------
-#set($commentchanges = 0)
-#foreach($objdiffs in $newdoc.getObjectDiff($origdoc, $newdoc))
-  #set($commentchangetitledone = 0)
-  #foreach($objdiff in $objdiffs)
-    #if($objdiff.getClassName().equals("XWiki.XWikiComments"))
-      #if($commentchangetitledone==0)
-        #set($commentchanges = 1 + $commentchanges)
-        #set($commentchangetitledone = 1)
-      #end
-    #end
-  #end
-#end
-#if($commentchanges&gt;0)
-#set ($identifiedModification = true)
-&lt;table class="changes-table" width="100%" style="border-color:#CDCDCD;font-family:arial;font-size:12px;text-align:left;"&gt;
-&lt;tr class="changes-table-title" style="border-bottom:1px solid #000000;"&gt;
-&lt;th style="border-bottom:1px solid #000000;"&gt;Comment&lt;/th&gt;
-&lt;/tr&gt;
-#foreach($objdiffs in $newdoc.getObjectDiff($origdoc, $newdoc))
-  #set ($wascomment = false)
-  #set ($author = "")
-  #set ($date = "")
-  #set ($comment = "")
-  #foreach($objdiff in $objdiffs)
-    #if($objdiff.getClassName().equals("XWiki.XWikiComments"))
-      #set ($wascomment = true)
-      #set($propname = $objdiff.getPropName())
-      #if($propname=="author")
-        #set($author = $objdiff.getNewValue().toString())
-        #if($author!="")
-          #set ($author = $xwiki.renderText($xwiki.getLocalUserName($author),$newdoc))
-        #end
-      #elseif ($propname=="date")
-        #set($date = $objdiff.getNewValue().toString())
-      #elseif ($propname=="comment")
-        #set($comment = $objdiff.getNewValue().toString())
-      #end
+  &lt;div style="$eventStyle"&gt;
+    #if ($event.getType() != "update")
+      &lt;h4 style="$h4Style"&gt;$msg.get("watchlist.event.${event.getType()}", [$xwiki.formatDate($event.getDate()), $xwiki.getLocalUserName($event.getAuthor(), false)])&lt;/h4&gt;
     #else
-      #set($wascomment = false)
-    #end
-  #end
-  #if ($comment!="")
-    &lt;tr&gt;
-      &lt;td&gt;
-         Added by $author on $date : &lt;br/&gt;
-         &lt;br/&gt;
-         $comment
-      &lt;/td&gt;
-    &lt;/tr&gt;
-  #end
-#end
-&lt;/table&gt;
-#end
-## ------------------------------------------
-## Attachments
-## ------------------------------------------
-#set($attachChanges = $newdoc.getAttachmentDiff($origdoc, $newdoc))
-#if ($attachChanges &amp;&amp; $attachChanges.size() &gt; 0)
-#set ($identifiedModification = true)
-  &lt;table class="changes-table" width="100%" style="border-color:#CDCDCD;font-family:arial;font-size:12px;text-align:left;"&gt;
-    &lt;tr class="changes-table-title"&gt;
-      &lt;th style="border-bottom:1px solid #000000;"&gt;Attachment&lt;/th&gt;
-    &lt;/tr&gt;
-    #foreach($attachChange in $attachChanges)
-      &lt;tr&gt;
-        &lt;td&gt;
-          #if(!$attachChange.origVersion)
-            Attachment added : &lt;a href="${externalUrl}$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)"&gt;$attachChange.fileName&lt;/a&gt;
-          #elseif(!$attachChange.newVersion)
-            Attachment deleted : $attachChange.fileName
-          #else
-            Attachment updated from version &lt;a href="${externalUrl}$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.origVersion)"&gt;$attachChange.origVersion&lt;/a&gt;
-            to version &lt;a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)"&gt;$attachChange.newVersion&lt;/a&gt;
+      #if ($event.isComposite())
+        #set($authors = "")
+        #foreach($author in $event.getAuthors())
+          #set($authors = "${authors}${xwiki.getLocalUserName($author, false)}")
+          #if($event.getAuthors().indexOf($author) &lt; $event.getAuthors().size() - 1)
+            #set($authors = "${authors}, ")  
           #end
-        &lt;/td&gt;
-      &lt;/tr&gt;
+        #end
+        #set($firstDateIndex = $event.getDates().size() - 1)
+        #set($firstDate = $xwiki.formatDate($event.getDates().get($firstDateIndex)))
+        &lt;h4 style="$h4Style"&gt;$msg.get("watchlist.event.update.multiple", [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])&lt;/h4&gt;
+      #end
+      &lt;div class="diff"&gt;
+        #displayhtmldiff($event.getHTMLDiff($context.context))
+      &lt;/div&gt;
     #end
-  &lt;/table&gt;
+  &lt;/div&gt;
+  #set($previousEvent = $event)
+  #set($previousDoc = $currentDoc)
 #end
-##
-## / Differences
-##
-#if (!$identifiedModification)
-Modifications on page objects or class
-#end
-&lt;/td&gt;
-&lt;/tr&gt;
-##
-## Spacer
-##
-&lt;tr&gt;
-  &lt;td&gt;&amp;nbsp;&lt;/td&gt;
-  &lt;td&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-#end
-&lt;/table&gt;
-&lt;/body&gt;</html>
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</html>
 </property>
 <property>
 <language>en</language>
 </property>
 <property>
-<subject>XWiki : Watchlist Updates, #set($format="dd/MM/yyyy")#if ($interval == 1)#set($format="${format} hh:mm")#end$xwiki.formatDate($util.date, $format)</subject>
+<subject>XWiki updates, $events.size() documents have been updated since $xwiki.formatDate($previousFireTime, $format)</subject>
 </property>
 <property>
-<text>Hello $pseudo,
-This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :
-
-#foreach ($udocname in $documents)
-#set ($udoc = $xwiki.getDocument($udocname))$udoc.getDisplayTitle() : ${udoc.getExternalURL()}
-#end</text>
+<text></text>
 </property>
 </object>
 <object>
@@ -351,6 +228,7 @@ This message is sent by XWiki. Here are the documents in your watchlist that hav
 <name>XWiki.WatchListMessage</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>0f7e83e5-a401-4c01-8d75-49ba09398575</guid>
 <property>
 <tags/>
 </property>

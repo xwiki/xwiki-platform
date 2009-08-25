@@ -114,15 +114,7 @@
         &lt;br/&gt;
         &lt;form action="$profileDoc.getURL("save")" method="post"&gt;
         $msg.get("watchlist.staytuned.email.frequency") :
-        #set ($iVal = $profileDoc.display("interval", "view"))
-        #set ($sel = "selected=\"selected\"")
-            &lt;select size="1" name="XWiki.WatchListClass_0_interval" id="XWiki.WatchListClass_0_interval"&gt;
-                &lt;option label="never" value="0" #if ($iVal == "never") $sel #end&gt;never&lt;/option&gt;
-                &lt;option label="hourly" value="1" #if ($iVal == "hourly") $sel #end&gt;hourly&lt;/option&gt;
-                &lt;option label="daily" value="2" #if ($iVal == "daily") $sel #end&gt;daily&lt;/option&gt;
-                &lt;option label="weekly" value="3" #if ($iVal == "weekly") $sel #end&gt;weekly&lt;/option&gt;
-                &lt;option label="monthly" value="4" #if ($iVal == "monthly") $sel #end&gt;monthly&lt;/option&gt;
-            &lt;/select&gt;
+            $profileDoc.display("interval", "edit")
             &lt;input type="hidden" name="xredirect" id="xredirect" value="$doc.getURL("view")"&gt;
             &lt;input type="submit" value="$msg.get("watchlist.staytuned.email.frequency.save")" class="button"/&gt;
         &lt;/div&gt;

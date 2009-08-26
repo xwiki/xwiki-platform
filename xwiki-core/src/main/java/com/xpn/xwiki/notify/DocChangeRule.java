@@ -28,7 +28,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DocChangeRule implements XWikiNotificationRule
 {
     private XWikiDocChangeNotificationInterface target;
+
     private boolean preverify = false;
+
     private boolean postverify = true;
 
     public DocChangeRule()
@@ -40,7 +42,8 @@ public class DocChangeRule implements XWikiNotificationRule
         setTarget(target);
     }
 
-    public DocChangeRule(XWikiDocChangeNotificationInterface target, boolean pre, boolean post) {
+    public DocChangeRule(XWikiDocChangeNotificationInterface target, boolean pre, boolean post)
+    {
         setTarget(target);
         setPreverify(pre);
         setPostverify(post);
@@ -48,7 +51,7 @@ public class DocChangeRule implements XWikiNotificationRule
 
     public XWikiDocChangeNotificationInterface getTarget()
     {
-        return target;
+        return this.target;
     }
 
     public void setTarget(XWikiDocChangeNotificationInterface target)
@@ -56,41 +59,73 @@ public class DocChangeRule implements XWikiNotificationRule
         this.target = target;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiNotificationRule#verify(com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     */
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
-        if(!isPostverify()) return;
-        getTarget().notify(this, newdoc, olddoc,
-            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        if (!isPostverify()) {
+            return;
+        }
+
+        getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiNotificationRule#preverify(com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     */
     public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
     {
-        if(!isPreverify()) return;
-        getTarget().notify(this, newdoc, olddoc,
-            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        if (!isPreverify()) {
+            return;
+        }
+
+        getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiNotificationRule#verify(com.xpn.xwiki.doc.XWikiDocument, java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
     public void verify(XWikiDocument doc, String action, XWikiContext context)
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiNotificationRule#preverify(com.xpn.xwiki.doc.XWikiDocument, java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
     public void preverify(XWikiDocument doc, String action, XWikiContext context)
     {
     }
 
-    public boolean isPostverify() {
-        return postverify;
+    public boolean isPostverify()
+    {
+        return this.postverify;
     }
 
-    public void setPostverify(boolean postnotify) {
+    public void setPostverify(boolean postnotify)
+    {
         this.postverify = postnotify;
     }
 
-    public boolean isPreverify() {
-        return preverify;
+    public boolean isPreverify()
+    {
+        return this.preverify;
     }
 
-    public void setPreverify(boolean prenotify) {
+    public void setPreverify(boolean prenotify)
+    {
         this.preverify = prenotify;
     }
 }

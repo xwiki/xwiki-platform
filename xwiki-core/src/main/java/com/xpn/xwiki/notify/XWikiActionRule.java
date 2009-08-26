@@ -25,40 +25,52 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Deprecated
-public class XWikiActionRule implements XWikiNotificationRule {
+public class XWikiActionRule implements XWikiNotificationRule
+{
     private XWikiActionNotificationInterface target;
+
     private boolean preverify = false;
+
     private boolean postverify = true;
 
-    public XWikiActionRule() {
+    public XWikiActionRule()
+    {
     }
 
-    public XWikiActionRule(XWikiActionNotificationInterface target) {
+    public XWikiActionRule(XWikiActionNotificationInterface target)
+    {
         setTarget(target);
     }
 
-    public XWikiActionRule(XWikiActionNotificationInterface target, boolean pre, boolean post) {
+    public XWikiActionRule(XWikiActionNotificationInterface target, boolean pre, boolean post)
+    {
         setTarget(target);
         setPreverify(pre);
         setPostverify(post);
     }
 
-    public XWikiActionNotificationInterface getTarget() {
-        return target;
+    public XWikiActionNotificationInterface getTarget()
+    {
+        return this.target;
     }
 
-    public void setTarget(XWikiActionNotificationInterface target) {
+    public void setTarget(XWikiActionNotificationInterface target)
+    {
         this.target = target;
     }
 
-    public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context) {
+    public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
+    {
     }
 
-    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context) {
+    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
+    {
     }
 
-    public void verify(XWikiDocument doc, String action, XWikiContext context) {
-    	if(!isPostverify()) return;
+    public void verify(XWikiDocument doc, String action, XWikiContext context)
+    {
+        if (!isPostverify())
+            return;
         try {
             getTarget().notify(this, doc, action, context);
         } catch (Throwable e) {
@@ -68,8 +80,10 @@ public class XWikiActionRule implements XWikiNotificationRule {
         }
     }
 
-    public void preverify(XWikiDocument doc, String action, XWikiContext context) {
-    	if(!isPreverify()) return;
+    public void preverify(XWikiDocument doc, String action, XWikiContext context)
+    {
+        if (!isPreverify())
+            return;
         try {
             getTarget().notify(this, doc, action, context);
         } catch (Throwable e) {
@@ -79,20 +93,24 @@ public class XWikiActionRule implements XWikiNotificationRule {
         }
     }
 
-	public boolean isPostverify() {
-		return postverify;
-	}
+    public boolean isPostverify()
+    {
+        return this.postverify;
+    }
 
-	public void setPostverify(boolean postnotify) {
-		this.postverify = postnotify;
-	}
+    public void setPostverify(boolean postnotify)
+    {
+        this.postverify = postnotify;
+    }
 
-	public boolean isPreverify() {
-		return preverify;
-	}
+    public boolean isPreverify()
+    {
+        return this.preverify;
+    }
 
-	public void setPreverify(boolean prenotify) {
-		this.preverify = prenotify;
-	}
+    public void setPreverify(boolean prenotify)
+    {
+        this.preverify = prenotify;
+    }
 
 }

@@ -21,5 +21,3 @@
 #if($isAdvancedUser)<li id="xwikiedithistory"#if($editor == "history") class="active"#end><a href="$doc.getURL("edit", "editor=history&amp;$docvariant&amp;$param")">$msg.get("editHistory")</a></li>#end
 </ul>
 </div>
-## Full Screen editor not yet ready
-#* </li><li id="xwikieditfullscreen"#if($editor == "fullscreen") class="active"#end><a href="$doc.getURL("edit", "editor=fullscreen&amp;$param")" onclick="document.forms.edit.action='$doc.getURL("edit", "editor=fullscreen&amp;$languageparams&amp;$param")'; document.forms.${formname}.submit(); return false;">$msg.get("editFullScreen")</a> *#

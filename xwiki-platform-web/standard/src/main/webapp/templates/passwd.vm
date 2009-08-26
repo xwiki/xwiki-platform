@@ -33,5 +33,5 @@ $response.setStatus(400)
 #xwikimessageboxstart($msg.get("platform.core.noticeMessageType") $msg.get("platform.core.profile.passwd.notaUser"))
 #xwikimessageboxend()
 #end
-</div></div>
+</div>
 #template("endpage.vm")

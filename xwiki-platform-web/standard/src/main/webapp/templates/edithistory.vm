@@ -1,3 +1,8 @@
+###
+### History page in the "edit" mode
+###
+###
 <div id="xwikieditcontent" class="clear">
+<h1><span>$msg.get('core.viewers.history.title', [$doc.displayTitle, $doc.getURL()])</span></h1>
 #template("historyinline.vm")
 </div>

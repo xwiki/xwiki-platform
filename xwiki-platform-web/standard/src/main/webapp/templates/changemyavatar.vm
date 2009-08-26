@@ -30,5 +30,5 @@
   #xwikimessageboxstart($msg.get('avatar') $msg.get('notauser'))
   #xwikimessageboxend()
 #end
-</div></div>
+</div>
 #template("endpage.vm")

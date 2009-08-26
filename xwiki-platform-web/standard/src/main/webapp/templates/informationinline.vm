@@ -24,7 +24,7 @@
         #end
       </dd>
     </dl>
-  </div>
+  </div>## informationleft
   <div id="informationright" style="float:right; width: 50.1%;">
     #if ($xwiki.hasAccessLevel('edit'))
       #template("tagedit.vm")
@@ -53,6 +53,7 @@
         <dd>
       #end
     </dl>
-  </div>
+  </div>## informationright
   <div class="clearfloats">&nbsp;</div>
-</div>
+</div>## _information
+</div>## informationcontent

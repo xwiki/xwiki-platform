@@ -5,6 +5,25 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 #set($saveaction = "save")
 #set($previewenabled = true)
 <div class="main layoutsubsection">
+##
+##
+## Can the document be edited?
+## If not, display an information and a forcing link:
+##
+#set($force = $!request.get("force"))
+#if (($doc.getLocked()==true)&&(!$force))
+  <div class="layoutsection">
+  $response.setStatus(423)
+  #set($newquerystring = "$!request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")
+  #set($forceEditURL = $doc.getURL($context.action, ${newquerystring}))
+  #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
+    <a href="$forceEditURL">$msg.get('forcelock')</a>
+  #xwikimessageboxend()
+  </div>
+#else
+##
+## Can edit. Display the form
+##
 #set($xredirect=$!request.getParameter("xredirect"))
 #set($xnotification=$!request.getParameter("xnotification"))
 <form id="inline" method="post" action="$doc.getURL("preview")">
@@ -22,27 +41,12 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 #if("$!request.title" != '')
   <input type="hidden" name="title" value="$xwiki.getXMLEncoded($!request.title)" />
 #end
-#set($force = $!request.get("force"))
-#if (($doc.getLocked()==true)&&(!$force))
-<div>
-$msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
-<br />
-<a href="$doc.getURL("inline", "$!request.getQueryString()&force=1")">$msg.get("forcelock")</a>
-</div>
-#else
-#set($editactions = "top")
-<div class="topbuttons">#template("editactions.vm")</div>
-<div class="clear">
-#foreach($class in $doc.xWikiClasses)
-#set( $nb = $doc.getObjectNumbers("${class.name}"))
-<input type="hidden" name="${class.name}_nb" value="$nb" />
-#end
 $cdoc.getRenderedContent()
 </div>  ## clear
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
-#end
 </div> ## form
 </form>
 #template("textarea_wysiwyg.vm")
-</div>
+#end ## can edit
+</div> ## main

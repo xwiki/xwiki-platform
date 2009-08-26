@@ -4,27 +4,27 @@
 ### General wrapper for view actions
 ###
 #if ($request.getParameter("raw").equals("1"))
-#template("code.vm")
+  #template("code.vm")
 #else
-#template("startpage.vm")
-#if((!$viewer) || ($viewer == ""))
-#set($viewer = $request.getParameter("viewer"))
-#end
-#if((!$viewer) || ($viewer == ""))
-#set($viewer = "view")
-#end
-#if($viewer == "view")
-<div class="minwidthb"></div>
-<div class="main layoutsubsection">
-#template("contentview.vm")
-#template("docextra.vm")
-<div class="clearfloats"></div>
-#else
-<div class="main layoutsubsection">
-#template("${viewer}.vm")
-<div class="clearfloats">
-</div>
-#end
-</div>## main
-#template("endpage.vm")
+  #template("startpage.vm")
+  #if("$!viewer" == '')
+    #set($viewer = $request.getParameter('viewer'))
+  #end
+  #if("$!viewer" == '')
+    #set($viewer = 'content')
+  #end
+  #if($viewer == 'content')
+    <div class="minwidthb"></div>
+    <div class="main layoutsubsection">
+    #template("contentview.vm")
+    #template("docextra.vm")
+    <div class="clearfloats"></div>
+    </div>## main
+  #else
+    <div class="main layoutsubsection">
+    #template("${viewer}.vm")
+    <div class="clearfloats"></div>
+    </div>## main
+  #end
+  #template("endpage.vm")
 #end

@@ -390,7 +390,7 @@
 <imtype>---</imtype>
 </property>
 <property>
-<blogfeed>http://www.xwiki.org/xwiki/bin/view/Main/BlogRss?xpage=rdf</blogfeed>
+<blogfeed>http://www.xwiki.org/xwiki/bin/view/Blog/BlogRss?xpage=plain</blogfeed>
 </property>
 <property>
 <pageWidth>default</pageWidth>

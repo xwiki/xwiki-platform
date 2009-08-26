@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.internal;
 
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;

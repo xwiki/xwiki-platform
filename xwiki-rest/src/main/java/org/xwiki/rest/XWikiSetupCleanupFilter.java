@@ -149,7 +149,7 @@ public class XWikiSetupCleanupFilter extends Filter
     private void initializeContainerComponent(XWikiContext context) throws ServletException
     {
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) com.xpn.xwiki.web.Utils.getComponent(ServletContainerInitializer.class);
+            com.xpn.xwiki.web.Utils.getComponent(ServletContainerInitializer.class);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
@@ -173,8 +173,8 @@ public class XWikiSetupCleanupFilter extends Filter
             }
         }
 
-        Container container = (Container) com.xpn.xwiki.web.Utils.getComponent(Container.class);
-        Execution execution = (Execution) com.xpn.xwiki.web.Utils.getComponent(Execution.class);
+        Container container = com.xpn.xwiki.web.Utils.getComponent(Container.class);
+        Execution execution = com.xpn.xwiki.web.Utils.getComponent(Execution.class);
 
         container.removeRequest();
         container.removeResponse();

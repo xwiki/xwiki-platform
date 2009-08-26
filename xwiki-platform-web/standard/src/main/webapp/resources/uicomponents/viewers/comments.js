@@ -224,6 +224,9 @@ XWiki.viewers.Comments = Class.create({
     if ($("Commentstab") && $("Commentstab").down(".itemcount")) {
       $("Commentstab").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
     }
+    if ($("commentsshortcut") && $("commentsshortcut").down(".itemcount")) {
+      $("commentsshortcut").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $$(this.xcommentSelector).size()));
+    }
   },
   /**
    * Registers a listener that watches for the insertion of the Comments tab and triggers the enhancements.

@@ -11,3 +11,8 @@
 #autosaveControl input.focused {
   border: 1px solid #DDD;
 }
+/** Override toucan styles */
+#body #autosaveControl label {
+  display: inline;
+  text-transform: none;
+}

@@ -87,7 +87,7 @@ XWiki.editors.AutoSave = Class.create({
     container.appendChild(document.createTextNode(" "));
     container.appendChild(frequencyLabel);
     // Insert in the editing UI
-    $(document.body).down(".alleditcontent").insert({before : container});
+    $(document.body).down(".alleditcontent").insert({bottom : container});
     // If we keep the autosave control in the form, the fast back-forward is broken in FF, so we lose the edited content
     // when pressing the browser Back button, instead of the form Back to Edit. Catch the form submission and remove the
     // controls.

@@ -118,7 +118,7 @@ body.editbody .clearfloats {
 }
 
 .loading {
-    background-image: url(icons/spinner.gif);
+    background-image: url($xwiki.getSkinFile('icons/xwiki/spinner.gif'));
     background-position: center center;
     background-repeat: no-repeat;
 }
@@ -271,7 +271,7 @@ span.edit_section {
     padding-left: 50px;
     line-height: 24px;
     visibility: visible;
-    background: transparent url( "images/black-edit.png" ) left top no-repeat;
+    background: transparent url( $xwiki.getSkinFile('icons/xwiki/edit-section.png') ) left top no-repeat;
     overflow: hidden;
     border: 0 solid blue;
 }
@@ -455,7 +455,6 @@ table#memberstable td {
 .main dd {
     font-style: italic;
     padding-left: 1em;
-    background: transparent url( images/bullet-3.png ) no-repeat 0 0.3em;
 }
 
 .main dd p {
@@ -536,7 +535,7 @@ ol.HEBREW { list-style-type: hebrew; }
 span.wikicreatelink a {
   text-decoration: underline;
   color: black;
-  background:transparent url("$xwiki.getSkinFile('qm-blue.png')") no-repeat scroll right center;
+  background:transparent url("$xwiki.getSkinFile('icons/xwiki/create-link.png')") no-repeat scroll right center;
   padding-right:13px;
 }
 
@@ -1632,10 +1631,7 @@ ul.xwikitabbar {
     text-align: center;
     padding: 15px 15px 0;
     line-height: 12px;
-    background-color: transparent;
     height: 50px;
-    background-image: url( images/search-bg.png );
-    background-repeat: no-repeat;
     margin: 0;
 }
 
@@ -1753,7 +1749,7 @@ h5.xwikipaneltitle.hidden {
 
 /* For new rendering, in order to display orange question marks for unknown links in panels */
 div.xwikipanelcontents span.wikicreatelink a {
-     background-image: url("$xwiki.getSkinFile("qm-orange.png")")
+     background-image: url("$xwiki.getSkinFile('qm-orange.png')")
 }
 
 div.xwikipanelcontents ul.star {
@@ -2025,7 +2021,7 @@ Rico Acordeon
     border-bottom: 1px solid #ccc;
     color: #333;
     background-color: #f0f0ee;
-    background-image: url( images/accordion.png );
+    background-image: url( $xwiki.getSkinFile('icons/xwiki/accordion.png') );
     background-repeat: no-repeat;
     background-position: 0% 50%;
 }
@@ -2770,18 +2766,13 @@ div.floatinginfobox .strong, fieldset.floatinginfobox .strong {
 }
 
 li.tocEntry,
-    div.floatinginfobox li,
-    fieldset.floatinginfobox li,
-    div.floatinginfobox ul,
-    fieldset.floatinginfobox ul {
-    padding: 0 0 0 1em;
-    margin: 0;
-    line-height: 1.4em;
-    list-style-type: none;
-    background-image: url( images/bullet-1.png );
-    background-repeat: no-repeat;
-    background-position: left 0.25em;
-    list-style-position: outside;
+div.floatinginfobox li,
+fieldset.floatinginfobox li,
+div.floatinginfobox ul,
+fieldset.floatinginfobox ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  line-height: 1.4em;
 }
 
 div.floatinginfobox ul,
@@ -2880,37 +2871,6 @@ body.mceContentBody {
     border: 0px;
 }
 
-.roundedbox {
-    margin: 0em;
-    border: 1em solid #fff;
-    border-width: 0 1em;
-    background: transparent url( images/rounded.png ) no-repeat bottom right;
-}
-
-.roundedheader {
-    background: transparent url( images/rounded.png ) no-repeat top right;
-    margin: 0;
-    padding: 0;
-    text-align: left;
-}
-
-.roundedheader h3 {
-    background: transparent url( images/rounded.png ) no-repeat top left;
-    margin: 0;
-    padding: 10px 10px 5px;
-    color: white;
-    font-weight: bold;
-    font-size: 1.2em;
-    line-height: 1em;
-}
-
-.roundedbody {
-    width: auto;
-    background: transparent url( images/rounded.png ) no-repeat bottom left;
-    margin: 0;
-    padding: 5px 30px 31px;
-}
-
 #changescontent {
 }
 
@@ -2962,7 +2922,7 @@ span.diffaddword {
 
 div#changes-info {
     background-color: #919dac;
-    background-image: url( images/DIFF-header.png );
+    background-image: url( $xwiki.getSkinFile('icons/xwiki/diff-header.png') );
     background-position: 50% -35px;
     background-repeat: no-repeat;
 }
@@ -2970,8 +2930,6 @@ div#changes-info {
 #changes-title {
     margin-top: 2em;
     background-color: #6b747f;
-    background-image: url( images/rounded.png ) !important;
-    background-image: url( images/rounded.gif );
 }
 
 #changes-title h1 {
@@ -2979,9 +2937,6 @@ div#changes-info {
     font-size: 1.4em;
     letter-spacing: 1px;
     text-align: center;
-    background-image: url( images/rounded.png ) !important;
-    background-image: url( images/rounded.gif );
-    background-position: top right;
     color: #fff;
     border-bottom: 4px solid #fff;
     border-color: #808c99;
@@ -3233,13 +3188,6 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 
 * html ul.xwikitabbar li a {
     line-height: 1em;
-}
-
-* html .roundedbox,
-    * html .roundedheader,
-    * html .roundedheader h3,
-    * html .roundedbody {
-    background-image: url( images/rounded.gif );
 }
 
 * html #lb #lb-content img#xwikiuseravatar.photo {
@@ -4571,7 +4519,7 @@ table.xwikidatatable th,
   background-color: $theme.panelCollapsedBackgroundColor;
   line-height:20px;
   color: $theme.panelHeaderBackgroundColor;
-  background-image: url(images/accordion.png);
+  background-image: url( $xwiki.getSkinFile('icons/xwiki/accordion.png') );
   background-position:0 50%;
   background-repeat:no-repeat;
   padding:4px 21px;

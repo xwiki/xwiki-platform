@@ -28,7 +28,7 @@ package org.xwiki.bridge;
 public class AttachmentName extends DocumentName
 {
     /**
-     * @see #getFileName(String) 
+     * @see #getFileName()  
      */
     private String fileName;
     

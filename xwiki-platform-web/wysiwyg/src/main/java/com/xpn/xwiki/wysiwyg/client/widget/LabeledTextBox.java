@@ -57,9 +57,10 @@ public class LabeledTextBox extends TextBox implements FocusHandler, BlurHandler
     {
         this.label = label;
         setLabeled(true);
+        setTitle(label);
 
-        this.addFocusHandler(this);
-        this.addBlurHandler(this);
+        addFocusHandler(this);
+        addBlurHandler(this);
     }
 
     /**

@@ -125,6 +125,8 @@ public interface Strings extends Constants
 
     String macroCategories();
 
+    String macroCategoriesToolTip();
+
     String macroCategoryAll();
 
     String macroCategoryOther();

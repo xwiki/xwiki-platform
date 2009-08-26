@@ -162,6 +162,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
         public MacroFilter()
         {
             categoryList = new com.google.gwt.user.client.ui.ListBox(false);
+            categoryList.setTitle(Strings.INSTANCE.macroCategoriesToolTip());
             categoryList.addStyleName("xMacroCategoryList");
             categoryList.addChangeHandler(this);
 

@@ -66,7 +66,7 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
           this.progressNotification.hide();
         }
         if (ajaxRequestParameters.onSuccess) {
-          ajaxRequestParameters.onSuccess(arguments);
+          ajaxRequestParameters.onSuccess.apply(this, arguments);
         }
       }.bind(this),
       onFailure : function(response) {
@@ -84,7 +84,7 @@ XWiki.widgets.ConfirmedAjaxRequest = Class.create(XWiki.widgets.ConfirmationBox,
           this.progressNotification.hide();
         }
         if (ajaxRequestParameters.onFailure) {
-          ajaxRequestParameters.onFailure(arguments);
+          ajaxRequestParameters.onFailure.apply(this, arguments);
         }
       }.bind(this)
     });

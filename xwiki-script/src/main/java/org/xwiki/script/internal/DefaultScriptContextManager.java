@@ -57,13 +57,15 @@ public class DefaultScriptContextManager extends AbstractLogEnabled implements S
      */
     public ScriptContext getScriptContext()
     {
-        // The Script Context is set in ScriptExecutionContextInitializer, when the XWiki Request is initialized so we
-        // are guaranteed it is defined when this method is called.
+        // The Script Context is set in ScriptExecutionContextInitializer, when the XWiki Execution Context is
+        // initialized so we are guaranteed it is defined when this method is called.
         ScriptContext context =
             (ScriptContext) this.execution.getContext()
                 .getProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID);
 
-        // Make sure the script context contains the rights value. For example if the context doc could change.
+        // We re-initialize the Script Context with all Script Context Initializers. We do this in order to ensure
+        // that the Script Context always contain correct values even if user scripts or XWiki code have modified them.
+        // For example the current document in the Script Context could have changed and thus needs to be set back.
         for (ScriptContextInitializer scriptContextInitializer : this.scriptContextInitializerList) {
             scriptContextInitializer.initialize(context);
         }

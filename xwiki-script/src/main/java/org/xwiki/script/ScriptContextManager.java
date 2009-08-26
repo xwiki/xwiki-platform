@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface ScriptContextManager
 {
     /**
-     * @return an initialized {@link ScriptContext}.
+     * @return an initialized {@link ScriptContext}
      */
     ScriptContext getScriptContext();
 }

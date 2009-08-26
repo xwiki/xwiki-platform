@@ -1,0 +1,23 @@
+###
+### Access denied message
+###
+###
+$response.setStatus(403)
+#if("$!request.ajax" != '')
+$msg.get('notallowed')
+#else
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="xwikicontent">
+#if ($xwiki.isReadOnly())
+#xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#end
+$!exception
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## xwikicontent
+</div>## main
+#template("endpage.vm")
+#end

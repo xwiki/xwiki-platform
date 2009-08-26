@@ -1,0 +1,14 @@
+$xwiki.jsfx.use('js/scriptaculous/scriptaculous.js')
+$xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="xwikicontent">
+<div class="topbuttons">#template("previewactions.vm")</div>
+#template("hierarchy.vm")
+<div id="document-title"><h1>$tdoc.displayTitle</h1></div>
+#template("shortcuts.vm")
+$tdoc.getRenderedContent($tdoc.content, $tdoc.getSyntaxId())
+<div class="bottombuttons">#template("previewactions.vm")</div>
+</div> ## xwikicontent
+</div> ## main
+#template("endpage.vm")

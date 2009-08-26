@@ -1,0 +1,48 @@
+html  * {zoom:1; }
+a {position:relative; z-index:1;}
+
+#headerspace {height: 24px; oveflow:hidden;}
+#companylogo a img {position: relative; float: left;}
+#companylogo {width: 740px;}
+#rightPanels, #editPanels { margin-top: -27px;}
+#globalsearch{margin-bottom: 1em}
+
+h5.xwikipaneltitle,
+.collapsed h5.xwikipaneltitle,
+.xwikipanelcontents {background-image: url(images/panel-v.gif);}
+#globalsearch form div {background-image:url(images/search-bg.gif);}
+
+
+#xwikihelpsyntax {background-image: url(images/panel-e.gif);}
+#editPanels .expanded h5.xwikipaneltitle {background-image: url(images/panel-e.gif);}
+#editPanels .xwikipanelcontents {background-image: url(images/panel-e.gif);}
+#editPanels .editmodes .xwikipanelcontents ul li.active {background-image: url();}
+#editPanels .editmodes h5, #editPanels .editmodes  .xwikipanelcontents {background-image: url(images/panel-m.gif);}
+#xwikicontent{overflow-y: hidden;}
+
+
+#headerglobal .minwithd {display: none;}
+.minwidth, .minwidthb, .minwidthc{}
+#contentcolumn .minwidthb{ display:block; width:740px; margin-right:220px;}
+#headerspace .minwidth{ display:block; width:710px;}/* 740 - 30 padding */
+.minwidthc{}
+
+body  #show-dialog-btn {
+right:1px;
+top:1px;
+}
+
+.R-box-one {
+
+	margin: 0 0 0 0.5%;
+}
+.R-box {
+
+	margin: 0 0 0 2%;
+}
+
+
+.R-body {
+	height:165px;
+}
+

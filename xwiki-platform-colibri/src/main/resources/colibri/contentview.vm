@@ -1,0 +1,51 @@
+###
+### Obtain document contents in normal "view" mode
+###
+## Get the proper syntax object for the provided request parameters
+#set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
+#if ($outputSyntax)
+  #set($syntaxType = $outputSyntax.type.toIdString())
+  #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
+    #set($renderedContent = $cdoc.getRenderedContent($outputSyntax))
+  #else
+    ## Make sure to print correctly the result when it's not html
+    #set($renderedContent = "<pre>${escapetool.html($cdoc.getRenderedContent($outputSyntax))}</pre>")
+  #end
+#else
+  #set($content = $cdoc.getContent())
+  #if($cdoc.syntaxId == 'xwiki/1.0')
+    #set($headerMarker = '1 ')
+  #elseif($cdoc.syntaxId == 'xwiki/2.0')
+    #set($headerMarker = '=')
+  #else
+    #set($headerMarker = '')
+  #end
+  #if($cdoc.title == '' && $content.trim().startsWith($headerMarker))
+    #set($content = $content.trim().substring($content.trim().indexOf($util.newline)))
+  #elseif($content.trim().startsWith($headerMarker))
+    #set($contentTitle = $content.trim().substring(0, $content.trim().indexOf($util.newline)).trim())
+    #if($cdoc.syntaxId == 'xwiki/2.0')
+      #set($contentTitle = $contentTitle.replaceAll('^={1,2} *', '').replaceAll(' *={1,2}$', ''))
+    #elseif($cdoc.syntaxId == 'xwiki/1.0')
+      #set($contentTitle = $contentTitle.replaceAll('1([.]1)? *', ''))
+    #end
+    #if($contentTitle == $cdoc.title)
+      #set($content = $content.trim().substring($content.trim().indexOf($util.newline)))
+    #end
+  #end
+  ## #set($renderedContent =$cdoc.getRenderedContent())
+  #set($renderedContent = $cdoc.getRenderedContent($content, $cdoc.syntaxId))
+#end
+  <div id="document-title"><h1>$tdoc.displayTitle</h1></div>
+  #template("shortcuts.vm")
+##
+##
+## Display the rendered content 
+##
+$renderedContent
+##
+##
+## Display the (1.0) footnotes
+##
+#set($footnotes = "#putFootnotes()")
+$xwiki.renderText($footnotes, $doc)

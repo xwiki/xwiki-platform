@@ -1,0 +1,17 @@
+###
+### Document deleted message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="xwikicontent">
+#if($message)
+<div id="xwikimessage">$message</div>
+#end
+#xwikimessageboxstart($msg.get("delete") $msg.get("deleted"))
+#template("recyclebinlist.vm")
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>## xwikicontent
+</div>## main
+#template("endpage.vm")

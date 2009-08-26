@@ -1,0 +1,7 @@
+#template("startpage.vm")
+<div class="main layoutsubsection">
+<div id="xwikicontent">
+#template("registerinline.vm")
+</div>## xwikicontent
+</div>## main
+#template("endpage.vm")

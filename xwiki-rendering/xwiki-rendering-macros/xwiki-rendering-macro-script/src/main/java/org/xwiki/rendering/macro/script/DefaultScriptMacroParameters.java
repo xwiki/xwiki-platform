@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.script;
 import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
- * Parameters for the {@link DefaultScriptMacro} Macro.
+ * Parameters for the {@link org.xwiki.rendering.macro.script.DefaultScriptMacroParameters} Macro.
  * 
  * @version $Id$
  * @since 1.9M1
@@ -37,7 +37,7 @@ public class DefaultScriptMacroParameters extends JSR223ScriptMacroParameters
     /**
      * @param language the identifier of the script language.
      */
-    @PropertyDescription("the identifier of the script language (java, python, etc.)")
+    @PropertyDescription("The identifier of the script language (\"groovy\", \"python\", etc)")
     public void setLanguage(String language)
     {
         this.language = language;

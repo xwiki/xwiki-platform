@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal;
 
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -26,6 +27,7 @@ import org.xwiki.context.ExecutionContextManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Validate XWikiStubContextInitializer and DefaultXWikiStubContextProvider.
@@ -44,7 +46,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
         this.executionContextManager = getComponentManager().lookup(ExecutionContextManager.class);
     }
 
-    public void testWithAndWithoutXWikiContext() throws ExecutionContextException, InterruptedException
+    public void testWithAndWithoutXWikiContext() throws Exception
     {
         XWikiContext xcontext = new XWikiContext();
         xcontext.put("key", "value");
@@ -53,9 +55,7 @@ public class XWikiStubContextInitializerTest extends AbstractBridgedXWikiCompone
         ExecutionContext context = new ExecutionContext();
         context.setProperty("xwikicontext", xcontext);
 
-        this.executionContextManager.initialize(context);
-
-        assertSame(xcontext, context.getProperty("xwikicontext"));
+        getComponentManager().lookup(XWikiStubContextProvider.class).initialize(xcontext);
 
         final ExecutionContext daemonContext = new ExecutionContext();
 

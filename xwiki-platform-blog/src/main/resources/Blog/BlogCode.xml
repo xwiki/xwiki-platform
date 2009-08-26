@@ -729,8 +729,8 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
       &lt;div class="pagingLinks"&gt;
       #if ($currentPageNumber &lt; $totalPages)
         #set($currentPageNumber = $currentPageNumber + 1)
-        #set($currentPageNumber = $currentPageNumber - 1)
         &lt;span class="prevPage"&gt;*[&amp;laquo; $msg.get("xe.blog.code.olderposts")&gt;$doc.name?page=${currentPageNumber}&amp;amp;ipp=${itemsPerPage}$queryString]*&lt;/span&gt;
+        #set($currentPageNumber = $currentPageNumber - 1)
       #end
       #if ($currentPageNumber &gt; 1)
         #if ($currentPageNumber &lt; $totalPages)

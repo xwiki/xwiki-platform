@@ -100,9 +100,13 @@
 <className>XWiki.Mail</className>
 <guid>6e7ba94a-fc9c-45ad-8758-9b9a04ce92c1</guid>
 <property>
-<html>Hello $first_name,
+<html>$msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
 
-This message is sent by XWiki. Here are the documents in your watchlist that have been created, updated or deleted since the last notification:
+#if($modifiedDocuments.size() == 1)
+$msg.get("watchlist.notification.email.singleUpdate.intro")
+#else
+$msg.get("watchlist.notification.email.multipleUpdates.intro")
+#end
 
 #set($lightGray = "#CCC")
 #set($veryLightGray = "#FDFDFD")
@@ -171,7 +175,7 @@ This message is sent by XWiki. Here are the documents in your watchlist that hav
       #foreach($author in $event.getAuthors())
         #set($authors = "${authors}${xwiki.getLocalUserName($author, false)}")
         #if($event.getAuthors().indexOf($author) &lt; $event.getAuthors().size() - 1)
-          #set($authors = "${authors}, ")
+          #set($authors = "${authors}, ")  
         #end
       #end
       #set($firstDateIndex = $event.getDates().size() - 1)
@@ -193,7 +197,7 @@ This message is sent by XWiki. Here are the documents in your watchlist that hav
 <language>en</language>
 </property>
 <property>
-<subject>XWiki updates, $modifiedDocuments.size() document#if($modifiedDocuments.size()&gt;1)s have#else has#end been modified since $xwiki.formatDate($previousFireTime, $format)</subject>
+<subject>#set($date=$xwiki.formatDate($previousFireTime))#set($nb=$modifiedDocuments.size())#if($nb==1)$msg.get("watchlist.notification.email.singleUpdate.subject", [$date])#else$msg.get("watchlist.notification.email.multipleUpdates.subject", [$nb, $date])#end</subject>
 </property>
 <property>
 <text></text>

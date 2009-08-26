@@ -160,6 +160,13 @@
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <artifactId>xwiki-skin-colibri</artifactId>
+                  <version>${platform.skin.colibri.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skin</outputDirectory>
+                </artifactItem>
+                <artifactItem>
                   <!-- We extract SmartClient library from smartGWT since smartGWT will 
                        use SmartClient from web-standard resources -->
                   <groupId>com.smartgwt</groupId>
@@ -204,7 +211,7 @@
               <targetPath>WEB-INF</targetPath>
               <filtering>true</filtering>
             </resource>
-            <!-- Add the Albatross skin -->
+            <!-- Add the skins -->
             <resource>
               <directory>${project.build.directory}/skin</directory>
               <targetPath>skins</targetPath>

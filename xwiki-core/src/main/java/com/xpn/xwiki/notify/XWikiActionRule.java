@@ -21,12 +21,17 @@
 
 package com.xpn.xwiki.notify;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Deprecated
 public class XWikiActionRule implements XWikiNotificationRule
 {
+    protected static final Log LOG = LogFactory.getLog(XWikiActionRule.class);
+
     private XWikiActionNotificationInterface target;
 
     private boolean preverify = false;
@@ -74,9 +79,9 @@ public class XWikiActionRule implements XWikiNotificationRule
         try {
             getTarget().notify(this, doc, action, context);
         } catch (Throwable e) {
-            // Notification should never fail
-            // Just report an error
-            e.printStackTrace();
+            // protect from bad listeners
+            LOG.error("Fail to notify target [" + getTarget() + "] for event [" + this + ", doc=" + doc + ", action="
+                + action + "]", e);
         }
     }
 
@@ -87,9 +92,9 @@ public class XWikiActionRule implements XWikiNotificationRule
         try {
             getTarget().notify(this, doc, action, context);
         } catch (Throwable e) {
-            // Notification should never fail
-            // Just report an error
-            e.printStackTrace();
+            // protect from bad listeners
+            LOG.error("Fail to notify target [" + getTarget() + "] for pre event [" + this + ", doc=" + doc
+                + ", action=" + action + "]", e);
         }
     }
 

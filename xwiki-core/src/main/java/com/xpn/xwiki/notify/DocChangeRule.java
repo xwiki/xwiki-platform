@@ -21,12 +21,17 @@
 
 package com.xpn.xwiki.notify;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 @Deprecated
 public class DocChangeRule implements XWikiNotificationRule
 {
+    protected static final Log LOG = LogFactory.getLog(DocChangeRule.class);
+
     private XWikiDocChangeNotificationInterface target;
 
     private boolean preverify = false;
@@ -71,7 +76,13 @@ public class DocChangeRule implements XWikiNotificationRule
             return;
         }
 
-        getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        try {
+            getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        } catch (Exception e) {
+            // protect from bad listeners
+            LOG.error("Fail to notify target [" + getTarget() + "] for event [" + this + ", newdoc=" + newdoc
+                + ", olddoc=" + olddoc + "]", e);
+        }
     }
 
     /**
@@ -86,7 +97,13 @@ public class DocChangeRule implements XWikiNotificationRule
             return;
         }
 
-        getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        try {
+            getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        } catch (Exception e) {
+            // protect from bad listeners
+            LOG.error("Fail to notify target [" + getTarget() + "] for pre event [" + this + ", newdoc=" + newdoc
+                + ", olddoc=" + olddoc + "]", e);
+        }
     }
 
     /**

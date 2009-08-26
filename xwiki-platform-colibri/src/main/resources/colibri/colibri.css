@@ -371,7 +371,7 @@ table td {
 }
 
 .mceContentBody td,
-    .main td {
+.main td {
     color: #4e6172;
     border-color: #e5eff8;
     padding: 3px 4px;
@@ -380,9 +380,9 @@ table td {
 }
 
 .mceContentBody tr.table-head td,
-    .main th {
+.main th {
     border-color: #e5eff8;
-    padding: .3em 0.5em;
+    padding: 3px 4px;
     background: #f4f9fe;
     text-align: center;
     font: bold 1.2em / 1.4em Arial, Helvetica, sans-serif;

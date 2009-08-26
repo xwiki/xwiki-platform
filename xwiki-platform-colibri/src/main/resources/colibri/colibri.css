@@ -1503,13 +1503,6 @@ html > body #actionmenu {
     float: right;
 }
 
-.topmenuentry {
-}
-
-#tmWatched a.tme {
-  color: #4cad1b;
-}
-
 .submenu {
     display: block;
     width: 12em;
@@ -3749,11 +3742,14 @@ div.xwikipanelcontents {
   color: $theme.menuLinkColor;
 }
 
-/* I don't know where to find and set the menuLinkColor when hovering a submenu element*/
-
 #actionmenu div.leftmenu div:hover a.tme, #actionmenu a.tme:hover {
   text-decoration: underline;
   color: $theme.menuLinkColor;
+}
+
+#actionmenu #tmWatched a.tme {
+  background-color: $theme.menuSelectedEntryBackgroundColor;
+  color: $theme.menuSelectedEntryLinkColor;
 }
 
 .leftmenu {

@@ -4594,3 +4594,8 @@ body .listGrid {
 #XWEWrapper {
   margin: 0 !important;
 }
+
+/* Hide the Search panel since this functionality is included in the header */
+.panels .Search {
+  display: none;
+}

@@ -21,12 +21,12 @@
 
 package com.xpn.xwiki.notify;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Manages general and named notifications rules.
@@ -47,8 +47,7 @@ public class XWikiNotificationManager
     }
 
     /**
-     * Add a "general" notification rule to be evaluated for any document (as opposed to a named
-     * rule)
+     * Add a "general" notification rule to be evaluated for any document (as opposed to a named rule)
      * 
      * @param rule the rule to be added
      */
@@ -75,12 +74,11 @@ public class XWikiNotificationManager
     }
 
     /**
-     * Add a "named" notification rule, to be evaluated only when the notification concerns the
-     * document with the given name
+     * Add a "named" notification rule, to be evaluated only when the notification concerns the document with the given
+     * name
      * 
-     * @param name the document's name for which the notification rule should apply. For example,
-     *            for the "Main.WebHome" document, the rule name should either be "Main.WebHome", or
-     *            "database:Main.WebHome"
+     * @param name the document's name for which the notification rule should apply. For example, for the "Main.WebHome"
+     *            document, the rule name should either be "Main.WebHome", or "database:Main.WebHome"
      * @param rule the rule to add for this name
      */
     public void addNamedRule(String name, XWikiNotificationRule rule)
@@ -134,8 +132,7 @@ public class XWikiNotificationManager
         }
     }
 
-    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
+    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context)
     {
         // Call rules explicitly for any actions of this document
         Vector<XWikiNotificationRule> vnamedrules;

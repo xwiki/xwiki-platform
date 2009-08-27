@@ -219,7 +219,7 @@ public class WatchListJob extends AbstractJob implements Job
 
             List<String> subscribers = getSubscribers();
             Date previousFireTime = getPreviousFireTime();
-            WatchListEventManager eventMatcher = new WatchListEventManager(previousFireTime, context);
+            WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, context);
 
             if (!hasSubscribers()) {
                 return;

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.PluginApi;
@@ -238,19 +239,26 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
         wEls.addAll(getWatchedWikis());
         return wEls;
     }
-
-    /**
-     * Get the list of the elements watched by user ordered by last modification date, descending.
-     * 
-     * @param user XWiki User
-     * @return the list of the elements watched by user ordered by last modification date, descending
-     * @throws Exception If the search request fails
+    
+    /** 
+     * @param entryNumber number of entries to retrieve
+     * @return the watchlist RSS feed for the current user
+     * @throws XWikiException if the retrieval of RSS entries fails
      */
-    public List<String> getWatchListWhatsNew(String user) throws Exception
+    public SyndFeed getFeed(int entryNumber) throws XWikiException
     {
-        // TODO
-        
-        return null;
+        return getFeed(context.getUser(), entryNumber);
+    }
+    
+    /**
+     * @param user the user to retreive the RSS for
+     * @param entryNumber number of entries to retrieve
+     * @return the watchlist RSS feed for the given user
+     * @throws XWikiException if the retrieval of RSS entries fails
+     */
+    public SyndFeed getFeed(String user, int entryNumber) throws XWikiException
+    {
+        return getWatchListPlugin().getFeedManager().getFeed(user, entryNumber, context);        
     }
 
     /**

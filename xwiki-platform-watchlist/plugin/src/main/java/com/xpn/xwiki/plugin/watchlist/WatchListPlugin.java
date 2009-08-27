@@ -77,6 +77,11 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * Notifier instance.
      */
     private WatchListNotifier notifier = new WatchListNotifier();
+    
+    /**
+     * Feed manager instance.
+     */
+    private WatchListEventFeedManager feedManager = new WatchListEventFeedManager(this);
 
     /**
      * {@inheritDoc}
@@ -165,5 +170,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public WatchListNotifier getNotifier()
     {
         return notifier;
+    }
+    
+    /**
+     * @return the feed manager instance.
+     */    
+    public WatchListEventFeedManager getFeedManager()
+    {
+        return feedManager;
     }
 }

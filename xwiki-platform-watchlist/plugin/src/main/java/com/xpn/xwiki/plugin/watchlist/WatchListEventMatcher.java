@@ -36,18 +36,18 @@ import com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPluginApi;
 
 /**
- * Manager for WatchList events. This class allow to store all the events fired during a given interval. It also allows
- * to perform a match between events and elements watched by a user.
+ * Matcher for WatchList events. This class store all the events fired during a given interval. It also allows to 
+ * perform a match between events and elements watched by a user.
  * 
  * @version $Id$
  */
 @SuppressWarnings("serial")
-public class WatchListEventManager
+public class WatchListEventMatcher
 {
     /**
      * Logger.
      */
-    private static final Log LOG = LogFactory.getLog(WatchListEventManager.class);
+    private static final Log LOG = LogFactory.getLog(WatchListEventMatcher.class);
 
     /**
      * Events to match.
@@ -77,7 +77,7 @@ public class WatchListEventManager
      * @param context the XWiki context
      * @param start start date to use for document matching
      */
-    public WatchListEventManager(Date start, XWikiContext context)
+    public WatchListEventMatcher(Date start, XWikiContext context)
     {
         asApi = (ActivityStreamPluginApi) context.getWiki().getPluginApi("activitystream", context);
         List<Object> parameters = new ArrayList<Object>();

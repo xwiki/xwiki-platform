@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>XWiki</web>
@@ -12,15 +12,17 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1204121756000</creationDate>
-<date>1204122314000</date>
-<contentUpdateDate>1204122314000</contentUpdateDate>
-<version>4.1</version>
+<date>1204121756000</date>
+<contentUpdateDate>1204121756000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
+<hidden>false</hidden>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -50,6 +52,7 @@
 <name>XWiki.WatchListManager</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
+<guid>ae26fa3e-adc1-4c91-9ca7-3c57c0c2c80b</guid>
 <property>
 <tags/>
 </property>
@@ -121,7 +124,7 @@
         &lt;/form&gt;
         &lt;div style="width:48%;float:right;"&gt;
         &lt;h3&gt;$msg.get("watchlist.staytuned.rss")&lt;/h3&gt;
-        &lt;a target="_blank" href="$profileDoc.getURL("view", "xpage=watchlistrss")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
+        &lt;a target="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;outputSyntax=plain")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
         &lt;br/&gt;
         &lt;/div&gt;
         &lt;div style="clear:both;"&gt;&lt;/div&gt;

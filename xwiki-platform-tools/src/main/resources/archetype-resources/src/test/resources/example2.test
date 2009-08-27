@@ -1,19 +1,25 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Test the macro in standalone mode
+.# Test the macro in inline mode
 .#-----------------------------------------------------
-{{example parameter="hello"/}}
+This is inline {{example parameter="hello"/}}
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>hello</p>
+<p>This is inline hello</p>
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [example] [parameter=hello]
 beginParagraph
+onWord [This]
+onSpace
+onWord [is]
+onSpace
+onWord [inline]
+onSpace
+beginMacroMarkerInline [example] [parameter=hello]
 onWord [hello]
+endMacroMarkerInline [example] [parameter=hello]
 endParagraph
-endMacroMarkerStandalone [example] [parameter=hello]
 endDocument

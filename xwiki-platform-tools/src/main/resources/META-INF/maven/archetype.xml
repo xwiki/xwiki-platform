@@ -13,5 +13,6 @@
   </resources>
   <testResources>
     <resource>src/test/resources/example1.test</resource>
+    <resource>src/test/resources/example2.test</resource>
   </testResources>
 </archetype>

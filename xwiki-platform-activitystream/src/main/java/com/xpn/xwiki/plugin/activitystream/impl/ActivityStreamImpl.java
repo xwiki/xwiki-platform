@@ -357,7 +357,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         ArrayList<String> params = new ArrayList<String>();
         params.add(0, newdoc.getDisplayTitle(context));
-
+        String msgPrefix = "activitystream.event.";
         String streamName = getStreamName(newdoc.getSpace(), context);
 
         if (streamName == null)
@@ -368,33 +368,33 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
                 case XWikiDocChangeNotificationInterface.EVENT_CHANGE:
                     if (olddoc == null || olddoc.isNew())
                         addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE,
-                            "as_document_has_been_created", params, context);
+                            msgPrefix + ActivityEventType.CREATE, params, context);
                     else if (newdoc == null || newdoc.isNew())
                         addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE,
-                            "as_document_has_been_deleted", params, context);
+                            msgPrefix + ActivityEventType.DELETE, params, context);
                     else
                         addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                            "as_document_has_been_updated", params, context);
+                            msgPrefix + ActivityEventType.UPDATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_NEW:
                     addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE,
-                        "as_document_has_been_created", params, context);
+                        msgPrefix + ActivityEventType.CREATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_DELETE:
                     addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE,
-                        "as_document_has_been_deleted", params, context);
+                        msgPrefix + ActivityEventType.DELETE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CONTENT:
                     addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                        "as_document_has_been_updated", params, context);
+                        msgPrefix + ActivityEventType.UPDATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_OBJECT:
                     addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                        "as_document_has_been_updated", params, context);
+                        msgPrefix + ActivityEventType.UPDATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CLASS:
                     addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                        "as_document_has_been_updated", params, context);
+                        msgPrefix + ActivityEventType.UPDATE, params, context);
                     break;
             }
         } catch (Throwable e) {
@@ -414,9 +414,9 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         String user = event.getUser();
         String displayUser = context.getWiki().getUserName(user, null, false, context);
         entry.setAuthor(displayUser);
-        event.setTitle(event.getTitle() + suffix);
+        event.setTitle(event.getTitle() + ".rss.title" + suffix);
         entry.setTitle(event.getDisplayTitle(context));
-        event.setBody(event.getBody() + suffix + "_body");
+        event.setBody(event.getBody() + ".rss.body" + suffix);
         SyndContentImpl sc = new SyndContentImpl();
         sc.setValue(event.getDisplayBody(context));
         sc.setType("text/html");

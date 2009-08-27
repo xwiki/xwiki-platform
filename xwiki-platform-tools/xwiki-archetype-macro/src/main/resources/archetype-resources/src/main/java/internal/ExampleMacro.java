@@ -20,15 +20,15 @@
  */
 package ${packageName}.internal;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import ${packageName}.ExampleMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -48,7 +48,7 @@ public class ExampleMacro extends AbstractMacro<ExampleMacroParameters>
      */
     public ExampleMacro()
     {
-        super(new DefaultMacroDescriptor(DESCRIPTION, ExampleMacroParameters.class));
+        super("Example", DESCRIPTION, ExampleMacroParameters.class);
     }
 
     /**
@@ -59,7 +59,20 @@ public class ExampleMacro extends AbstractMacro<ExampleMacroParameters>
     public List<Block> execute(ExampleMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Collections.singletonList((Block) new WordBlock(parameters.getParameter()));
+        List<Block> result;
+
+        List<Block> wordBlockAsList = Arrays.<Block>asList(new WordBlock(parameters.getParameter()));
+
+        // Handle both inline mode and standalone mode.
+        if (context.isInline()) {
+            result = wordBlockAsList;
+        } else {
+            // Wrap the result in a Paragraph Block since a WordBlock is an inline element and it needs to be
+            // inside a standalone block.
+            result = Arrays.<Block>asList(new ParagraphBlock(wordBlockAsList));
+        }
+
+        return result;
     }
 
     /**

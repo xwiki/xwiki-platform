@@ -19,8 +19,8 @@
  */
 package ${packageName};
 
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterDescription;
-import org.xwiki.rendering.macro.descriptor.annotation.ParameterMandatory;
+import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
  * Parameters for the {@link ${packageName}.internal.ExampleMacro} Macro.
@@ -43,8 +43,8 @@ public class ExampleMacroParameters
     /**
      * @param parameter the example parameter
      */
-    @ParameterMandatory
-    @ParameterDescription("Example parameter") 
+    @PropertyMandatory
+    @PropertyDescription("Example parameter")
     public void setParameter(String parameter)
     {
         this.parameter = parameter;

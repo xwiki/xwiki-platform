@@ -35,6 +35,7 @@ public class RenderingTests extends TestCase
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test the Example macro");
         suite.addTestsFromResource("example1", true);
+        suite.addTestsFromResource("example2", true);
         return new ComponentManagerTestSetup(suite);
     }
 }

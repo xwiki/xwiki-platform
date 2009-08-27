@@ -113,9 +113,16 @@ public class DefaultXHTMLImageRenderer implements XHTMLImageRenderer, Initializa
         // First we need to compute the image URL.
         String imageURL;
         if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = (DocumentImage) image;
-            imageURL = this.wikiModel.getAttachmentURL(documentImage.getDocumentName(), 
-                documentImage.getAttachmentName());
+            // Note if wikiModel is null then all Image objects will be of type URLImage. This must be ensured by the
+            // Image parser used beforehand. However we're adding a protection here against Image parsers
+            // that would not honor this contract.
+            if (this.wikiModel != null) {
+                DocumentImage documentImage = (DocumentImage) image;
+                imageURL = this.wikiModel.getAttachmentURL(documentImage.getDocumentName(),
+                    documentImage.getAttachmentName());
+            } else {
+                throw new RuntimeException("Invalid Image type. In non wiki mode, all image types must be URL images.");
+            }
         } else {
             URLImage urlImage = (URLImage) image;
             imageURL = urlImage.getURL();

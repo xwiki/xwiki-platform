@@ -39,7 +39,8 @@ import org.xwiki.rendering.wiki.WikiModel;
 public abstract class AbstractImageParser implements ImageParser
 {
     /**
-     * Used to verify if we're in wiki mode or not by looking up an implementation of {@link WikiModel}.
+     * Used to verify if we're in wiki mode or not by looking up an implementation of {@link WikiModel}. In non wiki
+     * mode all image references are considered as URLs.
      */
     @Requirement
     private ComponentManager componentManager;

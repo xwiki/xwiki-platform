@@ -89,6 +89,7 @@ public class FormulaMacro extends AbstractMacro<FormulaMacroParameters>
     public FormulaMacro()
     {
         super("Formula", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION), FormulaMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
 
     /**

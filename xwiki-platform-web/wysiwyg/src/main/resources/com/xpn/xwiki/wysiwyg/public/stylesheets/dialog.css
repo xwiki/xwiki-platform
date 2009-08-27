@@ -162,7 +162,8 @@
 .xLinkToUrl .gwt-TextBox, .xLinkConfig .gwt-TextBox, 
 .xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload,
 .xImageConfig .gwt-TextBox, .xMacroParameter .textInput,
-.xTablePanel .gwt-TextBox, .xImporterTabPanel .gwt-FileUpload {
+.xTablePanel .gwt-TextBox, .xImporterTabPanel .gwt-FileUpload, 
+.xExplorer input {
   width: 433px;
   border: 1px solid #AAA;
   padding: 2px;
@@ -190,8 +191,12 @@
 .xMacroParameterError, .xLinkParameterError, .xFileUploadError,
 .xPageNameError, .xImageParameterError, .xMacroSelectorError {
   font-size: 75%;
-  color: red;
+  color: #dd2222;
   margin-bottom: 3px;
+}
+
+.xFieldError {
+  border: 1px solid #dd5555 !important;
 }
 
 /* Sizes for the top-level containers in the dialogs, those that need to resize to 100% of the dialog content */

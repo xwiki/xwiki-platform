@@ -46,6 +46,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
 public abstract class AbstractFileUploadWizardStep implements WizardStep
 {
     /**
+     * The style of the fields under error.
+     */
+    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+
+    /**
      * Main panel of this wizard step, to be used for the {@link #display()}.
      */
     private final Panel mainPanel = new FlowPanel();
@@ -79,6 +84,8 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         fileLabel.setStyleName("xInfoLabel");
         fileLabel.addStyleDependentName("mandatory");
         fileUploadInput.setName(getFileUploadInputName());
+        // FIXME: this should be set from CSS, but it's not possible on all browsers
+        fileUploadInput.getElement().setAttribute("size", "50");
         FlowPanel formPanel = new FlowPanel();
 
         formPanel.add(fileLabel);
@@ -313,6 +320,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     {
         fileErrorLabel.setText(errorMessage);
         fileErrorLabel.setVisible(true);
+        fileUploadInput.addStyleName(FIELD_ERROR_STYLE);
     }
 
     /**
@@ -321,5 +329,6 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     protected void hideError()
     {
         fileErrorLabel.setVisible(false);
+        fileUploadInput.removeStyleName(FIELD_ERROR_STYLE);
     }
 }

@@ -144,12 +144,15 @@ public class ParameterDisplayer
      */
     public boolean validate()
     {
+        String errorFieldStyle = "xFieldError";
         // Let's suppose the current value is valid.
         validationMessage.setVisible(false);
+        input.removeStyleName(errorFieldStyle);
 
         if (descriptor.isMandatory() && StringUtils.isEmpty(getValue())) {
             validationMessage.setText(Strings.INSTANCE.macroParameterMandatory());
             validationMessage.setVisible(true);
+            input.addStyleName(errorFieldStyle);
             return false;
         }
 

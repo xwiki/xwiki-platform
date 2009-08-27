@@ -68,6 +68,11 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     public static final String ERROR_LABEL_STYLE = "xLinkParameterError";
 
     /**
+     * The style of the fields under error.
+     */
+    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+
+    /**
      * The link data to be edited by this wizard step.
      */
     private LinkConfig linkData;
@@ -148,7 +153,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         mainPanel.add(labelLabel);
         mainPanel.add(helpLabelLabel);
         mainPanel.add(labelErrorLabel);
-        mainPanel.add(getLabelTextBox());
+        mainPanel.add(labelTextBox);
     }
 
     /**
@@ -160,10 +165,10 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         linkData = (LinkConfig) data;
         // set the link text box according to the received config data
         labelTextBox.setText(linkData.getLabelText());
-        labelTextBox.setReadOnly(linkData.isReadOnlyLabel());
+        labelTextBox.setEnabled(!linkData.isReadOnlyLabel());
         tooltipTextBox.setText(linkData.getTooltip() == null ? "" : linkData.getTooltip());
         newWindowCheckBox.setValue(linkData.isOpenInNewWindow());
-        hideError();
+        hideErrors();
         cb.onSuccess(null);
     }
 
@@ -232,36 +237,49 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     }
 
     /**
-     * {@inheritDoc}<br/>
-     * FIXME: this will go very wrong if this function validates (and saves) and subclasses don't save and validate, the
-     * data in this superclass will be committed whereas the data in the subclasses not. This can potentially cause
-     * trouble when trying to go to previous, we'd go back with partially submitted data in the result. Solution is to
-     * skip the super call in the subclasses and do the validation only once, there: if everything passes, commit,
-     * otherwise not. Another solution could be that super classes validate first their data and then, if it's fine,
-     * validate this. They can roll back if this subclass doesn't validate.
+     * {@inheritDoc}
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         // first reset all error labels, consider everything's fine
-        hideError();
-        // check the label input field
-        if (this.labelTextBox.getText().trim().length() == 0) {
-            displayLabelError(Strings.INSTANCE.linkNoLabelError());
-            labelErrorLabel.setVisible(true);
-            // something is wrong, don't validate
+        hideErrors();
+        // validate and save if everything's fine
+        if (!validateForm()) {
             async.onSuccess(false);
         } else {
-            // everything is fine, commit it in the link (the labels)
-            if (!this.labelTextBox.getText().trim().equals(linkData.getLabelText().trim())) {
-                linkData.setLabel(labelTextBox.getText().trim());
-                linkData.setLabelText(labelTextBox.getText().trim());
-            }
-            // commit the tooltip value
-            linkData.setTooltip(getTooltipTextBox().getText());
-            // set the link to open in new window according to user input
-            linkData.setOpenInNewWindow(getNewWindowCheckBox().getValue());
+            saveForm();
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * Validates this step's form and displays errors if needed.
+     * 
+     * @return {@code true} if the form is valid and data can be saved, {@code false} otherwise.
+     */
+    protected boolean validateForm()
+    {
+        if (this.labelTextBox.getText().trim().length() == 0) {
+            displayLabelError(Strings.INSTANCE.linkNoLabelError());
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Saves the form values in this step's data, to be called only when {@link #validateForm()} returns {@code true}.
+     */
+    protected void saveForm()
+    {
+        // everything is fine, commit it in the link (the labels)
+        if (!this.labelTextBox.getText().trim().equals(linkData.getLabelText().trim())) {
+            linkData.setLabel(labelTextBox.getText().trim());
+            linkData.setLabelText(labelTextBox.getText().trim());
+        }
+        // commit the tooltip value
+        linkData.setTooltip(getTooltipTextBox().getText());
+        // set the link to open in new window according to user input
+        linkData.setOpenInNewWindow(getNewWindowCheckBox().getValue());
     }
 
     /**
@@ -367,13 +385,15 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     {
         labelErrorLabel.setText(errorMessage);
         labelErrorLabel.setVisible(true);
+        labelTextBox.addStyleName(FIELD_ERROR_STYLE);
     }
 
     /**
      * Hides the error message and markers for this dialog.
      */
-    protected void hideError()
+    protected void hideErrors()
     {
         labelErrorLabel.setVisible(false);
+        labelTextBox.removeStyleName(FIELD_ERROR_STYLE);
     }
 }

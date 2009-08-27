@@ -95,7 +95,7 @@ public class VerticalResizePanel extends FlowPanel
 
         int deltaHeight = desiredHeight - actualHeight;
         if (expandingWidget != null) {
-            int oldExpandingWidgetHeight = expandingWidget.getOffsetHeight();
+            int oldExpandingWidgetHeight = expandingWidget.getElement().getClientHeight();
             expandingWidget.setHeight((oldExpandingWidgetHeight + deltaHeight) + pixelUnit);
             if (needsReload) {
                 int index = getWidgetIndex(expandingWidget);

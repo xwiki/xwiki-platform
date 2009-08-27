@@ -44,6 +44,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
 public class CreateNewPageWizardStep implements WizardStep
 {
     /**
+     * The style of the fields under error.
+     */
+    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+    
+    /**
      * Main panel of this wizard.
      */
     private final Panel mainPanel = new FlowPanel();
@@ -205,6 +210,7 @@ public class CreateNewPageWizardStep implements WizardStep
     {
         pageNameErrorLabel.setText(errorMessage);
         pageNameErrorLabel.setVisible(true);
+        pageNameTextBox.addStyleName(FIELD_ERROR_STYLE);
     }
 
     /**
@@ -213,5 +219,6 @@ public class CreateNewPageWizardStep implements WizardStep
     private void hideError()
     {
         pageNameErrorLabel.setVisible(false);
+        pageNameTextBox.removeStyleName(FIELD_ERROR_STYLE);
     }
 }

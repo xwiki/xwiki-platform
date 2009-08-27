@@ -36,6 +36,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
 public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep<LinkConfig>
 {
     /**
+     * The style of the fields under error.
+     */
+    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+
+    /**
      * The xwiki tree explorer, used to select the page or file to link to.
      */
     private XWikiExplorer explorer;
@@ -94,7 +99,10 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         WikiDataSource ds = new WikiDataSource();
         explorer.setDataSource(ds);
         explorer.setDefaultValue(defaultSelection);
-        explorer.addStyleName("xExplorer");
+        // FIXME: this is somewhat implementation specific, explorer.getElement returns the explorer wrapper while
+        // explorer.addStyleName() actually sets the style on the inner tree. We need the style applied on the outer
+        // wrapper.
+        explorer.getElement().setClassName(explorer.getElement().getClassName() + " xExplorer");
 
         // create a label with the help for this step
         Label helpLabel = new Label();
@@ -185,6 +193,10 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     {
         errorLabel.setText(errorMessage);
         errorLabel.setVisible(true);
+        // set the class at the wrapper level, the element of this explorer
+        if (!explorer.getElement().getClassName().contains(FIELD_ERROR_STYLE)) {
+            explorer.getElement().setClassName(explorer.getElement().getClassName() + " " + FIELD_ERROR_STYLE);
+        }
         mainPanel.refreshHeights();
     }
 
@@ -194,6 +206,13 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     protected void hideError()
     {
         errorLabel.setVisible(false);
+        // remove the class from the wrapper level, the element of this explorer
+        String className = explorer.getElement().getClassName();
+        if (className.contains(FIELD_ERROR_STYLE)) {
+            explorer.getElement().setClassName(
+                className.substring(0, className.indexOf(FIELD_ERROR_STYLE))
+                    + className.substring(className.indexOf(FIELD_ERROR_STYLE) + FIELD_ERROR_STYLE.length()));
+        }
         mainPanel.refreshHeights();
     }
 }

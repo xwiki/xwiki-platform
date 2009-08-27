@@ -69,6 +69,11 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     }
 
     /**
+     * The style of the fields under error.
+     */
+    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+
+    /**
      * The main panel of this wizard step.
      */
     private VerticalResizePanel mainPanel = new VerticalResizePanel();
@@ -284,6 +289,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     protected void hideError()
     {
         errorLabel.setVisible(false);
+        pagesList.removeStyleName(FIELD_ERROR_STYLE);
         mainPanel.refreshHeights();
     }
 
@@ -296,6 +302,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+        pagesList.addStyleName(FIELD_ERROR_STYLE);
         mainPanel.refreshHeights();
     }
 }

@@ -610,6 +610,12 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
     {
         if (valid == validationMessage.isVisible()) {
             validationMessage.setVisible(!valid);
+            String errorStyle = "xFieldError";
+            if (!valid) {
+                macroList.addStyleName(errorStyle);
+            } else {
+                macroList.removeStyleName(errorStyle);
+            }
             ((VerticalResizePanel) getPanel()).refreshHeights();
         }
     }

@@ -1,10 +1,17 @@
 /* The width does not seem to be set on IE for the xwiki explorer input. The following should fit correctly*/
-.xExplorerPanel input {
+.xExplorer input {
   width: 98%;
 }
 
 .xExplorer .listGrid {
   border: none;
+}
+
+/* IE needs this to correctly return the clientHeight of the tree wrapper, offsetHeight - border width, etc. 
+   Otherwise, for the default overflow: visible, it returns 0 even if offsetHeight is correct */
+.xExplorer {
+  /* it could also be auto, since it always matches its content, but just to make sure we never get a scrollbar */
+  overflow: hidden; 
 }
 
 .xAttachmentsSelector .xListBox, .xPagesSelector .xListBox {

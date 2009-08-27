@@ -278,7 +278,7 @@ public class XWikiExplorer extends TreeGrid
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
         return self.isNewPage();
     }-*/;
-    
+
     /**
      * @return true if the selected node is a new page, created by clicking on a "New Page" node, false otherwise.
      */
@@ -287,7 +287,7 @@ public class XWikiExplorer extends TreeGrid
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
         return (self.isNewPage() && (self.getValue() == ""));
     }-*/;
-    
+
     /**
      * @return true if the selected node is a new page, created by typing text in the suggest input, false otherwise.
      */
@@ -307,4 +307,46 @@ public class XWikiExplorer extends TreeGrid
         var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
         return self.isNewAttachment();
     }-*/;
-};
+
+    /**
+     * {@inheritDoc}. Override this function because it sets the height of the inner tree grid, without the explorer
+     * input. So, we need this function to take into account the size taken by all elements under the tree (the input,
+     * its margin, etc).
+     */
+    @Override
+    public void setHeight(String height)
+    {
+        String pixelSize = "px";
+        if (height.endsWith(pixelSize)) {
+            String valueString = height.substring(0, height.length() - 2);
+            // because we cannot know the exact space taken by all the other elements besides the input under the tree,
+            // we proceed by delta adjustments: compute the difference between the ordered height and the current height
+            // and apply this difference on the inner tree
+            int desiredsize = Integer.parseInt(valueString);
+            // let's hope it will never scroll
+            int actualHeight = getWrapperClientHeight();
+            int deltaHeight = desiredsize - actualHeight;
+            // assume the tree will never have border, or some other things around it and use its offsetHeight. However,
+            // correct should be the clientHeight
+            super.setHeight((getOffsetHeight() + deltaHeight) + pixelSize);
+            // now remove the height of the input
+        } else {
+            super.setHeight(height);
+        }
+    }
+
+    /**
+     * Get the height of the HTML wrapper element, if it's there. Otherwise return 0.
+     * 
+     * @return the client height of the html wrapper, if there.
+     */
+    private native int getWrapperClientHeight()
+    /*-{
+        var self = this.@com.smartgwt.client.widgets.BaseWidget::getOrCreateJsObj()();
+        if (typeof self.htmlElement == "undefined" && self.htmlElement == null) {
+           return 0;
+        } else {
+            return self.htmlElement.clientHeight;
+        }
+    }-*/;
+}

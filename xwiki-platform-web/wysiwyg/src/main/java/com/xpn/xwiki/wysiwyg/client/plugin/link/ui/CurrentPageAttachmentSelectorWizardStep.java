@@ -70,6 +70,11 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     }
 
     /**
+     * The style of the fields under error.
+     */
+    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+
+    /**
      * The main panel of this wizard step.
      */
     private VerticalResizePanel mainPanel = new VerticalResizePanel();
@@ -283,19 +288,21 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
      * 
      * @param message the error message to display
      */
-    public void displayError(String message)
+    protected void displayError(String message)
     {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
+        attachmentsList.addStyleName(FIELD_ERROR_STYLE);
         mainPanel.refreshHeights();
     }
 
     /**
      * Hides the error message and markers.
      */
-    public void hideError()
+    protected void hideError()
     {
         errorLabel.setVisible(false);
+        attachmentsList.removeStyleName(FIELD_ERROR_STYLE);
         mainPanel.refreshHeights();
     }
 }

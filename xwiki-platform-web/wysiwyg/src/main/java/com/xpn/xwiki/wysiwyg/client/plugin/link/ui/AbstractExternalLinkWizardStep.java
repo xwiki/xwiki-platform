@@ -110,50 +110,33 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     {
         return mainPanel;
     }
-
+    
     /**
      * {@inheritDoc}
      */
-    public void onSubmit(final AsyncCallback<Boolean> async)
+    @Override
+    protected boolean validateForm()
     {
-        // call the super to process label
-        super.onSubmit(new AsyncCallback<Boolean>()
-        {
-            public void onSuccess(Boolean result)
-            {
-                if (!result) {
-                    async.onSuccess(false);
-                } else {
-                    // everything is fine and saved on superclass, validate and save this form
-                    validateAndSaveData(async);
-                }
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                async.onFailure(caught);
-            }
-        });
-    }
-
-    /**
-     * Validates the inputs of this form and saves the data inserted in the form of this wizard step. To be called at
-     * {@link #onSubmit(AsyncCallback)} time, to handle the positive response from the superclass' {@code onSubmit}.
-     * 
-     * @param async the callback used to pass asynchronously the result of this validation.
-     */
-    protected void validateAndSaveData(AsyncCallback<Boolean> async)
-    {
-        // validate this data
+        // validate everything: super first
+        boolean result = super.validateForm();
+        // then this form
         if (urlTextBox.getText().trim().length() == 0) {
             displayURLError(getURLErrorMessage());
-            async.onSuccess(false);
-        } else {
-            String linkUri = buildURL();
-            getLinkData().setUrl(linkUri);
-            getLinkData().setReference(linkUri);
-            async.onSuccess(true);
-        }
+            result = false;
+        }        
+        return result;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveForm()
+    {
+        super.saveForm();
+        String linkUri = buildURL();
+        getLinkData().setUrl(linkUri);
+        getLinkData().setReference(linkUri);        
     }
 
     /**
@@ -199,11 +182,12 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
      * {@inheritDoc}
      */
     @Override
-    protected void hideError()
+    protected void hideErrors()
     {
-        super.hideError();
+        super.hideErrors();
         // hide this dialog's specific errors
         urlErrorLabel.setVisible(false);
+        urlTextBox.removeStyleName(FIELD_ERROR_STYLE);
     }
 
     /**
@@ -211,9 +195,10 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
      * 
      * @param errorMessage the error message to display
      */
-    public void displayURLError(String errorMessage)
+    protected void displayURLError(String errorMessage)
     {
         urlErrorLabel.setText(errorMessage);
         urlErrorLabel.setVisible(true);
+        urlTextBox.addStyleName(FIELD_ERROR_STYLE);
     }
 }

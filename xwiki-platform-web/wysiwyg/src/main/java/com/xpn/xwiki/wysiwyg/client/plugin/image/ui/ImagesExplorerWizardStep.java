@@ -339,10 +339,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     {
         // remove old panel, if any
         if (pageWizardStep != null) {
-            int pageWizardStepIndex = mainPanel.getWidgetIndex(pageWizardStep.display());
-            if (pageWizardStepIndex > 0) {
-                mainPanel.remove(pageWizardStepIndex);
-            }
+            mainPanel.remove(pageWizardStep.display());
         }
         // create a new pageWizard step
         pageWizardStep = new CurrentPageImageSelectorWizardStep(resource, editedResource);

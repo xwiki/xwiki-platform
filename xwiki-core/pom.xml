@@ -65,11 +65,6 @@
       <artifactId>exo-platform.service.database.api</artifactId>
       <version>2.0</version>
     </dependency>
-    <dependency>
-      <groupId>exo-platform</groupId>
-      <artifactId>exo-platform.service.database.api</artifactId>
-      <version>2.0</version>
-    </dependency>
 
     <!-- The JRCS JARS are are in our repo till we get them published on the central repository.
          JRCS home page: http://www.suigeneris.org/kb/display/jrcs/JRCS+Home -->

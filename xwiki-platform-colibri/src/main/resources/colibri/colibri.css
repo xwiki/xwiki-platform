@@ -4096,7 +4096,7 @@ body#body.editbody #xwikimaincontainerinner {
 /** Edit Panels **/
 
 #editPanels .expanded h5.xwikipaneltitle {
-  background-color: $theme.panelBackgroundColor;
+  background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;
   text-align: left;
@@ -4112,7 +4112,7 @@ body#body.editbody #xwikimaincontainerinner {
 #editPanels .xwikipanelcontents {
   background: $theme.panelBackgroundColor;
   padding: 10px 15px;
-  color: $theme.textPrimaryColor;
+  color: $theme.panelTextColor;
 }
 
 #editPanels.panels .panel {
@@ -4120,7 +4120,6 @@ body#body.editbody #xwikimaincontainerinner {
 }
 
 #editPanels .EditModes .xwikipanelcontents {
-  background: $theme.panelBackgroundColor;
   padding-bottom: 10px;
 }
 
@@ -4129,7 +4128,6 @@ body#body.editbody #xwikimaincontainerinner {
 }
 
 #editPanels .EditModes .xwikipanelcontents ul li.active {
-  background: $theme.panelBackgroundColor;
   height: 20px;
   line-height: 20px;
 }
@@ -4145,11 +4143,9 @@ body#body.editbody #xwikimaincontainerinner {
 }
 
 #editPanels .SyntaxHelp div.xwikipanelcontents {
-  background: $theme.panelBackgroundColor;
   line-height:30px;
   padding:0 25px 0 10px;
   height:30px;
-  color: $theme.textPrimaryColor;
 }
 
 .alleditcontent {

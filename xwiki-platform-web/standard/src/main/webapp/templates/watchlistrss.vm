@@ -1,4 +1,0 @@
-#set ($baseurl = "$xwiki.getLocalUserName($doc.fullName, false)'s WatchList on ${request.scheme}://${request.serverName}")
-#set ($description = "RSS feed for $xwiki.getLocalUserName($doc.fullName, false)'s WatchList")
-#set ($list = $xwiki.watchlist.getWatchListWhatsNew($doc.fullName))
-$xwiki.includeForm('XWiki.WebRssCode', false)

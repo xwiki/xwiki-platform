@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -186,6 +188,26 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     public String getPrefixedFullName()
     {
         return prefixedFullName;
+    }
+    
+    /**
+     * @param context The XWiki context
+     * @return The URL of the document which has fired the event
+     */
+    public String getUrl(XWikiContext context) 
+    {
+        String url;
+        
+        try {
+            // Note that the URL we get from the context might not be the one we'd like to get (example: localhost:8080 
+            // instead of domain.com). The context is a stub context created on the first request, the URL will reflect
+            // the first request.
+            url = (new URL(context.getURL(), getActivityEvent().getUrl())).toString();
+        } catch (MalformedURLException e) {
+            url = getActivityEvent().getUrl();
+        }
+        
+        return url;
     }
 
     /**

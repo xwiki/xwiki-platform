@@ -364,7 +364,11 @@ Object.extend(XWiki, {
           var sectioncount = 1;
 
           // We can't use element.select() since it does not keep the order of the elements in the flow.
-          var nodes = $("xwikicontent").childNodes;
+          var nodes = $("xwikicontent");
+          if (!nodes) {
+            return;
+          }
+          nodes = nodes.childNodes;
 
           // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
           for (var i = 0; i < nodes.length; i++) {

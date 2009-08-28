@@ -34,7 +34,8 @@ public class TextBoxNumberFilter implements KeyPressHandler
      */
     private static final char[] AUTHORIZED_KEYS = {
         KeyCodes.KEY_BACKSPACE, KeyCodes.KEY_DELETE, KeyCodes.KEY_HOME, KeyCodes.KEY_END, KeyCodes.KEY_LEFT,
-        KeyCodes.KEY_UP, KeyCodes.KEY_RIGHT, KeyCodes.KEY_DOWN
+        KeyCodes.KEY_UP, KeyCodes.KEY_RIGHT, KeyCodes.KEY_DOWN, KeyCodes.KEY_TAB, KeyCodes.KEY_ENTER,
+        KeyCodes.KEY_ESCAPE
     };
 
     /**

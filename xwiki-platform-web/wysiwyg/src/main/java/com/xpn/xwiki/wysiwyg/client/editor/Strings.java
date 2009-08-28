@@ -349,19 +349,17 @@ public interface Strings extends Constants
 
     String tableRowsHelpLabel();
 
-    String tableRowsDefault();
+    String tableRowsToolTip();
 
     String tableColsLabel();
 
     String tableColsHelpLabel();
 
-    String tableColsDefault();
+    String tableColsToolTip();
 
     String tableBorderLabel();
 
     String tableBorderHelpLabel();
-
-    String tableBorderDefault();
 
     String tableHeaderLabel();
 
@@ -370,6 +368,12 @@ public interface Strings extends Constants
     String tablePixel();
 
     String tableInsertButton();
+
+    String tableInsertDialogCaption();
+
+    String tableInsertDialogTitle();
+
+    String tableInsertStrictPositiveIntegerRequired();
 
     String importerToolTip();
 

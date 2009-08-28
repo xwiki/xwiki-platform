@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
+import java.util.EnumSet;
+
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
@@ -26,24 +28,27 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
+import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.WizardStepMap;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.TableDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
-import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableConfigDialog;
+import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableConfigWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Feature allowing to insert a table in the editor. It is disabled when the caret is positioned in a table.
  * 
  * @version $Id$
  */
-public class InsertTable extends AbstractTableFeature implements CloseHandler<CompositeDialogBox>
+public class InsertTable extends AbstractTableFeature implements WizardListener
 {
     /**
      * Feature name.
@@ -51,9 +56,14 @@ public class InsertTable extends AbstractTableFeature implements CloseHandler<Co
     public static final String NAME = "inserttable";
 
     /**
-     * Table dialog.
+     * The name of the wizard step that configures a table before inserting it.
      */
-    private TableConfigDialog dialog;
+    private static final String CONFIG_STEP_NAME = "config";
+
+    /**
+     * Insert table wizard.
+     */
+    private Wizard wizard;
 
     /**
      * Initialize the feature. Table features needs to be aware of the plug-in (here the ClickListener) since they hold
@@ -71,23 +81,22 @@ public class InsertTable extends AbstractTableFeature implements CloseHandler<Co
      * 
      * @return the table wizard pop-up instance.
      */
-    public TableConfigDialog getDialog()
+    public Wizard getWizard()
     {
-        if (dialog == null) {
-            dialog = new TableConfigDialog();
-            dialog.addCloseHandler(this);
-        }
-        return dialog;
-    }
+        if (wizard == null) {
+            TableConfigWizardStep configStep = new TableConfigWizardStep(null);
+            configStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.tableInsertButton());
+            configStep.setValidDirections(EnumSet.of(NavigationDirection.FINISH));
 
-    /**
-     * Display the table creation wizard.
-     * 
-     * @param rta WYSIWYG RichTextArea
-     */
-    public void showDialog(RichTextArea rta)
-    {
-        getDialog().center();
+            WizardStepMap insertSteps = new WizardStepMap();
+            insertSteps.put(CONFIG_STEP_NAME, configStep);
+
+            wizard =
+                new Wizard(Strings.INSTANCE.tableInsertDialogCaption(), Images.INSTANCE.insertTable().createImage());
+            wizard.setProvider(insertSteps);
+            wizard.addWizardListener(this);
+        }
+        return wizard;
     }
 
     /**
@@ -189,8 +198,8 @@ public class InsertTable extends AbstractTableFeature implements CloseHandler<Co
     public boolean execute(RichTextArea rta, String parameter)
     {
         if (StringUtils.isEmpty(parameter)) {
-            // The command has been executed without insertion configuration, display the configuration dialog.
-            showDialog(rta);
+            // The command has been executed without insertion configuration, start the insert table wizard.
+            getWizard().start(CONFIG_STEP_NAME, null);
         } else {
             // Insert the table element.
             insertTable(rta, (TableConfig) TableConfig.fromJson(parameter));
@@ -213,17 +222,30 @@ public class InsertTable extends AbstractTableFeature implements CloseHandler<Co
     /**
      * {@inheritDoc}
      * 
-     * @see CloseHandler#onClose(CloseEvent)
+     * @see WizardListener#onCancel(Wizard)
      */
-    public void onClose(CloseEvent<CompositeDialogBox> event)
+    public void onCancel(Wizard sender)
     {
-        getPlugin().getTextArea().setFocus(true);
-        if (!event.isAutoClosed() && !getDialog().isCanceled()) {
+        if (sender == getWizard()) {
+            getPlugin().getTextArea().setFocus(true);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WizardListener#onFinish(Wizard, Object)
+     */
+    public void onFinish(Wizard sender, Object result)
+    {
+        if (sender == getWizard()) {
+            getPlugin().getTextArea().setFocus(true);
+            TableDescriptor descriptor = (TableDescriptor) result;
             // Call the command again, passing the insertion configuration as a JSON object.
             getPlugin().getTextArea().getCommandManager().execute(
                 getCommand(),
-                "{ rows:" + getDialog().getRowNumber() + ", cols: " + getDialog().getColNumber() + ", header: "
-                    + getDialog().hasHeader() + " }");
+                "{ rows:" + descriptor.getRowCount() + ", cols: " + descriptor.getColumnCount() + ", header: "
+                    + descriptor.isWithHeader() + " }");
         }
     }
 }

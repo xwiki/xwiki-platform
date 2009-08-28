@@ -1047,8 +1047,9 @@ body.exportbody #editPanels.panels,
 }
 
 #xwikieditcontent textarea#content {
-    width: 100%;
-    border: none; /* place border on external div*/
+  width: 100%;
+  border: 0;
+  padding: 0;
 }
 
 #xwikieditor {

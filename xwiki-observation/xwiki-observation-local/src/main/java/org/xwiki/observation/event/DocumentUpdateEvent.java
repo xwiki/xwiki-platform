@@ -47,7 +47,7 @@ public class DocumentUpdateEvent extends AbstractDocumentEvent
 
     /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
-     * meaning that this event will match only update events affecting the same document.
+     * meaning that this event will match only update events affecting the document matching the passed document name.
      * 
      * @param documentName the name of the updated document to match
      */

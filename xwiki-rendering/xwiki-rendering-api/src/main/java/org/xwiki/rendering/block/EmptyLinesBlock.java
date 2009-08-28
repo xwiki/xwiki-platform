@@ -40,7 +40,7 @@ public class EmptyLinesBlock  extends AbstractBlock
      */
     public EmptyLinesBlock(int count)
     {
-        this.count = count;
+        setEmptyLinesCount(count);
     }
 
     /**
@@ -51,6 +51,14 @@ public class EmptyLinesBlock  extends AbstractBlock
         return this.count;
     }
 
+    /**
+     * @param count the number of empty lines between 2 standalone Blocks
+     */
+    public void setEmptyLinesCount(int count)
+    {
+        this.count = count;
+    }
+    
     /**
      * {@inheritDoc}
      * @see AbstractBlock#traverse(Listener)

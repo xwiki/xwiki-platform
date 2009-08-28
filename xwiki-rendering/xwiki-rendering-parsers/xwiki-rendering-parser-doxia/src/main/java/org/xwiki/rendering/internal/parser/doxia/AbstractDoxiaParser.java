@@ -45,18 +45,26 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
     @Requirement("plain/1.0")
     private BlockRenderer plainTextBlockRenderer;
 
+    @Requirement("plain/1.0")
+    private Parser plainTextParser;
+    
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
+    /**
+     * {@inheritDoc}
+     * @see Parser#parse(Reader)
+     */
     public XDOM parse(Reader source) throws ParseException
     {
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
-        XDOMGeneratorSink sink = new XDOMGeneratorSink(this.linkParser, this.plainTextBlockRenderer);
+        XDOMGeneratorSink sink = new XDOMGeneratorSink(this.linkParser, this.plainTextParser, 
+            this.plainTextBlockRenderer);
 
         try {
             parser.parse(source, sink);
         } catch (org.apache.maven.doxia.parser.ParseException e) {
             throw new ParseException("Failed to parse input source", e);
         }
-        return sink.getDOM();
+        return sink.getXDOM();
     }
 }

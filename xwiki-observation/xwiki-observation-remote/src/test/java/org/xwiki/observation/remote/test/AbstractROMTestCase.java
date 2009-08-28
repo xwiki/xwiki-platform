@@ -37,7 +37,7 @@ import org.xwiki.test.XWikiComponentInitializer;
 /**
  * Base class to easily emulate two instances of observation manager communicate with each other by network.
  * 
- * @version $Id: AbstractROMTestCase.java 22739 2009-08-14 10:08:42Z tmortagne $
+ * @version $Id$
  */
 public abstract class AbstractROMTestCase
 {

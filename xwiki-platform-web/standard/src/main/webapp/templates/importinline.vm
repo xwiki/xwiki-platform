@@ -103,17 +103,20 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
   </form>
   ## Let the user upload XAR files.
   <h4 class="legend">$msg.get("uploadnewarchivetoimport")</h4>
-  <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
-    <fieldset class="expanded" id="attachform">
-      <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
-      <div><input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" /></div>
-      <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
-      <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("choosefiletoupload"):</label></div>
-      <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
-      <div>
-        <input type="submit" value="$msg.get("attachthisfile")" onclick="return updateAttachName(this.form, '$msg.get("doyouwanttoreplace")')" class="button"/>
-        <input type="reset" value="$msg.get("cancel")" onclick="hideForm(this.form);" class="button"/>
-      </div>
-    </fieldset>
+  <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
+    <div>
+      <input type="hidden" name="xredirect" value="${xwiki.getFormEncoded($redirect)}" />
+      <fieldset id="attachform">
+        <legend>$msg.get('addattachment')</legend>
+        ## Temporarily disabled, until we fix attachment name handling
+        ## <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get('core.viewers.attachments.upload.filename')</label></div>
+        <div><input id="xwikiuploadname" type="hidden" name="filename" value="" size="40"/></div>
+        <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40" class="uploadFileInput"/></div>
+        <div>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get('core.viewers.attachments.upload.submit')" class="button"/></span>
+        <span class="buttonwrapper"><input type="reset" value="$msg.get('core.viewers.attachments.upload.cancel')" class="button"/></span>
+        </div>
+      </fieldset>
+    </div>
   </form>
 #end

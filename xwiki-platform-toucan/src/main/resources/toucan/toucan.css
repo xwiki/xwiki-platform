@@ -826,7 +826,6 @@ body.mceContentBody {
     padding: 0;
     text-align: center;
     border: none;
-    overflow-y: hidden;
     background-color: #fff;
     background-image: url( images/colors/gray/bg-GRAY3.png );
     background-position: 0 0;
@@ -1042,8 +1041,6 @@ body.content #contentcolumn .main {
 }
 
 #xwikicontent {
-    overflow-x: auto;
-    overflow-y: hidden;
     padding: 0;
     position: relative;
 }

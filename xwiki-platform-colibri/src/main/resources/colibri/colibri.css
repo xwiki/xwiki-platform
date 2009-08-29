@@ -39,8 +39,9 @@ html, body, div, span, applet, object, iframe,
 }
 
 a, a:link, a:active, a:visited {
-    color: #39397f;
-    text-decoration: none;
+  color: #39397f;
+  text-decoration: none;
+  background-color: transparent;
 }
 
 a:hover {

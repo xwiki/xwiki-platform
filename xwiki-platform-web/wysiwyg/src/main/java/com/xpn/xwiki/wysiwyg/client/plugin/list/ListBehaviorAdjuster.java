@@ -393,7 +393,7 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
      */
     public void onKeyPress(KeyPressEvent event)
     {
-        dispatchKey((Widget) event.getSource(), (Event) event.getNativeEvent());
+        dispatchKey((Widget) event.getSource(), event.getNativeEvent().getKeyCode(), (Event) event.getNativeEvent());
     }
 
     /**
@@ -403,9 +403,10 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
      * it.
      * 
      * @param sender the sender widget of the key press event
-     * @param event the native event that was fired
+     * @param keyCode the code of the key to dispatch
+     * @param originalEvent the original native key event that was fired
      */
-    protected void dispatchKey(Widget sender, Event event)
+    protected void dispatchKey(Widget sender, int keyCode, Event originalEvent)
     {
         if (textArea != sender) {
             return;
@@ -418,12 +419,12 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
             return;
         }
 
-        switch (event.getKeyCode()) {
+        switch (keyCode) {
             case KeyCodes.KEY_DELETE:
-                onDelete((Element) li, event);
+                onDelete((Element) li, originalEvent);
                 break;
             case KeyCodes.KEY_BACKSPACE:
-                onBackspace((Element) li, event);
+                onBackspace((Element) li, originalEvent);
                 break;
             default:
                 break;

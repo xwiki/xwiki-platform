@@ -41,7 +41,7 @@ public class IEListBehaviorAdjuster extends ListBehaviorAdjuster
      */
     public void onKeyDown(KeyDownEvent event)
     {
-        dispatchKey((Widget) event.getSource(), (Event) event.getNativeEvent());
+        dispatchKey((Widget) event.getSource(), event.getNativeKeyCode(), (Event) event.getNativeEvent());
     }
 
     /**

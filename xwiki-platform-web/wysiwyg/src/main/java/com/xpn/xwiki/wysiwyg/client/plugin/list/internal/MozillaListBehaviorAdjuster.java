@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.list.internal;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
-import org.xwiki.gwt.dom.client.JavaScriptObject;
 
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -86,8 +85,7 @@ public class MozillaListBehaviorAdjuster extends ListBehaviorAdjuster
     {
         // just to be sure, although it should have been set on key down
         if (keyDownCode > 0) {
-            ((JavaScriptObject) event.getNativeEvent().cast()).set("keyCode", keyDownCode);
-            dispatchKey((Widget) event.getSource(), (Event) event.getNativeEvent());
+            dispatchKey((Widget) event.getSource(), keyDownCode, (Event) event.getNativeEvent());
         }
     }
 

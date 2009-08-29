@@ -3747,7 +3747,6 @@ ul.xwikitabbar {
 }
 
 .xwikitabbar li a {
-  background: $theme.menuBackgroundColor;
   color: $theme.menuLinkColor;
   letter-spacing:0;
   height: 20px;

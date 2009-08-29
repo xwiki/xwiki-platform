@@ -782,7 +782,6 @@ body.mceContentBody {
   padding: 0;
   text-align: center;
   border: none;
-  overflow-y: hidden;
 }
 
 #xwikimaincontainerinner {
@@ -969,8 +968,6 @@ body.content #contentcolumn .main {
 }
 
 #xwikicontent {
-    overflow-x: auto;
-    overflow-y: hidden;
     padding: 0;
     position: relative;
 }

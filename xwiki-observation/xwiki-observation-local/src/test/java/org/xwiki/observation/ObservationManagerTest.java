@@ -28,6 +28,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.xwiki.component.logging.Logger;
+import org.xwiki.component.phase.LogEnabled;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -186,5 +188,35 @@ public class ObservationManagerTest
         this.manager.addListener(listener);
         Assert.assertSame(listener, this.manager.getListener("mylistener"));
         this.manager.notify(event, "some source", "some data");
+    }
+    
+    /**
+     * Verify that a warning is logged is we try to register a listener with the same name.
+     */
+    @Test
+    public void testRegisterSameListenerSeveralTimes()
+    {
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Logger logger = this.context.mock(Logger.class);
+
+        ((LogEnabled) this.manager).enableLogging(logger);
+        
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(AllEvent.ALLEVENT)));
+            // The check is performed here, we verify that a warning is correctly logged
+            oneOf(logger).warn("An Event Listener was already registered for the name [mylistener]. It has been "
+                + "overwritten with the new Listener. In the future consider removing a Listener first if you "
+                + "really want to register it again.");
+        }});
+        
+        this.manager.addListener(listener);
+        // Will raise log warning on the next line 
+        this.manager.addListener(listener);
+        
+        // Verify that no log is logged if we remove the listener before re-registering it
+        this.manager.removeListener("mylistener");
+        // Next line will not log any warning
+        this.manager.addListener(listener);
     }
 }

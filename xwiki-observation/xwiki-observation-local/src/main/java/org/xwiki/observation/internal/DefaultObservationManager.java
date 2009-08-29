@@ -142,6 +142,13 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      */
     public void addListener(EventListener eventListener)
     {
+        // If the passed event listener name is already registered, log a warning
+        if (this.listenersByName.containsKey(eventListener.getName())) {
+            getLogger().warn("An Event Listener was already registered for the name [" + eventListener.getName() 
+                + "]. It has been overwritten with the new Listener. In the future consider removing a Listener first "
+                + "if you really want to register it again.");
+        }
+        
         // Register the listener by name. If already registered, override it.
         this.listenersByName.put(eventListener.getName(), eventListener);
         

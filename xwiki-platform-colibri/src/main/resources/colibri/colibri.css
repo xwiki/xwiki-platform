@@ -330,6 +330,13 @@ span.edit_section {
     background-color: inherit;
 }
 
+/* Special case for code macro used inline */
+span.code {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0;
+}
+
 table td {
     border-collapse: separate;
     border-spacing: 0;

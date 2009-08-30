@@ -978,6 +978,9 @@ body.content #contentcolumn .main {
     padding: 0;
     position: relative;
 }
+html>body #xwikicontent {
+    border: 1px solid transparent;
+}
 
 html > body .minwidth, html > body .minwidthb, html > body .minwidthc {
     display: none;
@@ -1000,7 +1003,7 @@ html > body .minwidth, html > body .minwidthb, html > body .minwidthc {
 }
 
 #contentcontainer {
-    height: 1%;
+  clear: both;
 }
 
 #rightPanels {

@@ -2614,14 +2614,12 @@ div#xwikiclassproperties.accordion
 
 .buttonwrapper {
     background: transparent;
-    display: inline-block;
     display: inline;
     margin: 10px 0px 10px 10px;
     padding-top: 10px;
 }
 
 #body .buttonwrapper * {
-    display: inline-block;
     display: inline;
     line-height: 1.35em !important;
     margin: 0px !important;
@@ -3142,7 +3140,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 /* @end */
 
 /* IE */
-* html div, * html .buttonwrapper * {
+* html div {
     display: inline-block;
 }
 
@@ -4014,7 +4012,7 @@ table.xwikidatatable td, #_history table td  {
 }
 
 .buttonwrapper {
-  display:inline-block;
+  display:inline;
   margin:5px;
   margin-left: 0px;
   margin-right: 10px;

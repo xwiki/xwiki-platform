@@ -4257,6 +4257,11 @@ ul#panelEditorSteps{ /* Styling for Panel Wizard */
   color: $theme.textPrimaryColor ;
 }
 
+#userstable, #groupstable, #usersandgroupstable, #alldocstable,
+#userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {
+  border: 0;
+}
+
 /**********************************************************************************************/
 /** SEARCH **/
 #body #globalsearch input {

@@ -3379,6 +3379,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   background: transparent 6px 8px no-repeat;
   text-align: justify;
   color: #555;
+  overflow: auto; /* Prevents the box from going under floating elements */
 }
 .infomessage {
   background-image: url( $xwiki.getSkinFile('icons/silk/information.gif') );

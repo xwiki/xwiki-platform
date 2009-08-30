@@ -1953,13 +1953,15 @@ span.pitemseparator {
     font-weight: bold;
 }
 
+.xwikipanelcontents dl dd table#xwikiincludeddocuments {
+    width: 100%;
+}
 .xwikipanelcontents dl dd table#xwikiincludeddocuments td {
     border-top: 1px dotted #EEE;
 }
 
 .xwikipanelcontents dl dd table#xwikiincludeddocuments td a {
     display: block;
-    width: 148px;
     position: relative;
     overflow: hidden;
 }

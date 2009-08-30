@@ -38,7 +38,7 @@
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="">
-    <div><input type="hidden" name="xpage" value="copy" /></div>
+    <div class="hidden"><input type="hidden" name="xpage" value="copy" /></div>
     <table>
     <tr><td>$msg.get("core.copy.sourcedoc"):</td>
     <td>$doc.fullName <input type="hidden" name="sourcedoc" value="$doc.fullName" size="60"/></td></tr>
@@ -57,9 +57,8 @@
     #end
     <tr><td>$msg.get("core.copy.targetdoc"):</td>
     <td><input type="text" name="targetdoc" value="$!{request.targetdoc}" size="60" /></td></tr>
-    <tr><td><input type="submit" value="Copy" />
-    </td></tr>
     </table>
+    <div><span class="buttonwrapper"><input type="submit" value="Copy" /></span></div>
     </form>
     #end
     <div class="clearfloats"></div>

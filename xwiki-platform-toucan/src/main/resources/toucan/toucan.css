@@ -3091,12 +3091,7 @@ span.messagetype {
     display: none;
 }
 
-html>body div.floatinginfobox, html>body fieldset.floatinginfobox{
-    width: auto; 
-}
-
 div.floatinginfobox, fieldset.floatinginfobox {
-    width: 0;
     float: right;
     border-left: 20px solid #FFF;
     border-bottom: 40px solid #FFF;

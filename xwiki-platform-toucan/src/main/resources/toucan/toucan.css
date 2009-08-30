@@ -3206,10 +3206,6 @@ form#inline textarea {
     width: 100%;
 }
 
-body.hideright #xwikimaincontainer {
-    overflow-y: auto;
-}
-
 body.mceContentBody {
     min-width: 100px;
 }

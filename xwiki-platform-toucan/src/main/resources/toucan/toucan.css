@@ -310,6 +310,7 @@ span.edit_section {
 	font-family: courier, courier new, monospace;
 	white-space: pre;
 }
+
 .code {
 	margin: 1em 0;
 	padding: 0 1px;
@@ -349,6 +350,13 @@ span.edit_section {
 .code .sql-keyword {
     color: #0000aa;
     background-color: inherit;
+}
+
+/* Special case for code macro used inline */
+span.code {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0;
 }
 
 table td {
@@ -3786,6 +3794,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
  .rssitemdescription .rssitemtitle .rsschanneltitle {
  	background-color: white;
 }
+
 .box {
 	margin: 1em 0;
 	padding: 0 1px;

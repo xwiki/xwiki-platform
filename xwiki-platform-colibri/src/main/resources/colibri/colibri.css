@@ -1653,6 +1653,9 @@ ul.xwikitabbar {
 #globalsearch {
     margin: 0 0 0 10px;
 }
+#globalsearch * {
+  vertical-align: middle;
+}
 
 .xwikipanelcontents form {
     margin: 0;

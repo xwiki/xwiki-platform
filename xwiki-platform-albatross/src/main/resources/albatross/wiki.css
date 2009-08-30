@@ -92,6 +92,13 @@ blockquote {
   font-family: courier, courier new, monospace;
 }
 
+/* Special case for code macro used inline */
+span.code {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0;
+}
+
 .java-keyword {
   font-weight: bold;
   color: #0000aa;

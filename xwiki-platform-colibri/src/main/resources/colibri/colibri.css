@@ -1770,7 +1770,7 @@ div.xwikipanelcontents span.wikicreatelink a {
 
 div.xwikipanelcontents ul.star {
     list-style-type: none;
-    list-style-position: inside;
+    list-style-position: outside; /* Outside, otherwise IE6 adds some padding */
     padding: 0;
     margin: 0;
 }

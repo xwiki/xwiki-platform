@@ -52,88 +52,8 @@ import com.xpn.xwiki.objects.BaseObject;
  * @since 2.0M2
  */
 @Component
-public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiMacroFactory
+public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiMacroFactory, WikiMacroConstants
 {
-    /**
-     * Constant for representing XWiki.WikiMacroClass xwiki class.
-     */
-    private static final String WIKI_MACRO_CLASS = "XWiki.WikiMacroClass";
-    
-    /**
-     * Constant for representing macro id property.
-     */
-    private static final String MACRO_ID_PROPERTY = "id";
-
-    /**
-     * Constant for representing macro name property.
-     */
-    private static final String MACRO_NAME_PROPERTY = "name";
-
-    /**
-     * Constant for representing macro description property.
-     */
-    private static final String MACRO_DESCRIPTION_PROPERTY = "description";
-
-    /**
-     * Constant for representing default macro category property.
-     */
-    private static final String MACRO_DEFAULT_CATEGORY_PROPERTY = "defaultCategory";
-
-    /**
-     * Constant for representing macro inline support property.
-     */
-    private static final String MACRO_INLINE_PROPERTY = "supportsInlineMode";
-
-    /**
-     * Constant for representing macro content type property.
-     */
-    private static final String MACRO_CONTENT_TYPE_PROPERTY = "contentType";
-
-    /**
-     * Constant for representing macro content mandatory status.
-     */
-    private static final String MACRO_CONTENT_MANDATORY = "Mandatory";
-
-    /**
-     * Constant for representing macro content optional status.
-     */
-    private static final String MACRO_CONTENT_OPTIONAL = "Optional";
-
-    /**
-     * Constant for representing macro content empty status.
-     */
-    private static final String MACRO_CONTENT_EMPTY = "No content";
-
-    /**
-     * Constant for representing macro content description property.
-     */
-    private static final String MACRO_CONTENT_DESCRIPTION_PROPERTY = "contentDescription";
-
-    /**
-     * Constant for representing macro code property.
-     */
-    private static final String MACRO_CODE_PROPERTY = "code";
-
-    /**
-     * Constant for representing XWiki.WikiMacroParameterClass xwiki class.
-     */
-    private static final String WIKI_MACRO_PARAMETER_CLASS = "XWiki.WikiMacroParameterClass";
-
-    /**
-     * Constant for representing parameter name property. Same as MACRO_NAME_PROPERTY (Check style Fix)
-     */
-    private static final String PARAMETER_NAME_PROPERTY = "name";
-
-    /**
-     * Constant for representing parameter description property. Same as MACRO_DESCRIPTION_PROPERTY (Check style Fix)
-     */
-    private static final String PARAMETER_DESCRIPTION_PROPERTY = "description";
-
-    /**
-     * Constant for representing parameter mandatory property.
-     */
-    private static final String PARAMETER_MANDATORY_PROPERTY = "mandatory";
-
     /**
      * The {@link ComponentManager} component.
      */

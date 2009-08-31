@@ -55,7 +55,7 @@ public class IncludeMacroParameters
      * Defines whether the included page is executed in its separated execution context or whether it's executed in the
      * context of the current page.
      */
-    private Context context;
+    private Context context = Context.CURRENT;
 
     /**
      * @param document the name of the document to include.

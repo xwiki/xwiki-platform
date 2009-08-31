@@ -4270,48 +4270,6 @@ ul#panelEditorSteps{ /* Styling for Panel Wizard */
 }
 
 /**********************************************************************************************/
-/** PRINT PREVIEW **/
-
-/** Commented so it doesn't interfere with the normal view **/
-/*.main {
-  background-color:$theme.pageContentBackgroundColor;
-  padding: 10px;
-}
-
-#commentform, #footerglobal, .xwikitabbar li, #Historyshortcut, #Informationshortcut, .separator{
-  display: none;
-}
-
-.xwikitabbar li.active {
-  display: block;
-}
-
-.commentheader .commenttools a, a.tag-delete , .tag-add a {
-  display: none;
-}
-
-#docextrapanes #AddComment {
-  border: none;
-}
-
-#xwikidatacontents, #docExtraTabs {
-  background: $theme.pageContentBackgroundColor;
-}
-
-#xdocFooter, #docextrapanes {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-#xwikicontent a , #xdocFooter a, #docextrapanes .commentauthor a, #breadcrumbs a{
-  color: $theme.textPrimaryColor !important;
-}
-
-#docExtraTabs ul.xwikitabbar {
-  padding: 0px;
-}
-*/
-/**********************************************************************************************/
 /** NEW ELEMENTS introduced just for this skin **/
 
 .submenu {

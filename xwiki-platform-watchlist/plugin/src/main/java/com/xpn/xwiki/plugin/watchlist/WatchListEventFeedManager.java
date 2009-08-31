@@ -68,7 +68,7 @@ public class WatchListEventFeedManager
         List<ActivityEvent> events =
             asApi.searchEvents("act.wiki in ('" + StringUtils.join(wikis, listItemsJoint) + "') or act.space in ('"
                 + StringUtils.join(spaces, listItemsJoint) + "') or act.page in ('"
-                + StringUtils.join(pages, listItemsJoint) + "')", false, entryNumber, 0);
+                + StringUtils.join(pages, listItemsJoint) + "')", false, true, entryNumber, 0);
         String msgPrefix = WatchListPlugin.APP_RES_PREFIX + "rss.";
         SyndFeed feed = asApi.getFeed(events);
         

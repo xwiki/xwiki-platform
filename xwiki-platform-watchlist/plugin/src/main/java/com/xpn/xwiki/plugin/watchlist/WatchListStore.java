@@ -511,13 +511,12 @@ public class WatchListStore implements EventListener
     public List<String> globalSearchDocuments(String request, int nb, int start, List<Object> values,
         XWikiContext context)
     {
-        String initialDb = !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
         List<String> wikiServers = new ArrayList<String>();
         List<String> results = new ArrayList<String>();
 
         if (context.getWiki().isVirtualMode()) {
             try {
-                wikiServers = context.getWiki().getVirtualWikiList();
+                wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
                 if (!wikiServers.contains(context.getMainXWiki())) {
                     wikiServers.add(context.getMainXWiki());
                 }
@@ -528,10 +527,11 @@ public class WatchListStore implements EventListener
             wikiServers = new ArrayList<String>();
             wikiServers.add(context.getMainXWiki());
         }
+        
+        String oriDatabase = context.getDatabase();
 
         try {
-            for (Iterator<String> iter = wikiServers.iterator(); iter.hasNext();) {
-                String wiki = (String) iter.next();
+            for (String wiki : wikiServers) {                
                 String wikiPrefix = wiki + WIKI_SPACE_SEP;
                 context.setDatabase(wiki);
                 try {
@@ -546,8 +546,9 @@ public class WatchListStore implements EventListener
                 }
             }
         } finally {
-            context.setDatabase(initialDb);
+            context.setDatabase(oriDatabase);
         }
+        
         return results;
     }
 

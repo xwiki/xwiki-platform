@@ -84,13 +84,13 @@ public class WatchListEventMatcher
         List<ActivityEvent> rawEvents;
 
         parameters.add(start);
-
+        
         try {
             rawEvents =
                 asApi.searchEvents("act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','")
-                    + "')", false, 0, 0, parameters);
+                    + "')", false, true, 0, 0, parameters);
 
-            // If the page has been modified several times we wan't to display only one diff, if the page has been
+            // If the page has been modified several times we want to display only one diff, if the page has been
             // delete after update events we want to discard the update events since we won't be able to display diff
             // from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and
             // WatchListEvent#equals(WatchListEvent).

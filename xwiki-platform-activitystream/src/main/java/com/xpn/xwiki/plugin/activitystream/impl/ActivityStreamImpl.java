@@ -40,6 +40,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
+import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -124,20 +125,83 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         addActivityEvent(event, null, context);
     }
 
+    /**
+     * This method determine if events must be store in the local wiki. If the wiki is not running in virtual mode this
+     * method will always return true. If it is running in virtual and if the activitystream is set not to store events
+     * in the main wiki the method will always return true. It the configuration does not match those 2 conditions, the
+     * method retrieves the platform.plugin.activitystream.uselocalstore configuration option. If the option is not
+     * found the method returns true (default behavior).
+     * 
+     * @param context the XWiki context
+     * @return true if the activity stream is configured to store events in the main wiki, false otherwise
+     */
+    private boolean useLocalStore(XWikiContext context)
+    {
+        if (!context.getWiki().isVirtualMode()) {
+            // If we aren't in virtual mode, force local store.
+            return true;
+        } else if (!useMainStore(context)) {
+            // If we are in virtual mode but the main store is disabled, force local store.
+            return true;
+        }
+
+        ActivityStreamPlugin plugin = (ActivityStreamPlugin) context.getWiki().getPlugin("activitystream", context);
+        return Integer.parseInt(plugin.getActivityStreamPreference("uselocalstore", "1", context)) == 1;
+    }
+
+    /**
+     * This method determine if events must be store in the main wiki. If the wiki is not running in virtual mode this
+     * method will always return false. If it is running in virtual mode this method retrieves the
+     * platform.plugin.activitystream.usemainstore configuration option. If the option is not found the method returns
+     * true (default behavior).
+     * 
+     * @param context the XWiki context
+     * @return true if the activity stream is configured to store events in the main wiki, false otherwise
+     */
+    private boolean useMainStore(XWikiContext context)
+    {
+        if (context.getWiki().isVirtualMode() && context.getDatabase().equals(context.getMainXWiki())) {
+            // We're in the main database, we don't have to store the data twice.
+            return false;
+        }
+        
+        ActivityStreamPlugin plugin = (ActivityStreamPlugin) context.getWiki().getPlugin("activitystream", context);
+        return Integer.parseInt(plugin.getActivityStreamPreference("usemainstore", "1", context)) == 1;
+    }
+
     public void addActivityEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
         throws ActivityStreamException
     {
         prepareEvent(event, doc, context);
 
-        // store event using hibernate
-        XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
-        try {
-            hibstore.beginTransaction(context);
-            Session session = hibstore.getSession(context);
-            session.save(event);
-            hibstore.endTransaction(context, true);
-        } catch (XWikiException e) {
-            hibstore.endTransaction(context, false);
+        if (useLocalStore(context)) {
+            // store event in the local database
+            XWikiHibernateStore localHibernateStore = context.getWiki().getHibernateStore();
+            try {
+                localHibernateStore.beginTransaction(context);
+                Session session = localHibernateStore.getSession(context);
+                session.save(event);
+                localHibernateStore.endTransaction(context, true);
+            } catch (XWikiException e) {
+                localHibernateStore.endTransaction(context, false);
+            }
+        }
+
+        if (useMainStore(context)) {
+            // store event in the main database
+            String oriDatabase = context.getDatabase();
+            context.setDatabase(context.getMainXWiki());
+            XWikiHibernateStore mainHibernateStore = context.getWiki().getHibernateStore();
+            try {
+                mainHibernateStore.beginTransaction(context);
+                Session session = mainHibernateStore.getSession(context);
+                session.save(event);
+                mainHibernateStore.endTransaction(context, true);
+            } catch (XWikiException e) {
+                mainHibernateStore.endTransaction(context, false);
+            } finally {
+                context.setDatabase(oriDatabase);
+            }
         }
     }
 
@@ -201,32 +265,72 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         ActivityEventImpl act = null;
         String eventId = ev.getEventId();
-        XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
-        try {
-            if (bTransaction) {
-                hibstore.checkHibernate(context);
-                bTransaction = hibstore.beginTransaction(false, context);
-            }
-            Session session = hibstore.getSession(context);
-            Query query =
-                session.createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
-            query.setString("eventId", eventId);
-            if (query.uniqueResult() != null) {
-                act = new ActivityEventImpl();
-                session.load(act, eventId);
-            }
 
-            if (bTransaction)
-                hibstore.endTransaction(context, false, false);
-        } catch (Exception e) {
-            throw new ActivityStreamException();
-        } finally {
+        if (useLocalStore(context)) {
+            // load event from the local database
+            XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
             try {
+                if (bTransaction) {
+                    hibstore.checkHibernate(context);
+                    bTransaction = hibstore.beginTransaction(false, context);
+                }
+                Session session = hibstore.getSession(context);
+                Query query =
+                    session
+                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                query.setString("eventId", eventId);
+                if (query.uniqueResult() != null) {
+                    act = new ActivityEventImpl();
+                    session.load(act, eventId);
+                }
+
                 if (bTransaction)
                     hibstore.endTransaction(context, false, false);
             } catch (Exception e) {
+                throw new ActivityStreamException();
+            } finally {
+                try {
+                    if (bTransaction) {
+                        hibstore.endTransaction(context, false, false);
+                    }
+                } catch (Exception e) {
+                }
+            }
+        } else if (useMainStore(context)) {
+            // load event from the main database
+            String oriDatabase = context.getDatabase();
+            context.setDatabase(context.getMainXWiki());
+            XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
+            try {
+                if (bTransaction) {
+                    hibstore.checkHibernate(context);
+                    bTransaction = hibstore.beginTransaction(false, context);
+                }
+                Session session = hibstore.getSession(context);
+                Query query =
+                    session
+                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                query.setString("eventId", eventId);
+                if (query.uniqueResult() != null) {
+                    act = new ActivityEventImpl();
+                    session.load(act, eventId);
+                }
+
+                if (bTransaction)
+                    hibstore.endTransaction(context, false, false);
+            } catch (Exception e) {
+                throw new ActivityStreamException();
+            } finally {
+                context.setDatabase(oriDatabase);
+                try {
+                    if (bTransaction) {
+                        hibstore.endTransaction(context, false, false);
+                    }
+                } catch (Exception e) {
+                }
             }
         }
+
         return act;
     }
 
@@ -234,29 +338,65 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         boolean bTransaction = true;
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
-        XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
-        try {
-            if (bTransaction) {
-                hibstore.checkHibernate(context);
-                bTransaction = hibstore.beginTransaction(context);
-            }
 
-            Session session = hibstore.getSession(context);
-
-            session.delete(evImpl);
-
-            if (bTransaction) {
-                hibstore.endTransaction(context, true);
-            }
-
-        } catch (XWikiException e) {
-            throw new ActivityStreamException();
-        } finally {
+        if (useLocalStore(context)) {
+            // delete event from the local database
+            XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
             try {
                 if (bTransaction) {
-                    hibstore.endTransaction(context, false);
+                    hibstore.checkHibernate(context);
+                    bTransaction = hibstore.beginTransaction(context);
                 }
-            } catch (Exception e) {
+
+                Session session = hibstore.getSession(context);
+
+                session.delete(evImpl);
+
+                if (bTransaction) {
+                    hibstore.endTransaction(context, true);
+                }
+
+            } catch (XWikiException e) {
+                throw new ActivityStreamException();
+            } finally {
+                try {
+                    if (bTransaction) {
+                        hibstore.endTransaction(context, false);
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+
+        if (useMainStore(context)) {
+            // delete event from the main database
+            String oriDatabase = context.getDatabase();
+            context.setDatabase(context.getMainXWiki());
+            XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
+            try {
+                if (bTransaction) {
+                    hibstore.checkHibernate(context);
+                    bTransaction = hibstore.beginTransaction(context);
+                }
+
+                Session session = hibstore.getSession(context);
+
+                session.delete(evImpl);
+
+                if (bTransaction) {
+                    hibstore.endTransaction(context, true);
+                }
+
+            } catch (XWikiException e) {
+                throw new ActivityStreamException();
+            } finally {
+                try {
+                    context.setDatabase(oriDatabase);
+                    if (bTransaction) {
+                        hibstore.endTransaction(context, false);
+                    }
+                } catch (Exception e) {
+                }
             }
         }
     }
@@ -266,6 +406,12 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         return searchEvents("", hql, filter, nb, start, context);
     }
+    
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start, 
+        XWikiContext context) throws ActivityStreamException
+{
+    return searchEvents("", hql, filter, globalSearch, nb, start, context);
+}
 
     /**
      * Alternate searchEvents function for the Activiy Stream
@@ -284,13 +430,26 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         return searchEvents(fromHql, hql, filter, nb, start, null, context);
     }
-
-    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
+    
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb, 
+        int start, XWikiContext context) throws ActivityStreamException
+    {
+        return searchEvents(fromHql, hql, filter, globalSearch, nb, start, null, context);
+    }
+    
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start, 
         List<Object> parameterValues, XWikiContext context) throws ActivityStreamException
     {
-        StringBuffer searchHql = new StringBuffer();
+        return searchEvents(fromHql, hql, filter, false, nb, start, parameterValues, context);
+    }
 
-        if (filter) {            
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb,
+        int start, List<Object> parameterValues, XWikiContext context) throws ActivityStreamException
+    {
+        StringBuffer searchHql = new StringBuffer();
+        List<ActivityEvent> results;
+
+        if (filter) {
             searchHql.append("select act from ActivityEventImpl as act, ActivityEventImpl as act2 ");
             searchHql.append(fromHql);
             searchHql.append(" where act.eventId=act2.eventId and ");
@@ -304,11 +463,29 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
             searchHql.append(" order by act.date desc");
         }
 
-        try {
-            return context.getWiki().getStore().search(searchHql.toString(), nb, start, parameterValues, context);
-        } catch (XWikiException e) {
-            throw new ActivityStreamException(e);
+        if (globalSearch) {
+            // Search in the main database
+            String oriDatabase = context.getDatabase();
+            try {
+                context.setDatabase(context.getMainXWiki());
+                results =
+                    context.getWiki().getStore().search(searchHql.toString(), nb, start, parameterValues, context);
+            } catch (XWikiException e) {
+                throw new ActivityStreamException(e);
+            } finally {
+                context.setDatabase(oriDatabase);
+            }
+        } else {
+            try {
+                // Search in the local database
+                results =
+                    context.getWiki().getStore().search(searchHql.toString(), nb, start, parameterValues, context);            
+            } catch (XWikiException e) {
+                throw new ActivityStreamException(e);
+            }
         }
+
+        return results;
     }
 
     public List<ActivityEvent> getEvents(boolean filter, int nb, int start, XWikiContext context)
@@ -367,34 +544,34 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
             switch (event) {
                 case XWikiDocChangeNotificationInterface.EVENT_CHANGE:
                     if (olddoc == null || olddoc.isNew())
-                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE,
-                            msgPrefix + ActivityEventType.CREATE, params, context);
+                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE, msgPrefix
+                            + ActivityEventType.CREATE, params, context);
                     else if (newdoc == null || newdoc.isNew())
-                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE,
-                            msgPrefix + ActivityEventType.DELETE, params, context);
+                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE, msgPrefix
+                            + ActivityEventType.DELETE, params, context);
                     else
-                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                            msgPrefix + ActivityEventType.UPDATE, params, context);
+                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
+                            + ActivityEventType.UPDATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_NEW:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE,
-                        msgPrefix + ActivityEventType.CREATE, params, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE, msgPrefix
+                        + ActivityEventType.CREATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_DELETE:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE,
-                        msgPrefix + ActivityEventType.DELETE, params, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE, msgPrefix
+                        + ActivityEventType.DELETE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CONTENT:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                        msgPrefix + ActivityEventType.UPDATE, params, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
+                        + ActivityEventType.UPDATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_OBJECT:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                        msgPrefix + ActivityEventType.UPDATE, params, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
+                        + ActivityEventType.UPDATE, params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CLASS:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE,
-                        msgPrefix + ActivityEventType.UPDATE, params, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
+                        + ActivityEventType.UPDATE, params, context);
                     break;
             }
         } catch (Throwable e) {

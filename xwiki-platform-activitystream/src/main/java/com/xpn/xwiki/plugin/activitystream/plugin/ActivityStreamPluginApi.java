@@ -213,6 +213,28 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             return null;
         }
     }
+
+    /**
+     * Search in database activity events matching the given hql query. Retrieved events are ordered
+     * by date descending.
+     * 
+     * @param hql the "where" clause of the hql query to look events for
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return a list of matching events, wrapped as
+     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
+     * @throws ActivityStreamException
+     */
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start)
+        throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            return wrapEvents(getActivityStream().searchEvents(hql, filter, globalSearch, nb, start, context));
+        } else {
+            return null;
+        }
+    }
     
     /**
      * Search in database activity events matching the given hql query. Retrieved events are ordered
@@ -232,6 +254,30 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().searchEvents("", hql, filter, nb, start, parameterValues, context));
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Search in database activity events matching the given hql query. Retrieved events are ordered
+     * by date descending.
+     * 
+     * @param hql the "where" clause of the hql query to look events for
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @param parameterValues list of parameters to insert in the query
+     * @return a list of matching events, wrapped as
+     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
+     * @throws ActivityStreamException
+     */
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start, 
+        List<Object> parameterValues) throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            return wrapEvents(getActivityStream().searchEvents("", hql, filter, globalSearch, nb, start, 
+                parameterValues, context));
         } else {
             return null;
         }
@@ -269,6 +315,29 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
+     * @return a list of matching events, wrapped as
+     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
+     * @throws ActivityStreamException
+     */
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb, 
+        int start) throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, globalSearch, nb, start, context));
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Search in database activity events matching the given hql query. Retrieved events are ordered
+     * by date descending.
+     * 
+     * @param fromHql the "from" clause of the hql query to look events for
+     * @param hql the "where" clause of the hql query to look events for
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
      * @param parameterValues list of parameters to insert in the query
      * @return a list of matching events, wrapped as
      *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
@@ -279,6 +348,30 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, nb, start, context));
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Search in database activity events matching the given hql query. Retrieved events are ordered
+     * by date descending.
+     * 
+     * @param fromHql the "from" clause of the hql query to look events for
+     * @param hql the "where" clause of the hql query to look events for
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @param parameterValues list of parameters to insert in the query
+     * @return a list of matching events, wrapped as
+     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
+     * @throws ActivityStreamException
+     */
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb, 
+        int start, List<Object> parameterValues) throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            return wrapEvents(getActivityStream().searchEvents(fromHql, hql, filter, globalSearch, nb, start, context));
         } else {
             return null;
         }

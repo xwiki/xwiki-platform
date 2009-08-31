@@ -87,6 +87,20 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Get a preference for the activitystream from the XWiki configuration.
+     * 
+     * @param preference Name of the preference to get the value from
+     * @param defaultValue Default value if the preference is not found in the configuration
+     * @param context the XWiki context
+     * @return value for the given preference
+     */
+    public String getActivityStreamPreference(String preference, String defaultValue, XWikiContext context)
+    {
+        String preferencePrefix = "xwiki.plugin.activitystream.";
+        return context.getWiki().getXWikiPreference(preferencePrefix + preference, defaultValue, context);
+    }
+    
+    /**
      * {@inheritDoc}
      * 
      * @see XWikiDefaultPlugin#init(XWikiContext)

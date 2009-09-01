@@ -24,17 +24,19 @@ import java.util.Date;
 import java.util.Vector;
 
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.block.XDOM;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Lazy loading document.
+ * Read oly lazy loading document.
  * 
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.0M4
  */
 public class LazyXWikiDocument extends XWikiDocument
 {
@@ -311,5 +313,82 @@ public class LazyXWikiDocument extends XWikiDocument
     public Boolean isHidden()
     {
         return getDocument().isHidden();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getDocumentArchive()
+     */
+    @Override
+    public XWikiDocumentArchive getDocumentArchive()
+    {
+        return getDocument().getDocumentArchive();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getDocumentArchive(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public XWikiDocumentArchive getDocumentArchive(XWikiContext context) throws XWikiException
+    {
+        return getDocument().getDocumentArchive(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getStore()
+     */
+    @Override
+    public XWikiStoreInterface getStore()
+    {
+        return getDocument().getStore();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getStore(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public XWikiStoreInterface getStore(XWikiContext context)
+    {
+        return getDocument().getStore(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getXDOM()
+     */
+    @Override
+    public XDOM getXDOM()
+    {
+        return getDocument().getXDOM();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#getTags(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public String getTags(XWikiContext context)
+    {
+        return getDocument().getTags(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.doc.XWikiDocument#isFromCache()
+     */
+    @Override
+    public boolean isFromCache()
+    {
+        return getDocument().isFromCache();
     }
 }

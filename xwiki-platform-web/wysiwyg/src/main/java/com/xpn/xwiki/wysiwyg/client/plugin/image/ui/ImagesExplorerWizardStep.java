@@ -40,14 +40,19 @@ import com.xpn.xwiki.wysiwyg.client.widget.PageSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.SpaceSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.WikiSelector;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
- * Wizard step to explore and select images from all the pages in the wiki.
+ * Wizard step to explore and select images from all the pages in the wiki. <br />
+ * FIXME: this class should extend the {@link CurrentPageImageSelectorWizardStep} rather than aggregate it.
  * 
  * @version $Id$
  */
-public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements ChangeHandler
+public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements ChangeHandler,
+    SourcesNavigationEvents
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -85,6 +90,12 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     private final VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
+     * Navigatiobn listeners to handle navigation in this wizard step. The images explorer fires navigation to next step
+     * when double-click or enter is hit in the images list.
+     */
+    private NavigationListenerCollection listeners = new NavigationListenerCollection();
+
+    /**
      * The image selector for the currently selected page in this wizard step. This will be instantiated every time the
      * list of pages for a selected page needs to be displayed, and the functionality of this aggregator will be
      * delegated to it.
@@ -102,7 +113,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     public ImagesExplorerWizardStep(ResourceName editedResource, boolean displayWikiSelector)
     {
         this.editedResource = editedResource;
-        
+
         Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageLocationHelpLabel());
         helpLabel.addStyleName("xHelpLabel");
         mainPanel.add(helpLabel);
@@ -340,9 +351,17 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         // remove old panel, if any
         if (pageWizardStep != null) {
             mainPanel.remove(pageWizardStep.display());
+            // remove the listeners
+            for (NavigationListener l : listeners) {
+                pageWizardStep.removeNavigationListener(l);
+            }
         }
         // create a new pageWizard step
         pageWizardStep = new CurrentPageImageSelectorWizardStep(resource, editedResource);
+        // pass all listeners
+        for (NavigationListener l : listeners) {
+            pageWizardStep.addNavigationListener(l);
+        }
         mainPanel.addStyleName(STYLE_LOADING);
         pageWizardStep.init(getData(), new AsyncCallback<Object>()
         {
@@ -422,5 +441,21 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         pageWizardStep.onSubmit(async);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addNavigationListener(NavigationListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNavigationListener(NavigationListener listener)
+    {
+        listeners.remove(listener);
     }
 }

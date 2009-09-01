@@ -161,17 +161,9 @@ public interface Strings extends Constants
 
     String undo();
 
-    String chooseWiki();
+    String quickSearch();
 
-    String chooseSpace();
-
-    String choosePage();
-
-    String chooseAnchor();
-
-    String chooseVersion();
-
-    String chooseAttachment();
+    String mandatory();
 
     String link();
 
@@ -204,10 +196,6 @@ public interface Strings extends Constants
     String linkEmailLabel();
 
     String linkEmailHelpLabel();
-
-    String linkEmailAddressTextBox();
-
-    String linkWebPageTextBox();
 
     String linkEmailAddressError();
 
@@ -406,6 +394,4 @@ public interface Strings extends Constants
     String wizardFinish();
 
     String errorServerRequestFailed();
-
-    String quickSearch();
 }

@@ -27,6 +27,7 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -139,9 +140,12 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
      */
     private void setUpLabelField()
     {
-        Label labelLabel = new Label(Strings.INSTANCE.linkLabelLabel());
+        Panel labelLabel = new FlowPanel();
         labelLabel.setStyleName(INFO_LABEL_STYLE);
-        labelLabel.addStyleDependentName("mandatory");
+        labelLabel.add(new InlineLabel(Strings.INSTANCE.linkLabelLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName("xMandatory");
+        labelLabel.add(mandatoryLabel);        
         Label helpLabelLabel = new Label(getLabelTextBoxTooltip());
         helpLabelLabel.setStyleName(HELP_LABEL_STYLE);
 

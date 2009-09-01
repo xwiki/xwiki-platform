@@ -28,6 +28,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Focusable;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -63,7 +64,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * Style used to signal mandatory elements.
      */
-    private static final String MANDATORY_STYLE = "mandatory";
+    private static final String MANDATORY_STYLE = "xMandatory";
 
     /**
      * Style of the information labels.
@@ -239,9 +240,12 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
         FlowPanel panel = new FlowPanel();
         panel.addStyleName(DEFAULT_PANEL_STYLE);
 
-        Label rowsLabel = new Label(Strings.INSTANCE.tableRowsLabel());
+        Panel rowsLabel = new FlowPanel();
         rowsLabel.setStyleName(INFO_LABEL_STYLE);
-        rowsLabel.addStyleDependentName(MANDATORY_STYLE);
+        rowsLabel.add(new InlineLabel(Strings.INSTANCE.tableRowsLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName(MANDATORY_STYLE);
+        rowsLabel.add(mandatoryLabel);
         panel.add(rowsLabel);
 
         Label rowsHelpLabel = new Label(Strings.INSTANCE.tableRowsHelpLabel());
@@ -271,9 +275,12 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
         FlowPanel panel = new FlowPanel();
         panel.addStyleName(DEFAULT_PANEL_STYLE);
 
-        Label colsLabel = new Label(Strings.INSTANCE.tableColsLabel());
+        Panel colsLabel = new FlowPanel();
         colsLabel.setStyleName(INFO_LABEL_STYLE);
-        colsLabel.addStyleDependentName(MANDATORY_STYLE);
+        colsLabel.add(new InlineLabel(Strings.INSTANCE.tableColsLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName(MANDATORY_STYLE);
+        colsLabel.add(mandatoryLabel);
         panel.add(colsLabel);
 
         Label colsHelpLabel = new Label(Strings.INSTANCE.tableColsHelpLabel());

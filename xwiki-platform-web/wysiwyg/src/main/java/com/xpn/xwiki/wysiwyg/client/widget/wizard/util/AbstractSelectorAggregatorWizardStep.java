@@ -32,8 +32,10 @@ import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Wizard step used to aggregate a set of selectors for a file attached (file attachment or image) to a page in the
@@ -44,7 +46,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * @version $Id$
  */
 public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSelectorWizardStep<T> implements
-    SelectionHandler<Integer>
+    SelectionHandler<Integer>, SourcesNavigationEvents, NavigationListener
 {
     /**
      * Loading class for the time to load the step to which it has been toggled.
@@ -82,6 +84,12 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     private ResourceName editedResource;
 
     /**
+     * The navigation listeners for this selector step, to pass further potential navigation events launched by
+     * aggregated steps.
+     */
+    private NavigationListenerCollection listeners = new NavigationListenerCollection();
+
+    /**
      * Creates a new aggregator selector wizard step, for the currently edited resource.
      * 
      * @param editedResource the currently edited resource
@@ -112,9 +120,14 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     {
         if (steps.get(name) == null) {
             // save it in the steps
-            steps.put(name, getStepInstance(name));
+            WizardStep instance = getStepInstance(name);
+            steps.put(name, instance);
+            // add this as a listener, if it's the case, to pass further the navigation events
+            if (instance instanceof SourcesNavigationEvents) {
+                ((SourcesNavigationEvents) instance).addNavigationListener(this);
+            }
             // as uninitialized
-            initialized.put(steps.get(name), false);
+            initialized.put(instance, false);
         }
         return steps.get(name);
     }
@@ -371,5 +384,35 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     public ResourceName getEditedResource()
     {
         return editedResource;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addNavigationListener(NavigationListener listener)
+    {
+        // cannot delegate here because the steps shouldn't be initialized only to add listeners; only current step
+        // should fire navigation events.
+        listeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNavigationListener(NavigationListener listener)
+    {
+        listeners.remove(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onDirection(NavigationDirection direction)
+    {
+        // FIXME: at this point we assume that only the current step will send navigation event, or we relaunch the
+        // navigation events of all steps, regardless if they're active or not. This is a good enough assumption ftm,
+        // since navigation events are issued by user actions and right now only the current step is visible at a given
+        // moment.
+        listeners.fireNavigationEvent(direction);
     }
 }

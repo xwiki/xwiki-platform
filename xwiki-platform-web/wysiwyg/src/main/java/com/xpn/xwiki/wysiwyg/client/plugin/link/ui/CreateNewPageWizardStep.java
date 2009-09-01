@@ -23,6 +23,7 @@ import java.util.EnumSet;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -47,7 +48,7 @@ public class CreateNewPageWizardStep implements WizardStep
      * The style of the fields under error.
      */
     protected static final String FIELD_ERROR_STYLE = "xFieldError";
-    
+
     /**
      * Main panel of this wizard.
      */
@@ -81,9 +82,12 @@ public class CreateNewPageWizardStep implements WizardStep
     public CreateNewPageWizardStep(ResourceName editedResource)
     {
         this.editedResource = editedResource;
-        Label pageNameLabel = new Label(Strings.INSTANCE.linkNewPageLabel());
+        Panel pageNameLabel = new FlowPanel();
         pageNameLabel.setStyleName("xInfoLabel");
-        pageNameLabel.addStyleDependentName("mandatory");
+        pageNameLabel.add(new InlineLabel(Strings.INSTANCE.linkNewPageLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName("xMandatory");
+        pageNameLabel.add(mandatoryLabel);
         Label helpPageNameLabel = new Label(Strings.INSTANCE.linkNewPageTextBoxTooltip());
         helpPageNameLabel.setStyleName("xHelpLabel");
 

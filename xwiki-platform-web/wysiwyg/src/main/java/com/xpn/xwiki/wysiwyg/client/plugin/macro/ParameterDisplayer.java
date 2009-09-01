@@ -20,7 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.HasFocus;
@@ -64,11 +66,14 @@ public class ParameterDisplayer
     {
         this.descriptor = descriptor;
 
-        Label label = new Label(descriptor.getName());
+        Panel label = new FlowPanel();
         label.setStylePrimaryName("xMacroParameterLabel");
+        label.add(new InlineLabel(descriptor.getName()));
         if (descriptor.isMandatory()) {
-            label.addStyleDependentName("mandatory");
-        }
+            InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+            mandatoryLabel.addStyleName("xMandatory");
+            label.add(mandatoryLabel);
+        }        
 
         Label description = new Label(descriptor.getDescription());
         description.addStyleName("xMacroParameterDescription");

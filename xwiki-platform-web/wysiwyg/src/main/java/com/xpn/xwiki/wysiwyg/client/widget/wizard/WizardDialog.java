@@ -28,7 +28,6 @@ import org.xwiki.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
@@ -139,28 +138,9 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
         // add the buttons
         // add here the cancel button if you want one on the form
 
-        // special handling of the previous button since it needs to be added only if wizard allows it and placed in
-        // special containers
+        // special handling of the previous button since it needs to be added only if wizard allows it
         if (hasPrevious && validDirections.contains(NavigationDirection.PREVIOUS)) {
-            String previousLabel = step.getDirectionName(NavigationDirection.PREVIOUS);
-            if (previousLabel == null) {
-                previousLabel = Strings.INSTANCE.wizardPrevious();
-            }
-            Button previousButton = new Button(previousLabel);
-            previousButton.addClickHandler(new ClickHandler()
-            {
-                public void onClick(ClickEvent event)
-                {
-                    navigationListeners.fireNavigationEvent(NavigationDirection.PREVIOUS);
-                }
-            });
-            // wrap the previous button in a div for the sake of styling
-            FlowPanel previousPanel = new FlowPanel();
-            previousPanel.addStyleName("button-container");
-            previousPanel.add(previousButton);
-            // insert the button panel first
-            getHeader().insert(previousPanel, 0);
-            buttons.add(previousButton);
+            addButton(step, NavigationDirection.PREVIOUS, getFooter(), Strings.INSTANCE.wizardPrevious());
         }
 
         if (validDirections.contains(NavigationDirection.NEXT)) {

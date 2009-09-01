@@ -21,7 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
@@ -51,9 +53,12 @@ public class ClipboardImportTab extends Composite
         mainPanel = new FlowPanel();
 
         // Info label.
-        Label infoLabel = new Label(Strings.INSTANCE.importerClipboardTabInfoLabel());
+        Panel infoLabel = new FlowPanel();
         infoLabel.setStyleName("xInfoLabel");
-        infoLabel.addStyleDependentName("mandatory");
+        infoLabel.add(new InlineLabel(Strings.INSTANCE.importerClipboardTabInfoLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName("xMandatory");
+        infoLabel.add(mandatoryLabel);
         Label helpLabel = new Label(Strings.INSTANCE.importerClipboardTabHelpLabel());
         helpLabel.setStyleName("xHelpLabel");
         mainPanel.add(infoLabel);

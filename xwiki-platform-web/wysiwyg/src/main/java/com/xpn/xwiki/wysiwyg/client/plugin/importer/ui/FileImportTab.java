@@ -23,7 +23,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
@@ -61,9 +63,12 @@ public class FileImportTab extends Composite
         mainPanel = new FlowPanel();
 
         // Info label.
-        Label infoLabel = new Label(Strings.INSTANCE.importerFileTabInfoLabel());
+        Panel infoLabel = new FlowPanel();
         infoLabel.setStyleName("xInfoLabel");
-        infoLabel.addStyleDependentName("mandatory");
+        infoLabel.add(new InlineLabel(Strings.INSTANCE.importerFileTabInfoLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName("xMandatory");
+        infoLabel.add(mandatoryLabel);
         mainPanel.add(infoLabel);
 
         Label helpLabel = new Label(Strings.INSTANCE.importerFileTabHelpLabel());

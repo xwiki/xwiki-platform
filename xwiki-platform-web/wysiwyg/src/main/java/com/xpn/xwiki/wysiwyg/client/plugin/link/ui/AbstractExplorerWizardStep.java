@@ -207,12 +207,9 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     {
         errorLabel.setVisible(false);
         // remove the class from the wrapper level, the element of this explorer
-        String className = explorer.getElement().getClassName();
-        if (className.contains(FIELD_ERROR_STYLE)) {
-            explorer.getElement().setClassName(
-                className.substring(0, className.indexOf(FIELD_ERROR_STYLE))
-                    + className.substring(className.indexOf(FIELD_ERROR_STYLE) + FIELD_ERROR_STYLE.length()));
-        }
+        String boundary = "\b";
+        explorer.getElement().setClassName(
+            explorer.getElement().getClassName().replaceAll(boundary + FIELD_ERROR_STYLE + boundary, ""));
         mainPanel.refreshHeights();
     }
 }

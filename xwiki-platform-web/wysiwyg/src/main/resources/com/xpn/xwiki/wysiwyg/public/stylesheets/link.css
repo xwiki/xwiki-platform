@@ -1,8 +1,3 @@
-/* The width does not seem to be set on IE for the xwiki explorer input. The following should fit correctly*/
-.xExplorer input {
-  width: 98%;
-}
-
 .xExplorer .listGrid {
   border: none;
 }

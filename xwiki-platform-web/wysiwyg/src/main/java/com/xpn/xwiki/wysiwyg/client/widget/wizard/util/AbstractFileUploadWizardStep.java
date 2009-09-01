@@ -26,6 +26,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
@@ -80,9 +81,12 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
         fileUploadForm.setMethod(FormPanel.METHOD_POST);
         // set the url on submit time, just before upload
 
-        Label fileLabel = new Label(getFileLabel());
+        Panel fileLabel = new FlowPanel();
         fileLabel.setStyleName("xInfoLabel");
-        fileLabel.addStyleDependentName("mandatory");
+        fileLabel.add(new InlineLabel(getFileLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName("xMandatory");
+        fileLabel.add(mandatoryLabel);
         fileUploadInput.setName(getFileUploadInputName());
         // FIXME: this should be set from CSS, but it's not possible on all browsers
         fileUploadInput.getElement().setAttribute("size", "50");

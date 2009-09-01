@@ -21,8 +21,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.List;
 
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
@@ -35,6 +41,10 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
@@ -42,35 +52,9 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
  * 
  * @version $Id$
  */
-public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardStep<ImageConfig>
+public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements
+    DoubleClickHandler, KeyUpHandler, SourcesNavigationEvents
 {
-    /**
-     * Fake image preview widget to hold the option of attaching a new image.
-     */
-    private static class NewImageOptionWidget extends ImagePreviewWidget
-    {
-        /**
-         * Default constructor.
-         */
-        public NewImageOptionWidget()
-        {
-            super(null);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Widget getUI()
-        {
-            FlowPanel newOptionPanel = new FlowPanel();
-            newOptionPanel.addStyleName("xNewImagePreview");
-            Label newOptionLabel = new Label(Strings.INSTANCE.imageUploadNewFileLabel());
-            newOptionPanel.add(newOptionLabel);
-            return newOptionPanel;
-        }
-    }
-
     /**
      * The style for an field in error.
      */
@@ -94,7 +78,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     /**
      * The list of images.
      */
-    private ListBox imageList = new ListBox();
+    private ListBox<Attachment> imageList = new ListBox<Attachment>();
 
     /**
      * Label to display the selection error in this wizard step.
@@ -105,6 +89,12 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
      * Specifies whether the new image option should be shown on top or on bottom of the list.
      */
     private boolean newOptionOnTop;
+
+    /**
+     * Navigation listeners to be notified by navigation events from this step. It generates navigation to the next step
+     * when an item is double clicked in the list, or enter key is pressed on a selected item.
+     */
+    private final NavigationListenerCollection navigationListeners = new NavigationListenerCollection();
 
     /**
      * Builds a selector from the images of the specified current page to edit the specified resource.
@@ -126,7 +116,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         errorLabel.setVisible(false);
         mainPanel.add(errorLabel);
 
-        // create an empty images list
+        imageList.addKeyUpHandler(this);
+        imageList.addDoubleClickHandler(this);
         mainPanel.add(imageList);
         mainPanel.setExpandingWidget(imageList, false);
         // put the new image option on top
@@ -197,23 +188,19 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         if (!StringUtils.isEmpty(getData().getReference())) {
             ResourceName r = new ResourceName(getData().getReference(), true);
             oldSelection = r.getFile();
-        } else if (imageList.getSelectedItem() != null
-            && !(imageList.getSelectedItem().getWidget(0) instanceof NewImageOptionWidget)) {
-            oldSelection =
-                ((ImagePreviewWidget) imageList.getSelectedItem().getWidget(0)).getAttachment().getFilename();
+        } else if (imageList.getSelectedItem() != null && imageList.getSelectedItem().getData() != null) {
+            oldSelection = imageList.getSelectedItem().getData().getFilename();
         }
         imageList.clear();
         for (Attachment attach : attachments) {
-            ListItem newItem = new ListItem();
-            newItem.add(new ImagePreviewWidget(attach));
+            ListItem<Attachment> newItem = getImageListItem(attach);
             imageList.addItem(newItem);
             // preserve selection
             if (oldSelection != null && oldSelection.equals(attach.getFilename())) {
                 imageList.setSelectedItem(newItem);
             }
         }
-        ListItem newOptionListItem = new ListItem();
-        newOptionListItem.add(new NewImageOptionWidget());
+        ListItem<Attachment> newOptionListItem = getNewImageListItem();
         if (newOptionOnTop) {
             imageList.insertItem(newOptionListItem, 0);
         } else {
@@ -224,8 +211,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         }
 
         // fake container to clear the floats set for the images preview. It's here exclusively for styling reasons
-        ListItem fakeClearListItem = new ListItem();
-        fakeClearListItem.addStyleName("clearfloats");
+        ListItem<Attachment> fakeClearListItem = new ListItem<Attachment>();
+        fakeClearListItem.setStyleName("clearfloats");
         imageList.addItem(fakeClearListItem);
     }
 
@@ -243,8 +230,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     public String getNextStep()
     {
         // check out the selection
-        if (imageList.getSelectedItem() != null
-            && imageList.getSelectedItem().getWidget(0) instanceof NewImageOptionWidget) {
+        if (imageList.getSelectedItem() != null && imageList.getSelectedItem().getData() == null) {
             return ImageWizardSteps.IMAGE_UPLOAD.toString();
         }
         return ImageWizardSteps.IMAGE_CONFIG.toString();
@@ -271,15 +257,13 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     public void onSubmit(AsyncCallback<Boolean> async)
     {
         hideError();
-        ImagePreviewWidget selectedOption =
-            (ImagePreviewWidget) 
-                (imageList.getSelectedItem() != null ? imageList.getSelectedItem().getWidget(0) : null);
-        if (selectedOption == null) {
+        if (imageList.getSelectedItem() == null) {
             displayError(Strings.INSTANCE.imageNoImageSelectedError());
             async.onSuccess(false);
             return;
         }
-        if (selectedOption instanceof NewImageOptionWidget) {
+        Attachment selectedImage = imageList.getSelectedItem() != null ? imageList.getSelectedItem().getData() : null;
+        if (selectedImage == null) {
             // new image option, let's setup the image data accordingly, to be handled by the file upload step
             getData().setWiki(currentPage.getWiki());
             getData().setSpace(currentPage.getSpace());
@@ -290,19 +274,55 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
             boolean changedFile = true;
             ResourceName editedFile = new ResourceName(getData().getReference(), true);
             if (!StringUtils.isEmpty(getData().getReference())
-                && editedFile.getFile().equals(selectedOption.getAttachment().getFilename())) {
+                && editedFile.getFile().equals(selectedImage.getFilename())) {
                 changedFile = false;
             }
             if (changedFile) {
                 // existing file option, set up the ImageConfig
                 // image reference has to be relative to the currently edited currentPage
                 // FIXME: move the reference setting logic in a controller
-                ResourceName ref = new ResourceName(selectedOption.getAttachment().getReference(), true);
+                ResourceName ref = new ResourceName(selectedImage.getReference(), true);
                 getData().setReference(ref.getRelativeTo(editedResource).toString());
-                getData().setImageURL(selectedOption.getAttachment().getDownloadUrl());
+                getData().setImageURL(selectedImage.getDownloadUrl());
             }
             async.onSuccess(true);
         }
+    }
+
+    /**
+     * Creates a list item with an image preview.
+     * 
+     * @param image the attachment data for the image to preview
+     * @return a list item containing a preview of the {@code image}.
+     */
+    protected ListItem<Attachment> getImageListItem(Attachment image)
+    {
+        ListItem<Attachment> imageItem = new ListItem<Attachment>();
+        imageItem.setData(image);
+        Image htmlImage = new Image(image.getDownloadUrl() + "?width=135");
+        htmlImage.setTitle(image.getFilename());
+        FlowPanel previewPanel = new FlowPanel();
+        previewPanel.addStyleName("xImagePreview");
+        previewPanel.add(htmlImage);
+        imageItem.add(previewPanel);
+        return imageItem;
+    }
+
+    /**
+     * Creates the list item for the new image upload option.
+     * 
+     * @return a list item with the new image option.
+     */
+    protected ListItem<Attachment> getNewImageListItem()
+    {
+        ListItem<Attachment> newImageOption = new ListItem<Attachment>();
+        newImageOption.setData(null);
+        FlowPanel newOptionPanel = new FlowPanel();
+        newOptionPanel.addStyleName("xNewImagePreview");
+        Label newOptionLabel = new Label(Strings.INSTANCE.imageUploadNewFileLabel());
+        newOptionPanel.add(newOptionLabel);
+        newImageOption.add(newOptionPanel);
+        return newImageOption;
     }
 
     /**
@@ -326,5 +346,44 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         errorLabel.setVisible(false);
         imageList.removeStyleName(FIELD_ERROR_STYLE);
         mainPanel.refreshHeights();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
+     */
+    public void onDoubleClick(DoubleClickEvent event)
+    {
+        if (event.getSource() == imageList && imageList.getSelectedItem() != null) {
+            navigationListeners.fireNavigationEvent(NavigationDirection.NEXT);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onKeyUp(KeyUpEvent event)
+    {
+        if (event.getSource() == imageList && event.getNativeKeyCode() == KeyCodes.KEY_ENTER
+            && imageList.getSelectedItem() != null) {
+            navigationListeners.fireNavigationEvent(NavigationDirection.NEXT);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addNavigationListener(NavigationListener listener)
+    {
+        navigationListeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNavigationListener(NavigationListener listener)
+    {
+        navigationListeners.remove(listener);
     }
 }

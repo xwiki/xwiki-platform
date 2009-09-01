@@ -21,9 +21,12 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
  * Wizard step to collect the data about an external link (e.g. http: or mailto:). Extends the default link
@@ -54,9 +57,12 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     public AbstractExternalLinkWizardStep()
     {
         super();
-        Label urlLabel = new Label(getURLLabel());
+        Panel urlLabel = new FlowPanel();
         urlLabel.setStyleName(INFO_LABEL_STYLE);
-        urlLabel.addStyleDependentName("mandatory");
+        urlLabel.add(new InlineLabel(getURLLabel()));
+        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+        mandatoryLabel.addStyleName("xMandatory");
+        urlLabel.add(mandatoryLabel);
         Label helpUrlLabel = new Label(getURLHelpLabel());
         helpUrlLabel.setStyleName(HELP_LABEL_STYLE);
 
@@ -110,7 +116,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
     {
         return mainPanel;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -123,10 +129,10 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         if (urlTextBox.getText().trim().length() == 0) {
             displayURLError(getURLErrorMessage());
             result = false;
-        }        
+        }
         return result;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -136,7 +142,7 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
         super.saveForm();
         String linkUri = buildURL();
         getLinkData().setUrl(linkUri);
-        getLinkData().setReference(linkUri);        
+        getLinkData().setReference(linkUri);
     }
 
     /**

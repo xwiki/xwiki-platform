@@ -20,7 +20,6 @@
  */
 package com.xpn.xwiki.internal.observation.remote.converter;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,7 +67,7 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
 
             if (this.actions.contains(event.getActionName())) {
                 // fill the remote event
-                remoteEvent.setEvent((Serializable) localEvent.getEvent());
+                remoteEvent.setEvent(event);
                 remoteEvent.setSource(serializeXWikiDocument((XWikiDocument) localEvent.getSource()));
                 remoteEvent.setData(serializeXWikiContext((XWikiContext) localEvent.getData()));
             }
@@ -88,7 +87,7 @@ public class ActionExecutionEventConverter extends AbstractXWikiEventConverter
     public boolean fromRemote(RemoteEventData remoteEvent, LocalEventData localEvent)
     {
         if (remoteEvent.getEvent() instanceof ActionExecutionEvent) {
-         // fill the local event
+            // fill the local event
             XWikiContext context = unserializeXWikiContext(remoteEvent.getData());
 
             if (context != null) {

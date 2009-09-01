@@ -27,7 +27,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
 
 /**
- * Plug-in for for managing streams of activity events
+ * Plug-in for for managing streams of activity events.
  * 
  * @see ActivityStream
  * @version $Id: $
@@ -35,14 +35,22 @@ import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
 public class ActivityStreamPlugin extends XWikiDefaultPlugin
 {
     /**
-     * We should user inversion of control instead
+     * Name of the plugin.
+     */
+    public static final String PLUGIN_NAME = "activitystream";
+    
+    /**
+     * We should user inversion of control instead.
      */
     private ActivityStream activityStream;
 
-    public static final String PLUGIN_NAME = "activitystream";
-
     /**
+     * Constructor.
+     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
+     * @param name name of the plugin
+     * @param className class name of the plugin
+     * @param context the XWiki context
      */
     public ActivityStreamPlugin(String name, String className, XWikiContext context)
     {
@@ -112,6 +120,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
         try {
             activityStream.init(context);
         } catch (Exception e) {
+            // Do nothing.
         }
     }
 

@@ -54,10 +54,12 @@ import com.sun.syndication.io.SyndFeedOutput;
  */
 public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotificationInterface
 {
-    public void initClasses(XWikiContext context) throws XWikiException
+    public void init(XWikiContext context) throws XWikiException
     {
         // listen to notifications
         context.getWiki().getNotificationManager().addGeneralRule(new DocChangeRule(this));
+        // init activitystream cleaner
+        ActivityStreamCleaner.getInstance().init(context);
     }
 
     protected void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
@@ -338,10 +340,19 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         boolean bTransaction = true;
         ActivityEventImpl evImpl = loadActivityEvent(event, true, context);
+        String oriDatabase = context.getDatabase();
 
         if (useLocalStore(context)) {
+            XWikiHibernateStore hibstore;
+            
             // delete event from the local database
-            XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
+            if (context.getDatabase().equals(event.getWiki())) {
+                hibstore = context.getWiki().getHibernateStore();
+            } else {
+                context.setDatabase(event.getWiki());
+                hibstore = context.getWiki().getHibernateStore();
+            }
+            
             try {
                 if (bTransaction) {
                     hibstore.checkHibernate(context);
@@ -363,6 +374,9 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
                     if (bTransaction) {
                         hibstore.endTransaction(context, false);
                     }
+                    if (context.getDatabase().equals(oriDatabase)) {
+                        context.setDatabase(oriDatabase);
+                    }
                 } catch (Exception e) {
                 }
             }
@@ -370,7 +384,6 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
 
         if (useMainStore(context)) {
             // delete event from the main database
-            String oriDatabase = context.getDatabase();
             context.setDatabase(context.getMainXWiki());
             XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
             try {
@@ -390,28 +403,34 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
             } catch (XWikiException e) {
                 throw new ActivityStreamException();
             } finally {
-                try {
-                    context.setDatabase(oriDatabase);
+                try {                    
                     if (bTransaction) {
                         hibstore.endTransaction(context, false);
                     }
+                    context.setDatabase(oriDatabase);
                 } catch (Exception e) {
                 }
             }
         }
     }
 
-    public List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context) 
         throws ActivityStreamException
     {
         return searchEvents("", hql, filter, nb, start, context);
     }
-    
+
     public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start, 
         XWikiContext context) throws ActivityStreamException
-{
-    return searchEvents("", hql, filter, globalSearch, nb, start, context);
-}
+    {
+        return searchEvents("", hql, filter, globalSearch, nb, start, context);
+    }
+
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start, 
+        List<Object> parameterValues, XWikiContext context) throws ActivityStreamException
+    {
+        return searchEvents("", hql, filter, globalSearch, nb, start, parameterValues, context);
+    }
 
     /**
      * Alternate searchEvents function for the Activiy Stream

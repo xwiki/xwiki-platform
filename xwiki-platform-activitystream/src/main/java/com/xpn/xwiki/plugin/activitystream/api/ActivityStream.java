@@ -35,9 +35,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface ActivityStream
 {
     /**
-     * Creates the classes used by the activity stream when necessary
+     * Init method, must be called on plugin init.
      */
-    void initClasses(XWikiContext context) throws XWikiException;
+    void init(XWikiContext context) throws XWikiException;
 
     /**
      * Tranforms space name into stream name
@@ -86,6 +86,9 @@ public interface ActivityStream
     
     List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start,
         XWikiContext context) throws ActivityStreamException;
+    
+    List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start,
+        List<Object> parameterValues, XWikiContext context) throws ActivityStreamException;
 
     List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
             XWikiContext context) throws ActivityStreamException;

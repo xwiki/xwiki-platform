@@ -3239,7 +3239,6 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 
 #docExtraTabs {
   border: 0px !important;
-  background-color: white;
 }
 
 #docextrapanes {
@@ -3653,18 +3652,6 @@ div.xwikipanelcontents {
 
 .xwikipanelcontents a {
   color: $theme.linkColor;
-}
-
-/**********************************************************************************************/
-/** Tabs **/
-
-/* Bg-color needed for IE6 */
-#docExtraTabs {
-  background: $theme.menuBackgroundColor;
-}
-
-#xwikidatacontents {
-  background: $theme.menuBackgroundColor;
 }
 
 /**********************************************************************************************/

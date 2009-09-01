@@ -31,66 +31,141 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
  */
 public class ActivityEventImpl implements ActivityEvent
 {
-    protected String eventId;
+    /**
+     * ID.
+     */
+    private String eventId;
 
-    protected String requestId;
+    /**
+     * Request ID.
+     */
+    private String requestId;
 
-    protected int priority = 0;
+    /**
+     * Priority.
+     */
+    private int priority;
 
-    protected Date date;
+    /**
+     * Date the event occured.
+     */
+    private Date date;
 
-    protected String stream;
+    /**
+     * Stream the event belongs to.
+     */
+    private String stream;
 
-    protected String application;
+    /**
+     * Application which fired the event (as of august 2009 this application is always "xwiki").
+     */
+    private String application;
 
-    protected String type;
+    /**
+     * Type of the event, see {@link ActivityEventType}.
+     */
+    private String type;
 
-    protected String user;
+    /**
+     * Context user at the time the event has been fired.
+     */
+    private String user;
 
-    protected String wiki;
+    /**
+     * Wiki in which the event occured, example: "xwiki".
+     */
+    private String wiki;
 
-    protected String space;
+    /**
+     * Space in which the event occured, example: "Main".
+     */
+    private String space;
 
-    protected String page;
+    /**
+     * Name of the document which fired the event, example: "Main.WebHome".
+     */
+    private String page;
 
-    protected String url;
+    /**
+     * URL of the document which fired the event, example: "/xwiki/bin/view/Main/WebHome".
+     */
+    private String url;
 
-    protected String title;
+    /**
+     * Title of the event.
+     */
+    private String title;
 
-    protected String body = "";
+    /**
+     * Body message of the event.
+     */
+    private String body = "";
     
-    protected String version = "";
+    /**
+     * Version of the document at the time the event occured.
+     */
+    private String version = "";
 
-    protected String param1 = "";
+    /**
+     * Free param 1.
+     */
+    private String param1 = "";
 
-    protected String param2 = "";
+    /**
+     * Free param 2.
+     */
+    private String param2 = "";
 
-    protected String param3 = "";
+    /**
+     * Free param 3.
+     */
+    private String param3 = "";
 
-    protected String param4 = "";
+    /**
+     * Free param 4.
+     */
+    private String param4 = "";
 
-    protected String param5 = "";
+    /**
+     * Free param 5.
+     */
+    private String param5 = "";
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDisplayTitle(XWikiContext context)
     {
         return context.getMessageTool().get(title, getParams());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDisplayBody(XWikiContext context)
     {
         return context.getMessageTool().get(body, getParams());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDisplayDate(XWikiContext context)
     {
         return context.getWiki().formatDate(date, null, context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDisplayUser(XWikiContext context)
     {
         return context.getWiki().getLocalUserName(user, context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setParams(List<String> params)
     {
         if (params != null) {
@@ -112,6 +187,9 @@ public class ActivityEventImpl implements ActivityEvent
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public List<String> getParams()
     {
         List<String> params = new ArrayList<String>();
@@ -123,51 +201,81 @@ public class ActivityEventImpl implements ActivityEvent
         return params;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getEventId()
     {
         return eventId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setEventId(String eventId)
     {
         this.eventId = eventId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getRequestId()
     {
         return requestId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setRequestId(String requestId)
     {
         this.requestId = requestId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int getPriority()
     {
         return priority;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setPriority(int priority)
     {
         this.priority = priority;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getApplication()
     {
         return application;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setStream(String stream)
     {
         this.stream = stream;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public String getVersion()
     {
         return version;
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public void setVersion(String version)
     {
         if (version != null) {
@@ -175,151 +283,241 @@ public class ActivityEventImpl implements ActivityEvent
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getParam1()
     {
         return param1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setParam1(String param1)
     {
         this.param1 = param1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getParam2()
     {
         return param2;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setParam2(String param2)
     {
         this.param2 = param2;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getParam3()
     {
         return param3;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setParam3(String param3)
     {
         this.param3 = param3;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getParam4()
     {
         return param4;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setParam4(String param4)
     {
         this.param4 = param4;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getParam5()
     {
         return param5;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setParam5(String param5)
     {
         this.param5 = param5;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getWiki()
     {
         return wiki;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getType()
     {
         return type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setType(String type)
     {
         this.type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getUser()
     {
         return user;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setUser(String user)
     {
         this.user = user;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getSpace()
     {
         return space;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setSpace(String space)
     {
         this.space = space;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getPage()
     {
         return page;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setPage(String page)
     {
         this.page = page;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getUrl()
     {
         return url;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setUrl(String url)
     {
         this.url = url;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getTitle()
     {
         return title;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setTitle(String title)
     {
         this.title = title;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getBody()
     {
         return body;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setBody(String body)
     {
         this.body = body;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Date getDate()
     {
         return date;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setDate(Date date)
     {
         this.date = date;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getStream()
     {
         return stream;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setApplication(String application)
     {
         this.application = application;

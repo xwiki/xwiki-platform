@@ -184,12 +184,12 @@ public interface ActivityEvent
      * @see #getBody()
      */
     void setBody(String body);
-    
+
     /**
      * @return The document version on the event
      */
     String getVersion();
-    
+
     /**
      * @param version Version on this event
      * @see #getVersion()
@@ -252,41 +252,33 @@ public interface ActivityEvent
     void setParam5(String param5);
 
     /**
-     * Retrieves the event in displayable format
-     * 
-     * @param context
-     * @return
+     * @param context the XWiki context
+     * @return the event title in a human readable format
      */
     String getDisplayTitle(XWikiContext context);
 
     /**
-     * Retrieves the event body in displayable format
-     * 
-     * @param context
-     * @return
+     * @param context the XWiki context
+     * @return the event body in a human readable format
      */
     String getDisplayBody(XWikiContext context);
 
     /**
-     * Retrieves the event date in displayable format
-     * 
-     * @param context
-     * @return
+     * @param context the XWiki context
+     * @return the event date in a human readable format
      */
     String getDisplayDate(XWikiContext context);
 
     /**
-     * Retrieves the event user in displayable format
-     * 
-     * @param context
-     * @return
+     * @param context the XWiki context
+     * @return the event user in a human readable format (example: Administrator instead of XWiki.Admin)
      */
     String getDisplayUser(XWikiContext context);
 
     /**
-     * Set all params at once
+     * Set all params at once.
      * 
-     * @param params
+     * @param params parameters to set
      */
     void setParams(List<String> params);
 

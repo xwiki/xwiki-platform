@@ -36,7 +36,7 @@ import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
  * 
  * @version $Id$
  */
-public class ActivityStreamCleaner
+public final class ActivityStreamCleaner
 {
     /**
      * Logger.
@@ -105,6 +105,34 @@ public class ActivityStreamCleaner
         String pref = plugin.getActivityStreamPreference("daystokeepevents", "0", context);
         return Integer.parseInt(pref);
     }
+    
+    /**
+     * Set cleaner common documents fields.
+     * 
+     * @param doc document to modify
+     * @return true if the fields have been modified, false otherwise
+     */
+    private boolean setCleanerCommonDocumentsFields(XWikiDocument doc)
+    {
+        boolean needsUpdate = false;
+
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(XWIKI_DEFAULT_ADMIN);
+        }
+
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator(XWIKI_DEFAULT_ADMIN);
+        }
+
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("Scheduler.WebHome");
+        }
+
+        return needsUpdate;
+    }
                                               
     /**
      * Create the XWiki rights object in the cleaner job document.
@@ -142,23 +170,9 @@ public class ActivityStreamCleaner
         BaseObject job = null;
 
         try {
-            doc = context.getWiki().getDocument(CLEANER_JOB_DOCNAME, context);
+            doc = context.getWiki().getDocument(CLEANER_JOB_DOCNAME, context);            
+            needsUpdate = setCleanerCommonDocumentsFields(doc);       
             
-            if (StringUtils.isBlank(doc.getAuthor())) {
-                needsUpdate = true;
-                doc.setAuthor(XWIKI_DEFAULT_ADMIN);
-            }
-
-            if (StringUtils.isBlank(doc.getCreator())) {
-                needsUpdate = true;
-                doc.setCreator(XWIKI_DEFAULT_ADMIN);
-            }
-
-            if (StringUtils.isBlank(doc.getParent())) {
-                needsUpdate = true;
-                doc.setParent("Scheduler.WebHome");
-            }
-
             job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
             if (job == null) {
                 needsUpdate = true;

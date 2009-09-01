@@ -32,14 +32,18 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 
 /**
- * API for {@link ActivityStreamPlugin}
+ * API for {@link ActivityStreamPlugin}.
  * 
  * @version $Id: $
  */
 public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 {
     /**
+     * Constructor.
+     * 
      * @see PluginApi#PluginApi(XWikiPluginInterface, XWikiContext)
+     * @param plugin plugin to wrap
+     * @param context the XWiki context
      */
     public ActivityStreamPluginApi(ActivityStreamPlugin plugin, XWikiContext context)
     {
@@ -55,11 +59,10 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Record in database the given {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEvent}
-     * event
+     * Record in database the given {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEvent} event.
      * 
      * @param event the event to record in databases
-     * @throws ActivityStreamException
+     * @throws ActivityStreamException if the event addition fails
      */
     public void addActivityEvent(com.xpn.xwiki.plugin.activitystream.api.ActivityEvent event)
         throws ActivityStreamException
@@ -70,17 +73,15 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Records in database the a event built upon the passed parameters
+     * Records in database the a event built upon the passed parameters.
      * 
      * @param streamName the name of the stream to record the event for
-     * @param type the type of event. The type can be a value picked from the list of values defined
-     *            in {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEventType} or any other
-     *            String
+     * @param type the type of event. The type can be a value picked from the list of values defined in
+     *            {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEventType} or any other String
      * @param title the event title
-     * @throws ActivityStreamException
+     * @throws ActivityStreamException if the event addition fails
      */
-    public void addActivityEvent(String streamName, String type, String title)
-        throws ActivityStreamException
+    public void addActivityEvent(String streamName, String type, String title) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
             getActivityStream().addActivityEvent(streamName, type, title, context);
@@ -88,11 +89,16 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * @see #addActivityEvent(String, String, String)
-     * @param params a list of up to 5 "free" String parameters that will be associated with the
-     *            event
+     * Records in database an event built upon the passed document and other parameters. The passed document is used to
+     * retrieve document-related data for the event : date, page name, database.
+     * 
+     * @param streamName name of the stream to use for the addition
+     * @param type type of the event
+     * @param title title of the event
+     * @param params parameters of the event
+     * @throws ActivityStreamException if the addition to the stream fails
      */
-    public void addActivityEvent(String streamName, String type, String title, List params)
+    public void addActivityEvent(String streamName, String type, String title, List<String> params)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -101,36 +107,39 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Records in database an event built upon the passed document and other parameters. The passed
-     * document is used to retrieve document-related data for the event : date, page name, database.
+     * Records in database an event built upon the passed document and other parameters. The passed document is used to
+     * retrieve document-related data for the event : date, page name, database.
      * 
      * @param streamName the name of the stream to add the event to
      * @param doc the document from which to retrieve document data for the event
      * @param type the type of event. (see {@link #addActivityEvent(String, String, String)}
      * @param title the title of the event
-     * @throws ActivityStreamException
+     * @throws ActivityStreamException if the event addition fails
      */
-    public void addDocumentActivityEvent(String streamName, Document doc, String type,
-        String title) throws ActivityStreamException
+    public void addDocumentActivityEvent(String streamName, Document doc, String type, String title)
+        throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
-                title, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, context);
         }
     }
 
     /**
-     * @see #addDocumentActivityEvent(String, Document, String, String)
-     * @param priority the priority for this event. see
-     *            {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority}
-     * @throws ActivityStreamException
+     * Records in database an event built upon the passed document and other parameters. The passed document is used to
+     * retrieve document-related data for the event : date, page name, database.
+     * 
+     * @param streamName name of the stream to use for the addition
+     * @param doc which fired the event
+     * @param type type of the event
+     * @param priority priority of the event
+     * @param title title of the event
+     * @throws ActivityStreamException if the addition to the stream fails
      */
-    public void addDocumentActivityEvent(String streamName, Document doc, String type,
-        int priority, String title) throws ActivityStreamException
+    public void addDocumentActivityEvent(String streamName, Document doc, String type, int priority, String title)
+        throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
-                priority, title, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title, context);
         }
     }
 
@@ -138,16 +147,14 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * Delete the passed events from the database.
      * 
      * @param evs the events to be deleted
+     * @throws ActivityStreamException if the event deletion fails
      */
     public void deleteActivityEvents(List<ActivityEvent> evs) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events =
-                unwrapEvents(evs);
-            {
-                for (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent ev : events) {
-                    getActivityStream().deleteActivityEvent(ev, context);
-                }
+            List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events = unwrapEvents(evs);
+            for (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent ev : events) {
+                getActivityStream().deleteActivityEvent(ev, context);
             }
         }
     }
@@ -156,6 +163,7 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * Delete the passed event form the database.
      * 
      * @param event the event to delete from database
+     * @throws ActivityStreamException if the event deletion fails
      */
     public void deleteActivityEvent(ActivityEvent event) throws ActivityStreamException
     {
@@ -165,44 +173,55 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * @see #addDocumentActivityEvent(String, Document, String, String)
-     * @param params a list of up to 5 "free" String parameters that will be associated with the
-     *            event
-     * @throws ActivityStreamException
+     * Records in database an event built upon the passed document and other parameters. The passed document is used to
+     * retrieve document-related data for the event : date, page name, database.
+     * 
+     * @param streamName name of the stream to use for the addition
+     * @param doc which fired the event
+     * @param type type of the event
+     * @param title title of the event
+     * @param params parameters of the event
+     * @throws ActivityStreamException if the addition to the stream fails
      */
-    public void addDocumentActivityEvent(String streamName, Document doc, String type,
-        String title, List params) throws ActivityStreamException
+    public void addDocumentActivityEvent(String streamName, Document doc, String type, String title, 
+        List<String> params) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
-                title, params, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, params, context);
         }
     }
 
     /**
-     * @see #addDocumentActivityEvent(String, Document, String, int, String)
-     * @see #addDocumentActivityEvent(String, Document, String, String, List)
+     * Records in database an event built upon the passed document and other parameters. The passed document is used to
+     * retrieve document-related data for the event : date, page name, database.
+     * 
+     * @param streamName name of the stream to use for the addition
+     * @param doc which fired the event
+     * @param type type of the event
+     * @param priority priority of the event
+     * @param title title of the event
+     * @param params parameters of the event
+     * @throws ActivityStreamException if the addition to the stream fails
      */
-    public void addDocumentActivityEvent(String streamName, Document doc, String type,
-        int priority, String title, List params) throws ActivityStreamException
+    public void addDocumentActivityEvent(String streamName, Document doc, String type, int priority, String title,
+        List<String> params) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
-                priority, title, params, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title, params,
+                context);
         }
     }
 
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start)
         throws ActivityStreamException
@@ -215,16 +234,16 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
+     * @param globalSearch true if the request must be performed on the main database
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start)
         throws ActivityStreamException
@@ -235,19 +254,18 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             return null;
         }
     }
-    
+
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
      * @param parameterValues list of parameters to insert in the query
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start, List<Object> parameterValues)
         throws ActivityStreamException
@@ -258,25 +276,25 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             return null;
         }
     }
-    
+
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
+     * @param globalSearch true if the request must be performed on the main database
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
      * @param parameterValues list of parameters to insert in the query
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start, 
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, boolean globalSearch, int nb, int start,
         List<Object> parameterValues) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().searchEvents("", hql, filter, globalSearch, nb, start, 
+            return wrapEvents(getActivityStream().searchEvents("", hql, filter, globalSearch, nb, start,
                 parameterValues, context));
         } else {
             return null;
@@ -284,17 +302,16 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start)
         throws ActivityStreamException
@@ -305,21 +322,21 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             return null;
         }
     }
-    
+
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
+     * @param globalSearch true if the request must be performed on the main database
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb, 
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb,
         int start) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -328,10 +345,9 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             return null;
         }
     }
-    
+
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
@@ -339,11 +355,11 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
      * @param parameterValues list of parameters to insert in the query
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start, 
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, int nb, int start,
         List<Object> parameterValues) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -352,22 +368,22 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
             return null;
         }
     }
-    
+
     /**
-     * Search in database activity events matching the given hql query. Retrieved events are ordered
-     * by date descending.
+     * Search in database activity events matching the given hql query. Retrieved events are ordered by date descending.
      * 
      * @param fromHql the "from" clause of the hql query to look events for
      * @param hql the "where" clause of the hql query to look events for
      * @param filter if true, group the matched events by priority
+     * @param globalSearch true if the request must be performed on the main database
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
      * @param parameterValues list of parameters to insert in the query
-     * @return a list of matching events, wrapped as
-     *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
-     * @throws ActivityStreamException
+     * @return a list of matching events, wrapped as {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent}
+     *         objects.
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb, 
+    public List<ActivityEvent> searchEvents(String fromHql, String hql, boolean filter, boolean globalSearch, int nb,
         int start, List<Object> parameterValues) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -378,15 +394,15 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Return the latest recorded events
+     * Return the latest recorded events.
      * 
      * @param filter if true, group the matched events by priority
      * @param nb the number of events to retrieve
      * @param start the offset to start retrieving event at
-     * @throws ActivityStreamException
+     * @return the latest recorded events
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> getEvents(boolean filter, int nb, int start)
-        throws ActivityStreamException
+    public List<ActivityEvent> getEvents(boolean filter, int nb, int start) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().getEvents(filter, nb, start, context));
@@ -396,18 +412,21 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
     }
 
     /**
-     * Return the latest recorded events for the given wiki space
+     * Return the latest recorded events for the given wiki space.
      * 
      * @see #getEvents(boolean, int, int)
      * @param space the space to retrieve latest events for
-     * @throws ActivityStreamException
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return the latest recorded events
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> getEventsForSpace(String space, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForSpace(space, filter, nb, start,
-                context));
+            return wrapEvents(getActivityStream().getEventsForSpace(space, filter, nb, start, context));
         } else {
             return null;
         }
@@ -418,155 +437,266 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
      * 
      * @see #getEvents(boolean, int, int)
      * @param user the user to retrieve latest events for
-     * @throws ActivityStreamException
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return the latest recorded events triggered by the given user.
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> getEventsForUser(String user, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForUser(user, filter, nb, start,
-                context));
+            return wrapEvents(getActivityStream().getEventsForUser(user, filter, nb, start, context));
         } else {
             return null;
         }
     }
 
     /**
-     * Return the latest events recorded for the given stream name
+     * Return the latest events recorded for the given stream name.
      * 
      * @see #getEvents(boolean, int, int)
      * @param streamName the name of the stream to retrieve latest events for
-     * @throws ActivityStreamException
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return the latest events recorded for the given stream name
+     * @throws ActivityStreamException if the search query fails
      */
     public List<ActivityEvent> getEvents(String streamName, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEvents(streamName, filter, nb, start,
-                context));
+            return wrapEvents(getActivityStream().getEvents(streamName, filter, nb, start, context));
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the latest events recorded for the given stream name and wiki space name
+     * Return the latest events recorded for the given stream name in the given space.
      * 
-     * @see #getEventsForSpace(String, boolean, int, int)
-     * @see #getEvents(String, boolean, int, int)
+     * @param streamName the name of the stream to retrieve latest events for
+     * @param space space in which the events have been fired
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return the latest events recorded for the given stream name
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> getEventsForSpace(String streamName, String space, boolean filter,
-        int nb, int start) throws ActivityStreamException
+    public List<ActivityEvent> getEventsForSpace(String streamName, String space, boolean filter, int nb, int start)
+        throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter,
-                nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter, nb, start, context));
         } else {
             return null;
         }
     }
 
     /**
-     * Returns the latest events recorded for the given stream name and user name
+     * Return the latest events recorded for the given stream name and the given user.
      * 
-     * @see #getEventsForUser(String, boolean, int, int)
-     * @see #getEvents(String, boolean, int, int)
+     * @param streamName the name of the stream to retrieve latest events for
+     * @param user context user at the time the events were fired
+     * @param filter if true, group the matched events by priority
+     * @param nb the number of events to retrieve
+     * @param start the offset to start retrieving event at
+     * @return the latest events recorded for the given stream name
+     * @throws ActivityStreamException if the search query fails
      */
-    public List<ActivityEvent> getEventsForUser(String streamName, String user, boolean filter,
-        int nb, int start) throws ActivityStreamException
+    public List<ActivityEvent> getEventsForUser(String streamName, String user, boolean filter, int nb, int start)
+        throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb,
-                start, context));
+            return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb, start, context));
         } else {
             return null;
         }
     }
 
-    protected List<ActivityEvent> wrapEvents(
-        List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events)
+    /**
+     * Wrap a list of events.
+     * 
+     * @param events events to wrap
+     * @return list of wrapped events
+     */
+    private List<ActivityEvent> wrapEvents(List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events)
     {
         List<ActivityEvent> result = new ArrayList<ActivityEvent>();
         if (events != null) {
             for (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent event : events) {
                 com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent wrappedEvent =
-                    new com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent(event,
-                        getXWikiContext());
+                    new com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent(event, getXWikiContext());
                 result.add(wrappedEvent);
             }
         }
         return result;
     }
 
-    protected List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> unwrapEvents(
-        List<ActivityEvent> events)
+    /**
+     * Unwrap a list of events.
+     * 
+     * @param events events to unwrap
+     * @return list of unwrapped events
+     */
+    private List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> unwrapEvents(List<ActivityEvent> events)
     {
         List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> result =
             new ArrayList<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent>();
         if (events != null) {
             for (ActivityEvent event : events) {
-                com.xpn.xwiki.plugin.activitystream.api.ActivityEvent unwrappedEvent =
-                    event.getEvent();
+                com.xpn.xwiki.plugin.activitystream.api.ActivityEvent unwrappedEvent = event.getEvent();
                 result.add(unwrappedEvent);
             }
         }
         return result;
     }
 
+    /**
+     * Get the feed entry for the given event.
+     * 
+     * @param event event to get the entry for
+     * @return the feed entry corresponding to the event
+     */
     public SyndEntry getFeedEntry(com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent event)
     {
         return getActivityStream().getFeedEntry(event.getEvent(), context);
     }
 
+    /**
+     * Get the feed entry for the given event.
+     * 
+     * @param event event to get the entry for
+     * @param suffix suffix to add to entry title and body strings
+     * @return the feed entry corresponding to the event
+     */
     public SyndEntry getFeedEntry(com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent event, String suffix)
     {
         return getActivityStream().getFeedEntry(event.getEvent(), suffix, context);
     }
 
+    /**
+     * Get a feed from the given events.
+     * 
+     * @param events events to create the feed from
+     * @return the feed entry corresponding to the given events
+     */
     public SyndFeed getFeed(List<ActivityEvent> events)
     {
         return getActivityStream().getFeed(unwrapEvents(events), context);
     }
 
+    /**
+     * Get a feed from the given events.
+     * 
+     * @param events events to create the feed from
+     * @param suffix suffix to add to entries title and body strings
+     * @return the feed entry corresponding to the given events
+     */
     public SyndFeed getFeed(List<ActivityEvent> events, String suffix)
     {
         return getActivityStream().getFeed(unwrapEvents(events), suffix, context);
     }
 
-    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
-        String description, String copyright, String encoding, String url)
+    /**
+     * Get a feed from the given events.
+     * 
+     * @param events events to create the feed from
+     * @param author author to set in the feed metadata
+     * @param title title to set in the feed metadata
+     * @param description description to set in the feed metadata
+     * @param copyright copyright to set in the feed metadata
+     * @param encoding encoding to set in the feed metadata
+     * @param url URL to set in the feed metadata
+     * @return the feed entry corresponding to the given events
+     */
+    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title, String description,
+        String copyright, String encoding, String url)
     {
-        return getActivityStream().getFeed(unwrapEvents(events), author, title, description,
-            copyright, encoding, url, context);
+        return getActivityStream().getFeed(unwrapEvents(events), author, title, description, copyright, encoding, url,
+            context);
     }
 
-    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
-            String description, String copyright, String encoding, String url, String suffix)
-        {
-            return getActivityStream().getFeed(unwrapEvents(events), author, title, description,
-                copyright, encoding, url, suffix, context);
-        }
-
-    public String getFeedOutput(List<ActivityEvent> events, String author, String title,
-        String description, String copyright, String encoding, String url, String type)
+    /**
+     * Get a feed from the given events.
+     * 
+     * @param events events to create the feed from
+     * @param author author to set in the feed metadata
+     * @param title title to set in the feed metadata
+     * @param description description to set in the feed metadata
+     * @param copyright copyright to set in the feed metadata
+     * @param encoding encoding to set in the feed metadata
+     * @param url URL to set in the feed metadata
+     * @param suffix suffix to add to entries title and body strings
+     * @return the feed entry corresponding to the given events
+     */
+    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title, String description,
+        String copyright, String encoding, String url, String suffix)
     {
-        return getActivityStream().getFeedOutput(unwrapEvents(events), author, title,
-            description, copyright, encoding, url, type, context);
+        return getActivityStream().getFeed(unwrapEvents(events), author, title, description, copyright, encoding, url,
+            suffix, context);
     }
 
-    public String getFeedOutput(List<ActivityEvent> events, String author, String title,
-            String description, String copyright, String encoding, String url, String type, String suffix)
-        {
-            return getActivityStream().getFeedOutput(unwrapEvents(events), author, title,
-                description, copyright, encoding, url, type, suffix, context);
-        }
+    /**
+     * Get the string representation of a feed from the given events.
+     * 
+     * @param events events to create the feed from
+     * @param author author to set in the feed metadata
+     * @param title title to set in the feed metadata
+     * @param description description to set in the feed metadata
+     * @param copyright copyright to set in the feed metadata
+     * @param encoding encoding to set in the feed metadata
+     * @param url URL to set in the feed metadata
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
+     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @return the feed entry corresponding to the given events
+     */
+    public String getFeedOutput(List<ActivityEvent> events, String author, String title, String description,
+        String copyright, String encoding, String url, String type)
+    {
+        return getActivityStream().getFeedOutput(unwrapEvents(events), author, title, description, copyright, encoding,
+            url, type, context);
+    }
 
+    /**
+     * Get the string representation of a feed from the given events.
+     * 
+     * @param events events to create the feed from
+     * @param author author to set in the feed metadata
+     * @param title title to set in the feed metadata
+     * @param description description to set in the feed metadata
+     * @param copyright copyright to set in the feed metadata
+     * @param encoding encoding to set in the feed metadata
+     * @param url URL to set in the feed metadata
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
+     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @param suffix suffix to add to entries title and body strings
+     * @return the feed entry corresponding to the given events
+     */
+    public String getFeedOutput(List<ActivityEvent> events, String author, String title, String description,
+        String copyright, String encoding, String url, String type, String suffix)
+    {
+        return getActivityStream().getFeedOutput(unwrapEvents(events), author, title, description, copyright, encoding,
+            url, type, suffix, context);
+    }
+
+    /**
+     * Get the string representation of a feed from the given feed.
+     * 
+     * @param feed the feed to get the string representation from  
+     * @param type the feed type (syntax) to use, <b>null</b> if none. It can be any version of RSS or Atom. Some 
+     *        possible values are "rss_1.0", "rss_2.0" and "atom_1.0"
+     * @return the feed entry corresponding to the given events
+     */
     public String getFeedOutput(SyndFeed feed, String type)
     {
         return getActivityStream().getFeedOutput(feed, type);
     }
 
     /**
+     * @param spaceName the space for which the stream name must be get
      * @return The name of the event stream associated with the given space
      */
     public String getStreamName(String spaceName)

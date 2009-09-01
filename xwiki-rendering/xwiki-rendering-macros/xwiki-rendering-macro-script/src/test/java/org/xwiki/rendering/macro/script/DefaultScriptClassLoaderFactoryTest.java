@@ -40,7 +40,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCase
 {
-    private MockSetup mockSetup;
+    private ScriptMockSetup mockSetup;
 
     private ScriptClassLoaderFactory factory;
     
@@ -48,7 +48,7 @@ public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCa
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
-        this.mockSetup = new MockSetup(getComponentManager());
+        this.mockSetup = new ScriptMockSetup(getComponentManager());
 
         this.factory = getComponentManager().lookup(ScriptClassLoaderFactory.class);
     }

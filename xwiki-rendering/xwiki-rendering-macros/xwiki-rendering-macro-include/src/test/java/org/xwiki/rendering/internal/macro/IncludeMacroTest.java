@@ -35,7 +35,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
-import org.xwiki.rendering.macro.script.MockSetup;
+import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -55,14 +55,14 @@ import org.xwiki.velocity.VelocityManager;
  */
 public class IncludeMacroTest extends AbstractComponentTestCase
 {
-    private MockSetup mockSetup;
+    private ScriptMockSetup mockSetup;
 
     @Override
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
         
-        this.mockSetup = new MockSetup(getComponentManager());
+        this.mockSetup = new ScriptMockSetup(getComponentManager());
     }
 
     @Test

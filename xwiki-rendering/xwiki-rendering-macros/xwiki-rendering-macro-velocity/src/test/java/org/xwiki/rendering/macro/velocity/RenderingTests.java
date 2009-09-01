@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.velocity;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.macro.script.MockSetup;
+import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -48,7 +48,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrovelocity8", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new MockSetup(testSetup.getComponentManager());
+        new ScriptMockSetup(testSetup.getComponentManager());
 
         // Note: We're using a static Mock for the VelocityManager since it leads to a cleaner code
         // (the Include Macro is reusing it too). We register this mock as real component in components.txt.

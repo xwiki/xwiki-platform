@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.ruby;
 
-import org.xwiki.rendering.macro.script.MockSetup;
+import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -49,7 +49,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroruby3", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new MockSetup(testSetup.getComponentManager());
+        new ScriptMockSetup(testSetup.getComponentManager());
 
         return testSetup;
     }

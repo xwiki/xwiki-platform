@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import org.jmock.Expectations;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.rendering.macro.script.MockSetup;
+import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.ComponentManagerTestSetup;
@@ -57,7 +57,7 @@ public class RenderingTests extends TestCase
 
     public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
     {
-        MockSetup mockSetup = new MockSetup(componentManager);
+        ScriptMockSetup mockSetup = new ScriptMockSetup(componentManager);
         
         // Script Context Mock
         final ScriptContextManager mockScriptContextManager = mockSetup.mockery.mock(ScriptContextManager.class);

@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
-import org.xwiki.rendering.macro.script.MockSetup;
+import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -38,7 +38,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class ClassLoadingTest extends AbstractComponentTestCase
 {
-    private MockSetup mockSetup;
+    private ScriptMockSetup mockSetup;
 
     private Macro<JSR223ScriptMacroParameters> macro;
     
@@ -48,7 +48,7 @@ public class ClassLoadingTest extends AbstractComponentTestCase
     protected void registerComponents() throws Exception
     {
         super.registerComponents();
-        this.mockSetup = new MockSetup(getComponentManager());
+        this.mockSetup = new ScriptMockSetup(getComponentManager());
         
         this.macro = getComponentManager().lookup(Macro.class, "groovy");
         

@@ -526,10 +526,18 @@ xwiki.plugin.captcha=0
 #-# database (default: xwiki) or both. If the wiki is not running in virtual mode these options will not have any 
 #-# effect. These options should not be both set to 0 (in this case the local store will be forced).
 #-# Important note: disabling storage in the main store will prevent the watchlist from retrieving events from subwikis.
+#-#
 #-# Default: 1 
 # xwiki.plugin.activitystream.uselocalstore=1
+#-#
 #-# Default: 1
 # xwiki.plugin.activitystream.usemainstore=1
+#-#
+#-# Number of days the events should be kept (0 or any negative value: infinite duration)
+#-# Note: if this value is greater than 0 a scheduler job will be created, this job will then be fired every week to
+#-# delete events older than the configured value.
+#-# Default: 0
+# xwiki.plugin.activitystream.daystokeepevents=0
 
 #---------------------------------------
 # Misc

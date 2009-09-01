@@ -3982,6 +3982,19 @@ table.xwikidatatable td, #_history table td  {
 /**********************************************************************************************/
 /** Buttons **/
 
+input.button{
+  background: $theme.buttonPrimaryBackgroundColor;
+  color: $theme.buttonPrimaryTextColor;
+  border: 1px solid $theme.buttonPrimaryBackgroundColor;
+  text-transform: uppercase;
+  font-size: 0.85em;
+}
+
+input.button:hover {
+  background: $theme.buttonSecondaryBackgroundColor;
+  color: $theme.buttonSecondaryTextColor;
+}
+
 #body .buttonwrapper * {
   background: $theme.buttonPrimaryBackgroundColor;
   color: $theme.buttonPrimaryTextColor;

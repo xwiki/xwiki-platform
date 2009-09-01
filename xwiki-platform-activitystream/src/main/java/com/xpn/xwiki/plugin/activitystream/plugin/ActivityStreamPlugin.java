@@ -97,7 +97,8 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     public String getActivityStreamPreference(String preference, String defaultValue, XWikiContext context)
     {
         String preferencePrefix = "xwiki.plugin.activitystream.";
-        return context.getWiki().getXWikiPreference(preferencePrefix + preference, defaultValue, context);
+        String prefName = preferencePrefix + preference;
+        return context.getWiki().getXWikiPreference(prefName, prefName, defaultValue, context);
     }
     
     /**
@@ -109,7 +110,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     {
         super.init(context);
         try {
-            activityStream.initClasses(context);
+            activityStream.init(context);
         } catch (Exception e) {
         }
     }
@@ -122,9 +123,5 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
-        try {
-            // activityStream.initClasses(context);
-        } catch (Exception e) {
-        }
     }
 }

@@ -9,10 +9,6 @@
   padding: 10px !important;
   overflow: visible !important;
 }
-#body {
-  overflow: auto !important;
-  height: auto !important;
-}
 /* Hide unneeded stuff */
 .edit_section,
 #rightPanels, #leftPanels, #actionmenu,

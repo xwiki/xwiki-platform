@@ -92,7 +92,7 @@ public class WatchListStore implements EventListener
     /**
      * The name of the listener.
      */
-    private static final String LISTENER_NAME = "rightsmanager";
+    private static final String LISTENER_NAME = "watchliststore";
 
     /**
      * The events to match.

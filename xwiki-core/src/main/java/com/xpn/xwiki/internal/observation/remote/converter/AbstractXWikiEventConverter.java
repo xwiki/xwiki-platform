@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Provide some serialization tools for old apis like {@link XWikiDocument} and {@link XWikiContext}.
  * 
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.0M4
  */
 public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
 {

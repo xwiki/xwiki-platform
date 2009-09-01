@@ -39,7 +39,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @todo make the list of actions to send configurable
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.0M4
  */
 @Component("action")
 public class ActionExecutionEventConverter extends AbstractXWikiEventConverter

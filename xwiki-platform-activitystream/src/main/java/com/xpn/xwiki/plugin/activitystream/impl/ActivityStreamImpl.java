@@ -28,13 +28,18 @@ import java.net.MalformedURLException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.jfree.util.Log;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentDeleteEvent;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.DocChangeRule;
-import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventPriority;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
@@ -42,6 +47,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.web.Utils;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndEntryImpl;
@@ -54,7 +60,8 @@ import com.sun.syndication.io.SyndFeedOutput;
  * 
  * @version $Id: $
  */
-public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotificationInterface
+@SuppressWarnings("serial")
+public class ActivityStreamImpl implements ActivityStream, EventListener
 {
     /**
      * Key used to store the request ID in the context.
@@ -65,6 +72,23 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
      * Character used as a separator in event IDs.
      */
     private static final String EVENT_ID_ELEMENTS_SEPARATOR = "-";
+    
+    /**
+     * The name of the listener.
+     */
+    private static final String LISTENER_NAME = "activitystream";
+    
+    /**
+     * The events to match.
+     */
+    private static final List<Event> LISTENER_EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new DocumentSaveEvent());
+            add(new DocumentUpdateEvent());
+            add(new DocumentDeleteEvent());
+        }
+    };
 
     /**
      * Set fields related to the document which fired the event in the given event object.
@@ -174,7 +198,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public void init(XWikiContext context) throws XWikiException
     {
         // listen to notifications
-        context.getWiki().getNotificationManager().addGeneralRule(new DocChangeRule(this));
+        Utils.getComponent(ObservationManager.class).addListener(this);
         // init activitystream cleaner
         ActivityStreamCleaner.getInstance().init(context);
     }
@@ -684,66 +708,6 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     /**
      * {@inheritDoc}
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
-        XWikiContext context)
-    {
-        List<String> params = new ArrayList<String>();
-        params.add(0, newdoc.getDisplayTitle(context));
-        String msgPrefix = "activitystream.event.";
-        String streamName = getStreamName(newdoc.getSpace(), context);
-
-        if (streamName == null) {
-            return;
-        }
-
-        try {
-            switch (event) {
-                case XWikiDocChangeNotificationInterface.EVENT_CHANGE:
-                    if (olddoc == null || olddoc.isNew()) {
-                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE, msgPrefix
-                            + ActivityEventType.CREATE, params, context);
-                    } else if (newdoc == null || newdoc.isNew()) {
-                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE, msgPrefix
-                            + ActivityEventType.DELETE, params, context);
-                    } else {
-                        addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
-                            + ActivityEventType.UPDATE, params, context);
-                    }
-                    break;
-                case XWikiDocChangeNotificationInterface.EVENT_NEW:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE, msgPrefix
-                        + ActivityEventType.CREATE, params, context);
-                    break;
-                case XWikiDocChangeNotificationInterface.EVENT_DELETE:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE, msgPrefix
-                        + ActivityEventType.DELETE, params, context);
-                    break;
-                case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CONTENT:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
-                        + ActivityEventType.UPDATE, params, context);
-                    break;
-                case XWikiDocChangeNotificationInterface.EVENT_UPDATE_OBJECT:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
-                        + ActivityEventType.UPDATE, params, context);
-                    break;
-                case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CLASS:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, msgPrefix
-                        + ActivityEventType.UPDATE, params, context);
-                    break;
-                default:
-                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.OTHER, msgPrefix
-                        + ActivityEventType.OTHER, params, context);
-                    break;
-            }
-        } catch (Throwable e) {
-            // Error in activity stream notify should be ignored but logged in the log file
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context)
     {
         return getFeedEntry(event, "", context);
@@ -860,5 +824,68 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
             return "";
         }
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return LISTENER_EVENTS;
+    }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getName()
+     */
+    public String getName()
+    {
+        return LISTENER_NAME;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
+     */
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiDocument currentDoc = (XWikiDocument) source;
+        XWikiDocument originalDoc = currentDoc.getOriginalDocument();
+        XWikiDocument doc = currentDoc != null ? currentDoc : originalDoc;        
+        XWikiContext context = (XWikiContext) data;
+        String wiki = context.getDatabase();
+        List<String> params = new ArrayList<String>();
+        params.add(0, doc.getDisplayTitle(context));
+        String msgPrefix = "activitystream.event.";
+        String streamName = getStreamName(doc.getSpace(), context);
+        
+        // If we haven't found a stream to store the event or if both currentDoc and originalDoc are null: exit
+        if (streamName == null || doc == null) {
+            return;
+        }
+        
+        // Take events into account only once in a cluster  
+        if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
+            String eventType = "";
+            
+            if (event instanceof DocumentSaveEvent) {
+                eventType = ActivityEventType.CREATE;
+            } else if (event instanceof DocumentUpdateEvent) {
+                eventType = ActivityEventType.UPDATE;
+            } else if (event instanceof DocumentDeleteEvent) {
+                eventType = ActivityEventType.DELETE;
+            }
+            
+            try {
+                addDocumentActivityEvent(streamName, doc, eventType, msgPrefix + eventType, params, context);
+            } catch (ActivityStreamException e) {
+                Log.error("Exception while trying to add a document activity event, updated document: [" 
+                    + wiki + ":" + doc.getFullName() + "]");                
+            }
+        }
+    }
 }

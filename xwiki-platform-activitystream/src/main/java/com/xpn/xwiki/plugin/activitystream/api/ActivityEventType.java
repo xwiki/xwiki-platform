@@ -27,11 +27,6 @@ package com.xpn.xwiki.plugin.activitystream.api;
 public interface ActivityEventType
 {
     /**
-     * Unknown type.
-     */
-    String OTHER = "other";
-
-    /**
      * Document creation.
      */
     String CREATE = "create";
@@ -45,59 +40,4 @@ public interface ActivityEventType
      * Document deletion.
      */
     String DELETE = "delete";
-
-    /**
-     * Document rename.
-     */
-    String MOVE = "move";
-
-    /**
-     * Comment creation.
-     */
-    String CREATE_COMMENT = "createcomment";
-
-    /**
-     * Attachment initial upload.
-     */
-    String CREATE_ATTACHMENT = "createattachment";
-
-    /**
-     * Attachment overwrite.
-     */
-    String UPDATE_ATTACHMENT = "updateattachment";
-
-    /**
-     * Attachment deletion.
-     */
-    String DELETE_ATTACHMENT = "deleteattachment";
-
-    /**
-     * User creation.
-     */
-    String CREATE_USER = "createuser";
-
-    /**
-     * User deletion.
-     */
-    String DELETE_USER = "deleteuser";
-
-    /**
-     * Space creation.
-     */
-    String CREATE_SPACE = "createspace";
-
-    /**
-     * Space deletion.
-     */
-    String DELETE_SPACE = "deletespace";
-
-    /**
-     * Rights modification.
-     */
-    String CHANGE_RIGHTS = "changerights";
-
-    /**
-     * Group member addition.
-     */
-    String NEW_MEMBER = "newmember";
 }

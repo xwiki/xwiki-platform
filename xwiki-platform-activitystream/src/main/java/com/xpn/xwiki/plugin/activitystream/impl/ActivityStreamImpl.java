@@ -162,6 +162,11 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
      */
     private boolean useMainStore(XWikiContext context)
     {
+        if (!context.getWiki().isVirtualMode()) {
+            // If we aren't in virtual mode, local store is forced.
+            return false;
+        }
+
         if (context.getWiki().isVirtualMode() && context.getDatabase().equals(context.getMainXWiki())) {
             // We're in the main database, we don't have to store the data twice.
             return false;

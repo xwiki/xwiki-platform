@@ -21,22 +21,30 @@ package org.xwiki.rendering.internal.macro;
 
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 
-import org.jmock.Mock;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import junit.framework.Assert;
+
+import org.jmock.Expectations;
+import org.junit.Test;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
 import org.xwiki.rendering.internal.transformation.MacroTransformation;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
+import org.xwiki.rendering.macro.script.MockSetup;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -45,22 +53,19 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacroTest extends AbstractRenderingTestCase
+public class IncludeMacroTest extends AbstractComponentTestCase
 {
-    private Mock mockDocumentAccessBridge;
+    private MockSetup mockSetup;
 
     @Override
     protected void registerComponents() throws Exception
     {
-        this.mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
-
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptor =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptor.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptor,
-            (DocumentAccessBridge) this.mockDocumentAccessBridge.proxy());
+        super.registerComponents();
+        
+        this.mockSetup = new MockSetup(getComponentManager());
     }
 
+    @Test
     public void testIncludeMacroWithNewContext() throws Exception
     {
         String expected = "beginDocument\n"
@@ -79,14 +84,17 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             "#set ($myvar = 'hello')");
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
-        mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
-            returnValue("{{velocity}}$myvar{{/velocity}}"));
-        mockDocumentAccessBridge.expects(once()).method("getDocumentSyntaxId").will(
-            returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
-        macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
-        mockDocumentAccessBridge.stubs().method("pushDocumentInContext");
-        mockDocumentAccessBridge.stubs().method("popDocumentFromContext");
+        
+        this.mockSetup.mockery.checking(new Expectations() {{
+            oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
+            oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
+                will(returnValue("{{velocity}}$myvar{{/velocity}}"));
+            oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
+                will(returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
+            allowing(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(any(String.class)));
+            allowing(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
+        }});
+        macro.setDocumentAccessBridge(this.mockSetup.bridge);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");
@@ -104,6 +112,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         assertBlocks(expected, blocks);
     }
 
+    @Test
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
         String expected = "beginDocument\n"
@@ -111,11 +120,16 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
-        mockDocumentAccessBridge.expects(once()).method("isDocumentViewable").will(returnValue(true));
-        mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
-        mockDocumentAccessBridge.expects(once()).method("getDocumentSyntaxId").will(
-            returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
-        macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
+        
+        this.mockSetup.mockery.checking(new Expectations() {{
+            oneOf(mockSetup.bridge).isDocumentViewable(with(any(String.class))); will(returnValue(true));
+            oneOf(mockSetup.bridge).getDocumentContent(with(any(String.class))); 
+                will(returnValue("{{someMacro/}}"));
+            oneOf(mockSetup.bridge).getDocumentSyntaxId(with(any(String.class)));
+                will(returnValue(new Syntax(SyntaxType.XWIKI, "2.0").toIdString()));
+        }});
+        
+        macro.setDocumentAccessBridge(mockSetup.bridge);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");
@@ -126,6 +140,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         assertBlocks(expected, blocks);
     }
 
+    @Test
     public void testIncludeMacroWithNoDocumentSpecified() throws Exception
     {
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(Macro.class, "include");
@@ -133,10 +148,24 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
         try {
             macro.execute(parameters, null, new MacroTransformationContext());
-            fail("An exception should have been thrown");
+            Assert.fail("An exception should have been thrown");
         } catch (MacroExecutionException expected) {
-            assertEquals("You must specify a 'document' parameter pointing to the document to include.",
+            Assert.assertEquals("You must specify a 'document' parameter pointing to the document to include.",
                 expected.getMessage());
         }
+    }
+    
+    private void assertBlocks(String expected, List<Block> blocks) throws Exception
+    {
+        // Assert the result by parsing it through the EventsRenderer to generate easily
+        // assertable events.
+        XDOM dom = new XDOM(blocks);
+        WikiPrinter printer = new DefaultWikiPrinter();
+
+        PrintRendererFactory factory = getComponentManager().lookup(PrintRendererFactory.class, "event/1.0");
+        PrintRenderer eventRenderer = factory.createRenderer(printer);
+
+        dom.traverse(eventRenderer);
+        Assert.assertEquals(expected, printer.toString());
     }
 }

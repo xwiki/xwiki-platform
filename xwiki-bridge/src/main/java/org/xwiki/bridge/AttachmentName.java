@@ -25,13 +25,34 @@ package org.xwiki.bridge;
  * @version $Id$
  * @since 2.0M1
  */
-public class AttachmentName extends DocumentName
+public class AttachmentName
 {
+    /**
+     * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
+     * changes.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * @see #getDocumentName()
+     */
+    private DocumentName documentName;
+    
     /**
      * @see #getFileName()  
      */
     private String fileName;
-    
+
+    /**
+     * @param documentName the attachment's document (ie the document to which the filename is attached to)
+     * @param fileName the name of the file attached to the document
+     */
+    public AttachmentName(DocumentName documentName, String fileName)
+    {
+        setDocumentName(documentName);
+        setFileName(fileName);
+    }
+
     /**
      * @param wiki the wiki to which the attachment's document belongs to (eg "xwiki")
      * @param space the space to which the attachment's document belongs to (eg "Main")
@@ -40,19 +61,25 @@ public class AttachmentName extends DocumentName
      */
     public AttachmentName(String wiki, String space, String page, String fileName)
     {
-        super(wiki, space, page);
-        this.fileName = fileName;
+        this(new DocumentName(wiki, space, page), fileName);
+    }
+
+    /**
+     * @param documentName the name of the document to which the attachment filename is attached to
+     */
+    public void setDocumentName(DocumentName documentName)
+    {
+        this.documentName = documentName;
     }
     
     /**
-     * @param documentName the attachment's document (ie the document to which the filename is attached to)
-     * @param fileName the name of the file attached to the document
+     * @return the name of the document to which the attachment filename is attached to
      */
-    public AttachmentName(DocumentName documentName, String fileName)
+    public DocumentName getDocumentName()
     {
-        this(documentName.getWiki(), documentName.getSpace(), documentName.getPage(), fileName);
+        return this.documentName;
     }
-
+    
     /**
      * @param fileName the file name of the attachment in the document's page.
      */
@@ -68,4 +95,50 @@ public class AttachmentName extends DocumentName
     {
         return this.fileName;
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "documentName = [" + getDocumentName() + "], fileName = [" + getFileName() + "]";
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        boolean equals = false;
+
+        if (obj == this) {
+            equals = true;
+        } else if (obj instanceof AttachmentName) {
+            AttachmentName attachmentName = (AttachmentName) obj;
+
+            equals = (attachmentName.getDocumentName() == null ? getDocumentName() == null 
+                : attachmentName.getDocumentName().equals(getDocumentName()))
+                && (attachmentName.getFileName() == null ? getFileName() == null 
+                : attachmentName.getFileName().equals(getFileName()));
+        }
+
+        return equals;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
+        return toString().hashCode();
+    }    
 }

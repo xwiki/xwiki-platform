@@ -19,12 +19,7 @@
  */
 package org.xwiki.rendering.macro.ruby;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.macro.script.MockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -54,33 +49,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macroruby3", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
+        new MockSetup(testSetup.getComponentManager());
 
         return testSetup;
-    }
-
-    /**
-     * Sets up mock component descriptors.
-     * 
-     * @param componentManager the {@link ComponentManager} component.
-     */
-    public static void setUpMocks(EmbeddableComponentManager componentManager)
-    {
-        Mockery context = new Mockery();
-
-        // Document Access Bridge Mock setup
-        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        context.checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).hasProgrammingRights();
-                will(returnValue(true));
-            }
-        });
-
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
     }
 }

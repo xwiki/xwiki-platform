@@ -52,10 +52,8 @@
         <configuration>
           <includes>
             <include>**/RenderingTests.java</include>
+            <include>**/*Test.java</include>
           </includes>
-          <excludes>
-            <exclude>**/scaffolding/**.java</exclude>
-          </excludes>
         </configuration>
       </plugin>
       <plugin>
@@ -66,10 +64,16 @@
             <goals>
               <goal>test-jar</goal>
             </goals>
+            <configuration>
+              <includes>
+                <include>**/MockSetup*.class</include>
+              </includes>
+            </configuration>
           </execution>
         </executions>
       </plugin>
-      <plugin><!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+      <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
       </plugin>

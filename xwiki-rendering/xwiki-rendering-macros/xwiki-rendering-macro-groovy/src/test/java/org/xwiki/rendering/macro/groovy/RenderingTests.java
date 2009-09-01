@@ -26,10 +26,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.rendering.macro.script.MockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.test.ComponentManagerTestSetup;
@@ -56,35 +55,17 @@ public class RenderingTests extends TestCase
         return testSetup;
     }
 
-    public static void setUpMocks(EmbeddableComponentManager componentManager)
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
     {
-        Mockery context = new Mockery();
-
-        // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        context.checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentAccessBridge).hasProgrammingRights();
-                will(returnValue(true));
-            }
-        });
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
-
+        MockSetup mockSetup = new MockSetup(componentManager);
+        
         // Script Context Mock
-        final ScriptContextManager mockScriptContextManager = context.mock(ScriptContextManager.class);
+        final ScriptContextManager mockScriptContextManager = mockSetup.mockery.mock(ScriptContextManager.class);
         final SimpleScriptContext scriptContext = new SimpleScriptContext();
         scriptContext.setAttribute("var", "value", ScriptContext.ENGINE_SCOPE);
-        context.checking(new Expectations()
-        {
-            {
-                allowing(mockScriptContextManager).getScriptContext();
-                will(returnValue(scriptContext));
-            }
-        });
+        mockSetup.mockery.checking(new Expectations() {{
+            allowing(mockScriptContextManager).getScriptContext(); will(returnValue(scriptContext));
+        }});
         DefaultComponentDescriptor<ScriptContextManager> descriptorSCM =
             new DefaultComponentDescriptor<ScriptContextManager>();
         descriptorSCM.setRole(ScriptContextManager.class);

@@ -19,32 +19,25 @@
  */
 package org.xwiki.rendering.macro.script;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
+ * Create Class Loader to be used when executing scripts, see {@link #createClassLoader(String)} for more details.
  * 
  * @version $Id$
- * @since 2.0M1
+ * @since 2.0RC1
  */
-public class RenderingTests extends TestCase
+@ComponentRole
+public interface ScriptClassLoaderFactory
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
-        suite.addTestsFromResource("macroscript1", true);
-        suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript3", true);
-        suite.addTestsFromResource("macroscript4", true);
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new MockSetup(testSetup.getComponentManager());
-
-        return testSetup;
-    }
+    /**
+     * Create Class Loader to be used when executing scripts. The class loader is created based on some
+     * passed reference specifying a list of jars to be made available in the created class loader. The format
+     * is not defined and left to implementation classes.
+     * 
+     * @param scriptJars the list of jars to make available in the returned class loader
+     * @return the configured class loader
+     * @throws Exception if the class loader fails to be created for any reason (eg some invalid URL passed)
+     */
+    ClassLoader createClassLoader(String scriptJars) throws Exception;
 }

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -53,6 +54,12 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     protected static final String CONTENT_DESCRIPTION = "the script to execute";
 
     /**
+     * Used to find if the current document's author has programming rights.
+     */
+    @Requirement
+    protected DocumentAccessBridge documentAccessBridge;
+
+    /**
      * Used to get the current syntax parser.
      */
     @Requirement
@@ -65,6 +72,13 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     @Requirement("plain/1.0")
     private Parser plainTextParser;
 
+    /**
+     * Used to handle the parameter of the Script macro used to specified the URLs to use in the class loader used
+     * to evaluate the script the macro contains.
+     */
+    @Requirement
+    private ScriptClassLoaderFactory scriptClassLoaderFactory;
+    
     /**
      * Used to clean result of the parser syntax.
      */
@@ -140,8 +154,12 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         List<Block> result = Collections.emptyList();
 
         if (!StringUtils.isEmpty(content)) {
+            // If the user is using the jars parameters, check for programming rights since otherwise it's
+            // a security hole that opens up...
+            ClassLoader classLoader = createClassLoader(parameters.getJars());
+
             // 1) Run script engine on macro block content
-            String scriptResult = evaluate(parameters, content, context);
+            String scriptResult = evaluate(parameters, content, classLoader, context);
 
             if (parameters.isOutput()) {
                 // 2) Run the wiki syntax parser on the script-rendered content
@@ -152,6 +170,33 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         return result;
     }
 
+    /**
+     * @param jarsParameterValue the value of the macro parameters used to pass extra URLs that should be in the 
+     *        execution class loader
+     * @return the class loader to use for executing the script
+     * @throws MacroExecutionException in case of an error in building the class loader
+     */
+    private ClassLoader createClassLoader(String jarsParameterValue) throws MacroExecutionException
+    {
+        ClassLoader classLoader;
+        if (!StringUtils.isEmpty(jarsParameterValue)) {
+            if (canHaveJarsParameters()) {
+                try {
+                    classLoader = this.scriptClassLoaderFactory.createClassLoader(jarsParameterValue);
+                } catch (Exception e) {
+                    throw new MacroExecutionException("Failed to construct class loader from [" 
+                        + jarsParameterValue + "]", e);
+                }
+            } else {
+                throw new MacroExecutionException(
+                    "You cannot pass additional jars since you don't have programming rights");
+            }
+        } else {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
+        return classLoader;
+    }
+    
     /**
      * Convert script result as a {@link Block} list.
      * 
@@ -198,11 +243,12 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * @param parameters the macro parameters.
      * @param content the script to execute.
      * @param context the context of the macro transformation.
+     * @param classLoader the Class Loader to use when executing the script
      * @return the result of script execution.
      * @throws MacroExecutionException failed to evaluate provided content.
      */
-    protected abstract String evaluate(P parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException;
+    protected abstract String evaluate(P parameters, String content, ClassLoader classLoader, 
+        MacroTransformationContext context) throws MacroExecutionException;
 
     /**
      * Get the parser of the current wiki syntax.
@@ -238,5 +284,17 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             throw new MacroExecutionException("Failed to parse content [" + content + "] with Syntax parser ["
                 + parser.getSyntax() + "]", e);
         }
+    }
+
+    /**
+     * Note that this method allows extending classes to override it to allow jars parameters to be used without 
+     * programming rights for example or to use some other conditions.
+     * 
+     * @return true if the user can use the macro parameter used to pass additional JARs to the classloader used 
+     *         to evaluate a script
+     */
+    protected boolean canHaveJarsParameters()
+    {
+        return this.documentAccessBridge.hasProgrammingRights();
     }
 }

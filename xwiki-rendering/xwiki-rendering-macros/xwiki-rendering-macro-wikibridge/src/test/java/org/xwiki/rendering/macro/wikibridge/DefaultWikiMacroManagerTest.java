@@ -27,7 +27,7 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Test case for verifying correct macro registration.
@@ -35,7 +35,7 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * @version $id$
  * @since 2.0M2
  */
-public class DefaultWikiMacroManagerTest extends AbstractRenderingTestCase
+public class DefaultWikiMacroManagerTest extends AbstractXWikiComponentTestCase
 {
     /**
      * The {@link WikiMacroManager} component.

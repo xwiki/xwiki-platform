@@ -30,7 +30,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -52,12 +51,6 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
      */
     @Requirement
     private ScriptContextManager scriptContextManager;
-
-    /**
-     * Used to find if the current document's author has programming rights.
-     */
-    @Requirement
-    private DocumentAccessBridge documentAccessBridge;
 
     /**
      * @param macroName the name of the macro (eg "groovy")
@@ -161,11 +154,11 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext) 
+     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, ClassLoader, MacroTransformationContext) 
      */
     @Override
-    protected String evaluate(P parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    protected String evaluate(P parameters, String content, ClassLoader classLoader,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         if (StringUtils.isEmpty(content)) {
             return "";
@@ -176,7 +169,16 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
         String scriptResult;
         if (engineName != null) {
             // 2) execute script
+
+            // JSR223 doesn't support the notion of classloader used to find classes in scripts and this is 
+            // probably normal since not all script engines have the notion of classloader I guess.
+            // The way most JSR223 implementation work is by using the context classloader to load the classes
+            // and thus we need to set the context class loader to be the passed class loader and we restore it
+            // afterwards to ensure no leakage.
+            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
             try {
+                Thread.currentThread().setContextClassLoader(classLoader);
+                
                 ScriptEngineManager sem = new ScriptEngineManager();
                 ScriptEngine engine = sem.getEngineByName(engineName);
                 if (engine != null) {
@@ -198,7 +200,11 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
                 }
             } catch (ScriptException e) {
                 throw new MacroExecutionException("Failed to evaluate Script Macro for content [" + content + "]", e);
+            } finally {
+                // Restore original class loader
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
+            
         } else {
             // If no language identifier is provided, don't evaluate content
             scriptResult = content;
@@ -223,19 +229,6 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
         return engine.eval(content, scriptContext);
     }
 
-    /**
-     * Indicate if the script is executable in the current context.
-     * <p>
-     * For example with not protected script engine, we are testing if the current dcument's author has "programming"
-     * right.
-     * 
-     * @return true if the script can be evaluated, false otherwise.
-     */
-    protected boolean canExecuteScript()
-    {
-        return this.documentAccessBridge.hasProgrammingRights();
-    }
-
     // /////////////////////////////////////////////////////////////////////
     // Compiled scripts management
 
@@ -253,4 +246,17 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
 
         return engine.compile(content);
     }
+    
+    /**
+     * Indicate if the script is executable in the current context.
+     * <p>
+     * For example with not protected script engine, we are testing if the current dcument's author has "programming"
+     * right.
+     * 
+     * @return true if the script can be evaluated, false otherwise.
+     */
+    protected boolean canExecuteScript()
+    {
+        return this.documentAccessBridge.hasProgrammingRights();
+    }    
 }

@@ -124,6 +124,9 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
             try {
                 return this.componentManager.lookup(Macro.class, macroId.getId());
             } catch (ComponentLookupException ex2) {
+                // TODO: Improve this since it's possible the macro wasn't found because it contains some invalid
+                // requirement and since we're not passing the raised exception it's hard to know why the macro
+                // couldn't be found.
                 throw new MacroLookupException(String.format("No macro [%s] could be found.", macroId.toString()));
             }
         }

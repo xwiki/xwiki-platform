@@ -55,7 +55,7 @@ public class DefaultMacroManagerTest extends AbstractXWikiComponentTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#setUp() 
+     * @see org.xwiki.rendering.scaffolding.AbstractXWikiComponentTestCase#setUp() 
      */
     @Override
     protected void setUp() throws Exception

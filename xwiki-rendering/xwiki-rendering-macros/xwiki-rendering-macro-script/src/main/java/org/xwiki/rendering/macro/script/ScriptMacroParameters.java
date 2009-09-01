@@ -40,9 +40,14 @@ public class ScriptMacroParameters
     private boolean wiki = true;
 
     /**
+     * @see #getJars()
+     */
+    private String jarURLsAsString;
+    
+    /**
      * @param output indicate the output result has to be inserted back in the document.
      */
-    @PropertyDescription("indicate the output result has to be inserted back in the document")
+    @PropertyDescription("Specifies whether the output result should be inserted back in the document")
     public void setOutput(boolean output)
     {
         this.output = output;
@@ -61,8 +66,7 @@ public class ScriptMacroParameters
      *            it's put in a verbatim block.
      * @since 2.0M1
      */
-    @PropertyDescription("indicate if the result of the script execution has to be parsed by the current wiki parser."
-        + " If not it's put in a verbatim block")
+    @PropertyDescription("Specifies whether wiki syntax in the script execution result will be rendered or not")
     public void setWiki(boolean wiki)
     {
         this.wiki = wiki;
@@ -75,5 +79,25 @@ public class ScriptMacroParameters
     public boolean isWiki()
     {
         return this.wiki;
+    }
+    
+    /**
+     * @param jarURLsAsString see {@link #getJars()}
+     */
+    @PropertyDescription("List of JARs to be added to the class loader used to execute this script. "
+        + "Example: \"attach:wiki:space.page@somefile.jar\", \"attach:somefile.jar\", \"attach:wiki:space.page\" "
+        + "(adds all JARs attached to the page) or URL to a JAR")
+    public void setJars(String jarURLsAsString)
+    {
+        this.jarURLsAsString = jarURLsAsString;
+    }
+    
+    /**
+     * @return the list of JARs to be added to the script execution class loader, see 
+     *         {@link org.xwiki.rendering.internal.macro.script.DefaultScriptClassLoaderFactory} for more details
+     */
+    public String getJars()
+    {
+        return this.jarURLsAsString;
     }
 }

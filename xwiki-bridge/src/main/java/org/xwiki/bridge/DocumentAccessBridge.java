@@ -251,14 +251,36 @@ public interface DocumentAccessBridge
     String getURL(String documentName, String action, String queryString, String anchor);
 
     /**
-     * Retrieves the internal (without the hostname) URL that can be used to access an attachment.
+     * Retrieves the relative URL (ie the path without the hostname and port) that can be used to access an attachment.
      * 
      * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page")
      * @param attachmentName the attachment name (eg "my.png")
      * @return the attachment URL
+     * @deprecated use {@link #getAttachmentURL(AttachmentName)} instead
      */
     String getAttachmentURL(String documentName, String attachmentName);
 
+    /**
+     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be
+     * used to access an attachment.
+     * 
+     * @param attachmentName the attachment name for which to find the URL
+     * @param isFullURL whether the returned URL will a relative URL or the full URL
+     * @return the attachment URL
+     * @since 2.0RC1
+     */
+    String getAttachmentURL(AttachmentName attachmentName, boolean isFullURL);
+
+    /**
+     * @param documentName the document for which to retrieve all attachment URLs
+     * @param isFullURL whether the returned URL will a relative URL or the full URL
+     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full 
+     *         URL) for all attachments in the passed document  
+     * @since 2.0RC1
+     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name 
+     */
+    List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception;
+    
     /**
      * @param documentName the name of the document to access.
      * @return true if current user can view provided document.

@@ -45,7 +45,7 @@ public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScript
     private static final String CONTENT_DESCRIPTION = "the script to execute";
 
     /**
-     * The identifier of the script language. If null, {@link DefaultScriptMacroParameters#getLanguage()} as to be not
+     * The identifier of the script language. If null, {@link DefaultScriptMacroParameters#getLanguage()} has to be not
      * null.
      */
     private String language;

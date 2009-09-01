@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.AttachmentName;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
@@ -352,6 +353,26 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#pushDocumentInContext(Map, String)
      */
     public void pushDocumentInContext(Map<String, Object> backupObjects, String documentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentURL(AttachmentName, boolean)
+     */
+    public String getAttachmentURL(AttachmentName attachmentName, boolean isFullURL)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentURLs(DocumentName, boolean)
+     */
+    public List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }

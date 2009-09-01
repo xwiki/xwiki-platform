@@ -33,7 +33,7 @@ public class XWikiAttachmentURL extends XWikiDocumentURL
     
     public XWikiAttachmentURL(AttachmentName attachmentName)
     {
-        super(attachmentName);
+        super(attachmentName.getDocumentName());
         setType(XWikiURLType.ATTACHMENT);
         setAttachmentName(attachmentName);
     }

@@ -87,9 +87,9 @@ public class DocumentName implements Serializable
     }
 
     /**
-     * Converts this {@link DocumentName} into a string representation.
+     * {@inheritDoc}
      * 
-     * @return a string representing this {@link DocumentName} of the form wiki:space.page.
+     * @see java.lang.Object#toString()
      */
     @Override
     public String toString()

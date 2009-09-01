@@ -3,25 +3,16 @@
 .# Validate output=false option
 .#-----------------------------------------------------
 {{script output=false}}
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+will not be printed
 {{/script}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [script] [output=false] [
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+will not be printed
 ]
 endMacroMarkerStandalone [script] [output=false] [
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+will not be printed
 ]
 endDocument

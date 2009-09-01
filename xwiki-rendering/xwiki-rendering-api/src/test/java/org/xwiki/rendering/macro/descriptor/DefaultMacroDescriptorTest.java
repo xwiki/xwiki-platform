@@ -25,7 +25,6 @@ import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyMandatory;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**

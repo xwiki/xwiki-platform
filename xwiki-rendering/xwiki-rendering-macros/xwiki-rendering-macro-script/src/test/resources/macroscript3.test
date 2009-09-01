@@ -4,10 +4,7 @@
 .#-----------------------------------------------------
 {{script}}
 {{script}}
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+script here
 {{/script}}
 {{/script}}
 .#-----------------------------------------------------
@@ -16,74 +13,23 @@ list.each { item ->
 beginDocument
 beginMacroMarkerStandalone [script] [] [
 {{script}}
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+script here
 {{/script}}
 ]
 beginMacroMarkerStandalone [script] [] [
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+script here
 ]
 beginParagraph
-onWord [def]
+onWord [script]
 onSpace
-onWord [list]
-onSpace
-onSpecialSymbol [=]
-onSpace
-onSpecialSymbol [[]
-onSpecialSymbol ["]
-onWord [one]
-onSpecialSymbol ["]
-onSpecialSymbol [,]
-onSpace
-onSpecialSymbol ["]
-onWord [two]
-onSpecialSymbol ["]
-onSpecialSymbol []]
-onNewLine
-onWord [list]
-onSpecialSymbol [.]
-onWord [each]
-onSpace
-onSpecialSymbol [{]
-onSpace
-onWord [item]
-onSpace
-onSpecialSymbol [-]
-onSpecialSymbol [>]
-onNewLine
-onSpace
-onSpace
-onWord [println]
-onSpace
-onSpecialSymbol ["]
-onSpecialSymbol [*]
-onSpace
-onSpecialSymbol [$]
-onSpecialSymbol [{]
-onWord [item]
-onSpecialSymbol [}]
-onSpecialSymbol ["]
-onNewLine
-onSpecialSymbol [}]
+onWord [here]
 endParagraph
 endMacroMarkerStandalone [script] [] [
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+script here
 ]
 endMacroMarkerStandalone [script] [] [
 {{script}}
-def list = ["one", "two"]
-list.each { item ->
-  println "* ${item}"
-}
+script here
 {{/script}}
 ]
 endDocument

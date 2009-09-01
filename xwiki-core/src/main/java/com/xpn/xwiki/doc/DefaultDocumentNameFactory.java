@@ -29,10 +29,16 @@ import org.xwiki.context.Execution;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Generate a Document Name from a raw string reference.
+ * Generate a Document Name from a raw string reference. The format is:
+ * {@code wiki:space.page}. If wiki is not specified then the current wiki is returned and
+ * if there's no current wiki then "xwiki" is used. If the space is not specified then the
+ * current space is returned and if there's no current space then the "XWiki" space name is
+ * used. If the page is not specified then "WebHome" is used. 
  * 
  * @version $Id$
  * @since 1.8.1
+ * @todo move this implementation to the bridge module. We could almost move it if we are sure that that
+ *       bridge.getCurrentDocumentName().getWiki() has always the same value as xwikicontext.getDatabase() 
  */
 @Component
 public class DefaultDocumentNameFactory implements DocumentNameFactory
@@ -62,6 +68,11 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
     @Requirement
     private Execution execution;
     
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentNameFactory#createDocumentName(String)
+     */
     public DocumentName createDocumentName(String reference)
     {
         String wiki;
@@ -71,7 +82,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
         if (StringUtils.isBlank(reference)) {
             wiki = getDefaultWikiName();
             space = getDefaultSpaceName();
-            page = DEFAULT_PAGE;
+            page = getDefaultPageName();
         } else {
 
             // Step 1: Extract the wiki name
@@ -120,7 +131,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
                 if (spaceSeparatorPosition + SPACE_SEPARATOR.length() < reference.length()) {
                     page = reference.substring(spaceSeparatorPosition + SPACE_SEPARATOR.length());
                 } else {
-                    page = DEFAULT_PAGE;
+                    page = getDefaultPageName();
                 }
             } else {
                 // No space separator the whole substring is thus the page.
@@ -132,7 +143,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
                 {
                     page = reference.substring(wikiSeparatorPosition + WIKI_SEPARATOR.length());
                 } else {
-                    page = DEFAULT_PAGE;
+                    page = getDefaultPageName();
                 }
             }
         }
@@ -140,7 +151,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
         return new DocumentName(wiki, space, page);
     }
     
-    private String getDefaultWikiName()
+    protected String getDefaultWikiName()
     {
         String wiki = getContext().getDatabase();
         if (wiki == null) {
@@ -149,7 +160,12 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
         return wiki;
     }
 
-    private String getDefaultSpaceName()
+    protected String getDefaultPageName()
+    {
+        return DEFAULT_PAGE;
+    }
+    
+    protected String getDefaultSpaceName()
     {
         String space;
         XWikiDocument currentDocument = getContext().getDoc();
@@ -167,7 +183,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
     /**
      * @return the XWiki Context used to bridge with the old API
      */
-    private XWikiContext getContext()
+    protected XWikiContext getContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }

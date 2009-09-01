@@ -22,10 +22,7 @@ package org.xwiki.rendering.macro.velocity;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.jmock.Mockery;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.rendering.macro.script.MockSetup;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -51,23 +48,11 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrovelocity8", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        setUpMocks(testSetup.getComponentManager());
+        new MockSetup(testSetup.getComponentManager());
 
         // Note: We're using a static Mock for the VelocityManager since it leads to a cleaner code
         // (the Include Macro is reusing it too). We register this mock as real component in components.txt.
 
         return testSetup;
-    }
-
-    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
-    {
-        Mockery context = new Mockery();
-
-        // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
     }
 }

@@ -54,7 +54,7 @@ public class HeadingNameNamingCriterionTest extends AbstractComponentTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.scaffolding.AbstractRenderingTestCase#setUp()
+     * @see AbstractComponentTestCase#setUp()
      */
     @Before
     public void setUp() throws Exception

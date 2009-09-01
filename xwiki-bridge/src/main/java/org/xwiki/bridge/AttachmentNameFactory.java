@@ -17,34 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.script;
+package org.xwiki.bridge;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.test.ComponentManagerTestSetup;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * All Rendering integration tests defined in text files using a special format.
- * 
+ * Generate an Attachment Name from a raw string reference. The exact format of the reference depends on the 
+ * implementation used. For example see {@link org.xwiki.bridge.internal.DefaultAttachmentNameFactory}.
+ *
  * @version $Id$
- * @since 2.0M1
+ * @since 2.0RC1
  */
-public class RenderingTests extends TestCase
+@ComponentRole
+public interface AttachmentNameFactory
 {
-    public static Test suite() throws Exception
-    {
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
-
-        suite.addTestsFromResource("macroscript1", true);
-        suite.addTestsFromResource("macroscript2", true);
-        suite.addTestsFromResource("macroscript3", true);
-        suite.addTestsFromResource("macroscript4", true);
-
-        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
-        new MockSetup(testSetup.getComponentManager());
-
-        return testSetup;
-    }
+    /**
+     * @param reference the attachment's name as a string using a textual format 
+     *        (eg {@code wiki:space.page@attachment}). The supported format is up to implementers of this method.
+     * @return the object representing an attachment reference
+     */
+    AttachmentName createAttachmentName(String reference);    
 }

@@ -25,9 +25,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.AttachmentName;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -53,6 +56,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Requirement
     private Execution execution;
 
+    @Requirement 
+    private DocumentNameSerializer documentNameSerializer;
+    
+    @Requirement 
+    private DocumentNameFactory documentNameFactory;
+    
     private XWikiContext getContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
@@ -382,6 +391,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentURL(String, String)
+     * @deprecated use {@link #getAttachmentURL(AttachmentName)} instead
      */
     public String getAttachmentURL(String documentName, String attachmentName)
     {
@@ -396,6 +406,49 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             throw new RuntimeException("Failed to get attachment URL", e);
         }
         return attachmentURL;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentURL(AttachmentName, boolean)
+     * @since 2.0RC1
+     */
+    public String getAttachmentURL(AttachmentName attachmentName, boolean isFullURL)
+    {
+        String url;
+        if (isFullURL) {
+            XWikiContext xcontext = getContext();
+            url = xcontext.getURLFactory().createAttachmentURL(attachmentName.getFileName(), 
+                attachmentName.getDocumentName().getSpace(), attachmentName.getDocumentName().getPage(),
+                "download", null, attachmentName.getDocumentName().getWiki(), xcontext).toString();
+        } else {
+            url = getAttachmentURL(this.documentNameSerializer.serialize(attachmentName.getDocumentName()), 
+                attachmentName.getFileName()); 
+        }
+        return url; 
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentURLs(DocumentName, boolean)
+     * @since 2.0RC1
+     */
+    public List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception
+    {
+        List<String> urls = new ArrayList<String>();
+        XWikiContext xcontext = getContext();
+        DocumentName resolvedName = documentName;
+        if (documentName == null) {
+            resolvedName = this.documentNameFactory.createDocumentName(xcontext.getDoc().getFullName()); 
+        }
+        List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
+            this.documentNameSerializer.serialize(resolvedName), xcontext).getAttachmentList();
+        for (XWikiAttachment attachment : attachments) {
+            urls.add(getAttachmentURL(new AttachmentName(resolvedName, attachment.getFilename()), isFullURL));
+        }
+        return urls;
     }
 
     /**

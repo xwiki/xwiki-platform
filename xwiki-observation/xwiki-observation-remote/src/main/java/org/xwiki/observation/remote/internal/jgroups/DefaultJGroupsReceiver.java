@@ -54,6 +54,11 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
     private ComponentManager componentManager;
 
     /**
+     * The address of the member.
+     */
+    private Address address;
+
+    /**
      * @return the RemoteObservationManager
      */
     public RemoteObservationManager getRemoteObservationManager()
@@ -86,11 +91,13 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
      */
     public void receive(Message msg)
     {
-        RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
+        if (this.address == null || !this.address.equals(msg.getSrc())) {
+            RemoteEventData remoteEvent = (RemoteEventData) msg.getObject();
 
-        getLogger().debug("Received JGroups remote event [" + remoteEvent + "]");
+            getLogger().debug("Received JGroups remote event [" + remoteEvent + "]");
 
-        getRemoteObservationManager().notify(remoteEvent);
+            getRemoteObservationManager().notify(remoteEvent);
+        }
     }
 
     /**
@@ -131,5 +138,15 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
     public void viewAccepted(View newView)
     {
 
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.remote.jgroups.JGroupsReceiver#setLocalAddess(org.jgroups.Address)
+     */
+    public void setLocalAddess(Address address)
+    {
+        this.address = address;
     }
 }

@@ -56,16 +56,22 @@ public class TCPROMTest extends AbstractROMTestCase
     @Test
     public void testSerializableEvent() throws InterruptedException
     {
-        final EventListener listener = this.context.mock(EventListener.class);
+        final EventListener listener1 = this.context.mock(EventListener.class, "listener1");
+        final EventListener listener2 = this.context.mock(EventListener.class, "listener2");
+
         final TestEvent event = new TestEvent();
 
         this.context.checking(new Expectations() {{
-                allowing(listener).getName(); will(returnValue("mylistener"));
-                allowing(listener).getEvents(); will(returnValue(Arrays.asList(event)));
-                oneOf(listener).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
+                allowing(listener1).getName(); will(returnValue("mylistener"));
+                allowing(listener2).getName(); will(returnValue("mylistener"));
+                allowing(listener1).getEvents(); will(returnValue(Arrays.asList(event)));
+                allowing(listener2).getEvents(); will(returnValue(Arrays.asList(event)));
+                oneOf(listener1).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
+                oneOf(listener2).onEvent(with(equal(event)), with(equal("some source")), with(equal("some data")));
             }});
 
-        getObservationManager2().addListener(listener);
+        getObservationManager1().addListener(listener1);
+        getObservationManager2().addListener(listener2);
 
         getObservationManager1().notify(event, "some source", "some data");
 

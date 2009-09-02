@@ -7,16 +7,25 @@
 ##
 ## Settings, compute what versions should be displayed.
 ##
+  #if($context.action == 'view')
+    #set($viewer = 'viewer=history')
+  #else
+    #set($viewer = 'editor=history')
+  #end
   #set($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == 'true'))
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
   #set($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
-  #set($totalVersions = $tdoc.getRevisions($criteria).size())
-## This will fill in $startAt, $endAt and the variables needed later by #printPagedViewLinks
-  #preparePagedViewParams($totalVersions, $xwiki.getXWikiPreferenceAsInt('web_history_versionsPerPage', 20))
+  #set($versions = $util.reverseList($tdoc.getRevisions($criteria)))
+  #set($totalVersions = $versions.size())
+  #if($totalVersions == 0)
+    #warning($msg.get("thispagedoesnotexist"))
+  #else
+  #set($paginationParameters = {'url' : "?${viewer}&amp;showminor=${minorVersions}", 'totalItems' : $totalVersions, 'defaultItemsPerPage' : 20, 'position': 'top'})
+  #pagination($paginationParameters)
 ## Since we're displaying revisions starting from the last one, we need to mirror the range inside
 ## the total versions range.
-  #set($startAt = $totalVersions - $startAt)
-  #set($endAt = 0 - $itemsPerPage)
+  #set($startAt = $totalVersions - ${paginationParameters.firstItem})
+  #set($endAt = 0 - ${paginationParameters.itemsPerPage})
   #set($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
 ## Reuse the old object, just add the range.
   $criteria.setRange($range)
@@ -26,10 +35,14 @@
     #set($lang = '')
   #end
 ##
+## Pagination style
+$xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
+##
 ## Preamble, output some HTML.
 ##
   <div id="historycontent" class="xwikiintracontent">
-    #set($versions = $util.reverseList($tdoc.getRevisions($criteria)))
+##
+##
     #set($formname="historyform")
     <form id="$formname" action="$doc.getURL('view', "viewer=changes&amp;$docvariant")" method="post">
       <div id="_history">
@@ -45,23 +58,23 @@
           <th>$msg.get('core.viewers.history.author')</th>
           <th>$msg.get('core.viewers.history.date')</th>
 ## Might be disabled in certain wikis.
-  #if($xwiki.hasEditComment())
+        #if($xwiki.hasEditComment())
           <th>$msg.get('core.viewers.history.comment')</th>
-  #end
+        #end
 ## Editors see the Revert button.
-  #if($hasEdit && !$hasAdmin)
+        #if($hasEdit && !$hasAdmin)
           <th></th>
 ## Admins see the Revert and Delete buttons.
-  #elseif($hasAdmin)
+        #elseif($hasAdmin)
           <th colspan="2"></th>
-  #end
+        #end
         </tr>
 ##
 ## Display, loop over the extracted revisions and print them in the table.
 ##
   #foreach ($version in $versions)
     #set($revinfo = $tdoc.getRevisionInfo($version))
-    #if ($tdoc.getRCSVersion()==$version)
+    #if ($tdoc.getRCSVersion() == $version)
         <tr class="currentversion odd">
     #else
          <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
@@ -100,7 +113,8 @@
 #else
   #set($viewer = 'editor=history')
 #end
-  #printPagedViewLinks($itemsPerPage $totalPages $currentPageNumber "${viewer}&amp;showminor=${minorVersions}" false)
+    #set($discard = $paginationParameters.put('position', 'bottom'))
+    #pagination($paginationParameters)
       <div class="buttons">
         #if ($totalVersions > 1)
           <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get('core.viewers.history.compare')" class="button"/></div>
@@ -123,3 +137,4 @@
     </div>
   </form>
   </div>
+#end ## versions.size

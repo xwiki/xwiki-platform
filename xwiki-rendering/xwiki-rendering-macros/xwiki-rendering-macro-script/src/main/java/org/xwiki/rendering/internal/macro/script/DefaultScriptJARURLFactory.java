@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.macro.script;
 
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -33,22 +32,22 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.macro.script.ScriptClassLoaderFactory;
+import org.xwiki.rendering.macro.script.ScriptJARURLFactory;
 
 /**
- * Default implementation supporting the syntax defined in {@link #createClassLoader(String)}. 
+ * Default implementation supporting the syntax defined in {@link #createJARURLs(String)}. 
  *  
  * @version $Id$
  * @since 2.0RC1
  */
 @Component
-public class DefaultScriptClassLoaderFactory implements ScriptClassLoaderFactory
+public class DefaultScriptJARURLFactory implements ScriptJARURLFactory
 {
     /**
      * Character to separate document name from JAR name, see {@link #createClassLoader(String)}.
      * Note that we cannot rely completely on {@link AttachmentNameFactory} since we need to handle one 
      * special case: when the format {@code attach:wiki:space.page} is used to signify that all jar
-     * attachments from 
+     * attachments from the specified page must be added.
      */
     private static final String FILENAME_SEPARATOR = "@";
 
@@ -80,16 +79,16 @@ public class DefaultScriptClassLoaderFactory implements ScriptClassLoaderFactory
     /**
      * {@inheritDoc}
      * 
-     * Parse a string listing URLs to add to the class loader that will be returned. This is s a comma-separated
-     * list of URLs. 
+     * Parse a string pointing to JARs locations, either a known URL protocol such as "http" or a special "attach" 
+     * protocol to generate JAR URLs from JARs attached to wiki pages.
+     * <ul>
+     *   <li>{@code attach:wiki:space.page@somefile.jar}</li>
+     *   <li>{@code attach:wiki:space.page}: all jars located on the passed page</li>
+     * </ul>
      * 
-     * There's a special notation for specifying a URL to an attachment located on a wiki page:
-     * {@code attach:wiki:space.page@somefile.jar}. The following syntax will also add all jars located on the
-     * passed page: {@code attach:wiki:space.page}.
-     * 
-     * @see ScriptClassLoaderFactory#createClassLoader(String)
+     * @see ScriptJARURLFactory#createURLs(String)
      */
-    public ClassLoader createClassLoader(String scriptJars) throws Exception
+    public List<URL> createJARURLs(String scriptJars) throws Exception
     {
         List<URL> urls = new ArrayList<URL>();
         
@@ -112,7 +111,7 @@ public class DefaultScriptClassLoaderFactory implements ScriptClassLoaderFactory
             }
         }
         
-        return new URLClassLoader(urls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+        return urls;
     }
     
     /**

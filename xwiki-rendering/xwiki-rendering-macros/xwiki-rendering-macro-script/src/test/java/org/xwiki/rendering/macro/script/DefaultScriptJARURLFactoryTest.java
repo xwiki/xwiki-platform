@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro.script;
 
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,16 +32,16 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link DefaultScriptClassLoaderFactory}.
+ * Unit tests for {@link DefaultScriptJARURLFactoryTest}.
  * 
  * @version $Id$
  * @since 2.0RC1
  */
-public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCase
+public class DefaultScriptJARURLFactoryTest extends AbstractComponentTestCase
 {
     private ScriptMockSetup mockSetup;
 
-    private ScriptClassLoaderFactory factory;
+    private ScriptJARURLFactory factory;
     
     @Override
     protected void registerComponents() throws Exception
@@ -50,14 +49,13 @@ public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCa
         super.registerComponents();
         this.mockSetup = new ScriptMockSetup(getComponentManager());
 
-        this.factory = getComponentManager().lookup(ScriptClassLoaderFactory.class);
+        this.factory = getComponentManager().lookup(ScriptJARURLFactory.class);
     }
 
     @Test
     public void testExtraJarLocatedAtURL() throws Exception
     {
-        URLClassLoader cl = (URLClassLoader) this.factory.createClassLoader("http://path/to/some.jar");
-        List<URL> urls = Arrays.asList(cl.getURLs()); 
+        List<URL> urls = this.factory.createJARURLs("http://path/to/some.jar");
         Assert.assertEquals(1, urls.size());
         Assert.assertTrue(urls.contains(new URL("http://path/to/some.jar")));
     }
@@ -66,9 +64,8 @@ public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCa
     public void testExtraJarsLocatedAtURL() throws Exception
     {
         // Note: we test with spaces between urls too below.
-        URLClassLoader cl = (URLClassLoader) this.factory.createClassLoader(
+        List<URL> urls = this.factory.createJARURLs(
             "http://path1/to/some.jar,http://path2/to/some.jar,   http://path3/to/some.jar");
-        List<URL> urls = Arrays.asList(cl.getURLs());
         Assert.assertEquals(3, urls.size());
         Assert.assertTrue(urls.contains(new URL("http://path1/to/some.jar")));
         Assert.assertTrue(urls.contains(new URL("http://path2/to/some.jar")));
@@ -88,8 +85,7 @@ public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCa
                 will(returnValue("http://path/to/some.jar"));
         }});
 
-        URLClassLoader cl = (URLClassLoader) this.factory.createClassLoader("attach:wiki:space.page@some.jar");
-        List<URL> urls = Arrays.asList(cl.getURLs()); 
+        List<URL> urls = this.factory.createJARURLs("attach:wiki:space.page@some.jar");
         Assert.assertTrue(urls.contains(new URL("http://path/to/some.jar")));
     }
 
@@ -103,8 +99,7 @@ public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCa
                 will(returnValue("http://path/to/some.jar"));
         }});
 
-        URLClassLoader cl = (URLClassLoader) this.factory.createClassLoader("attach:some.jar");
-        List<URL> urls = Arrays.asList(cl.getURLs()); 
+        List<URL> urls = this.factory.createJARURLs("attach:some.jar");
         Assert.assertTrue(urls.contains(new URL("http://path/to/some.jar")));
     }
     
@@ -120,8 +115,7 @@ public class DefaultScriptClassLoaderFactoryTest extends AbstractComponentTestCa
                 "http://path/to/some1.jar", "http://path/to/notajar.txt", "http://path/to/some2.jar")));
         }});
         
-        URLClassLoader cl = (URLClassLoader) this.factory.createClassLoader("attach:wiki:space.page");
-        List<URL> urls = Arrays.asList(cl.getURLs());
+        List<URL> urls = this.factory.createJARURLs("attach:wiki:space.page");
         Assert.assertEquals(2, urls.size());
         Assert.assertTrue(urls.contains(new URL("http://path/to/some1.jar")));
         Assert.assertTrue(urls.contains(new URL("http://path/to/some2.jar")));

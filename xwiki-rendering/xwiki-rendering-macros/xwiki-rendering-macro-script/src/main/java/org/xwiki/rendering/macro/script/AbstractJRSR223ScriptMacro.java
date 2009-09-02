@@ -20,7 +20,9 @@
 package org.xwiki.rendering.macro.script;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -31,6 +33,7 @@ import javax.script.ScriptException;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
@@ -46,6 +49,11 @@ import org.xwiki.script.ScriptContextManager;
  */
 public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroParameters> extends AbstractScriptMacro<P>
 {
+    /**
+     * Key under which the Script Engines are saved in the Execution Context, see {@link #execution}.
+     */
+    private static final String EXECUTION_CONTEXT_ENGINE_KEY = "scriptEngines"; 
+    
     /**
      * Used to get the current script context to give to script engine evaluation method.
      */
@@ -154,11 +162,11 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, ClassLoader, MacroTransformationContext) 
+     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext) 
      */
     @Override
-    protected String evaluate(P parameters, String content, ClassLoader classLoader,
-        MacroTransformationContext context) throws MacroExecutionException
+    protected String evaluate(P parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         if (StringUtils.isEmpty(content)) {
             return "";
@@ -168,19 +176,10 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
 
         String scriptResult;
         if (engineName != null) {
-            // 2) execute script
 
-            // JSR223 doesn't support the notion of classloader used to find classes in scripts and this is 
-            // probably normal since not all script engines have the notion of classloader I guess.
-            // The way most JSR223 implementation work is by using the context classloader to load the classes
-            // and thus we need to set the context class loader to be the passed class loader and we restore it
-            // afterwards to ensure no leakage.
-            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
             try {
-                Thread.currentThread().setContextClassLoader(classLoader);
+                ScriptEngine engine = getScriptEngine(engineName, parameters.getJars());
                 
-                ScriptEngineManager sem = new ScriptEngineManager();
-                ScriptEngine engine = sem.getEngineByName(engineName);
                 if (engine != null) {
                     ScriptContext scriptContext = getScriptContext();
 
@@ -200,9 +199,6 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
                 }
             } catch (ScriptException e) {
                 throw new MacroExecutionException("Failed to evaluate Script Macro for content [" + content + "]", e);
-            } finally {
-                // Restore original class loader
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
             }
             
         } else {
@@ -213,6 +209,47 @@ public abstract class AbstractJRSR223ScriptMacro<P extends JSR223ScriptMacroPara
         return scriptResult;
     }
 
+    /**
+     * @param engineName the script engine name (eg "groovy", etc)
+     * @param jarsParameterValue the value of the jars parameter for passing JAR URLs
+     * @return the Script engine to use to evaluate the script 
+     * @throws MacroExecutionException in case of an error in parsing the jars parameter
+     */
+    private ScriptEngine getScriptEngine(String engineName, String jarsParameterValue)
+        throws MacroExecutionException
+    {
+        // Look for a script engine in the Execution Context since we want the same engine to be used
+        // for all evals during the same execution lifetime.
+        ExecutionContext executionContext = this.execution.getContext();
+        Map<String, ScriptEngine> scriptEngines = 
+            (Map<String, ScriptEngine>) executionContext.getProperty(EXECUTION_CONTEXT_ENGINE_KEY);
+        if (scriptEngines == null) {
+            scriptEngines = new HashMap<String, ScriptEngine>();
+            executionContext.setProperty(EXECUTION_CONTEXT_ENGINE_KEY, scriptEngines);
+        }
+        ScriptEngine engine = scriptEngines.get(engineName);
+        if (engine == null) {
+            ScriptEngineManager sem = new ScriptEngineManager();
+
+            // Some engines will create their class loader when the engine is instantiated and use the context
+            // classloader as the parent class loader. Thus we must set our own class loader at this point so
+            // that we can add other URLs to it later on if some JARs are specified in other script macro
+            // executions.
+            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+            try {
+                Thread.currentThread().setContextClassLoader(getClassLoader(jarsParameterValue));
+                engine = sem.getEngineByName(engineName);
+            } finally {
+                // Restore original class loader
+                Thread.currentThread().setContextClassLoader(originalClassLoader);
+            }
+
+            scriptEngines.put(engineName, engine);
+        }
+
+        return engine;
+    }
+    
     /**
      * Execute the script.
      * 

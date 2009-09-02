@@ -19,25 +19,29 @@
  */
 package org.xwiki.rendering.macro.script;
 
+import java.net.URL;
+import java.util.List;
+
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Create Class Loader to be used when executing scripts, see {@link #createClassLoader(String)} for more details.
+ * Create JAR URLs to be used in the script Class Loader when executing scripts, see {@link #createJARURLs(String)}
+ * for more details.
  * 
  * @version $Id$
  * @since 2.0RC1
  */
 @ComponentRole
-public interface ScriptClassLoaderFactory
+public interface ScriptJARURLFactory
 {
     /**
-     * Create Class Loader to be used when executing scripts. The class loader is created based on some
-     * passed reference specifying a list of jars to be made available in the created class loader. The format
+     * Create a list of JAR URLs to be put in the Class Loader used when executing scripts. The URLs are created based
+     * on some passed reference specifying a list of JARs to be made available in the created class loader. The format
      * is not defined and left to implementation classes.
      * 
-     * @param scriptJars the list of jars to make available in the returned class loader
-     * @return the configured class loader
-     * @throws Exception if the class loader fails to be created for any reason (eg some invalid URL passed)
+     * @param scriptJars the list of JARs to make available in the returned class loader
+     * @return the JAR URLs
+     * @throws Exception if the URLs fail to be created for any reason (eg some invalid URL reference passed)
      */
-    ClassLoader createClassLoader(String scriptJars) throws Exception;
+    List<URL> createJARURLs(String scriptJars) throws Exception;
 }

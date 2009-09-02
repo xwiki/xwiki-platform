@@ -71,4 +71,20 @@ public class ClassLoadingTest extends AbstractComponentTestCase
         // execute the script.
         this.macro.execute(params, "def var = new Dummy()", this.context);
     }
+    
+    /**
+     * Verify that it's possible to add jars to the class loader used by the Groovy engine
+     * across multiple invocations of the Groovy macro. 
+     */
+    @Test
+    public void testJarParamsInSecondMacro() throws Exception
+    {
+        // Execute a first macro without any jars param passed
+        this.macro.execute(new JSR223ScriptMacroParameters(), "def var", this.context);
+
+        // Execute a second macro this time with jars param and verify it works
+        JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();
+        params.setJars(getClass().getClassLoader().getResource("dummy.jar").toString());
+        this.macro.execute(params, "def var = new Dummy()", this.context);
+    }
 }

@@ -48,6 +48,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrogroovy1", true);
         suite.addTestsFromResource("macrogroovy2", true);
         suite.addTestsFromResource("macrogroovy3", true);
+        suite.addTestsFromResource("macrogroovy4", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());

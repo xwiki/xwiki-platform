@@ -3645,7 +3645,7 @@ div.xwikipanelcontents {
   background: $theme.panelBackgroundColor;
   background-image: none;
   padding: 10px 15px;
-  color: $theme.textPrimaryColor ;
+  color: $theme.panelTextColor;
 }
 
 .xwikipanelcontents a {

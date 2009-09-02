@@ -1,6 +1,5 @@
 package org.xwiki.observation.remote.jgroups;
 
-import org.jgroups.Address;
 import org.jgroups.Receiver;
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -14,9 +13,4 @@ import org.xwiki.component.annotation.ComponentRole;
 @ComponentRole
 public interface JGroupsReceiver extends Receiver
 {
-    /**
-     * @param address the member address
-     * @since 2.0RC1
-     */
-    void setLocalAddess(Address address);
 }

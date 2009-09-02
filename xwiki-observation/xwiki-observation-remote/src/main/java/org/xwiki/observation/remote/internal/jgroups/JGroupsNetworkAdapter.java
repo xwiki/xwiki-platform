@@ -89,20 +89,7 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
         JChannel channel;
         try {
             channel = createChannel(channelId);
-
-            // get Receiver
-            JGroupsReceiver channelReceiver;
-            try {
-                channelReceiver = this.componentManager.lookup(JGroupsReceiver.class, channelId);
-            } catch (ComponentLookupException e) {
-                channelReceiver = this.componentManager.lookup(JGroupsReceiver.class);
-            }
-
-            channel.setReceiver(channelReceiver);
-
             channel.connect("event");
-
-            channelReceiver.setLocalAddess(channel.getLocalAddress());
 
             this.channels.put(channelId, channel);
         } catch (Exception e) {
@@ -150,8 +137,20 @@ public class JGroupsNetworkAdapter extends AbstractLogEnabled implements Network
             throw new ChannelException("Failed to load configuration for the channel [" + channelId + "]", e);
         }
 
+        // get Receiver
+        JGroupsReceiver channelReceiver;
+        try {
+            channelReceiver = this.componentManager.lookup(JGroupsReceiver.class, channelId);
+        } catch (ComponentLookupException e) {
+            channelReceiver = this.componentManager.lookup(JGroupsReceiver.class);
+        }
+        
         // create channel
         JChannel channel = new JChannel(channelConf);
+        
+        channel.setReceiver(channelReceiver);
+        channel.setOpt(JChannel.LOCAL, false);
+        
         return channel;
     }
 

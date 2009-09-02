@@ -139,14 +139,4 @@ public class DefaultJGroupsReceiver extends AbstractLogEnabled implements JGroup
     {
 
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.observation.remote.jgroups.JGroupsReceiver#setLocalAddess(org.jgroups.Address)
-     */
-    public void setLocalAddess(Address address)
-    {
-        this.address = address;
-    }
 }

@@ -89,29 +89,14 @@ blockquote {
 }
 
 .clearfloats {
-    clear: both;
-    height: 1px;
-    margin: 0 220px;
-}
-
-body.hideleft .clearfloat {
-    margin: 0 220px 0 30px;
-}
-
-body.hideright .clearfloat {
-    margin: 0 30px 0 220px;
-}
-
-body.hidelefthideright .clearfloat {
-    margin: 0 30px;
-}
-
-body#body.loginbody .clearfloats {
-    display: none;
+  clear: both;
+  height: 1px;
+  overflow: hidden;
+  margin: -1px 220px 0;
 }
 
 body.editbody .clearfloats {
-    margin-right: 300px;
+  margin-right: 300px;
 }
 
 .hidden {
@@ -2953,13 +2938,6 @@ div#changes-info-boxes {
     border: 0px solid #f4f9fe;
     background-color: transparent;
 
-}
-
-#changescontent .clearfloats {
-    clear: both;
-    height: 1px;
-    background-color: transparent;
-    margin-right: 0;
 }
 
 div#changes-info-box-from {

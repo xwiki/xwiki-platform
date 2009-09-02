@@ -2,7 +2,7 @@
 <config>
     <TCP bind_addr="localhost"
          bind_port="7900"
-         loopback="false"
+         loopback="true"
          recv_buf_size="20000000"
          send_buf_size="640000"
          discard_incompatible_packets="true"

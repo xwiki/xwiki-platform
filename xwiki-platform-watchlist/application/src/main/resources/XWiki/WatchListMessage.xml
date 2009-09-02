@@ -164,7 +164,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
     #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
     &lt;div class="document" style="$documentDivStyle"&gt;
     #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" /&gt; $currentDoc.getDisplayTitle()&lt;/h3&gt;
+    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" /&gt; &lt;a href="$event.getUrl($context.context)"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/h3&gt;
     &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
   &lt;div style="$eventStyle"&gt;

@@ -3565,7 +3565,7 @@ body.hideright #contentcolumn .main {
   background: transparent;
 }
 #headerglobal {
-  background: $theme.pageHeaderBackgroundColor $!{theme.headerBackgoundImage} $!{theme.headerBackgoundPosition};
+  background: $theme.pageHeaderBackgroundColor $!{theme.headerBackgroundImage} $!{theme.headerBackgroundPosition};
 }
 #headerglobal, #company, #companylogo, #companylogo a, #companylogo a img, #globallinks {
   height: auto !important;

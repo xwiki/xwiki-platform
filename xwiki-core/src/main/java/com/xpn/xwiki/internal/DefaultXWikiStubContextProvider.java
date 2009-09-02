@@ -1,6 +1,7 @@
 package com.xpn.xwiki.internal;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.logging.AbstractLogEnabled;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -18,7 +19,7 @@ import com.xpn.xwiki.web.XWikiServletRequestStub;
  * @since 2.0M3
  */
 @Component
-public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
+public class DefaultXWikiStubContextProvider extends AbstractLogEnabled implements XWikiStubContextProvider
 {
     /**
      * The initial stub XWikiContext.
@@ -53,6 +54,8 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
         this.stubContext.flushClassCache();
         this.stubContext.flushArchiveCache();
+
+        getLogger().debug("Stub context initialized.");
     }
 
     /**

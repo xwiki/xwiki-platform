@@ -137,4 +137,11 @@
 #-# The default remote event distribution implementation is using JGroups and you'll need to drop your JGroups channel
 #-# xml files in the WEB-INF/observation/remote/jgroups/ directory. There's a README file in that directory with more
 #-# information.
-#-# Example: observation.remote.channels = public.xml, cluster.xml
+#-# Example: observation.remote.channels = public, cluster
+
+#-# [Since 2.0M4]
+#-# The implementation of network adapter to use.
+#-# The default is jgroups.
+#-#
+#-# By default obnly jgroups is provided. To add one implements NetworkAdaptor componenet interface. The identifier provided in the configuration is matched with the component role hint.
+#-# Example: observation.remote.networkadapter = jgroups

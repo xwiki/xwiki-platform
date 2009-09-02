@@ -108,7 +108,6 @@
 #if($isAdvancedUser)&lt;li id="xwikieditobject"#if($editor &amp;&amp; $editor == "object") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=object&amp;amp;$param")"&gt;$msg.get("editObject")&lt;/a&gt;&lt;/li&gt; #end
 #if($isAdvancedUser)&lt;li id="xwikieditclass"#if($editor &amp;&amp; $editor == "class") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=class&amp;amp;$param")"&gt;$msg.get("editClass")&lt;/a&gt;&lt;/li&gt; #end
 &lt;li id="xwikieditrights"#if($editor &amp;&amp; $editor == "rights") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=rights&amp;amp;$param")"&gt;$msg.get("editRights")&lt;/a&gt;&lt;/li&gt;
-#if($isAdvancedUser)&lt;li id="xwikiedithistory"#if($editor &amp;&amp; $editor == "history") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=history&amp;amp;$docvariant&amp;amp;$param")"&gt;$msg.get("editHistory")&lt;/a&gt;&lt;/li&gt;#end
 &lt;/ul&gt;
 #panelfooter()</content>
 </property>

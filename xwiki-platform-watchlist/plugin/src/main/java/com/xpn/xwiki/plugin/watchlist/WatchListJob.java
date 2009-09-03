@@ -218,9 +218,10 @@ public class WatchListJob extends AbstractJob implements Job
             }
 
             List<String> subscribers = getSubscribers();
-            Date previousFireTime = getPreviousFireTime();
+            Date previousFireTime = getPreviousFireTime();            
             WatchListEventMatcher eventMatcher = new WatchListEventMatcher(previousFireTime, context);
-
+            setPreviousFireTime();
+            
             if (!hasSubscribers()) {
                 return;
             }
@@ -242,10 +243,7 @@ public class WatchListJob extends AbstractJob implements Job
                     plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents, getEmailTemplate(),
                         previousFireTime, context);
                 }
-            }
-
-            setPreviousFireTime();
-
+            }            
         } catch (Exception e) {
             // We're in a job, we don't throw exceptions
             LOG.error("Exception while running job", e);

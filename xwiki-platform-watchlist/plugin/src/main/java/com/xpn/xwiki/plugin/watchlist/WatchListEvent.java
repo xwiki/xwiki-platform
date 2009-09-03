@@ -33,6 +33,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.AttachmentDiff;
+import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
@@ -51,6 +52,11 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Prefix used in inline style we put in HTML diffs.
      */
     private static final String HTML_STYLE_PLACEHOLDER_PREFIX = "WATCHLIST_STYLE_DIFF_";
+    
+    /**
+     * Suffix used to insert images later in HTML diffs.
+     */
+    private static final String HTML_IMG_PLACEHOLDER_SUFFIX = "_WATCHLIST_IMG_PLACEHOLDER";
 
     /**
      * Event hashcode.
@@ -408,16 +414,19 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     Div mainDiv = createDiffDiv(prefix + "Diff");
                     Span objectName = createDiffSpan(prefix + "ClassName");
                     objectName.addElement(oList.get(0).getClassName());
+                    mainDiv.addElement(prefix + HTML_IMG_PLACEHOLDER_SUFFIX);
                     mainDiv.addElement(objectName);
                     for (ObjectDiff oDiff : oList) {
                         if (!StringUtils.isBlank(oDiff.getPropName())) {
                             Div propDiv = createDiffDiv("propDiffContainer");
-                            Span propNameSpan = createDiffSpan("propName");
+                            Span propNameSpan = createDiffSpan("propName");                            
                             propNameSpan.addElement(oDiff.getPropName() + propSeparator);
+                            propDiv.addElement(StringUtils.removeEnd(oDiff.getPropType(), "Class").toLowerCase() 
+                                + HTML_IMG_PLACEHOLDER_SUFFIX);                            
                             propDiv.addElement(propNameSpan);
                             String propDiff =
                                 diff.getDifferencesAsHTML(oDiff.getPrevValue().toString(), oDiff.getNewValue()
-                                    .toString());
+                                    .toString(), false);
                             Div propDiffDiv = createDiffDiv("propDiff");
                             propDiffDiv.addElement(propDiff);
                             propDiv.addElement(propDiffDiv);
@@ -450,22 +459,31 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 List<AttachmentDiff> attachDiffs = d2.getAttachmentDiff(d1, d2, context);
                 List<List<ObjectDiff>> objectDiffs = d2.getObjectDiff(d1, d2, context);
                 List<List<ObjectDiff>> classDiffs = d2.getClassDiff(d1, d2, context);
+                List<MetaDataDiff> metaDiffs = d2.getMetaDataDiff(d1, d2, context);
 
                 if (!d1.getContent().equals(d2.getContent())) {                    
                     Div contentDiv = createDiffDiv("contentDiff");
-                    String contentDiff = diff.getDifferencesAsHTML(d1.getContent(), d2.getContent());
+                    String contentDiff = diff.getDifferencesAsHTML(d1.getContent(), d2.getContent(), false);
                     contentDiv.addElement(contentDiff);
                     result.append(contentDiv);
                 }
-
+                                
                 for (AttachmentDiff aDiff : attachDiffs) {
                     Div attachmentDiv = createDiffDiv("attachmentDiff");
+                    attachmentDiv.addElement("attach" + HTML_IMG_PLACEHOLDER_SUFFIX);
                     attachmentDiv.addElement(aDiff.toString());
                     result.append(attachmentDiv);
                 }
 
                 result.append(getHTMLObjectsDiff(objectDiffs, "object", diff));
                 result.append(getHTMLObjectsDiff(classDiffs, "class", diff));
+                
+                for (MetaDataDiff mDiff : metaDiffs) {
+                    Div metaDiv = createDiffDiv("metaDiff");
+                    metaDiv.addElement("metadata" + HTML_IMG_PLACEHOLDER_SUFFIX);
+                    metaDiv.addElement(mDiff.toString());
+                    result.append(metaDiv);
+                }
 
                 htmlDiff = result.toString();
             } catch (XWikiException e) {

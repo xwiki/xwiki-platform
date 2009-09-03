@@ -53,8 +53,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 {
     public static final Random rand = new Random(Calendar.getInstance().getTimeInMillis());
 
-    private XWikiContext context;
-
     private com.xpn.xwiki.XWiki xwiki;
 
     private Document apiDocument;
@@ -67,23 +65,22 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockXWikiRightService;
 
-    private Map docs = new HashMap();
+    private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.context = new XWikiContext();
         this.xwiki = new com.xpn.xwiki.XWiki();
-        this.context.setWiki(this.xwiki);
+        getContext().setWiki(this.xwiki);
         this.xwiki.setConfig(new XWikiConfig());
         this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
-        this.apiXWiki = new XWiki(this.xwiki, this.context);
+        this.apiXWiki = new XWiki(this.xwiki, getContext());
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new java.lang.Class[] {com.xpn.xwiki.XWiki.class, XWikiContext.class},
-                new java.lang.Object[] {this.xwiki, this.context});
+                new java.lang.Object[] {this.xwiki, getContext()});
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -114,7 +111,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         this.mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new java.lang.Class[] {com.xpn.xwiki.XWiki.class,
-            XWikiContext.class}, new java.lang.Object[] {this.xwiki, this.context});
+            XWikiContext.class}, new java.lang.Object[] {this.xwiki, getContext()});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(new XWikiDocumentArchive()));
         this.mockXWikiVersioningStore.stubs().method("saveXWikiDocArchive").will(returnValue(null));
@@ -128,18 +125,18 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) this.mockXWikiVersioningStore.proxy());
         this.xwiki.setRightService((XWikiRightService) this.mockXWikiRightService.proxy());
 
-        this.context.setUser("Redtail");
-        this.apiDocument = new Document(new XWikiDocument("MilkyWay", "Fidis"), this.context);
-        this.apiDocument.getDocument().setCreator("c" + this.context.getUser());
-        this.apiDocument.getDocument().setAuthor("a" + this.context.getUser());
+        getContext().setUser("Redtail");
+        this.apiDocument = new Document(new XWikiDocument("MilkyWay", "Fidis"), getContext());
+        this.apiDocument.getDocument().setCreator("c" + getContext().getUser());
+        this.apiDocument.getDocument().setAuthor("a" + getContext().getUser());
         this.apiDocument.save();
-        this.context.setUser("Earth");
+        getContext().setUser("Earth");
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Lyre";
-        String currentUser = this.context.getUser();
+        String currentUser = getContext().getUser();
         this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
         Document copy = this.apiXWiki.getDocument(copyName);
 
@@ -149,7 +146,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testCreatorAfterDocumentCopy() throws XWikiException
     {
         String copyName = "Sirius";
-        String currentUser = this.context.getUser();
+        String currentUser = getContext().getUser();
         this.apiXWiki.copyDocument(this.apiDocument.getName(), copyName);
         Document copy = this.apiXWiki.getDocument(copyName);
 

@@ -21,6 +21,8 @@
 package com.xpn.xwiki;
 
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -55,8 +57,6 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         }
     }
 
-    XWikiContext context;
-
     XWiki xwiki;
 
     @Override
@@ -64,14 +64,20 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
     {
         super.setUp();
 
-        this.context = new XWikiContext();
         this.xwiki = new XWiki();
-        this.context.setWiki(this.xwiki);
+        getContext().setWiki(this.xwiki);
 
         this.xwiki.setNotificationManager(new XWikiNotificationManager());
 
         Mock mockStore = mock(XWikiStoreInterface.class);
         mockStore.expects(atLeastOnce()).method("saveXWikiDoc");
+        mockStore.stubs().method("loadXWikiDoc").will(new CustomStub("Implements XWiki.getDocument")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
+            {
+                return invocation.parameterValues.get(0);
+            }
+        });
         this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
     }
 
@@ -86,7 +92,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiDocument document = new XWikiDocument("Space", "Page");
 
-        this.xwiki.saveDocument(document, this.context);
+        this.xwiki.saveDocument(document, getContext());
         assertTrue("Listener not called", listener.hasListenerBeenCalled);
     }
 
@@ -111,7 +117,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         document.setContent("New content");
         document.setOriginalDocument(original);
 
-        Document api = new Document(document, this.context);
+        Document api = new Document(document, getContext());
         api.save();
         assertTrue("Listener not called", listener.hasListenerBeenCalled);
     }

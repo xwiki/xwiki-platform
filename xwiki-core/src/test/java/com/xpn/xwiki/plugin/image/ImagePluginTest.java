@@ -46,7 +46,7 @@ public class ImagePluginTest extends org.jmock.cglib.MockObjectTestCase
         mockXWiki.stubs().method("Param").will(returnValue("10"));
         Mock mockCacheFactory = mock(CacheFactory.class);
         mockCacheFactory.expects(once()).method("newCache");
-        mockXWiki.stubs().method("getLocalCacheFactory").will(returnValue((CacheFactory) mockCacheFactory.proxy()));
+        mockXWiki.stubs().method("getLocalCacheFactory").will(returnValue(mockCacheFactory.proxy()));
         context.setWiki((XWiki) mockXWiki.proxy());
         this.plugin = new ImagePlugin("image", ImagePlugin.class.getName(), context);
     }

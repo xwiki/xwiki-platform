@@ -19,13 +19,6 @@
  */
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-
-import org.jmock.Mock;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,6 +26,12 @@ import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import org.jmock.Mock;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.packaging.Package} class.
@@ -43,20 +42,17 @@ public class PackageTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Package pack;
 
-    private XWikiContext context;
-
     private Mock mockXWiki;
 
     protected void setUp() throws Exception
     {
         super.setUp();
         this.pack = new Package();
-        this.context = new XWikiContext();
 
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
         this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        getContext().setWiki((XWiki) this.mockXWiki.proxy());
     }
 
     public void testImportWithHeterogeneousEncodingInFiles() throws Exception
@@ -74,13 +70,12 @@ public class PackageTest extends AbstractBridgedXWikiComponentTestCase
 
         XWikiDocument docs[] = {doc1, doc2};
 
-        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}), this.context);
+        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}), getContext());
 
         assertEquals(2, this.pack.getFiles().size());
-        assertEquals(((DocumentInfo) this.pack.getFiles().get(0)).getDoc().getTitle(), ((DocumentInfo) this.pack
-            .getFiles().get(1)).getDoc().getTitle());
-        assertEquals(((DocumentInfo) this.pack.getFiles().get(0)).getDoc().getContent(), ((DocumentInfo) this.pack
-            .getFiles().get(1)).getDoc().getContent());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(), (this.pack.getFiles().get(1)).getDoc().getTitle());
+        assertEquals(this.pack.getFiles().get(0).getDoc().getContent(),
+            this.pack.getFiles().get(1).getDoc().getContent());
     }
 
     private String getPackageXML(XWikiDocument docs[])
@@ -134,7 +129,7 @@ public class PackageTest extends AbstractBridgedXWikiComponentTestCase
         for (int i = 0; i < docs.length; i++) {
             ZipEntry zipe = new ZipEntry(docs[i].getSpace() + "/" + docs[i].getName());
             zos.putNextEntry(zipe);
-            String xmlCode = docs[i].toXML(false, false, false, false, context);
+            String xmlCode = docs[i].toXML(false, false, false, false, getContext());
             zos.write(getEncodedByteArray(xmlCode, encodings[i]));
         }
         zos.closeEntry();

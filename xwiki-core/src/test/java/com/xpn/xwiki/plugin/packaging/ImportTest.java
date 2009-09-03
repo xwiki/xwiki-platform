@@ -65,7 +65,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockRightService;
 
-    private Map docs = new HashMap();
+    private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
     /**
      * {@inheritDoc}
@@ -98,7 +98,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
                         documentKey += "." + shallowDoc.getLanguage();
                     }
                     if (docs.containsKey(documentKey)) {
-                        return (XWikiDocument) docs.get(documentKey);
+                        return docs.get(documentKey);
                     } else {
                         return shallowDoc;
                     }

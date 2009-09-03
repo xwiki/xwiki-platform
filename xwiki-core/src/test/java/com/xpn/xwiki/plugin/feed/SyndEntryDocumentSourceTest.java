@@ -90,7 +90,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         doc.createNewObject(ARTICLE_CLASS_NAME, getContext());
         doc.setStringValue(ARTICLE_CLASS_NAME, "title", "Old story");
         doc.setStringValue(ARTICLE_CLASS_NAME, "content", "Once upon a <i>time</i> there was..");
-        List categories = new ArrayList();
+        List<String> categories = new ArrayList<String>();
         categories.add("News");
         categories.add("Information");
         doc.setStringListValue(ARTICLE_CLASS_NAME, "category", categories);
@@ -108,7 +108,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
 
     private void mockUp() throws Exception
     {
-        final Map docs = new HashMap();
+        final Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
         final XWikiContext context = getContext();
         final XWiki xwiki = new XWiki(new XWikiConfig(), context);
         context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/", "bin/"));
@@ -123,7 +123,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
                     if (docs.containsKey(shallowDoc.getName())) {
-                        return (XWikiDocument) docs.get(shallowDoc.getName());
+                        return docs.get(shallowDoc.getName());
                     } else {
                         return shallowDoc;
                     }

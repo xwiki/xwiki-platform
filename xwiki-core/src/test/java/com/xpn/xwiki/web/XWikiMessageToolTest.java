@@ -43,13 +43,14 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
 
     private XWikiMessageTool tool;
 
-    private XWikiContext context;
-
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.context = createXWikiContext();
-        this.tool = new XWikiMessageTool(new TestResources(), context);
+
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+
+        this.tool = new XWikiMessageTool(new TestResources(), getContext());
     }
 
     public class TestResources extends ListResourceBundle
@@ -143,7 +144,7 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1"));
         this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
             returnValue(createDocument(111111L, "Space1.Doc1", "", true)));
-        List docs = this.tool.getDocumentBundles();
+        List<XWikiDocument> docs = this.tool.getDocumentBundles();
         assertEquals(0, docs.size());
     }
 
@@ -196,12 +197,12 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
             returnValue(createDocumentWithTrans(111111L, "Space1.Doc1", "somekey=somevalue\nsomekey2=somevalue2",
                 "somekey=somevaluetrans", false)));
 
-        this.context.setLanguage("en");
+        getContext().setLanguage("en");
         assertEquals("somevalue", this.tool.get("somekey"));
         assertEquals("somevalue2", this.tool.get("somekey2"));
 
         // Switch to french
-        this.context.setLanguage("fr");
+        getContext().setLanguage("fr");
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
         assertEquals("somevaluetrans", this.tool.get("somekey"));
         assertEquals("somevalue2", this.tool.get("somekey2"));
@@ -278,14 +279,5 @@ public class XWikiMessageToolTest extends AbstractBridgedXWikiComponentTestCase
         doc.setDefaultLanguage(defaultLanguage);
         doc.setNew(isNew);
         return doc;
-    }
-
-    private XWikiContext createXWikiContext()
-    {
-        XWikiContext context = new XWikiContext();
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
-        context.setWiki((XWiki) this.mockXWiki.proxy());
-
-        return context;
     }
 }

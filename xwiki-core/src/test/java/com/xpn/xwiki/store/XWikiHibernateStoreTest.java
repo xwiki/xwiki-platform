@@ -34,10 +34,10 @@ public class XWikiHibernateStoreTest extends TestCase
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
-        assertEquals(", doc.date, doc.name", store
-            .getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
-        assertEquals(", doc.date, doc.name", store
-            .getColumnsForSelectStatement("where 1=1 order by doc.date ASC, doc.name DESC"));
+        assertEquals(", doc.date, doc.name",
+            store.getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
+        assertEquals(", doc.date, doc.name",
+            store.getColumnsForSelectStatement("where 1=1 order by doc.date ASC, doc.name DESC"));
         assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
     }
 

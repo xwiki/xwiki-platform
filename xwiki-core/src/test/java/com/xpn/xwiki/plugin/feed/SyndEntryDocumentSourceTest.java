@@ -110,7 +110,17 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
     {
         final Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
         final XWikiContext context = getContext();
-        final XWiki xwiki = new XWiki(new XWikiConfig(), context);
+        final XWiki xwiki = new XWiki(new XWikiConfig(), context)
+        {
+            protected void initWikiMacros()
+            {
+            }
+
+            public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
+            {
+                return defaultValue;
+            }
+        };
         context.setURLFactory(new XWikiServletURLFactory(new URL("http://www.xwiki.org/"), "xwiki/", "bin/"));
 
         final Mock mockXWikiStore =

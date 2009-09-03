@@ -28,6 +28,7 @@ import org.jmock.Mock;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
@@ -64,9 +65,33 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
             returnValue(new ByteArrayInputStream("".getBytes())));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
 
-        XWiki xwiki = new XWiki(config, getContext(), engineContext, false);
+        XWiki xwiki = new XWiki(config, getContext(), engineContext, false)
+        {
+            @Override
+            public String getSkin(XWikiContext context)
+            {
+                return "skin";
+            }
+
+            @Override
+            public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
+            {
+                return defaultValue;
+            }
+
+            @Override
+            public String getWebPreference(String prefname, String defaultValue, XWikiContext context)
+            {
+                return defaultValue;
+            }
+
+            protected void initWikiMacros()
+            {
+
+            }
+        };
         xwiki.setVersion("1.0");
-        
+
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
         // not providing it in our unit test resources).
@@ -82,20 +107,15 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
         // We also ensure that any Radeox macro coming after the code macro is rendered properly.
         // Last we also ensure that a second code macro works too.
         String text =
-            "{code:none}\n" + "1 Title\n" + "c:\\dev\n" + "#info(\"test\")\n"
-                + "<pre>hello</pre>\n" + "$xwiki.getVersion()\n" + "{style}style{style}\n"
-                + "&#123;code}nested&#123;code}\n" + "<% print(\"hello\") %>\n" + "{code}\n"
-                + "{table}\n" + "a | b\n" + "c | d\n" + "{table}\n" + "#set ($var = 'dummy')\n"
-                + "{code:none}\n" + "1 Something\n" + "{code}";
+            "{code:none}\n" + "1 Title\n" + "c:\\dev\n" + "#info(\"test\")\n" + "<pre>hello</pre>\n"
+                + "$xwiki.getVersion()\n" + "{style}style{style}\n" + "&#123;code}nested&#123;code}\n"
+                + "<% print(\"hello\") %>\n" + "{code}\n" + "{table}\n" + "a | b\n" + "c | d\n" + "{table}\n"
+                + "#set ($var = 'dummy')\n" + "{code:none}\n" + "1 Something\n" + "{code}";
 
         String expectedText =
-            "<div class=\"code\"><pre>1 Title\n"
-                + "c:&#92;dev\n"
-                + "&#35;info(\"test\")\n"
-                + "&#60;pre&#62;hello&#60;/pre&#62;\n"
-                + "&#36;xwiki.getVersion()\n"
-                + "&#123;style&#125;style&#123;style&#125;\n"
-                + "&&#35;123;code&#125;nested&&#35;123;code&#125;\n"
+            "<div class=\"code\"><pre>1 Title\n" + "c:&#92;dev\n" + "&#35;info(\"test\")\n"
+                + "&#60;pre&#62;hello&#60;/pre&#62;\n" + "&#36;xwiki.getVersion()\n"
+                + "&#123;style&#125;style&#123;style&#125;\n" + "&&#35;123;code&#125;nested&&#35;123;code&#125;\n"
                 + "&#60;% print(\"hello\") %&#62;</pre></div>\n"
                 + "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>a</th>"
                 + "<th>b</th></tr><tr class=\"table-odd\"><td>c</td><td>d</td></tr></table>\n"

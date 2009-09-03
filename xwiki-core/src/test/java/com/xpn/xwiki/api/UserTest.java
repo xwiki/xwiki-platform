@@ -19,19 +19,17 @@ public class UserTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Mock mockXWiki;
 
-    private XWikiContext context;
-
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.context = new XWikiContext();
+        
         this.mockXWiki = mock(XWiki.class);
-        context.setWiki((XWiki) mockXWiki.proxy());
+        getContext().setWiki((XWiki) mockXWiki.proxy());
         XWikiDocument doc = new XWikiDocument("XWiki", "Admin");
         BaseClass userClass = new BaseClass();
         userClass.addTextField("email", "email address", 20);
         mockXWiki.stubs().method("getClass").will(returnValue(userClass));
-        BaseObject userObj = doc.newObject("XWiki.XWikiUsers", context);
+        BaseObject userObj = doc.newObject("XWiki.XWikiUsers", getContext());
         userObj.setStringValue("email", "admin@mail.com");
         mockXWiki.stubs().method("getDocument").will(returnValue(doc));
     }
@@ -59,7 +57,7 @@ public class UserTest extends AbstractBridgedXWikiComponentTestCase
         assertNull(u.getEmail());
 
         XWikiUser xu = new XWikiUser("XWiki.Admin");
-        u = new User(xu, context);
+        u = new User(xu, getContext());
         assertEquals("admin@mail.com", u.getEmail());
     }
 }

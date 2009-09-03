@@ -74,7 +74,23 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         super.setUp();
 
         this.document = new XWikiDocument("MilkyWay", "Fidis");
-        this.xwiki = new XWiki(new XWikiConfig(), getContext());
+        this.xwiki = new XWiki(new XWikiConfig(), getContext())
+        {
+            protected void initWikiMacros()
+            {
+            }
+
+            // Avoid all the error at XWiki initialization
+            public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
+            {
+                if (prefname.equals("plugins") || prefname.startsWith("macros_")) {
+                    return defaultValue;
+                } else {
+                    return super.getXWikiPreference(prefname, defaultValue, context);
+                }
+            }
+        };
+        getContext().setWiki(this.xwiki);
 
         // Ensure that no Velocity Templates are going to be used when executing Velocity since otherwise
         // the Velocity init would fail (since by default the macros.vm templates wouldn't be found as we're
@@ -133,6 +149,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         this.document.setCreator("Condor");
         this.document.setAuthor("Albatross");
+
         this.xwiki.saveDocument(this.document, getContext());
     }
 
@@ -280,7 +297,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockListener = mock(EventListener.class);
         mockListener.stubs().method("getName").will(returnValue("testlistener"));
-        mockListener.expects(once()).method("getEvents").will(returnValue(Arrays.asList(new DocumentSaveEvent("xwikitest:Some.Document"))));
+        mockListener.expects(once()).method("getEvents").will(
+            returnValue(Arrays.asList(new DocumentSaveEvent("xwikitest:Some.Document"))));
 
         ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
@@ -289,7 +307,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         document.setContent("the content");
 
         // Ensure that the onEvent method has been called
-        mockListener.expects(once()).method("onEvent").with(isA(DocumentSaveEvent.class), same(document), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentSaveEvent.class), same(document),
+            isA(XWikiContext.class));
 
         this.xwiki.saveDocument(document, getContext());
     }
@@ -301,7 +320,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockListener = mock(EventListener.class);
         mockListener.stubs().method("getName").will(returnValue("testlistener"));
-        mockListener.expects(once()).method("getEvents").will(returnValue(Arrays.asList(new DocumentDeleteEvent("xwikitest:Another.Document"))));
+        mockListener.expects(once()).method("getEvents").will(
+            returnValue(Arrays.asList(new DocumentDeleteEvent("xwikitest:Another.Document"))));
 
         ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
@@ -314,7 +334,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.saveDocument(document, getContext());
 
         // Ensure that the onEvent method has been called
-        mockListener.expects(once()).method("onEvent").with(isA(DocumentDeleteEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentDeleteEvent.class), isA(XWikiDocument.class),
+            isA(XWikiContext.class));
 
         this.xwiki.deleteDocument(document, false, getContext());
     }
@@ -352,23 +373,23 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         });
         assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
     }
-    
+
     public void testGetCurrentContentSyntaxId()
     {
         XWikiDocument doc1 = new XWikiDocument();
         doc1.setSyntaxId("syntax1");
         XWikiDocument doc2 = new XWikiDocument();
         doc2.setSyntaxId("syntax2");
-        
+
         assertEquals(null, this.xwiki.getCurrentContentSyntaxId(null, getContext()));
         assertEquals("syntax", this.xwiki.getCurrentContentSyntaxId("syntax", getContext()));
-        
+
         getContext().setDoc(doc1);
-        
+
         assertEquals("syntax1", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
-        
+
         getContext().put("sdoc", doc2);
-        
+
         assertEquals("syntax2", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
     }
 }

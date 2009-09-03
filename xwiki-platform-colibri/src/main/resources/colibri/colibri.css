@@ -3395,10 +3395,6 @@ body#body.editbody #globallinks #globalmenu a.glink:hover, #globalmenu a.glink:h
   text-decoration: underline;
 }
 
-#actionmenu .editinfo a, #actionmenu .editinfo a:hover  {
-  color: $theme.linkColor;
-}
-
 #actionmenu .editinfo a:hover {
   text-decoration: underline;
 }
@@ -3587,6 +3583,10 @@ div.xwikipanelcontents {
   background: $theme.menuBackgroundColor;
   border: 0;
   min-width: 970px;
+}
+
+#actionmenu .editinfo, #actionmenu .editinfo * {
+  color: $theme.menuLinkColor;
 }
 
 #actionmenu a {

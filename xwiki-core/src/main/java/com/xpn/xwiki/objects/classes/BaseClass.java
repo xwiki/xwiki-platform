@@ -1023,20 +1023,25 @@ public class BaseClass extends BaseCollection implements ClassInterface
         for (PropertyClass newProperty : (Collection<PropertyClass>) getFieldList()) {
             String propertyName = newProperty.getName();
             PropertyClass oldProperty = (PropertyClass) oldClass.get(propertyName);
+            String propertyType = StringUtils.substringAfterLast(newProperty.getClassType(), ".");            
 
             if (oldProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "added", propertyName, "", ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, "", 
+                    ""));
             } else if (!oldProperty.equals(newProperty)) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed", propertyName, "", ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, "", 
+                    ""));
             }
         }
 
         for (PropertyClass oldProperty : (Collection<PropertyClass>) oldClass.getFieldList()) {
             String propertyName = oldProperty.getName();
             PropertyClass newProperty = (PropertyClass) get(propertyName);
+            String propertyType = StringUtils.substringAfterLast(oldProperty.getClassType(), ".");
 
             if (newProperty == null) {
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed", propertyName, "", ""));
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "removed", propertyName, propertyType, "", 
+                    ""));
             }
         }
 

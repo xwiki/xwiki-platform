@@ -30,6 +30,8 @@ public class ObjectDiff extends Object
     private String guid;
 
     private String propName;
+    
+    private String propType;
 
     private Object prevValue;
 
@@ -37,19 +39,21 @@ public class ObjectDiff extends Object
 
     private String action;
 
+    @Deprecated
     public ObjectDiff(String className, int number, String action, String propName, Object prevValue, Object newValue)
     {
-        this(className, number, "", action, propName, prevValue, newValue);
+        this(className, number, "", action, propName, "", prevValue, newValue);
     }
 
-    public ObjectDiff(String className, int number, String guid, String action, String propName, Object prevValue,
-        Object newValue)
+    public ObjectDiff(String className, int number, String guid, String action, String propName, String propType, 
+        Object prevValue, Object newValue)
     {
         this.setClassName(className);
         this.setNumber(number);
         this.setGuid(guid);
         this.setAction(action);
         this.setPropName(propName);
+        this.setPropType(propType);
         this.setPrevValue(prevValue);
         this.setNewValue(newValue);
     }
@@ -92,6 +96,16 @@ public class ObjectDiff extends Object
     public void setPropName(String propName)
     {
         this.propName = propName;
+    }
+    
+    public String getPropType()
+    {
+        return this.propType;
+    }
+    
+    public void setPropType(String propType)
+    {
+        this.propType = propType;
     }
 
     public Object getPrevValue()

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -555,6 +556,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             String propertyName = (String) key;
             BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
+            BaseClass bclass = getxWikiClass(context);
+            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");                
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
@@ -563,13 +567,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                         (newProperty.getValue() instanceof String) ? newProperty.toText()
                             : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(propertyName,
                                 this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "added", propertyName, "",
-                        newPropertyValue));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, 
+                        "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
-                BaseClass bclass = getxWikiClass(context);
-                PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
@@ -578,12 +580,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     String oldPropertyValue =
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                             propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed", propertyName, oldPropertyValue,
-                        newPropertyValue));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, 
+                        oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed", propertyName, oldProperty
-                        .toText(), newProperty.toText()));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "changed", propertyName, propertyType, 
+                        oldProperty.toText(), newProperty.toText()));
                 }
             }
         }
@@ -593,23 +595,24 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             String propertyName = (String) key;
             BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
-
+            BaseClass bclass = getxWikiClass(context);
+            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
+            
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
-                    BaseClass bclass = oldCollection.getxWikiClass(context);
-                    PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                                 propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "removed",
-                            propertyName, oldPropertyValue, ""));
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "", 
+                            "removed", propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "removed",
-                            propertyName, oldProperty.toText(), ""));
+                        difflist.add(new ObjectDiff(oldCollection.getClassName(), oldCollection.getNumber(), "", 
+                            "removed", propertyName, propertyType, oldProperty.toText(), ""));
                     }
                 }
             }

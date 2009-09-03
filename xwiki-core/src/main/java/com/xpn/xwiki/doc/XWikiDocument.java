@@ -3895,7 +3895,7 @@ public class XWikiDocument implements DocumentModelBridge
                         dlist = new BaseObject().getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
                             new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), originalObj.getGuid(),
-                                "object-removed", "", "", "");
+                                "object-removed", "", "", "", "");
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
@@ -3924,7 +3924,7 @@ public class XWikiDocument implements DocumentModelBridge
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff addMarker =
                             new ObjectDiff(newObj.getClassName(), newObj.getNumber(), newObj.getGuid(), "object-added",
-                                "", "", "");
+                                "", "", "", "");
                         dlist.add(0, addMarker);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);

@@ -253,6 +253,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         for (String propertyName : this.getPropertyList()) {
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
+            BaseClass bclass = getxWikiClass(context);
+            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");            
 
             if (oldProperty == null) {
                 // The property exist in the new object, but not in the old one
@@ -261,13 +264,11 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                         (newProperty.getValue() instanceof String) ? newProperty.toText()
                             : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(propertyName,
                                 this, context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName, "",
-                        newPropertyValue));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "added", propertyName, 
+                        propertyType, "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
-                BaseClass bclass = getxWikiClass(context);
-                PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
@@ -277,11 +278,11 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
                         (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                             propertyName, oldObject, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
-                        oldPropertyValue, newPropertyValue));
+                        propertyType, oldPropertyValue, newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), getGuid(), "changed", propertyName,
-                        oldProperty.toText(), newProperty.toText()));
+                        propertyType, oldProperty.toText(), newProperty.toText()));
                 }
             }
         }
@@ -290,23 +291,24 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         for (String propertyName : oldObject.getPropertyList()) {
             BaseProperty newProperty = (BaseProperty) this.getField(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldObject.getField(propertyName);
+            BaseClass bclass = getxWikiClass(context);
+            PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+            String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");            
 
             if (newProperty == null) {
                 // The property exists in the old object, but not in the new one
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
-                    BaseClass bclass = oldObject.getxWikiClass(context);
-                    PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
                                 propertyName, oldObject, context);
                         difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
-                            .getGuid(), "removed", propertyName, oldPropertyValue, ""));
+                            .getGuid(), "removed", propertyName, propertyType, oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
                         difflist.add(new ObjectDiff(oldObject.getClassName(), oldObject.getNumber(), oldObject
-                            .getGuid(), "removed", propertyName, oldProperty.toText(), ""));
+                            .getGuid(), "removed", propertyName, propertyType, oldProperty.toText(), ""));
                     }
                 }
             }

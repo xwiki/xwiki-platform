@@ -26,12 +26,16 @@ import org.xwiki.gwt.dom.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.ClosingEvent;
+import com.google.gwt.user.client.Window.ClosingHandler;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatelessUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.EnableExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.ResetExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.SubmitExecutable;
+import com.xpn.xwiki.wysiwyg.client.util.Cache;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
@@ -45,7 +49,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
  * 
  * @version $Id$
  */
-public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener
+public class SubmitPlugin extends AbstractPlugin implements BlurHandler, CommandListener, ClosingHandler
 {
     /**
      * The name attribute, used by HTML form elements to pass data to the server when the form is submitted.
@@ -74,10 +78,20 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     private static final Command ENABLE = new Command("enable");
 
     /**
+     * The command used to reset the content of the rich text area.
+     */
+    private static final Command RESET = new Command("reset");
+
+    /**
      * This flag tells the server that it needs to convert the editor output from HTML to the storage syntax before
      * processing it.
      */
     private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
+
+    /**
+     * The key used to cache the content of the rich text area.
+     */
+    private static final String CACHE_KEY_CONTENT = "plugin.submit.content";
 
     /**
      * The JavaScript object that catches the submit event and calls {@link #onSubmit()}. We couldn't use a FormPanel
@@ -101,6 +115,11 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     private Element form;
 
     /**
+     * The object used to cache the submitted value.
+     */
+    private Cache cache;
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
@@ -112,7 +131,7 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         String hookId = getConfig().getParameter("hookId");
         getTextArea().getCommandManager().registerCommand(SUBMIT, new SubmitExecutable(hookId));
         getTextArea().getCommandManager().registerCommand(ENABLE, new EnableExecutable());
-        getTextArea().getCommandManager().registerCommand(new Command("reset"), new ResetExecutable());
+        getTextArea().getCommandManager().registerCommand(RESET, new ResetExecutable());
 
         if (getTextArea().getCommandManager().isSupported(SUBMIT)) {
             Element hook = (Element) Document.get().getElementById(hookId);
@@ -137,7 +156,14 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
                 hookSubmitEvent(form);
             }
 
+            cache = new Cache((Element) Document.get().getElementById(getConfig().getParameter("cacheId", "")));
+            String content = cache.get(CACHE_KEY_CONTENT);
+            if (content != null) {
+                getTextArea().getCommandManager().execute(RESET, content);
+            }
+
             saveRegistration(getTextArea().addBlurHandler(this));
+            saveRegistration(Window.addWindowClosingHandler(this));
             getTextArea().getCommandManager().addCommandListener(this);
         }
     }
@@ -152,6 +178,8 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         if (rootExtension.getFeatures().length > 0) {
             unhookSubmitEvent(form);
             form = null;
+            cache = null;
+            hiddenConfig.removeFromParent();
             hiddenConfig = null;
             submitHandler = null;
             rootExtension.clearFeatures();
@@ -216,8 +244,10 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     protected void onSubmit()
     {
         // Submit the content of the rich text area only if it is enabled.
-        if (getTextArea().getCommandManager().isExecuted(ENABLE)) {
+        if (getTextArea().isAttached() && getTextArea().isEnabled()) {
             getTextArea().getCommandManager().execute(SUBMIT);
+            // Cache submitted value.
+            cache.put(CACHE_KEY_CONTENT, getTextArea().getCommandManager().getStringValue(SUBMIT));
         }
     }
 
@@ -246,5 +276,16 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
                 hiddenConfig.removeFlag(REQUIRES_HTML_CONVERSION);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ClosingHandler#onWindowClosing(ClosingEvent)
+     */
+    public void onWindowClosing(ClosingEvent event)
+    {
+        // Allow the browser to cache the content of the rich text area when the user navigates away from the edit page.
+        onSubmit();
     }
 }

@@ -23,18 +23,20 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.xwiki.gwt.dom.client.Element;
+
 import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.dom.client.TextAreaElement;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.IncrementalCommand;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,15 +48,15 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.separator.ToolBarSeparator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
+import com.xpn.xwiki.wysiwyg.client.util.Cache;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.HandlerRegistrationCollection;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultExecutable;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleWithCssExecutable;
 
 /**
  * The controller part of the WYSIWYG editor.
@@ -112,16 +114,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     public static final String DEFAULT_SYNTAX = "xhtml/1.0";
 
     /**
-     * The CSS class name used to make an element invisible.
-     */
-    protected static final String STYLE_NAME_INVISIBLE = "invisible";
-
-    /**
-     * The CSS class name used to display a spinner in the middle of an element.
-     */
-    protected static final String STYLE_NAME_LOADING = "loading";
-
-    /**
      * WYWISYWG tab index in the TabPanel.
      */
     protected static final int WYSIWYG_TAB_INDEX = 0;
@@ -170,9 +162,10 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private static final Command SUBMIT = new Command("submit");
 
     /**
-     * Main Container.
+     * The interface of the WYSIWYG editor. It can be either a {@link RichTextEditor} or a {@link TabPanel} containing
+     * the {@link RichTextEditor} and the {@link PlainTextEditor}.
      */
-    private final FlowPanel ui;
+    private final Widget ui;
 
     /**
      * The WYSIWYG entry point.
@@ -195,16 +188,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private final SyntaxValidatorManager svm;
 
     /**
-     * Flag set to true when the editor has a TabBar.
-     */
-    private final boolean isTabbed;
-
-    /**
-     * A reference to the rich text editor panel.
-     */
-    private final FlowPanel richTextEditorWrapper;
-
-    /**
      * Schedules updates and executes only the most recent one.
      */
     private final DeferredUpdater updater = new DeferredUpdater(this);
@@ -215,9 +198,9 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private final WysiwygEditorListener listener = new WysiwygEditorListener(this);
 
     /**
-     * Height of the editor.
+     * The collection of handler registrations used by this editor.
      */
-    private final String height;
+    private final HandlerRegistrationCollection registrations = new HandlerRegistrationCollection();
 
     /**
      * The plug-in manager.
@@ -233,11 +216,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      * A reference to the rich text editor.
      */
     private RichTextEditor richTextEditor;
-
-    /**
-     * A reference to the plain text editor.
-     */
-    private PlainTextEditor plainTextEditor;
 
     /**
      * The features that have been placed on the tool bar. The key is the feature name and the value is the widget that
@@ -260,31 +238,14 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
         this.svm = svm;
         this.pfm = pfm;
 
-        TextAreaElement originalTextArea = TextAreaElement.as(DOM.getElementById(config.getParameter("hookId")));
-        height = Math.max(originalTextArea.getOffsetHeight(), 100) + "px";
-
-        ui = new FlowPanel();
-        richTextEditorWrapper = new FlowPanel();
-
-        if (Boolean.TRUE.toString().equals(config.getParameter("displayTabs"))) {
-            isTabbed = true;
-            plainTextEditor = new PlainTextEditor(originalTextArea);
-            if ("wysiwyg".equals(config.getParameter("defaultEditor"))) {
-                ui.add(createTabPanel(true));
-                // Call the getter to be sure the RichTextEditor is created.
-                getRichTextEditor();
-            } else {
-                ui.add(createTabPanel(false));
-                plainTextEditor.setFocus(true);
-            }
+        if (isTabbed()) {
+            ui = createTabPanel();
         } else {
-            isTabbed = false;
-            plainTextEditor = null;
-            originalTextArea.getStyle().setProperty("display", "none");
-            // Call the getter to be sure the RichTextEditor is created.
-            getRichTextEditor();
-            ui.add(richTextEditorWrapper);
+            ui = getRichTextEditor();
         }
+
+        // Hide the hook.
+        getHook().getStyle().setProperty("display", "none");
     }
 
     /**
@@ -344,36 +305,16 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     public void onLoad(LoadEvent event)
     {
         if (event.getSource() == richTextEditor) {
-            initRichTextArea();
             loadPlugins();
             initEditor();
             fillMenu();
             fillToolBar();
             richTextEditor.getTextArea().getCommandManager().execute(SUBMIT);
-        }
-    }
-
-    /**
-     * Initializes the rich text area.
-     */
-    private void initRichTextArea()
-    {
-        // Focus the rich text area to be sure it has reached design mode.
-        getRichTextEditor().getTextArea().setFocus(true);
-
-        // Make sure the editor uses formatting tags instead of CSS.
-        // This is a requirement for HTML to wiki conversion.
-        StyleWithCssExecutable styleWithCss = new StyleWithCssExecutable();
-        if (styleWithCss.isSupported(getRichTextEditor().getTextArea())) {
-            // If we disable styleWithCss then the indent command will generate blockquote elements even when the caret
-            // is inside a list item. Let's keep it enabled until we overwrite the default list support.
-            styleWithCss.execute(getRichTextEditor().getTextArea(), String.valueOf(true));
-        }
-
-        // Make sure pressing return generates a new paragraph.
-        DefaultExecutable insertBrOnReturn = new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString());
-        if (insertBrOnReturn.isSupported(getRichTextEditor().getTextArea())) {
-            insertBrOnReturn.execute(getRichTextEditor().getTextArea(), String.valueOf(false));
+            richTextEditor.setLoading(false);
+            // Focus the rich text area, if it's enabled, to be sure it has reached design mode.
+            if (richTextEditor.getTextArea().isEnabled()) {
+                richTextEditor.getTextArea().setFocus(true);
+            }
         }
     }
 
@@ -405,27 +346,43 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     }
 
     /**
-     * Build the editor tab panel. This panel contains two tabs, one for the WYSIWYG editor and one for the wiki editor.
+     * Build the editor tab panel. This panel contains two tabs, one for the WYSIWYG editor and one for the source
+     * editor.
      * 
-     * @param defaultIsWysiwyg True if the WYSIWYG editor must be displayed by default.
-     * @return The newly created tab panel.
+     * @return the newly created tab panel
      */
-    public TabPanel createTabPanel(boolean defaultIsWysiwyg)
+    public TabPanel createTabPanel()
     {
-        TabPanel tabs = new TabPanel();
+        final Cache cache = new Cache((Element) DOM.getElementById(config.getParameter("cacheId", "")).cast());
+        PlainTextEditor plainTextEditor = new PlainTextEditor(getHook(), cache);
 
-        tabs.add(richTextEditorWrapper, Strings.INSTANCE.wysiwyg());
+        TabPanel tabs = new TabPanel();
+        tabs.add(getRichTextEditor(), Strings.INSTANCE.wysiwyg());
         tabs.add(plainTextEditor, Strings.INSTANCE.source());
         tabs.setStyleName("xRichTextEditorTabPanel");
+        tabs.setAnimationEnabled(false);
 
-        if (defaultIsWysiwyg) {
+        final String wysiwygTabName = "wysiwyg";
+        final String cacheKeyActiveTextArea = "editor.activeTextArea";
+        if (wysiwygTabName.equals(cache.get(cacheKeyActiveTextArea, config.getParameter("defaultEditor")))) {
+            plainTextEditor.getTextArea().setEnabled(false);
             tabs.selectTab(WYSIWYG_TAB_INDEX);
         } else {
+            getRichTextEditor().getTextArea().setEnabled(false);
             tabs.selectTab(WIKI_TAB_INDEX);
         }
 
-        tabs.addBeforeSelectionHandler(listener);
-        tabs.addSelectionHandler(listener);
+        registrations.add(tabs.addBeforeSelectionHandler(listener));
+        registrations.add(tabs.addSelectionHandler(new SelectionHandler<Integer>()
+        {
+            public void onSelection(SelectionEvent<Integer> event)
+            {
+                // Cache the active text area.
+                cache.put(cacheKeyActiveTextArea, event.getSelectedItem() == WYSIWYG_TAB_INDEX ? wysiwygTabName
+                    : "source");
+            }
+        }));
+        registrations.add(tabs.addSelectionHandler(listener));
 
         return tabs;
     }
@@ -523,7 +480,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     protected void setLoading(boolean loading)
     {
-        if (isTabbed) {
+        if (isTabbed()) {
             getRichTextEditor().setLoading(loading);
             getPlainTextEditor().setLoading(loading);
         } else {
@@ -548,7 +505,8 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     public boolean canUpdate()
     {
-        return getUI().isAttached();
+        // NOTE: Currently only the rich text area triggers updates.
+        return getRichTextEditor().getTextArea().isAttached() && getRichTextEditor().getTextArea().isEnabled();
     }
 
     /**
@@ -557,7 +515,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      * 
      * @return The editor User Interface main panel.
      */
-    public FlowPanel getUI()
+    public Widget getUI()
     {
         return ui;
     }
@@ -571,15 +529,13 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     {
         if (richTextEditor == null) {
             richTextEditor = new RichTextEditor();
-            richTextEditor.addLoadHandler(this);
-            richTextEditor.getTextArea().addMouseUpHandler(this);
-            richTextEditor.getTextArea().addKeyUpHandler(this);
+            registrations.add(richTextEditor.addLoadHandler(this));
+            registrations.add(richTextEditor.getTextArea().addMouseUpHandler(this));
+            registrations.add(richTextEditor.getTextArea().addKeyUpHandler(this));
             richTextEditor.getTextArea().getCommandManager().addCommandListener(this);
             IFrameElement.as(richTextEditor.getTextArea().getElement()).setSrc(
                 config.getParameter("inputURL", "about:blank"));
-            richTextEditor.getTextArea().setHeight(height);
-
-            richTextEditorWrapper.add(richTextEditor);
+            richTextEditor.getTextArea().setHeight(Math.max(getHook().getOffsetHeight(), 100) + "px");
 
             sv = svm.getSyntaxValidator(getConfig().getParameter("syntax", DEFAULT_SYNTAX));
 
@@ -596,7 +552,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     public PlainTextEditor getPlainTextEditor()
     {
-        return plainTextEditor;
+        return isTabbed() ? (PlainTextEditor) ((TabPanel) ui).getWidget(WIKI_TAB_INDEX) : null;
     }
 
     /**
@@ -605,5 +561,40 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     public Config getConfig()
     {
         return config;
+    }
+
+    /**
+     * @return the element replaced by the WYSIWYG editor
+     */
+    private Element getHook()
+    {
+        return DOM.getElementById(config.getParameter("hookId")).cast();
+    }
+
+    /**
+     * @return {@code true} if the WYSIWYG/Source tabs are displayed, {@code false} otherwise
+     */
+    private boolean isTabbed()
+    {
+        return Boolean.valueOf(getConfig().getParameter("displayTabs", "false"));
+    }
+
+    /**
+     * Destroys this WYSIWYG editor, unregistering all the listeners and releasing the used memory.
+     */
+    public void destroy()
+    {
+        // Unload all the plug-ins.
+        toolBarFeatures.clear();
+        pm.unloadAll();
+        // Remove all listeners and handlers.
+        registrations.removeHandlers();
+        richTextEditor.getTextArea().getCommandManager().removeCommandListener(this);
+        // Detach the user interface.
+        ui.removeFromParent();
+        // Drop references.
+        pm = null;
+        sv = null;
+        richTextEditor = null;
     }
 }

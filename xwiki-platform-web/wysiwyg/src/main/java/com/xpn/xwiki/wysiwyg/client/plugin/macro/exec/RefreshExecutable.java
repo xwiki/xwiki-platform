@@ -19,12 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 
-import org.xwiki.gwt.dom.client.Style;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.util.Console;
+import com.xpn.xwiki.wysiwyg.client.widget.LoadingPanel;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
@@ -51,7 +49,7 @@ public class RefreshExecutable extends AbstractExecutable
     /**
      * Used to prevent typing in the rich text area while waiting for the updated content from the server.
      */
-    private final FocusPanel waiting;
+    private final LoadingPanel waiting = new LoadingPanel();
 
     /**
      * Creates a new refresh executable.
@@ -61,10 +59,6 @@ public class RefreshExecutable extends AbstractExecutable
     public RefreshExecutable(String syntax)
     {
         this.syntax = syntax;
-
-        waiting = new FocusPanel();
-        waiting.addStyleName("loading");
-        waiting.getElement().getStyle().setProperty(Style.POSITION, Style.Position.ABSOLUTE);
     }
 
     /**
@@ -75,16 +69,12 @@ public class RefreshExecutable extends AbstractExecutable
     public boolean execute(final RichTextArea rta, String param)
     {
         // Check if there is a refresh in progress.
-        // NOTE: We don't test the parent but the next sibling because in IE the parent of an orphan node is sometimes a
-        // document fragment, thus not null.
-        if (waiting.getElement().getNextSibling() != null) {
+        if (waiting.isLoading()) {
             return false;
         }
 
         // Prevent typing while waiting for the updated content.
-        waiting.getElement().getStyle().setPropertyPx(Style.WIDTH, rta.getOffsetWidth());
-        waiting.getElement().getStyle().setPropertyPx(Style.HEIGHT, rta.getOffsetHeight());
-        rta.getElement().getParentNode().insertBefore(waiting.getElement(), rta.getElement());
+        waiting.startLoading(rta);
         waiting.setFocus(true);
 
         // Allow other plug-ins to adjust the content before the refresh by executing a submit command.
@@ -128,7 +118,7 @@ public class RefreshExecutable extends AbstractExecutable
             public void onFailure(Throwable caught)
             {
                 rta.setFocus(true);
-                waiting.getElement().getParentNode().removeChild(waiting.getElement());
+                waiting.stopLoading();
                 Console.getInstance().error(caught.getMessage());
             }
 
@@ -140,7 +130,7 @@ public class RefreshExecutable extends AbstractExecutable
                 rta.getCommandManager().execute(SUBMIT, true);
                 // Try to focus the rich text area.
                 rta.setFocus(true);
-                waiting.getElement().getParentNode().removeChild(waiting.getElement());
+                waiting.stopLoading();
             }
         });
     }

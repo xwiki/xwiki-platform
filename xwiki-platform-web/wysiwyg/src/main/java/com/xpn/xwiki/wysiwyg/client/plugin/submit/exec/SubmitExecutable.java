@@ -33,6 +33,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 public class SubmitExecutable implements Executable
 {
     /**
+     * The name of the property holding the submitted value.
+     */
+    private static final String VALUE = "value";
+
+    /**
      * The form field identifier.
      */
     private final String fieldId;
@@ -56,7 +61,7 @@ public class SubmitExecutable implements Executable
     {
         Element field = (Element) Document.get().getElementById(fieldId);
         if (field != null) {
-            field.setPropertyString("value", rta.getHTML());
+            field.setPropertyString(VALUE, rta.getHTML());
             return true;
         }
         return false;
@@ -69,7 +74,8 @@ public class SubmitExecutable implements Executable
      */
     public String getParameter(RichTextArea rta)
     {
-        return null;
+        Element field = (Element) Document.get().getElementById(fieldId);
+        return field != null ? field.getPropertyString(VALUE) : null;
     }
 
     /**

@@ -20,7 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
@@ -146,7 +148,7 @@ public class DefaultPluginManager implements PluginManager
      */
     public void unload(String pluginName)
     {
-        Plugin plugin = (Plugin) loadedPlugins.remove(pluginName);
+        Plugin plugin = loadedPlugins.remove(pluginName);
         if (plugin != null) {
             // remove UI extensions from cache
             UIExtension[] pluginUIExtensions = plugin.getUIExtensions();
@@ -162,6 +164,20 @@ public class DefaultPluginManager implements PluginManager
             }
             plugin.destroy();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see PluginManager#unloadAll()
+     */
+    public void unloadAll()
+    {
+        Set<String> pluginNames = new HashSet<String>(loadedPlugins.keySet());
+        for (String pluginName : pluginNames) {
+            unload(pluginName);
+        }
+        pluginNames.clear();
     }
 
     /**

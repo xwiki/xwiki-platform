@@ -58,6 +58,11 @@ public interface PluginManager
     void unload(String pluginName);
 
     /**
+     * Unloads all the plug-ins for which the {@link #load(String)} method has been called.
+     */
+    void unloadAll();
+
+    /**
      * @param role The extension point. See {@link UIExtension#getRole()}.
      * @param feature The feature name. See {@link UIExtension#getFeatures()}.
      * @return The user interface extension for the given role and the given feature.

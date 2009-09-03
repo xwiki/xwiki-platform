@@ -326,8 +326,8 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         NodeList<com.google.gwt.dom.client.Element> brs = document.getBody().getElementsByTagName(BR);
         for (int i = 0; i < brs.getLength(); i++) {
             Element br = (Element) brs.getItem(i);
-            // Skip the BRs added by the browser before the document was loaded.
-            if (!br.hasAttribute("_moz_dirty")) {
+            // Skip the spaces and the BRs added by the browser before the document was loaded.
+            if (!br.hasAttribute("_moz_dirty") && !SPACER.equals(br.getClassName())) {
                 br.setClassName(LINE_BREAK);
             }
         }

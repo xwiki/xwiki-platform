@@ -21,8 +21,11 @@ package com.xpn.xwiki.wysiwyg.client.editor;
 
 import org.xwiki.gwt.dom.client.JavaScriptObject;
 
+import com.google.gwt.event.logical.shared.CloseEvent;
+import com.google.gwt.event.logical.shared.CloseHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
@@ -75,7 +78,7 @@ public class WysiwygEditorApi
         }
 
         // Prepare the DOM by creating a container for the editor.
-        Element container = DOM.createDiv();
+        final Element container = DOM.createDiv();
         String containerId = hook.getId() + "_container" + Math.round(Math.random() * 1000);
         container.setId(containerId);
         hook.getParentElement().insertBefore(container, hook);
@@ -88,6 +91,21 @@ public class WysiwygEditorApi
         } else {
             RootPanel.get(containerId).add(editor.getUI());
         }
+
+        // Cleanup when the window is closed. This way the HTML form elements generated on the server preserve their
+        // index and thus can be cached by the browser.
+        Window.addCloseHandler(new CloseHandler<Window>()
+        {
+            public void onClose(CloseEvent<Window> event)
+            {
+                if (editor != null) {
+                    editor.destroy();
+                }
+                if (container.getParentNode() != null) {
+                    container.getParentNode().removeChild(container);
+                }
+            }
+        });
     }
 
     /**

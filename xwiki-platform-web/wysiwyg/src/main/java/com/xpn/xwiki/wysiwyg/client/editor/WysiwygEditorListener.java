@@ -64,8 +64,12 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
         public void onSuccess(String result)
         {
             editor.setLoading(false);
+            // Disable the plain text area.
+            editor.getPlainTextEditor().getTextArea().setEnabled(false);
             // Enable the rich text area in order to be able to submit its content.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
+            // Focus the rich text area.
+            editor.getRichTextEditor().getTextArea().setFocus(true);
             // Reset the content of the rich text area.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(new Command("reset"), result);
             // Store the initial value of the rich text area in case it is submitted without gaining focus.
@@ -110,7 +114,10 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
             editor.setLoading(false);
             // Disable the rich text area to avoid submitting its content.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(WysiwygEditorListener.ENABLE, false);
+            // Enable the plain text area.
+            editor.getPlainTextEditor().getTextArea().setEnabled(true);
             editor.getPlainTextEditor().getTextArea().setText(result);
+            editor.getPlainTextEditor().getTextArea().setFocus(true);
         }
 
         /**
@@ -181,19 +188,20 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     {
         editor.setLoading(true);
         WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
-        // We test if the RTE textarea is disabled to be sure that the editor is not already being switched.
+        // We test if the rich text area is disabled to be sure that the editor is not already being switched.
         if (event.getSelectedItem() == WysiwygEditor.WYSIWYG_TAB_INDEX
             && !editor.getRichTextEditor().getTextArea().isEnabled()) {
             wysiwygService.toHTML(editor.getPlainTextEditor().getTextArea().getText(), editor.getConfig().getParameter(
                 SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWysiwygCallback(editor));
         } else {
-            // We test if the RTE textarea is enabled to be sure that the editor is not already being switched.
+            // We test if the rich text area is enabled to be sure that the editor is not already being switched.
             if (event.getSelectedItem() == WysiwygEditor.WIKI_TAB_INDEX
                 && editor.getRichTextEditor().getTextArea().isEnabled()) {
-                // At this point we should have the HTML, adjusted by plug-ins, in the hidden plain text area.
-                // Make the request to convert the HTML to Wiki syntax.
-                wysiwygService.fromHTML(editor.getPlainTextEditor().getTextArea().getText(),
-                    editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX),
+                // At this point we should have the HTML, adjusted by plug-ins, submitted.
+                // See #onBeforeSelection(BeforeSelectionEvent)
+                // Make the request to convert the HTML to source syntax.
+                wysiwygService.fromHTML(editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(
+                    SUBMIT), editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX),
                     new SwitchToWikiCallback(editor));
             }
         }

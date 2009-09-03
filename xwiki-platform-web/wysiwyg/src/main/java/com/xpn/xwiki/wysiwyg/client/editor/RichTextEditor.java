@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import org.xwiki.gwt.dom.client.Style;
+
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.dom.client.HasLoadHandlers;
@@ -30,6 +32,7 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.xpn.xwiki.wysiwyg.client.util.Console;
+import com.xpn.xwiki.wysiwyg.client.widget.LoadingPanel;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
@@ -57,6 +60,11 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
     protected final RichTextArea textArea;
 
     /**
+     * The panel used to indicate the loading state of the editor.
+     */
+    protected final LoadingPanel loadingPanel;
+
+    /**
      * The UI container.
      */
     protected final FlowPanel container;
@@ -71,6 +79,9 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
         if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof HasLoadHandlers) {
             ((HasLoadHandlers) textArea.getBasicFormatter()).addLoadHandler(this);
         }
+
+        loadingPanel = new LoadingPanel();
+        loadingPanel.getElement().getStyle().setProperty(Style.BACKGROUND_COLOR, "white");
 
         container = new FlowPanel();
         container.add(textArea);
@@ -126,11 +137,10 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
     public void setLoading(boolean loading)
     {
         if (loading) {
-            container.addStyleName(WysiwygEditor.STYLE_NAME_LOADING);
-            textArea.addStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
+            // NOTE: Setting and then removing visibility:hidden on the rich text area prevents it from being focused.
+            loadingPanel.startLoading(textArea);
         } else {
-            container.removeStyleName(WysiwygEditor.STYLE_NAME_LOADING);
-            textArea.removeStyleName(WysiwygEditor.STYLE_NAME_INVISIBLE);
+            loadingPanel.stopLoading();
         }
     }
 
@@ -141,6 +151,9 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
      */
     protected void onLoad()
     {
+        // This rich text editor has been attached to the document but its rich text area might not be ready yet.
+        setLoading(true);
+
         if (textArea.getBasicFormatter() == null || !(textArea.getBasicFormatter() instanceof HasLoadHandlers)) {
             // We defer the notification in order to allow the rich text area to complete its initialization.
             DeferredCommand.addCommand(new Command()

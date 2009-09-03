@@ -67,19 +67,16 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
 
         XWiki xwiki = new XWiki(config, getContext(), engineContext, false)
         {
-            @Override
             public String getSkin(XWikiContext context)
             {
                 return "skin";
             }
 
-            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;
             }
 
-            @Override
             public String getWebPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 return defaultValue;

@@ -2005,6 +2005,37 @@ function (row, i, table) {
 #end
 
 #**
+  * Hides the element that will be replaced by the WYSIWYG editor and shows the loading animation instead.
+  *
+  * @param $fieldId identifies the form field that will be replaced by the WYSIWYG editor
+  *#
+#macro(wysiwyg_hide $fieldId)
+<script type="text/javascript">
+//<![CDATA[
+(function() {
+  var field = document.getElementById('$!{fieldId}');
+  if (field) {
+    // Hide the element that will be wrapped by the WYSIWYG editor.
+    field.style.visibility = 'hidden';
+    // Show the loading animation.
+    var loading = document.createElement('span');
+    loading.className = 'loading';
+    loading.style.display = 'block';
+    loading.style.position = 'absolute';
+    loading.style.width = field.offsetWidth + 'px';
+    loading.style.height = field.offsetHeight + 'px';
+    field.parentNode.insertBefore(loading, field);
+    // Remove the loading animation after the WYSIWYG module has been loaded.
+    Wysiwyg.onModuleLoad(function() {
+      loading.parentNode.removeChild(loading);
+    });
+  }
+}).call();
+//]]>
+</script>
+#end
+
+#**
   * Imports the JavaScript files required by the WYSIWYG editor.
   *
   * @param $lazy {@code true} to download the WYSIWYG code only when it is needed, {@code false} to download it when the page is loaded
@@ -2146,6 +2177,15 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 #end
 
 #**
+  * Creates the input hidden whose value will be used to cache the state of the WYSIWYG editor in order to preserve it
+  * when the user navigates away from the edit page and restore it when the user comes back.
+  *#
+#macro(wysiwyg_createCache)
+#set($wysiwyg_cacheId = "wysiwygCache${util.generateRandomString(4)}")
+<input type="hidden" id="$!wysiwyg_cacheId" />
+#end
+
+#**
   * Stores the WYSIWYG configuration in a JavaScript variable.
   *
   * @param $jsVarName the name of the JavaScript variable to store the WYSIWYG configuration
@@ -2158,6 +2198,7 @@ $request.getSession().setAttribute("com.xpn.xwiki.wysiwyg.input", $wysiwygInput)
 //<![CDATA[
 var $jsVarName = {
   hookId: '$!{fieldId}',
+  cacheId: '$!{wysiwyg_cacheId}',
   syntax: '$!{editedDocument.syntaxId}',
 #if("$!wysiwyg_inputURLQueryString" != "")
   ## We get this content in edit mode so that we are able to detect the edit context in the javascript transformations 
@@ -2218,12 +2259,16 @@ Wysiwyg.onModuleLoad(function() {
   * @param $full {@code true} to use a fully-fledged editor, {@code false} to use a compact editor
   *#
 #macro(wysiwyg_editProperty $editedDocument $propertyId $full)
+## Hide the plain text area.
+#wysiwyg_hide($propertyId)
 ## Import required JavaScript files (lazy=false).
 #wysiwyg_import(false)
 ## Set the input value for the editor.
 #wysiwyg_inputProperty($editedDocument $propertyId)
 ## Display conversion errors, if present.
 #wysiwyg_displayConversionError($propertyId)
+## Create the cache.
+#wysiwyg_createCache()
 ## Create the editor UI.
 #wysiwyg_createEditor($editedDocument $propertyId $full)
 #end

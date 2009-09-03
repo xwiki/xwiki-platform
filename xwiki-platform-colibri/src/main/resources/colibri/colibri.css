@@ -514,7 +514,6 @@ ol.HEBREW { list-style-type: hebrew; }
 
 .wikicreatelinktext {
     text-decoration: underline;
-    color: black;
 }
 
 .wikicreatelinkqm {
@@ -968,7 +967,7 @@ body.content #contentcolumn .main {
     position: relative;
 }
 html>body #xwikicontent {
-    border: 1px solid transparent;
+  border: 1px solid transparent;
 }
 
 html > body .minwidth, html > body .minwidthb, html > body .minwidthc {
@@ -1127,13 +1126,8 @@ body#body.editbody #globallinks #globalmenu .glink,
     float: left;
 }
 
-/*IE*/
-
 #globaldoctitle {
   display: none;
-}
-
-#globaldoctitle h1 {
 }
 
 /* @end */
@@ -2145,10 +2139,6 @@ td.label {
     padding-right: 4px;
 }
 
-#xwikiclassproperties, #xwikiobjects {
-    border: 1px solid #DDD !important;
-}
-
 .center {
     text-align: center;
 }
@@ -2745,9 +2735,6 @@ div.floatinginfobox, fieldset.floatinginfobox {
     border: 1px solid;
     padding: 10px;
     margin: 1em 0 1em 1em;
-}
-
-div.floatingboxinner, fieldset.floatingboxinner {
 }
 
 div.floatinginfobox .strong, fieldset.floatinginfobox .strong {
@@ -3468,9 +3455,11 @@ body#body.editbody #globallinks #globalmenu a.glink:hover, #globalmenu a.glink:h
 /**********************************************************************************************/
 /** Headers **/
 
+h1, h2, h3, h4 {
+  color: $theme.titleColor;
+}
 h1 span, h2 span, h3 span, h4 span {
   border-bottom: 1px dotted $theme.borderColor;
-  color: $theme.titleColor;
 }
 
 h1 span span, h2 span span, h3 span span, h4 span span {
@@ -3958,7 +3947,7 @@ table.xwikidatatable td, #_history table td  {
 /**********************************************************************************************/
 /** Buttons **/
 
-input.button{
+input.button {
   background: $theme.buttonPrimaryBackgroundColor;
   color: $theme.buttonPrimaryTextColor;
   border: 1px solid $theme.buttonPrimaryBackgroundColor;
@@ -4297,7 +4286,6 @@ html>#body #globalsearch #globalsearchinput {
 }
 #document-title h1 {
   border-bottom: 1px dotted $theme.borderColor;
-  color: $theme.titleColor;
   padding: 0px 0px 5px;
 }
 #document-info {

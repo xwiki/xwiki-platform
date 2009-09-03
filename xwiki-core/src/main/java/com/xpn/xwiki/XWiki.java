@@ -800,7 +800,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             LOG.error("Error while initializing wiki macros", e);
         }
     }
-    
+
     public XWikiStoreInterface getNotCacheStore()
     {
         XWikiStoreInterface store = getStore();
@@ -2033,7 +2033,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             // If empty we take it from the default pref object
             if (result.equals("")) {
-                result = doc.getxWikiObject().getStringValue(prefname);
+                object = doc.getxWikiObject();
+                if (object != null) {
+                    result = doc.getxWikiObject().getStringValue(prefname);
+                }
             }
 
             if (!result.equals("")) {

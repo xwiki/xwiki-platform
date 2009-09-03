@@ -1204,25 +1204,25 @@ fieldset.xwikimessage, div.xwikimessage {
     display: block;
     float: none;
     width: 400px;
-    margin: 65px auto 0;
-    border: none;
-    border-top: 4em solid #efffd4;
-    border-bottom: 65px solid #FFF;
-    padding: 0 8px 16px;
-    background-color: #efffd4;
-    text-align: center;
+    margin: 65px auto;
+    border: 0 solid;
+    border-top-width: 4em;
+    border-top-width/*\**/: 0px\9; /* IE8 */
+    *border-top-width: 0px none transparent; /* IE6, IE7 */
+    padding: 0 20px 16px;
+    text-align: left;
 }
 
 fieldset.xwikimessage legend,
     div.xwikimessage h3 {
     display: block;
     width: 100%;
-    text-align: center;
+    text-align: left;
     font: bold 1.4em sans-serif;
     letter-spacing: 0.4em;
-    color: #508000;
-    padding: 0;
+    padding: 1em 0 0;
     margin: 0;
+    height: 1.8em; /* For Opera */
 }
 
 div.errormessage {
@@ -1230,13 +1230,13 @@ div.errormessage {
 }
 
 fieldset.xwikimessage .xwikimessage {
-    text-align: center;
+    text-align: left;
     font-weight: bold;
     font-size: 110%;
 }
 
 fieldset.xwikimessage .buttons {
-    text-align: center;
+    text-align: left;
 }
 
 fieldset.xwikimessage .buttons a {
@@ -4423,4 +4423,14 @@ body .listGrid {
 /* Hide the Search panel since this functionality is included in the header */
 .panels .Search {
   display: none;
+}
+
+fieldset.xwikimessage, div.xwikimessage {
+  background-color: $theme.backgroundSecondaryColor;
+  border-top-color: $theme.backgroundSecondaryColor;
+}
+
+fieldset.xwikimessage legend, div.xwikimessage h3 {
+  color: $theme.titleColor;
+  background: $theme.backgroundSecondaryColor; /* For Opera */
 }

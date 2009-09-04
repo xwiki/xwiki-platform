@@ -131,6 +131,10 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextException;
 
 public class XWikiDocument implements DocumentModelBridge
 {
@@ -5157,17 +5161,41 @@ public class XWikiDocument implements DocumentModelBridge
             backup.put("gcdoc", gcontext.get("cdoc"));
             backup.put("gtdoc", gcontext.get("tdoc"));
         }
+
+        // Clone the Execution Context to provide isolation
+        Execution execution = Utils.getComponent(Execution.class);
+        ExecutionContext clonedEc;
+        try {
+            clonedEc = Utils.getComponent(ExecutionContextManager.class).clone(execution.getContext());
+        } catch (ExecutionContextException e) {
+            throw new RuntimeException("Failed to clone the Execution Context", e);
+        }
+        execution.pushContext(clonedEc);
     }
 
     public static void restoreContext(Map<String, Object> backup, XWikiContext context)
     {
-        if (backup.get("doc") != null) {
-            context.setDoc((XWikiDocument) backup.get("doc"));
+        // Restore the Execution Context
+        Execution execution = Utils.getComponent(Execution.class);
+        execution.popContext();
+
+        Map gcontext = (Map) context.get("gcontext");
+        if (gcontext != null) {
+            if (backup.get("gdoc") != null) {
+                gcontext.put("doc", backup.get("gdoc"));
+            }
+
+            if (backup.get("gcdoc") != null) {
+                gcontext.put("cdoc", backup.get("gcdoc"));
+            }
+
+            if (backup.get("gtdoc") != null) {
+                gcontext.put("tdoc", backup.get("gtdoc"));
+            }
         }
 
         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
-        Map gcontext = (Map) context.get("gcontext");
         if (vcontext != null) {
             if (backup.get("vdoc") != null) {
                 vcontext.put("doc", backup.get("vdoc"));
@@ -5182,18 +5210,8 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
 
-        if (gcontext != null) {
-            if (backup.get("gdoc") != null) {
-                gcontext.put("doc", backup.get("gdoc"));
-            }
-
-            if (backup.get("gcdoc") != null) {
-                gcontext.put("cdoc", backup.get("gcdoc"));
-            }
-
-            if (backup.get("gtdoc") != null) {
-                gcontext.put("tdoc", backup.get("gtdoc"));
-            }
+        if (backup.get("doc") != null) {
+            context.setDoc((XWikiDocument) backup.get("doc"));
         }
     }
 

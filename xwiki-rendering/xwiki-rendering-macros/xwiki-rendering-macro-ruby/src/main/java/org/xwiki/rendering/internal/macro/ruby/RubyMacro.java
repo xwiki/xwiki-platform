@@ -19,13 +19,9 @@
  */
 package org.xwiki.rendering.internal.macro.ruby;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro;
+import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 
 /**
@@ -35,7 +31,7 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
  * @since 2.0M2
  */
 @Component("ruby")
-public class RubyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroParameters>
+public class RubyMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroParameters>
 {
     /**
      * The description of the macro.
@@ -46,22 +42,12 @@ public class RubyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroParam
      * The description of the macro content.
      */
     private static final String CONTENT_DESCRIPTION = "The ruby script to execute";
-    
+
     /**
      * Create and initialize the descriptor of the macro.
      */
     public RubyMacro()
     {
         super("Ruby", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Object eval(String content, ScriptEngine engine, ScriptContext scriptContext) throws ScriptException
-    {
-        return super.eval(content, engine, scriptContext);
     }
 }

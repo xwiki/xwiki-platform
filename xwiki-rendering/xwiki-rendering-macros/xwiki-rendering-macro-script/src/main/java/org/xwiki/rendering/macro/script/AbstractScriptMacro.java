@@ -55,12 +55,12 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
      * The default description of the script macro content.
      */
     protected static final String CONTENT_DESCRIPTION = "the script to execute";
-    
+
     /**
-     * Key under which the class loader used by script executions is saved in the Execution Context, 
-     * see {@link #execution}.
+     * Key under which the class loader used by script executions is saved in the Execution Context, see
+     * {@link #execution}.
      */
-    private static final String EXECUTION_CONTEXT_CLASSLOADER_KEY = "scriptClassLoader"; 
+    private static final String EXECUTION_CONTEXT_CLASSLOADER_KEY = "scriptClassLoader";
 
     /**
      * Used to find if the current document's author has programming rights.
@@ -69,8 +69,8 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     protected DocumentAccessBridge documentAccessBridge;
 
     /**
-     * Used to set the classLoader to be used by scripts across invocations. We save it in the Execution
-     * Context to be sure it's the same classLoader used.
+     * Used to set the classLoader to be used by scripts across invocations. We save it in the Execution Context to be
+     * sure it's the same classLoader used.
      */
     @Requirement
     protected Execution execution;
@@ -82,18 +82,18 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     private ComponentManager componentManager;
 
     /**
-     * Used to parse the result of the script execution into a XDOM object when the macro is configured by the user
-     * to not interpret wiki syntax.
+     * Used to parse the result of the script execution into a XDOM object when the macro is configured by the user to
+     * not interpret wiki syntax.
      */
     @Requirement("plain/1.0")
     private Parser plainTextParser;
 
     /**
-     * Used to create JAR URLs from the {@link ScriptMacroParameters#getJars()} parameter value. 
+     * Used to create JAR URLs from the {@link ScriptMacroParameters#getJars()} parameter value.
      */
     @Requirement
     private ScriptJARURLFactory scriptJARURLFactory;
-    
+
     /**
      * Used to clean result of the parser syntax.
      */
@@ -105,6 +105,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     public AbstractScriptMacro(String macroName)
     {
         super(macroName, null, ScriptMacroParameters.class);
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
@@ -175,10 +176,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
             ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(getClassLoader(parameters.getJars()));
-            
+
                 // 1) Run script engine on macro block content
                 String scriptResult = evaluate(parameters, content, context);
-    
+
                 if (parameters.isOutput()) {
                     // 2) Run the wiki syntax parser on the script-rendered content
                     result = parseScriptResult(scriptResult, parameters, context);
@@ -193,15 +194,15 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     }
 
     /**
-     * @param jarsParameterValue the value of the macro parameters used to pass extra URLs that should be in the 
-     *        execution class loader
+     * @param jarsParameterValue the value of the macro parameters used to pass extra URLs that should be in the
+     *            execution class loader
      * @return the class loader to use for executing the script
      * @throws MacroExecutionException in case of an error in building the class loader
      */
     protected ClassLoader getClassLoader(String jarsParameterValue) throws MacroExecutionException
     {
         // Set a class loader for script execution in the EC if not set.
-        XWikiURLClassLoader cl = 
+        XWikiURLClassLoader cl =
             (XWikiURLClassLoader) this.execution.getContext().getProperty(EXECUTION_CONTEXT_CLASSLOADER_KEY);
         if (cl == null) {
             cl = new XWikiURLClassLoader(new URL[0], Thread.currentThread().getContextClassLoader());
@@ -221,10 +222,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 throw new MacroExecutionException(
                     "You cannot pass additional jars since you don't have programming rights");
             }
-        }        
+        }
         return cl;
     }
-    
+
     /**
      * Convert script result as a {@link Block} list.
      * 
@@ -314,11 +315,11 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     }
 
     /**
-     * Note that this method allows extending classes to override it to allow jars parameters to be used without 
+     * Note that this method allows extending classes to override it to allow jars parameters to be used without
      * programming rights for example or to use some other conditions.
      * 
-     * @return true if the user can use the macro parameter used to pass additional JARs to the classloader used 
-     *         to evaluate a script
+     * @return true if the user can use the macro parameter used to pass additional JARs to the classloader used to
+     *         evaluate a script
      */
     protected boolean canHaveJarsParameters()
     {

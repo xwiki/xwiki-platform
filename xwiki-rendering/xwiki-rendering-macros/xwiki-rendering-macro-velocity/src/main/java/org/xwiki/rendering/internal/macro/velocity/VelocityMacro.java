@@ -72,7 +72,6 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     {
         super("Velocity", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             VelocityMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
@@ -88,7 +87,7 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext) 
+     * @see AbstractScriptMacro#evaluate(ScriptMacroParameters, String, MacroTransformationContext)
      */
     @Override
     protected String evaluate(VelocityMacroParameters parameters, String content, MacroTransformationContext context)
@@ -108,8 +107,8 @@ public class VelocityMacro extends AbstractScriptMacro<VelocityMacroParameters>
             }
 
             StringWriter writer = new StringWriter();
-            this.velocityManager.getVelocityEngine()
-                .evaluate(velocityContext, writer, "velocity macro", cleanedContent);
+            this.velocityManager.getVelocityEngine().evaluate(velocityContext, writer, "velocity macro",
+                cleanedContent);
             result = writer.toString();
 
             if (filter != null) {

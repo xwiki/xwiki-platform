@@ -28,7 +28,7 @@ import javax.script.ScriptException;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro;
+import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
 import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
 
 /**
@@ -38,7 +38,7 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
  * @since 1.7M3
  */
 @Component("groovy")
-public class GroovyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroParameters>
+public class GroovyMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroParameters>
 {
     /**
      * The description of the macro.
@@ -56,13 +56,12 @@ public class GroovyMacro extends AbstractJRSR223ScriptMacro<JSR223ScriptMacroPar
     public GroovyMacro()
     {
         super("Groovy", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro#eval(java.lang.String,
+     * @see org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro#eval(java.lang.String,
      *      javax.script.ScriptEngine, javax.script.ScriptContext)
      */
     @Override

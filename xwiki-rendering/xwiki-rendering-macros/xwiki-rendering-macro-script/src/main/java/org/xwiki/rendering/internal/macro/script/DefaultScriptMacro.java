@@ -21,7 +21,7 @@ package org.xwiki.rendering.internal.macro.script;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
-import org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro;
+import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
 import org.xwiki.rendering.macro.script.DefaultScriptMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -32,7 +32,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @since 1.7M3
  */
 @Component("script")
-public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScriptMacroParameters>
+public class DefaultScriptMacro extends AbstractJSR223ScriptMacro<DefaultScriptMacroParameters>
 {
     /**
      * The description of the macro.
@@ -57,13 +57,12 @@ public class DefaultScriptMacro extends AbstractJRSR223ScriptMacro<DefaultScript
     {
         super("Script", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION),
             DefaultScriptMacroParameters.class);
-        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.script.AbstractJRSR223ScriptMacro#getScriptEngineName(org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters,
+     * @see org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro#getScriptEngineName(org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters,
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     @Override

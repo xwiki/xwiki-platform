@@ -21,9 +21,6 @@ package org.xwiki.rendering.internal.parser.pygments;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,16 +58,6 @@ import org.xwiki.rendering.parser.Parser;
 public class PygmentsParser extends AbstractHighlightParser implements Initializable
 {
     /**
-     * A Pygments .py file to search for the location of the jar.
-     */
-    private static final String LEXER_PY = "Lib/pygments/lexer.py";
-
-    /**
-     * A Pygments .py file to search for the location of the jar.
-     */
-    private static final String XDOMFORMATTER_PY = "Lib/pygments/formatters/xdom.py";
-
-    /**
      * The name of the lexer variable in PPython code.
      */
     private static final String PY_LEXER_VARNAME = "lexer";
@@ -104,21 +91,6 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
             + "except ClassNotFound:\n" + "  pass";
 
     /**
-     * Java jar URL special characters.
-     */
-    private static final String JAR_URL_PREFIX = "jar:file:";
-
-    /**
-     * Jar path separator.
-     */
-    private static final String JAR_SEPARATOR = "!";
-
-    /**
-     * The character use to separate URL parts.
-     */
-    private static final String URL_SEPARATOR = "/";
-
-    /**
      * The syntax identifier.
      */
     private Syntax syntax;
@@ -144,17 +116,14 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         String highlightSyntaxId = getSyntaxId() + "-highlight";
         this.syntax = new Syntax(new SyntaxType(highlightSyntaxId, highlightSyntaxId), "1.0");
 
-        System.setProperty("python.home", findPygmentsPath());
-
         this.pythonInterpreter = new PythonInterpreter();
 
         // imports Pygments
         this.pythonInterpreter.exec("import pygments");
 
-        this.pythonInterpreter.execfile(getClass().getClassLoader().getResourceAsStream(XDOMFORMATTER_PY));
-
         this.pythonInterpreter.exec("from pygments.lexers import guess_lexer");
         this.pythonInterpreter.exec("from pygments.util import ClassNotFound");
+        this.pythonInterpreter.exec("from pygments.formatters.xdom import XDOMFormatter");
     }
 
     /**
@@ -225,57 +194,5 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     protected PythonInterpreter getPythonInterpreter()
     {
         return this.pythonInterpreter;
-    }
-
-    /**
-     * Get the full URL root path of provided Python file.
-     * 
-     * @param fileToFind the Python file to find in the classpath.
-     * @return the root URL path.
-     */
-    private String findPath(String fileToFind)
-    {
-        URL url = getClass().getResource(URL_SEPARATOR + fileToFind);
-
-        // Note: we encode using UTF8 since it's the W3C recommendation.
-        // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
-        String urlString;
-        try {
-            urlString = URLDecoder.decode(url.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
-            // without that encoding.
-            throw new RuntimeException("Failed to URL decode [" + url.toString() + "] using UTF-8.", e);
-        }
-
-        // we expect an URL like
-        // jar:file:/jar_dir/jython-lib.jar!/Lib/pygments/lexer.py
-        int jarSeparatorIndex = urlString.indexOf(JAR_SEPARATOR);
-        if (urlString.startsWith(JAR_URL_PREFIX) && jarSeparatorIndex > 0) {
-            urlString = urlString.substring(JAR_URL_PREFIX.length(), jarSeparatorIndex);
-        } else {
-            // Just in case we don't get a jar URL
-            int begin = urlString.indexOf(URL_SEPARATOR);
-            int lexerPyIndex = urlString.lastIndexOf(fileToFind);
-            urlString = urlString.substring(begin, lexerPyIndex);
-            if (urlString.endsWith(URL_SEPARATOR)) {
-                urlString = urlString.substring(0, urlString.length() - 1);
-            }
-            if (urlString.endsWith(JAR_SEPARATOR)) {
-                urlString = urlString.substring(0, urlString.length() - 1);
-            }
-        }
-
-        return urlString;
-    }
-
-    /**
-     * Determine and register the home of the Pygments Pyton files.
-     * 
-     * @return the root path of Pygments Pyton files.
-     */
-    private String findPygmentsPath()
-    {
-        return findPath(LEXER_PY);
     }
 }

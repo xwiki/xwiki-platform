@@ -286,7 +286,7 @@ public class DBListClass extends ListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOG.warn("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
+            LOG.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
         }
         return sql;
     }

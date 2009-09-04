@@ -481,8 +481,7 @@ public class DBTreeListClass extends DBListClass
         try {
             sql = context.getWiki().parseContent(sql, context);
         } catch (Exception e) {
-            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error [" + e.getMessage()
-                + "]. Continuing with non-rendered script.");
+            LOG.error("Failed to parse SQL script [" + sql + "]. Continuing with non-rendered script.", e);
         }
         return sql;
     }

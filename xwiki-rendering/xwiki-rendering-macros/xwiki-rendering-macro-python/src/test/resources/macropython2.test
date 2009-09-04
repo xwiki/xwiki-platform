@@ -1,0 +1,16 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify ruby macro does not fail with null content
+.#-----------------------------------------------------
+{{python/}}{{python}}{{/python}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+beginMacroMarkerInline [python] []
+endMacroMarkerInline [python] []
+beginMacroMarkerInline [python] [] []
+endMacroMarkerInline [python] [] []
+endParagraph
+endDocument

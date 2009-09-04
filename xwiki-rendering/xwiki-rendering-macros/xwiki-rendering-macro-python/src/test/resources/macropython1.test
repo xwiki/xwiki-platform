@@ -1,0 +1,33 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{python}}
+print "Hello World"
+{{/python}}
+
+= Hello {{jython}}print "World"{{/jython}}=
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [python] [] [
+print "Hello World"
+]
+beginParagraph
+onWord [Hello]
+onSpace
+onWord [World]
+endParagraph
+endMacroMarkerStandalone [python] [] [
+print "Hello World"
+]
+beginSection
+beginHeader [1, HHello]
+onWord [Hello]
+onSpace
+beginMacroMarkerInline [jython] [] [print "World"]
+onWord [World]
+endMacroMarkerInline [jython] [] [print "World"]
+endHeader [1, HHello]
+endSection
+endDocument

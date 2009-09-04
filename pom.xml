@@ -68,6 +68,12 @@
           </exclusion>
         </exclusions>
       </dependency>
+      <!-- Jython engine -->
+      <dependency>
+        <groupId>org.python</groupId>
+        <artifactId>jython-standalone</artifactId>
+        <version>2.5.1rc1-xwiki</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>

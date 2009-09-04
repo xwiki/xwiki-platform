@@ -1,0 +1,109 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{python}}
+demo = [1, 3, 6, 10, 15, 21, "lots"]
+
+size = len(demo)
+print "Number of elements is ",size
+
+counter = size
+while counter > 0:
+        counter -= 1
+        print "El",counter,"val",demo[counter]
+{{/python}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [python] [] [
+demo = [1, 3, 6, 10, 15, 21, "lots"]
+
+size = len(demo)
+print "Number of elements is ",size
+
+counter = size
+while counter > 0:
+        counter -= 1
+        print "El",counter,"val",demo[counter]
+]
+beginParagraph
+onWord [Number]
+onSpace
+onWord [of]
+onSpace
+onWord [elements]
+onSpace
+onWord [is]
+onSpace
+onSpace
+onWord [7]
+onNewLine
+onWord [El]
+onSpace
+onWord [6]
+onSpace
+onWord [val]
+onSpace
+onWord [lots]
+onNewLine
+onWord [El]
+onSpace
+onWord [5]
+onSpace
+onWord [val]
+onSpace
+onWord [21]
+onNewLine
+onWord [El]
+onSpace
+onWord [4]
+onSpace
+onWord [val]
+onSpace
+onWord [15]
+onNewLine
+onWord [El]
+onSpace
+onWord [3]
+onSpace
+onWord [val]
+onSpace
+onWord [10]
+onNewLine
+onWord [El]
+onSpace
+onWord [2]
+onSpace
+onWord [val]
+onSpace
+onWord [6]
+onNewLine
+onWord [El]
+onSpace
+onWord [1]
+onSpace
+onWord [val]
+onSpace
+onWord [3]
+onNewLine
+onWord [El]
+onSpace
+onWord [0]
+onSpace
+onWord [val]
+onSpace
+onWord [1]
+endParagraph
+endMacroMarkerStandalone [python] [] [
+demo = [1, 3, 6, 10, 15, 21, "lots"]
+
+size = len(demo)
+print "Number of elements is ",size
+
+counter = size
+while counter > 0:
+        counter -= 1
+        print "El",counter,"val",demo[counter]
+]
+endDocument

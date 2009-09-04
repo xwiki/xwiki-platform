@@ -20,8 +20,15 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
+
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -35,13 +42,29 @@ public class DBListClassTest extends AbstractBridgedXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         getContext().setDoc(new XWikiDocument());
 
-        XWikiHibernateStore store = new XWikiHibernateStore("dummy");
         XWiki xwiki = new XWiki();
+
+        Mock mockXWikiStore =
+            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {xwiki,
+            getContext()});
+        xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
+
+        Mock mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
+        mockXWikiRenderingEngine.stubs().method("interpretText").will(
+            new CustomStub("Implements XWikiRenderingEngine.interpretText")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return invocation.parameterValues.get(0);
+                }
+            });
+
+        xwiki.setRenderingEngine((XWikiRenderingEngine) mockXWikiRenderingEngine.proxy());
+
         getContext().setWiki(xwiki);
-        xwiki.setStore(store);
     }
 
     public void testGetDefaultQueryWhenNoSqlSCriptSpecified()

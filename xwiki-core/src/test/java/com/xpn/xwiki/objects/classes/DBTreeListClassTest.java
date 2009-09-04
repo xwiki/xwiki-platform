@@ -20,9 +20,16 @@
  */
 package com.xpn.xwiki.objects.classes;
 
+import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
+
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
@@ -35,13 +42,29 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
         getContext().setDoc(new XWikiDocument());
 
-        XWikiHibernateStore store = new XWikiHibernateStore("dummy");
         XWiki xwiki = new XWiki();
+
+        Mock mockXWikiStore =
+            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {xwiki,
+            getContext()});
+        xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
+
+        Mock mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
+        mockXWikiRenderingEngine.stubs().method("interpretText").will(
+            new CustomStub("Implements XWikiRenderingEngine.interpretText")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return invocation.parameterValues.get(0);
+                }
+            });
+
+        xwiki.setRenderingEngine((XWikiRenderingEngine) mockXWikiRenderingEngine.proxy());
+
         getContext().setWiki(xwiki);
-        xwiki.setStore(store);
     }
 
     public void testGetQueryWhenNoSQLSCriptSpecified()
@@ -82,15 +105,15 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
-        assertEquals("select distinct doc.name, doc.name, doc.parent from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.name, doc.parent from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setIdField("obj.className");
         assertEquals("select distinct obj.className, obj.className, doc.parent"
-            + " from XWikiDocument as doc, BaseObject as obj" + " where doc.fullName=obj.name", dbtlc
-            .getQuery(getContext()));
+            + " from XWikiDocument as doc, BaseObject as obj" + " where doc.fullName=obj.name",
+            dbtlc.getQuery(getContext()));
         dbtlc.setIdField("property");
-        assertEquals("select distinct doc.property, doc.property, doc.parent" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.property, doc.property, doc.parent" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
     }
 
     public void testGetQueryWithIdAndParentSpecified()
@@ -98,47 +121,47 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
         dbtlc.setParentField("doc.name");
-        assertEquals("select distinct doc.name, doc.name, doc.name from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.name, doc.name from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setParentField("obj.className");
         assertEquals("select distinct doc.name, doc.name, obj.className"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
         dbtlc.setParentField("property");
-        assertEquals("select distinct doc.name, doc.name, doc.property from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.name, doc.property from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
 
         dbtlc.setIdField("obj.className");
         dbtlc.setParentField("doc.name");
         assertEquals("select distinct obj.className, obj.className, doc.name"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
         dbtlc.setParentField("obj.className");
-        assertEquals("select distinct obj.className, obj.className, obj.className" + " from BaseObject as obj", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct obj.className, obj.className, obj.className" + " from BaseObject as obj",
+            dbtlc.getQuery(getContext()));
         dbtlc.setParentField("property");
         assertEquals("select distinct obj.className, obj.className, doc.property"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
 
         dbtlc.setIdField("property");
         dbtlc.setParentField("doc.name");
-        assertEquals("select distinct doc.property, doc.property, doc.name" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.property, doc.property, doc.name" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setParentField("obj.className");
         assertEquals("select distinct doc.property, doc.property, obj.className"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
         dbtlc.setParentField("property");
-        assertEquals("select distinct doc.property, doc.property, doc.property" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.property, doc.property, doc.property" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setParentField("property2");
-        assertEquals("select distinct doc.property, doc.property, doc.property2" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.property, doc.property, doc.property2" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
     }
 
     public void testGetQueryWithValueSpecified()
     {
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setValueField("doc.name");
-        assertEquals("select distinct doc.name, doc.name, doc.parent from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.name, doc.parent from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
     }
 
     public void testGetQueryWithIdAndClassnameSpecified()
@@ -216,17 +239,17 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
         dbtlc.setValueField("doc.name");
-        assertEquals("select distinct doc.name, doc.name, doc.parent" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.name, doc.parent" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setValueField("doc.creator");
-        assertEquals("select distinct doc.name, doc.creator, doc.parent" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.creator, doc.parent" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setValueField("obj.className");
         assertEquals("select distinct doc.name, obj.className, doc.parent"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
         dbtlc.setValueField("property");
-        assertEquals("select distinct doc.name, doc.property, doc.parent" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.property, doc.parent" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
 
         dbtlc.setIdField("obj.className");
         dbtlc.setValueField("doc.name");
@@ -244,14 +267,14 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
 
         dbtlc.setIdField("property");
         dbtlc.setValueField("doc.name");
-        assertEquals("select distinct doc.property, doc.name, doc.parent" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.property, doc.name, doc.parent" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setValueField("obj.className");
         assertEquals("select distinct doc.property, obj.className, doc.parent"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
         dbtlc.setValueField("property");
-        assertEquals("select distinct doc.property, doc.property, doc.parent" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.property, doc.property, doc.parent" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setValueField("otherProperty");
         assertEquals("select distinct doc.property, doc.otherProperty, doc.parent" + " from XWikiDocument as doc",
             dbtlc.getQuery(getContext()));
@@ -263,15 +286,15 @@ public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
         dbtlc.setIdField("doc.name");
         dbtlc.setValueField("doc.title");
         dbtlc.setParentField("doc.space");
-        assertEquals("select distinct doc.name, doc.title, doc.space" + " from XWikiDocument as doc", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct doc.name, doc.title, doc.space" + " from XWikiDocument as doc",
+            dbtlc.getQuery(getContext()));
         dbtlc.setValueField("obj.name");
         assertEquals("select distinct doc.name, obj.name, doc.space"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc.getQuery(getContext()));
         dbtlc.setIdField("obj.className");
         dbtlc.setParentField("obj.id");
-        assertEquals("select distinct obj.className, obj.name, obj.id" + " from BaseObject as obj", dbtlc
-            .getQuery(getContext()));
+        assertEquals("select distinct obj.className, obj.name, obj.id" + " from BaseObject as obj",
+            dbtlc.getQuery(getContext()));
     }
 
     public void testGetQueryWithIdValueAndClassSpecified()

@@ -75,7 +75,7 @@ public class DefaultExecutionContextManager implements ExecutionContextManager
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
         for (ExecutionContextInitializer initializer: this.initializers) {
-            ((ExecutionContextInitializer) initializer).initialize(context);
+            initializer.initialize(context);
         }
     }
     

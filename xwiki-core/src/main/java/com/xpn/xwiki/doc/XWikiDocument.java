@@ -521,9 +521,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getRenderedContent(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
-        // Note: We are currently duplicating code from the other getRendered signature since there are
-        // some unresolved issues with saving/restoring the context in some cases (need to be investigated),
-        // for example in the Admin Import page.
+        // Note: We are currently duplicating code from the other getRendered signature because some calling
+        // code is expecting that the rendering will happen in the calling document's context and not in this
+        // document's context. For example this is true for the Admin page, see 
+        // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
         String renderedContent;
         Object isInRenderingEngine = context.get("isInRenderingEngine");

@@ -3994,6 +3994,7 @@ input.button:hover {
 
 .panel input, .panel select, #editPanels dl dd input {
   background-color:$theme.pageContentBackgroundColor ;
+  color: $theme.textColor;
   border:1px solid $theme.borderColor;
 }
 
@@ -4002,7 +4003,7 @@ input.button:hover {
   border:1px solid $theme.borderColor;
 }
 
-input[type="text"], input[type="password"] {
+input[type="text"], input[type="password"], select, textarea {
   background-color: $theme.pageContentBackgroundColor ;
   border: 1px solid $theme.borderColor;
   color: $theme.textColor;

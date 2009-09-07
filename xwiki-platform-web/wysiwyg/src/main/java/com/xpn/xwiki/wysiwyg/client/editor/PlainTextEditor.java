@@ -164,7 +164,7 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
     /**
      * Stores the value of the plain text area in the hook's value property and also caches it if the cache is enabled.
      */
-    private void submit()
+    public void submit()
     {
         if (textArea.isAttached() && textArea.isEnabled()) {
             hook.setPropertyString(PROPERTY_VALUE, textArea.getText());

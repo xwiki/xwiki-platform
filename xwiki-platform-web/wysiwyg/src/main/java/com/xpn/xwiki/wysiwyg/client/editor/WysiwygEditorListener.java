@@ -117,7 +117,10 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
             // Enable the plain text area.
             editor.getPlainTextEditor().getTextArea().setEnabled(true);
             editor.getPlainTextEditor().getTextArea().setText(result);
+            // Try giving focus to the plain text area (this might not work if the browser window is not focused).
             editor.getPlainTextEditor().getTextArea().setFocus(true);
+            // Store the initial value of the plain text area in case it is submitted without gaining focus.
+            editor.getPlainTextEditor().submit();
         }
 
         /**

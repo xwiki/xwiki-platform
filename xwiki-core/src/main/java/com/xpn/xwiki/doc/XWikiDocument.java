@@ -4131,26 +4131,24 @@ public class XWikiDocument implements DocumentModelBridge
 
     public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException
     {
-        String oldname = getFullName();
-
         loadAttachments(context);
         loadArchive(context);
-
-        /*
-         * if (oldname.equals(docname)) return this;
-         */
 
         XWikiDocument newdoc = (XWikiDocument) clone();
         newdoc.setFullName(newDocumentName, context);
         newdoc.setContentDirty(true);
         newdoc.getxWikiClass().setName(newDocumentName);
-        Vector<BaseObject> objects = newdoc.getObjects(oldname);
-        if (objects != null) {
-            for (BaseObject object : objects) {
-                object.setName(newDocumentName);
-                // Since GUIDs are supposed to be Unique, although this object holds the same data, it is not exactly
-                // the same object, so it should have a different identifier.
-                object.setGuid(UUID.randomUUID().toString());
+        Map<String, Vector<BaseObject>> objectclasses = newdoc.getxWikiObjects();
+        if (objectclasses != null) {
+            for (Vector<BaseObject> objects : objectclasses.values()) {
+                if (objects != null) {
+                    for (BaseObject object : objects) {
+                        object.setName(newDocumentName);
+                        // Since GUIDs are supposed to be Unique, although this object holds the same data, it is not
+                        // exactly the same object, so it should have a different identifier.
+                        object.setGuid(UUID.randomUUID().toString());
+                    }
+                }
             }
         }
 

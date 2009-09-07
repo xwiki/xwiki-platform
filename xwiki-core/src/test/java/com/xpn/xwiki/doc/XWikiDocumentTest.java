@@ -143,7 +143,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
-        
+
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
@@ -158,8 +158,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setContent("Some content");
         this.document.setTitle("Title");
-        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING)
-            .will(returnValue("Title"));
+        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING).will(
+            returnValue("Title"));
 
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
@@ -167,8 +167,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetDisplayWhenNoTitleButSectionExists()
     {
         this.document.setContent("Some content\n1 Title");
-        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING)
-            .will(returnValue("Title"));
+        this.mockXWikiRenderingEngine.expects(once()).method("interpretText").with(eq("Title"), ANYTHING, ANYTHING).will(
+            returnValue("Title"));
 
         assertEquals("Title", this.document.getDisplayTitle(getContext()));
     }
@@ -469,9 +469,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
         assertEquals("1.1", sections.get(1).getSectionLevel());
         // Test blank lines are preserved
-        this.document
-            .setContent("\n\n1 Section 1\n\n\n" + "Content of first section\n\n\n" + "   1.1    Subsection 2  \n\n"
-                + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        this.document.setContent("\n\n1 Section 1\n\n\n" + "Content of first section\n\n\n"
+            + "   1.1    Subsection 2  \n\n" + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
         sections = this.document.getSections();
         assertEquals(3, sections.size());
         assertEquals(2, sections.get(0).getSectionIndex());
@@ -745,8 +744,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.document.rename("newwikiname:newspace.newpage", Arrays.asList("1", "2", "3"), getContext());
 
         assertEquals(
-            "[[newwikiname:newspace.newpage]] [[newwikiname:newspace.newpage]] [[newwikiname:newspace.newpage]]", doc1
-                .getContent());
+            "[[newwikiname:newspace.newpage]] [[newwikiname:newspace.newpage]] [[newwikiname:newspace.newpage]]",
+            doc1.getContent());
         assertEquals("[[newspace.newpage]]", doc2.getContent());
         assertEquals("[[newspace.newpage]]", doc3.getContent());
     }
@@ -794,5 +793,19 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // Check the correct behavior
         assertTrue(objects.contains(o1));
         assertFalse(objects.contains(o2));
+    }
+
+    public void testCopyDocument() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument();
+        BaseObject o = new BaseObject();
+        o.setClassName(CLASSNAME);
+        doc.addObject(CLASSNAME, o);
+
+        XWikiDocument newDoc = doc.copyDocument("newdoc", getContext());
+        BaseObject newO = newDoc.getObject(CLASSNAME);
+
+        assertNotSame(o, newDoc.getObject(CLASSNAME));
+        assertFalse(newO.getGuid().equals(o.getGuid()));
     }
 }

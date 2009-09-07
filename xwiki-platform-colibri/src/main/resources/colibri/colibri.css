@@ -4277,9 +4277,13 @@ html>#body #globalsearch #globalsearchinput {
   border-color: $theme.borderColor;
 }
 
+.wikicreatelinktext {
+  color: $theme.textPrimaryColor;
+}
 .wikicreatelinkqm {
   background-color: $theme.buttonPrimaryBackgroundColor;
 }
+
 .footnoteRef:target, .footnotes *:target {
   border-color: $theme.borderColor;
   background: $theme.highlightColor;

@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.watchlist;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.ServletException;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
@@ -169,11 +171,26 @@ public class WatchListJob extends AbstractJob implements Job
     }
 
     /**
+     * @param userWiki wiki from which the user comes from
      * @return the name of the page that should be used as email template for this job
      */
-    private String getEmailTemplate()
+    private String getEmailTemplate(String userWiki)
     {
-        return watchListJobObject.getStringValue(WatchListJobManager.WATCHLIST_JOB_EMAIL_PROP);
+        String fullName = watchListJobObject.getStringValue(WatchListJobManager.WATCHLIST_JOB_EMAIL_PROP);
+        String prefixedFullName;
+        
+        if (fullName.contains(WatchListStore.WIKI_SPACE_SEP)) {
+            // If the configured template is already an absolute reference it's meant to force the template.
+            prefixedFullName = fullName;
+        } else {
+            prefixedFullName = userWiki + WatchListStore.WIKI_SPACE_SEP + fullName;
+            if (context.getWiki().exists(prefixedFullName, context)) {
+                // If the configured template exists in the user wiki, use it.
+                return prefixedFullName;
+            }
+        }
+                
+        return fullName;
     }
 
     /**
@@ -237,10 +254,11 @@ public class WatchListJob extends AbstractJob implements Job
                     plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
                 List<WatchListEvent> matchingEvents =
                     eventMatcher.getMatchingEvents(wikis, spaces, documents, subscriber, context);
+                String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
 
                 // If events have occurred on at least one element watched by the user, send the email
                 if (matchingEvents.size() > 0) {
-                    plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents, getEmailTemplate(),
+                    plugin.getNotifier().sendEmailNotification(subscriber, matchingEvents, getEmailTemplate(userWiki),
                         previousFireTime, context);
                 }
             }            

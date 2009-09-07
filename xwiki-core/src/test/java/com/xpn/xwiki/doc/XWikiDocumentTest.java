@@ -792,4 +792,18 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertTrue(objects.contains(o1));
         assertFalse(objects.contains(o2));
     }
+
+    public void testCopyDocument() throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument();
+        BaseObject o = new BaseObject();
+        o.setClassName(CLASSNAME);
+        doc.addObject(CLASSNAME, o);
+
+        XWikiDocument newDoc = doc.copyDocument("newdoc", getContext());
+        BaseObject newO = newDoc.getObject(CLASSNAME);
+
+        assertNotSame(o, newDoc.getObject(CLASSNAME));
+        assertFalse(newO.getGuid().equals(o.getGuid()));
+    }
 }

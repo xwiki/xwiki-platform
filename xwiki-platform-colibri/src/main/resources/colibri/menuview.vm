@@ -61,16 +61,20 @@
 ##
 ## Create menu
 ##
-##if($hasEdit)
-### #xwikitopmenuentrystart($doc.getURL($editaction, $!languageparams) $msg.get('core.menu.create') 'tmCreate')
-##xwikitopmenuentrystart($xwiki.getURL('XWiki.CreateSubpage', 'view', "parent=${doc.fullName}") $msg.get('core.menu.create') 'tmCreate')
-##submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "parent=${doc.fullName}") $msg.get('core.menu.create.page') 'tmCreatePage')
-##submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', 'tocreate=space') $msg.get('core.menu.create.space') 'tmCreateSpace')
-##submenuitem($xwiki.getURL('Blog.CreateBlogPost') $msg.get('core.menu.create.blogpost') 'tmCreateBlogPost')
-##if($xwiki.hasAccessLevel('edit', 'Main.EventCalendar'))#submenuitem($xwiki.getURL('Main.EventCalendar') $msg.get('core.menu.create.event') 'tmCreateCalendarEvent')#end
-##if($hasAdmin)#submenuitem($xwiki.getURL('Panels.WebHome') $msg.get('core.menu.create.panel') 'tmCreatePanel')#end
-##xwikitopmenuentryend()
-##end
+#if($hasEdit)
+  #xwikitopmenuentrystart($xwiki.getURL('XWiki.CreatePage', 'view', "parent=${doc.fullName}") $msg.get('core.menu.create') 'tmCreate')
+  #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "parent=${doc.fullName}") $msg.get('core.menu.create.page') 'tmCreatePage')
+  #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', 'tocreate=space') $msg.get('core.menu.create.space') 'tmCreateSpace')
+  #set ($canImport = $xwiki.exists('XWiki.OfficeImporter') && $xwiki.checkAccess('XWiki.OfficeImporter', 'view') && !$isguest)
+  #if($canImport)
+    #submenuseparator()
+    #submenuitem($xwiki.getURL('XWiki.OfficeImporter') $msg.get('core.menu.create.importFromOffice') 'tmActionImport')
+  #end
+  ## #submenuitem($xwiki.getURL('Blog.CreateBlogPost') $msg.get('core.menu.create.blogpost') 'tmCreateBlogPost')
+  ## #if($xwiki.hasAccessLevel('edit', 'Main.EventCalendar'))#submenuitem($xwiki.getURL('Main.EventCalendar') $msg.get('core.menu.create.event') 'tmCreateCalendarEvent')#end
+  ## #if($hasAdmin)#submenuitem($xwiki.getURL('Panels.WebHome') $msg.get('core.menu.create.panel') 'tmCreatePanel')#end
+  #xwikitopmenuentryend()
+#end
 ##
 ## Edit menu
 ##
@@ -105,9 +109,9 @@
 #end
 #end
 ##
-## Print menu
+## Export menu
 ##
-#xwikitopmenuentrystart($doc.getURL('export', "format=pdf&amp;$!docvariant") 'Export' 'tmPrint') ## TODO $msg.get('core.menu.export')
+#xwikitopmenuentrystart($doc.getURL('export', "format=pdf&amp;$!docvariant") $msg.get('core.menu.export') 'tmPrint')
 #submenuitem($doc.getURL('export', "format=pdf&amp;$!docvariant") $msg.get('core.menu.export.pdf') 'tmExportPdf')
 #submenuitem($doc.getURL('export', "format=rtf&amp;$!docvariant") $msg.get('core.menu.export.rtf') 'tmExportRtf')
 #submenuitem($doc.getURL('export', "format=html&amp;$!docvariant") $msg.get('core.menu.export.html') 'tmExportHtml')
@@ -119,7 +123,6 @@
 #xwikitopmenuentrystart('' $msg.get('core.menu.actions') 'tmFile')
 #submenuitem($doc.getURL('view', "xpage=print&amp;$!docvariant") $msg.get('core.menu.preview') 'tmPrintPreview')
 #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
-#set ($canImport = $xwiki.exists('XWiki.OfficeImporter') && $xwiki.checkAccess('XWiki.OfficeImporter', 'view') && !$isguest)
   #if($canDelete)
     #submenuseparator()
     #submenuitem($doc.getURL('delete', $!languageparams) $msg.get('core.menu.delete') 'tmActionDelete')
@@ -127,10 +130,6 @@
     #if($xwiki.hasProgrammingRights())
       #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy')
     #end
-  #end
-  #if($canImport)
-    #submenuseparator()
-    #submenuitem($xwiki.getURL('XWiki.OfficeImporter') $msg.get('core.menu.import') 'tmActionImport')
   #end
   #xwikitopmenuentryend()
   #if($canDelete && $keyboardShortcutsEnabled)

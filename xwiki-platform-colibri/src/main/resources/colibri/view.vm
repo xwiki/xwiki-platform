@@ -18,8 +18,8 @@
     <div id="xwikicontent">
     #template("hierarchy.vm")
     #template("contentview.vm")
-    </div>## xwikicontent
     <div class="clearfloats"></div>
+    </div>## xwikicontent
     #template("docextra.vm")
     </div>## main
   #else

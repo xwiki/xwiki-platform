@@ -302,55 +302,57 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void endFormat(WikiFormat format)
     {
-        // Get the styles: the styles are wiki syntax styles (i.e. styles which have a wiki syntax such as bold, italic ,etc).
-        // As opposed to format parameters which don't have any specific wiki syntax (they have a generic wiki syntax such as
+        // Get the styles: the styles are wiki syntax styles (i.e. styles which have a wiki syntax such as bold, italic
+        // ,etc).
+        // As opposed to format parameters which don't have any specific wiki syntax (they have a generic wiki syntax
+        // such as
         // (% a='b' %) for example in XWiki Syntax 2.0.
         List<WikiStyle> styles = format.getStyles();
-        
-        // If there's any style or parameter defined, do something. The reason we need to check for this is because wikimodel
+
+        // If there's any style or parameter defined, do something. The reason we need to check for this is because
+        // wikimodel
         // sends an empty begin/endFormat event before starting an inline block (such as a paragraph).
         if ((styles.size() > 0) || (format.getParams().size() > 0)) {
 
             // Generate nested FormatBlock blocks since XWiki uses nested Format blocks whereas Wikimodel doesn't.
             //
             // Simple Use Case: (% a='b' %)**//hello//**(%%)
-            // WikiModel Events: 
-            //   beginFormat(params: a='b', styles = BOLD, ITALIC)
-            //   onWord(hello)
-            //   endFormat(params: a='b', styles = BOLD, ITALIC)
+            // WikiModel Events:
+            // beginFormat(params: a='b', styles = BOLD, ITALIC)
+            // onWord(hello)
+            // endFormat(params: a='b', styles = BOLD, ITALIC)
             // XWiki Blocks:
-            //   FormatBLock(params: a='b', format = BOLD)
-            //     FormatBlock(format = ITALIC)
+            // FormatBLock(params: a='b', format = BOLD)
+            // FormatBlock(format = ITALIC)
             //
             // More complex Use Case: **(% a='b' %)hello**world
-            // WikiModel Events: 
-            //   beginFormat(params: a='b', styles = BOLD)
-            //   onWord(hello)
-            //   endFormat(params: a='b', styles = BOLD)
-            //   beginFormat(params: a='b')
-            //   onWord(world)
-            //   endFormat(params: a='b')
+            // WikiModel Events:
+            // beginFormat(params: a='b', styles = BOLD)
+            // onWord(hello)
+            // endFormat(params: a='b', styles = BOLD)
+            // beginFormat(params: a='b')
+            // onWord(world)
+            // endFormat(params: a='b')
             // XWiki Blocks:
-            //   FormatBlock(params: a='b', format = BOLD)
-            //     WordBlock(hello)
-            //   FormatBlock(params: a='b')
-            //     WordBlock(world)
-            
+            // FormatBlock(params: a='b', format = BOLD)
+            // WordBlock(hello)
+            // FormatBlock(params: a='b')
+            // WordBlock(world)
+
             // TODO: We should instead have the following which would allow to simplify XWikiSyntaxChaining Renderer
             // which currently has to check if the next format has the same params as the previous format to decide
             // whether to print it or not.
-            //   FormatBlock(params: a='b')
-            //     FormatBlock(format = BOLD)
-            //       WordBlock(hello)
-            //     WordBlock(world)
-            
+            // FormatBlock(params: a='b')
+            // FormatBlock(format = BOLD)
+            // WordBlock(hello)
+            // WordBlock(world)
+
             FormatBlock block;
             if (styles.size() > 0) {
                 block = new FormatBlock(generateListFromStack(), convertFormat(styles.get(styles.size() - 1)));
             } else {
                 block = new FormatBlock(generateListFromStack(), Format.NONE);
             }
-            
 
             if (styles.size() > 1) {
                 ListIterator<WikiStyle> it = styles.listIterator(styles.size() - 1);
@@ -377,7 +379,7 @@ public class XDOMGeneratorListener implements IWemListener
             }
 
         } else {
-            // Empty format. We need to remove our marker so pop all blocks after our marker and push them back on 
+            // Empty format. We need to remove our marker so pop all blocks after our marker and push them back on
             // the stack.
             for (Block block : generateListFromStack()) {
                 this.stack.push(block);
@@ -559,10 +561,11 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     *
-     * <p>Called when WikiModel finds an reference (link or image) such as a URI located directly in the text
-     * (free-standing URI), as opposed to a link/image inside wiki link/image syntax delimiters.</p>
-     *
+     * <p>
+     * Called when WikiModel finds an reference (link or image) such as a URI located directly in the text
+     * (free-standing URI), as opposed to a link/image inside wiki link/image syntax delimiters.
+     * </p>
+     * 
      * @see org.wikimodel.wem.IWemListener#onLineBreak()
      */
     public void onReference(String reference)
@@ -613,8 +616,8 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onImage(WikiReference ref)
     {
-        this.stack.push(new ImageBlock(this.imageParser.parse(ref.getLink()), false, convertParameters(ref
-            .getParameters())));
+        this.stack.push(new ImageBlock(this.imageParser.parse(ref.getLink()), false,
+            convertParameters(ref.getParameters())));
     }
 
     /**
@@ -783,5 +786,29 @@ public class XDOMGeneratorListener implements IWemListener
         }
 
         return resultBlock;
+    }
+
+    public void beginSection(int docLevel, int headerLevel, WikiParameters params)
+    {
+        // TODO add support for it
+
+    }
+
+    public void beginSectionContent(int docLevel, int headerLevel, WikiParameters params)
+    {
+        // TODO add support for it
+
+    }
+
+    public void endSection(int docLevel, int headerLevel, WikiParameters params)
+    {
+        // TODO add support for it
+
+    }
+
+    public void endSectionContent(int docLevel, int headerLevel, WikiParameters params)
+    {
+        // TODO add support for it
+
     }
 }

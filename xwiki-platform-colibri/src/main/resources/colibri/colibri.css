@@ -1421,7 +1421,7 @@ Menu
 */
 #actionmenu {
     position: absolute;
-    width: expression( body . scrollLeft + document . body . clientWidth + "px" );
+    width: 100%;
     height: 20px !important;
     top: 0;
     left: 0;
@@ -1433,9 +1433,6 @@ Menu
 
 html > body #actionmenu {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
 }
 
 #actionmenu a {

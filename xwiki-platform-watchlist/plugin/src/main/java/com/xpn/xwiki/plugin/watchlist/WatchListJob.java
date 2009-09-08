@@ -252,8 +252,9 @@ public class WatchListJob extends AbstractJob implements Job
                 List<String> spaces = plugin.getStore().getWatchedElements(subscriber, ElementType.SPACE, this.context);
                 List<String> documents =
                     plugin.getStore().getWatchedElements(subscriber, ElementType.DOCUMENT, this.context);
+                List<String> users = plugin.getStore().getWatchedElements(subscriber, ElementType.USER, this.context);
                 List<WatchListEvent> matchingEvents =
-                    eventMatcher.getMatchingEvents(wikis, spaces, documents, subscriber, context);
+                    eventMatcher.getMatchingEvents(wikis, spaces, documents, users, subscriber, context);
                 String userWiki = StringUtils.substringBefore(subscriber, WatchListStore.WIKI_SPACE_SEP);
 
                 // If events have occurred on at least one element watched by the user, send the email

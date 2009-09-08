@@ -53,7 +53,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * Is current document within a space watched by the current user.
      * 
      * @return True if the containing space is watched
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean isDocInWatchedSpaces() throws XWikiException
     {
@@ -65,7 +65,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * Is current document watched by the current user.
      * 
      * @return True if the document is in the current user's WatchList
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean isDocumentWatched() throws XWikiException
     {
@@ -78,7 +78,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * 
      * @param wDoc Document to add
      * @return True if the document wasn't already in the WatchList
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean addDocument(String wDoc) throws XWikiException
     {
@@ -87,12 +87,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
     }
 
     /**
-     * Allows Adminstrators to add the specified document in the specified user's WatchList.
+     * Allows Administrators to add the specified document in the specified user's WatchList.
      * 
      * @param user XWiki User
      * @param wDoc Document to add
      * @return True if the document wasn't already in the WatchList
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean addDocumentForUser(String user, String wDoc) throws XWikiException
     {
@@ -105,7 +105,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * 
      * @param wDoc Document to remove
      * @return True if the document was in the WatchList and has been removed
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean removeDocument(String wDoc) throws XWikiException
     {
@@ -119,7 +119,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * @param user XWiki User
      * @param wDoc Document to remove
      * @return True if the document was in the WatchList and has been removed
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean removeDocumentForUser(String user, String wDoc) throws XWikiException
     {
@@ -127,11 +127,12 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
             && getWatchListPlugin().getStore().removeWatchedElement(user, wDoc, ElementType.DOCUMENT, context);
     }
 
+
     /**
      * Is the current space watched by the current user.
      * 
-     * @return True if the document is in the current user's watchlist
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @return True if the space is in the current user's watchlist
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean isSpaceWatched() throws XWikiException
     {
@@ -144,7 +145,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * 
      * @param wSpace Space to add
      * @return True if the space wasn't already in the user's WatchList and has been added
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean addSpace(String wSpace) throws XWikiException
     {
@@ -157,7 +158,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * @param user XWiki User
      * @param wSpace Space to add
      * @return True if the space wasn't already in the user's WatchList and has been added
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean addSpaceForUser(String user, String wSpace) throws XWikiException
     {
@@ -170,7 +171,7 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * 
      * @param wSpace Space to remove
      * @return True if the space was in the user's WatchList and has been removed
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean removeSpace(String wSpace) throws XWikiException
     {
@@ -184,12 +185,143 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
      * @param user XWiki User
      * @param wSpace Space to remove
      * @return True if the space was in the user's WatchList and has been removed
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public boolean removeSpaceForUser(String user, String wSpace) throws XWikiException
     {
         return context.getWiki().getUser(context).hasAdminRights()
             && getWatchListPlugin().getStore().removeWatchedElement(user, wSpace, ElementType.SPACE, context);
+    }    
+
+    /**
+     * Is the current wiki watched by the current user.
+     * 
+     * @return True if the wiki is in the current user's watchlist
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean isWikiWatched() throws XWikiException
+    {
+        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.WIKI, context)
+            .contains(context.getDatabase());
+    }
+
+    /**
+     * Add the current wiki to the current user's WatchList.
+     * 
+     * @param wWiki Wiki to add
+     * @return True if the wiki wasn't already in the user's WatchList and has been added
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean addWiki(String wWiki) throws XWikiException
+    {
+        return getWatchListPlugin().getStore().addWatchedElement(context.getUser(), wWiki, ElementType.WIKI, context);
+    }
+
+    /**
+     * Allows Administrators to add the specified wiki to the specified user's WatchList.
+     * 
+     * @param user XWiki User
+     * @param wWiki Wiki to add
+     * @return True if the wiki wasn't already in the user's WatchList and has been added
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean addWikiForUser(String user, String wWiki) throws XWikiException
+    {
+        return context.getWiki().getUser(context).hasAdminRights()
+            && getWatchListPlugin().getStore().addWatchedElement(user, wWiki, ElementType.WIKI, context);
+    }
+
+    /**
+     * Remove the specified wiki from the current user's WatchList.
+     * 
+     * @param wWiki Wiki to remove
+     * @return True if the wiki was in the user's WatchList and has been removed
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean removeWiki(String wWiki) throws XWikiException
+    {
+        return getWatchListPlugin().getStore().removeWatchedElement(context.getUser(), wWiki, ElementType.WIKI,
+            context);
+    }
+
+    /**
+     * Allows Administrators to remove the specified wiki from the specified user's WatchList.
+     * 
+     * @param user XWiki User
+     * @param wWiki Wiki to remove
+     * @return True if the wiki was in the user's WatchList and has been removed
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean removeWikiForUser(String user, String wWiki) throws XWikiException
+    {
+        return context.getWiki().getUser(context).hasAdminRights()
+            && getWatchListPlugin().getStore().removeWatchedElement(user, wWiki, ElementType.WIKI, context);
+    }
+    
+    /**
+     * Is the given user watched by the current user.
+     * 
+     * @param user the prefixed fullName of the user to test
+     * @return True if the user is in the current user's WatchList
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean isUserWatched(String user) throws XWikiException
+    {
+        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.USER, context)
+            .contains(user);
+    }
+
+    /**
+     * Add the specified user to the current user's WatchList.
+     * 
+     * @param user User to add
+     * @return True if the user wasn't already in the WatchList
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean addUser(String user) throws XWikiException
+    {
+        return getWatchListPlugin().getStore()
+            .addWatchedElement(context.getUser(), user, ElementType.USER, context);
+    }
+
+    /**
+     * Allows Administrators to add the specified user in the specified user's WatchList.
+     * 
+     * @param user XWiki User
+     * @param userToWatch User to add
+     * @return True if the user wasn't already in the WatchList
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean addUserForUser(String user, String userToWatch) throws XWikiException
+    {
+        return context.getWiki().getUser(context).hasAdminRights()
+            && getWatchListPlugin().getStore().addWatchedElement(user, userToWatch, ElementType.USER, context);
+    }
+
+    /**
+     * Removed the specified user from the current user's WatchList.
+     * 
+     * @param user User to remove
+     * @return True if the user was in the WatchList and has been removed
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean removeUser(String user) throws XWikiException
+    {
+        return getWatchListPlugin().getStore().removeWatchedElement(context.getUser(), user, ElementType.USER, context);
+    }
+
+    /**
+     * Allows Administrators to remove the specified user from the specified user's WatchList.
+     * 
+     * @param user XWiki User
+     * @param userToRemove User to remove
+     * @return True if the user was in the WatchList and has been removed
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public boolean removeUserForUser(String user, String userToRemove) throws XWikiException
+    {
+        return context.getWiki().getUser(context).hasAdminRights()
+            && getWatchListPlugin().getStore().removeWatchedElement(user, userToRemove, ElementType.USER, context);
     }
 
     /**
@@ -224,12 +356,23 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
     {
         return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.WIKI, context);
     }
+    
+    /**
+     * Get the list of users watched by the current user.
+     * 
+     * @return The list of the users in the user's WatchList
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
+     */
+    public List<String> getWatchedUsers() throws XWikiException
+    {
+        return getWatchListPlugin().getStore().getWatchedElements(context.getUser(), ElementType.USER, context);
+    }
 
     /**
-     * Get the elements (wikis + spaces + documents) watched by the current user.
+     * Get the elements (wikis + spaces + documents + users) watched by the current user.
      * 
      * @return The list of the elements in the user's WatchList
-     * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
+     * @throws XWikiException If the user's WatchList Object cannot be retrieved nor created
      */
     public List<String> getWatchedElements() throws XWikiException
     {
@@ -237,6 +380,8 @@ public class WatchListPluginApi extends PluginApi<WatchListPlugin>
         wEls.addAll(getWatchedDocuments());
         wEls.addAll(getWatchedSpaces());
         wEls.addAll(getWatchedWikis());
+        wEls.addAll(getWatchedUsers());
+        
         return wEls;
     }
     

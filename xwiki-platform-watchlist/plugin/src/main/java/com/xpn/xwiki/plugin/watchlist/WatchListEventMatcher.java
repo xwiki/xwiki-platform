@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -123,18 +124,21 @@ public class WatchListEventMatcher
      * @param wikis a list of wikis from which events should match
      * @param spaces a list of spaces from which events should match
      * @param documents a list of documents from which events should match
+     * @param users a list of users from which events should match
      * @param userName notification recipient
      * @param context the XWiki context
      * @return the list of events matching the given scopes
      */
     public List<WatchListEvent> getMatchingEvents(List<String> wikis, List<String> spaces, List<String> documents,
-        String userName, XWikiContext context)
+        List<String> users, String userName, XWikiContext context)
     {
-        List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();
-
+        List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();        
+               
+        
         for (WatchListEvent event : events) {
             if (wikis.contains(event.getWiki()) || spaces.contains(event.getPrefixedSpace())
-                || documents.contains(event.getPrefixedFullName())) {
+                || documents.contains(event.getPrefixedFullName()) 
+                || ListUtils.intersection(users, event.getAuthors()).size() > 0) {
                 try {
                     if (context.getWiki().getRightService().hasAccessLevel("view", userName,
                         event.getPrefixedFullName(), context)) {

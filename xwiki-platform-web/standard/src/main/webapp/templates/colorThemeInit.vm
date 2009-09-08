@@ -57,7 +57,11 @@
        #set($discard = $theme.put($prop.name, $prop.value))
      #end
      #if($prop.name.endsWith('Image'))
-       #set($discard = $theme.put($prop.name, "url(${themeDoc.getAttachmentURL($prop.value)})"))
+       #if("$!prop.value" != '')
+         #set($discard = $theme.put($prop.name, "url(${themeDoc.getAttachmentURL($prop.value)})"))
+       #else
+         #set($discard = $theme.put($prop.name, ''))
+       #end
      #end
   #end
 #end

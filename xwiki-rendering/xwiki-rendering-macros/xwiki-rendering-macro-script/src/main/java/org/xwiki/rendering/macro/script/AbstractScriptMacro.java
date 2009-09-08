@@ -105,6 +105,7 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     public AbstractScriptMacro(String macroName)
     {
         super(macroName, null, ScriptMacroParameters.class);
+
         setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
@@ -115,6 +116,8 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     public AbstractScriptMacro(String macroName, String macroDescription)
     {
         super(macroName, macroDescription, ScriptMacroParameters.class);
+
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
@@ -125,6 +128,8 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
     public AbstractScriptMacro(String macroName, String macroDescription, ContentDescriptor contentDescriptor)
     {
         super(macroName, macroDescription, contentDescriptor, ScriptMacroParameters.class);
+
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
@@ -136,6 +141,8 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         Class< ? extends ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, parametersBeanClass);
+
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**
@@ -148,6 +155,8 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
         Class< ? extends ScriptMacroParameters> parametersBeanClass)
     {
         super(macroName, macroDescription, contentDescriptor, parametersBeanClass);
+
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     /**

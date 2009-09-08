@@ -86,7 +86,11 @@ public class WatchListStore implements EventListener
         /**
          * Document.
          */
-        DOCUMENT
+        DOCUMENT,
+        /**
+         * User.
+         */
+        USER
     }
 
     /**
@@ -135,6 +139,11 @@ public class WatchListStore implements EventListener
      * Property of the watchlist class used to store the list of documents to watch.
      */
     private static final String WATCHLIST_CLASS_DOCUMENTS_PROP = "documents";
+    
+    /**
+     * Property of the watchlist class used to store the list of users to watch.
+     */
+    private static final String WATCHLIST_CLASS_USERS_PROP = "users";
 
     /**
      * Watchlist jobs document names in the wiki.
@@ -188,6 +197,7 @@ public class WatchListStore implements EventListener
         needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_WIKIS_PROP, "Wiki list", 80, 5);
         needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_SPACES_PROP, "Space list", 80, 5);
         needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_DOCUMENTS_PROP, "Document list", 80, 5);
+        needsUpdate |= bclass.addTextAreaField(WATCHLIST_CLASS_USERS_PROP, "User list", 80, 5);
 
         return needsUpdate;
     }
@@ -348,7 +358,9 @@ public class WatchListStore implements EventListener
     {
         BaseObject watchListObject = this.getWatchListObject(user, context);
         String watchedItems = watchListObject.getLargeStringValue(getWatchListClassPropertyForType(type)).trim();
-        return Arrays.asList(watchedItems.split(WATCHLIST_ELEMENT_SEP));
+        List<String> elements = new ArrayList<String>();
+        elements.addAll(Arrays.asList(watchedItems.split(WATCHLIST_ELEMENT_SEP)));
+        return elements;
     }
 
     /**
@@ -380,6 +392,8 @@ public class WatchListStore implements EventListener
             return WATCHLIST_CLASS_SPACES_PROP;
         } else if (ElementType.DOCUMENT.equals(type)) {
             return WATCHLIST_CLASS_DOCUMENTS_PROP;
+        } else if (ElementType.USER.equals(type)) {
+            return WATCHLIST_CLASS_USERS_PROP;
         } else {
             return StringUtils.EMPTY;
         }
@@ -398,14 +412,17 @@ public class WatchListStore implements EventListener
     public boolean addWatchedElement(String user, String newWatchedElement, ElementType type, XWikiContext context)
         throws XWikiException
     {
-        String elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
+        String elementToWatch = newWatchedElement;
+        
+        if (!ElementType.WIKI.equals(type) && !newWatchedElement.contains(WIKI_SPACE_SEP)) {
+            elementToWatch = context.getDatabase() + WIKI_SPACE_SEP + newWatchedElement;
+        }
 
         if (this.isWatched(elementToWatch, user, type, context)) {
             return false;
         }
 
-        List<String> watchedElements = new ArrayList<String>();
-        watchedElements.addAll(getWatchedElements(user, type, context));
+        List<String> watchedElements = getWatchedElements(user, type, context);
         watchedElements.add(elementToWatch);
 
         this.setWatchListElementsProperty(user, type, watchedElements, context);
@@ -426,16 +443,16 @@ public class WatchListStore implements EventListener
         throws XWikiException
     {
         String elementToRemove = watchedElement;
-        if (!watchedElement.contains(WIKI_SPACE_SEP)) {
+        
+        if (!ElementType.WIKI.equals(type) && !watchedElement.contains(WIKI_SPACE_SEP)) {
             elementToRemove = context.getDatabase() + WIKI_SPACE_SEP + watchedElement;
         }
 
         if (!this.isWatched(elementToRemove, user, type, context)) {
             return false;
         }
-
-        List<String> watchedElements = new ArrayList<String>();
-        watchedElements.addAll(getWatchedElements(user, type, context));
+        
+        List<String> watchedElements = getWatchedElements(user, type, context);
         watchedElements.remove(elementToRemove);
 
         this.setWatchListElementsProperty(user, type, watchedElements, context);

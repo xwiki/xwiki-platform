@@ -282,8 +282,9 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 authors.add(getAuthor());
             } else {
                 for (ActivityEvent event : activityEvents) {
-                    if (!authors.contains(event.getUser())) {
-                        authors.add(event.getUser());
+                    String prefixedAuthor = event.getWiki() + WatchListStore.WIKI_SPACE_SEP + event.getUser();
+                    if (!authors.contains(prefixedAuthor)) {
+                        authors.add(prefixedAuthor);
                     }
                 }
             }

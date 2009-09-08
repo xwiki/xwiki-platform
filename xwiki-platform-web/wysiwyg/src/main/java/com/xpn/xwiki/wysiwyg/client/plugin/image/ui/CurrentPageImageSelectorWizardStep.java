@@ -161,6 +161,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
      */
     private void refreshAttachmentsList(final AsyncCallback< ? > cb)
     {
+        imageList.clear();        
         WysiwygService.Singleton.getInstance().getImageAttachments(currentPage.getWiki(), currentPage.getSpace(),
             currentPage.getPage(), new AsyncCallback<List<Attachment>>()
             {
@@ -191,7 +192,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
         } else if (imageList.getSelectedItem() != null && imageList.getSelectedItem().getData() != null) {
             oldSelection = imageList.getSelectedItem().getData().getFilename();
         }
-        imageList.clear();
         for (Attachment attach : attachments) {
             ListItem<Attachment> newItem = getImageListItem(attach);
             imageList.addItem(newItem);
@@ -385,5 +385,17 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     public void removeNavigationListener(NavigationListener listener)
     {
         navigationListeners.remove(listener);
+    }
+
+    /**
+     * Updates the current page for which this wizard step provides selection interface. However, it <strong>will
+     * not</strong> update the displayed images, this will have to be done manually through
+     * {@link #refreshAttachmentsList(AsyncCallback)}.
+     * 
+     * @param currentPage the currentPage to set
+     */
+    public void setCurrentPage(ResourceName currentPage)
+    {
+        this.currentPage = currentPage;
     }
 }

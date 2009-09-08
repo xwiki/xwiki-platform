@@ -41,13 +41,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.SpaceSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.WikiSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
  * Wizard step to explore and select images from all the pages in the wiki. <br />
- * FIXME: this class should extend the {@link CurrentPageImageSelectorWizardStep} rather than aggregate it.
  * 
  * @version $Id$
  */
@@ -90,12 +88,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     private final VerticalResizePanel mainPanel = new VerticalResizePanel();
 
     /**
-     * Navigatiobn listeners to handle navigation in this wizard step. The images explorer fires navigation to next step
-     * when double-click or enter is hit in the images list.
-     */
-    private NavigationListenerCollection listeners = new NavigationListenerCollection();
-
-    /**
      * The image selector for the currently selected page in this wizard step. This will be instantiated every time the
      * list of pages for a selected page needs to be displayed, and the functionality of this aggregator will be
      * delegated to it.
@@ -121,6 +113,9 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         mainPanel.addStyleName("xImagesExplorer");
         this.displayWikiSelector = displayWikiSelector;
         mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace(), editedResource.getPage()));
+        pageWizardStep = new CurrentPageImageSelectorWizardStep(editedResource);
+        mainPanel.add(pageWizardStep.display());
+        mainPanel.setExpandingWidget(pageWizardStep.display(), true);
     }
 
     /**
@@ -148,8 +143,8 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         {
             public void onClick(ClickEvent event)
             {
-                initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector
-                    .getSelectedSpace(), pageSelector.getSelectedPage(), null));
+                initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
+                    pageSelector.getSelectedPage(), null));
             }
         });
 
@@ -291,8 +286,8 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             {
                 public void onSuccess(List<String> result)
                 {
-                    initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector
-                        .getSelectedSpace(), pageSelector.getSelectedPage(), selectedFile));
+                    initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
+                        pageSelector.getSelectedPage(), selectedFile));
                 }
 
                 public void onFailure(Throwable caught)
@@ -303,8 +298,8 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             if (!selectedPage.equals(pageSelector.getSelectedPage())) {
                 pageSelector.setSelectedPage(selectedPage);
             }
-            initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(),
-                spaceSelector.getSelectedSpace(), pageSelector.getSelectedPage(), selectedFile));
+            initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
+                pageSelector.getSelectedPage(), selectedFile));
         }
     }
 
@@ -346,31 +341,15 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * 
      * @param resource the resource to display the selector panel for
      */
-    protected void initAndDisplayCurrentPage(ResourceName resource)
+    protected void initCurrentPage(ResourceName resource)
     {
-        // remove old panel, if any
-        if (pageWizardStep != null) {
-            mainPanel.remove(pageWizardStep.display());
-            // remove the listeners
-            for (NavigationListener l : listeners) {
-                pageWizardStep.removeNavigationListener(l);
-            }
-        }
-        // create a new pageWizard step
-        pageWizardStep = new CurrentPageImageSelectorWizardStep(resource, editedResource);
-        // pass all listeners
-        for (NavigationListener l : listeners) {
-            pageWizardStep.addNavigationListener(l);
-        }
+        pageWizardStep.setCurrentPage(resource);
         mainPanel.addStyleName(STYLE_LOADING);
         pageWizardStep.init(getData(), new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
             {
                 mainPanel.removeStyleName(STYLE_LOADING);
-                mainPanel.add(pageWizardStep.display());
-                mainPanel.setExpandingWidget(pageWizardStep.display(), true);
-                mainPanel.refreshHeights();
             };
 
             public void onFailure(Throwable caught)
@@ -378,6 +357,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 mainPanel.removeStyleName(STYLE_LOADING);
                 Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
                 error.addStyleName("errormessage");
+                mainPanel.remove(pageWizardStep.display());
                 mainPanel.add(error);
             }
         });
@@ -413,17 +393,19 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     @Override
     protected void initializeSelection()
     {
-        if (!StringUtils.isEmpty(getData().getReference()) || pageWizardStep == null) {
-            // if it's the first display (i.e. no pageWizardStep) or an image needs to be edited, refresh selectors and
-            // page list
+        if (!StringUtils.isEmpty(getData().getReference())
+            || (wikiSelector.getSelectedWiki() == null && spaceSelector.getSelectedSpace() == null && pageSelector
+                .getSelectedPage() == null)) {
+            // if it's the first display (i.e. no selection in the wikiselector, spaceSelector or pageSelector) or an
+            // image needs to be edited, refresh selectors and page list
             ResourceName r = new ResourceName(getData().getReference(), true);
             ResourceName resolved = r.resolveRelativeTo(editedResource);
             setSelection(resolved.getWiki(), resolved.getSpace(), resolved.getPage(), resolved.getFile(), true);
         } else {
             // just initialize the step for the space, page, wiki selection in the selectors. I.e. preserve last
             // selection
-            initAndDisplayCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(),
-                spaceSelector.getSelectedSpace(), pageSelector.getSelectedPage(), null));
+            initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
+                pageSelector.getSelectedPage(), null));
         }
     }
 
@@ -448,7 +430,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      */
     public void addNavigationListener(NavigationListener listener)
     {
-        listeners.add(listener);
+        pageWizardStep.addNavigationListener(listener);
     }
 
     /**
@@ -456,6 +438,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      */
     public void removeNavigationListener(NavigationListener listener)
     {
-        listeners.remove(listener);
+        pageWizardStep.removeNavigationListener(listener);
     }
 }

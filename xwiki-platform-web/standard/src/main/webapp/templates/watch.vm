@@ -7,4 +7,8 @@
   $xwiki.watchlist.addSpace($doc.space)
 #elseif ($do == 'removespace')
   $xwiki.watchlist.removeSpace($doc.space)
+#elseif ($do == 'addwiki')
+  $xwiki.watchlist.addWiki($doc.wiki)
+#elseif ($do == 'removewiki')
+  $xwiki.watchlist.removeWiki($doc.wiki)
 #end

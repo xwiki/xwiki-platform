@@ -19,9 +19,9 @@
   #end
   </div> ## metamodifs
   <div class="buttons">
-    #editActionButton('cancel', 'cancel')
     #if($previewenabled) #editActionButton('preview', 'preview') #end
     #editActionButton('saveandcontinue', 'saveandcontinue')
     #editActionButton($saveaction, 'saveandview')
+    #editActionButton('cancel', 'cancel')
   </div> ## buttons
 #end

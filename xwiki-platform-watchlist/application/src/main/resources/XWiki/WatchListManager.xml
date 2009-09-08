@@ -119,7 +119,7 @@
         $msg.get("watchlist.staytuned.email.frequency") :
             $profileDoc.display("interval", "edit")
             &lt;input type="hidden" name="xredirect" id="xredirect" value="$doc.getURL("view")"&gt;
-            &lt;input type="submit" value="$msg.get("watchlist.staytuned.email.frequency.save")" class="button"/&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('watchlist.staytuned.email.frequency.save')" class="button"/&gt;&lt;/span&gt;
         &lt;/div&gt;
         &lt;/form&gt;
         &lt;div style="width:48%;float:right;"&gt;

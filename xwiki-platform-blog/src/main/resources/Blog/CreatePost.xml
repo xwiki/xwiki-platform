@@ -36,12 +36,11 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   #if($space == '')
     #set($space = $doc.space)
   #end
-  1.1 $msg.get('xe.blog.post.createpost')
   &lt;form action="${xwiki.getURL('Blog.CreatePost', 'view', 'xpage=plain')}" id="newBlogPost" method="post"&gt;
   &lt;div&gt;
     &lt;input type="hidden" name="entrySpace" value="$space"/&gt;
-    &lt;input type="text" name="entryTitle" value="$msg.get("xe.blog.post.title")"/&gt;
-    &lt;input type="submit" value="$msg.get("xe.blog.post.create")"/&gt;
+    ## TODO: put the styling in the CSS extension!
+    &lt;label style="font-weight: bold; font-size: 80%; padding-left: 18px; background: transparent url($xwiki.getSkinFile('icons/silk/add.gif')) no-repeat left center;)"&gt;$msg.get('xe.blog.post.createpost') &lt;input type="text" name="entryTitle" value="$msg.get('xe.blog.post.title')" style="border: 1px solid #DDD" class="withTip"/&gt;&lt;/label&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('xe.blog.post.create')"/&gt;&lt;/span&gt;
   &lt;/div&gt;
   &lt;/form&gt;
 #else

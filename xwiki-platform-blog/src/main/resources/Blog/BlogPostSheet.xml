@@ -25,6 +25,8 @@
 <hidden>true</hidden>
 <content>#includeMacros("Blog.BlogCode")
 #includeMacros("Blog.CategoriesCode")
+$xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
+$xwiki.ssx.use('Blog.ManageCategories')##
 #getEntryObject($doc $entryObj)
 #if("$!entryObj" == '')
   #warning($msg.get("xe.blog.sheet.notpost"))
@@ -44,10 +46,8 @@
   &lt;dd&gt;$doc.display("extract", "edit", $entryObj)&lt;/dd&gt;
   &lt;dt&gt;$msg.get("xe.blog.sheet.category")&lt;/dt&gt;
   &lt;dd&gt;
-  #getCategoriesHierarchy('' $tree)
-  &lt;div id="blog_category_container"&gt;
-  #displayCategoriesHierarchy($tree 'selectable')&lt;/div&gt;
-  #showCreateCategoryBox($tree)
+  #displayCategoryManagementTree('' 'selectable')
+  &lt;div class="clearfloats"&gt;&lt;/div&gt;
   &lt;/dd&gt;
   &lt;/dl&gt;
   #template('tagedit.vm')

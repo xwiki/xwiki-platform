@@ -66,12 +66,28 @@
 <name>Blog.Categories</name>
 <number>0</number>
 <className>Blog.CategoryClass</className>
+<guid>10b04d01-8109-4726-9cd1-c4b15d41375b</guid>
 <property>
-<description>Pseudo-category.</description>
+<description></description>
 </property>
 <property>
-<name>Default</name>
+<name>Blog categories</name>
 </property>
 </object>
-<content>#includeForm("Blog.CategorySheet")</content>
+<content>1 Blog categories
+#includeMacros("Blog.CategoriesCode")
+$xwiki.ssx.use("Blog.ManageCategories")##
+$xwiki.jsx.use("Blog.ManageCategories")##
+
+&lt;div class="blog-categories-list"&gt;
+#getCategoriesHierarchy($doc.space $tree)
+#displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'editable')
+#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName))
+* &lt;span class="blog-add-category-label"&gt;&lt;a href="$doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=${doc.fullName}")"&gt;$msg.get("xe.blog.categories.addcategory")&lt;/a&gt;&lt;/span&gt;
+##
+#if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "${doc.fullName}") #addCategoryForm() #end
+##
+#end
+&lt;/div&gt;
+&lt;div class="clearfloats"&gt;&lt;/div&gt;</content>
 </xwikidoc>

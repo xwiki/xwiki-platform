@@ -30,7 +30,7 @@ import org.xwiki.rendering.macro.script.JSR223ScriptMacroParameters;
  * @version $Id$
  * @since 2.0M2
  */
-@Component(hints = {"python", "jython" })
+@Component("python")
 public class PythonMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroParameters>
 {
     /**

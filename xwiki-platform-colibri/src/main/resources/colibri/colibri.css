@@ -1,3 +1,4 @@
+#template('colorThemeInit.vm')
 /* @group RESET */
 /* --------------------------------------------------------------
 
@@ -2762,10 +2763,10 @@ div.floatinginfobox ul,
 }
 
 /*
-    ---------------------------------------
-    Images
-    ---------------------------------------
-    */
+---------------------------------------
+  Images
+---------------------------------------
+*/
 .imgfloatleft {
     float: left;
     margin-right: 1em;
@@ -2848,33 +2849,66 @@ body.mceContentBody {
     border: 0px;
 }
 
-#changescontent {
+/*
+---------------------------------------
+  Changes
+---------------------------------------
+*/
+div#changes-info {
+  background: $theme.backgroundSecondaryColor url( $xwiki.getSkinFile('icons/xwiki/diff-header.png') ) no-repeat 50% -35px;
+  color: $theme.textPrimaryColor;
+}
+
+div#changes-info-boxes {
+  margin-top: 0em;
+  line-height: 1.4em;
+  border: 0px solid #f4f9fe;
+  background-color: transparent;
+  text-align: center;
+  padding-top: 1em;
+}
+
+div#changes-info-box-from {
+  float: left;
+  width: 49%;
+}
+
+#changes-info-box-to {
+  margin-left: 51%;
+}
+
+div.changes-info-title {
+  font-weight: bold;
+  font-size: 1.4em;
+}
+
+#changes-info-comment {
+  text-align: center;
+  padding: 1em 0;
 }
 
 #changescontent table {
-    width: 100%;
-    margin: 0;
+  width: 100%;
+  margin: 1em 0 0;
 }
 
-#changescontent table tr.changes-table-title th {
-    text-align: center;
-    font-size: 1.1em;
-    padding: 3px 5px;
-    border-bottom: 1px solid #fff;
-    background-color: #6b747f;
-    color: #fff;
+#changescontent .changes-table-title th {
+  text-align: center;
+  font-size: 1.1em;
+  padding: 3px 5px;
+  border-bottom: 1px solid $theme.borderColor;
+  background-color: $theme.backgroundSecondaryColor;
+  color: $theme.textPrimaryColor;
 }
 
 #changescontent table tr.changes-table-title + tr.changes-table-title th {
-    font-size: 0.75em;
-    text-align: left;
-    padding: 1px 5px;
-    border-bottom: 4px solid #e4e4e4;
+  font-size: 0.75em;
+  text-align: left;
+  border-bottom-width: 4px;
 }
 
 #changescontent table td {
-    background-color: #f8f8f8;
-    border-bottom: 1px solid #CCC;
+  border-bottom: 1px solid $theme.borderColor;
 }
 
 div.diff {
@@ -2895,62 +2929,6 @@ div.diffmodifiedline {
 
 span.diffaddword {
     color: #287f00;
-}
-
-div#changes-info {
-    background-color: #919dac;
-    background-image: url( $xwiki.getSkinFile('icons/xwiki/diff-header.png') );
-    background-position: 50% -35px;
-    background-repeat: no-repeat;
-}
-
-#changes-title {
-    margin-top: 2em;
-    background-color: #6b747f;
-}
-
-#changes-title h1 {
-    padding: 10px 15px;
-    font-size: 1.4em;
-    letter-spacing: 1px;
-    text-align: center;
-    color: #fff;
-    border-bottom: 4px solid #fff;
-    border-color: #808c99;
-}
-
-div#changes-info-boxes {
-    margin-top: 0em;
-    line-height: 1.4em;
-    border: 0px solid #f4f9fe;
-    background-color: transparent;
-
-}
-
-div#changes-info-box-from {
-    float: left;
-    padding-top: 1em;
-    width: 49%;
-    text-align: center;
-    color: #fff;
-}
-
-#changes-info-box-to {
-    padding-top: 1em;
-    margin-left: 51%;
-    text-align: center;
-    color: #fff;
-}
-
-div.changes-info-title {
-    font-weight: bold;
-    font-size: 1.4em;
-}
-
-#changes-info-comment {
-    text-align: center;
-    padding: 1em 0;
-    color: #FFF;
 }
 
 /* profil */
@@ -3346,7 +3324,6 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 /* Start Colibri.css */
-/*! #template('colorThemeInit.vm') */
 
 /**********************************************************************************************/
 /** Text Colors **/

@@ -774,23 +774,20 @@ body.mceContentBody {
 
 #xwikimaincontainer, body.hideright #xwikimaincontainer {
   line-height: 1.2em;
-  margin: 0;
-  padding: 0;
+  margin: 20px 0 0;
   text-align: center;
   border: none;
 }
 
 #xwikimaincontainerinner {
     height: 100%;
-    margin: 0 0 0 0;
-    padding-top: 20px;
     border: none;
     text-align: left;
     clear: both;
 }
 
 body.hideleft #xwikimaincontainerinner {
-    margin: 0 0 0 30px;
+    margin-left: 30px;
 }
 
 body.hideright #xwikimaincontainerinner {
@@ -801,13 +798,13 @@ body.importbody #xwikimaincontainerinner,
     body.exportbody #xwikimaincontainerinner,
     body.adminbody #xwikimaincontainerinner,
     body.hidelefthideright #xwikimaincontainerinner {
-    margin: 0 0 0 30px;
+    margin-left: 30px;
     padding-right: 30px;
 }
 
 body#body.editbody #xwikimaincontainerinner {
     padding-right: 0;
-    margin: 0 0 0 30px;
+    margin-left: 30px;
 }
 
 body#body.editbody #globallinks,

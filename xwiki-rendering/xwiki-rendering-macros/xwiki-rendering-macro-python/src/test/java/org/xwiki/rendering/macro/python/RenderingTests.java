@@ -27,7 +27,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 
 /**
- * Rendering tests for ruby macro.
+ * Rendering tests for python macro.
  * 
  * @version $Id$
  * @since 2.0M2
@@ -35,14 +35,14 @@ import junit.framework.TestCase;
 public class RenderingTests extends TestCase
 {
     /**
-     * Creates a rendering test suit for testing ruby macro.
+     * Creates a rendering test suit for testing python macro.
      * 
-     * @return rendering test suit for testing ruby macro.
+     * @return rendering test suit for testing python macro.
      * @throws Exception if an error occurs while setting up the test suite.
      */
     public static Test suite() throws Exception
     {
-        RenderingTestSuite suite = new RenderingTestSuite("Test Ruby Macro");
+        RenderingTestSuite suite = new RenderingTestSuite("Test Python Macro");
 
         suite.addTestsFromResource("macropython1", true);
         suite.addTestsFromResource("macropython2", true);

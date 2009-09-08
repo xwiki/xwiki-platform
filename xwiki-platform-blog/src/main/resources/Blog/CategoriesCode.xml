@@ -190,7 +190,56 @@
  *###
 #macro(displaySelectableCategory $name $level)
   #set($categoryDoc = $xwiki.getDocument($name))
-  #foreach($i in [1..$level])*#end &lt;label id='blog_category_${name}' title="#getCategoryDescription($categoryDoc)"&gt;&lt;input name="${blogPostClassname}_$!{entryObj.number}_category" value="$name" type="checkbox"#if($entryObj.getProperty('category').getValue().contains($name)) checked="checked" #end/&gt; #getCategoryName($categoryDoc)&lt;/label&gt;
+  #foreach($i in [1..$level])*#end ##
+&lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
+&lt;label id='blog_category_${name}' title="#getCategoryDescription($categoryDoc)"&gt;&lt;input name="${blogPostClassname}_$!{entryObj.number}_category" value="$name" type="checkbox"#if($entryObj.getProperty('category').getValue().contains($name)) checked="checked" #end/&gt; #getCategoryName($categoryDoc)&lt;/label&gt;##
+&lt;/span&gt;##
+#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))
+&lt;span class="blog-category-tools"&gt;##
+&lt;a href="$doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=$name")" class="tool add-subcategory"&gt;#categoryToolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt;##
+&lt;/span&gt;##
+#end
+&lt;/span&gt;
+
+#end
+##
+##
+##
+#**
+ * Displays a form for creating a new category. If a parentCategory parameter is present in the 
+ * query string, the parent category is set accordingly. Otherwise, the form provides a selection
+ * control for choosing the parent category among existing categories.
+ *###
+## DO NOT CHANGE INDENTATION
+#macro(addCategoryForm) &lt;form action="$doc.getURL()" method="post" class="category-add-form"&gt;&lt;div class='create-category'&gt; &lt;input type="hidden" name="xaction" value="create"/&gt; &lt;label&gt;$msg.get("xe.blog.categories.new")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;#if("$!{request.parentCategory}" == "")&lt;label&gt;#* $msg.get("xe.blog.categories.parent")*# Subcategory of:&lt;br/&gt; &lt;select name="newCategoryParent" id="blog_category_selectBox" class="category-add-input"&gt; &lt;option value="${defaultCategoryParent}" selected="selected"&gt;None&lt;/option&gt; $!processedCategories.clear() #displayCategoriesHierarchy($tree 'option') &lt;/select&gt; &lt;br/&gt;&lt;/label&gt;#else&lt;input type="hidden" name="newCategoryParent" value="$!{request.parentCategory}"/&gt;#end&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Add"&gt;&lt;/input&gt;&lt;/span&gt; &lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt; &lt;/div&gt;&lt;/form&gt; #end
+##
+##
+##
+#**
+ * Displays a form for renaming a category.
+ *###
+## DO NOT CHANGE INDENTATION
+#macro(renameCategoryForm)##
+&lt;form action="$doc.getURL()" method="post" class="category-rename-form"&gt;&lt;div class='rename-category'&gt;##
+&lt;input type="hidden" name="xaction" value="rename"/&gt;##
+&lt;input type="hidden" name="category" value="${request.category}"/&gt;##
+&lt;label&gt;$msg.get("xe.blog.categories.newName")&lt;br/&gt; &lt;input type="text" name="newCategoryName" class="category-name-input"&gt;&lt;/input&gt;&lt;/label&gt;&lt;br/&gt;##
+&lt;span class="buttonwrapper"&gt;&lt;input class="button" type="submit" value="Rename"&gt;&lt;/input&gt;&lt;/span&gt; ##
+&lt;a href="$doc.getURL()"&gt;Cancel&lt;/a&gt;##
+&lt;/div&gt;&lt;/form&gt;##
+#end
+##
+##
+##
+#**
+ * Displays an image for a category management tool. Only for internal use.
+ *
+ * @param imageName The name of the image file, without extension.
+ * @param alternativeText The text to be displayed if the image is missing; also used as title.
+ *###
+## DO NOT CHANGE INDENTATION
+#macro(categoryToolImage $imageName $alternativeText)##
+  &lt;img src='$xwiki.getSkinFile("icons/silk/${imageName}.gif")' alt='${alternativeText}' title='${alternativeText}' /&gt; ##
 #end
 ##
 ##
@@ -202,9 +251,22 @@
  * @param name The full name of the document containing the category to be displayed.
  * @param level The depth where this category is in the tree, used for proper indentation.
  *###
+## DO NOT CHANGE INDENTATION
 #macro(displayEditableCategory $name $level)
-  #set($categoryDoc = $xwiki.getDocument($name))
-  #foreach($i in [1..$level])*#end #getCategoryName($categoryDoc) &lt;a href="$doc.getURL('view', "action=delete&amp;amp;category=$name")"&gt;#toolImage('delete.png' 'delete ')&lt;/a&gt; &lt;a href="$categoryDoc.getURL('inline')"&gt;#toolImage('edit.png' 'edit ')&lt;/a&gt;
+  #getEntriesForCategory($name $discard $totalEntries)
+  #foreach($i in [1..$level])*#end ##
+&lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
+&lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/bullet_feed.gif')" alt="(RSS)" title="RSS"/&gt;&lt;/a&gt;##
+&lt;a href="$xwiki.getDocument($name).getURL()"&gt;#getCategoryName($xwiki.getDocument($name)) ($totalEntries)&lt;/a&gt;&lt;/span&gt; ##
+&lt;span class="blog-category-tools"&gt;##
+#if($xwiki.hasAccessLevel('delete', $context.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$doc.getURL('view', "xaction=showRenameCategory&amp;amp;category=$name")" class="tool rename"&gt;#categoryToolImage('pencil' 'Rename ')&lt;/a&gt;#end ##
+#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=$name")" class="tool add-subcategory"&gt;#categoryToolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt; #end ##
+#if($xwiki.hasAccessLevel('delete', $context.user, $name)) &lt;a href="$doc.getURL('view', "xaction=delete&amp;amp;category=$name")" class="tool delete"&gt;#categoryToolImage('cross' 'Delete ')&lt;/a&gt;#end ##
+&lt;/span&gt;##
+#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showRenameCategory" &amp;&amp; "$!{request.category}" == $name) #renameCategoryForm() #end##
+#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == $name) #addCategoryForm() #end##
+&lt;/span&gt;
+
 #end
 ##
 ##
@@ -281,7 +343,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
  * Generates a box for creating a new category. This allows to enter the name of the new
  * category, and select a parent category from the existing ones. Note that this does not create
  * a HTML form element, but requires one to be defined already as its ancestor.
- * 
+ *
  * @param tree The category hierarchy HashMap&lt;String, List&lt;String&gt;&gt; structure, where the key
  *        is the name of a category, and the value contains the names of all its subcategories.
  * @todo When javascript is disabled, a link to "Manage categories" should be displayed instead.
@@ -304,6 +366,19 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
 ##
 ##
 ##
+##
+##
+##
+#macro(displayCategoryManagementTree $space $displayType)
+&lt;div class="blog-categories-list"&gt;
+  #getCategoriesHierarchy("$!{space}" $tree)
+  #displayCategoriesHierarchy($tree $displayType)
+  #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName))
+    * &lt;span class="blog-add-category-label"&gt;&lt;a href="$doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=")"&gt;$msg.get("xe.blog.categories.addcategory")&lt;/a&gt;&lt;/span&gt;
+     #if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "") #addCategoryForm() #end
+  #end
+&lt;/div&gt;
+#end
 #**
  * Deletes a category, moving all the subcategories to its parent and removing this category from
  * all existing blog entries.
@@ -325,7 +400,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     #if($xwiki.hasAccessLevel('edit', $context.user, $item))
       #set($subcategoryDoc = $xwiki.getDocument($item))
       $subcategoryDoc.setParent($categoryParent)
-      $subcategoryDoc.save('Update category parent')
+      $subcategoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedParent'), true)
     #end
   #end
   #set($query = ', BaseObject obj, DBStringListProperty categories join categories.list as category where ')
@@ -337,9 +412,44 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     #if($xwiki.hasAccessLevel('edit', $context.user, $item))
       #set($blogEntryDoc = $xwiki.getDocument($item))
       #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
-      $blogEntryDoc.save('$msg.get("xe.blog.categories.remove")')
+      $blogEntryDoc.save($msg.get('xe.blog.manageCategories.comment.removedDeletedCategory'), true)
     #end
   #end
   $categoryDoc.delete()
+#end
+##
+##
+##
+#**
+ * Renames a category, updating all the subcategories and all existing blog entries.
+ * 
+ * @param category The full name of the document containing the category to be renamed.
+ * @param newCategoryName The new name of the category.
+ *###
+#macro(renameCategory $category $newCategoryName)
+  #set($categoryDoc = $xwiki.getDocument($category))
+  #set($newCategoryDoc = $xwiki.getDocument($newCategoryName))
+  #set($query = ', BaseObject obj where ')
+  #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogCategoryClassname}' and doc.fullName &lt;&gt; 'Blog.CategoryTemplate' and doc.parent = '$category' order by doc.name")
+  #foreach($item in $xwiki.searchDocuments($query))
+    #if($xwiki.hasAccessLevel('edit', $context.user, $item))
+      #set($subcategoryDoc = $xwiki.getDocument($item))
+      $subcategoryDoc.setParent($newCategoryDoc.fullName)
+      $subcategoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedParent'), true)
+    #end
+  #end
+  #set($query = ', BaseObject obj, DBStringListProperty categories join categories.list as category where ')
+  #set($query = "${query}obj.name = doc.fullName and obj.className = '${blogPostClassname}' and doc.fullName &lt;&gt; 'Blog.BlogPostTemplate' and categories.id.id = obj.id and categories.id.name = 'category' and category = '$category' order by doc.name")
+  #foreach($item in $xwiki.searchDocuments($query))
+    #if($xwiki.hasAccessLevel('edit', $context.user, $item))
+      #set($blogEntryDoc = $xwiki.getDocument($item))
+      #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.remove($category))
+      #set($discard = $blogEntryDoc.getObject(${blogPostClassname}).getProperty('category').value.add($newCategoryDoc.fullName))
+      $blogEntryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedRenamedCategory'), true)
+    #end
+  #end
+  $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
+  $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
+  $categoryDoc.rename($newCategoryName)
 #end</content>
 </xwikidoc>

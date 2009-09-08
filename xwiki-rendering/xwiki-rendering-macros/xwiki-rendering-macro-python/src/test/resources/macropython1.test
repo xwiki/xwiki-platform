@@ -5,7 +5,7 @@
 print "Hello World"
 {{/python}}
 
-= Hello {{jython}}print "World"{{/jython}}=
+= Hello {{python}}print "World"{{/python}}=
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -25,9 +25,9 @@ beginSection
 beginHeader [1, HHello]
 onWord [Hello]
 onSpace
-beginMacroMarkerInline [jython] [] [print "World"]
+beginMacroMarkerInline [python] [] [print "World"]
 onWord [World]
-endMacroMarkerInline [jython] [] [print "World"]
+endMacroMarkerInline [python] [] [print "World"]
 endHeader [1, HHello]
 endSection
 endDocument

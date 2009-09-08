@@ -182,7 +182,7 @@
   color: #4D4D4D;
   font-size: 1.1em;
 }
-.searchQuery {
+#searchBar .searchQuery {
   background: transparent url($xwiki.getSkinFile('icons/xwiki/search.png')) left center no-repeat;
   display: inline-block;
   padding-left: 18px;
@@ -191,7 +191,7 @@
   font-size: 1.1em;
   width: 400px;
 }
-.searchButton {
+#searchBar .searchButton {
   background-color: #B3B3B3;
   border: 2px solid #B3B3B3;
   color: #FFF;

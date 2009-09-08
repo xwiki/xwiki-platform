@@ -3180,13 +3180,37 @@ public class XWikiDocument implements DocumentModelBridge
         return pageNames;
     }
 
+    /**
+     * Returns a list of fullNames of all documents which list this document as their parent
+     *
+     * {@link #getChildren(int, int, com.xpn.xwiki.XWikiContext)}
+     */
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
-        String[] whereParams =
-            {this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(), this.getSpace()};
+        return getChildren(0, 0, context);
+    }
 
-        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
-        return context.getWiki().getStore().searchDocumentsNames(whereStatement, Arrays.asList(whereParams), context);
+    /**
+     * Returns a list of fullNames of all documents which list this document as their parent
+     * 
+     * @param nb The number of results to return.
+     * @param start The number of results to skip before we begin returning results.
+     * @param context The {@link com.xpn.xwiki.XWikiContext context}.
+     * @return List of fullNames of documents
+     * @throws XWikiException If there's an error querying the database.
+     */
+    public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
+    {
+        String[] whereParams = {
+            this.getWikiName() + ":" + this.getFullName(), 
+            this.getFullName(), 
+            this.getName(), 
+            this.getWikiName() + ":" + this.getName(), 
+            this.getSpace()
+        };
+
+        String whereStatement = "doc.parent=? or doc.parent=? or ((doc.parent=? or doc.parent=?) and doc.space=?)";
+        return context.getWiki().getStore().searchDocumentsNames(whereStatement, nb, start, Arrays.asList(whereParams), context);
     }
 
     public void renameProperties(String className, Map<String, String> fieldsToRename)

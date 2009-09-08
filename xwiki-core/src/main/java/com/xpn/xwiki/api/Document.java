@@ -1538,7 +1538,7 @@ public class Document extends Api
     }
 
     /**
-     * Get document children. Children are document with the current document as parent.
+     * Get document children. Children are documents with the current document as parent.
      * 
      * @return The list of children for the current document.
      * @since 1.8 Milestone 2
@@ -1546,6 +1546,20 @@ public class Document extends Api
     public List<String> getChildren() throws XWikiException
     {
         return this.doc.getChildren(getXWikiContext());
+    }
+
+    /**
+     * Get document children. Children are documents with the current document as parent.
+     * Where a document has a large number of children, one may desire to return a certain number
+     * of children (nb) and skip some number (start) of the first results.
+     * 
+     * @param nb The number of results to return.
+     * @param start The number of results to skip before we begin returning results.
+     * @return The list of children for the current document.
+     */
+    public List<String> getChildren(int nb, int start) throws XWikiException
+    {
+        return this.doc.getChildren(nb, start, getXWikiContext());
     }
 
     /**

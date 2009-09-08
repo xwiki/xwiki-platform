@@ -27,7 +27,6 @@ import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
-import org.wikimodel.wem.xwiki.XWikiReferenceParser;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Image;
@@ -36,10 +35,10 @@ import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.xml.XMLUtils;
 
 /**
@@ -60,8 +59,6 @@ public class XWikiCommentHandler extends CommentHandler
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
-    private XWikiReferenceParser referenceParser;
-
     private BlockRenderer plainTextBlockRenderer;
 
     /**
@@ -72,8 +69,8 @@ public class XWikiCommentHandler extends CommentHandler
 
     /**
      * @since 2.0M3
-     * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links.
-     *       See http://code.google.com/p/wikimodel/issues/detail?id=87
+     * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
+     *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
     public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser,
         PrintRendererFactory xwikiSyntaxPrintRendererFactory, BlockRenderer plainTextBlockRenderer)
@@ -81,7 +78,6 @@ public class XWikiCommentHandler extends CommentHandler
         this.parser = parser;
         this.linkParser = linkParser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
-        this.referenceParser = new XWikiReferenceParser();
         this.imageParser = imageParser;
         this.plainTextBlockRenderer = plainTextBlockRenderer;
     }
@@ -163,10 +159,7 @@ public class XWikiCommentHandler extends CommentHandler
             String reference = linkComment;
             WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
 
-            WikiReference wikiReference =
-                this.referenceParser.parse((label.length() > 0 ? label + ">>" : "") + reference);
-
-            wikiReference = new WikiReference(wikiReference.getLink(), wikiReference.getLabel(), params);
+            WikiReference wikiReference = new WikiReference(reference, label, params);
 
             stack.getScannerContext().onReference(wikiReference);
         }

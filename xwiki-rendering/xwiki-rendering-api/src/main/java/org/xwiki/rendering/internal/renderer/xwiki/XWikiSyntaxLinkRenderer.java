@@ -67,11 +67,34 @@ public class XWikiSyntaxLinkRenderer
         }
     }
 
-    public void renderLinkContent(WikiPrinter printer, String wikiSyntaxContent)
+    public String escapeLinkLabel(String label)
+    {
+        // Escape label
+        // This need to be done after anything else because link label add another level of escaping (escaped as
+        // link label and then escaped as wiki content).
+        String escapedLabel = label;
+
+        escapedLabel =
+            escapedLabel.replace(XWikiSyntaxEscapeHandler.ESCAPE_CHAR, XWikiSyntaxEscapeHandler.ESCAPE_CHAR
+                + XWikiSyntaxEscapeHandler.ESCAPE_CHAR);
+        escapedLabel =
+            escapedLabel.replace("]]", XWikiSyntaxEscapeHandler.ESCAPE_CHAR + "]"
+                + XWikiSyntaxEscapeHandler.ESCAPE_CHAR + "]");
+        escapedLabel =
+            escapedLabel.replace(">>", XWikiSyntaxEscapeHandler.ESCAPE_CHAR + ">"
+                + XWikiSyntaxEscapeHandler.ESCAPE_CHAR + ">");
+        escapedLabel =
+            escapedLabel.replace("||", XWikiSyntaxEscapeHandler.ESCAPE_CHAR + "|"
+                + XWikiSyntaxEscapeHandler.ESCAPE_CHAR + "|");
+
+        return escapedLabel;
+    }
+
+    public void renderLinkContent(WikiPrinter printer, String label)
     {
         // If there was some link content specified then output the character separator ">>".
-        if (!StringUtils.isEmpty(wikiSyntaxContent)) {
-            printer.print(wikiSyntaxContent);
+        if (!StringUtils.isEmpty(label)) {
+            printer.print(escapeLinkLabel(label));
             printer.print(">>");
         }
     }

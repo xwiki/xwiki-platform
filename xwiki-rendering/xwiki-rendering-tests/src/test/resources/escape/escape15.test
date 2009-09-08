@@ -22,10 +22,14 @@ endDocument
 .#-----------------------------------------------------
 <p><span class="wikiexternallink"><a param="value" href="refe||rence">lab&gt;&gt;el~</a></span></p>
 .#-----------------------------------------------------
+.expect|annotatedxhtml/1.0
+.#-----------------------------------------------------
+<p><!--startwikilink:refe||rence--><span class="wikiexternallink"><a param="value" href="refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 [[lab~>~>el~~~~>>refe~|~|rence||param="value"]]
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p><!--startwikilink:refe~|~|rence--><span class="wikiexternallink"><a param="value" href="refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>
+<p><!--startwikilink:refe||rence--><span class="wikiexternallink"><a param="value" href="refe||rence">lab&gt;&gt;el~</a></span><!--stopwikilink--></p>

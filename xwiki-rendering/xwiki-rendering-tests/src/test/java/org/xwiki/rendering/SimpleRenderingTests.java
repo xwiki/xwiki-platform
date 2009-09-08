@@ -183,6 +183,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("escape/escape16", false);
         suite.addTestsFromResource("escape/escape17", false);
         suite.addTestsFromResource("escape/escape18", false);
+        suite.addTestsFromResource("escape/escape19", false);
 
         // Other
         suite.addTestsFromResource("horizontalline/horizontalline1", false);

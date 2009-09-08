@@ -48,7 +48,7 @@ public class XWikiSyntaxEscapeHandler
 
     private static final Pattern DOUBLE_CHARS_PATTERN = Pattern.compile("\\/\\/|\\*\\*|__|--|\\^\\^|,,|##|\\\\\\\\");
 
-    private static final String ESCAPE_CHAR = "~";
+    public static final String ESCAPE_CHAR = "~";
 
     public void escape(StringBuffer accumulatedBuffer, XWikiSyntaxListenerChain listenerChain, boolean escapeLastChar,
         Pattern escapeFirstIfMatching)
@@ -109,6 +109,9 @@ public class XWikiSyntaxEscapeHandler
                 + ESCAPE_CHAR + matcher.group().charAt(1));
         }
 
+        // Escape starting link syntax
+        replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
+
         // Escape ":" in "image:something", "attach:something" and "mailto:something"
         // Note: even though there are some restriction in the URI specification as to what character is valid after
         // the ":" character following the scheme we only check for characters greater than the space symbol for
@@ -130,18 +133,6 @@ public class XWikiSyntaxEscapeHandler
         if (escapeLastChar) {
             accumulatedBuffer.replace(accumulatedBuffer.length() - 1, accumulatedBuffer.length(), ESCAPE_CHAR
                 + accumulatedBuffer.charAt(accumulatedBuffer.length() - 1));
-        }
-
-        // Escape "[[" if not in a link.
-        if (!blockStateListener.isInLink()) {
-            replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
-        } else {
-            // This need to be done after anything else because link label add another level of escaping (escaped as
-            // link label and then escaped as wiki content).
-            replaceAll(accumulatedBuffer, ESCAPE_CHAR, ESCAPE_CHAR + ESCAPE_CHAR);
-            replaceAll(accumulatedBuffer, "]]", ESCAPE_CHAR + "]" + ESCAPE_CHAR + "]");
-            replaceAll(accumulatedBuffer, ">>", ESCAPE_CHAR + ">" + ESCAPE_CHAR + ">");
-            replaceAll(accumulatedBuffer, "||", ESCAPE_CHAR + "|" + ESCAPE_CHAR + "|");
         }
     }
 

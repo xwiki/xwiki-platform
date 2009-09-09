@@ -3475,7 +3475,7 @@ body.hideright #companylogo {
   background: $theme.pageContentBackgroundColor;
   margin-top: 0px;
   border-top-color: $theme.borderColor;
-  padding:5px 25px 10px;
+  padding: 5px 25px 10px;
   width: auto;
   overflow: auto;
   color: $theme.textPrimaryColor;

@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.renderer.xwiki;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
@@ -49,6 +50,8 @@ public class XWikiSyntaxEscapeHandler
     private static final Pattern DOUBLE_CHARS_PATTERN = Pattern.compile("\\/\\/|\\*\\*|__|--|\\^\\^|,,|##|\\\\\\\\");
 
     public static final String ESCAPE_CHAR = "~";
+
+    private boolean beforeLink = false;
 
     public void escape(StringBuffer accumulatedBuffer, XWikiSyntaxListenerChain listenerChain, boolean escapeLastChar,
         Pattern escapeFirstIfMatching)
@@ -109,9 +112,6 @@ public class XWikiSyntaxEscapeHandler
                 + ESCAPE_CHAR + matcher.group().charAt(1));
         }
 
-        // Escape starting link syntax
-        replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
-
         // Escape ":" in "image:something", "attach:something" and "mailto:something"
         // Note: even though there are some restriction in the URI specification as to what character is valid after
         // the ":" character following the scheme we only check for characters greater than the space symbol for
@@ -120,8 +120,7 @@ public class XWikiSyntaxEscapeHandler
         escapeURI(accumulatedBuffer, "attach:");
         escapeURI(accumulatedBuffer, "mailto:");
 
-        if (groupStateListener.isInGroup()
-            && accumulatedBuffer.charAt(accumulatedBuffer.length() - 1) == ')'
+        if (groupStateListener.isInGroup() && accumulatedBuffer.charAt(accumulatedBuffer.length() - 1) == ')'
             && lookaheadListener.getNextEvent() != null
             && lookaheadListener.getNextEvent().eventType == EventType.END_GROUP) {
             escapeLastChar = true;
@@ -134,6 +133,38 @@ public class XWikiSyntaxEscapeHandler
             accumulatedBuffer.replace(accumulatedBuffer.length() - 1, accumulatedBuffer.length(), ESCAPE_CHAR
                 + accumulatedBuffer.charAt(accumulatedBuffer.length() - 1));
         }
+
+        // Escape begin link
+        replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
+        
+        // Escape link label
+        int linkLevel = getLinkLevel(listenerChain);
+
+        if (linkLevel > 0) {
+            // This need to be done after anything else because link label add another level of escaping (escaped as
+            // link label and then escaped as wiki content).
+            String escape = StringUtils.repeat(ESCAPE_CHAR, linkLevel);
+            replaceAll(accumulatedBuffer, ESCAPE_CHAR, escape + ESCAPE_CHAR);
+            replaceAll(accumulatedBuffer, "]]", escape + "]" + escape + "]");
+            replaceAll(accumulatedBuffer, ">>", escape + ">" + escape + ">");
+            replaceAll(accumulatedBuffer, "||", escape + "|" + escape + "|");
+        }
+    }
+
+    private int getLinkLevel(XWikiSyntaxListenerChain listenerChain)
+    {
+        int linkDepth = listenerChain.getBlockStateChainingListener().getLinkDepth();
+
+        if (this.beforeLink) {
+            --linkDepth;
+        }
+
+        return linkDepth;
+    }
+
+    public void setBeforeLink(boolean beforeLink)
+    {
+        this.beforeLink = beforeLink;
     }
 
     private void escapeURI(StringBuffer accumulatedBuffer, String match)

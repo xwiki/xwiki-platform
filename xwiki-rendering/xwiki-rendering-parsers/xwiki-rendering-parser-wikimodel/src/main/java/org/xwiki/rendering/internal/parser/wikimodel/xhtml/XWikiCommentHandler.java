@@ -30,14 +30,12 @@ import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 import org.xwiki.rendering.listener.Image;
-import org.xwiki.rendering.listener.chaining.ChainingListener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.xml.XMLUtils;
 
@@ -137,14 +135,6 @@ public class XWikiCommentHandler extends CommentHandler
         XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.popStackParameter("xdomGeneratorListener");
 
         renderer.beginDocument(Collections.<String, String> emptyMap());
-        // We make sure we have the right states to have the right escaping but we want only the label so we can't
-        // simply traverse a LinkBlock
-        // TODO: This is a big hack and a bug since it'll fail if someone provides his own implementation of
-        // PrintRendererFactory for the XWiki 2.0 Syntax.
-        ChainingListener rendererAsChainingListener = (ChainingListener) renderer;
-        XWikiSyntaxListenerChain xwikiSyntaxListenerChain =
-            (XWikiSyntaxListenerChain) rendererAsChainingListener.getListenerChain();
-        xwikiSyntaxListenerChain.getBlockStateChainingListener().pushLinkDepth();
         for (Block block : listener.getXDOM().getChildren()) {
             block.traverse(renderer);
         }

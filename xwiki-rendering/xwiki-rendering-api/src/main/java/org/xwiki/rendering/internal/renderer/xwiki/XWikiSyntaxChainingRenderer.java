@@ -165,6 +165,13 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        // Flush test content before the link.
+        // TODO: improve the block state renderer to be able to make the difference between what is bufferized
+        // before the link and what in the label link
+        getXWikiPrinter().setBeforeLink(true);
+        getXWikiPrinter().flush();
+        getXWikiPrinter().setBeforeLink(false);
+
         int linkDepth = getBlockState().getLinkDepth();
 
         // If we are at a depth of 2 or greater it means we're in a link inside a link and in this case we
@@ -245,7 +252,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     /**
      * {@inheritDoc}
      * 
- * @see AbstractChainingPrintRenderer#endFormat(org.xwiki.rendering.listener.Format, java.util.Map)
+     * @see AbstractChainingPrintRenderer#endFormat(org.xwiki.rendering.listener.Format, java.util.Map)
      */
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
@@ -753,6 +760,13 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
+        // Flush test content before the link.
+        // TODO: improve the block state renderer to be able to make the difference between what is bufferized
+        // before the link and what in the label link
+        getXWikiPrinter().setBeforeLink(true);
+        getXWikiPrinter().flush();
+        getXWikiPrinter().setBeforeLink(false);
+
         Link link = new Link();
         link.setReference("image:" + getImageRenderer().renderImage(image));
         link.setType(LinkType.URI);
@@ -760,7 +774,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         getLinkRenderer().beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
         getLinkRenderer().endRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
     }
-    
+
     protected void printParameters(Map<String, String> parameters)
     {
         printParameters(parameters, true);

@@ -204,6 +204,26 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("misc/misc7", false);
         suite.addTestsFromResource("encoding/encoding1", false);
 
+        suite.addTestsFromResource("escape/escape1", false);
+        suite.addTestsFromResource("escape/escape2", false);
+        suite.addTestsFromResource("escape/escape3", false);
+        suite.addTestsFromResource("escape/escape4", false);
+        suite.addTestsFromResource("escape/escape5", false);
+        suite.addTestsFromResource("escape/escape6", false);
+        suite.addTestsFromResource("escape/escape7", false);
+        suite.addTestsFromResource("escape/escape8", false);
+        suite.addTestsFromResource("escape/escape9", false);
+        suite.addTestsFromResource("escape/escape10", false);
+        suite.addTestsFromResource("escape/escape11", false);
+        suite.addTestsFromResource("escape/escape12", false);
+        suite.addTestsFromResource("escape/escape13", false);
+        suite.addTestsFromResource("escape/escape14", false);
+        suite.addTestsFromResource("escape/escape15", false);
+        suite.addTestsFromResource("escape/escape16", false);
+        suite.addTestsFromResource("escape/escape17", false);
+        suite.addTestsFromResource("escape/escape18", false);
+        suite.addTestsFromResource("escape/escape19", false);
+
         return new ComponentManagerTestSetup(suite);
     }
 }

@@ -80,6 +80,11 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         }
     }
 
+    public void setBeforeLink(boolean beforeLink)
+    {
+        this.escapeHandler.setBeforeLink(beforeLink);
+    }
+
     public void printBeginItalic()
     {
         // If the lookahead buffer is not empty and the last character is ":" then we need to escape it

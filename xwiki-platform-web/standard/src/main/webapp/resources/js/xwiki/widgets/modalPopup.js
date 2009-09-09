@@ -127,7 +127,7 @@ XWiki.widgets.ModalPopup = Class.create({
       // Start listening to keyboard events
       this.attachKeyListeners();
       // In IE, position: fixed does not work.
-      if (Prototype.Browser.IE) {
+      if (window.browser.isIE6) {
         this.dialog.setStyle({top : document.viewport.getScrollOffsets().top + "px"});
         this.dialog._x_scrollListener = this.onScroll.bindAsEventListener(this);
         Event.observe(window, "scroll", this.dialog._x_scrollListener);
@@ -148,7 +148,7 @@ XWiki.widgets.ModalPopup = Class.create({
     if (event) {
       Event.stop(event);
     }
-    if (Prototype.Browser.IE) {
+    if (window.browser.isIE6) {
       Event.stopObserving(window, "scroll", this.dialog._x_scrollListener);
       $$("select").each(function(item) {
         item.style.visibility = item._x_initiallyVisible;

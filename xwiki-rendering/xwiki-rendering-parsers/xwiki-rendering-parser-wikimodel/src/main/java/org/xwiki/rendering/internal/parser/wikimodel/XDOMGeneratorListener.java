@@ -318,34 +318,34 @@ public class XDOMGeneratorListener implements IWemListener
             //
             // Simple Use Case: (% a='b' %)**//hello//**(%%)
             // WikiModel Events:
-            // beginFormat(params: a='b', styles = BOLD, ITALIC)
-            // onWord(hello)
-            // endFormat(params: a='b', styles = BOLD, ITALIC)
+            // __beginFormat(params: a='b', styles = BOLD, ITALIC)
+            // __onWord(hello)
+            // __endFormat(params: a='b', styles = BOLD, ITALIC)
             // XWiki Blocks:
-            // FormatBLock(params: a='b', format = BOLD)
-            // FormatBlock(format = ITALIC)
+            // __FormatBLock(params: a='b', format = BOLD)
+            // ____FormatBlock(format = ITALIC)
             //
             // More complex Use Case: **(% a='b' %)hello**world
             // WikiModel Events:
-            // beginFormat(params: a='b', styles = BOLD)
-            // onWord(hello)
-            // endFormat(params: a='b', styles = BOLD)
-            // beginFormat(params: a='b')
-            // onWord(world)
-            // endFormat(params: a='b')
+            // __beginFormat(params: a='b', styles = BOLD)
+            // __onWord(hello)
+            // __endFormat(params: a='b', styles = BOLD)
+            // __beginFormat(params: a='b')
+            // __onWord(world)
+            // __endFormat(params: a='b')
             // XWiki Blocks:
-            // FormatBlock(params: a='b', format = BOLD)
-            // WordBlock(hello)
-            // FormatBlock(params: a='b')
-            // WordBlock(world)
+            // __FormatBlock(params: a='b', format = BOLD)
+            // ____WordBlock(hello)
+            // __FormatBlock(params: a='b')
+            // ____WordBlock(world)
 
             // TODO: We should instead have the following which would allow to simplify XWikiSyntaxChaining Renderer
             // which currently has to check if the next format has the same params as the previous format to decide
             // whether to print it or not.
-            // FormatBlock(params: a='b')
-            // FormatBlock(format = BOLD)
-            // WordBlock(hello)
-            // WordBlock(world)
+            // __FormatBlock(params: a='b')
+            // ____FormatBlock(format = BOLD)
+            // ______WordBlock(hello)
+            // ____WordBlock(world)
 
             FormatBlock block;
             if (styles.size() > 0) {

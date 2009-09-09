@@ -1,9 +1,9 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-= Title1
-
 {{toc/}}
+
+= Title1
 == Title1.1
 ==== Title1.1.1.1
 = Title2
@@ -11,11 +11,12 @@
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginSection
-beginHeader [1, HTitle1]
-onWord [Title1]
-endHeader [1, HTitle1]
 beginMacroMarkerStandalone [toc] []
+beginList [BULLETED]
+beginListItem
+beginLink [Anchor = [HTitle1]] [false]
+onWord [Title1]
+endLink [Anchor = [HTitle1]] [false]
 beginList [BULLETED]
 beginListItem
 beginLink [Anchor = [HTitle11]] [false]
@@ -42,7 +43,18 @@ endListItem
 endList [BULLETED]
 endListItem
 endList [BULLETED]
+endListItem
+beginListItem
+beginLink [Anchor = [HTitle2]] [false]
+onWord [Title2]
+endLink [Anchor = [HTitle2]] [false]
+endListItem
+endList [BULLETED]
 endMacroMarkerStandalone [toc] []
+beginSection
+beginHeader [1, HTitle1]
+onWord [Title1]
+endHeader [1, HTitle1]
 beginSection
 beginHeader [2, HTitle11]
 onWord [Title1]

@@ -49,7 +49,7 @@ public class TocMacroParameters
     /**
      * The minimum section level. For example if 2 then level 1 sections will not be listed.
      */
-    private int start = 2;
+    private int start = 1;
 
     /**
      * Indicate if the start has been set or if it has the default value.

@@ -33,7 +33,6 @@
       #set($content = $content.trim().substring($content.trim().indexOf($util.newline)))
     #end
   #end
-  ## #set($renderedContent =$cdoc.getRenderedContent())
   #set($renderedContent = $cdoc.getRenderedContent($content, $cdoc.syntaxId))
 #end
   <div id="document-title"><h1>$tdoc.displayTitle</h1></div>
@@ -42,7 +41,7 @@
 ##
 ## Display the rendered content 
 ##
-$renderedContent
+$renderedContent.replaceFirst('^[ \n\r\t]*+<h1.*?</h1>', '')
 ##
 ##
 ## Display the (1.0) footnotes

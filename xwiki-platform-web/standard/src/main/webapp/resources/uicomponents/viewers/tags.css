@@ -1,3 +1,4 @@
+#template("colorThemeInit.vm")
 .doc-tags {
   width: 48%;
   float: left;
@@ -12,10 +13,10 @@ a.tag-delete, a.tag-delete:visited {
   vertical-align: super;
   font-size: 70%;
   font-weight: bold;
-  color: #FFF;
+  color: $theme.pageContentBackgroundColor;
   text-decoration: none !important;
 }
-.tag-wrapper:hover a.tag-delete, * html a.tag-delete, * html a.tag-delete:visited {
+.tag-wrapper:hover a.tag-delete {
   color: #999;
 }
 .tag-wrapper a.tag-delete:hover {

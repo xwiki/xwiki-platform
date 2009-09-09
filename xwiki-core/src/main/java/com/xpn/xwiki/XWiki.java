@@ -2926,6 +2926,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
         needsUpdate |= bclass.addTextField("skin", "Skin", 30);
+        needsUpdate |= bclass.addDBListField("colorTheme", "Color theme",
+                "select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme "
+                    + "where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' "
+                    + "and doc.fullName<>'ColorThemes.ColorThemeTemplate'");
         // This one should not be in the prefs
         PropertyInterface baseskinProp = bclass.get("baseskin");
         if (baseskinProp != null) {

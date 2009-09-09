@@ -602,7 +602,7 @@ public class XWikiDocument implements DocumentModelBridge
             } else {
                 SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
                 result =
-                    performSyntaxConversion(text, getSyntaxId(),
+                    performSyntaxConversion(text, sourceSyntaxId,
                         syntaxFactory.createSyntaxFromIdString(targetSyntaxId), true);
             }
         } catch (Exception e) {

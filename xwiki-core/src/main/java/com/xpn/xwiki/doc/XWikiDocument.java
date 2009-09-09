@@ -582,7 +582,7 @@ public class XWikiDocument implements DocumentModelBridge
             if (is10Syntax(syntaxId)) {
                 result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-                result = performSyntaxConversion(text, getSyntaxId(), Syntax.XHTML_1_0, true);
+                result = performSyntaxConversion(text, syntaxId, Syntax.XHTML_1_0, true);
             }
         } catch (XWikiException e) {
             // Failed to render for some reason. This method should normally throw an exception but this

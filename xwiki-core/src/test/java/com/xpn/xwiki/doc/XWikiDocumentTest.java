@@ -719,6 +719,13 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
     }
 
+    public void testGetRenderedContentWithSourceSyntax() throws XWikiException
+    {
+        this.document.setSyntaxId("xwiki/1.0");
+
+        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent("**bold**", "xwiki/2.0", getContext()));
+    }
+
     public void testRename() throws XWikiException
     {
         XWikiDocument doc1 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page1");

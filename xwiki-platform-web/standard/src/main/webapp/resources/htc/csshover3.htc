@@ -1,0 +1,26 @@
+<public:attach event="ondocumentready" onevent="CSSHover()" />
+<script>
+// <![CDATA[
+/**
+ *  Whatever:hover - V3.01.090909
+ *  ------------------------------------------------------------
+ *  Author  - Peter Nederlof, http://www.xs4all.nl/~peterned
+ *          - Sergiu Dumitriu, http://purl.org/net/sergiu/
+ *  License - http://creativecommons.org/licenses/LGPL/2.1
+ *
+ *  Whatever:hover is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  Whatever:hover is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  howto: body { behavior:url("csshover3.htc"); }
+ *  ------------------------------------------------------------
+ */
+window.CSSHover=(function(){var c=/((^|\s)((([^a]([^ ]+)?)|(a([^#.][^ ]+)+)):(hover|active|focus)))|((input|textarea)([#.][^ ]+)?:unknown)/i,f=/(.*?)\:(hover|active|focus|unknown)/i,a=/[^:]+:([a-z-]+).*/i,m=/(\.([a-z0-9_-]+):[a-z]+)|(:[a-z]+)/gi,i=/\.([a-z0-9_-]*on(hover|active|focus|unknown))/i,k=/msie (5|6|7)/i,b=/backcompat/i;var j=["text-kashida","text-kashida-space","text-justify","layout-grid-mode"];var g={};var d=function(r){var q=r.split("-"),n=q.length;if(n==1){return q[0]}var p=r.charAt(0)=="-"?q[0].charAt(0).toUpperCase()+q[0].substring(1):q[0];for(var o=1;o<n;o++){p+=q[o].charAt(0).toUpperCase()+q[o].substring(1)}return p};var h={elements:[],callbacks:{},counters:{},init:function(){if(!k.test(navigator.userAgent)&&!b.test(window.document.compatMode)){return}for(var o=0;o<j.length;++o){g[d(j[o])]=window.document.getElementById("body").currentStyle[d(j[o])]}var p=window.document.styleSheets,n=p.length;for(var o=0;o<n;o++){this.parseStylesheet(p[o])}},parseStylesheet:function(s){if(s.imports){try{var o=s.imports,n=o.length;for(var r=0;r<n;r++){this.parseStylesheet(s.imports[r])}}catch(q){}}try{var t=s.rules,n=t.length;for(var p=0;p<n;p++){this.parseCSSRule(t[p],s)}}catch(q){}},parseCSSRule:function(s,r){var t=s.selectorText;if(c.test(t)){var n=s.style.cssText;var o=f.exec(t)[1];var u=t.replace(a,"on$1");var w=t.replace(m,".$2"+u);var q=i.exec(w)[1];var p=o+q;if(!this.callbacks[p]){var v=this.getProperty(o);r.addRule(o,v+':expression(CSSHover(this, "'+u+'", "'+q+'", "'+v+'"))');this.callbacks[p]=true}r.addRule(w,n)}},getProperty:function(n){if(!this.counters[n]){this.counters[n]=0}return j[this.counters[n]++]},patch:function(q,p,o,r){r=d(r);q.style[r]=g[r];if(!q.csshover){q.csshover=[]}if(!q.csshover[o]){q.csshover[o]=true;var n=new l(q,p,o);this.elements.push(n)}return""},unload:function(){try{var n=this.elements.length;for(var o=0;o<n;o++){this.elements[o].unload()}this.elements=[];this.callbacks={}}catch(p){}}};window.attachEvent("onbeforeunload",function(){h.unload()});var e={onhover:{activator:"onmouseenter",deactivator:"onmouseleave"},onactive:{activator:"onmousedown",deactivator:"onmouseup"},onfocus:{activator:"onfocus",deactivator:"onblur"},onunknown:{activator:"onfocus",deactivator:"onblur"}};function l(q,p,o){this.node=q;this.type=p;var n=new RegExp("(^|\\s)"+o+"(\\s|$)","g");this.activator=function(){q.className+=" "+o};this.deactivator=function(){q.className=q.className.replace(n," ")};q.attachEvent(e[p].activator,this.activator);q.attachEvent(e[p].deactivator,this.deactivator)}l.prototype={unload:function(){this.node.detachEvent(e[this.type].activator,this.activator);this.node.detachEvent(e[this.type].deactivator,this.deactivator);this.activator=null;this.deactivator=null;this.node=null;this.type=null}};return function(p,o,n,q){if(p){return h.patch(p,o,n,q)}else{h.init()}}})();
+// ]]>
+</script>

@@ -239,6 +239,9 @@ h1, h2, h3, h4, h5{
     display:block;
     position:relative;
 }
+#xwikicontent h1, #xwikicontent h2, #xwikicontent h3, #xwikicontent h4, #xwikicontent h5 {
+  overflow: hidden;
+}
 
 span.edit_section {
     position: relative;
@@ -1769,7 +1772,6 @@ span.panelitem {
     font-size: 1em;
     text-align: center;
     letter-spacing: -1px;
-    padding: 5px 25px 5px 10px;
 }
 
 #editPanels .editmodes h5 {
@@ -1777,13 +1779,11 @@ span.panelitem {
     font-size: 1em;
     text-align: center;
     letter-spacing: -1px;
-    padding: 5px 25px 5px 10px;
 }
 
 #editPanels .collapsed h5.xwikipaneltitle {
     text-align: center;
     letter-spacing: -1px;
-    padding: 5px 25px 5px 10px;
 }
 
 #editPanels .xwikipanelcontents {

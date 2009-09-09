@@ -67,6 +67,6 @@
 #if("$!editor" == 'globaladmin')
   #set($params.footer = ['webcopyright', 'version'])
 #end
-#set($params.skin = ['skin', 'stylesheet', 'stylesheets'])
+#set($params.skin = ['skin', 'colorTheme', 'stylesheet', 'stylesheets'])
 #includeForm('XWiki.AdminFieldsDisplaySheet')</content>
 </xwikidoc>

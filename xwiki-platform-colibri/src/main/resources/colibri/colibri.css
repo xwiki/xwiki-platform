@@ -2511,23 +2511,23 @@ div#xwikiclassproperties.accordion textarea,
     width: 100%;
 }
 
-#_history .centered {
+#historycontent .centered {
     margin: 0;
 }
 
-#_history table {
+#historycontent table {
     margin: 0 0 1em 0;
     border-top: none;
     border-collapse: collapse;
     width: 100%;
 }
 
-#_history table th {
+#historycontent table th {
     padding: 5px;
     font-weight: bold;
 }
 
-#_history table td {
+#historycontent table td {
     padding: 5px;
     border: 1px solid #ccc;
     text-align: center;
@@ -3179,7 +3179,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
   height: 2em;
 }
 
-#_information dd, #_information dt {
+#informationcontent dd, #informationcontent dt {
   padding-top: 4px;
   padding-bottom: 4px;
   background: none;
@@ -3728,19 +3728,19 @@ div.commentheader:hover {
 }
 
 /* Overwrites comments.css and toucan.css */
-#_comments .xwikicomment {
+#commentscontent .xwikicomment {
   padding: 0px;
   margin:0;
 }
 
 /* Overwrites comments.css */
-div#_comments form#AddComment div.commentcontainer label {
+div#commentscontent form#AddComment div.commentcontainer label {
   background-image: none;
 }
 
 /* Overwrites comments.css */
 /* Needs testing on IE6 */
-#_comments #AddComment .commentcontainer {
+#commentscontent #AddComment .commentcontainer {
   padding:4px 0px;
   background-image: none;
 }
@@ -3761,11 +3761,11 @@ li.reply div.notification {
 
 /** Information **/
 
-#_information dt {
+#informationcontent dt {
   color: $theme.textPrimaryColor;
 }
 
-#_information dd {
+#informationcontent dd {
   color: $theme.textPrimaryColor;
   font-style: normal;
 }
@@ -3814,7 +3814,7 @@ table.xwikidatatable tr {
   border-bottom: 1px solid $theme.borderColor;
 }
 
-table.xwikidatatable td, #_history table td  {
+table.xwikidatatable td, #historycontent table td  {
   border: 0px;
   text-align: left;
   color: $theme.textPrimaryColor;
@@ -3823,8 +3823,8 @@ table.xwikidatatable td, #_history table td  {
   border: none;
 }
 
-#_history table tr.row.even,
-#_history table tr.row.odd {
+#historycontent table tr.row.even,
+#historycontent table tr.row.odd {
     background-color: $theme.pageContentBackgroundColor ;
 }
 
@@ -3834,7 +3834,7 @@ table.xwikidatatable td, #_history table td  {
 }
 
 /** Remove div class=center **/
-#_history .centered {
+#historycontent .centered {
   text-align: left;
 }
 
@@ -4289,7 +4289,7 @@ table.xwikidatatable, table.xwikidatatable th {
 }
 
 /* Changed the bg-color */
-#_history table th {
+#historycontent table th {
   text-align: left;
   background-color: $theme.backgroundSecondaryColor;
 }
@@ -4313,7 +4313,7 @@ h5.xwikipaneltitle,
 #editPanels .collapsed h5.xwikipaneltitle,
 table.xwikidatatable th,
 #actionmenu a,
-#_information dt,
+#informationcontent dt,
 #body .buttonwrapper a:hover, #body .buttonwrapper button:hover, #body .buttonwrapper input.button:hover ,
 #body .buttonwrapper *,
 #body #globalsearch input.button,

@@ -22,6 +22,7 @@
 <module rename-to="xwe">
   <inherits name='com.google.gwt.user.User'/>
   <inherits name="com.google.gwt.http.HTTP"/>
+  <inherits name="com.google.gwt.i18n.I18N"/>
   <inherits name="com.google.gwt.widgetideas.GlassPanel"/>
   <inherits name="com.smartgwt.SmartGwtNoScript"/>
   <inherits name="com.xpn.xwiki.gwt.api.Api"/>

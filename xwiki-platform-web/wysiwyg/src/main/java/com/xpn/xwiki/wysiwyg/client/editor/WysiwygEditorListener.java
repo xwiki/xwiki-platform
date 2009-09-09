@@ -113,7 +113,7 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
         {
             editor.setLoading(false);
             // Disable the rich text area to avoid submitting its content.
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(WysiwygEditorListener.ENABLE, false);
+            editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, false);
             // Enable the plain text area.
             editor.getPlainTextEditor().getTextArea().setEnabled(true);
             editor.getPlainTextEditor().getTextArea().setText(result);

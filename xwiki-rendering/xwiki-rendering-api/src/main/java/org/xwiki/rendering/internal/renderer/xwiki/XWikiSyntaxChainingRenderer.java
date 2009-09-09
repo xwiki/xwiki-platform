@@ -760,13 +760,6 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        // Flush test content before the link.
-        // TODO: improve the block state renderer to be able to make the difference between what is bufferized
-        // before the link and what in the label link
-        getXWikiPrinter().setBeforeLink(true);
-        getXWikiPrinter().flush();
-        getXWikiPrinter().setBeforeLink(false);
-
         Link link = new Link();
         link.setReference("image:" + getImageRenderer().renderImage(image));
         link.setType(LinkType.URI);

@@ -55,7 +55,7 @@ endDocument
 [[Label>Reference]]
 [[Reference|Param=Value]]
 [[[[no link]]>>Reference]]
-[[~[~[image:whatever>>Reference]]
+[[~~[~~[image:whatever>>Reference]]
 not:link
 .#-----------------------------------------------------
 .input|xhtml/1.0

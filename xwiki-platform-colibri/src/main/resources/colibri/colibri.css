@@ -2133,7 +2133,7 @@ td.label {
 }
 
 .padded {
-    padding: 8px;
+    padding: 4px;
 }
 
 .editactions {
@@ -4353,7 +4353,6 @@ table.xwikidatatable th,
 /* class padded should be removed from "Add Property" Panel */
 .xwikipanelcontents div.padded {
   font-size: 1em;
-  padding: 0px;
 }
 
 .xwikipanelcontents dt label{

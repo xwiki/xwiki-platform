@@ -45,12 +45,25 @@ public class NativeRange extends JavaScriptObject
     public final native void select()
     /*-{
         // Test if the owner document holds the current selection.
-        if (typeof(this.ownerDocument.parentWindow.__savedRange) == 'undefined') {
-            // Apply this range.
-            this.select();
+        if (typeof(this.ownerDocument.parentWindow.__xwe_savedRange) == 'undefined') {
+            // Try to apply this range.
+            try {
+                this.select();
+                // This range was successfully applied. Reset the cache.
+                this.ownerDocument.parentWindow.__xwe_cachedRange = undefined;
+                this.ownerDocument.parentWindow.__xwe_cachedRangeWitness = undefined;
+            } catch (e) {
+                // "Could not complete the operation due to error 800a025e"
+                // This range probably starts or ends inside a hidden element. In order to make the selection work for
+                // hidden elements (without visual representation, of course) we have to cache this range and return it
+                // next time if the selection doesn't change in the mean time.
+                this.ownerDocument.parentWindow.__xwe_cachedRange = @org.xwiki.gwt.dom.client.internal.ie.NativeRange::duplicate(Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;)(this);
+                // The cache expires when the witness range is not anymore selected.
+                this.ownerDocument.parentWindow.__xwe_cachedRangeWitness = this.ownerDocument.selection.createRange();
+            }
         } else {
             // Save this range till the owner document gains the focus.
-            this.ownerDocument.parentWindow.__savedRange = this;
+            this.ownerDocument.parentWindow.__xwe_savedRange = this;
         }
     }-*/;
 
@@ -79,4 +92,39 @@ public class NativeRange extends JavaScriptObject
     /*-{
         return this.item ? false : true;
     }-*/;
+
+    /**
+     * NOTE: We had to add this method because overlay types don't support method overriding and both {@link TextRange}
+     * and {@link ControlRange} have a {@code duplicate} method but with a different implementation. Using an abstract
+     * {@code duplicate} method is not an option because overlay types can't implement interfaces and this method can't
+     * return an abstract type. We had to make this method static because only static references to overlay types are
+     * allowed from JSNI.
+     * 
+     * @param range the native range to be duplicated
+     * @return a duplicate of the given native range
+     */
+    public static NativeRange duplicate(NativeRange range)
+    {
+        return range.isTextRange() ? ((TextRange) range).duplicate() : ((ControlRange) range).duplicate();
+    }
+
+    /**
+     * NOTE: We added this static method for the same reasons we added the {@link #duplicate(NativeRange)} method.
+     * 
+     * @param alice a native range
+     * @param bob a native range
+     * @return {@code true} if the given native ranges are equal, {@code false} otherwise
+     * @see #duplicate(NativeRange)
+     */
+    public static boolean areEqual(NativeRange alice, NativeRange bob)
+    {
+        if (alice == bob) {
+            return true;
+        }
+        if (alice == null || bob == null || alice.isTextRange() != bob.isTextRange()) {
+            return false;
+        }
+        return alice.isTextRange() ? ((TextRange) alice).isEqual((TextRange) bob) : ((ControlRange) alice)
+            .isEqual((ControlRange) bob);
+    }
 }

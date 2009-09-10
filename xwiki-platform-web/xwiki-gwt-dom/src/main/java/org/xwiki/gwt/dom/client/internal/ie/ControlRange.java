@@ -87,4 +87,38 @@ public final class ControlRange extends NativeRange
     /*-{
         this.remove(index);
     }-*/;
+
+    /**
+     * @return a duplicate of this control range
+     */
+    public ControlRange duplicate()
+    {
+        ControlRange clone = newInstance(getOwnerDocument());
+        for (int i = 0; i < getLength(); i++) {
+            clone.add(get(i));
+        }
+        return clone;
+    }
+
+    /**
+     * Tests if this control range equals the given control range.
+     * 
+     * @param other the control range to compare with this control range
+     * @return {@code true} if the given control range is equal to this control rage, {@code false} otherwise
+     */
+    public boolean isEqual(ControlRange other)
+    {
+        if (this == other) {
+            return true;
+        }
+        if (other != null && getLength() == other.getLength()) {
+            for (int i = 0; i < getLength(); i++) {
+                if (get(i) != other.get(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 }

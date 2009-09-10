@@ -46,4 +46,41 @@ public class SelectionTest extends AbstractDOMTest
         assertTrue(DOMUtils.getInstance().comparePoints(range.getEndContainer(), range.getEndOffset(),
             getContainer().getChildNodes().getItem(3), 1) <= 0);
     }
+
+    /**
+     * Tests if hidden text can be selected.
+     */
+    public void testSelectHiddenText()
+    {
+        getContainer().setInnerHTML("1<span style=\"display:none\">2</span>3");
+
+        Range range = getDocument().createRange();
+        range.selectNodeContents(getContainer().getChildNodes().getItem(1));
+
+        Selection selection = getDocument().getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        assertEquals("2", selection.toString());
+    }
+
+    /**
+     * Tests if a hidden image can be selected.
+     */
+    public void testSelectHiddenImage()
+    {
+        getContainer().setInnerHTML("<span style=\"display:none\">x<img/>y</span>");
+
+        Range range = getDocument().createRange();
+        range.selectNode(getContainer().getFirstChild().getChildNodes().getItem(1));
+
+        Selection selection = getDocument().getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        range = selection.getRangeAt(0);
+        assertEquals(1, range.getStartOffset());
+        assertEquals(2, range.getEndOffset());
+        assertSame(getContainer().getFirstChild(), range.getStartContainer());
+        assertSame(getContainer().getFirstChild(), range.getEndContainer());
+    }
 }

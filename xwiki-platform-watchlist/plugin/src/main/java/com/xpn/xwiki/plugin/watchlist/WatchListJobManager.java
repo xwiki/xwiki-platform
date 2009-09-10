@@ -45,11 +45,6 @@ public class WatchListJobManager
     public static final String WATCHLIST_JOB_CLASS = "XWiki.WatchListJobClass";
 
     /**
-     * WatchList Job short name property name.
-     */
-    public static final String WATCHLIST_JOB_SHORT_NAME_PROP = "short_name";
-
-    /**
      * WatchList Job email template property name.
      */
     public static final String WATCHLIST_JOB_EMAIL_PROP = "template";
@@ -115,7 +110,6 @@ public class WatchListJobManager
         BaseClass bclass = watchListJobClass.getxWikiClass();
 
         bclass.setName(WATCHLIST_JOB_CLASS);
-        needsUpdate |= bclass.addTextField(WATCHLIST_JOB_SHORT_NAME_PROP, "Short name of this notifier", 30);
         needsUpdate |= bclass.addTextField(WATCHLIST_JOB_EMAIL_PROP, "Email template to use", 30);
         needsUpdate |=
             bclass.addDateField(WATCHLIST_JOB_LAST_FIRE_TIME_PROP, "Last notifier fire time", "dd/MM/yyyy HH:mm:ss", 1);
@@ -162,14 +156,13 @@ public class WatchListJobManager
      * Create the watchlist job object in the scheduler job document.
      * 
      * @param doc Scheduler job document
-     * @param shortName short name of the job
      * @param emailTemplate email template to use for the job
      * @param context the XWiki context
      * @return true if the document has been updated, false otherwise
      * @throws XWikiException if the object creation fails
      */
-    private boolean createWatchListJobObject(XWikiDocument doc, String shortName, String emailTemplate,
-        XWikiContext context) throws XWikiException
+    private boolean createWatchListJobObject(XWikiDocument doc, String emailTemplate, XWikiContext context) 
+        throws XWikiException
     {
         BaseObject obj = null;
         boolean needsupdate = false;
@@ -181,11 +174,6 @@ public class WatchListJobManager
         }
 
         obj = doc.getObject(WATCHLIST_JOB_CLASS);
-
-        if (StringUtils.isBlank(obj.getStringValue(WATCHLIST_JOB_SHORT_NAME_PROP))) {
-            obj.setStringValue(WATCHLIST_JOB_SHORT_NAME_PROP, shortName);
-            needsupdate = true;
-        }
 
         if (StringUtils.isBlank(obj.getStringValue(WATCHLIST_JOB_EMAIL_PROP))) {
             obj.setStringValue(WATCHLIST_JOB_EMAIL_PROP, emailTemplate);
@@ -228,13 +216,13 @@ public class WatchListJobManager
      * 
      * @param docName Name of the document storing the job (example: Scheduler.WatchListDailyNotifier)
      * @param name Job name (example: Watchlist daily notifier)
-     * @param shortName (example: daily)
+     * @param nameResource (example: platform.plugin.watchlist.job.daily)
      * @param emailTemplate email template to use for this job (example: XWiki.WatchListMessage)
      * @param cron CRON expression (see quartz CRON expressions)
      * @param context Context of the request
      * @throws XWikiException if the jobs creation fails.
      */
-    private void initWatchListJob(String docName, String name, String shortName, String emailTemplate, String cron,
+    private void initWatchListJob(String docName, String name, String nameResource, String emailTemplate, String cron,
         XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
@@ -258,8 +246,13 @@ public class WatchListJobManager
             }
 
             needsUpdate = createWatchListJobRightsObject(doc, context);
-            needsUpdate = createWatchListJobObject(doc, shortName, emailTemplate, context);
+            needsUpdate = createWatchListJobObject(doc, emailTemplate, context);
             needsUpdate = setWatchListCommonDocumentsFields(doc);
+            
+            if (StringUtils.isBlank(doc.getTitle())) {
+                needsUpdate = true;
+                doc.setTitle("$msg.get('" + nameResource +  "')");                
+            }
 
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
@@ -285,11 +278,11 @@ public class WatchListJobManager
     public void init(XWikiContext context) throws XWikiException
     {
         initWatchListJobClass(context);
-        initWatchListJob("Scheduler.WatchListHourlyNotifier", "WatchList hourly notifier", "Hourly",
-            WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 * * * ?", context);
-        initWatchListJob("Scheduler.WatchListDailyNotifier", "WatchList daily notifier", "Daily",
-            WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 * * ?", context);
-        initWatchListJob("Scheduler.WatchListWeeklyNotifier", "WatchList weekly notifier", "Weekly",
-            WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 ? * MON", context);
+        initWatchListJob("Scheduler.WatchListHourlyNotifier", "WatchList hourly notifier", 
+            "watchlist.job.hourly", WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 * * * ?", context);
+        initWatchListJob("Scheduler.WatchListDailyNotifier", "WatchList daily notifier", 
+            "watchlist.job.daily", WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 * * ?", context);
+        initWatchListJob("Scheduler.WatchListWeeklyNotifier", "WatchList weekly notifier", 
+            "watchlist.job.weekly", WatchListNotifier.DEFAULT_EMAIL_TEMPLATE, "0 0 0 ? * MON", context);
     }
 }

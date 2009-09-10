@@ -257,6 +257,12 @@
     <mime-type>text/css</mime-type>
   </mime-mapping>
 
+  <!-- In order to properly work, HTML Components MUST have the proper MIME type starting with XP SP2 -->
+  <mime-mapping>
+    <extension>htc</extension>
+    <mime-type>text/x-component</mime-type>
+  </mime-mapping>
+
   <mime-mapping>
     <extension>bmp</extension>
     <mime-type>image/bmp</mime-type>
@@ -267,7 +273,7 @@
        Note 1: for this to work fine the redirect file needs to exist in the WAR
        Note 2: with Servlet 2.4 it's possible to have a Servlet directly specified in the welcome
                file list but right now we'd like XWiki to work out of the box with Servlet 2.3
-  -->               
+  -->
   <welcome-file-list>
     <welcome-file>redirect</welcome-file>
   </welcome-file-list>

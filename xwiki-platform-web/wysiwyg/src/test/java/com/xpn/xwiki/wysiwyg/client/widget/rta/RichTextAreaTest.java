@@ -44,6 +44,19 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     public static final String PARAGRAPH = "p";
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractRichTextAreaTest#gwtTearDown()
+     */
+    protected void gwtTearDown() throws Exception
+    {
+        super.gwtTearDown();
+
+        // Reset the visibility since some tests hide the rich text area.
+        rta.setVisible(true);
+    }
+
+    /**
      * Unit test for {@link RichTextArea#setHTML(String)}. We test the workaround we use for Issue 3147.
      * 
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3147
@@ -691,5 +704,48 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), "strong"));
         assertNotNull(DOMUtils.getInstance().getFirstAncestor(range.getStartContainer(), PARAGRAPH));
+    }
+
+    /**
+     * Tests if the selection can be read and written while the rich text area is hidden.
+     */
+    public void testReadWriteHiddenSelection()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestReadWriteHiddenSelection();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the selection can be read and written while the rich text area is hidden.
+     */
+    private void doTestReadWriteHiddenSelection()
+    {
+        // Hide the rich text area.
+        rta.setVisible(false);
+
+        rta.setHTML("123<img/>4");
+
+        // Make a text selection.
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getFirstChild(), 1);
+        range.setEnd(getBody().getFirstChild(), 2);
+        select(range);
+
+        // Check if the text was selected even if the rich text area is hidden.
+        assertEquals("2", rta.getDocument().getSelection().toString());
+
+        // Make a control selection.
+        range.selectNode(getBody().getChildNodes().getItem(1));
+        select(range);
+
+        // Verify the control selection.
+        assertSelectionWrapsNode(getBody().getChildNodes().getItem(1));
     }
 }

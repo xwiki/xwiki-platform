@@ -38,7 +38,7 @@
       <meta name="wiki" content="$xwiki.getXMLEncoded($doc.wiki)"/>
     #end
     ## Localize GWT applications.
-    <meta name="gwt:property" content="locale=$!{context.language}">
+    <meta name="gwt:property" content="locale=$!{context.language}" />
     $xwiki.parseContent($!xwiki.getWebPreference("meta"))
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
     <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->

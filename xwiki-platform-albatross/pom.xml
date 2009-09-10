@@ -27,19 +27,19 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.skins</groupId>
     <artifactId>xwiki-skins</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>16</version>
   </parent>
   <artifactId>xwiki-skin-albatross</artifactId>
   <name>XWiki Platform - Skins - Albatross</name>
-  <version>1.22-SNAPSHOT</version>
+  <version>1.22</version>
   <packaging>pom</packaging>
   <description>Albatross Skin</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/skins/trunk/albatross</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/skins/trunk/albatross</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/skins/trunk/albatross</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-albatross-1.22</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-albatross-1.22</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/skins/tags/xwiki-skin-albatross-1.22</url>
   </scm>
   <build>
     <plugins>

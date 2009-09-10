@@ -27,18 +27,18 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>24-SNAPSHOT</version>
+    <version>23</version>
   </parent>
   <artifactId>xwiki-application-wiki-macro-bridge</artifactId>
   <name>XWiki Platform - Applications - Wiki Macro Bridge</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>xar</packaging>
   <description>XWiki Platform - Applications - Wiki Macro Bridge</description>
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-wiki-macro-bridge-1.2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-wiki-macro-bridge-1.2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/tags/xwiki-application-wiki-macro-bridge-1.2</url>
   </scm>
 </project>

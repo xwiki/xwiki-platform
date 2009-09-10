@@ -17,6 +17,7 @@
     <div class="minwidthb"></div>
     <div class="main layoutsubsection">
     #template("contentview.vm")
+    <div class="clearfloats"></div>
     #template("docextra.vm")
     <div class="clearfloats"></div>
     </div>## main

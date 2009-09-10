@@ -419,15 +419,17 @@ public class IESelection extends AbstractSelection
     protected void moveTextRangeBeforeElement(TextRange textRange, Element element)
     {
         textRange.moveToElementText(element);
-        // Sometimes moveToElementText has unexpected results. Let's test if textRange starts before element and if not
-        // then try something different.
-        int left = getLeft(element);
-        int top = getTop(element);
-        if (textRange.getOffsetLeft() != left || top < textRange.getOffsetTop()
-            || top > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
-            // This can fail moving the text range before the element too (that's why we tried moveToElementText first).
-            textRange.moveToPoint(left, top);
-            // Don't bet on the result!
+        if (isRendered(element)) {
+            // Sometimes moveToElementText has unexpected results. Let's test if textRange starts before element and if
+            // not then try something different.
+            int left = getLeft(element);
+            int top = getTop(element);
+            if (textRange.getOffsetLeft() != left || top < textRange.getOffsetTop()
+                || top > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
+                // This can fail moving textRange before element too (that's why we tried moveToElementText first).
+                textRange.moveToPoint(left, top);
+                // Don't bet on the result!
+            }
         }
     }
 
@@ -463,6 +465,18 @@ public class IESelection extends AbstractSelection
             element = element.offsetParent;
         }
         return top;
+    }-*/;
+
+    /**
+     * The elements with {@code display:none} and all of their descendants are not rendered by the browser. Also, the
+     * elements that are not attached to the document are not rendered.
+     * 
+     * @param element a DOM element
+     * @return {@code true} if the given element is rendered by the browser, {@code false} otherwise
+     */
+    protected native boolean isRendered(Element element)
+    /*-{
+        return element.getClientRects().length > 0;
     }-*/;
 
     /**

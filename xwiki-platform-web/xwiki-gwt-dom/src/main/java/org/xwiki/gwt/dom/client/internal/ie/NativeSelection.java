@@ -71,9 +71,9 @@ public final class NativeSelection extends JavaScriptObject
             // the edited document, the BODY element looses the focus when this elements are edited. There's no need to
             // restore the selection when the focus comes from such an inner node.
             if (!event.fromElement || event.fromElement.ownerDocument != document) {
-                var range = document.parentWindow.__savedRange;
+                var range = document.parentWindow.__xwe_savedRange;
                 // Clear the reference to the saved range.
-                document.parentWindow.__savedRange = undefined;
+                document.parentWindow.__xwe_savedRange = undefined;
                 try {
                     // Restore the saved range.
                     range.select();
@@ -95,7 +95,8 @@ public final class NativeSelection extends JavaScriptObject
             // the edited document, the BODY element looses the focus when this elements are edited. There's no need to
             // save the selection when the focus goes to such an inner node.
             if (!event.toElement || event.toElement.ownerDocument != document) {
-                document.parentWindow.__savedRange = document.selection.createRange();
+                document.parentWindow.__xwe_savedRange = document.selection.createRange();
+                document.parentWindow.__xwe_savedRange.ownerDocument = document;
             }
         });
     }-*/;
@@ -116,29 +117,27 @@ public final class NativeSelection extends JavaScriptObject
         // it back. Additionally, we have to be able to work with a document's selection while it doesn't have the
         // focus. To do so, we save a reference to the current range as a property of the window object. While the
         // document doesn't have the focus we read and overwrite this range, instead of using the selection object.
-        var range;
-        var savedRange = this.ownerDocument.parentWindow.__savedRange;
+        var savedRange = this.ownerDocument.parentWindow.__xwe_savedRange;
         if (typeof(savedRange) == 'undefined') {
-            // There's no saved range. Let's create a new range.
-            range = this.createRange();
-        } else {
-            // There's a saved range. Return a clone of the saved range. 
-            if (savedRange.duplicate) {
-                // Text Range
-                range = savedRange.duplicate();
-            } else if (savedRange.item) {
-                // Control Range
-                range = this.ownerDocument.body.createControlRange();
-                for(var i = 0; i < savedRange.length; i++) {
-                    range.addElement(savedRange.item(i));
-                }
+            // There's no saved range. Default on current range.
+            var currentRange = this.createRange();
+            currentRange.ownerDocument = this.ownerDocument;
+            // Ranges unsupported by the native selection are cached (ranges that start or end inside a hidden element).
+            var cachedRange = this.ownerDocument.parentWindow.__xwe_cachedRange;
+            var cachedRangeWitness = this.ownerDocument.parentWindow.__xwe_cachedRangeWitness;
+            // If there's a cached range and the witness equals the current range then return the cached range.
+            if (typeof(cachedRange) != 'undefined' && @org.xwiki.gwt.dom.client.internal.ie.NativeRange::areEqual(Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;)(currentRange, cachedRangeWitness)) {
+                return @org.xwiki.gwt.dom.client.internal.ie.NativeRange::duplicate(Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;)(cachedRange);
             } else {
-                // The saved range seems to be invalid.
-                throw 'NativeSelection#createRange: Invalid saved range.';
+                // Reset the cache.
+                this.ownerDocument.parentWindow.__xwe_cachedRange = undefined;
+                this.ownerDocument.parentWindow.__xwe_cachedRangeWitness = undefined;
+                return currentRange;
             }
+        } else {
+            // There's a saved range. Return a clone of the saved range.
+            return @org.xwiki.gwt.dom.client.internal.ie.NativeRange::duplicate(Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;)(savedRange);
         }
-        range.ownerDocument = this.ownerDocument;
-        return range;
     }-*/;
 
     /**
@@ -146,11 +145,16 @@ public final class NativeSelection extends JavaScriptObject
      */
     public native void empty()
     /*-{
-        if (typeof(this.ownerDocument.parentWindow.__savedRange) == 'undefined') {
-            this.empty();
+        if (typeof(this.ownerDocument.parentWindow.__xwe_savedRange) == 'undefined') {
+            try {
+                // Try canceling the current selection. This throws an exception if the parent window is hidden.
+                this.empty();
+            } catch(e) {
+                // Do nothing.
+            }
         } else {
             // Save an invalid range.
-            this.ownerDocument.parentWindow.__savedRange = {select : function(){}};
+            this.ownerDocument.parentWindow.__xwe_savedRange = {select : function(){}};
         }
     }-*/;
 

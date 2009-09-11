@@ -80,25 +80,19 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
             "<html><head><title></tile></head><body><p><strong>Hello There</strong></p></body></html>".getBytes());
 
         final OpenOfficeDocumentConverter mockDocumentConverter = this.context.mock(OpenOfficeDocumentConverter.class);
-        this.context.checking(new Expectations()
-        {
-            {
+        this.context.checking(new Expectations() {{
                 allowing(mockDocumentConverter).convert(mockInput);
-                will(returnValue(mockOutput));
-            }
-        });
+                will(returnValue(mockOutput));            
+        }});
         ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "documentConverter", mockDocumentConverter);
 
         // Create & register a mock document name serializer.
         final DocumentName mockDocumentName = new DocumentName("xwiki", "Main", "Test");
         final DocumentNameSerializer nameSerializer = this.context.mock(DocumentNameSerializer.class, "test");
-        this.context.checking(new Expectations()
-        {
-            {
+        this.context.checking(new Expectations() {{
                 allowing(nameSerializer).serialize(mockDocumentName);
-                will(returnValue("xwiki:Main.Test"));
-            }
-        });
+                will(returnValue("xwiki:Main.Test"));            
+        }});
         ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "nameSerializer", nameSerializer);
 
         XDOMOfficeDocument document = xdomOfficeDocumentBuilder.build(mockInput, mockDocumentName, true);

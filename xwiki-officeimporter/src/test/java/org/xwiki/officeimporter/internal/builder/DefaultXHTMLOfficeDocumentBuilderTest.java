@@ -72,25 +72,19 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         mockOutput.put("output.html", "<html><head><title></tile></head><body></body></html>".getBytes());
 
         final OpenOfficeDocumentConverter mockDocumentConverter = this.context.mock(OpenOfficeDocumentConverter.class);
-        this.context.checking(new Expectations()
-        {
-            {
+        this.context.checking(new Expectations() {{
                 allowing(mockDocumentConverter).convert(mockInput);
                 will(returnValue(mockOutput));
-            }
-        });
+        }});
         ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "documentConverter", mockDocumentConverter);
 
         // Create & register a mock document name serializer.
         final DocumentName mockDocumentName = new DocumentName("xwiki", "Main", "Test");
         final DocumentNameSerializer nameSerializer = this.context.mock(DocumentNameSerializer.class, "test");
-        this.context.checking(new Expectations()
-        {
-            {
+        this.context.checking(new Expectations() {{
                 allowing(nameSerializer).serialize(mockDocumentName);                
                 will(returnValue("xwiki:Main.Test"));
-            }
-        });
+        }});
         ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "nameSerializer", nameSerializer);
 
         XHTMLOfficeDocument document = xhtmlDocumentBuilder.build(mockInput, mockDocumentName, true);

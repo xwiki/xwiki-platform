@@ -50,13 +50,10 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         super.setUp();
 
         final DocumentAccessBridge mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);
-        context.checking(new Expectations()
-        {
-            {
+        context.checking(new Expectations() {{
                 allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
                 will(returnValue("/bridge/foo.png"));
-            }
-        });
+        }});
     }
 
     /**

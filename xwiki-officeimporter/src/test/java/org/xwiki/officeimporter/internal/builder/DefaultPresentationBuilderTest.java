@@ -71,13 +71,10 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         mockOutput.put("output.html", "<html><head><title></tile></head><body><p>Slide1</p></body></html>".getBytes());
 
         final OpenOfficeDocumentConverter mockDocumentConverter = this.context.mock(OpenOfficeDocumentConverter.class);
-        this.context.checking(new Expectations()
-        {
-            {
+        this.context.checking(new Expectations() {{
                 allowing(mockDocumentConverter).convert(mockInput);
                 will(returnValue(mockOutput));
-            }
-        });
+        }});
         ReflectionUtils.setFieldValue(presentationBuilder, "documentConverter", mockDocumentConverter);
         
         XDOMOfficeDocument presentation = presentationBuilder.build(mockInput);

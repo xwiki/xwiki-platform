@@ -28,10 +28,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -153,29 +153,50 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5);
         needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
         needsUpdate |= bclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "select");
-        needsUpdate |= bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
-            "Mandatory|Optional|No content", "select", "|");
-        needsUpdate |= bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY, 
-            "Content description (Not applicable for \"No content\" type)", 40, 5);
+        needsUpdate |=
+            bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
+                "Mandatory|Optional|No content", "select", "|");
+        needsUpdate |=
+            bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
+                "Content description (Not applicable for \"No content\" type)", 40, 5);
         needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 5);
-        
+
         if (needsUpdate) {
-           xcontext.getWiki().saveDocument(doc, xcontext); 
+            update(doc);
         }
-        
+
         // Install or Upgrade XWiki.WikiMacroParameterClass
         doc = xcontext.getWiki().getDocument(WIKI_MACRO_PARAMETER_CLASS, xcontext);
         bclass = doc.getxWikiClass();
         bclass.setName(WIKI_MACRO_PARAMETER_CLASS);
-        
+
         needsUpdate = false;
-        
+
         needsUpdate |= bclass.addTextField(PARAMETER_NAME_PROPERTY, "Parameter name", 30);
         needsUpdate |= bclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
         needsUpdate |= bclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "select");
-        
+
         if (needsUpdate) {
-            xcontext.getWiki().saveDocument(doc, xcontext); 
+            update(doc);
         }
+    }
+
+    /**
+     * Utility method for updating a wiki macro class definition document.
+     * 
+     * @param doc xwiki document containing the wiki macro class.
+     * @throws XWikiException if an error occurs while saving the document.
+     */
+    private void update(XWikiDocument doc) throws XWikiException
+    {
+        XWikiContext xcontext = getContext();
+
+        if (doc.isNew()) {
+            doc.setCreator("System");
+            doc.setParent("XWiki.WebHome");
+        }
+        
+        doc.setAuthor("System");
+        xcontext.getWiki().saveDocument(doc, xcontext);
     }
 }

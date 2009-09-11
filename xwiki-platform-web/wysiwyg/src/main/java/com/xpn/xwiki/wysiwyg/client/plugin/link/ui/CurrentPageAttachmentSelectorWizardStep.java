@@ -23,7 +23,6 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
@@ -31,73 +30,20 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.AttachmentPreviewWidget;
-import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
-import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
 
 /**
  * Wizard step to select a file attached to a page.
  * 
  * @version $Id$
  */
-public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWizardStep<LinkConfig>
+public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelectorWizardStep<LinkConfig, Attachment>
 {
-    /**
-     * Fake attachment preview widget to hold the option of attaching a new file.
-     */
-    private static class NewAttachmentOptionWidget extends AttachmentPreviewWidget
-    {
-        /**
-         * Default constructor.
-         */
-        public NewAttachmentOptionWidget()
-        {
-            super(null);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Widget getUI()
-        {
-            Label newOptionPanel = new Label(Strings.INSTANCE.fileUploadNewFileLabel());
-            newOptionPanel.addStyleName("xNewFilePreview");
-            return newOptionPanel;
-        }
-    }
-
-    /**
-     * The style of the fields under error.
-     */
-    protected static final String FIELD_ERROR_STYLE = "xFieldError";
-
-    /**
-     * The main panel of this wizard step.
-     */
-    private VerticalResizePanel mainPanel = new VerticalResizePanel();
-
     /**
      * The currently edited resource (the currently edited page).
      */
     private ResourceName editedResource;
-
-    /**
-     * The label to signal errors of the list selection in.
-     */
-    private Label errorLabel = new Label();
-
-    /**
-     * The list of attachments.
-     */
-    private ListBox attachmentsList = new ListBox();
-
-    /**
-     * Specifies whether the new attachment option should be shown on top or on bottom of the list.
-     */
-    private boolean newOptionOnTop;
 
     /**
      * Builds a selector from the attachments of the specified page.
@@ -106,111 +52,89 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
      */
     public CurrentPageAttachmentSelectorWizardStep(ResourceName editedResource)
     {
+        getMainPanel().addStyleName("xAttachmentsSelector");
         this.editedResource = editedResource;
-        mainPanel.addStyleName("xAttachmentsSelector");
-        Label helpLabel = new Label(Strings.INSTANCE.linkSelectAttachmentHelpLabel());
-        helpLabel.setStyleName("xHelpLabel");
-        errorLabel.addStyleName("xLinkParameterError");
-        errorLabel.setVisible(false);
-
-        mainPanel.add(helpLabel);
-        mainPanel.add(errorLabel);
-        // create an empty attachments list
-        mainPanel.add(attachmentsList);
-        mainPanel.setExpandingWidget(attachmentsList, false);
-        // put the new attachment option on top
-        newOptionOnTop = true;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void init(final Object data, final AsyncCallback< ? > cb)
+    protected String getSelectHelpLabel()
     {
-        hideError();
-        super.init(data, new AsyncCallback<Object>()
-        {
-            public void onSuccess(Object result)
-            {
-                refreshAttachmentsList(cb);
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                cb.onFailure(caught);
-            }
-        });
-    }
-
-    /**
-     * Reloads the list of attachments previews in asynchronous manner.
-     * 
-     * @param cb the callback to handle server call
-     */
-    private void refreshAttachmentsList(final AsyncCallback< ? > cb)
-    {
-        WysiwygService.Singleton.getInstance().getAttachments(editedResource.getWiki(), editedResource.getSpace(),
-            editedResource.getPage(), new AsyncCallback<List<Attachment>>()
-            {
-                public void onSuccess(List<Attachment> result)
-                {
-                    fillAttachmentsList(result);
-                    cb.onSuccess(null);
-                }
-
-                public void onFailure(Throwable caught)
-                {
-                    cb.onFailure(caught);
-                }
-            });
-    }
-
-    /**
-     * Fills the preview list with attachments.
-     * 
-     * @param attachments the list of attachments to build the preview for
-     */
-    private void fillAttachmentsList(List<Attachment> attachments)
-    {
-        String oldSelection = null;
-        if (!StringUtils.isEmpty(getData().getReference())) {
-            ResourceName r = new ResourceName(getData().getReference(), true);
-            oldSelection = r.getFile();
-        } else if (attachmentsList.getSelectedItem() != null
-            && !(attachmentsList.getSelectedItem().getWidget(0) instanceof NewAttachmentOptionWidget)) {
-            oldSelection =
-                ((AttachmentPreviewWidget) attachmentsList.getSelectedItem().getWidget(0)).getAttachment()
-                    .getFilename();
-        }
-        attachmentsList.clear();
-        for (Attachment attach : attachments) {
-            ListItem newItem = new ListItem();
-            newItem.add(new AttachmentPreviewWidget(attach));
-            attachmentsList.addItem(newItem);
-            // preserve selection
-            if (oldSelection != null && oldSelection.equals(attach.getFilename())) {
-                attachmentsList.setSelectedItem(newItem);
-            }
-        }
-        ListItem newOptionListItem = new ListItem();
-        newOptionListItem.add(new NewAttachmentOptionWidget());
-        if (newOptionOnTop) {
-            attachmentsList.insertItem(newOptionListItem, 0);
-        } else {
-            attachmentsList.addItem(newOptionListItem);
-        }
-        if (oldSelection == null) {
-            attachmentsList.setSelectedItem(newOptionListItem);
-        }
+        return Strings.INSTANCE.linkSelectAttachmentHelpLabel();
     }
 
     /**
      * {@inheritDoc}
      */
-    public Widget display()
+    @Override
+    protected String getSelectErrorMessage()
     {
-        return mainPanel;
+        return Strings.INSTANCE.linkNoAttachmentSelectedError();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void fetchData(AsyncCallback<List<Attachment>> callback)
+    {
+        WysiwygService.Singleton.getInstance().getAttachments(editedResource.getWiki(), editedResource.getSpace(),
+            editedResource.getPage(), callback);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getSelection()
+    {
+        if (!StringUtils.isEmpty(getData().getReference())) {
+            ResourceName r = new ResourceName(getData().getReference(), true);
+            return r.getFile();
+        } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
+            return getSelectedItem().getData().getFilename();
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matchesSelection(Attachment item, String selection)
+    {
+        return selection != null && selection.equals(item.getFilename());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ListItem<Attachment> getListItem(Attachment data)
+    {
+        ListItem<Attachment> item = new ListItem<Attachment>();
+        item.setData(data);
+        Label attachmentLabel = new Label(data.getFilename());
+        attachmentLabel.addStyleName("xAttachPreview");
+        item.add(attachmentLabel);
+        return item;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ListItem<Attachment> getNewOptionListItem()
+    {
+        ListItem<Attachment> item = new ListItem<Attachment>();
+        // no data for the new option item
+        item.setData(null);
+        Label newOptionPanel = new Label(Strings.INSTANCE.fileUploadNewFileLabel());
+        newOptionPanel.addStyleName("xNewFilePreview");
+        item.add(newOptionPanel);
+        return item;
     }
 
     /**
@@ -218,9 +142,8 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
      */
     public String getNextStep()
     {
-        // check out the selection
-        if (attachmentsList.getSelectedItem() != null
-            && attachmentsList.getSelectedItem().getWidget(0) instanceof NewAttachmentOptionWidget) {
+        // check out the selection, if it's a new file option
+        if (getSelectedItem() != null && getSelectedItem().getData() == null) {
             return LinkWizardSteps.ATTACHMENT_UPLOAD.toString();
         }
         return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
@@ -237,72 +160,33 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractSelectorWiz
     /**
      * {@inheritDoc}
      */
-    public void onCancel()
+    @Override
+    protected void saveSelectedValue()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onSubmit(AsyncCallback<Boolean> async)
-    {
-        hideError();
-        AttachmentPreviewWidget selectedOption =
-            (AttachmentPreviewWidget) (attachmentsList.getSelectedItem() != null ? attachmentsList.getSelectedItem()
-                .getWidget(0) : null);
-        if (selectedOption == null) {
-            displayError(Strings.INSTANCE.linkNoAttachmentSelectedError());
-            async.onSuccess(false);
-            return;
-        }
-        if (selectedOption instanceof NewAttachmentOptionWidget) {
+        Attachment selectedAttach = getSelectedItem().getData();
+        if (selectedAttach == null) {
             // new file option, let's setup the attachment link data accordingly
             getData().setWiki(editedResource.getWiki());
             getData().setSpace(editedResource.getSpace());
             getData().setPage(editedResource.getPage());
-            async.onSuccess(true);
         } else {
             // check if attachment changed
             boolean changedAttachment = true;
             ResourceName editedAttach = new ResourceName(getData().getReference(), true);
             if (!StringUtils.isEmpty(getData().getReference())
-                && editedAttach.getFile().equals(selectedOption.getAttachment().getFilename())) {
+                && editedAttach.getFile().equals(selectedAttach.getFilename())) {
                 changedAttachment = false;
             }
             if (changedAttachment) {
                 // existing file option, set up the LinkConfig
                 // attachment reference has to be relative to the currently edited page
                 // FIXME: move the reference setting logic in a controller
-                ResourceName ref = new ResourceName(selectedOption.getAttachment().getReference(), true);
+                ResourceName ref = new ResourceName(selectedAttach.getReference(), true);
                 String attachmentRef = "attach:" + ref.getRelativeTo(editedResource).toString();
-                String attachmentURL = selectedOption.getAttachment().getDownloadUrl();
+                String attachmentURL = selectedAttach.getDownloadUrl();
                 getData().setReference(attachmentRef);
                 getData().setUrl(attachmentURL);
             }
-            async.onSuccess(true);
         }
-    }
-
-    /**
-     * Displays the error message and markers for this steps form.
-     * 
-     * @param message the error message to display
-     */
-    protected void displayError(String message)
-    {
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
-        attachmentsList.addStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
-    }
-
-    /**
-     * Hides the error message and markers.
-     */
-    protected void hideError()
-    {
-        errorLabel.setVisible(false);
-        attachmentsList.removeStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
     }
 }

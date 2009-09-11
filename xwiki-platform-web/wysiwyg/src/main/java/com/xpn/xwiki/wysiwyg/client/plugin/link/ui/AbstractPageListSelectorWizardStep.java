@@ -19,84 +19,28 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
-import java.util.List;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
-import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
 
 /**
  * Wizard step to select the wiki page to link to, from a list of wiki pages.
  * 
  * @version $Id$
  */
-public abstract class AbstractPageListSelectorWizardStep extends AbstractSelectorWizardStep<LinkConfig>
+public abstract class AbstractPageListSelectorWizardStep extends AbstractListSelectorWizardStep<LinkConfig, Document>
 {
-    /**
-     * Fake page preview widget to hold the option of creating a new page.
-     */
-    private static class NewPageOptionWidget extends PagePreviewWidget
-    {
-        /**
-         * Default constructor.
-         */
-        public NewPageOptionWidget()
-        {
-            super(null);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected Widget getUI()
-        {
-            Label newOptionPanel = new Label(Strings.INSTANCE.linkNewPageOptionLabel());
-            newOptionPanel.addStyleName("xNewPagePreview");
-            return newOptionPanel;
-        }
-    }
-
-    /**
-     * The style of the fields under error.
-     */
-    protected static final String FIELD_ERROR_STYLE = "xFieldError";
-
-    /**
-     * The main panel of this wizard step.
-     */
-    private VerticalResizePanel mainPanel = new VerticalResizePanel();
-
     /**
      * The currently edited resource (the currently edited page).
      */
     private ResourceName editedResource;
-
-    /**
-     * The list of pages.
-     */
-    private ListBox pagesList = new ListBox();
-
-    /**
-     * The label to display the selection error in this wizard step.
-     */
-    private Label errorLabel = new Label();
-
-    /**
-     * Specifies whether the new attachment option should be shown on top or on bottom of the list.
-     */
-    private boolean newOptionOnTop;
 
     /**
      * Builds a selector from a list of pages of the specified page.
@@ -105,98 +49,89 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
      */
     public AbstractPageListSelectorWizardStep(ResourceName editedResource)
     {
+        getMainPanel().addStyleName("xPagesSelector");
         this.editedResource = editedResource;
-        mainPanel.addStyleName("xPagesSelector");
-
-        Label helpLabel = new Label(Strings.INSTANCE.linkSelectWikipageHelpLabel());
-        helpLabel.addStyleName("xHelpLabel");
-
-        errorLabel.setText(Strings.INSTANCE.linkNoPageSelectedError());
-        errorLabel.addStyleName("xLinkParameterError");
-        errorLabel.setVisible(false);
-
-        mainPanel.add(helpLabel);
-        mainPanel.add(errorLabel);
-
-        // create an empty pages list
-        mainPanel.add(pagesList);
-
-        mainPanel.setExpandingWidget(pagesList, false);
-        // put the new attachment option on top
-        newOptionOnTop = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Widget display()
-    {
-        return mainPanel;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void init(final Object data, final AsyncCallback< ? > cb)
+    protected String getSelectHelpLabel()
     {
-        hideError();
-        super.init(data, new AsyncCallback<Object>()
-        {
-            public void onSuccess(Object result)
-            {
-                refreshPagesList(cb);
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                cb.onFailure(caught);
-            }
-        });
+        return Strings.INSTANCE.linkSelectWikipageHelpLabel();
     }
 
     /**
-     * Reloads the list of pages previews in asynchronous manner.
-     * 
-     * @param cb the callback to handle server call
+     * {@inheritDoc}
      */
-    protected abstract void refreshPagesList(AsyncCallback< ? > cb);
+    @Override
+    protected String getSelectErrorMessage()
+    {
+        return Strings.INSTANCE.linkNoPageSelectedError();
+    }
 
     /**
-     * Fills the preview list with the pages in the passed list.
-     * 
-     * @param pages the list of pages to build the preview for
+     * {@inheritDoc}
      */
-    protected void fillPagesList(List<Document> pages)
+    @Override
+    protected String getSelection()
     {
-        String oldSelection = null;
         if (!StringUtils.isEmpty(getData().getReference())) {
-            oldSelection = getData().getReference();
-        } else if (pagesList.getSelectedItem() != null
-            && !(pagesList.getSelectedItem().getWidget(0) instanceof NewPageOptionWidget)) {
-            oldSelection = ((PagePreviewWidget) pagesList.getSelectedItem().getWidget(0)).getDocument().getFullName();
+            return getData().getReference();
+        } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
+            return getSelectedItem().getData().getFullName();
         }
-        pagesList.clear();
-        for (Document doc : pages) {
-            ListItem newItem = new ListItem();
-            newItem.add(new PagePreviewWidget(doc));
-            pagesList.addItem(newItem);
-            // preserve selection
-            if (oldSelection != null && oldSelection.equals(doc.getFullName())) {
-                pagesList.setSelectedItem(newItem);
-            }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean matchesSelection(Document item, String selection)
+    {
+        return selection != null && selection.equals(item.getFullName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ListItem<Document> getListItem(Document data)
+    {
+        ListItem<Document> item = new ListItem<Document>();
+        item.setData(data);
+        Label pageName = new Label(data.getFullName());
+        pageName.addStyleName("xPagePreviewFullname");
+        Label title = new Label(data.getTitle());
+        title.addStyleName("xPagePreviewTitle");
+
+        FlowPanel ui = new FlowPanel();
+        if (!StringUtils.isEmpty(data.getTitle())) {
+            ui.add(title);
         }
-        ListItem newOptionListItem = new ListItem();
-        newOptionListItem.add(new NewPageOptionWidget());
-        if (newOptionOnTop) {
-            pagesList.insertItem(newOptionListItem, 0);
-        } else {
-            pagesList.addItem(newOptionListItem);
-        }
-        // if there is no old selection or old selection didn't match, select the new page
-        if (oldSelection == null) {
-            pagesList.setSelectedItem(newOptionListItem);
-        }
+        String prettyName = StringUtils.isEmpty(data.getTitle()) ? "" : data.getTitle() + " - ";
+        prettyName += data.getFullName();
+        ui.setTitle(prettyName);
+        ui.add(pageName);
+        ui.addStyleName("xPagePreview");
+        item.add(ui);
+        return item;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ListItem<Document> getNewOptionListItem()
+    {
+        ListItem<Document> item = new ListItem<Document>();
+        item.setData(null);
+        Label newOptionPanel = new Label(Strings.INSTANCE.linkNewPageOptionLabel());
+        newOptionPanel.addStyleName("xNewPagePreview");
+        item.add(newOptionPanel);
+        return item;
     }
 
     /**
@@ -204,9 +139,8 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
      */
     public String getNextStep()
     {
-        // check out the selection
-        if (pagesList.getSelectedItem() != null
-            && pagesList.getSelectedItem().getWidget(0) instanceof NewPageOptionWidget) {
+        // check out the selection, if it's a new page option
+        if (getSelectedItem() != null && getSelectedItem().getData() == null) {
             return LinkWizardSteps.WIKI_PAGE_CREATOR.toString();
         }
         return LinkWizardSteps.WIKI_PAGE_CONFIG.toString();
@@ -223,34 +157,20 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
     /**
      * {@inheritDoc}
      */
-    public void onCancel()
+    @Override
+    protected void saveSelectedValue()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onSubmit(AsyncCallback<Boolean> async)
-    {
-        hideError();
-        PagePreviewWidget selectedOption =
-            (PagePreviewWidget) (pagesList.getSelectedItem() != null ? pagesList.getSelectedItem().getWidget(0) : null);
-        if (selectedOption == null) {
-            displayError(Strings.INSTANCE.linkNoPageSelectedError());
-            async.onSuccess(false);
-            return;
-        }
-        if (selectedOption instanceof NewPageOptionWidget) {
+        Document selectedDocument = getSelectedItem().getData();
+        if (selectedDocument == null) {
             // new page option, let's setup the link data accordingly
             getData().setWiki(editedResource.getWiki());
             getData().setSpace(editedResource.getSpace());
-            async.onSuccess(true);
         } else {
             // check if document changed
             boolean changedDoc = true;
             ResourceName editedPage = new ResourceName(getData().getReference(), false).getRelativeTo(editedResource);
             ResourceName selectedPage =
-                new ResourceName(selectedOption.getDocument().getFullName(), false).getRelativeTo(editedResource);
+                new ResourceName(selectedDocument.getFullName(), false).getRelativeTo(editedResource);
             if (!StringUtils.isEmpty(getData().getReference()) && editedPage.equals(selectedPage)) {
                 changedDoc = false;
             }
@@ -258,51 +178,11 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractSelecto
                 // existing page option, set up the LinkConfig
                 // page reference has to be relative to the currently edited page
                 // FIXME: move the reference setting logic in a controller
-                ResourceName ref = new ResourceName(selectedOption.getDocument().getFullName(), false);
+                ResourceName ref = new ResourceName(selectedDocument.getFullName(), false);
                 getData().setReference(ref.getRelativeTo(editedResource).toString());
                 // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
-                getData().setUrl(selectedOption.getDocument().getUploadURL());
+                getData().setUrl(selectedDocument.getUploadURL());
             }
-            async.onSuccess(true);
         }
-    }
-
-    /**
-     * @return the pagesList
-     */
-    public ListBox getPagesList()
-    {
-        return pagesList;
-    }
-
-    /**
-     * @return the mainPanel
-     */
-    public FlowPanel getMainPanel()
-    {
-        return mainPanel;
-    }
-
-    /**
-     * Clears the error message and markers from the UI.
-     */
-    protected void hideError()
-    {
-        errorLabel.setVisible(false);
-        pagesList.removeStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
-    }
-
-    /**
-     * Displays the passed error message and error markers for this wizard step.
-     * 
-     * @param message the error message to display
-     */
-    protected void displayError(String message)
-    {
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
-        pagesList.addStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
     }
 }

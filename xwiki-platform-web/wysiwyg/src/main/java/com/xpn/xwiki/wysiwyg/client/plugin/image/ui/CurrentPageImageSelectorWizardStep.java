@@ -21,16 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.List;
 
-import com.google.gwt.event.dom.client.DoubleClickEvent;
-import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
@@ -38,33 +32,16 @@ import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
-import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
 
 /**
  * Wizard step to select an image from the list of images attached to a page.
  * 
  * @version $Id$
  */
-public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardStep<ImageConfig> implements
-    DoubleClickHandler, KeyUpHandler, SourcesNavigationEvents
+public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWizardStep<ImageConfig, Attachment>
 {
-    /**
-     * The style for an field in error.
-     */
-    private static final String FIELD_ERROR_STYLE = "xFieldError";
-
-    /**
-     * The main panel of this wizard step.
-     */
-    private VerticalResizePanel mainPanel = new VerticalResizePanel();
-
     /**
      * The currently edited resource (the currently edited page).
      */
@@ -76,27 +53,6 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     private ResourceName currentPage;
 
     /**
-     * The list of images.
-     */
-    private ListBox<Attachment> imageList = new ListBox<Attachment>();
-
-    /**
-     * Label to display the selection error in this wizard step.
-     */
-    private final Label errorLabel = new Label();
-
-    /**
-     * Specifies whether the new image option should be shown on top or on bottom of the list.
-     */
-    private boolean newOptionOnTop;
-
-    /**
-     * Navigation listeners to be notified by navigation events from this step. It generates navigation to the next step
-     * when an item is double clicked in the list, or enter key is pressed on a selected item.
-     */
-    private final NavigationListenerCollection navigationListeners = new NavigationListenerCollection();
-
-    /**
      * Builds a selector from the images of the specified current page to edit the specified resource.
      * 
      * @param currentPage the page to currently show images for
@@ -104,24 +60,9 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
      */
     public CurrentPageImageSelectorWizardStep(ResourceName currentPage, ResourceName editedResource)
     {
+        getMainPanel().addStyleName("xImagesSelector");
         this.editedResource = editedResource;
         this.currentPage = currentPage;
-        mainPanel.addStyleName("xImagesSelector");
-
-        Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageHelpLabel());
-        helpLabel.addStyleName("xHelpLabel");
-        mainPanel.add(helpLabel);
-
-        errorLabel.addStyleName("xImageParameterError");
-        errorLabel.setVisible(false);
-        mainPanel.add(errorLabel);
-
-        imageList.addKeyUpHandler(this);
-        imageList.addDoubleClickHandler(this);
-        mainPanel.add(imageList);
-        mainPanel.setExpandingWidget(imageList, false);
-        // put the new image option on top
-        newOptionOnTop = true;
     }
 
     /**
@@ -137,91 +78,43 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     /**
      * {@inheritDoc}
      */
-    public void init(final Object data, final AsyncCallback< ? > cb)
+    @Override
+    protected String getSelectHelpLabel()
     {
-        hideError();
-        super.init(data, new AsyncCallback<Object>()
-        {
-            public void onSuccess(Object result)
-            {
-                refreshAttachmentsList(cb);
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                cb.onFailure(caught);
-            }
-        });
-    }
-
-    /**
-     * Reloads the list of image previews in asynchronous manner.
-     * 
-     * @param cb the callback to handle server call
-     */
-    private void refreshAttachmentsList(final AsyncCallback< ? > cb)
-    {
-        imageList.clear();        
-        WysiwygService.Singleton.getInstance().getImageAttachments(currentPage.getWiki(), currentPage.getSpace(),
-            currentPage.getPage(), new AsyncCallback<List<Attachment>>()
-            {
-                public void onSuccess(List<Attachment> result)
-                {
-                    fillAttachmentsList(result);
-                    cb.onSuccess(null);
-                }
-
-                public void onFailure(Throwable caught)
-                {
-                    cb.onFailure(caught);
-                }
-            });
-    }
-
-    /**
-     * Fills the preview list with image preview widgets.
-     * 
-     * @param attachments the list of images to build the preview for
-     */
-    private void fillAttachmentsList(List<Attachment> attachments)
-    {
-        String oldSelection = null;
-        if (!StringUtils.isEmpty(getData().getReference())) {
-            ResourceName r = new ResourceName(getData().getReference(), true);
-            oldSelection = r.getFile();
-        } else if (imageList.getSelectedItem() != null && imageList.getSelectedItem().getData() != null) {
-            oldSelection = imageList.getSelectedItem().getData().getFilename();
-        }
-        for (Attachment attach : attachments) {
-            ListItem<Attachment> newItem = getImageListItem(attach);
-            imageList.addItem(newItem);
-            // preserve selection
-            if (oldSelection != null && oldSelection.equals(attach.getFilename())) {
-                imageList.setSelectedItem(newItem);
-            }
-        }
-        ListItem<Attachment> newOptionListItem = getNewImageListItem();
-        if (newOptionOnTop) {
-            imageList.insertItem(newOptionListItem, 0);
-        } else {
-            imageList.addItem(newOptionListItem);
-        }
-        if (oldSelection == null) {
-            imageList.setSelectedItem(newOptionListItem);
-        }
-
-        // fake container to clear the floats set for the images preview. It's here exclusively for styling reasons
-        ListItem<Attachment> fakeClearListItem = new ListItem<Attachment>();
-        fakeClearListItem.setStyleName("clearfloats");
-        imageList.addItem(fakeClearListItem);
+        return Strings.INSTANCE.imageSelectImageHelpLabel();
     }
 
     /**
      * {@inheritDoc}
      */
-    public Widget display()
+    @Override
+    protected String getSelectErrorMessage()
     {
-        return mainPanel;
+        return Strings.INSTANCE.imageNoImageSelectedError();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void fetchData(AsyncCallback<List<Attachment>> callback)
+    {
+        WysiwygService.Singleton.getInstance().getImageAttachments(currentPage.getWiki(), currentPage.getSpace(),
+            currentPage.getPage(), callback);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void fillList(List<Attachment> itemsList)
+    {
+        super.fillList(itemsList);
+
+        // fake container to clear the floats set for the images preview. It's here exclusively for styling reasons
+        ListItem<Attachment> fakeClearListItem = new ListItem<Attachment>();
+        fakeClearListItem.setStyleName("clearfloats");
+        getList().addItem(fakeClearListItem);
     }
 
     /**
@@ -230,7 +123,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     public String getNextStep()
     {
         // check out the selection
-        if (imageList.getSelectedItem() != null && imageList.getSelectedItem().getData() == null) {
+        if (getSelectedItem() != null && getSelectedItem().getData() == null) {
             return ImageWizardSteps.IMAGE_UPLOAD.toString();
         }
         return ImageWizardSteps.IMAGE_CONFIG.toString();
@@ -247,28 +140,15 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     /**
      * {@inheritDoc}
      */
-    public void onCancel()
+    @Override
+    protected void saveSelectedValue()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onSubmit(AsyncCallback<Boolean> async)
-    {
-        hideError();
-        if (imageList.getSelectedItem() == null) {
-            displayError(Strings.INSTANCE.imageNoImageSelectedError());
-            async.onSuccess(false);
-            return;
-        }
-        Attachment selectedImage = imageList.getSelectedItem() != null ? imageList.getSelectedItem().getData() : null;
+        Attachment selectedImage = getSelectedItem().getData();
         if (selectedImage == null) {
             // new image option, let's setup the image data accordingly, to be handled by the file upload step
             getData().setWiki(currentPage.getWiki());
             getData().setSpace(currentPage.getSpace());
             getData().setPage(currentPage.getPage());
-            async.onSuccess(true);
         } else {
             // check if attachment changed
             boolean changedFile = true;
@@ -285,17 +165,14 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
                 getData().setReference(ref.getRelativeTo(editedResource).toString());
                 getData().setImageURL(selectedImage.getDownloadUrl());
             }
-            async.onSuccess(true);
         }
     }
 
     /**
-     * Creates a list item with an image preview.
-     * 
-     * @param image the attachment data for the image to preview
-     * @return a list item containing a preview of the {@code image}.
+     * {@inheritDoc}
      */
-    protected ListItem<Attachment> getImageListItem(Attachment image)
+    @Override
+    protected ListItem<Attachment> getListItem(Attachment image)
     {
         ListItem<Attachment> imageItem = new ListItem<Attachment>();
         imageItem.setData(image);
@@ -309,11 +186,10 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     }
 
     /**
-     * Creates the list item for the new image upload option.
-     * 
-     * @return a list item with the new image option.
+     * {@inheritDoc}
      */
-    protected ListItem<Attachment> getNewImageListItem()
+    @Override
+    protected ListItem<Attachment> getNewOptionListItem()
     {
         ListItem<Attachment> newImageOption = new ListItem<Attachment>();
         newImageOption.setData(null);
@@ -326,71 +202,33 @@ public class CurrentPageImageSelectorWizardStep extends AbstractSelectorWizardSt
     }
 
     /**
-     * Displays the specified error message and error markers for this wizard step.
-     * 
-     * @param message the error message to display
-     */
-    protected void displayError(String message)
-    {
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
-        imageList.addStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
-    }
-
-    /**
-     * Hides the error markers for this wizard step.
-     */
-    protected void hideError()
-    {
-        errorLabel.setVisible(false);
-        imageList.removeStyleName(FIELD_ERROR_STYLE);
-        mainPanel.refreshHeights();
-    }
-
-    /**
      * {@inheritDoc}
-     * 
-     * @see DoubleClickHandler#onDoubleClick(DoubleClickEvent)
      */
-    public void onDoubleClick(DoubleClickEvent event)
+    @Override
+    protected String getSelection()
     {
-        if (event.getSource() == imageList && imageList.getSelectedItem() != null) {
-            navigationListeners.fireNavigationEvent(NavigationDirection.NEXT);
+        if (!StringUtils.isEmpty(getData().getReference())) {
+            ResourceName r = new ResourceName(getData().getReference(), true);
+            return r.getFile();
+        } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
+            return getSelectedItem().getData().getFilename();
         }
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void onKeyUp(KeyUpEvent event)
+    @Override
+    protected boolean matchesSelection(Attachment item, String selection)
     {
-        if (event.getSource() == imageList && event.getNativeKeyCode() == KeyCodes.KEY_ENTER
-            && imageList.getSelectedItem() != null) {
-            navigationListeners.fireNavigationEvent(NavigationDirection.NEXT);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addNavigationListener(NavigationListener listener)
-    {
-        navigationListeners.add(listener);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeNavigationListener(NavigationListener listener)
-    {
-        navigationListeners.remove(listener);
+        return selection != null && selection.equals(item.getFilename());
     }
 
     /**
      * Updates the current page for which this wizard step provides selection interface. However, it <strong>will
      * not</strong> update the displayed images, this will have to be done manually through
-     * {@link #refreshAttachmentsList(AsyncCallback)}.
+     * {@link #refreshList(AsyncCallback)}.
      * 
      * @param currentPage the currentPage to set
      */

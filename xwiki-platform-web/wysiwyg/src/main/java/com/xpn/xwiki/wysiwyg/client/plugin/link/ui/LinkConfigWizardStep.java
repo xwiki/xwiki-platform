@@ -66,12 +66,12 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     /**
      * The style of the error labels in this form.
      */
-    public static final String ERROR_LABEL_STYLE = "xLinkParameterError";
+    public static final String ERROR_LABEL_STYLE = "xErrorMsg";
 
     /**
      * The style of the fields under error.
      */
-    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+    protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
      * The link data to be edited by this wizard step.

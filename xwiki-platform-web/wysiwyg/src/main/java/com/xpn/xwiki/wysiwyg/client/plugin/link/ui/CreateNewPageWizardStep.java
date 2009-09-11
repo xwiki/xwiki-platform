@@ -47,7 +47,7 @@ public class CreateNewPageWizardStep implements WizardStep
     /**
      * The style of the fields under error.
      */
-    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+    protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
      * Main panel of this wizard.
@@ -91,7 +91,7 @@ public class CreateNewPageWizardStep implements WizardStep
         Label helpPageNameLabel = new Label(Strings.INSTANCE.linkNewPageTextBoxTooltip());
         helpPageNameLabel.setStyleName("xHelpLabel");
 
-        pageNameErrorLabel.addStyleName("xPageNameError");
+        pageNameErrorLabel.addStyleName("xErrorMsg");
         pageNameErrorLabel.setVisible(false);
 
         mainPanel.addStyleName("xLinkToNewPage");

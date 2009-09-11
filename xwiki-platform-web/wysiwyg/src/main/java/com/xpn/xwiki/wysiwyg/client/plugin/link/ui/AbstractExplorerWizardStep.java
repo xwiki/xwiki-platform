@@ -22,10 +22,16 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
+import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.XWikiExplorer;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.ds.WikiDataSource;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**
@@ -33,12 +39,13 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
  * 
  * @version $Id$
  */
-public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep<LinkConfig>
+public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep<LinkConfig> implements
+    SourcesNavigationEvents, RecordDoubleClickHandler
 {
     /**
      * The style of the fields under error.
      */
-    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+    protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
      * The xwiki tree explorer, used to select the page or file to link to.
@@ -54,6 +61,12 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
      * The label to display the error on submission of the wizard step form.
      */
     private final Label errorLabel = new Label();
+
+    /**
+     * The collection of listeners to launch navigation events to, when an item in the tree displayed by this step is
+     * double clicked.
+     */
+    private NavigationListenerCollection listeners = new NavigationListenerCollection();
 
     /**
      * Builds a {@link AbstractExplorerWizardStep} from the passed settings.
@@ -104,6 +117,8 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         // wrapper.
         explorer.getElement().setClassName(explorer.getElement().getClassName() + " xExplorer");
 
+        explorer.addRecordDoubleClickHandler(this);
+
         // create a label with the help for this step
         Label helpLabel = new Label();
         helpLabel.addStyleName("xHelpLabel");
@@ -112,7 +127,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
 
         errorLabel.setText(getDefaultErrorText());
         errorLabel.setVisible(false);
-        errorLabel.addStyleName("xLinkParameterError");
+        errorLabel.addStyleName("xErrorMsg");
         mainPanel.add(errorLabel);
 
         mainPanel.addStyleName("xExplorerPanel");
@@ -207,9 +222,33 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     {
         errorLabel.setVisible(false);
         // remove the class from the wrapper level, the element of this explorer
-        String boundary = "\b";
+        String boundary = "\\b";
         explorer.getElement().setClassName(
             explorer.getElement().getClassName().replaceAll(boundary + FIELD_ERROR_STYLE + boundary, ""));
         mainPanel.refreshHeights();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addNavigationListener(NavigationListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNavigationListener(NavigationListener listener)
+    {
+        listeners.remove(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onRecordDoubleClick(RecordDoubleClickEvent event)
+    {
+        listeners.fireNavigationEvent(NavigationDirection.NEXT);
     }
 }

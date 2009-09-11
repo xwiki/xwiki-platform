@@ -47,20 +47,9 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
     /**
      * {@inheritDoc}
      */
-    protected void refreshPagesList(final AsyncCallback< ? > cb)
+    @Override
+    protected void fetchData(AsyncCallback<List<Document>> callback)
     {
-        WysiwygService.Singleton.getInstance().getRecentlyModifiedPages(0, 20, new AsyncCallback<List<Document>>()
-        {
-            public void onSuccess(List<Document> result)
-            {
-                fillPagesList(result);
-                cb.onSuccess(null);
-            }
-
-            public void onFailure(Throwable caught)
-            {
-                cb.onFailure(caught);
-            }
-        });
+        WysiwygService.Singleton.getInstance().getRecentlyModifiedPages(0, 20, callback);
     }
 }

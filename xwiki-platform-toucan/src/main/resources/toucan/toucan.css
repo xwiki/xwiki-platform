@@ -218,7 +218,6 @@ h1 {
     font-size: 2.3em;
     font-weight: normal;
     letter-spacing: -1px;
-    line-height: 1.1em;
 }
 
 h2 {
@@ -226,14 +225,12 @@ h2 {
     font-weight: normal;
     font-style: normal;
     font-size: 2em;
-    line-height: 1.1em;
 }
 
 h3 {
     padding-top: 1px;
     font-weight: normal;
     font-size: 1.6em;
-    line-height: 1.1em;
     margin: 20px 0;
 }
 
@@ -243,7 +240,6 @@ h4 {
     color: #404040;
     left: 0;
     font-size: 1.4em;
-    line-height: 1.1em;
 }
 
 h5 {
@@ -251,12 +247,12 @@ h5 {
     color: #404040;
     font-style: normal;
     font-size: 1.3em;
-    line-height: 1.1em;
 }
 
 h1, h2, h3, h4, h5{
     display:block;
     position:relative;
+    line-height: 1.2em;
 }
 #xwikicontent h1, #xwikicontent h2, #xwikicontent h3, #xwikicontent h4, #xwikicontent h5 {
   overflow: hidden;

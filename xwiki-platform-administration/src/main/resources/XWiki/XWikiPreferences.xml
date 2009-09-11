@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1106311617000</creationDate>
-<date>1214061284000</date>
-<contentUpdateDate>1214061284000</contentUpdateDate>
+<date>1252681723000</date>
+<contentUpdateDate>1252681723000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
@@ -112,6 +112,20 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </backlinks>
+<colorTheme>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>colorTheme</name>
+<number>76</number>
+<prettyName>Color theme</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>1</size>
+<sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate'</sql>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+</colorTheme>
 <comment_anonymous>
 <cache>0</cache>
 <customDisplay></customDisplay>
@@ -1038,7 +1052,7 @@
 <groups>XWiki.XWikiAdminGroup,</groups>
 </property>
 <property>
-<levels>admin,edit,undelete,</levels>
+<levels>admin,edit,undelete</levels>
 </property>
 <property>
 <users></users>
@@ -1117,7 +1131,7 @@
 <groups>XWiki.XWikiAllGroup,</groups>
 </property>
 <property>
-<levels>view,edit,comment,register,undelete,</levels>
+<levels>view,edit,comment,undelete,register</levels>
 </property>
 <property>
 <users></users>
@@ -1196,10 +1210,10 @@
 <groups></groups>
 </property>
 <property>
-<levels>view,register,</levels>
+<levels>view,register</levels>
 </property>
 <property>
-<users>XWiki.XWikiGuest,</users>
+<users>XWiki.XWikiGuest</users>
 </property>
 </object>
 <object>
@@ -1292,6 +1306,20 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
 </backlinks>
+<colorTheme>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>colorTheme</name>
+<number>76</number>
+<prettyName>Color theme</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>1</size>
+<sql>select doc.fullName, doc.title from XWikiDocument as doc, BaseObject as theme where doc.fullName=theme.name and theme.className='ColorThemes.ColorThemeClass' and doc.fullName&lt;&gt;'ColorThemes.ColorThemeTemplate'</sql>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+</colorTheme>
 <comment_anonymous>
 <cache>0</cache>
 <customDisplay></customDisplay>
@@ -2160,6 +2188,9 @@
 </property>
 <property>
 <authenticate_view>0</authenticate_view>
+</property>
+<property>
+<colorTheme>ColorThemes.DefaultColorTheme</colorTheme>
 </property>
 <property>
 <comment_anonymous>---</comment_anonymous>

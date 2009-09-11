@@ -244,14 +244,18 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     public Object getProperty(String documentName, String className, String propertyName)
     {
+        Object value;
+        
         try {
             XWikiContext xcontext = getContext();
-
-            return ((BaseProperty) xcontext.getWiki().getDocument(documentName, xcontext).getObject(className).get(
-                propertyName)).getValue();
+            XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
+            BaseObject object = doc.getObject(className);
+            BaseProperty property = (BaseProperty) object.get(propertyName);
+            value = property.getValue();
         } catch (Exception ex) {
-            return null;
+            value = null;
         }
+        return value;
     }
 
     /**

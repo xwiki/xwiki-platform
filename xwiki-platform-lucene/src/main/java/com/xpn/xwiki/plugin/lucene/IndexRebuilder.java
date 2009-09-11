@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -182,7 +183,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      * @return total number of documents and attachments successfully added to the indexer queue, -1
      *         when errors occured.
      */
-    private int rebuildIndex(XWikiContext context)
+    private int rebuildIndex(XWikiContext context) throws IOException
     {
         this.indexUpdater.cleanIndex();
         int retval = 0;

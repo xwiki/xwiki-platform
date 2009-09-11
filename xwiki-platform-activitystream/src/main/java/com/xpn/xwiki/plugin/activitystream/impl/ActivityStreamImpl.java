@@ -855,36 +855,40 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     {
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
-        XWikiDocument doc = currentDoc != null ? currentDoc : originalDoc;        
         XWikiContext context = (XWikiContext) data;
         String wiki = context.getDatabase();
-        List<String> params = new ArrayList<String>();
-        params.add(0, doc.getDisplayTitle(context));
         String msgPrefix = "activitystream.event.";
-        String streamName = getStreamName(doc.getSpace(), context);
+        String streamName = getStreamName(currentDoc.getSpace(), context);
         
         // If we haven't found a stream to store the event or if both currentDoc and originalDoc are null: exit
-        if (streamName == null || doc == null) {
+        if (streamName == null) {
             return;
         }
         
         // Take events into account only once in a cluster  
         if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
-            String eventType = "";
+            String eventType;
+            String displayTitle;
             
             if (event instanceof DocumentSaveEvent) {
                 eventType = ActivityEventType.CREATE;
+                displayTitle = currentDoc.getDisplayTitle(context);
             } else if (event instanceof DocumentUpdateEvent) {
                 eventType = ActivityEventType.UPDATE;
-            } else if (event instanceof DocumentDeleteEvent) {
+                displayTitle = originalDoc.getDisplayTitle(context);
+            } else { // event instanceof DocumentDeleteEvent
                 eventType = ActivityEventType.DELETE;
+                displayTitle = originalDoc.getDisplayTitle(context);
             }
             
+            List<String> params = new ArrayList<String>();
+            params.add(displayTitle);
+            
             try {
-                addDocumentActivityEvent(streamName, doc, eventType, msgPrefix + eventType, params, context);
+                addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
                 Log.error("Exception while trying to add a document activity event, updated document: [" 
-                    + wiki + ":" + doc.getFullName() + "]");                
+                    + wiki + ":" + currentDoc.getFullName() + "]");                
             }
         }
     }

@@ -19,11 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.cleaner;
 
+import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.xml.html.HTMLCleaner;
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.test.AbstractComponentTestCase;
-import org.jmock.Mockery;
 
 /**
  * Abstract class for all HTML cleaner tests.
@@ -31,7 +28,7 @@ import org.jmock.Mockery;
  * @version $Id$
  * @since 1.8M2
  */
-public class AbstractHTMLCleaningTest extends AbstractComponentTestCase
+public class AbstractHTMLCleaningTest extends AbstractOfficeImporterTest
 {
     /**
      * Beginning of the test html document.
@@ -53,24 +50,13 @@ public class AbstractHTMLCleaningTest extends AbstractComponentTestCase
      */
     protected HTMLCleaner wysiwygHTMLCleaner;
 
-    protected Mockery context = new Mockery();
-
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected void registerComponents() throws Exception
+    public void setUp() throws Exception
     {
-        super.registerComponents();
-        
-        // Document Access Bridge Mock
-        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
-        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
-            new DefaultComponentDescriptor<DocumentAccessBridge>();
-        descriptorDAB.setRole(DocumentAccessBridge.class);
-        getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
-
+        super.setUp();        
         this.openOfficeHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "openoffice");
         this.wysiwygHTMLCleaner = getComponentManager().lookup(HTMLCleaner.class, "wysiwyg");
-    }
+    }        
 }

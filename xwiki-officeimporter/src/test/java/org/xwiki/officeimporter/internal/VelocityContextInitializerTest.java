@@ -20,11 +20,10 @@
 package org.xwiki.officeimporter.internal;
 
 import org.apache.velocity.VelocityContext;
-import org.xwiki.velocity.VelocityContextFactory;
-import org.xwiki.velocity.VelocityContextInitializer;
-import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.velocity.VelocityContextFactory;
+import org.xwiki.velocity.VelocityContextInitializer;
 
 /**
  * Test class for various {@link VelocityContextInitializer} implementations.
@@ -32,7 +31,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.9RC2
  */
-public class VelocityContextInitializerTest extends AbstractHTMLCleaningTest
+public class VelocityContextInitializerTest extends AbstractOfficeImporterTest
 {
     /**
      * Test the presence of velocity bridges.

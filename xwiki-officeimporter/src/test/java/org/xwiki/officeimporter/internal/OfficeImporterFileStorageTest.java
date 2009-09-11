@@ -19,7 +19,8 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
+import java.io.File;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,16 +30,18 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.9M1
  */
-public class OfficeImporterFileStorageTest extends AbstractHTMLCleaningTest
+public class OfficeImporterFileStorageTest extends AbstractOfficeImporterTest
 {
     /**
      * Test filtering of invalid file name characters.
      */
     @Test
-    public void testInvalidFileNameCharacterFiltering() throws RuntimeException
-    {
-        OfficeImporterFileStorage storage = new OfficeImporterFileStorage("Temp/\\:*?\"<>|Dir");
-        Assert.assertEquals("Temp---------Dir", storage.getTempDir().getName());
+    public void testInvalidFileNameCharacterFiltering() throws Exception
+    {        
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        tempDir.mkdir();
+        OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, "temp/\\:*?\"<>|dir");
+        Assert.assertEquals("xwiki-officeimporter-temp---------dir", storage.getInputFile().getParentFile().getName());        
         storage.cleanUp();
     }
 }

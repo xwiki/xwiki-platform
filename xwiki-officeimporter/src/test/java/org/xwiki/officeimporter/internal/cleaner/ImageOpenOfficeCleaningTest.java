@@ -22,16 +22,16 @@ package org.xwiki.officeimporter.internal.cleaner;
 import java.io.StringReader;
 import java.util.Collections;
 
+import org.jmock.Expectations;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.Before;
-import org.jmock.Expectations;
+import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
 /**
  * Test case for cleaning html images in {@link OpenOfficeHTMLCleaner}.
@@ -41,16 +41,22 @@ import org.jmock.Expectations;
  */
 public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
+    /**
+     * {@inheritDoc}
+     */
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
         final DocumentAccessBridge mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);
-        context.checking(new Expectations() {{
-            allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
+        context.checking(new Expectations()
+        {
+            {
+                allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
                 will(returnValue("/bridge/foo.png"));
-        }});
+            }
+        });
     }
 
     /**

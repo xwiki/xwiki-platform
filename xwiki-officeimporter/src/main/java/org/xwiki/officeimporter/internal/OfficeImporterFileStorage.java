@@ -21,8 +21,10 @@ package org.xwiki.officeimporter.internal;
 
 import java.io.File;
 
+import org.xwiki.officeimporter.OfficeImporterException;
+
 /**
- * Keeps track of file system storage for office importer.
+ * Keeps track of file system storage used by office importer for a particular conversion.
  * 
  * @version $Id$
  * @since 1.8M2
@@ -32,7 +34,7 @@ public class OfficeImporterFileStorage
     /**
      * Top-level temporary working directory.
      */
-    private File tempDir;
+    private File storageDir = null;
 
     /**
      * Storage for input document.
@@ -56,40 +58,28 @@ public class OfficeImporterFileStorage
     public static final String INVALID_FILE_NAME_CHARS = "[/\\\\:\\*\\?\"<>|]";
 
     /**
-     * Default constructor.
+     * Creates a new {@link OfficeImporterFileStorage} instance.
      * 
-     * @param tempDirName name of the temporary files directory.
+     * @param tempDir temporary directory to be used.
+     * @param uid unique id to be appended when creating the storage directory (to avoid conflicts).
+     * @throws OfficeImporterException if an error occurs while creating temporary directories.
      */
-    public OfficeImporterFileStorage(String tempDirName)
+    public OfficeImporterFileStorage(File tempDir, String uid) throws OfficeImporterException
     {
-        tempDir = new File(System.getProperty("java.io.tmpdir"), tempDirName.replaceAll(INVALID_FILE_NAME_CHARS, "-"));
-        tempDir.mkdir();
-        inputFile = new File(tempDir, "input.tmp");
-        outputDir = new File(tempDir, "output");
-        outputDir.mkdir();
-        outputFile = new File(outputDir, "output.html");
-    }
-
-    /**
-     * Cleans up the allocated file storage.
-     */
-    public void cleanUp()
-    {
-        File[] outputFiles = outputDir.listFiles();
-        for (File file : outputFiles) {
-            file.delete();
+        String storageDirName = "xwiki-officeimporter-" + uid.replaceAll(INVALID_FILE_NAME_CHARS, "-");
+        storageDir = new File(tempDir, storageDirName);
+        boolean success = false;
+        if (storageDir.mkdir()) {
+            inputFile = new File(storageDir, "input.tmp");
+            outputDir = new File(storageDir, "output");
+            if (outputDir.mkdir()) {
+                outputFile = new File(outputDir, "output.html");
+                success = true;
+            }
         }
-        outputDir.delete();
-        inputFile.delete();
-        tempDir.delete();
-    }
-
-    /**
-     * @return the top level temporary directory.
-     */
-    public File getTempDir()
-    {
-        return tempDir;
+        if (!success) {
+            throw new OfficeImporterException("Error while creating temporary files.");
+        }
     }
 
     /**
@@ -114,5 +104,19 @@ public class OfficeImporterFileStorage
     public File getOutputFile()
     {
         return outputFile;
+    }
+    
+    /**
+     * Cleans up the allocated file storage.
+     */
+    public void cleanUp()
+    {
+        File[] outputFiles = outputDir.listFiles();
+        for (File file : outputFiles) {
+            file.delete();
+        }
+        outputDir.delete();
+        inputFile.delete();
+        storageDir.delete();
     }
 }

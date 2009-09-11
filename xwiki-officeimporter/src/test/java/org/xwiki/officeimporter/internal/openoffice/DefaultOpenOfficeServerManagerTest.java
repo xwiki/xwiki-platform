@@ -19,11 +19,11 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 
 /**
  * Test case for {@link DefaultOpenOfficeManager}.
@@ -31,7 +31,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeServerManagerTest extends AbstractHTMLCleaningTest
+public class DefaultOpenOfficeServerManagerTest extends AbstractOfficeImporterTest
 {
     /**
      * Tests the initial status of the oo server manager.

@@ -1,4 +1,7 @@
 org.xwiki.officeimporter.internal.DefaultOfficeImporter
+org.xwiki.officeimporter.internal.builder.DefaultXHTMLOfficeDocumentBuilder
+org.xwiki.officeimporter.internal.builder.DefaultXDOMOfficeDocumentBuilder
+org.xwiki.officeimporter.internal.builder.DefaultPresentationBuilder
 org.xwiki.officeimporter.internal.OfficeImporterVelocityContextInitializer
 org.xwiki.officeimporter.internal.filter.AnchorFilter
 org.xwiki.officeimporter.internal.filter.ImageFilter

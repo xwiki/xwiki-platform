@@ -19,10 +19,10 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import org.xwiki.officeimporter.internal.cleaner.AbstractHTMLCleaningTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 
 /**
  * Test case for {@link DefaultOpenOfficeConfiguration}.
@@ -30,7 +30,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOpenOfficeConfigurationTest extends AbstractHTMLCleaningTest
+public class DefaultOpenOfficeConfigurationTest extends AbstractOfficeImporterTest
 {
     /**
      * Test if default configuration values are present.

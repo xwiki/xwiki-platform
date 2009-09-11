@@ -42,8 +42,20 @@ public interface OpenOfficeDocumentConverter
      * 
      * @param in the {@link InputStream} of the office document.
      * @param storage temporary disk storage to hold the resulting artifacts.
-     * @return
+     * @return map of file names to file streams resulting from the conversion.
      */
+    @Deprecated
     public Map<String, InputStream> convert(InputStream in, OfficeImporterFileStorage storage)
         throws OfficeImporterException;
+
+    /**
+     * Converts the input office document into html. This conversion results in multiple files on disk including
+     * output.html which holds the html equivalent of the office document. Non textual data present in the document will
+     * be converted into images. This method returns a byte[] for each resulting output file.
+     * 
+     * @param officeFileData binary data of the office document.
+     * @return map of file names to file contents resulting from the conversion.
+     * @since 2.1M1
+     */
+    public Map<String, byte[]> convert(byte[] officeFileData) throws OfficeImporterException;
 }

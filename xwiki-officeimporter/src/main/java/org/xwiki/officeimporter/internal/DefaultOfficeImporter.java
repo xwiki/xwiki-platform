@@ -23,6 +23,7 @@ import groovy.lang.GroovyClassLoader;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -41,6 +42,7 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.container.Container;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterFilter;
@@ -138,14 +140,20 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     private DocumentSplitter documentSplitter;
 
     /**
+     * Used for querying temporary directory information.
+     */
+    @Requirement
+    private Container container;
+
+    /**
      * {@inheritDoc}
      */
     public void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
         Map<String, String> params) throws OfficeImporterException
     {
         params.put("targetDocument", targetWikiDocument);
-        OfficeImporterFileStorage storage =
-            new OfficeImporterFileStorage("xwiki-office-importer-" + docBridge.getCurrentUser());
+        File tempDir = container.getApplicationContext().getTemporaryDirectory();
+        OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, docBridge.getCurrentUser());
         OfficeImporterFilter importerFilter = getImporterFilter(params);
         try {
             Map<String, InputStream> artifacts = ooConverter.convert(documentStream, storage);
@@ -185,8 +193,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         throws OfficeImporterException
     {
         params.put("targetDocument", documentName);
-        OfficeImporterFileStorage storage =
-            new OfficeImporterFileStorage("xwiki-office-importer-" + docBridge.getCurrentUser());
+        File tempDir = container.getApplicationContext().getTemporaryDirectory();
+        OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, docBridge.getCurrentUser());
         try {
             ByteArrayInputStream bis =
                 new ByteArrayInputStream(docBridge.getAttachmentContent(documentName, attachmentName));

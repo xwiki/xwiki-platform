@@ -192,11 +192,9 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         XWikiContext xcontext = getContext();
 
         if (doc.isNew()) {
-            doc.setCreator("System");
             doc.setParent("XWiki.WebHome");
         }
         
-        doc.setAuthor("System");
         xcontext.getWiki().saveDocument(doc, xcontext);
     }
 }

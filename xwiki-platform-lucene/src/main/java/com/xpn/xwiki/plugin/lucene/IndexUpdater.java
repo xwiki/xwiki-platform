@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.io.IOExceptionWithCause;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -338,7 +339,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         return retval;
     }
 
-    private void openWriter(boolean create)
+    private void openWriter(boolean create) throws IOException
     {
         if (writer != null) {
             LOG.error("Writer already open and createWriter called");
@@ -356,7 +357,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 LOG.debug("successfully opened index writer : " + indexDir);
             }
         } catch (IOException e) {
-            LOG.error("IOException when opening Lucene Index for writing at " + indexDir, e);
+        	throw new IOExceptionWithCause("Error opening Lucene Index for writing at " + indexDir, e);
         }
     }
 
@@ -457,7 +458,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         // openSearcher()) as each task needing it will open it itself.
     }
     
-    public void cleanIndex()
+    public void cleanIndex() throws IOException
     {
         if (LOG.isInfoEnabled()) {
             LOG.info("trying to clear index for rebuilding");

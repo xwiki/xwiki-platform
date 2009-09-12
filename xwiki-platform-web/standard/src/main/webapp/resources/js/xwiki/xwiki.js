@@ -354,7 +354,7 @@ Object.extend(XWiki, {
   },
   
   /**
-   * Insert a link to section edit into level 1 and 2 headings.
+   * Insert a link for editing sections.
    */
   insertSectionEditLinks: function() {
       // Insert links only in view mode and for xwiki/2.0 documents.
@@ -370,12 +370,15 @@ Object.extend(XWiki, {
           }
           nodes = nodes.childNodes;
 
+          // Only allow section editing for the specified depth level (2 by default)              
+          var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
+
           // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
           for (var i = 0; i < nodes.length; i++) {
-              var node = $(nodes[i]);
 
-              if ((node.nodeName == "H1" || node.nodeName == "H2") 
-                      && node.className.include("wikigeneratedheader") == false) {
+              var node = $(nodes[i]);
+              
+              if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");
                   var editlink = document.createElement("A");
 

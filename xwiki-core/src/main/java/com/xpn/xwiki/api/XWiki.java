@@ -2722,4 +2722,13 @@ public class XWiki extends Api
 
         return syntax;
     }
+    
+    /**
+     * @return the section depth for which section editing is available (can be configured through 
+     *         {@code xwiki.section.depth} configuration property. Defaults to 2 when not defined
+     */
+    public long getSectionEditingDepth()
+    {
+        return this.xwiki.getSectionEditingDepth();
+    }
 }

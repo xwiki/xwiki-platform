@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.internal;
 
+import org.apache.axis.utils.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.configuration.ConfigurationSource;
@@ -51,10 +52,27 @@ public class DefaultCoreConfiguration implements CoreConfiguration
     private ConfigurationSource configuration;
 
     /**
+     * Main XWiki Properties configuration source, see {@link #getDefaultDocumentSyntax()}. 
+     */
+    @Requirement("xwikiproperties")
+    private ConfigurationSource xwikiPropertiesConfiguration;
+
+    /**
      * @see CoreConfiguration#getDefaultDocumentSyntax()
      */
     public String getDefaultDocumentSyntax()
     {
-        return this.configuration.getProperty(PREFIX + "defaultDocumentSyntax", DEFAULT_DEFAULT_DOCUMENT_SYNTAX);
+        // If the found value is an empty string then default to the configuration value in the main configuration
+        // source.
+        // TODO: In the future we would need the notion of initialized/not-initialized property values in the wiki.
+        // When this is implemented modify the code below.
+        String key = PREFIX + "defaultDocumentSyntax";
+        String value = this.configuration.getProperty(key, String.class); 
+        
+        if (StringUtils.isEmpty(value)) {
+            value = this.xwikiPropertiesConfiguration.getProperty(key, DEFAULT_DEFAULT_DOCUMENT_SYNTAX);
+        }
+            
+        return value; 
     }
 }

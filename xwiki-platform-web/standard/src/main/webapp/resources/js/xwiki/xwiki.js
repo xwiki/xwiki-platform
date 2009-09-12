@@ -370,14 +370,14 @@ Object.extend(XWiki, {
           }
           nodes = nodes.childNodes;
 
+          // Only allow section editing for the specified depth level (2 by default)              
+          var allowedSectionDepth = $xwiki.getWebPreferenceAsInt("xwiki.section.depth", 2);
+          var headerPattern = new RegExp("H[1-" + allowedSectionDepth + "]");
+
           // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
           for (var i = 0; i < nodes.length; i++) {
 
               var node = $(nodes[i]);
-
-              // Only allow section editing for the specified depth level (2 by default)              
-              var allowedSectionDepth = $xwiki.getWebPreferenceAsInt("xwiki.section.depth", 2);
-              var headerPattern = new RegExp("H[1-" + allowedSectionDepth + "]");
               
               if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");

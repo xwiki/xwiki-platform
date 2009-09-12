@@ -28,8 +28,12 @@ xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 #-# since we want to be independend of the underlying system.
 xwiki.encoding=$xwikiCfgEncoding
 
-#-# This parameter will activate the sectional editing
+#-# This parameter will activate the sectional editing.
 xwiki.section.edit=1
+
+#-# This parameter controls the depth of sections that have section editing.
+#-# By default level 1 and level 2 sections have section editing.
+xwiki.section.depth=2
 
 #-# Enable backlinks storage, which increases the update time, but allows to keep track of inter document links.
 xwiki.backlinks=1

@@ -371,8 +371,7 @@ Object.extend(XWiki, {
           nodes = nodes.childNodes;
 
           // Only allow section editing for the specified depth level (2 by default)              
-          var allowedSectionDepth = $xwiki.getWebPreferenceAsInt("xwiki.section.depth", 2);
-          var headerPattern = new RegExp("H[1-" + allowedSectionDepth + "]");
+          var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
 
           // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
           for (var i = 0; i < nodes.length; i++) {

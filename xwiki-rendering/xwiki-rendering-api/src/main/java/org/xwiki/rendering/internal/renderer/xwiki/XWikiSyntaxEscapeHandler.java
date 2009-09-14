@@ -43,6 +43,8 @@ public class XWikiSyntaxEscapeHandler
     private static final Pattern LIST_PATTERN =
         Pattern.compile("\\p{Blank}*((\\*+[:;]*)|([1*]+\\.[:;]*)|([:;]+))\\p{Blank}+");
 
+    private static final Pattern QUOTE_PATTERN = Pattern.compile("(\\>+)");
+
     private static final Pattern HEADER_PATTERN = Pattern.compile("\\p{Blank}*(=+)");
 
     private static final Pattern TABLE_PATTERN = Pattern.compile("\\p{Blank}*(\\||!!)");
@@ -77,6 +79,9 @@ public class XWikiSyntaxEscapeHandler
 
             // Look for table character patterns at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(TABLE_PATTERN, accumulatedBuffer);
+
+            // Look for quote pattern at beginning of line and escape the first character only (it's enough)
+            escapeFirstMatchedCharacter(QUOTE_PATTERN, accumulatedBuffer);
         }
 
         // Escape table characters
@@ -136,7 +141,7 @@ public class XWikiSyntaxEscapeHandler
 
         // Escape begin link
         replaceAll(accumulatedBuffer, "[[", ESCAPE_CHAR + "[" + ESCAPE_CHAR + "[");
-        
+
         // Escape link label
         int linkLevel = getLinkLevel(listenerChain);
 

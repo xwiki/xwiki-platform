@@ -269,6 +269,17 @@
               <exclude>**/usersandgroups.js</exclude>
             </excludes>
           </configuration>
+          <dependencies>
+            <!-- The yuicompressor plugins requires a dep on plexus utils but doesn't have it declared
+                 in its pom.xml so we need to add it since starting with Maven 3.x doesn't have the hack
+                 that there is in Maven 2.x which automatically adds a dep on plexus-utils 1.1 if it's 
+                 not declared. -->
+            <dependency>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-utils</artifactId>
+              <version>1.1</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>

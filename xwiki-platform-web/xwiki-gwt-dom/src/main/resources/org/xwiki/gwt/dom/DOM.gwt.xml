@@ -22,9 +22,10 @@
 <module>
   <inherits name='com.google.gwt.dom.DOM'/>
 
-  <define-property name="old.user.agent" values="yes,no"/>
+  <!-- This property is required because the "gecko1_8" value of the user.agent property matches also Gecko1.9+ -->
+  <define-property name="gecko1_9" values="yes,no"/>
 
-  <property-provider name="old.user.agent"><![CDATA[
+  <property-provider name="gecko1_9"><![CDATA[
     var ua = navigator.userAgent.toLowerCase();
     var makeVersion = function(result) {
       return (parseInt(result[1]) * 1000) + parseInt(result[2]);
@@ -33,11 +34,11 @@
       var result = /rv:([0-9]+)\.([0-9]+)/.exec(ua);
       if (result && result.length == 3) {
         if (makeVersion(result) >= 1009) {
-          return "no";
+          return "yes";
         }
       }
     }
-    return "yes";
+    return "no";
   ]]></property-provider>
 
   <!-- SelectionManager -->
@@ -47,16 +48,21 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaSelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
-    <when-property-is name="old.user.agent" value="yes"/>
     <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
       <when-property-is name="user.agent" value="gecko"/>
+      <all>
+        <when-property-is name="user.agent" value="gecko1_8"/>
+        <when-property-is name="gecko1_9" value="no"/>
+      </all>
     </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IESelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
-    <when-property-is name="user.agent" value="ie6"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
   </replace-with>
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.opera.OperaSelectionManager">
@@ -71,6 +77,9 @@
 
   <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IEDOMUtils">
     <when-type-is class="org.xwiki.gwt.dom.client.DOMUtils"/>
-    <when-property-is name="user.agent" value="ie6"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
   </replace-with>
 </module>

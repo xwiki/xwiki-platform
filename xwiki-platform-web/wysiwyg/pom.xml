@@ -51,8 +51,8 @@
     <!-- GWT libraries -->
     <dependency>
       <groupId>com.google.gwt</groupId>
-      <artifactId>incubator-glasspanel</artifactId>
-      <version>r729</version>
+      <artifactId>gwt-incubator</artifactId>
+      <version>july-14-2009</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

@@ -25,15 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -165,7 +159,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
     public static final String FIELD_CONTRIBUTORS = "contributors";
 
-    public static final Map DEFAULT_PARAMS;
+    public static final Map<String, Object> DEFAULT_PARAMS;
 
     static {
         // general configuration
@@ -191,7 +185,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         TIDY_HTML_CONFIG.setProperty("logical-emphasis", "yes");
 
         // default parameters for all instances of this class
-        DEFAULT_PARAMS = new HashMap();
+        DEFAULT_PARAMS = new HashMap<String, Object>();
         DEFAULT_PARAMS.put(CONTENT_TYPE, "text/html");
         DEFAULT_PARAMS.put(CONTENT_LENGTH, new Integer(-1)); // no limit by default
     }
@@ -201,11 +195,11 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * parameters are overwritten by those used when calling
      * {@link SyndEntrySource#source(SyndEntry, Object, Map, XWikiContext)} method
      */
-    private Map params;
+    private Map<String, Object> params;
 
     public SyndEntryDocumentSource()
     {
-        this(Collections.EMPTY_MAP);
+        this(new HashMap<String, Object>());
     }
 
     /**
@@ -213,7 +207,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * 
      * @param params parameters only for this instance
      */
-    public SyndEntryDocumentSource(Map params)
+    public SyndEntryDocumentSource(Map<String, Object> params)
     {
         setParams(params);
     }
@@ -221,7 +215,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     /**
      * @return instance parameters
      */
-    public Map getParams()
+    public Map<String, Object> getParams()
     {
         return params;
     }
@@ -231,7 +225,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * 
      * @param params instance parameters
      */
-    public void setParams(Map params)
+    public void setParams(Map<String, Object> params)
     {
         this.params = joinParams(params, getDefaultParams());
     }
@@ -239,7 +233,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     /**
      * Strategy class parameters
      */
-    protected Map getDefaultParams()
+    protected Map<String, Object> getDefaultParams()
     {
         return DEFAULT_PARAMS;
     }
@@ -249,7 +243,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * 
      * @see SyndEntrySource#source(SyndEntry, Object, Map, XWikiContext)
      */
-    public void source(SyndEntry entry, Object obj, Map params, XWikiContext context) throws XWikiException
+    public void source(SyndEntry entry, Object obj, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         // cast source
         Document doc = castDocument(obj, context);
@@ -261,7 +256,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
 
         // prepare parameters (overwrite instance parameters)
-        Map trueParams = joinParams(params, getParams());
+        Map<String, Object> trueParams = joinParams(params, getParams());
 
         sourceDocument(entry, doc, trueParams, context);
     }
@@ -275,7 +270,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * @param context the XWiki context
      * @throws XWikiException
      */
-    public void sourceDocument(SyndEntry entry, Document doc, Map params, XWikiContext context) throws XWikiException
+    public void sourceDocument(SyndEntry entry, Document doc, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         entry.setUri(getURI(doc, params, context));
         entry.setLink(getLink(doc, params, context));
@@ -288,12 +284,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         entry.setContributors(getContributors(doc, params, context));
     }
 
-    protected String getDefaultURI(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected String getDefaultURI(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         return doc.getExternalURL("view", "language=" + doc.getRealLanguage());
     }
 
-    protected String getURI(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected String getURI(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         String mapping = (String) params.get(FIELD_URI);
         if (mapping == null) {
@@ -305,12 +301,13 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected String getDefaultLink(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected String getDefaultLink(Document doc, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         return getDefaultURI(doc, params, context);
     }
 
-    protected String getLink(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected String getLink(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         String mapping = (String) params.get(FIELD_LINK);
         if (mapping == null) {
@@ -322,12 +319,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected String getDefaultTitle(Document doc, Map params, XWikiContext context)
+    protected String getDefaultTitle(Document doc, Map<String, Object> params, XWikiContext context)
     {
         return doc.getDisplayTitle();
     }
 
-    protected String getTitle(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected String getTitle(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         String mapping = (String) params.get(FIELD_TITLE);
         if (mapping == null) {
@@ -339,7 +336,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected String getDefaultDescription(Document doc, Map params, XWikiContext context)
+    protected String getDefaultDescription(Document doc, Map<String, Object> params, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
         String author = xwiki.getUserName(doc.getAuthor(), null, false, context);
@@ -348,7 +345,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return String.format(descFormat, new Object[] {doc.getVersion(), author, doc.getDate()});
     }
 
-    protected SyndContent getDescription(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected SyndContent getDescription(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         String description;
         String mapping = (String) params.get(FIELD_DESCRIPTION);
@@ -373,26 +370,30 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return getSyndContent(contentType, description);
     }
 
-    protected List getDefaultCategories(Document doc, Map params, XWikiContext context)
+    protected List<SyndCategory> getDefaultCategories(Document doc, Map<String, Object> params, XWikiContext context)
     {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
-    protected List getCategories(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected List<SyndCategory> getCategories(Document doc, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         String mapping = (String) params.get(FIELD_CATEGORIES);
-        List categories = null;
         if (mapping == null) {
-            categories = getDefaultCategories(doc, params, context);
-        } else if (isVelocityCode(mapping)) {
+            return getDefaultCategories(doc, params, context);
+        }
+        
+        List<Object> categories;
+        if (isVelocityCode(mapping)) {            
             categories = parseList(mapping, doc, context);
         } else {
             categories = getListValue(mapping, doc, context);
         }
-        List result = new ArrayList();
+        
+        List<SyndCategory> result = new ArrayList<SyndCategory>();
         for(Object category: categories) {
             if(category instanceof SyndCategory) {
-                result.add(category);
+                result.add((SyndCategory) category);
             } else if(category != null) {
                 SyndCategory scat = new SyndCategoryImpl();
                 scat.setName(category.toString());
@@ -402,12 +403,13 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return result;
     }
 
-    protected Date getDefaultPublishedDate(Document doc, Map params, XWikiContext context)
+    protected Date getDefaultPublishedDate(Document doc, Map<String, Object> params, XWikiContext context)
     {
         return doc.getCreationDate();
     }
 
-    protected Date getPublishedDate(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected Date getPublishedDate(Document doc, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         String mapping = (String) params.get(FIELD_PUBLISHED_DATE);
         if (mapping == null) {
@@ -419,12 +421,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected Date getDefaultUpdateDate(Document doc, Map params, XWikiContext context)
+    protected Date getDefaultUpdateDate(Document doc, Map<String, Object> params, XWikiContext context)
     {
         return doc.getDate();
     }
 
-    protected Date getUpdateDate(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected Date getUpdateDate(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         String mapping = (String) params.get(FIELD_UPDATED_DATE);
         if (mapping == null) {
@@ -436,12 +438,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected String getDefaultAuthor(Document doc, Map params, XWikiContext context)
+    protected String getDefaultAuthor(Document doc, Map<String, Object> params, XWikiContext context)
     {
         return context.getWiki().getUserName(doc.getCreator(), null, false, context);
     }
 
-    protected String getAuthor(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected String getAuthor(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
     {
         String mapping = (String) params.get(FIELD_AUTHOR);
         if (mapping == null) {
@@ -453,24 +455,39 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected List getDefaultContributors(Document doc, Map params, XWikiContext context)
+    protected List<String> getDefaultContributors(Document doc, Map<String, Object> params, XWikiContext context)
     {
         XWiki xwiki = context.getWiki();
-        List contributors = new ArrayList();
+        List<String> contributors = new ArrayList<String>();
         contributors.add(xwiki.getUserName(doc.getAuthor(), null, false, context));
         return contributors;
     }
 
-    protected List getContributors(Document doc, Map params, XWikiContext context) throws XWikiException
+    protected List<String> getContributors(Document doc, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         String mapping = (String) params.get(FIELD_CONTRIBUTORS);
         if (mapping == null) {
             return getDefaultContributors(doc, params, context);
-        } else if (isVelocityCode(mapping)) {
-            return parseList(mapping, doc, context);
-        } else {
-            return getListValue(mapping, doc, context);
         }
+        
+        List<Object> rawContributors;         
+        if (isVelocityCode(mapping)) {
+            rawContributors = parseList(mapping, doc, context);
+        } else {
+            rawContributors = getListValue(mapping, doc, context);
+        }
+        
+        List<String> contributors = new ArrayList<String>();
+        for (Object rawContributor : rawContributors) {
+            if (rawContributor instanceof String) {
+                contributors.add((String) rawContributor);
+            } else {
+                contributors.add(rawContributor.toString());
+            }
+        }
+        
+        return contributors;
     }
 
     /**
@@ -511,7 +528,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * Converts the given velocity code to a {@link List} instance. The velocity code must be evaluated to a string with
      * the following format: "[item1,item2,...,itemN]".
      */
-    protected List parseList(String mapping, Document doc, XWikiContext context) throws XWikiException
+    protected List<Object> parseList(String mapping, Document doc, XWikiContext context) throws XWikiException
     {
         if (!isVelocityCode(mapping)) {
             return null;
@@ -522,13 +539,13 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
         String[] array = strRep.substring(1, strRep.length() - 1).split(",");
         if (array.length > 0) {
-            List list = new ArrayList();
+            List<Object> list = new ArrayList<Object>();
             for (int i = 0; i < array.length; i++) {
                 list.add(array[i]);
             }
             return list;
         } else {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 
@@ -563,7 +580,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     /**
      * Retrieves the value of a list property.
      */
-    protected List getListValue(String mapping, Document doc, XWikiContext context) throws XWikiException
+    protected List<Object> getListValue(String mapping, Document doc, XWikiContext context) throws XWikiException
     {
         XWikiDocument xdoc = context.getWiki().getDocument(doc.getFullName(), context);
         PropertySelector ps = new PropertySelector(mapping);
@@ -577,13 +594,12 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     /**
      * @return base + (extra - base)
      */
-    protected Map joinParams(Map base, Map extra)
+    protected Map<String, Object> joinParams(Map<String, Object> base, Map<String, Object> extra)
     {
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<String, Object>();
         params.putAll(base);
-        Iterator it = extra.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
+        
+        for (Map.Entry<String, Object> entry : extra.entrySet()) {
             if (params.get(entry.getKey()) == null) {
                 params.put(entry.getKey(), entry.getValue());
             }

@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.plugin.feed;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -51,7 +51,7 @@ public class SyndEntrySourceApi extends Api
     /**
      * @see SyndEntrySource#source(SyndEntry, Object, java.util.Map, XWikiContext)
      */
-    public boolean source(SyndEntry entry, Object obj, Map params)
+    public boolean source(SyndEntry entry, Object obj, Map<String, Object> params)
     {
         getXWikiContext().remove(SYND_ENTRY_SOURCE_EXCEPTION);
         try {
@@ -68,13 +68,13 @@ public class SyndEntrySourceApi extends Api
      */
     public boolean source(SyndEntry entry, Object obj)
     {
-        return this.source(entry, obj, Collections.EMPTY_MAP);
+        return this.source(entry, obj, new HashMap<String, Object>());
     }
 
     /**
      * @see SyndEntrySource#source(SyndEntry, Object, java.util.Map, XWikiContext)
      */
-    public SyndEntry source(Object obj, Map params)
+    public SyndEntry source(Object obj, Map<String, Object> params)
     {
         getXWikiContext().remove(SYND_ENTRY_SOURCE_EXCEPTION);
         try {
@@ -92,6 +92,6 @@ public class SyndEntrySourceApi extends Api
      */
     public SyndEntry source(Object obj)
     {
-        return this.source(obj, Collections.EMPTY_MAP);
+        return this.source(obj, new HashMap<String, Object>());
     }
 }

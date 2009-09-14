@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -67,13 +66,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
     private Map<String, UpdateThread> updateThreads = new HashMap<String, UpdateThread>();
 
-    public static class SyndEntryComparator implements Comparator
+    public static class SyndEntryComparator implements Comparator<SyndEntry>
     {
-        public int compare(Object element1, Object element2)
+        public int compare(SyndEntry entry1, SyndEntry entry2)
         {
-            SyndEntry entry1 = (SyndEntry) element1;
-            SyndEntry entry2 = (SyndEntry) element2;
-
             if ((entry1.getPublishedDate() == null) && (entry2.getPublishedDate() == null)) {
                 return 0;
             }
@@ -88,24 +84,24 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         }
     }
 
-    public static class EntriesComparator implements Comparator
+    public static class EntriesComparator implements Comparator<com.xpn.xwiki.api.Object>
     {
-        public int compare(Object element1, Object element2)
+        public int compare(com.xpn.xwiki.api.Object entry1, com.xpn.xwiki.api.Object entry2)
         {
-            BaseObject entry1 = ((com.xpn.xwiki.api.Object) element1).getXWikiObject();
-            BaseObject entry2 = ((com.xpn.xwiki.api.Object) element2).getXWikiObject();
-
-            if ((entry1.getDateValue("date") == null) && (entry2.getDateValue("date") == null)) {
+            BaseObject bobj1 = entry1.getXWikiObject();
+            BaseObject bobj2 = entry1.getXWikiObject();
+            
+            if ((bobj1.getDateValue("date") == null) && (bobj2.getDateValue("date") == null)) {
                 return 0;
             }
-            if (entry1.getDateValue("date") == null) {
+            if (bobj1.getDateValue("date") == null) {
                 return 1;
             }
-            if (entry2.getDateValue("date") == null) {
+            if (bobj2.getDateValue("date") == null) {
                 return -1;
             }
 
-            return (-entry1.getDateValue("date").compareTo(entry2.getDateValue("date")));
+            return (-bobj1.getDateValue("date").compareTo(bobj2.getDateValue("date")));
         }
     }
 
@@ -218,7 +214,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         } else {
             feeds = sfeeds.split("\\|");
         }
-        List entries = new ArrayList();
+        List<SyndEntry> entries = new ArrayList<SyndEntry>();
         SyndFeed outputFeed = new SyndFeedImpl();
         if (context.getDoc() != null) {
             outputFeed.setTitle(context.getDoc().getFullName());
@@ -228,15 +224,15 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             outputFeed.setTitle("XWiki Feeds");
             outputFeed.setAuthor("XWiki Team");
         }
-        outputFeed.setEntries(entries);
         for (int i = 0; i < feeds.length; i++) {
-            SyndFeed feed = getFeed(feeds[i], ignoreInvalidFeeds, force, context);
+            SyndFeed feed = getFeed(feeds[i], ignoreInvalidFeeds, force, context);            
             if (feed != null) {
                 entries.addAll(feed.getEntries());
             }
         }
         SyndEntryComparator comp = new SyndEntryComparator();
         Collections.sort(entries, comp);
+        outputFeed.setEntries(entries);
 
         return outputFeed;
     }
@@ -337,13 +333,11 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if (objs == null) {
             return 0;
         }
-
-        Iterator<BaseObject> it = objs.iterator();
+        
         int total = 0;
         int nbfeeds = 0;
         int nbfeedsErrors = 0;
-        while (it.hasNext()) {
-            BaseObject obj = it.next();
+        for (BaseObject obj : objs) {
             if (obj != null) {
                 String feedurl = obj.getStringValue("url");
                 String feedname = obj.getStringValue("name");
@@ -765,17 +759,15 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             for (int i = 0; i < queryTab.length; i++) {
                 sql += " and (prop.value LIKE '%" + queryTab[i] + "%' or lprop.value LIKE '%" + queryTab[i] + "%')";
             }
-            List res = context.getWiki().search(sql, context);
+            List<Object[]> res = context.getWiki().search(sql, context);
 
             if (res == null) {
                 return null;
             }
-
-            Iterator it = res.iterator();
-            List apiObjs = new ArrayList();
-            while (it.hasNext()) {
+            
+            List<com.xpn.xwiki.api.Object> apiObjs = new ArrayList<com.xpn.xwiki.api.Object>();
+            for (Object obj[] : res) {
                 try {
-                    Object obj[] = (Object[]) it.next();
                     XWikiDocument doc = context.getWiki().getDocument((String) obj[1], context);
                     if (context.getWiki().getRightService().checkAccess("view", doc, context)) {
                         BaseObject bObj = doc.getObject("XWiki.FeedEntryClass", ((Integer) obj[0]).intValue());
@@ -783,9 +775,9 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                         apiObjs.add(apiObj);
                     }
                 } catch (Exception e) {
-                    Map map = (Map) context.get("searchFeedError");
+                    Map<String, Exception> map = (Map<String, Exception>) context.get("searchFeedError");
                     if (map == null) {
-                        map = new HashMap();
+                        map = new HashMap<String, Exception>();
                         context.put("searchFeedError", map);
                     }
                     map.put(query, e);
@@ -820,7 +812,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getSyndEntrySource(String, Map)
      */
-    public SyndEntrySource getSyndEntrySource(String className, Map params, XWikiContext context) throws XWikiException
+    public SyndEntrySource getSyndEntrySource(String className, Map<String, Object> params, XWikiContext context) 
+        throws XWikiException
     {
         try {
             Class< ? extends SyndEntrySource> sesc = Class.forName(className).asSubclass(SyndEntrySource.class);
@@ -866,15 +859,15 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getFeed(List, SyndEntrySourceApi, Map)
      */
-    public SyndFeed getFeed(List<String> list, SyndEntrySource source, Map sourceParams, XWikiContext context)
-        throws XWikiException
+    public SyndFeed getFeed(List<Object> list, SyndEntrySource source, Map<String, Object> sourceParams, 
+        XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(context);
         List<SyndEntry> entries = new ArrayList<SyndEntry>();
         for (int i = 0; i < list.size(); i++) {
             SyndEntry entry = getFeedEntry(context);
             try {
-                source.source(entry, list.get(i), sourceParams, context);
+                source.source(entry, list.get(i), sourceParams, context);                
                 entries.add(entry);
             } catch (Throwable t) {
                 // skip this entry
@@ -887,18 +880,19 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getFeed(String, int, int, SyndEntrySourceApi, Map)
      */
-    public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source, Map sourceParams,
-        XWikiContext context) throws XWikiException
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source, 
+        Map<String, Object> sourceParams, XWikiContext context) throws XWikiException
     {
-        List<String> entries = context.getWiki().getStore().searchDocumentsNames(query, count, start, context);
+        List<Object> entries = new ArrayList<Object>(); 
+        entries.addAll(context.getWiki().getStore().searchDocumentsNames(query, count, start, context));
         return getFeed(entries, source, sourceParams, context);
     }
 
     /**
      * @see FeedPluginApi#getFeed(List, SyndEntrySourceApi, Map, Map)
      */
-    public SyndFeed getFeed(List list, SyndEntrySource source, Map sourceParams, Map metadata, XWikiContext context)
-        throws XWikiException
+    public SyndFeed getFeed(List<Object> list, SyndEntrySource source, Map<String, Object> sourceParams, 
+        Map<String, Object> metadata, XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(list, source, sourceParams, context);
         fillFeedMetadata(feed, metadata);
@@ -908,20 +902,21 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      */
-    public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source, Map sourceParams, Map metadata,
-        XWikiContext context) throws XWikiException
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source, 
+        Map<String, Object> sourceParams, Map<String, Object> metadata, XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(query, count, start, source, sourceParams, context);
         fillFeedMetadata(feed, metadata);
         return feed;
     }
 
-    private void fillFeedMetadata(SyndFeed feed, Map metadata)
+    private void fillFeedMetadata(SyndFeed feed, Map<String, Object> metadata)
     {
         feed.setAuthor(String.valueOf(metadata.get("author")));
         feed.setDescription(String.valueOf(metadata.get("description")));
         feed.setCopyright(String.valueOf(metadata.get("copyright")));
         feed.setEncoding(String.valueOf(metadata.get("encoding")));
+        // TODO: rename "url" to "link" for consistency ?
         feed.setLink(String.valueOf(metadata.get("url")));
         feed.setTitle(String.valueOf(metadata.get("title")));
         feed.setLanguage(String.valueOf(metadata.get("language")));
@@ -948,8 +943,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getFeedOutput(List, SyndEntrySourceApi, Map, Map, String)
      */
-    public String getFeedOutput(List list, SyndEntrySource source, Map sourceParams, Map metadata, String type,
-        XWikiContext context) throws XWikiException
+    public String getFeedOutput(List<Object> list, SyndEntrySource source, Map<String, Object> sourceParams, 
+        Map<String, Object> metadata, String type, XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(list, source, sourceParams, metadata, context);
         return getFeedOutput(feed, type, context);
@@ -958,8 +953,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     /**
      * @see FeedPluginApi#getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
      */
-    public String getFeedOutput(String query, int count, int start, SyndEntrySource source, Map sourceParams,
-        Map metadata, String type, XWikiContext context) throws XWikiException
+    public String getFeedOutput(String query, int count, int start, SyndEntrySource source, Map<String, 
+        Object> sourceParams, Map<String, Object> metadata, String type, XWikiContext context) throws XWikiException
     {
         SyndFeed feed = getFeed(query, count, start, source, sourceParams, metadata, context);
         return getFeedOutput(feed, type, context);

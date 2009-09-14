@@ -39,5 +39,5 @@ public interface SyndEntrySource
      * @param context the XWiki context
      * @throws XWikiException
      */
-    void source(SyndEntry entry, Object obj, Map params, XWikiContext context) throws XWikiException;
+    void source(SyndEntry entry, Object obj, Map<String, Object> params, XWikiContext context) throws XWikiException;
 }

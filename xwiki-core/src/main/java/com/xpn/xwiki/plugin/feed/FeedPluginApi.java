@@ -44,12 +44,12 @@ public class FeedPluginApi extends Api
     private static final String BLOG_POST_CLASS_NAME = "Blog.BlogPostClass";
     private static final String BLOG_POST_TEMPLATE_NAME = "Blog.BlogPostTemplate";
 
-    private static final Map BLOG_FIELDS_MAPPING;
+    private static final Map<String, Object> BLOG_FIELDS_MAPPING;
 
     public static final String FEED_PLUGIN_EXCEPTION = "FeedPluginException";
 
     static {
-        BLOG_FIELDS_MAPPING = new HashMap();
+        BLOG_FIELDS_MAPPING = new HashMap<String, Object>();
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_TITLE, "Blog.BlogPostClass_title");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "Blog.BlogPostClass_content");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "Blog.BlogPostClass_category");
@@ -189,7 +189,7 @@ public class FeedPluginApi extends Api
         return plugin.getUpdateThread(space, context);
     }
 
-    public Collection getActiveUpdateThreads() {
+    public Collection<String> getActiveUpdateThreads() {
         return plugin.getActiveUpdateThreads();
     }
 
@@ -200,7 +200,7 @@ public class FeedPluginApi extends Api
      * @param params constructor parameters
      * @return a new SyndEntrySource instance
      */
-    public SyndEntrySourceApi getSyndEntrySource(String className, Map params)
+    public SyndEntrySourceApi getSyndEntrySource(String className, Map<String, Object> params)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
@@ -226,7 +226,7 @@ public class FeedPluginApi extends Api
      * @param params strategy parameters
      * @return a new {@link SyndEntrySourceApi} wrapping a {@link SyndEntryDocumentSource} object
      */
-    public SyndEntrySourceApi getSyndEntryDocumentSource(Map params)
+    public SyndEntrySourceApi getSyndEntryDocumentSource(Map<String, Object> params)
     {
         return this.getSyndEntrySource(SyndEntryDocumentSource.class.getName());
     }
@@ -236,7 +236,8 @@ public class FeedPluginApi extends Api
      */
     public SyndEntrySourceApi getSyndEntryDocumentSource()
     {
-        return getSyndEntryDocumentSource(Collections.EMPTY_MAP);
+        Map<String, Object> params = Collections.emptyMap();
+        return getSyndEntryDocumentSource(params);
     }
 
     /**
@@ -246,7 +247,8 @@ public class FeedPluginApi extends Api
      */
     public SyndEntrySourceApi getSyndEntryArticleSource()
     {
-        return getSyndEntryArticleSource(Collections.EMPTY_MAP);
+        Map<String, Object> params = Collections.emptyMap();
+        return getSyndEntryArticleSource(params);
     }
 
     /**
@@ -255,9 +257,9 @@ public class FeedPluginApi extends Api
      * 
      * @return a new {@link SyndEntrySourceApi} wrapping a {@link SyndEntryArticleSource} object
      */
-    public SyndEntrySourceApi getSyndEntryArticleSource(Map params)
+    public SyndEntrySourceApi getSyndEntryArticleSource(Map<String, Object> params)
     {
-        Map defParams = new HashMap();
+        Map<String, Object> defParams = new HashMap<String, Object>();
         defParams.put(SyndEntryDocumentSource.FIELD_TITLE, "XWiki.ArticleClass_title");
         defParams.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "XWiki.ArticleClass_content");
         defParams.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "XWiki.ArticleClass_category");
@@ -348,9 +350,10 @@ public class FeedPluginApi extends Api
      * @param sourceParams strategy parameters
      * @return a new feed
      */
-    public SyndFeed getFeed(List list, SyndEntrySourceApi sourceApi, Map sourceParams)
+    public SyndFeed getFeed(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams)
     {
-        return getFeed(list, sourceApi, sourceParams, Collections.EMPTY_MAP);
+        Map<String, Object> metadata = Collections.emptyMap();
+        return getFeed(list, sourceApi, sourceParams, metadata);
     }
 
     /**
@@ -364,9 +367,10 @@ public class FeedPluginApi extends Api
      * @see #getFeed(List, SyndEntrySourceApi, Map)
      * @see SyndEntryDocumentSource
      */
-    public SyndFeed getDocumentFeed(List list, Map params)
+    public SyndFeed getDocumentFeed(List<Object> list, Map<String, Object> params)
     {
-        return getDocumentFeed(list, params, Collections.EMPTY_MAP);
+        Map<String, Object> metadata = Collections.emptyMap();
+        return getDocumentFeed(list, params, metadata);
     }
 
     /**
@@ -379,9 +383,10 @@ public class FeedPluginApi extends Api
      * @see #getFeed(List, SyndEntrySourceApi, Map)
      * @see SyndEntryArticleSource
      */
-    public SyndFeed getArticleFeed(List list)
+    public SyndFeed getArticleFeed(List<Object> list)
     {
-        return getArticleFeed(list, Collections.EMPTY_MAP);
+        Map<String, Object> params = Collections.emptyMap();
+        return getArticleFeed(list, params);
     }
 
     /**
@@ -391,9 +396,10 @@ public class FeedPluginApi extends Api
      * @return a new feed
      * @see #getDocumentFeed(List)
      */
-    public SyndFeed getWebFeed(List list)
+    public SyndFeed getWebFeed(List<Object> list)
     {
-        return getWebFeed(list, Collections.EMPTY_MAP);
+        Map<String, Object> metadata = new HashMap<String, Object>();
+        return getWebFeed(list, metadata);
     }
 
     /**
@@ -403,9 +409,10 @@ public class FeedPluginApi extends Api
      * @return a new feed
      * @see #getArticleFeed(List)
      */
-    public SyndFeed getBlogFeed(List list)
+    public SyndFeed getBlogFeed(List<Object> list)
     {
-        return getBlogFeed(list, Collections.EMPTY_MAP);
+        Map<String, Object> params = Collections.emptyMap();
+        return getBlogFeed(list, params);
     }
 
     /**
@@ -419,9 +426,11 @@ public class FeedPluginApi extends Api
      * @param sourceParams strategy parameters
      * @return a new feed
      */
-    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi, Map sourceParams)
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi, 
+        Map<String, Object> sourceParams)
     {
-        return getFeed(query, count, start, sourceApi, sourceParams, Collections.EMPTY_MAP);
+        Map<String, Object> metadata = Collections.emptyMap();
+        return getFeed(query, count, start, sourceApi, sourceParams, metadata);
     }
 
     /**
@@ -437,9 +446,10 @@ public class FeedPluginApi extends Api
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map)
      * @see SyndEntryDocumentSource
      */
-    public SyndFeed getDocumentFeed(String query, int count, int start, Map params)
+    public SyndFeed getDocumentFeed(String query, int count, int start, Map<String, Object> params)
     {
-        return getDocumentFeed(query, count, start, params, Collections.EMPTY_MAP);
+        Map<String, Object> metadata = Collections.emptyMap();
+        return getDocumentFeed(query, count, start, params, metadata);
     }
 
     /**
@@ -456,7 +466,8 @@ public class FeedPluginApi extends Api
      */
     public SyndFeed getArticleFeed(String query, int count, int start)
     {
-        return getArticleFeed(query, count, start, Collections.EMPTY_MAP);
+        Map<String, Object> params = Collections.emptyMap();
+        return getArticleFeed(query, count, start, params);
     }
 
     /**
@@ -470,7 +481,8 @@ public class FeedPluginApi extends Api
      */
     public SyndFeed getWebFeed(String query, int count, int start)
     {
-        return getWebFeed(query, count, start, Collections.EMPTY_MAP);
+        Map<String, Object> metadata = new HashMap<String, Object>();
+        return getWebFeed(query, count, start, metadata);
     }
 
     /**
@@ -497,7 +509,8 @@ public class FeedPluginApi extends Api
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      */
-    public SyndFeed getFeed(List list, SyndEntrySourceApi sourceApi, Map sourceParams, Map metadata)
+    public SyndFeed getFeed(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams, 
+        Map<String, Object> metadata)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
@@ -520,7 +533,7 @@ public class FeedPluginApi extends Api
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryDocumentSource
      */
-    public SyndFeed getDocumentFeed(List list, Map params, Map metadata)
+    public SyndFeed getDocumentFeed(List<Object> list, Map<String, Object> params, Map<String, Object> metadata)
     {
         return getFeed(list, getSyndEntryDocumentSource(), params, metadata);
     }
@@ -537,12 +550,13 @@ public class FeedPluginApi extends Api
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryArticleSource
      */
-    public SyndFeed getArticleFeed(List list, Map metadata)
+    public SyndFeed getArticleFeed(List<Object> list, Map<String, Object> metadata)
     {
-        return getFeed(list, getSyndEntryArticleSource(), Collections.EMPTY_MAP, metadata);
+        Map<String, Object> params = Collections.emptyMap();
+        return getFeed(list, getSyndEntryArticleSource(), params, metadata);
     }
 
-    private static boolean keyHasValue(Map map, Object key, Object defaultValue)
+    private static boolean keyHasValue(Map<String, Object> map, String key, Object defaultValue)
     {
         Object value = map.get(key);
         return value != null && !value.equals(defaultValue);
@@ -551,31 +565,38 @@ public class FeedPluginApi extends Api
     /**
      * Fills the missing feed meta data fields with default values.
      */
-    private Map fillDefaultFeedMetadata(Map metadata)
+    private Map<String, Object> fillDefaultFeedMetadata(Map<String, Object> metadata)
     {
         XWiki xwiki = getXWikiContext().getWiki();
         XWikiDocument doc = getXWikiContext().getDoc();
+        
         if (metadata.get("author") == null) {
             metadata.put("author", xwiki.getUserName(doc.getAuthor(), null, false, getXWikiContext()));
         }
+        
         if (!keyHasValue(metadata, "copyright", "")) {
             metadata.put("copyright", xwiki.getWebCopyright(getXWikiContext()));
         }
+        
         if (!keyHasValue(metadata, "encoding", "")) {
             metadata.put("encoding", xwiki.getEncoding());
         }
+        
         if (!keyHasValue(metadata, "url", "")) {
             metadata.put("url", "http://" + getXWikiContext().getRequest().getServerName());
         }
+        
         if (!keyHasValue(metadata, "language", "")) {
             metadata.put("language", doc.getDefaultLanguage());
         }
+        
         return metadata;
     }
 
-    private Map fillWebFeedMetadata(Map metadata)
+    private Map<String, Object> fillWebFeedMetadata(Map<String, Object> metadata)
     {
         fillDefaultFeedMetadata(metadata);
+        
         // these strings should be taken from a resource bundle
         String title = "Feed for document changes";
         String description = title;
@@ -588,11 +609,12 @@ public class FeedPluginApi extends Api
         return metadata;
     }
 
-    private Map fillBlogFeedMetadata(Map metadata)
+    private Map<String, Object> fillBlogFeedMetadata(Map<String, Object> metadata)
     {
         // Make sure that we don't have an immutable Map
-        Map result = new HashMap(metadata);
+        Map<String, Object> result = new HashMap<String, Object>(metadata);
         fillDefaultFeedMetadata(result);
+        
         // these strings should be taken from a resource bundle
         String title = "Personal Wiki Blog";
         String description = title;
@@ -613,9 +635,10 @@ public class FeedPluginApi extends Api
      * @return a new feed
      * @see #getDocumentFeed(List, Map)
      */
-    public SyndFeed getWebFeed(List list, Map metadata)
+    public SyndFeed getWebFeed(List<Object> list, Map<String, Object> metadata)
     {
-        SyndFeed webFeed = getDocumentFeed(list, Collections.EMPTY_MAP, fillWebFeedMetadata(metadata));
+        Map<String, Object> params = Collections.emptyMap();
+        SyndFeed webFeed = getDocumentFeed(list, params, fillWebFeedMetadata(metadata));
         if (webFeed != null) {
             webFeed.setImage(getDefaultFeedImage());
         }
@@ -630,9 +653,11 @@ public class FeedPluginApi extends Api
      * @return a new feed
      * @see #getArticleFeed(List, Map)
      */
-    public SyndFeed getBlogFeed(List list, Map metadata)
+    public SyndFeed getBlogFeed(List<Object> list, Map<String, Object> metadata)
     {
-        SyndFeed blogFeed =  getFeed(list, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), Collections.EMPTY_MAP, fillBlogFeedMetadata(metadata));
+        Map<String, Object> params = Collections.emptyMap();
+        SyndFeed blogFeed =  getFeed(list, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), 
+            BLOG_FIELDS_MAPPING), params, fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }
@@ -651,8 +676,8 @@ public class FeedPluginApi extends Api
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      */
-    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi, Map sourceParams,
-        Map metadata)
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi, 
+        Map<String, Object> sourceParams, Map<String, Object> metadata)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
@@ -678,7 +703,8 @@ public class FeedPluginApi extends Api
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryDocumentSource
      */
-    public SyndFeed getDocumentFeed(String query, int count, int start, Map params, Map metadata)
+    public SyndFeed getDocumentFeed(String query, int count, int start, Map<String, Object> params, 
+        Map<String, Object> metadata)
     {
         return getFeed(query, count, start, getSyndEntryDocumentSource(), params, metadata);
     }
@@ -697,9 +723,10 @@ public class FeedPluginApi extends Api
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryArticleSource
      */
-    public SyndFeed getArticleFeed(String query, int count, int start, Map metadata)
+    public SyndFeed getArticleFeed(String query, int count, int start, Map<String, Object> metadata)
     {
-        return getFeed(query, count, start, getSyndEntryArticleSource(), Collections.EMPTY_MAP, metadata);
+        Map<String, Object> params = Collections.emptyMap();
+        return getFeed(query, count, start, getSyndEntryArticleSource(), params, metadata);
     }
 
     /**
@@ -712,12 +739,13 @@ public class FeedPluginApi extends Api
      * @return a new feed
      * @see #getDocumentFeed(String, int, int, Map)
      */
-    public SyndFeed getWebFeed(String query, int count, int start, Map metadata)
+    public SyndFeed getWebFeed(String query, int count, int start, Map<String, Object> metadata)
     {
         if (query == null) {
             query = "where 1=1 order by doc.date desc";
         }
-        SyndFeed webFeed = getDocumentFeed(query, count, start, Collections.EMPTY_MAP, fillWebFeedMetadata(metadata));
+        Map<String, Object> params = new HashMap<String, Object>();
+        SyndFeed webFeed = getDocumentFeed(query, count, start, params, fillWebFeedMetadata(metadata));
         if (webFeed != null) {
             webFeed.setImage(getDefaultFeedImage());
         }
@@ -734,7 +762,7 @@ public class FeedPluginApi extends Api
      * @return a new feed
      * @see #getArticleFeed(String, int, int, Map)
      */
-    public SyndFeed getBlogFeed(String query, int count, int start, Map metadata)
+    public SyndFeed getBlogFeed(String query, int count, int start, Map<String, Object> metadata)
     {
         if (query == null) {
             XWikiRequest request = getXWikiContext().getRequest();
@@ -748,7 +776,8 @@ public class FeedPluginApi extends Api
                         + category + "' order by doc.creationDate desc";
             }
         }
-        SyndFeed blogFeed =  getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), Collections.EMPTY_MAP, fillBlogFeedMetadata(metadata));
+        Map<String, Object> params = Collections.emptyMap();
+        SyndFeed blogFeed =  getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), params, fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }
@@ -764,7 +793,7 @@ public class FeedPluginApi extends Api
      * @return the string representation of the given feed using the syntax associated with the specified feed type
      */
     public String getFeedOutput(SyndFeed feed, String type)
-    {
+    {        
         return plugin.getFeedOutput(feed, type, getXWikiContext());
     }
 
@@ -772,7 +801,7 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(SyndFeed, String)
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
      */
-    public String getFeedOutput(List list, SyndEntrySourceApi sourceApi, Map sourceParams, Map metadata, String type)
+    public String getFeedOutput(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams, Map<String, Object> metadata, String type)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
@@ -788,7 +817,7 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(List, SyndEntrySourceApi, Map, Map, String)
      * @see SyndEntryDocumentSource
      */
-    public String getDocumentFeedOutput(List list, Map params, Map metadata, String type)
+    public String getDocumentFeedOutput(List<Object> list, Map<String, Object> params, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(list, getSyndEntryDocumentSource(), params, metadata, type);
     }
@@ -797,16 +826,17 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(List, SyndEntrySourceApi, Map, Map, String)
      * @see SyndEntryArticleSource
      */
-    public String getArticleFeedOutput(List list, Map metadata, String type)
+    public String getArticleFeedOutput(List<Object> list, Map<String, Object> metadata, String type)
     {
-        return getFeedOutput(list, getSyndEntryArticleSource(), Collections.EMPTY_MAP, metadata, type);
+        Map<String, Object> params = Collections.emptyMap();
+        return getFeedOutput(list, getSyndEntryArticleSource(), params, metadata, type);
     }
 
     /**
      * @see #getWebFeed(List, Map)
      * @see #getFeedOutput(SyndFeed, String)
      */
-    public String getWebFeedOutput(List list, Map metadata, String type)
+    public String getWebFeedOutput(List<Object> list, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(getWebFeed(list, metadata), type);
     }
@@ -815,7 +845,7 @@ public class FeedPluginApi extends Api
      * @see #getBlogFeed(List, Map)
      * @see #getFeedOutput(SyndFeed, String)
      */
-    public String getBlogFeedOutput(List list, Map metadata, String type)
+    public String getBlogFeedOutput(List<Object> list, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(getBlogFeed(list, metadata), type);
     }
@@ -824,8 +854,8 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(SyndFeed, String)
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      */
-    public String getFeedOutput(String query, int count, int start, SyndEntrySourceApi sourceApi, Map sourceParams,
-        Map metadata, String type)
+    public String getFeedOutput(String query, int count, int start, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams,
+        Map<String, Object> metadata, String type)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
@@ -841,7 +871,7 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
      * @see SyndEntryDocumentSource
      */
-    public String getDocumentFeedOutput(String query, int count, int start, Map params, Map metadata, String type)
+    public String getDocumentFeedOutput(String query, int count, int start, Map<String, Object> params, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(query, count, start, getSyndEntryDocumentSource(), params, metadata, type);
     }
@@ -850,16 +880,17 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
      * @see SyndEntryArticleSource
      */
-    public String getArticleFeedOutput(String query, int count, int start, Map metadata, String type)
+    public String getArticleFeedOutput(String query, int count, int start, Map<String, Object> metadata, String type)
     {
-        return getFeedOutput(query, count, start, getSyndEntryArticleSource(), Collections.EMPTY_MAP, metadata, type);
+        Map<String, Object> params = Collections.emptyMap();
+        return getFeedOutput(query, count, start, getSyndEntryArticleSource(), params, metadata, type);
     }
 
     /**
      * @see #getWebFeed(String, int, int, Map)
      * @see #getFeedOutput(SyndFeed, String)
      */
-    public String getWebFeedOutput(String query, int count, int start, Map metadata, String type)
+    public String getWebFeedOutput(String query, int count, int start, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(getWebFeed(query, count, start, metadata), type);
     }
@@ -868,7 +899,7 @@ public class FeedPluginApi extends Api
      * @see #getBlogFeed(String, int, int, Map)
      * @see #getFeedOutput(SyndFeed, String)
      */
-    public String getBlogFeedOutput(String query, int count, int start, Map metadata, String type)
+    public String getBlogFeedOutput(String query, int count, int start, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(getBlogFeed(query, count, start, metadata), type);
     }

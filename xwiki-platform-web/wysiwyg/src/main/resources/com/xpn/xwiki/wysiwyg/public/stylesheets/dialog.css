@@ -159,7 +159,7 @@
 .xLinkToNewPage .gwt-TextBox, .xUploadPanel .gwt-FileUpload,
 .xImageConfig .gwt-TextBox, .xMacroParameter .textInput,
 .xTablePanel .gwt-TextBox, .xImporterTabPanel .gwt-FileUpload, 
-.xExplorer input {
+.xExplorer input, .xSearchForm input {
   width: 433px;
   border: 1px solid #AAA;
   padding: 2px;

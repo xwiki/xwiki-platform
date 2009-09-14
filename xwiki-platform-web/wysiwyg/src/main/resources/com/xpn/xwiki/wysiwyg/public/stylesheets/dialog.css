@@ -194,11 +194,6 @@
   border: 1px solid #dd5555 !important;
 }
 
-.xAttachmentsSelector .xListItem-selected, .xPagesSelector .xListItem-selected, 
-.xImagesSelector .xListItem-selected, .xMacroSelector .xListItem-selected {
-  background-color: #D4E8FF;
-}
-
 /* Sizes for the top-level containers in the dialogs, those that need to resize to 100% of the dialog content */
 /* without aggregator */
 .xAttachmentsSelector, .xPagesSelector, .xExplorerPanel, 

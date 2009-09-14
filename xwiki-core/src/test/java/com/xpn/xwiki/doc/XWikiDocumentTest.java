@@ -119,6 +119,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
+        this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().put("msg", this.mockXWikiMessageTool.proxy());
@@ -417,14 +418,27 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testGetContentOfSection() throws XWikiException
     {
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
-            + "== header 2==\nheader 2 content");
+            + "== header 2==\nheader 2 content\n" + "=== header 3===\nheader 3 content\n"
+            + "== header 4==\nheader 4 content");
         this.document.setSyntaxId("xwiki/2.0");
 
         String content1 = this.document.getContentOfSection(1);
         String content2 = this.document.getContentOfSection(2);
+        String content3 = this.document.getContentOfSection(3);
 
-        assertEquals("= header 1 =\n\nheader 1 content\n\n== header 2 ==\n\nheader 2 content", content1);
-        assertEquals("== header 2 ==\n\nheader 2 content", content2);
+        assertEquals("= header 1 =\n\nheader 1 content\n\n== header 2 ==\n\nheader 2 content\n\n"
+            + "=== header 3 ===\n\nheader 3 content\n\n== header 4 ==\n\nheader 4 content", content1);
+        assertEquals("== header 2 ==\n\nheader 2 content\n\n=== header 3 ===\n\nheader 3 content", content2);
+        assertEquals("== header 4 ==\n\nheader 4 content", content3);
+
+        // Validate that third level header is not skipped anymore
+        this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(3L));
+
+        content3 = this.document.getContentOfSection(3);
+        String content4 = this.document.getContentOfSection(4);
+
+        assertEquals("=== header 3 ===\n\nheader 3 content", content3);
+        assertEquals("== header 4 ==\n\nheader 4 content", content4);
     }
 
     public void testSectionSplit10() throws XWikiException
@@ -725,9 +739,10 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         this.document.setSyntaxId("xwiki/1.0");
 
-        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent("**bold**", "xwiki/2.0", getContext()));
+        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent("**bold**", "xwiki/2.0",
+            getContext()));
     }
-    
+
     public void testRename() throws XWikiException
     {
         XWikiDocument doc1 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page1");

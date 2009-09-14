@@ -33,10 +33,6 @@
   background-image: url(../images/bullet_add.gif);
 }
 
-.xAttachmentsSelector .xListItem-selected, .xPagesSelector .xListItem-selected {
-  background-color: #D4E8FF;
-}
-
 .xPagePreview .xPagePreviewTitle {
   margin-bottom: 3px;
   font-style: italic;
@@ -50,4 +46,22 @@
 .xPagesSearch .xSearchForm {
   height: 25px;
   line-height: 19px;
+}
+
+.xSearchForm button {
+  -moz-border-radius-bottomleft: 5px;
+  -moz-border-radius-bottomright: 5px;
+  -moz-border-radius-topleft: 5px;
+  -moz-border-radius-topright: 5px;
+  border: 1px solid #AAA;
+  margin-left: 5px;
+  /* good trade-off between too large buttons on IE and to small buttons on FF: 
+     even if slightly larger on FF, they fit good on IE, and look good overall */
+  height: 23px;
+  /* not very flexible but good enough, should match well all i18ns*/
+  width: 83px;
+}
+ 
+.xSearchForm input {
+  width: 365px;
 }

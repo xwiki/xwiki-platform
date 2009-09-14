@@ -3182,7 +3182,6 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Returns a list of fullNames of all documents which list this document as their parent
-     *
      * {@link #getChildren(int, int, com.xpn.xwiki.XWikiContext)}
      */
     public List<String> getChildren(XWikiContext context) throws XWikiException
@@ -4738,7 +4737,7 @@ public class XWikiDocument implements DocumentModelBridge
             return getSections10();
         } else {
             List<DocumentSection> splitSections = new ArrayList<DocumentSection>();
-            List<HeaderBlock> headers = getXDOM().getChildrenByType(HeaderBlock.class, true);
+            List<HeaderBlock> headers = getFilteredHeaders();
 
             int sectionNumber = 1;
             for (HeaderBlock header : headers) {
@@ -4756,6 +4755,54 @@ public class XWikiDocument implements DocumentModelBridge
 
             return splitSections;
         }
+    }
+
+    /**
+     * Get XWiki context from execution context.
+     * 
+     * @return the XWiki context for the current thread
+     */
+    private XWikiContext getContext()
+    {
+        Execution execution = Utils.getComponent(Execution.class);
+
+        ExecutionContext ec = execution.getContext();
+
+        XWikiContext context = null;
+        if (ec != null) {
+            context = (XWikiContext) ec.getProperty("xwikicontext");
+        }
+
+        return context;
+    }
+
+    /**
+     * Filter the headers from a document XDOM based on xwiki.section.depth property from xwiki.cfg file.
+     * 
+     * @return the filtered headers
+     */
+    private List<HeaderBlock> getFilteredHeaders()
+    {
+        List<HeaderBlock> filteredHeaders = new ArrayList<HeaderBlock>();
+
+        // get the headers
+        List<HeaderBlock> headers = getXDOM().getChildrenByType(HeaderBlock.class, true);
+
+        // get the maximum header level
+        int sectionDepth = 2;
+        XWikiContext context = getContext();
+        if (context != null) {
+            sectionDepth = (int) context.getWiki().getSectionEditingDepth();
+        }
+
+        // filter the headers
+        for (HeaderBlock header : headers) {
+            if (header.getLevel().getAsInt() <= sectionDepth) {
+                filteredHeaders.add(header);
+            }
+        }
+
+        return filteredHeaders;
     }
 
     /**
@@ -4810,7 +4857,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (is10Syntax()) {
             content = getContentOfSection10(sectionNumber);
         } else {
-            List<HeaderBlock> headers = getXDOM().getChildrenByType(HeaderBlock.class, true);
+            List<HeaderBlock> headers = getFilteredHeaders();
 
             if (headers.size() >= sectionNumber) {
                 SectionBlock section = headers.get(sectionNumber - 1).getSection();
@@ -4874,10 +4921,10 @@ public class XWikiDocument implements DocumentModelBridge
         if (is10Syntax()) {
             content = updateDocumentSection10(sectionNumber, newSectionContent);
         } else {
-            XDOM xdom = getXDOM();
-
             // Get the current section block
-            HeaderBlock header = xdom.getChildrenByType(HeaderBlock.class, true).get(sectionNumber - 1);
+            HeaderBlock header = getFilteredHeaders().get(sectionNumber - 1);
+
+            XDOM xdom = (XDOM) header.getRoot();
 
             // newSectionContent -> Blocks
             List<Block> blocks = parseContent(newSectionContent).getChildren();

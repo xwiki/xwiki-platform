@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>XWiki</web>
@@ -11,17 +11,17 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1231844576000</creationDate>
-<date>1239902341000</date>
-<contentUpdateDate>1239902341000</contentUpdateDate>
+<creationDate>1252454400000</creationDate>
+<date>1252454400000</date>
+<contentUpdateDate>1252454400000</contentUpdateDate>
 <version>1.1</version>
-<title>Tag Cloud</title>
+<title>$msg.get('xe.tag.tagcloud')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -148,78 +148,83 @@ ol.tagCloud .ultraPopular {
 <use>onDemand</use>
 </property>
 </object>
-<content>##
+<content>{{velocity}}
+##
 ## Tag cloud.
 ## 
 ## @param tagCloudSpace - the space to display the tag cloud for. If blank, display cloud for the whole wiki. Default is blank.
 ##
 ## Configurable popularity levels. You must an even number of levels. Default: 6.
 ##
-#set($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
+#set ($popularityLevels = ["notPopular", "notVeryPopular", "somewhatPopular", "popular", "veryPopular", "ultraPopular"])
 $xwiki.ssx.use("XWiki.TagCloud")
 ##
 ## Get tag count map. Key: tag, value: number of occurrences.
 ## Store the minimum number of occurrences for a tag.
 ## Store the maximum number of occurrences for a tag.
 ##
-#set($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
-#set($sortedTagCounts = $sorttool.sort($tagCount.values()))
-#set($maxIndex = $sortedTagCounts.size() - 1)
-#set($minCount = $listtool.get($sortedTagCounts, 0))
-#set($maxCount = $listtool.get($sortedTagCounts, $maxIndex))
+#set ($tagCount = $xwiki.tag.getTagCount("$!tagCloudSpace"))
+#set ($sortedTagCounts = $sorttool.sort($tagCount.values()))
+#set ($maxIndex = $sortedTagCounts.size() - 1)
+#set ($minCount = $listtool.get($sortedTagCounts, 0))
+#set ($maxCount = $listtool.get($sortedTagCounts, $maxIndex))
 ##
 ## Calculate the total number of tags in the wiki.
 ##
-#set($totalTagNumber = 0)
-#foreach($currentTagCount in $sortedTagCounts)
-  #set($totalTagNumber = $totalTagNumber + $currentTagCount)
+#set ($totalTagNumber = 0)
+#foreach ($currentTagCount in $sortedTagCounts)
+  #set ($totalTagNumber = $totalTagNumber + $currentTagCount)
 #end
 ##
 ## Build popularity map using the difference between minimum maximum tag occurrences counts
 ## and the average tag occurences count.
 ##
-#set($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
-#set($levelsHalf = $popularityLevels.size() / 2)
-#set($firstHalfCountDelta = $mathtool.sub($countAverage, $minCount))
-#set($secondHalfCountDelta = $mathtool.sub($maxCount, $countAverage))
-#set($popularityMap = $util.getHashMap())
-#set($firstHalfIntervalSize = $mathtool.div($firstHalfCountDelta, $levelsHalf))
-#set($secondHalfIntervalSize = $mathtool.div($secondHalfCountDelta, $levelsHalf))
-#set($previousPopularityMax = $minCount)
-#set($intervalSize = $firstHalfIntervalSize)
-#set($halfPassed = false)
-#foreach($popularityLevel in $popularityLevels)
-  #if($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)
-    #set($intervalSize = $secondHalfIntervalSize)
-    #set($halfPassed = true)
+#set ($countAverage = $mathtool.div($totalTagNumber, $tagCount.size()))
+#set ($levelsHalf = $popularityLevels.size() / 2)
+#set ($firstHalfCountDelta = $mathtool.sub($countAverage, $minCount))
+#set ($secondHalfCountDelta = $mathtool.sub($maxCount, $countAverage))
+#set ($popularityMap = $util.getHashMap())
+#set ($firstHalfIntervalSize = $mathtool.div($firstHalfCountDelta, $levelsHalf))
+#set ($secondHalfIntervalSize = $mathtool.div($secondHalfCountDelta, $levelsHalf))
+#set ($previousPopularityMax = $minCount)
+#set ($intervalSize = $firstHalfIntervalSize)
+#set ($halfPassed = false)
+#foreach ($popularityLevel in $popularityLevels)
+  #if ($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)
+    #set ($intervalSize = $secondHalfIntervalSize)
+    #set ($halfPassed = true)
   #end
-  #set($currentPopularityMax = $mathtool.add($previousPopularityMax, $intervalSize))
-  #set($discard = $popularityMap.put($currentPopularityMax, $popularityLevel))
-  #set($previousPopularityMax = $currentPopularityMax)
+  #set ($currentPopularityMax = $mathtool.add($previousPopularityMax, $intervalSize))
+  #set ($discard = $popularityMap.put($currentPopularityMax, $popularityLevel))
+  #set ($previousPopularityMax = $currentPopularityMax)
 #end
 ##
 ## Display tag cloud.
 ##
-#if($tagCount.size() &gt; 0)
-  &lt;ol class="tagCloud"&gt;
-    #foreach($tag in $tagCount.keySet())
-      ## This hackish loop could be made simpler with #break (introduced in velocity 1.6)
-      #set($classSet = false)
-      #foreach($popularityMax in $sorttool.sort($popularityMap.keySet()))
-        #if($tagCount.get($tag) &gt; $popularityMax)
-        #elseif(!$classSet)
-          #set($liClass = $popularityMap.get($popularityMax))
-          #set($classSet = true)
+{{html}}
+#if ($tagCount.size() &gt; 0)
+    &lt;ol class="tagCloud"&gt;
+      #foreach($tag in $tagCount.keySet())
+        ## This hackish loop could be made simpler with #break (introduced in velocity 1.6)
+        #set($classSet = false)
+        #foreach($popularityMax in $sorttool.sort($popularityMap.keySet()))
+          #if($tagCount.get($tag) &gt; $popularityMax)
+            ## Tag already processed
+          #elseif(!$classSet)
+            #set($liClass = $popularityMap.get($popularityMax))
+            #set($classSet = true)
+          #end
         #end
+        &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "do=viewTag&amp;amp;tag=$tag")" title="$msg.get("xe.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$tag&lt;/a&gt;&lt;/li&gt;
       #end
-      &lt;li class="$liClass"&gt;&lt;a class="tag" href="$xwiki.getURL("Main.Tags", "view", "do=viewTag&amp;amp;tag=$tag")" title="$msg.get("xe.tag.tooltip", ["${tagCount.get($tag)}"])"&gt;$tag&lt;/a&gt;&lt;/li&gt;
-    #end
-  &lt;/ol&gt;
+    &lt;/ol&gt;
 #else
   #if("$!tagCloudSpace" == "")
     $msg.get("xe.tag.notags")
   #else
     $msg.get("xe.tag.notagsforspace", ["$tagCloudSpace"])
   #end
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

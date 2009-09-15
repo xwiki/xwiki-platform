@@ -184,15 +184,13 @@
   color: #5A1;
 }
 
-.xMacroParameterError, .xLinkParameterError, .xFileUploadError,
-.xPageNameError, .xImageParameterError, .xMacroSelectorError,
-.xTableInsertError {
+.xErrorMsg {
   font-size: 75%;
   color: #dd2222;
   margin-bottom: 3px;
 }
 
-.xFieldError {
+.xErrorField {
   border: 1px solid #dd5555 !important;
 }
 

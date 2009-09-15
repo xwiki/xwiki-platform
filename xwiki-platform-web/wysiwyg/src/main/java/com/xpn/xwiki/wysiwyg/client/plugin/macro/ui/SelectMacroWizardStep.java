@@ -334,7 +334,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
 
         validationMessage = new Label(Strings.INSTANCE.macroNoMacroSelected());
         validationMessage.setVisible(false);
-        validationMessage.addStyleName("xMacroSelectorError");
+        validationMessage.addStyleName("xErrorMsg");
         getPanel().add(validationMessage);
 
         macroList = new ListBox<MacroDescriptor>();
@@ -610,7 +610,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
     {
         if (valid == validationMessage.isVisible()) {
             validationMessage.setVisible(!valid);
-            String errorStyle = "xFieldError";
+            String errorStyle = "xErrorField";
             if (!valid) {
                 macroList.addStyleName(errorStyle);
             } else {

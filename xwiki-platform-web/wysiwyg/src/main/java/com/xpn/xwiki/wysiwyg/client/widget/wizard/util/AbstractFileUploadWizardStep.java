@@ -49,7 +49,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * The style of the fields under error.
      */
-    protected static final String FIELD_ERROR_STYLE = "xFieldError";
+    protected static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
      * Main panel of this wizard step, to be used for the {@link #display()}.
@@ -99,7 +99,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
             formPanel.add(fileHelpLabel);
         }
 
-        fileErrorLabel.addStyleName("xFileUploadError");
+        fileErrorLabel.addStyleName("xErrorMsg");
         fileErrorLabel.setVisible(false);
 
         formPanel.add(fileErrorLabel);

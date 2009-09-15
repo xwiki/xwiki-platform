@@ -86,7 +86,7 @@ public class ParameterDisplayer
 
         validationMessage = new Label();
         validationMessage.setVisible(false);
-        validationMessage.addStyleName("xMacroParameterError");
+        validationMessage.addStyleName("xErrorMsg");
 
         container = new FlowPanel();
         container.addStyleName("xMacroParameter");
@@ -149,7 +149,7 @@ public class ParameterDisplayer
      */
     public boolean validate()
     {
-        String errorFieldStyle = "xFieldError";
+        String errorFieldStyle = "xErrorField";
         // Let's suppose the current value is valid.
         validationMessage.setVisible(false);
         input.removeStyleName(errorFieldStyle);

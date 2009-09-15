@@ -97,27 +97,23 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     {
         // set the keyword from the search input
         keyword = searchBox.getText().trim();
-        // set loading on the pages list
-        getPagesList().clear();
-        getPagesList().addStyleName(STYLE_LOADING);
+        getMainPanel().addStyleName(STYLE_LOADING);
         // refresh the results list
-        refreshPagesList(new AsyncCallback<Object>()
+        refreshList(new AsyncCallback<Object>()
         {
             public void onSuccess(Object result)
             {
-                getPagesList().removeStyleName(STYLE_LOADING);
-                getPagesList().setVisible(true);
+                getMainPanel().removeStyleName(STYLE_LOADING);
             }
 
             public void onFailure(Throwable caught)
             {
-                getPagesList().setVisible(true);
-                getPagesList().removeStyleName(STYLE_LOADING);
+                getMainPanel().removeStyleName(STYLE_LOADING);
                 Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
                 error.addStyleName(STYLE_ERROR);
-                ListItem errorListItem = new ListItem();
+                ListItem<Document> errorListItem = new ListItem<Document>();
                 errorListItem.add(error);
-                getPagesList().addItem(errorListItem);
+                getList().insertItem(errorListItem, 0);
             }
         });
     }
@@ -126,22 +122,9 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
      * {@inheritDoc}
      */
     @Override
-    protected void refreshPagesList(final AsyncCallback< ? > cb)
+    protected void fetchData(AsyncCallback<List<Document>> callback)
     {
-        WysiwygService.Singleton.getInstance().getMatchingPages(getKeyword(), 0, 20,
-            new AsyncCallback<List<Document>>()
-            {
-                public void onSuccess(List<Document> result)
-                {
-                    fillPagesList(result);
-                    cb.onSuccess(null);
-                }
-
-                public void onFailure(Throwable caught)
-                {
-                    cb.onFailure(caught);
-                }
-            });
+        WysiwygService.Singleton.getInstance().getMatchingPages(getKeyword(), 0, 20, callback);
     }
 
     /**

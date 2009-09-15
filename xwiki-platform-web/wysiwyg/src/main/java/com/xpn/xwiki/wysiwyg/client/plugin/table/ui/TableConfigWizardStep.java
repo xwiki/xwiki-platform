@@ -74,12 +74,12 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     /**
      * The style applied to the validation messages.
      */
-    private static final String ERROR_STYLE = "xTableInsertError";
+    private static final String ERROR_STYLE = "xErrorMsg";
 
     /**
      * The style for an field in error.
      */
-    private static final String FIELD_ERROR_STYLE = "xFieldError";
+    private static final String FIELD_ERROR_STYLE = "xErrorField";
 
     /**
      * Row number text input.

@@ -43,6 +43,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
+import com.google.gwt.user.client.ui.Focusable;
 
 /**
  * Displays a list of items allowing us to select one using the mouse or the keyboard.
@@ -51,7 +52,7 @@ import com.google.gwt.user.client.ui.FocusPanel;
  * @version $Id$
  */
 public class ListBox<T> extends Composite implements HasSelectionHandlers<ListItem<T>>, HasDoubleClickHandlers,
-    HasAllKeyHandlers, ClickHandler, KeyDownHandler, KeyPressHandler, KeyUpHandler
+    HasAllKeyHandlers, ClickHandler, KeyDownHandler, KeyPressHandler, KeyUpHandler, Focusable
 {
     /**
      * The list of items from which we can choose one.
@@ -298,10 +299,20 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         ListItem<T> oldItem = selectedItem;
         switch (event.getKeyCode()) {
             case KeyCodes.KEY_UP:
-                selectPreviousItem();
+                if (getSelectedItem() == null) {
+                    // key up enters list through the last item
+                    selectLastItem();
+                } else {
+                    selectPreviousItem();
+                }
                 break;
             case KeyCodes.KEY_DOWN:
-                selectNextItem();
+                if (getSelectedItem() == null) {
+                    // key down enters list through the first item
+                    selectFirstItem();
+                } else {
+                    selectNextItem();
+                }
                 break;
             case KeyCodes.KEY_HOME:
                 selectFirstItem();
@@ -358,5 +369,45 @@ public class ListBox<T> extends Composite implements HasSelectionHandlers<ListIt
         if (list.getWidgetCount() > 0) {
             setSelectedItem(getItem(list.getWidgetCount() - 1));
         }
+    }
+
+    /**
+     * @return the number of list items in this list box
+     */
+    public int getItemCount()
+    {
+        return list.getWidgetCount();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int getTabIndex()
+    {
+        return ((Focusable) getWidget()).getTabIndex();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setTabIndex(int index)
+    {
+        ((Focusable) getWidget()).setTabIndex(index);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setFocus(boolean focused)
+    {
+        ((Focusable) getWidget()).setFocus(focused);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setAccessKey(char key)
+    {
+        ((Focusable) getWidget()).setAccessKey(key);
     }
 }

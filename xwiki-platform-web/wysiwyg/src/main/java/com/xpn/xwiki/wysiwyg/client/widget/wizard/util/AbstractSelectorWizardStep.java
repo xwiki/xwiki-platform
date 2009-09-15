@@ -93,4 +93,17 @@ public abstract class AbstractSelectorWizardStep<T> implements WizardStep
     {
         return data;
     }
+
+    /**
+     * Notifies this wizard step that it has been activated, when part of an aggregator for example. <br />
+     * FIXME: this function should not be here but in it's own decorating interface for aggregated wizard steps or,
+     * cleaner, all wizard steps who need to be notified when they're activated should implement Focusable interface and
+     * all wizard step handlers (the dialog, the aggregator) should call setFocus(). This is a quick solution to handle
+     * tab change in the selector aggregator.
+     */
+    public void setActive()
+    {
+        // nothing by default, to be overriden by subclasses to execute specific activation code, such as setting focus
+        // in the appropriate fields
+    }
 }

@@ -50,6 +50,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCall;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Updatable;
 import com.xpn.xwiki.wysiwyg.client.widget.LabeledTextBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
@@ -119,6 +120,8 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
                 macroFilter.setCategories(macroListItemsByCategory.keySet());
                 if (initCallback != null) {
                     initCallback.onSuccess(null);
+                    // set the focus on the filter panel
+                    macroFilter.focus();
                 }
                 updater.deferUpdate();
                 return false;
@@ -255,6 +258,14 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
 
             // Select initially the All category.
             categoryList.setSelectedIndex(0);
+        }
+
+        /**
+         * Focuses this widget.
+         */
+        public void focus()
+        {
+            DeferredCommand.addCommand(new FocusCommand(categoryList));
         }
     }
 
@@ -397,6 +408,8 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
                 setValid(true);
             }
             initCallback.onSuccess(null);
+            // set focus on the filter panel
+            macroFilter.focus();
         } else if (macroDescriptorsCallback == null) {
             // There's no pending request for macro descriptors.
             macroDescriptorsCallback = new AsyncCallback<List<MacroDescriptor>>()
@@ -438,7 +451,12 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {
-        async.onSuccess(validate());
+        boolean result = validate();
+        async.onSuccess(result);
+        // if validation fails, set focus on the macros list
+        if (!result) {
+            DeferredCommand.addCommand(new FocusCommand(macroList));
+        }
     }
 
     /**

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -27,6 +28,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 
 /**
  * Wizard step to collect the data about an external link (e.g. http: or mailto:). Extends the default link
@@ -107,6 +109,20 @@ public abstract class AbstractExternalLinkWizardStep extends LinkConfigWizardSte
                 cb.onFailure(caught);
             }
         });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void setFocus()
+    {
+        // on the label error label if it's an error on label and not on url, otherwise on the url text box
+        if (getLabelErrorLabel().isVisible() && !urlErrorLabel.isVisible()) {
+            DeferredCommand.addCommand(new FocusCommand(getLabelTextBox()));
+        } else {
+            DeferredCommand.addCommand(new FocusCommand(urlTextBox));
+        }
     }
 
     /**

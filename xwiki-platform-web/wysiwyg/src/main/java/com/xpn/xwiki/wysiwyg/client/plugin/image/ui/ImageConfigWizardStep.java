@@ -26,6 +26,7 @@ import java.util.List;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -35,6 +36,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
@@ -276,6 +278,8 @@ public class ImageConfigWizardStep implements WizardStep, KeyPressHandler, Sourc
         setImageAlignment(imageData.getAlignment());
         altTextBox.setText(imageData.getAltText());
         cb.onSuccess(null);
+        // and set focus
+        DeferredCommand.addCommand(new FocusCommand(widthBox));
     }
 
     /**

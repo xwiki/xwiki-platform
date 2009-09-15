@@ -21,6 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.List;
 
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -41,6 +43,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizar
  * @version $Id$
  */
 public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWizardStep<ImageConfig, Attachment>
+    implements SelectionHandler<ListItem<Attachment>>
 {
     /**
      * The currently edited resource (the currently edited page).
@@ -53,6 +56,12 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
     private ResourceName currentPage;
 
     /**
+     * Fake list item to add to the end of the list, for styling purposes, to clear the floats of the image previews
+     * list items.
+     */
+    private final ListItem<Attachment> clearFloatsListItem;
+
+    /**
      * Builds a selector from the images of the specified current page to edit the specified resource.
      * 
      * @param currentPage the page to currently show images for
@@ -63,6 +72,11 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
         getMainPanel().addStyleName("xImagesSelector");
         this.editedResource = editedResource;
         this.currentPage = currentPage;
+
+        clearFloatsListItem = new ListItem<Attachment>();
+        clearFloatsListItem.setStyleName("clearfloats");
+
+        getList().addSelectionHandler(this);
     }
 
     /**
@@ -111,10 +125,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
     {
         super.fillList(itemsList);
 
-        // fake container to clear the floats set for the images preview. It's here exclusively for styling reasons
-        ListItem<Attachment> fakeClearListItem = new ListItem<Attachment>();
-        fakeClearListItem.setStyleName("clearfloats");
-        getList().addItem(fakeClearListItem);
+        getList().addItem(clearFloatsListItem);
     }
 
     /**
@@ -235,5 +246,17 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
     public void setCurrentPage(ResourceName currentPage)
     {
         this.currentPage = currentPage;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onSelection(SelectionEvent<ListItem<Attachment>> event)
+    {
+        // if the selection is the clear floats fake item, move it to the last item
+        if (event.getSelectedItem() == clearFloatsListItem) {
+            // it's the fake item, select the last item in the list
+            getList().setSelectedItem(getList().getItem(getList().getItemCount() - 2));
+        }
     }
 }

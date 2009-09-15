@@ -22,6 +22,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.smartgwt.client.widgets.events.KeyPressEvent;
+import com.smartgwt.client.widgets.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
@@ -40,7 +42,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardSte
  * @version $Id$
  */
 public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardStep<LinkConfig> implements
-    SourcesNavigationEvents, RecordDoubleClickHandler
+    SourcesNavigationEvents, RecordDoubleClickHandler, KeyPressHandler
 {
     /**
      * The style of the fields under error.
@@ -118,6 +120,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
         explorer.getElement().setClassName(explorer.getElement().getClassName() + " xExplorer");
 
         explorer.addRecordDoubleClickHandler(this);
+        explorer.addKeyPressHandler(this);
 
         // create a label with the help for this step
         Label helpLabel = new Label();
@@ -250,5 +253,16 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     public void onRecordDoubleClick(RecordDoubleClickEvent event)
     {
         listeners.fireNavigationEvent(NavigationDirection.NEXT);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onKeyPress(KeyPressEvent event)
+    {
+        // :)
+        if ("Enter".equals(event.getKeyName())) {
+            listeners.fireNavigationEvent(NavigationDirection.NEXT);
+        }
     }
 }

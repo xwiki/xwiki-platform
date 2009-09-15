@@ -721,11 +721,14 @@ public class XWikiDocument implements DocumentModelBridge
         // 3) Last if a title has been found renders it as it can contain macros, velocity code,
         // groovy, etc.
         if (title.length() > 0) {
-            // This will not completely work for scripting code in title referencing variables
-            // defined elsewhere. In that case it'll only work if those variables have been
-            // parsed and put in the corresponding scripting context. This will not work for
-            // breadcrumbs for example.
-            title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
+            if (is10Syntax()) {
+                // Only needed for xwiki 1.0 syntax, for other syntaxes it's already rendered in #extractTitle
+                // This will not completely work for scripting code in title referencing variables
+                // defined elsewhere. In that case it'll only work if those variables have been
+                // parsed and put in the corresponding scripting context. This will not work for
+                // breadcrumbs for example.
+                title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
+            }
         } else {
             // 4) No title has been found, return the page name as the title
             title = getName();
@@ -746,7 +749,16 @@ public class XWikiDocument implements DocumentModelBridge
                 if (blocks.size() > 0) {
                     HeaderBlock header = blocks.get(0);
                     if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
-                        title = renderXDOM(new XDOM(header.getChildren()), Syntax.PLAIN_1_0);
+                        XDOM headerXDOM = new XDOM(Collections.<Block>singletonList(header));
+
+                        // transform
+                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, getSyntax());
+
+                        // render
+                        Block headerBlock = headerXDOM.getChildren().get(0);
+                        if (headerBlock instanceof HeaderBlock) {
+                            title = renderXDOM(new XDOM(headerBlock.getChildren()), Syntax.XHTML_1_0);
+                        }
                     }
                 }
             }

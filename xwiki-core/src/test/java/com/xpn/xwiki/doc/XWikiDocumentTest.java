@@ -43,6 +43,7 @@ import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
@@ -75,6 +76,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     private Mock mockXWikiStoreInterface;
 
     private Mock mockXWikiMessageTool;
+
+    private Mock mockXWikiRightService;
 
     private BaseClass baseClass;
 
@@ -114,12 +117,16 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
             getContext()});
         this.mockXWikiMessageTool.stubs().method("get").will(returnValue("message"));
 
+        this.mockXWikiRightService = mock(XWikiRightService.class);
+        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
+
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
         this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
         this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
         this.mockXWiki.stubs().method("getSectionEditingDepth").will(returnValue(2L));
+        this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
         getContext().put("msg", this.mockXWikiMessageTool.proxy());
@@ -643,21 +650,36 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testExtractTitle()
     {
+        this.document.setSyntaxId("xwiki/2.0");
+
         this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
-        this.document.setSyntaxId("xwiki/2.0");
 
         assertEquals("header 1", this.document.extractTitle());
 
         this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
 
-        assertEquals("header 1", this.document.extractTitle());
+        assertEquals("<strong>header 1</strong>", this.document.extractTitle());
 
         this.document.setContent("content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
 
-        assertEquals("Page", this.document.extractTitle());
+        this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
+
+        assertEquals("<span class=\"wikilink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
+            + "Page" + "</span></a></span>", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("#set($var = \"value\")", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n"
+            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("value", this.document.extractTitle());
 
         this.document.setContent("content not in section\n=== header 3===");
 

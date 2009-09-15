@@ -34,7 +34,10 @@
   <!-- RichTextArea -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplIE6">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
-    <when-property-is name="user.agent" value="ie6"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
   </replace-with>
   <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplMozilla">
     <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
@@ -73,6 +76,7 @@
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
     <any>
       <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
 
@@ -85,6 +89,7 @@
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
     <any>
       <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
 
@@ -152,6 +157,7 @@
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.line.LinePlugin"/>
     <any>
       <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
 
@@ -164,6 +170,7 @@
     <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPlugin"/>
     <any>
       <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
 </module>

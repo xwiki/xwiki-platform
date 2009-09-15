@@ -21,8 +21,11 @@ package org.xwiki.officeimporter.document;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -40,7 +43,7 @@ public class XDOMOfficeDocument implements OfficeDocument
      * {@link XDOM} corresponding to office document content.
      */
     private XDOM xdom;
-    
+
     /**
      * Artifacts for this office document.
      */
@@ -71,7 +74,7 @@ public class XDOMOfficeDocument implements OfficeDocument
     public XDOM getContentDocument()
     {
         return this.xdom;
-    }        
+    }
 
     /**
      * {@inheritDoc}
@@ -106,5 +109,70 @@ public class XDOMOfficeDocument implements OfficeDocument
     public Map<String, byte[]> getArtifacts()
     {
         return this.artifacts;
-    }        
+    }
+
+    /**
+     * Tries to extract a title suitable for this document. This is done by navigating the internal {@link XDOM} and
+     * finding a matching header block.
+     * 
+     * @return a title suitable for this document or null if no title can be found.
+     */
+    public String getTitle()
+    {
+        String title = getTitle(this.xdom);
+        if (null != title) {
+            // Strip line-feed and new-line characters if present.
+            title = title.replaceAll("[\n\r]", "");
+            // Truncate long titles.
+            if (title.length() > 255) {
+                title = title.substring(0, 255);
+            }
+        }
+        return title;
+    }
+
+    /**
+     * Utility method for recursively traversing the XDOM and extracting a title.
+     * 
+     * @param parent parent block.
+     * @return a title if found or null.
+     */
+    private String getTitle(Block parent)
+    {
+        String result = null;
+
+        for (Block block : parent.getChildren()) {
+            if (block instanceof HeaderBlock) {
+                String title = renderTitle((HeaderBlock) block);
+                if (!StringUtils.isBlank(title)) {
+                    result = title;
+                }
+            } else {
+                result = getTitle(block);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Utility method for rendering a title.
+     * 
+     * @param header header block which contains the title.
+     * @return header block content rendered as a string.
+     */
+    private String renderTitle(HeaderBlock header)
+    {
+        String title = null;
+        try {
+            WikiPrinter printer = new DefaultWikiPrinter();
+            BlockRenderer renderer = this.componentManager.lookup(BlockRenderer.class, "plain/1.0");
+            renderer.render(this.xdom, printer);
+            title = printer.toString();
+        } catch (ComponentLookupException ex) {
+            // Ignore.
+        }
+
+        return title;
+    }
 }

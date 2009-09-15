@@ -35,6 +35,7 @@ import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 
 /**
@@ -155,6 +156,20 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
             && !event.isAnyModifierKeyDown()) {
             // should send the correct sender
             onClick(null);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setActive()
+    {
+        // if the search box is empty, set focus there
+        if (StringUtils.isEmpty(getKeyword())) {
+            searchBox.setFocus(true);
+        } else {
+            super.setActive();
         }
     }
 }

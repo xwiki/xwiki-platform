@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.table.ui;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -36,6 +35,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.AbstractNavigationAwareWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableDescriptor;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.util.TextBoxNumberFilter;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
@@ -184,7 +184,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
     {
         cb.onSuccess(null);
         // Focus the first input field.
-        deferFocus(rows);
+        DeferredCommand.addCommand(new FocusCommand(rows));
     }
 
     /**
@@ -372,7 +372,7 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
         }
 
         if (failed != null) {
-            deferFocus(failed);
+            DeferredCommand.addCommand(new FocusCommand(failed));
             return false;
         }
         return true;
@@ -423,21 +423,5 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
         descriptor.setRowCount(Integer.parseInt(rows.getText()));
         descriptor.setColumnCount(Integer.parseInt(columns.getText()));
         descriptor.setWithHeader(header.getValue());
-    }
-
-    /**
-     * Schedules a focus for the given focusable widget.
-     * 
-     * @param widget a focusable widget
-     */
-    private void deferFocus(final Focusable widget)
-    {
-        DeferredCommand.addCommand(new Command()
-        {
-            public void execute()
-            {
-                widget.setFocus(true);
-            }
-        });
     }
 }

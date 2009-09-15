@@ -26,9 +26,11 @@ import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
 import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
@@ -145,6 +147,8 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
                 if (cb != null) {
                     cb.onSuccess(null);
                 }
+                // set this as active, by default setting focus on the list
+                setActive();
             }
 
             public void onFailure(Throwable caught)
@@ -260,6 +264,8 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
         if (getSelectedItem() == null) {
             displayError();
             async.onSuccess(false);
+            // set focus on the errored field
+            DeferredCommand.addCommand(new FocusCommand(list));
             return;
         }
 
@@ -368,5 +374,23 @@ public abstract class AbstractListSelectorWizardStep<D, L> extends AbstractSelec
     public void setNewOptionOnTop(boolean newOptionOnTop)
     {
         this.newOptionOnTop = newOptionOnTop;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setActive()
+    {
+        // schedule focus set on the list
+        DeferredCommand.addCommand(new FocusCommand(list));
+    }
+
+    /**
+     * @return the errorLabel
+     */
+    protected Label getErrorLabel()
+    {
+        return errorLabel;
     }
 }

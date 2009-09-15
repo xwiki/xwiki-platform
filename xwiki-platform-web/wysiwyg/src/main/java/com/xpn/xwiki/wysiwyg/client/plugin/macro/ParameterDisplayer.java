@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -28,6 +29,7 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.HasFocus;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.HasValue;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.InputFactory;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
@@ -73,7 +75,7 @@ public class ParameterDisplayer
             InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
             mandatoryLabel.addStyleName("xMandatory");
             label.add(mandatoryLabel);
-        }        
+        }
 
         Label description = new Label(descriptor.getDescription());
         description.addStyleName("xMacroParameterDescription");
@@ -118,9 +120,20 @@ public class ParameterDisplayer
      * 
      * @param focused whether the input control should take focus or release it
      */
-    public void setFocused(boolean focused)
+    public void setFocused(final boolean focused)
     {
-        ((HasFocus) input).setFocus(focused);
+        // FIXME: hack to avoid changing the whole inputs class hierarchy to implement Focusable and to allow callers
+        // to still use setFocused
+        // also, extend FocusCommand anonymously instead of just Command so that we find this piece here in usages of
+        // FocusCommand, for future maintenance
+        DeferredCommand.addCommand(new FocusCommand(null)
+        {
+            @Override
+            public void execute()
+            {
+                ((HasFocus) input).setFocus(focused);
+            }
+        });
     }
 
     /**

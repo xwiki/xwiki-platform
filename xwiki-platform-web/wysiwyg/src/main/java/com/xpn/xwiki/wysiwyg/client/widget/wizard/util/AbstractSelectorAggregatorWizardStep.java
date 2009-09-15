@@ -178,13 +178,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
         {
             public void onSuccess(Object result)
             {
-                // add the UI of the step we switched to to the tabbed panel, if not already there
-                if (stepPanel.getWidgetCount() == 0) {
-                    stepPanel.add(stepToShow.display());
-                }
-                // show content back
-                stepPanel.getWidget(0).setVisible(true);
-                tabPanel.removeStyleName(STYLE_LOADING);
+                onStepInitialized(stepToShow, stepPanel);
             }
 
             public void onFailure(Throwable caught)
@@ -194,6 +188,26 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
                 showError(Strings.INSTANCE.linkErrorLoadingData());
             }
         });
+    }
+
+    /**
+     * Helper function to handle the success of the step initialization on tab select.
+     * 
+     * @param step the step that just finished loading
+     * @param stepPanel the container panel of the tab where this widget is to be displayed
+     */
+    @SuppressWarnings("unchecked")
+    private void onStepInitialized(WizardStep step, FlowPanel stepPanel)
+    {
+        // add the UI of the step we switched to to the tabbed panel, if not already there
+        if (stepPanel.getWidgetCount() == 0) {
+            stepPanel.add(step.display());
+        }
+        stepPanel.getWidget(0).setVisible(true);
+        tabPanel.removeStyleName(STYLE_LOADING);
+        if (step instanceof AbstractSelectorWizardStep) {
+            ((AbstractSelectorWizardStep) step).setActive();
+        }
     }
 
     /**

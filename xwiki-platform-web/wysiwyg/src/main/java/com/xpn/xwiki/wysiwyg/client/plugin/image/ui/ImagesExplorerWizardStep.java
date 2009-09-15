@@ -440,4 +440,17 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     {
         pageWizardStep.removeNavigationListener(listener);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setActive()
+    {
+        if (displayWikiSelector) {
+            wikiSelector.setFocus(true);
+        } else {
+            spaceSelector.setFocus(true);
+        }
+    }
 }

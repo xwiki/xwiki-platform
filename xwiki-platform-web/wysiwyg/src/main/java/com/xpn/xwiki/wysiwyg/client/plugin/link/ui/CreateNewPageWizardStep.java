@@ -21,6 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.EnumSet;
 
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -32,8 +36,12 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
+import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
@@ -42,7 +50,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * 
  * @version $Id$
  */
-public class CreateNewPageWizardStep implements WizardStep
+public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, SourcesNavigationEvents
 {
     /**
      * The style of the fields under error.
@@ -75,6 +83,12 @@ public class CreateNewPageWizardStep implements WizardStep
     private ResourceName editedResource;
 
     /**
+     * Collection of {@link NavigationListener}s, to be notified by navigation events from this step. Used to handle
+     * default buttons in this wizard step, by firing next event whenever enter key is hit in the step form.
+     */
+    private final NavigationListenerCollection listeners = new NavigationListenerCollection();
+
+    /**
      * Creates a new wizard step for the passed edited resource.
      * 
      * @param editedResource the resource being edited by this wizard step
@@ -99,6 +113,7 @@ public class CreateNewPageWizardStep implements WizardStep
         mainPanel.add(helpPageNameLabel);
         mainPanel.add(pageNameErrorLabel);
         pageNameTextBox.setTitle(Strings.INSTANCE.linkNewPageTextBoxTooltip());
+        pageNameTextBox.addKeyPressHandler(this);
         mainPanel.add(pageNameTextBox);
     }
 
@@ -162,6 +177,7 @@ public class CreateNewPageWizardStep implements WizardStep
         linkData = (LinkConfig) data;
         hideError();
         cb.onSuccess(null);
+        DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
     }
 
     /**
@@ -182,6 +198,7 @@ public class CreateNewPageWizardStep implements WizardStep
         if (StringUtils.isEmpty(newPageName)) {
             displayError(Strings.INSTANCE.linkNewPageError());
             async.onSuccess(false);
+            DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
         } else {
             // call the server to get the page URL and reference
             // FIXME: move the reference setting logic in a controller, along with the async fetching logic
@@ -200,6 +217,7 @@ public class CreateNewPageWizardStep implements WizardStep
                     public void onFailure(Throwable caught)
                     {
                         async.onSuccess(false);
+                        DeferredCommand.addCommand(new FocusCommand(pageNameTextBox));
                     }
                 });
         }
@@ -224,5 +242,43 @@ public class CreateNewPageWizardStep implements WizardStep
     {
         pageNameErrorLabel.setVisible(false);
         pageNameTextBox.removeStyleName(FIELD_ERROR_STYLE);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see KeyPressHandler#onKeyPress(KeyPressEvent)
+     */
+    public void onKeyPress(KeyPressEvent event)
+    {
+        if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+            // fire the event for the default direction
+            listeners.fireNavigationEvent(getDefaultDirection());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void addNavigationListener(NavigationListener listener)
+    {
+        listeners.add(listener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeNavigationListener(NavigationListener listener)
+    {
+        listeners.remove(listener);
+    }
+
+    /**
+     * @return the default navigation direction, to be fired automatically when enter is hit in an input in the form of
+     *         this configuration wizard step.
+     */
+    public NavigationDirection getDefaultDirection()
+    {
+        return NavigationDirection.NEXT;
     }
 }

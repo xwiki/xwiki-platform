@@ -24,6 +24,7 @@ import java.util.EnumSet;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
@@ -145,7 +147,7 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         labelLabel.add(new InlineLabel(Strings.INSTANCE.linkLabelLabel()));
         InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
         mandatoryLabel.addStyleName("xMandatory");
-        labelLabel.add(mandatoryLabel);        
+        labelLabel.add(mandatoryLabel);
         Label helpLabelLabel = new Label(getLabelTextBoxTooltip());
         helpLabelLabel.setStyleName(HELP_LABEL_STYLE);
 
@@ -174,6 +176,16 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         newWindowCheckBox.setValue(linkData.isOpenInNewWindow());
         hideErrors();
         cb.onSuccess(null);
+        setFocus();
+    }
+
+    /**
+     * Sets the default focus in this wizard step.
+     */
+    protected void setFocus()
+    {
+        // always in the label textbox
+        DeferredCommand.addCommand(new FocusCommand(labelTextBox));
     }
 
     /**
@@ -250,6 +262,8 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
         // validate and save if everything's fine
         if (!validateForm()) {
             async.onSuccess(false);
+            // and set the focus
+            setFocus();
         } else {
             saveForm();
             async.onSuccess(true);
@@ -399,5 +413,13 @@ public class LinkConfigWizardStep implements WizardStep, SourcesNavigationEvents
     {
         labelErrorLabel.setVisible(false);
         labelTextBox.removeStyleName(FIELD_ERROR_STYLE);
+    }
+
+    /**
+     * @return the labelErrorLabel
+     */
+    protected Label getLabelErrorLabel()
+    {
+        return labelErrorLabel;
     }
 }

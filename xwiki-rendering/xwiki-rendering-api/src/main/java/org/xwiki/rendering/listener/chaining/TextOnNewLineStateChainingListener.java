@@ -394,8 +394,8 @@ public class TextOnNewLineStateChainingListener extends AbstractChainingListener
     @Override
     public void onNewLine()
     {
-        this.isTextOnNewLine = true;
         super.onNewLine();
+        this.isTextOnNewLine = true;
     }
 
     /**

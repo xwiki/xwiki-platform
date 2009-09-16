@@ -1,18 +1,20 @@
+#template('colorThemeInit.vm')
 /* The following two rules are needed for overriding styles defined in toucan */
 #xwikiobjects, #xwikiclassproperties {
-  border: 1px solid #fff !important;
   padding: 0 8px;
+  overflow: auto;
+  border: none !important;
 }
 #body #xwikiobjects label, #body #xwikiclassproperties label {
   display: inline;
   text-transform: none;
   font-variant: normal;
-  color: #000;
+  color: $theme.textPrimaryColor;
 }
 /* Basic form elements styling */
 #xwikiobjects input, #xwikiobjects textarea,
 #xwikiclassproperties input, #xwikiclassproperties textarea {
-  border: 1px solid #DDC;
+  border: 1px solid $theme.borderColor;
   width: 90%;
 }
 .boolean-property input {
@@ -23,11 +25,11 @@
 #xwikiobjects input:focus, #xwikiobjects textarea:focus,
 #xwikiclassproperties input:hover, #xwikiclassproperties textarea:hover,
 #xwikiclassproperties input:focus, #xwikiclassproperties textarea:focus {
-  border: 1px solid #000;
+  border: 1px solid $theme.textPrimaryColor;
 }
 #xwikiobjects input:focus, #xwikiobjects textarea:focus,
 #xwikiclassproperties input:focus, #xwikiclassproperties textarea:focus {
-  background-color: #FFD;
+  background-color: $theme.highlightColor;
 }
 
 /* Generic links */
@@ -66,7 +68,8 @@
 }
 .xobject:hover .xobject-title,
 .xproperty:hover .xproperty-title {
-  background-color: #FFD;
+  background-color: $theme.highlightColor;
+  color: $theme.textPrimaryColor;
 }
 .xobject-title h3 {
   border: none;
@@ -211,7 +214,7 @@
   cursor: move;
 }
 .dragged .xproperty-title {
-  border: 1px solid #28C;
+  border: 1px solid $theme.borderColor;
 }
 /* Property type icons */
 .StringClass h2 {

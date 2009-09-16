@@ -48,15 +48,17 @@ public abstract class AbstractSelectorWizardStep<T> implements WizardStep
     public void init(Object data, AsyncCallback< ? > cb)
     {
         this.data = (T) data;
-        initializeSelection();
-        cb.onSuccess(null);
+        initializeSelection(cb);
     }
 
     /**
      * Initializes the selection on {@link #init(Object, AsyncCallback)} time.
+     * 
+     * @param initCallback the initialization callback, to handle asynchronous initialization.
      */
-    protected void initializeSelection()
+    protected void initializeSelection(AsyncCallback< ? > initCallback)
     {
+        initCallback.onSuccess(null);
     }
 
     /**

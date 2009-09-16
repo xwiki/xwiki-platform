@@ -21,12 +21,19 @@ package org.xwiki.velocity.internal;
 
 import java.util.Properties;
 
+import org.apache.velocity.tools.generic.DateTool;
+import org.apache.velocity.tools.generic.EscapeTool;
+import org.apache.velocity.tools.generic.ListTool;
+import org.apache.velocity.tools.generic.MathTool;
+import org.apache.velocity.tools.generic.NumberTool;
+import org.apache.velocity.tools.generic.SortTool;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.tools.RegexTool;
 
 /**
  * All configuration options for the Velocity subsystem.
@@ -66,12 +73,13 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
     public void initialize() throws InitializationException
     {
         // Default Velocity tools.
-        this.defaultTools.setProperty("listtool", "org.apache.velocity.tools.generic.ListTool");
-        this.defaultTools.setProperty("numbertool", "org.apache.velocity.tools.generic.NumberTool");
-        this.defaultTools.setProperty("datetool", "org.apache.velocity.tools.generic.DateTool");
-        this.defaultTools.setProperty("mathtool", "org.apache.velocity.tools.generic.MathTool");
-        this.defaultTools.setProperty("sorttool", "org.apache.velocity.tools.generic.SortTool");
-        this.defaultTools.setProperty("escapetool", "org.apache.velocity.tools.generic.EscapeTool");
+        this.defaultTools.setProperty("listtool", ListTool.class.getName());
+        this.defaultTools.setProperty("numbertool", NumberTool.class.getName());
+        this.defaultTools.setProperty("datetool", DateTool.class.getName());
+        this.defaultTools.setProperty("mathtool", MathTool.class.getName());
+        this.defaultTools.setProperty("sorttool", SortTool.class.getName());
+        this.defaultTools.setProperty("escapetool", EscapeTool.class.getName());
+        this.defaultTools.setProperty("regextool", RegexTool.class.getName());
 
         // Default Velocity properties
         this.defaultProperties.setProperty("resource.loader", "webapp");

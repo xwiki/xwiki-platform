@@ -144,7 +144,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             public void onClick(ClickEvent event)
             {
                 initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                    pageSelector.getSelectedPage(), null));
+                    pageSelector.getSelectedPage(), null), null);
             }
         });
 
@@ -165,23 +165,26 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * @param page the page to set the selection on
      * @param fileName the filename of the image to set as currently selected image
      * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     * @param cb callback to handle asynchronous fill of the wiki, space, page list boxes
      */
     public void setSelection(final String wiki, final String space, final String page, final String fileName,
-        final boolean forceRefresh)
+        final boolean forceRefresh, final AsyncCallback< ? > cb)
     {
         WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
         {
             public void onFailure(Throwable caught)
             {
-                throw new RuntimeException(caught.getMessage());
+                if (cb != null) {
+                    cb.onFailure(caught);
+                }
             }
 
             public void onSuccess(Boolean result)
             {
                 if (result) {
-                    setWikiSelection(wiki, space, page, fileName, forceRefresh);
+                    setWikiSelection(wiki, space, page, fileName, forceRefresh, cb);
                 } else {
-                    setSpaceSelection(space, page, fileName, forceRefresh);
+                    setSpaceSelection(space, page, fileName, forceRefresh, cb);
                 }
             }
         });
@@ -195,9 +198,10 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * @param page the page to set as selected
      * @param fileName the file to set as selected
      * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     * @param cb callback to handle asynchronous initialization of the wikis list
      */
     private void setWikiSelection(String selectedWiki, final String space, final String page, final String fileName,
-        final boolean forceRefresh)
+        final boolean forceRefresh, final AsyncCallback< ? > cb)
     {
         if (!displayWikiSelector) {
             // if the wiki selector doesn't need to be displayed, add the edited resource wiki as the default selected
@@ -210,7 +214,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             // but keep it invisible
             wikiSelector.setVisible(false);
             // set the space selection further
-            setSpaceSelection(space, page, fileName, true);
+            setSpaceSelection(space, page, fileName, true, cb);
         } else {
             wikiSelector.setVisible(true);
             if (forceRefresh) {
@@ -218,18 +222,21 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 {
                     public void onSuccess(List<String> result)
                     {
-                        setSpaceSelection(space, page, fileName, true);
+                        setSpaceSelection(space, page, fileName, true, cb);
                     }
 
                     public void onFailure(Throwable caught)
                     {
+                        if (cb != null) {
+                            cb.onFailure(caught);
+                        }
                     }
                 });
             } else {
                 // just set the selection
                 if (!wikiSelector.getSelectedWiki().equals(selectedWiki)) {
                     wikiSelector.setSelectedWiki(selectedWiki);
-                    setSpaceSelection(space, page, fileName, true);
+                    setSpaceSelection(space, page, fileName, true, cb);
                 }
             }
         }
@@ -242,9 +249,10 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * @param selectedPage the page to be set as selected
      * @param selectedFile the file to set as selected in the images list
      * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     * @param cb callback to handle asynchronous initialization of the spaces list
      */
     private void setSpaceSelection(String selectedSpace, final String selectedPage, final String selectedFile,
-        final boolean forceRefresh)
+        final boolean forceRefresh, final AsyncCallback< ? > cb)
     {
         if (forceRefresh) {
             // refresh the spaces list
@@ -253,19 +261,22 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             {
                 public void onSuccess(List<String> result)
                 {
-                    setPageSelection(selectedPage, selectedFile, true);
+                    setPageSelection(selectedPage, selectedFile, true, cb);
                 }
 
                 public void onFailure(Throwable caught)
                 {
+                    if (cb != null) {
+                        cb.onFailure(caught);
+                    }
                 }
             });
         } else {
             if (!selectedSpace.equals(spaceSelector.getSelectedSpace())) {
                 spaceSelector.setSelectedSpace(selectedSpace);
-                setPageSelection(selectedPage, selectedFile, true);
+                setPageSelection(selectedPage, selectedFile, true, cb);
             } else {
-                setPageSelection(selectedPage, selectedFile, forceRefresh);
+                setPageSelection(selectedPage, selectedFile, forceRefresh, cb);
             }
         }
     }
@@ -276,8 +287,10 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * @param selectedPage the page to be set as selected
      * @param selectedFile the file to set as selected in the images list
      * @param forceRefresh if a refresh should be forced on the list of wikis, spaces, pages in the list boxes
+     * @param cb callback to handle asynchronous initialization of the pages list
      */
-    private void setPageSelection(String selectedPage, final String selectedFile, boolean forceRefresh)
+    private void setPageSelection(String selectedPage, final String selectedFile, boolean forceRefresh,
+        final AsyncCallback< ? > cb)
     {
         if (forceRefresh) {
             pageSelector.setWiki(wikiSelector.getSelectedWiki());
@@ -287,11 +300,14 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 public void onSuccess(List<String> result)
                 {
                     initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                        pageSelector.getSelectedPage(), selectedFile));
+                        pageSelector.getSelectedPage(), selectedFile), cb);
                 }
 
                 public void onFailure(Throwable caught)
                 {
+                    if (cb != null) {
+                        cb.onFailure(caught);
+                    }
                 }
             });
         } else {
@@ -299,7 +315,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                 pageSelector.setSelectedPage(selectedPage);
             }
             initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                pageSelector.getSelectedPage(), selectedFile));
+                pageSelector.getSelectedPage(), selectedFile), cb);
         }
     }
 
@@ -340,8 +356,9 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      * Initializes and displays the page selector panel for the currently selected resource.
      * 
      * @param resource the resource to display the selector panel for
+     * @param cb the callback to handle asynchronous initialization
      */
-    protected void initCurrentPage(ResourceName resource)
+    protected void initCurrentPage(ResourceName resource, final AsyncCallback< ? > cb)
     {
         pageWizardStep.setCurrentPage(resource);
         mainPanel.addStyleName(STYLE_LOADING);
@@ -349,18 +366,49 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         {
             public void onSuccess(Object result)
             {
-                mainPanel.removeStyleName(STYLE_LOADING);
-            };
+                onCurrenPageInitialization();
+                if (cb != null) {
+                    cb.onSuccess(null);
+                }
+            }
 
             public void onFailure(Throwable caught)
             {
-                mainPanel.removeStyleName(STYLE_LOADING);
-                Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
-                error.addStyleName("errormessage");
-                mainPanel.remove(pageWizardStep.display());
-                mainPanel.add(error);
+                if (cb != null) {
+                    cb.onFailure(caught);
+                } else {
+                    showCurrentPageInitializationError();
+                }
+
             }
         });
+    }
+
+    /**
+     * Helper function to handle the error on current page initialization: display an error message in the reserved
+     * panel.
+     */
+    private void showCurrentPageInitializationError()
+    {
+        mainPanel.removeStyleName(STYLE_LOADING);
+        Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
+        error.addStyleName("errormessage");
+        mainPanel.remove(pageWizardStep.display());
+        mainPanel.add(error);
+    }
+
+    /**
+     * Helper function to handle the success on initialization of the current page wizard step.
+     */
+    private void onCurrenPageInitialization()
+    {
+        // if the current page's display is not there (maybe an error before removed it), remove the error and add
+        if (mainPanel.getWidgetIndex(pageWizardStep.display()) < 0) {
+            // FIXME: the error panel shouldn't be identified by its position!
+            mainPanel.remove(mainPanel.getWidgetCount() - 1);
+            mainPanel.add(pageWizardStep.display());
+        }
+        mainPanel.removeStyleName(STYLE_LOADING);
     }
 
     /**
@@ -390,8 +438,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     /**
      * {@inheritDoc}
      */
-    @Override
-    protected void initializeSelection()
+    protected void initializeSelection(AsyncCallback< ? > cb)
     {
         if (!StringUtils.isEmpty(getData().getReference())
             || (wikiSelector.getSelectedWiki() == null && spaceSelector.getSelectedSpace() == null && pageSelector
@@ -400,12 +447,12 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
             // image needs to be edited, refresh selectors and page list
             ResourceName r = new ResourceName(getData().getReference(), true);
             ResourceName resolved = r.resolveRelativeTo(editedResource);
-            setSelection(resolved.getWiki(), resolved.getSpace(), resolved.getPage(), resolved.getFile(), true);
+            setSelection(resolved.getWiki(), resolved.getSpace(), resolved.getPage(), resolved.getFile(), true, cb);
         } else {
             // just initialize the step for the space, page, wiki selection in the selectors. I.e. preserve last
             // selection
             initCurrentPage(new ResourceName(wikiSelector.getSelectedWiki(), spaceSelector.getSelectedSpace(),
-                pageSelector.getSelectedPage(), null));
+                pageSelector.getSelectedPage(), null), cb);
         }
     }
 
@@ -440,7 +487,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     {
         pageWizardStep.removeNavigationListener(listener);
     }
-    
+
     /**
      * {@inheritDoc}
      */

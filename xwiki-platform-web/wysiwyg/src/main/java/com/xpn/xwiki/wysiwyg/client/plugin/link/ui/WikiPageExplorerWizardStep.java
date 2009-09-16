@@ -58,12 +58,13 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
      * {@inheritDoc}
      */
     @Override
-    protected void initializeSelection()
+    protected void initializeSelection(AsyncCallback< ? > initCallback)
     {
         if (!StringUtils.isEmpty(getData().getReference())) {
             getExplorer().setValue(getData().getReference());
         }
         // else leave the tree where the last selection was
+        super.initializeSelection(initCallback);
     }
 
     /**

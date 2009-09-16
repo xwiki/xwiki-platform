@@ -61,7 +61,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     /**
      * {@inheritDoc}
      */
-    protected void initializeSelection()
+    protected void initializeSelection(AsyncCallback< ? > initCallback)
     {
         String reference = getData().getReference();
         if (!StringUtils.isEmpty(reference)) {
@@ -69,6 +69,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
             getExplorer().setValue(r.toString());
         }
         // else leave the selection where it was the last time
+        super.initializeSelection(initCallback);
     }
 
     /**

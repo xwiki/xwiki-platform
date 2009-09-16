@@ -28,6 +28,7 @@ import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -185,7 +186,7 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
             {
                 stepPanel.setVisible(true);
                 tabPanel.removeStyleName(STYLE_LOADING);
-                showError(Strings.INSTANCE.linkErrorLoadingData());
+                showError(Strings.INSTANCE.linkErrorLoadingData(), stepPanel);
             }
         });
     }
@@ -199,6 +200,10 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     @SuppressWarnings("unchecked")
     private void onStepInitialized(WizardStep step, FlowPanel stepPanel)
     {
+        // remove any existant error message
+        if (stepPanel.getWidgetCount() > 0 && stepPanel.getWidget(0).getStyleName().contains(STYLE_ERROR)) {
+            stepPanel.clear();
+        }
         // add the UI of the step we switched to to the tabbed panel, if not already there
         if (stepPanel.getWidgetCount() == 0) {
             stepPanel.add(step.display());
@@ -211,15 +216,18 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
     }
 
     /**
-     * Helper function to show an error in the main panel.
+     * Helper function to show an error in the passed panel.
      * 
      * @param message the error message
+     * @param panel the panel in which the error is to be displayed
      */
-    private void showError(String message)
+    private void showError(String message, Panel panel)
     {
+        // remove all content before
+        panel.clear();
         Label error = new Label(message);
         error.addStyleName(STYLE_ERROR);
-        tabPanel.add(error);
+        panel.add(error);
     }
 
     /**
@@ -325,27 +333,19 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      */
     private void dispatchInit(final AsyncCallback< ? > cb)
     {
+        // pick the right tab to select
         String stepName = getRequiredStep();
-        if (stepName != null) {
-            // if a requirement on the needed step is made,
-            if (getSelectedStepName() == null || !getSelectedStepName().equals(stepName)) {
-                // the tabs should be switched if the required step is not already selected
-                selectTab(stepName);
-                cb.onSuccess(null);
-            } else {
-                lazyInitializeStep(getCurrentStep(), cb);
-            }
-        } else {
-            // if a requirement is not made
-            if (getSelectedStepName() == null) {
-                // and no selection already exists, just select the default step
-                selectTab(getDefaultStepName());
-                cb.onSuccess(null);
-            } else {
-                // otherwise, fake a selection on the current tab to initialize the current tab
-                lazyInitializeStep(getCurrentStep(), cb);
+        if (stepName == null) {
+            stepName = getSelectedStepName();
+            if (stepName == null) {
+                stepName = getDefaultStepName();
             }
         }
+        // select the chosen tab
+        selectTab(stepName);
+        // always return null, failure of aggregated step initialization will be handled inside this aggregator step,
+        // because one aggregated step failure should not prevent the others to be selected
+        cb.onSuccess(null);
     }
 
     /**
@@ -354,11 +354,28 @@ public abstract class AbstractSelectorAggregatorWizardStep<T> extends AbstractSe
      * @param step the step to initialize
      * @param cb the call back to handle asynchronous load of the step
      */
-    private void lazyInitializeStep(WizardStep step, AsyncCallback< ? > cb)
+    private void lazyInitializeStep(final WizardStep step, final AsyncCallback< ? > cb)
     {
         if (!initialized.get(step)) {
-            step.init(getData(), cb);
-            initialized.put(step, true);
+            step.init(getData(), new AsyncCallback<Object>()
+            {
+                public void onSuccess(Object result)
+                {
+                    // only mark as initialized when init succeeded, so that a second retry is attempted and its panel
+                    // is not used further if init fails to initialize it correctly
+                    initialized.put(step, true);
+                    if (cb != null) {
+                        cb.onSuccess(null);
+                    }
+                }
+
+                public void onFailure(Throwable caught)
+                {
+                    if (cb != null) {
+                        cb.onFailure(caught);
+                    }
+                }
+            });
             return;
         }
         // nothing to do, just signal success

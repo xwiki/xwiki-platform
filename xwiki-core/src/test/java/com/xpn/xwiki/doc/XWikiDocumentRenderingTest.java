@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.jmock.Mock;
+import org.jmock.core.Invocation;
+import org.jmock.core.stub.CustomStub;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
@@ -94,6 +97,14 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
+        this.mockXWikiRenderingEngine.stubs().method("interpretText").will(
+            new CustomStub("Implements XWikiRenderingEngine.interpretText")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                    return invocation.parameterValues.get(0);
+                }
+            });
 
         this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
@@ -102,6 +113,8 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
         this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
+        this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
+
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(this.mockXWikiRenderingEngine.proxy()));
@@ -133,8 +146,6 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
-        
-        this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
     public void testScriptContext() throws XWikiException
@@ -143,5 +154,83 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setSyntaxId("xwiki/2.0");
 
         assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
+    }
+
+    public void testGetRenderedTitleWithTitle() throws XWikiException
+    {
+        this.document.setSyntaxId("xwiki/2.0");
+
+        this.document.setTitle("title");
+
+        assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setTitle("**title**");
+
+        assertEquals("**title**", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setTitle("#set($key = \"title\")$key");
+        this.mockXWikiRenderingEngine.stubs().method("interpretText").with(eq("#set($key = \"title\")$key"), ANYTHING,
+            ANYTHING).will(returnValue("title"));
+
+        assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
+    public void testGetRenderedTitleWithoutTitleHTML() throws XWikiException
+    {
+        this.document.setSyntaxId("xwiki/2.0");
+
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("header 1", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("<strong>header 1</strong>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setContent("content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
+
+        assertEquals("<span class=\"wikilink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
+            + "Page" + "</span></a></span>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("#set($var = \"value\")", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setContent("content not in section\n"
+            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+
+        assertEquals("value", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+
+        this.document.setContent("content not in section\n=== header 3===");
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
+    public void testGetRenderedTitleWithoutTitlePLAIN() throws XWikiException
+    {
+        this.document.setSyntaxId("xwiki/2.0");
+
+        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("header 1", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+
+        this.document.setContent("content not in section\n"
+            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+
+        assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+    }
+
+    public void testGetRenderedTitleNoTitleAndContent() throws XWikiException
+    {
+        this.document.setSyntaxId("xwiki/2.0");
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
     }
 }

@@ -1,22 +1,57 @@
 ###
-### Display document contents in normal "view" mode
+### Display document contents in "view" mode.
 ###
 ### TODO: Web service?
 ###
 <div id="xwikicontent">
-## Get the proper syntax object for the provided request parameters
+## -------------------------------
+## Compute the content to display 
+## -------------------------------
+## Honor the syntax if it's passed in the request.
 #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
 #if ($outputSyntax)
+  ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be 
+  ## displayed fine in HTML (since at the point this vm file is called we're already inside an HTML page with
+  ## panels on the side, header, etc).
   #set($syntaxType = $outputSyntax.type.toIdString())
   #if (($syntaxType == "xhtml") || ($syntaxType == "html"))
-    $cdoc.getRenderedContent($outputSyntax)
+    #set ($renderedContent = $cdoc.getRenderedContent($outputSyntax))
   #else
-    ## Make sure to print correctly the result when it's not html
-    <pre>$escapetool.html($cdoc.getRenderedContent($outputSyntax))</pre>
+    ## Make sure to print correctly the result when it's not HTML
+    #set ($renderedContent = "<pre>$escapetool.html($cdoc.getRenderedContent($outputSyntax))</pre>")
   #end
 #else
-  $cdoc.getRenderedContent()
+  #set ($renderedContent = $cdoc.getRenderedContent())
 #end
+## ----------------------------------------------------------------------------
+## Remove the first rendered H1 or H2 if the following conditions are met:
+## - the title compatibility flag is on or the document title is not set
+## - the title extracted from the rendered content is the same as the set title
+## We need to do this since we've changed how titles are used and we need to
+## ensure we don't break existing documents that have not yet migrated to the
+## new way.
+## -----------------------------------------------------------------------------
+#set ($titleToDisplay = $tdoc.displayTitle)
+## Look for first H1 or H2 either in lowercase or uppercase
+#set ($regexResult = $regextool.find($renderedContent, "<[hH][12].*?><span>(.*?)</span></[hH][12]>"))
+#if (!$regexResult.isEmpty() && $regexResult.get(1).group.equals($titleToDisplay))
+  #if ($regexResult.get(0).end < $mathtool.sub($renderedContent.length(), 1))
+    #set ($renderedContent = "${renderedContent.substring(0, $regexResult.get(0).start)}${renderedContent.substring($regexResult.get(0).end)}")                                                  
+  #else
+    #set ($renderedContent = $renderedContent.substring(0, $regexResult.get(0).start))   
+  #end
+#end
+## ----------------------------
+## Display the title
+## ----------------------------
+<div id="document-title"><h1>$titleToDisplay</h1></div>
+## ----------------------------
+## Display the rendered content
+## ----------------------------
+$renderedContent
+## -----------------------------------------------------------------------------------
+## Display the footnotes if the document is in 1.0 syntax and if there are any defined
+## -----------------------------------------------------------------------------------
 #set($footnotes = "#putFootnotes()")
 $xwiki.renderText($footnotes, $doc)
 </div>

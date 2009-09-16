@@ -216,7 +216,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
             if (StringUtils.isBlank(doc.getCreator())) {
                 needsUpdate = true;
-                doc.setCreator("XWiki.Admin");
+                doc.setCreator("superadmin");
             }
             if (StringUtils.isBlank(doc.getAuthor())) {
                 needsUpdate = true;
@@ -226,10 +226,14 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
                 needsUpdate = true;
                 doc.setParent("XWiki.XWikiClasses");
             }
-            if (StringUtils.isBlank(doc.getContent())) {
+            if (StringUtils.isBlank(doc.getTitle())) {
                 needsUpdate = true;
-                doc.setContent("1 XWiki " + getExtensionName() + " Extension Class");
-                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+                doc.setTitle("XWiki " + getExtensionName() + " Extension Class");
+            }
+            if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+                needsUpdate = true;      
+                doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+                doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
             }
 
             if (needsUpdate) {

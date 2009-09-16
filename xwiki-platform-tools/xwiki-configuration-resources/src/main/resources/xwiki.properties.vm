@@ -108,6 +108,7 @@
 #-#   velocity.tools = mathtool = org.apache.velocity.tools.generic.MathTool
 #-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool     
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
+#-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is

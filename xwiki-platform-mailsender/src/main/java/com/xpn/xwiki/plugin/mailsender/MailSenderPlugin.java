@@ -247,22 +247,26 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15);
         needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15);
 
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor("XWiki.Admin");
-        }
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
-            doc.setCreator("XWiki.Admin");
+            doc.setCreator("superadmin");
+        }
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
         }
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }
-        if (StringUtils.isBlank(doc.getContent())) {
+        if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
-            doc.setContent("#includeForm(\"XWiki.XWikiMailSheet\"");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setTitle("XWiki Mail Class");
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            needsUpdate = true;      
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
         }
 
         if (needsUpdate) {

@@ -33,7 +33,7 @@
 #set ($regexResult = $regextool.find($renderedContent, "<[hH][12].*?><span>(.*?)</span></[hH][12]>"))
 #set ($titleToDisplay = $tdoc.displayTitle)
 #if (!$regexResult.isEmpty())
-  #if ($tdoc.title.length() == 0 || $regexResult.get(1).group.equals($titleToDisplay))
+  #if ($tdoc.title.length() == 0 || ($xwiki.isTitleInCompatibilityMode() && $regexResult.get(1).group.equals($titleToDisplay)))
     #if ($regexResult.get(0).end < $mathtool.sub($renderedContent.length(), 1))
       #set ($renderedContent = "${renderedContent.substring(0, $regexResult.get(0).start)}${renderedContent.substring($regexResult.get(0).end)}")
     #else

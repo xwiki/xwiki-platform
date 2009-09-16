@@ -212,48 +212,46 @@ body#mceSpanFonts h1 span, body#mceSpanFonts h2 span,
     border-bottom: 1px solid #ccc;
 }
 
+h1, h2, h3, h4, h5{
+  display:block;
+  position:relative;
+  line-height: 1.2em;
+  font-weight: normal;
+  padding-top: 1px;
+}
+
+/* Font size for Hn is 1.1^(7-n) */
 h1 {
-    padding-top: 1px;
-    margin-top: 5px;
-    font-size: 2.3em;
-    font-weight: normal;
-    letter-spacing: -1px;
+  margin-top: 5px;
+  font-size: 1.77em;
+}
+
+#document-title h1 {
+  font-size: 2.15em;
+  letter-spacing: -1px;
 }
 
 h2 {
-    padding-top: 1px;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 2em;
+  font-size: 1.61em;
 }
 
 h3 {
-    padding-top: 1px;
-    font-weight: normal;
-    font-size: 1.6em;
-    margin: 20px 0;
+  font-size: 1.46em;
+  margin: 20px 0;
 }
 
 h4 {
-    padding-top: 1px;
-    font-weight: normal;
-    color: #404040;
-    left: 0;
-    font-size: 1.4em;
+  font-size: 1.33em;
 }
 
 h5 {
-    font-weight: normal;
-    color: #404040;
-    font-style: normal;
-    font-size: 1.3em;
+  font-size: 1.21em;
 }
 
-h1, h2, h3, h4, h5{
-    display:block;
-    position:relative;
-    line-height: 1.2em;
+h6 {
+  font-size: 1.1em;
 }
+
 #xwikicontent h1, #xwikicontent h2, #xwikicontent h3, #xwikicontent h4, #xwikicontent h5 {
   overflow: hidden;
 }

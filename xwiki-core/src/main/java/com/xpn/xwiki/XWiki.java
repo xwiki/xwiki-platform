@@ -2746,11 +2746,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             tagClass.setRelationalStorage(true);
             needsUpdate = true;
         }
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            generatePageContent(doc, "XWiki TagClass");
-        }
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Tag Class");
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -2787,9 +2783,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("defaultEditMode", "Default Edit Mode", 15);
 
         if (doc.isNew()) {
-            generatePageContent(doc, "Sheet Class");
+            needsUpdate |= setClassDocumentFields(doc, "XWiki Sheet Class");
             doc.setContent(doc.getContent() + "\n\nClass that should be used to recognize sheet pages.");
-            doc.setParent("XWiki.XWikiClasses");
         }
 
         if (needsUpdate) {
@@ -2841,12 +2836,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            generatePageContent(doc, "XWiki Users");
-        }
+        needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");        
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -2878,12 +2868,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName("XWiki.GlobalRedirect");
         needsUpdate |= bclass.addTextField("pattern", "Pattern", 30);
-        needsUpdate |= bclass.addTextField("destination", "Destination", 30);
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            generatePageContent(doc, "XWiki Global Redirect Class");
-        }
+        needsUpdate |= bclass.addTextField("destination", "Destination", 30);        
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Global Redirect Class");        
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3026,12 +3012,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             ((BooleanClass) bclass.get("showRightPanels")).setDisplayType("yesno");
             needsUpdate = true;
         }
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            generatePageContent(doc, "XWiki Preferences");
-        }
+        
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");        
 
         String menu = doc.getStringValue("XWiki.XWikiPreferences", "menu");
         if (menu.indexOf("../..") != -1) {
@@ -3068,11 +3050,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         bclass.setName("XWiki.XWikiGroups");
 
         needsUpdate |= bclass.addTextField("member", "Member", 30);
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            generatePageContent(doc, "XWiki Groups");
-        }
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Group Class");
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3095,8 +3073,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     template.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
                 }
                 template.createNewObject(bclass.getName(), context);
-                template.setCreator("XWiki.Admin");
-                template.setAuthor("XWiki.Admin");
+                template.setCreator(XWikiRightService.SUPERADMIN_USER);
+                template.setAuthor(template.getCreator());
                 List<String> args = new ArrayList<String>(1);
                 args.add("Group");
                 saveDocument(template, context.getMessageTool().get("core.comment.createdTemplate", args), context);
@@ -3157,11 +3135,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             afield.setDefaultValue(1);
             needsUpdate = true;
         }
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            generatePageContent(doc, "XWiki " + pagename + " Class");
+        
+        String title;
+        if (pagename.equals("XWikiGlobalRights")) {
+            title = "XWiki Global Rights Class";
+        } else {
+            title = "XWiki Rights Class";
         }
+
+        needsUpdate |= setClassDocumentFields(doc, title);        
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3197,12 +3179,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
         needsUpdate |= bclass.addDateField("date", "Date");
         needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            generatePageContent(doc, "XWiki Comment Class");
-        }
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Comment Class");        
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3232,12 +3209,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTemplateField("viewheader.vm", "View Header");
         needsUpdate |= bclass.addTemplateField("view.vm", "View");
         needsUpdate |= bclass.addTemplateField("edit.vm", "Edit");
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            generatePageContent(doc, "XWiki Skin Class");
-        }
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Skin Class");
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3310,7 +3282,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             String parent = request.getParameter("parent");
             String validkey = null;
 
-            if ("superadmin".equalsIgnoreCase(xwikiname)) {
+            if (XWikiRightService.SUPERADMIN_USER.equalsIgnoreCase(xwikiname)) {
                 return -8;
             }
             try {
@@ -4718,7 +4690,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         int active = 1;
 
         // These users are necessarly active
-        if (user.equals("XWiki.XWikiGuest") || (user.equals("XWiki.superadmin"))) {
+        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME) 
+            || (user.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
             return active;
         }
 
@@ -6817,21 +6790,45 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Create a default content for the document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
+     * Set the fields of the class document passed as parameter. Can generate content for both XWiki Syntax 1.0 and
      * XWiki Syntax 2.0. If new documents are set to be created in XWiki Syntax 1.0 then generate XWiki 1.0 Syntax
      * otherwise generate XWiki Syntax 2.0.
      * 
-     * @param pageHeader the page header to set
+     * @param title the page title to set
+     * @return true if the document has been modified, false otherwise
      */
-    private void generatePageContent(XWikiDocument document, String pageHeader)
+    private boolean setClassDocumentFields(XWikiDocument doc, String title)
     {
-        if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
-            document.setContent("= " + pageHeader);
-            document.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
-        } else {
-            document.setContent("1 " + pageHeader);
-            document.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+        boolean needsUpdate = false;
+
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(doc.getTitle())) {
+            needsUpdate = true;
+            doc.setTitle(title);
+        }
+        if (StringUtils.isBlank(doc.getContent())) {
+            needsUpdate = true;
+            if (!getDefaultDocumentSyntax().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
+                doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+                doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+            } else {
+                doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
+                doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            }
+        }
+        
+        return needsUpdate;
     }
 
     /**

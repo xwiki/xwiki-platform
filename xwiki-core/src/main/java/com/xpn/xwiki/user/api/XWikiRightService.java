@@ -29,6 +29,16 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface XWikiRightService
 {
+    /**
+     * The Superadmin username.
+     */
+    public static final String SUPERADMIN_USER = "superadmin";
+    
+    /**
+     * The Superadmin full name.
+     */
+    public static final String SUPERADMIN_USER_FULLNAME = "XWiki." + SUPERADMIN_USER;
+    
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)

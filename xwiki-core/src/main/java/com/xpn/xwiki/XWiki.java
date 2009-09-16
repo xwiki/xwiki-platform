@@ -6859,4 +6859,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         return syntaxId;
     }
+    
+    /**
+     * @return true if title handling should be using the compatibility mode or not. When the compatibility
+     *         mode is active, if the document's content first header (level 1 or level 2) matches the document's 
+     *         title the first header is stripped.
+     */
+    public boolean isTitleInCompatibilityMode()
+    {
+        return "1".equals(Param("xwiki.title.compatibility", "0"));
+    }
 }

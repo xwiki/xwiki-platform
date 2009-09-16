@@ -37,7 +37,9 @@ import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -58,6 +60,7 @@ import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.util.TOCGenerator;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 public class Document extends Api
 {
@@ -249,6 +252,27 @@ public class Document extends Api
     public String getDisplayTitle()
     {
         return this.doc.getDisplayTitle(getXWikiContext());
+    }
+
+    /**
+     * @see XWikiDocument#getRenderedTitle(Syntax, XWikiContext)
+     */
+    public String getRenderedTitle(String syntaxId) throws XWikiException
+    {
+        try {
+            return this.doc.getRenderedTitle(
+                Utils.getComponent(SyntaxFactory.class).createSyntaxFromIdString(syntaxId), getXWikiContext());
+        } catch (ParseException e) {
+            LOG.error("Failed to parse provided syntax identifier [" + syntaxId + "]", e);
+
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to parse syntax identifier [" + syntaxId + "]", e);
+        } catch (Exception e) {
+            LOG.error("Failed to render document [" + getPrefixedFullName() + "] title content", e);
+
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to render document [" + getPrefixedFullName() + "] content title", e);
+        }
     }
 
     /**
@@ -494,7 +518,7 @@ public class Document extends Api
     {
         return this.doc.getRenderedContent(targetSyntax, getXWikiContext());
     }
-    
+
     /**
      * return a escaped version of the content of this document
      */
@@ -1214,8 +1238,8 @@ public class Document extends Api
                     newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return this.doc.getRenderedContentDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc
-                    .getName()), getXWikiContext());
+                return this.doc.getRenderedContentDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
+                    origdoc.getName()), getXWikiContext());
             }
 
             return this.doc.getRenderedContentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1549,9 +1573,9 @@ public class Document extends Api
     }
 
     /**
-     * Get document children. Children are documents with the current document as parent.
-     * Where a document has a large number of children, one may desire to return a certain number
-     * of children (nb) and skip some number (start) of the first results.
+     * Get document children. Children are documents with the current document as parent. Where a document has a large
+     * number of children, one may desire to return a certain number of children (nb) and skip some number (start) of
+     * the first results.
      * 
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.

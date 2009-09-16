@@ -90,6 +90,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
 
@@ -118,6 +119,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -527,7 +529,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         // Note: We are currently duplicating code from the other getRendered signature because some calling
         // code is expecting that the rendering will happen in the calling document's context and not in this
-        // document's context. For example this is true for the Admin page, see 
+        // document's context. For example this is true for the Admin page, see
         // http://jira.xwiki.org/jira/browse/XWIKI-4274 for more details.
 
         String renderedContent;
@@ -710,27 +712,116 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public String getDisplayTitle(XWikiContext context)
     {
-        // 1) Check if the user has provided a title
-        String title = getTitle();
+        try {
+            return getRenderedTitle(Syntax.XHTML_1_0, context);
+        } catch (XWikiException e) {
+            LOG.error("Failed to render document title content", e);
 
-        // 2) If not, then try to extract the title from the first document section title
-        if (title.length() == 0) {
-            title = extractTitle();
+            return getName();
         }
+    }
+
+    /**
+     * The first found first or second level header content is rendered with
+     * {@link XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}.
+     * 
+     * @param context the XWiki context
+     * @return the rendered version of the found header content. Empty string if not can be found.
+     */
+    private String getRenderedContentTitle10(XWikiContext context)
+    {
+        // 1) Check if the user has provided a title
+        String title = extractTitle10();
 
         // 3) Last if a title has been found renders it as it can contain macros, velocity code,
         // groovy, etc.
         if (title.length() > 0) {
-            if (is10Syntax()) {
-                // Only needed for xwiki 1.0 syntax, for other syntaxes it's already rendered in #extractTitle
-                // This will not completely work for scripting code in title referencing variables
-                // defined elsewhere. In that case it'll only work if those variables have been
-                // parsed and put in the corresponding scripting context. This will not work for
-                // breadcrumbs for example.
-                title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
-            }
+            // Only needed for xwiki 1.0 syntax, for other syntaxes it's already rendered in #extractTitle
+            // This will not completely work for scripting code in title referencing variables
+            // defined elsewhere. In that case it'll only work if those variables have been
+            // parsed and put in the corresponding scripting context. This will not work for
+            // breadcrumbs for example.
+            title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
+        }
+
+        return title;
+    }
+
+    /**
+     * Get the rendered version of the first of second level first found header content in the document content.
+     * <ul>
+     * <li>xwiki/1.0: the first found first or second level header content is rendered with
+     * {@link XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}</li>
+     * <li>xwiki/2.0: the first found first or seconf level content is executed and rendered with renderer for the
+     * provided syntax</li>
+     * </ul>
+     * 
+     * @param outputSyntax the syntax to render to. This is not taken into account for xwiki/1.0 syntax.
+     * @param context the XWiki context
+     * @return the rendered version of the title. null or empty (when xwiki/1.0 syntax) string if none can be found
+     * @throws XWikiException failed to render content
+     */
+    private String getRenderedContentTitle(Syntax outputSyntax, XWikiContext context) throws XWikiException
+    {
+        String title = null;
+
+        if (is10Syntax()) {
+            title = getRenderedContentTitle10(context);
         } else {
-            // 4) No title has been found, return the page name as the title
+            List<HeaderBlock> blocks = getXDOM().getChildrenByType(HeaderBlock.class, true);
+            if (blocks.size() > 0) {
+                HeaderBlock header = blocks.get(0);
+                if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
+                    XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
+
+                    // transform
+                    try {
+                        Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, getSyntax());
+                    } catch (TransformationException e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING,
+                            XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to transform document", e);
+                    }
+
+                    // render
+                    Block headerBlock = headerXDOM.getChildren().get(0);
+                    if (headerBlock instanceof HeaderBlock) {
+                        title = renderXDOM(new XDOM(headerBlock.getChildren()), outputSyntax);
+                    }
+                }
+            }
+        }
+
+        return title;
+    }
+
+    /**
+     * Get the rendered version of the title of the document.
+     * <ul>
+     * <li>if document <code>title</code> field is not empty: its returned after a call to
+     * {@link XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}</li>
+     * <li>if document <code>title</code> field is empty: see {@link #getRenderedContentTitle(Syntax, XWikiContext)}</li>
+     * <li>if after the two first step the title is still empty, the page name is returned</li>
+     * </ul>
+     * 
+     * @param outputSyntax the syntax to render to. This is not taken into account for xwiki/1.0 syntax.
+     * @param context the XWiki context
+     * @return the rendered version of the title
+     * @throws XWikiException failed to render title content
+     */
+    public String getRenderedTitle(Syntax outputSyntax, XWikiContext context) throws XWikiException
+    {
+        // 1) Check if the user has provided a title
+        String title = getTitle();
+
+        if (!StringUtils.isEmpty(title)) {
+            return context.getWiki().getRenderingEngine().interpretText(title, this, context);
+        }
+
+        // 2) If not, then try to extract the title from the first document section title
+        title = getRenderedContentTitle(outputSyntax, context);
+
+        // 3) No title has been found, return the page name as the title
+        if (StringUtils.isEmpty(title)) {
             title = getName();
         }
 
@@ -749,7 +840,7 @@ public class XWikiDocument implements DocumentModelBridge
                 if (blocks.size() > 0) {
                     HeaderBlock header = blocks.get(0);
                     if (header.getLevel().compareTo(HeaderLevel.LEVEL2) <= 0) {
-                        XDOM headerXDOM = new XDOM(Collections.<Block>singletonList(header));
+                        XDOM headerXDOM = new XDOM(Collections.<Block> singletonList(header));
 
                         // transform
                         Utils.getComponent(TransformationManager.class).performTransformations(headerXDOM, getSyntax());
@@ -772,7 +863,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
      * @todo this method has nothing to do in this class and should be moved elsewhere
      */
-    public String extractTitle10()
+    private String extractTitle10()
     {
         String content = getContent();
         Matcher m = HEADING_PATTERN_10.matcher(content);
@@ -4820,7 +4911,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * @return the sections in the current document
      */
-    public List<DocumentSection> getSections10()
+    private List<DocumentSection> getSections10()
     {
         // Pattern to match the title. Matches only level 1 and level 2 headings.
         Pattern headingPattern = Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);
@@ -4887,7 +4978,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the content of a section
      * @throws XWikiException error when trying to extract section content
      */
-    public String getContentOfSection10(int sectionNumber) throws XWikiException
+    private String getContentOfSection10(int sectionNumber) throws XWikiException
     {
         List<DocumentSection> splitSections = getSections();
         int indexEnd = 0;
@@ -4964,7 +5055,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the new document content.
      * @throws XWikiException error when updating document content with section content
      */
-    public String updateDocumentSection10(int sectionNumber, String newSectionContent) throws XWikiException
+    private String updateDocumentSection10(int sectionNumber, String newSectionContent) throws XWikiException
     {
         StringBuffer newContent = new StringBuffer();
         // get document section that will be edited

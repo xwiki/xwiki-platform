@@ -30,10 +30,10 @@
       #end
     #end
   #end
-  #editActionButton('cancel', 'cancel')
   #editActionButton($backToEditAction, 'backtoedit')
   #editActionButton('saveandcontinue', 'saveandcontinue')
   #editActionButton('save', 'saveandview')
+  #editActionButton('cancel', 'cancel')
   </div>
 </form>
 #end ## showactions

@@ -25,20 +25,23 @@
 #end
 ## ----------------------------------------------------------------------------
 ## Remove the first rendered H1 or H2 if the following conditions are met:
-## - the title compatibility flag is on or the document title is not set
+## - the title compatibility flag is on
 ## - the title extracted from the rendered content is the same as the set title
 ## We need to do this since we've changed how titles are used and we need to
 ## ensure we don't break existing documents that have not yet migrated to the
 ## new way.
 ## -----------------------------------------------------------------------------
-#set ($titleToDisplay = $tdoc.displayTitle)
 ## Look for first H1 or H2 either in lowercase or uppercase
 #set ($regexResult = $regextool.find($renderedContent, "<[hH][12].*?><span>(.*?)</span></[hH][12]>"))
-#if (!$regexResult.isEmpty() && $regexResult.get(1).group.equals($titleToDisplay))
-  #if ($regexResult.get(0).end < $mathtool.sub($renderedContent.length(), 1))
-    #set ($renderedContent = "${renderedContent.substring(0, $regexResult.get(0).start)}${renderedContent.substring($regexResult.get(0).end)}")                                                  
-  #else
-    #set ($renderedContent = $renderedContent.substring(0, $regexResult.get(0).start))   
+#set ($titleToDisplay = $tdoc.displayTitle)
+#if (!$regexResult.isEmpty())
+  #if ($tdoc.title.length() == 0 || $regexResult.get(1).group.equals($titleToDisplay))
+    #if ($regexResult.get(0).end < $mathtool.sub($renderedContent.length(), 1))
+      #set ($renderedContent = "${renderedContent.substring(0, $regexResult.get(0).start)}${renderedContent.substring($regexResult.get(0).end)}")
+    #else
+      #set ($renderedContent = $renderedContent.substring(0, $regexResult.get(0).start))
+    #end
+    #set ($titleToDisplay = $regexResult.get(1).group)
   #end
 #end
 ## ----------------------------

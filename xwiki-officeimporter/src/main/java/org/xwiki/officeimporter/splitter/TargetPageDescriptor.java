@@ -60,19 +60,35 @@ public class TargetPageDescriptor
     }
 
     /**
-     * @return name of the target wiki page.
+     * @return target page name.
      */
-    public String getPageName()
+    public DocumentName getPageName()
+    {
+        return this.pageName;
+    }
+    
+    /**
+     * @return target page name as a string.
+     */
+    public String getPageNameAsString()
     {
         return serializeDocumentName(pageName, "default");
     }
 
     /**
+     * @return target parent page name.
+     */
+    public DocumentName getParentName()
+    {
+       return this.parentName; 
+    }
+    
+    /**
      * @return name of the parent wiki page.
      */
-    public String getParentName()
+    public String getParentNameAsString()
     {
-        return serializeDocumentName(parentName, "default");
+        return (null != parentName) ? serializeDocumentName(parentName, "default") : null;
     }
 
     /**

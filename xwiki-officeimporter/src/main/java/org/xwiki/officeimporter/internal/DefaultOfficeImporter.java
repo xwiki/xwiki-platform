@@ -21,55 +21,31 @@ package org.xwiki.officeimporter.internal;
 
 import groovy.lang.GroovyClassLoader;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
-import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.container.Container;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterFilter;
-import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
-import org.xwiki.refactoring.WikiDocument;
-import org.xwiki.refactoring.splitter.DocumentSplitter;
-import org.xwiki.refactoring.splitter.criterion.HeadingLevelSplittingCriterion;
-import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
-import org.xwiki.refactoring.splitter.criterion.naming.HeadingNameNamingCriterion;
-import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
-import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BlockFilter;
-import org.xwiki.rendering.block.HeaderBlock;
-import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.rendering.block.SpecialSymbolBlock;
-import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
+import org.xwiki.officeimporter.builder.PresentationBuilder;
+import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
+import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
+import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
+import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.xml.html.HTMLCleaner;
-import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
 /**
@@ -87,63 +63,46 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
 
     /**
-     * Name of the presentation archive.
-     */
-    public static final String PRESENTATION_ARCHIVE_NAME = "presentation.zip";
-
-    /**
      * Document access bridge used to access wiki documents.
      */
     @Requirement
     private DocumentAccessBridge docBridge;
 
     /**
-     * OpenOffice document converter.
+     * Used to dynamically lookup for components.
      */
     @Requirement
-    private OpenOfficeDocumentConverter ooConverter;
+    private ComponentManager componentManager;
 
     /**
-     * OpenOffice html cleaner.
-     */
-    @Requirement("openoffice")
-    private HTMLCleaner ooHtmlCleaner;
-
-    /**
-     * XHTML/1.0 syntax parser.
-     */
-    @Requirement("xhtml/1.0")
-    private Parser xHtmlParser;
-
-    /**
-     * XWiki/2.0 syntax parser.
-     */
-    @Requirement("xwiki/2.0")
-    private Parser xwikiParser;
-
-    /**
-     * To render XDOM into XWiki Syntax 2.0.
-     */
-    @Requirement("xwiki/2.0")
-    private BlockRenderer xwikiSyntaxRenderer;
-
-    /**
-     * To Render XDOM into XHTML.
-     */
-    @Requirement("xhtml/1.0")
-    private BlockRenderer xhtmlRenderer;
-
-    /**
-     * The {@link DocumentSplitter} used for splitting documents.
+     * Used for parsing document name strings.
      */
     @Requirement
-    private DocumentSplitter documentSplitter;
+    private DocumentNameFactory nameFactory;
 
     /**
-     * Used for querying temporary directory information.
+     * Used for importing office documents.
      */
     @Requirement
-    private Container container;
+    private XHTMLOfficeDocumentBuilder xhtmlOfficeDocumentBuilder;
+
+    /**
+     * Used for importing office documents.
+     */
+    @Requirement
+    private XDOMOfficeDocumentBuilder xdomOfficeDocumentBuilder;
+
+    /**
+     * Used for importing (presentation) office documents.
+     */
+    @Requirement
+    private PresentationBuilder presentationBuilder;
+
+    /**
+     * Used for splitting office imports.
+     */
+    @Requirement
+    private XDOMOfficeDocumentSplitter xdomOfficeDocumentSplitter;
 
     /**
      * {@inheritDoc}
@@ -151,75 +110,204 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     public void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
         Map<String, String> params) throws OfficeImporterException
     {
-        params.put("targetDocument", targetWikiDocument);
-        File tempDir = container.getApplicationContext().getTemporaryDirectory();
-        OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, docBridge.getCurrentUser());
-        OfficeImporterFilter importerFilter = getImporterFilter(params);
-        try {
-            Map<String, InputStream> artifacts = ooConverter.convert(documentStream, storage);
-            if (isPresentation(documentFormat)) {
-                byte[] archive = buildPresentationArchive(artifacts);
-                docBridge.setAttachmentContent(targetWikiDocument, PRESENTATION_ARCHIVE_NAME, archive);
-                String xwikiPresentationCode = buildPresentationFrameCode(PRESENTATION_ARCHIVE_NAME, "output.html");
-                saveDocument(targetWikiDocument, null, xwikiPresentationCode, isAppendRequest(params));
+        DocumentName baseDocument = nameFactory.createDocumentName(targetWikiDocument);
+        if (isPresentation(documentFormat)) {
+            XDOMOfficeDocument presentation = presentationBuilder.build(readStream(documentStream));
+            saveDocument(presentation, new TargetPageDescriptor(baseDocument, this.componentManager), null,
+                isAppendRequest(params), false);
+        } else {
+            OfficeImporterFilter importerFilter = getImporterFilter(params);
+            XHTMLOfficeDocument xhtmlDoc =
+                xhtmlOfficeDocumentBuilder.build(readStream(documentStream), baseDocument, shouldFilterStyles(params));
+            importerFilter.filter(targetWikiDocument, xhtmlDoc.getContentDocument());
+            XDOMOfficeDocument xdomDoc = xdomOfficeDocumentBuilder.build(xhtmlDoc);
+            importerFilter.filter(targetWikiDocument, xdomDoc.getContentDocument(), false);
+            if (!isSplitRequest(params)) {
+                saveDocument(xdomDoc, new TargetPageDescriptor(baseDocument, this.componentManager), importerFilter,
+                    isAppendRequest(params), false);
             } else {
-                InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
-                HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
-                configuration.setParameters(params);
-                Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
-                importerFilter.filter(targetWikiDocument, xhtmlDoc);
-                HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
-                XDOM xdom = xHtmlParser.parse(new StringReader(HTMLUtils.toString(xhtmlDoc)));
-                importerFilter.filter(targetWikiDocument, xdom, false);
-                if (!isSplitRequest(params)) {
-                    saveDocument(targetWikiDocument, extractTitle(xdom), importerFilter.filter(targetWikiDocument,
-                        renderXdom(xdom, this.xwikiSyntaxRenderer), false), isAppendRequest(params));
-                    attachArtifacts(targetWikiDocument, artifacts);
-                } else {
-                    splitImport(targetWikiDocument, xdom, artifacts, params, importerFilter);
+                int[] headingLevels = getHeadingLevelsToSplit(params);
+                String namingCriterionHint = params.get("childPagesNamingMethod");
+                Map<TargetPageDescriptor, XDOMOfficeDocument> results =
+                    xdomOfficeDocumentSplitter.split(xdomDoc, headingLevels, namingCriterionHint, baseDocument);
+                for (Map.Entry<TargetPageDescriptor, XDOMOfficeDocument> result : results.entrySet()) {
+                    boolean append = result.getKey().getPageName().equals(baseDocument);                    
+                    saveDocument(result.getValue(), result.getKey(), importerFilter, append, true);
                 }
             }
-        } catch (Exception ex) {
-            throw new OfficeImporterException(ex.getMessage(), ex);
-        } finally {
-            storage.cleanUp();
         }
     }
-
+    
     /**
      * {@inheritDoc}
      */
     public String importAttachment(String documentName, String attachmentName, Map<String, String> params)
         throws OfficeImporterException
     {
-        params.put("targetDocument", documentName);
-        File tempDir = container.getApplicationContext().getTemporaryDirectory();
-        OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, docBridge.getCurrentUser());
+        String result = null;
+        DocumentName baseDocument = nameFactory.createDocumentName(documentName);               
+        byte[] data = readAttachment(documentName, attachmentName);                
+        if (isPresentation(attachmentName)) {
+            XDOMOfficeDocument presentation = presentationBuilder.build(data);
+            result = presentation.getContentAsString("xhtml/1.0");
+            attachArtifacts(documentName, presentation.getArtifacts());
+        } else {
+            XHTMLOfficeDocument xhtmlDoc = xhtmlOfficeDocumentBuilder.build(data, baseDocument, shouldFilterStyles(params));
+            HTMLUtils.stripHTMLEnvelope(xhtmlDoc.getContentDocument());
+            result = xhtmlDoc.getContentAsString();
+            attachArtifacts(documentName, xhtmlDoc.getArtifacts());
+        }        
+        return result;
+    }
+
+    /**
+     * Utility method for saving an {@link XDOMOfficeDocument} into a wiki page.
+     * 
+     * @param document the xdom office document.
+     * @param targetDescriptor where to save the office document.
+     * @param importerFilter filter to be used on the final content just before saving.
+     * @param append whether content should be appended if the target document already exists.
+     * @param isSplit if this document is a newly split one.
+     */
+    private void saveDocument(XDOMOfficeDocument document, TargetPageDescriptor targetDescriptor,
+        OfficeImporterFilter importerFilter, boolean append, boolean isSplit) throws OfficeImporterException
+    {
+        String target = targetDescriptor.getPageNameAsString();
+        String parent = targetDescriptor.getParentNameAsString();
+        String title = document.getTitle();
+        String content = document.getContentAsString();
+        content = (null != importerFilter) ? importerFilter.filter(target, content, isSplit) : content;
         try {
-            ByteArrayInputStream bis =
-                new ByteArrayInputStream(docBridge.getAttachmentContent(documentName, attachmentName));
-            Map<String, InputStream> artifacts = ooConverter.convert(bis, storage);
-            if (isPresentation(attachmentName)) {
-                byte[] archive = buildPresentationArchive(artifacts);
-                docBridge.setAttachmentContent(documentName, PRESENTATION_ARCHIVE_NAME, archive);
-                String xwikiPresentationCode = buildPresentationFrameCode(PRESENTATION_ARCHIVE_NAME, "output.html");
-                XDOM xdom = xwikiParser.parse(new StringReader(xwikiPresentationCode));
-                return renderXdom(xdom, this.xhtmlRenderer);
+            if (docBridge.exists(target) && append) {
+                // Must make sure that the target document is in xwiki 2.0 syntax.
+                if (!docBridge.getDocumentSyntaxId(target).equals(Syntax.XWIKI_2_0.toIdString())) {
+                    throw new OfficeImporterException("Target document is not an xwiki/2.0 document.");
+                }
+                String oldContent = docBridge.getDocumentContent(target);
+                // Insert a newline between the old content and the appended content.
+                docBridge.setDocumentContent(target, oldContent + "\n" + content, "Updated by office importer", false);
             } else {
-                InputStreamReader reader = new InputStreamReader(artifacts.remove("output.html"), "UTF-8");
-                attachArtifacts(documentName, artifacts);
-                HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
-                configuration.setParameters(params);
-                Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
-                HTMLUtils.stripHTMLEnvelope(xhtmlDoc);
-                return HTMLUtils.toString(xhtmlDoc);
+                docBridge.setDocumentSyntaxId(target, Syntax.XWIKI_2_0.toIdString());
+                if (null != title) {
+                    docBridge.getDocument(target).setTitle(title);
+                }
+                if (null != parent) {
+                    docBridge.getDocument(target).setParent(targetDescriptor.getParentName());
+                }
+                docBridge.setDocumentContent(target, content, "Created by office importer", false);
             }
+            // Attach the artifacts.
+            attachArtifacts(target, document.getArtifacts());
         } catch (Exception ex) {
-            throw new OfficeImporterException(ex.getMessage(), ex);
-        } finally {
-            storage.cleanUp();
+            throw new OfficeImporterException("Error while saving office document.", ex);
         }
     }
+    
+    /**
+     * Utility method for attaching artifacts into a wiki page.
+     * 
+     * @param documentName name of the document.
+     * @param artifacts artifacts.
+     */
+    private void attachArtifacts(String documentName, Map<String, byte[]> artifacts)
+    {
+        for (Map.Entry<String, byte[]> artifact : artifacts.entrySet()) {
+            try {
+                docBridge.setAttachmentContent(documentName, artifact.getKey(), artifact.getValue());
+            } catch (Exception ex) {
+                // Log the error and skip the artifact.
+                getLogger().error("Error while attaching artifact.", ex);
+            }
+        }
+    }
+
+    /**
+     * Utility method for reading an input stream into a byte array.
+     * 
+     * @param is input stream.
+     * @return a byte array containing data read from the stream.
+     */
+    private byte[] readStream(InputStream is) throws OfficeImporterException
+    {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        byte[] buff = new byte[1024];
+        int count = 0;
+        try {
+            while (-1 != (count = is.read(buff))) {
+                bos.write(buff, 0, count);
+            }
+        } catch (IOException ex) {
+            throw new OfficeImporterException("Erro while reading office document input stream.", ex);
+        }
+        return bos.toByteArray();
+    }
+    
+    /**
+     * Utility method for reading an attachment.
+     * 
+     * @param documentName document name.
+     * @param attachmentName attachment name.
+     * @return attachment content as a byte array.
+     * @throws OfficeImporterException if an error occurs while accessing the attachment.
+     */
+    private byte[] readAttachment(String documentName, String attachmentName) throws OfficeImporterException
+    {
+        try {
+            return docBridge.getAttachmentContent(documentName, attachmentName);
+        } catch (Exception ex) {
+            throw new OfficeImporterException("Error while reading attachment.", ex);
+        }
+    }    
+
+    /**
+     * Utility method for building a {@link OfficeImporterFilter} suitable for this import operation. If no external
+     * filter has been specified a {@link DefaultOfficeImporterFilter} will be used.
+     * 
+     * @param params additional parameters provided for this import operation.
+     * @return an {@link OfficeImporterFilter}.
+     */
+    private OfficeImporterFilter getImporterFilter(Map<String, String> params)
+    {
+        OfficeImporterFilter importerFilter = null;
+        String groovyFilterParam = params.get("groovyFilter");
+        if (null != groovyFilterParam && !groovyFilterParam.equals("")) {
+            try {
+                String groovyScript = docBridge.getDocumentContent(groovyFilterParam);
+                GroovyClassLoader gcl = new GroovyClassLoader();
+                importerFilter = (OfficeImporterFilter) gcl.parseClass(groovyScript).newInstance();
+            } catch (Throwable t) {
+                getLogger().warn("Could not build the groovy filter.", t);
+            }
+        }
+        importerFilter = (importerFilter == null) ? new DefaultOfficeImporterFilter() : importerFilter;
+        importerFilter.setDocBridge(docBridge);
+        return importerFilter;
+    }
+    
+    /**
+     * Utility method for extracting heading levels used for splitting.
+     * 
+     * @param params additional parameters passed in for the import operation.
+     * @return heading levels array.
+     * @throws OfficeImporterException if an error occurs while extracting heading levels.
+     */
+    private int[] getHeadingLevelsToSplit(Map<String, String> params) throws OfficeImporterException
+    {
+        String headingLevelsParam = params.get("headingLevelsToSplit");
+        if (headingLevelsParam != null) {
+            try {
+                String[] headingLevelsStringArray = headingLevelsParam.split(",");
+                int[] headingLevelsIntArray = new int[headingLevelsStringArray.length];
+                for (int i = 0; i < headingLevelsStringArray.length; i++) {
+                    headingLevelsIntArray[i] = Integer.parseInt(headingLevelsStringArray[i]);
+                }
+                return headingLevelsIntArray;
+            } catch (NumberFormatException ex) {
+                throw new OfficeImporterException("Unable to determine splitting criterion.");
+            }
+        }
+        throw new OfficeImporterException("Unable to determine splitting criterion.");
+    }    
 
     /**
      * Utility method for checking if a file name corresponds to an office presentation.
@@ -258,290 +346,14 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     }
 
     /**
-     * Utility method for rendering a given xdom into target syntax.
+     * Utility method for checking if a request specifies styles be filtered from the import.
      * 
-     * @param xdom the {@link XDOM}
-     * @param renderer the renderer to use to perform the XDOM rendering
-     * @return the rendered content in target syntax
+     * @param params additional parameters passed in for the import operation.
+     * @return whether styles should be filtered or not.
      */
-    private String renderXdom(XDOM xdom, BlockRenderer renderer)
+    private boolean shouldFilterStyles(Map<String, String> params)
     {
-        WikiPrinter printer = new DefaultWikiPrinter();
-        renderer.render(xdom, printer);
-        return printer.toString();
-    }
-
-    /**
-     * Generates a suitable title for the document represented by newDoc.
-     * 
-     * @param xdom the {@link XDOM} of the newly split document.
-     * @return a string representing the title for the new document or null.
-     */
-    private String extractTitle(XDOM xdom)
-    {
-        String title = null;
-        // Filter all top-level header blocks.
-        List<HeaderBlock> headerBlocks = xdom.getChildrenByType(HeaderBlock.class, false);
-        // Filter all top-level section blocks.
-        List<SectionBlock> sectionBlocks = xdom.getChildrenByType(SectionBlock.class, false);
-        // If no top-level header blocks are present, search inside top-level section blocks.
-        if (headerBlocks.isEmpty() && !sectionBlocks.isEmpty()) {
-            headerBlocks = sectionBlocks.get(0).getChildrenByType(HeaderBlock.class, true);
-        }
-        // If a suitable header block is found, filter it's content and generate the title.
-        if (!headerBlocks.isEmpty()) {
-            Block firstHeader = headerBlocks.get(0);
-            // Clone the header block and remove any unwanted stuff
-            Block clonedHeaderBlock = firstHeader.clone(new BlockFilter()
-            {
-                public List<Block> filter(Block block)
-                {
-                    List<Block> blocks = new ArrayList<Block>();
-                    if (block instanceof WordBlock || block instanceof SpaceBlock
-                        || block instanceof SpecialSymbolBlock) {
-                        blocks.add(block);
-                    }
-                    return blocks;
-                }
-            });
-            title = renderXdom(new XDOM(clonedHeaderBlock.getChildren()), this.xwikiSyntaxRenderer);
-            // Strip line-feed and new-line characters if present.
-            title = title.replaceAll("[\n\r]", "");
-            // Truncate long titles.
-            if (title.length() > 255) {
-                title = title.substring(0, 255);
-            }
-        }
-        return title;
-    }
-
-    /**
-     * Splits the document represented by inputReader into multiple documents.
-     * 
-     * @param documentName name of the master document, this name will be used as a basis for naming the resulting
-     *            documents.
-     * @param xdom the {@link XDOM} of the master document that needs to be split.
-     * @param params additional parameters for the split operation (split criterion, naming criterion etc.)
-     * @param importerFilter the {@link OfficeImporterFilter} to be used for filtering split documents.
-     * @throws OfficeImporterException if a parsing error occurs.
-     */
-    private void splitImport(String documentName, XDOM xdom, Map<String, InputStream> artifacts,
-        Map<String, String> params, OfficeImporterFilter importerFilter) throws OfficeImporterException
-    {
-        SplittingCriterion splittingCriterion = getSplittingCriterion(documentName, params);
-        NamingCriterion namingCriterion = getNamingCriterion(documentName, params);
-        try {
-            WikiDocument rootDoc = new WikiDocument(documentName, xdom, null);
-            List<WikiDocument> documents = documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
-            for (WikiDocument doc : documents) {
-                XDOM childXdom = doc.getXdom();
-                // Apply extended filtering.
-                importerFilter.filter(doc.getFullName(), childXdom, true);
-                // Set parent document (if possible).
-                if (doc.getParent() != null) {
-                    DocumentName parentName = docBridge.getDocumentName(doc.getParent().getFullName());
-                    docBridge.getDocument(doc.getFullName()).setParent(parentName);
-                }
-                // Extract all image artifacts & attach them to the current document.
-                Map<String, InputStream> tempArtifacts = new HashMap<String, InputStream>();
-                List<ImageBlock> imageBlocks = childXdom.getChildrenByType(ImageBlock.class, true);
-                for (ImageBlock imageBlock : imageBlocks) {
-                    String imageName = imageBlock.getImage().getName();
-                    tempArtifacts.put(imageName, artifacts.remove(imageName));
-                }
-                attachArtifacts(doc.getFullName(), tempArtifacts);
-                String content = renderXdom(childXdom, this.xwikiSyntaxRenderer);
-                // Check if this is an append request (only root doc can be appended).
-                boolean append = doc.equals(rootDoc) ? isAppendRequest(params) : false;
-                saveDocument(doc.getFullName(), extractTitle(doc.getXdom()), importerFilter.filter(doc.getFullName(),
-                    content, true), append);
-            }
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Internal error while importing document.", ex);
-        }
-    }
-
-    /**
-     * Utility method for building a {@link SplittingCriterion} based on the parameters provided.
-     * 
-     * @param targetWikiDocument name of the master wiki page.
-     * @param params parameters provided for the splitting function.
-     * @return a {@link DocumentSplitter} based on the parameters provided.
-     * @throws OfficeImporterException if it's not possible to determine / build the splitting criterion.
-     */
-    private SplittingCriterion getSplittingCriterion(String targetWikiDocument, Map<String, String> params)
-        throws OfficeImporterException
-    {
-        String headingLevelsParam = params.get("headingLevelsToSplit");
-        if (headingLevelsParam != null) {
-            try {
-                String[] headingLevelsStringArray = headingLevelsParam.split(",");
-                int[] headingLevelsIntArray = new int[headingLevelsStringArray.length];
-                for (int i = 0; i < headingLevelsStringArray.length; i++) {
-                    headingLevelsIntArray[i] = Integer.parseInt(headingLevelsStringArray[i]);
-                }
-                return new HeadingLevelSplittingCriterion(headingLevelsIntArray);
-            } catch (NumberFormatException ex) {
-                throw new OfficeImporterException("Unable to determine splitting criterion.");
-            }
-        }
-        throw new OfficeImporterException("Unable to determine splitting criterion.");
-    }
-
-    /**
-     * Utility method for building a {@link NamingCriterion} based on the parameters provided.
-     * 
-     * @param targetWikiDocument name of the master wiki page.
-     * @param params parameters provided for the splitting function.
-     * @return a {@link NamingCriterion} based on the parameters provided.
-     */
-    private NamingCriterion getNamingCriterion(String targetWikiDocument, Map<String, String> params)
-        throws OfficeImporterException
-    {
-        String namingMethodParam = params.get("childPagesNamingMethod");
-        if (namingMethodParam == null || namingMethodParam.equals("")) {
-            throw new OfficeImporterException("Unable to determine child pages naming method.");
-        } else if (namingMethodParam.equals("headingNames")) {
-            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, this.xwikiSyntaxRenderer, false);
-        } else if (namingMethodParam.equals("mainPageNameAndHeading")) {
-            return new HeadingNameNamingCriterion(targetWikiDocument, docBridge, this.xwikiSyntaxRenderer, true);
-        } else if (namingMethodParam.equals("mainPageNameAndNumbering")) {
-            return new PageIndexNamingCriterion(targetWikiDocument, docBridge);
-        } else {
-            throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
-        }
-    }
-
-    /**
-     * Utility method for building a {@link OfficeImporterFilter} suitable for this import operation. If no external
-     * filter has been specified a {@link DefaultOfficeImporterFilter} will be used.
-     * 
-     * @param params additional parameters provided for this import operation.
-     * @return an {@link OfficeImporterFilter}.
-     */
-    private OfficeImporterFilter getImporterFilter(Map<String, String> params)
-    {
-        OfficeImporterFilter importerFilter = null;
-        String groovyFilterParam = params.get("groovyFilter");
-        if (null != groovyFilterParam && !groovyFilterParam.equals("")) {
-            try {
-                String groovyScript = docBridge.getDocumentContent(groovyFilterParam);
-                GroovyClassLoader gcl = new GroovyClassLoader();
-                importerFilter = (OfficeImporterFilter) gcl.parseClass(groovyScript).newInstance();
-            } catch (Throwable t) {
-                getLogger().warn("Could not build the groovy filter.", t);
-            }
-        }
-        importerFilter = (importerFilter == null) ? new DefaultOfficeImporterFilter() : importerFilter;
-        importerFilter.setDocBridge(docBridge);
-        return importerFilter;
-    }
-
-    /**
-     * Utility method for saving xwiki/2.0 content generated from the import operation.
-     * 
-     * @param documentName name of the xwiki document where the content should be saved into.
-     * @param title title to be set for the document, should be null if not required.
-     * @param content the string content (result of the import operation)
-     * @param append if the content should be appended in case of an existing document.
-     * @throws OfficeImporterException if an error occurs while saving the document.
-     */
-    private void saveDocument(String documentName, String title, String content, boolean append)
-        throws OfficeImporterException
-    {
-        try {
-            if (docBridge.exists(documentName) && append) {
-                // Must make sure that the target document is in xwiki 2.0 syntax.
-                if (!docBridge.getDocumentSyntaxId(documentName).equals(Syntax.XWIKI_2_0.toIdString())) {
-                    throw new OfficeImporterException("Target document is not an xwiki 2.0 document.");
-                }
-                String oldContent = docBridge.getDocumentContent(documentName);
-                // Append the new content.
-                docBridge.setDocumentSyntaxId(documentName, Syntax.XWIKI_2_0.toIdString());
-                // Insert a newline between the old content and the appended content.
-                docBridge.setDocumentContent(documentName, oldContent + "\n" + content, "Updated by office importer",
-                    false);
-            } else {
-                if (null != title) {
-                    docBridge.getDocument(documentName).setTitle(title);
-                }
-                docBridge.setDocumentSyntaxId(documentName, Syntax.XWIKI_2_0.toIdString());
-                docBridge.setDocumentContent(documentName, content, "Updated by office importer", false);
-            }
-        } catch (Exception ex) {
-            throw new OfficeImporterException(ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * Attached the given artifacts into target wiki document.
-     * 
-     * @param documentName target wiki document name.
-     * @param artifacts artifacts collected during the document conversion.
-     */
-    private void attachArtifacts(String documentName, Map<String, InputStream> artifacts)
-    {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buf = new byte[1024];
-        int len = 0;
-        for (String artifactName : artifacts.keySet()) {
-            try {
-                InputStream stream = artifacts.get(artifactName);
-                while ((len = stream.read(buf)) > 0) {
-                    bos.write(buf, 0, len);
-                }
-                docBridge.setAttachmentContent(documentName, artifactName, bos.toByteArray());
-                bos.reset();
-            } catch (Exception ex) {
-                getLogger().error("Error while attaching artifact.", ex);
-                // Skip the artifact.
-            }
-        }
-    }
-
-    /**
-     * Utility method for building xwiki 2.0 code required for displaying an office presentation.
-     * 
-     * @param zipFilename name of the presentation zip archive.
-     * @param index the html file (in the archive) to begin the presentation.
-     * @return the xwiki code for displaying the presentation.
-     */
-    private String buildPresentationFrameCode(String zipFilename, String index)
-    {
-        return "{{velocity}}#set($url=$xwiki.zipexplorer.getFileLink($doc, \"" + zipFilename + "\", \"" + index
-            + "\")){{html}}<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>{{/html}}{{/velocity}}";
-    }
-
-    /**
-     * Utility method for building a zip archive for presentation imports.
-     * 
-     * @param artifacts artifacts collected during the document conversion.
-     * @return the byte[] containing the zip archive.
-     * @throws OfficeImporterException if an I/O exception is encountered.
-     */
-    private byte[] buildPresentationArchive(Map<String, InputStream> artifacts) throws OfficeImporterException
-    {
-        try {
-            ByteArrayOutputStream zipBos = new ByteArrayOutputStream();
-            ZipOutputStream zos = new ZipOutputStream(zipBos);
-            ByteArrayOutputStream tempBos = new ByteArrayOutputStream();
-            byte[] buf = new byte[1024];
-            int len = 0;
-            for (String artifactName : artifacts.keySet()) {
-                ZipEntry entry = new ZipEntry(artifactName);
-                zos.putNextEntry(entry);
-                InputStream stream = artifacts.get(artifactName);
-                while ((len = stream.read(buf)) > 0) {
-                    tempBos.write(buf, 0, len);
-                }
-                zos.write(tempBos.toByteArray());
-                zos.closeEntry();
-                tempBos.reset();
-            }
-            zos.close();
-            return zipBos.toByteArray();
-        } catch (IOException ex) {
-            throw new OfficeImporterException("Error while creating presentation archive.", ex);
-        }
-    }
+        String filterStylesParam = params.get("filterStyles");
+        return (filterStylesParam != null) ? filterStylesParam.equals("strict") : false;
+    }   
 }

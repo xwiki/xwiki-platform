@@ -225,22 +225,25 @@ public class WatchListStore implements EventListener
 
         needsUpdate = initWatchListClassProperties(doc, context);
 
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(WatchListPlugin.DEFAULT_ADMIN);
-        }
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
-            doc.setCreator(WatchListPlugin.DEFAULT_ADMIN);
+            doc.setCreator(WatchListPlugin.DEFAULT_DOC_AUTHOR);
+        }
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
         }
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }
-
-        if (StringUtils.isBlank(doc.getContent())) {
+        if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
-            doc.setContent("= XWiki Watchlist Notification Rule Class =");
+            doc.setTitle("XWiki WatchList Notification Rules Class");
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            needsUpdate = true;      
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
         }
 

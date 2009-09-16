@@ -51,7 +51,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     /**
      * Default XWiki Administrator.
      */
-    public static final String DEFAULT_ADMIN = "XWiki.Admin";
+    public static final String DEFAULT_DOC_AUTHOR = "superadmin";
 
     /**
      * Default parent to use for class pages.

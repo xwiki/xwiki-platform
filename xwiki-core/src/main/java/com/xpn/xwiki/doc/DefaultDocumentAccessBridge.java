@@ -168,16 +168,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      */
     public boolean exists(String documentName)
     {
-        boolean exists = false;
-        try {
-            XWikiContext xcontext = getContext();
-            XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
-            exists = (!doc.isNew());
-        } catch (XWikiException e) {
-            // If we failed to get the document we consider it doesn't exist.
-            // Note that this can happen when the storage subsystem is down for example.
-        }
-        return exists;
+        return getContext().getWiki().exists(documentName, getContext());
     }
 
     /**

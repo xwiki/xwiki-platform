@@ -65,11 +65,6 @@ public class WatchListJobManager
     private static final String XWIKI_RIGHTS_CLASS = "XWiki.XWikiRights";
 
     /**
-     * Default XWiki Administrator.
-     */
-    private static final String DEFAULT_ADMIN = "XWiki.Admin";
-
-    /**
      * Set watchlist common documents fields.
      * 
      * @param doc document used for this job.
@@ -79,16 +74,14 @@ public class WatchListJobManager
     {
         boolean needsUpdate = false;
 
-        if (StringUtils.isBlank(doc.getAuthor())) {
-            needsUpdate = true;
-            doc.setAuthor(DEFAULT_ADMIN);
-        }
-
         if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
-            doc.setCreator(DEFAULT_ADMIN);
+            doc.setCreator(WatchListPlugin.DEFAULT_DOC_AUTHOR);
         }
-
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
         if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.WatchListClass");
@@ -138,12 +131,16 @@ public class WatchListJobManager
             needsUpdate = true;
         }
 
-        needsUpdate = initWatchListJobClassProperties(doc, context);
-        needsUpdate = setWatchListCommonDocumentsFields(doc);
+        needsUpdate |= initWatchListJobClassProperties(doc, context);
+        needsUpdate |= setWatchListCommonDocumentsFields(doc);
 
-        if (StringUtils.isBlank(doc.getContent())) {
+        if (StringUtils.isBlank(doc.getTitle())) {
             needsUpdate = true;
-            doc.setContent("= XWiki Watchlist Notification Job Class =");
+            doc.setTitle("XWiki WatchList Notifier Class");
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            needsUpdate = true;      
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
             doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
         }
 
@@ -240,14 +237,14 @@ public class WatchListJobManager
                 job.setStringValue("jobName", name);
                 job.setStringValue("jobClass", WatchListJob.class.getName());
                 job.setStringValue("cron", cron);
-                job.setStringValue("contextUser", DEFAULT_ADMIN);
+                job.setStringValue("contextUser", "XWiki.Admin");
                 job.setStringValue("contextLang", "en");
                 job.setStringValue("contextDatabase", "xwiki");
             }
 
-            needsUpdate = createWatchListJobRightsObject(doc, context);
-            needsUpdate = createWatchListJobObject(doc, emailTemplate, context);
-            needsUpdate = setWatchListCommonDocumentsFields(doc);
+            needsUpdate |= createWatchListJobRightsObject(doc, context);
+            needsUpdate |= createWatchListJobObject(doc, emailTemplate, context);
+            needsUpdate |= setWatchListCommonDocumentsFields(doc);
             
             if (StringUtils.isBlank(doc.getTitle())) {
                 needsUpdate = true;

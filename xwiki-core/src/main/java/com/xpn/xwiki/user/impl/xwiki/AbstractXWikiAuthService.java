@@ -27,6 +27,7 @@ import org.securityfilter.realm.SimplePrincipal;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Common methods useful to all Authentication services implementations.
@@ -39,21 +40,11 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      * Logging tool.
      */
     private static final Log LOG = LogFactory.getLog(AbstractXWikiAuthService.class);
-
-    /**
-     * The Superadmin username.
-     */
-    private static final String SUPERADMIN = "superadmin";
-
+    
     /**
      * The XWiki config property for storing the superadmin password.
      */
     private static final String SUPERADMIN_PASSWORD_CONFIG = "xwiki.superadminpassword";
-
-    /**
-     * The Superadmin full name.
-     */
-    private static final String SUPERADMIN_FULLNAME = "XWiki.superadmin";
 
     /**
      * @param username the username to check for superadmin access
@@ -63,7 +54,8 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
     {
         String lowerUserName = username.toLowerCase();
 
-        return (lowerUserName.equals(SUPERADMIN) || lowerUserName.endsWith("." + SUPERADMIN));
+        return (lowerUserName.equals(XWikiRightService.SUPERADMIN_USER) 
+            || lowerUserName.endsWith("." + XWikiRightService.SUPERADMIN_USER));
     }
 
     /**
@@ -84,9 +76,10 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         String superadminpassword = context.getWiki().Param(SUPERADMIN_PASSWORD_CONFIG);
         if ((superadminpassword != null) && (superadminpassword.equals(password))) {
             if (context.isMainWiki()) {
-                principal = new SimplePrincipal(SUPERADMIN_FULLNAME);
+                principal = new SimplePrincipal(XWikiRightService.SUPERADMIN_USER_FULLNAME);
             } else {
-                principal = new SimplePrincipal(context.getMainXWiki() + ":" + SUPERADMIN_FULLNAME);
+                principal = 
+                    new SimplePrincipal(context.getMainXWiki() + ":" + XWikiRightService.SUPERADMIN_USER_FULLNAME);
             }
         } else {
             principal = null;

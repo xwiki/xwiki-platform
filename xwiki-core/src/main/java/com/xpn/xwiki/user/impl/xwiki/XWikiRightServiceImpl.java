@@ -711,7 +711,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     {
         String database = context.getDatabase();
         boolean allow;
-        if (name.equals("XWiki.superadmin") || name.endsWith(":XWiki.superadmin")) {
+        if (name.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME) 
+            || name.endsWith(":" + XWikiRightService.SUPERADMIN_USER_FULLNAME)) {
             logAllow(name, resourceKey, accessLevel, "super admin level");
             return true;
         }

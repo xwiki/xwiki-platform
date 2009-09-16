@@ -33,6 +33,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl}.
@@ -154,7 +155,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         assertFalse(this.rightService.hasProgrammingRights(this.context));
 
         // superadmin should always have PR
-        this.context.setUser("XWiki.superadmin");
+        this.context.setUser(XWikiRightService.SUPERADMIN_USER_FULLNAME);
         assertTrue(this.rightService.hasProgrammingRights(this.context));
     }
 }

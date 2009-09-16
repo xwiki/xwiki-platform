@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * A {@link DefaultWikiMacroInitializer} providing wiki macros.
@@ -131,6 +133,35 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             wikiMacroManager.registerWikiMacro(MAIN_WIKI + ":" + documentName, wikiMacros.get(documentName));
         }
     }
+    
+    private boolean setWikiMacroClassesDocumentFields(XWikiDocument doc, String title)
+    {
+        boolean needsUpdate = false;
+        
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
+        }
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(doc.getTitle())) {
+            needsUpdate = true;
+            doc.setTitle(title);
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            needsUpdate = true;      
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+        }
+        
+        return needsUpdate;
+    }
 
     /**
      * Installs or upgrades XWiki.WikiMacroClass & XWiki.WikiMacroParameterClass.
@@ -147,7 +178,8 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         bclass.setName(WIKI_MACRO_CLASS);
 
         boolean needsUpdate = false;
-
+        
+        needsUpdate |= setWikiMacroClassesDocumentFields(doc, "XWiki Wiki Macro Class");
         needsUpdate |= bclass.addTextField(MACRO_ID_PROPERTY, "Macro id", 30);
         needsUpdate |= bclass.addTextField(MACRO_NAME_PROPERTY, "Macro name", 30);
         needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5);
@@ -170,6 +202,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         
         needsUpdate = false;
         
+        needsUpdate |= setWikiMacroClassesDocumentFields(doc, "XWiki Wiki Macro Parameter Class");
         needsUpdate |= bclass.addTextField(PARAMETER_NAME_PROPERTY, "Parameter name", 30);
         needsUpdate |= bclass.addTextAreaField(PARAMETER_DESCRIPTION_PROPERTY, "Parameter description", 40, 5);
         needsUpdate |= bclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "select");

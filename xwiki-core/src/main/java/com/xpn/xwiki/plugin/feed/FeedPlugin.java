@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.config.CacheConfiguration;
@@ -58,6 +59,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
@@ -580,23 +582,32 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addTextField("imgurl", "Image url", 80);
         needsUpdate |= bclass.addDateField("date", "date", "dd/MM/yyyy HH:mm:ss");
         needsUpdate |= bclass.addNumberField("nb", "nb", 5, "integer");
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
+        
+        if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
-            doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
         }
-
-        String parent = doc.getParent();
-        if ((parent == null) || (parent.trim().equals(""))) {
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
+        if (StringUtils.isBlank(doc.getTitle())) {
+            needsUpdate = true;
+            doc.setTitle("XWiki Aggregator URL Class");
+        }
+        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            needsUpdate = true;      
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }
-
         if (needsUpdate) {
             context.getWiki().saveDocument(doc, context);
         }
+        
         return bclass;
     }
 
@@ -632,15 +643,28 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         needsUpdate |= bclass.addNumberField("read", "Read", 5, "integer");
         needsUpdate |= bclass.addStaticListField("tags", "Tags", 1, true, true, "", null, null);
 
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
+        if (StringUtils.isBlank(doc.getCreator())) {
             needsUpdate = true;
-            doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
-            doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
+            doc.setCreator(XWikiRightService.SUPERADMIN_USER);
+        }
+        
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor(doc.getCreator());
+        }
+        
+        if (StringUtils.isBlank(doc.getTitle())) {
+            needsUpdate = true;
+            doc.setTitle("XWiki Feed Entry Class");
         }
 
-        String parent = doc.getParent();
-        if ((parent == null) || (parent.trim().equals(""))) {
+        if (StringUtils.isBlank(doc.getContent()) || !XWikiDocument.XWIKI20_SYNTAXID.equals(doc.getSyntaxId())) {
+            needsUpdate = true;      
+            doc.setContent("{{include document=\"XWiki.ClassSheet\" /}}");
+            doc.setSyntaxId(XWikiDocument.XWIKI20_SYNTAXID);
+        }
+        
+        if (StringUtils.isBlank(doc.getParent())) {
             needsUpdate = true;
             doc.setParent("XWiki.XWikiClasses");
         }

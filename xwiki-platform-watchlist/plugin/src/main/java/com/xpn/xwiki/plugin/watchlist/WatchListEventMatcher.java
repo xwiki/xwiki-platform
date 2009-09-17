@@ -32,9 +32,10 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityStream;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
-import com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent;
-import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPluginApi;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
+import com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin;
 
 /**
  * Matcher for WatchList events. This class store all the events fired during a given interval. It also allows to 
@@ -63,11 +64,6 @@ public class WatchListEventMatcher
     };
 
     /**
-     * ActivityStream plugin API.
-     */
-    private final ActivityStreamPluginApi asApi;
-
-    /**
      * List of events which have occurred between the start date and the current time.
      */
     private final List<WatchListEvent> events = new ArrayList<WatchListEvent>();
@@ -80,7 +76,8 @@ public class WatchListEventMatcher
      */
     public WatchListEventMatcher(Date start, XWikiContext context)
     {
-        asApi = (ActivityStreamPluginApi) context.getWiki().getPluginApi("activitystream", context);
+        ActivityStream actStream = 
+            ((ActivityStreamPlugin) context.getWiki().getPlugin("activitystream", context)).getActivityStream();
         List<Object> parameters = new ArrayList<Object>();
         List<ActivityEvent> rawEvents;
 
@@ -88,25 +85,23 @@ public class WatchListEventMatcher
         
         try {
             rawEvents =
-                asApi.searchEvents("act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','")
-                    + "')", false, true, 0, 0, parameters);
-            
-            // During wiki initialization searchEvents may return null.
-            if (rawEvents != null) {
-                // If the page has been modified several times we want to display only one diff, if the page has been
-                // delete after update events we want to discard the update events since we won't be able to display 
-                // diff from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and 
-                // WatchListEvent#equals(WatchListEvent).
-                for (ActivityEvent rawEvent : rawEvents) {
-                    WatchListEvent event = new WatchListEvent(rawEvent);
-                    if (!events.contains(event)) {
-                        events.add(new WatchListEvent(rawEvent));
-                    } else {
-                        WatchListEvent existingCompositeEvent = events.get(events.indexOf(event));
-                        existingCompositeEvent.addEvent(event);
-                    }
+                actStream.searchEvents("act.date > ? and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','")
+                    + "')", false, true, 0, 0, parameters, context);
+
+            // If the page has been modified several times we want to display only one diff, if the page has been
+            // delete after update events we want to discard the update events since we won't be able to display 
+            // diff from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and 
+            // WatchListEvent#equals(WatchListEvent).
+            for (ActivityEvent rawEvent : rawEvents) {
+                WatchListEvent event = new WatchListEvent(rawEvent);
+                if (!events.contains(event)) {
+                    events.add(new WatchListEvent(rawEvent));
+                } else {
+                    WatchListEvent existingCompositeEvent = events.get(events.indexOf(event));
+                    existingCompositeEvent.addEvent(event);
                 }
             }
+
         } catch (ActivityStreamException e) {
             LOG.error("Failed to retrieve updated documents from activity stream");
             e.printStackTrace();

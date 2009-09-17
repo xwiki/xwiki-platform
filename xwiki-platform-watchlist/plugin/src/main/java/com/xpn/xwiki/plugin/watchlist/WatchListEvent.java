@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
-import com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent;
+import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.diff.DiffPluginApi;
 
 /**

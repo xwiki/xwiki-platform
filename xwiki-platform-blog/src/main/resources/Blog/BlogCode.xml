@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1220389470000</creationDate>
-<date>1227682070000</date>
-<contentUpdateDate>1227682070000</contentUpdateDate>
+<date>1253183596000</date>
+<contentUpdateDate>1253183596000</contentUpdateDate>
 <version>1.1</version>
 <title>Macros for the Blog application</title>
 <template></template>
@@ -41,14 +41,14 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
 #macro(printBlog $blogDoc)
   #includeInContext('Blog.CreatePost')
   #getBlogEntries($blogDoc $entries)
-  #displayBlog($entries 'index' true)
+  #displayBlog($entries 'index' true true)
   #displayNavigationLinks($blogDoc)
 #end
 ##
 ##
 ##
 #**
- * Shows blog information. In view mode, the title and description are printed. In inline edit mode, allows changing
+ * Shows blog information. In view mode, the description is printed. In inline edit mode, allows changing
  * blog settings: title, description, blog type (global or in-space), index display type (fixed size pagination, weekly
  * index, monthly index, all entries).
  * 
@@ -69,10 +69,6 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
         #displayProperty($blogDoc 'itemsPerPage')
       &lt;/dl&gt;
     #else
-      #getBlogTitle($blogDoc $title)
-      #if($title != "")
-        1 $title
-      #end
       $blogDoc.display('description')
     #end
   #elseif($doc.fullName == $blogSheet)
@@ -338,8 +334,10 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  *        unpublished entries, etc. This will be used as the classname(s) for the container div (hfeed). Currently
  *        used values: index, single, category, search, unpublished, hidden.
  * @param onlyExtract If &lt;tt&gt;true&lt;/tt&gt;, only display the extract of articles where available, otherwise display the full content.
+ * @param shouldDisplayTitles If &lt;tt&gt;true&lt;/tt&gt;, display the blog title (blog posts shouldn't display the title when they're
+ *        displayed alone on their page since it's the page title which is used in this case)
  *###
-#macro(displayBlog $entries $displaying $onlyExtract)
+#macro(displayBlog $entries $displaying $onlyExtract $shouldDisplayTitles)
   #set($blogDay = "")
   &lt;div class="hfeed $!{displaying}"&gt;
   &lt;div class="blogDay"&gt;
@@ -362,7 +360,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
           #set ($blogDay = $entryDateStr)
         #end
         ## Finally, display the entry.
-        #displayEntry($entryDoc $entryObj $onlyExtract)
+        #displayEntry($entryDoc $entryObj $onlyExtract $shouldDisplayTitles)
       #end
     #end
   #end
@@ -430,8 +428,10 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
  * @param entryDoc The xdocument of the blog post. Each post resides in its own document.
  * @param entryObj The xobject of the blog post, an instance of the &lt;tt&gt;Blog.BlogPostClass&lt;/tt&gt; xclass.
  * @param onlyExtract If &lt;tt&gt;true&lt;/tt&gt;, try to display only a summary of the entry, instead of the full content.
+ * @param shouldDisplayTitle If &lt;tt&gt;true&lt;/tt&gt;, display the blog title (blog posts shouldn't display the title 
+ *        when they're displayed alone on their page since it's the page title which is used in this case)
  *###
-#macro(displayEntry $entryDoc $entryObj $onlyExtract)
+#macro(displayEntry $entryDoc $entryObj $onlyExtract $shouldDisplayTitle)
   ## Only articles with an explicit hidden setting or an explicit unpublished setting are hidden
   #isPublished($entryObj $isPublished)
   #isHidden($entryObj $isHidden)
@@ -441,7 +441,9 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
     &lt;div class="hentry#if(!$isPublished) unpublished-article#elseif($isHidden) hidden-article#end"&gt;
   #end
   #displayEntryTools($entryDoc $entryObj)
-  #displayEntryTitle($entryDoc $entryObj)
+  #if($shouldDisplayTitle)
+    #displayEntryTitle($entryDoc $entryObj)
+  #end
   #if($doc.fullName == $entryDoc.fullName)
     #if(!$isPublished)
       #warning($msg.get('xe.blog.code.published'))

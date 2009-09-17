@@ -30,7 +30,7 @@
 ## new way.
 ## -----------------------------------------------------------------------------
 ## Look for first H1 or H2 either in lowercase or uppercase
-#set ($regexResult = $regextool.find($renderedContent, "<[hH][12].*?><span>(.*?)</span></[hH][12]>"))
+#set ($regexResult = $regextool.find($renderedContent, "<[hH][12].*?>(?:<span>)?(.*?)(?:</span>)?</[hH][12]>"))
 #set ($titleToDisplay = $tdoc.displayTitle)
 #if (!$regexResult.isEmpty())
   #if ($tdoc.title.length() == 0 || ($xwiki.isTitleInCompatibilityMode() && $regexResult.get(1).group.equals($titleToDisplay)))

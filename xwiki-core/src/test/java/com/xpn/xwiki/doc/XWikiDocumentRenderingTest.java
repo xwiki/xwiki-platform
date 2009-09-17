@@ -123,6 +123,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
         this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
         this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
+        this.mockXWiki.stubs().method("exists").will(returnValue(false));
 
         getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
@@ -194,7 +195,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
 
-        assertEquals("<span class=\"wikilink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
+        assertEquals("<span class=\"wikicreatelink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
             + "Page" + "</span></a></span>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
 
         this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
@@ -232,5 +233,54 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.document.setSyntaxId("xwiki/2.0");
 
         assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+    }
+
+    public void testExtractTitle()
+    {
+        this.document.setSyntaxId("xwiki/2.0");
+
+        this.document.setContent("content not in section\n" + "= header 1=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("header 1", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n" + "= **header 1**=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("<strong>header 1</strong>", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
+
+        assertEquals("<span class=\"wikicreatelink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
+            + "Page" + "</span></a></span>", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
+            + "== header 2==\nheader 2 content");
+
+        assertEquals("#set($var = \"value\")", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n"
+            + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+
+        assertEquals("value", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n=== header 3===");
+
+        assertEquals("", this.document.extractTitle());
+    }
+
+    public void testExtractTitle10()
+    {
+        this.document.setContent("content not in section\n" + "1 header 1\nheader 1 content\n"
+            + "1.1 header 2\nheader 2 content");
+
+        assertEquals("header 1", this.document.extractTitle());
+
+        this.document.setContent("content not in section\n");
+
+        assertEquals("", this.document.extractTitle());
     }
 }

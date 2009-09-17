@@ -15,7 +15,7 @@
 <date>1236779890000</date>
 <contentUpdateDate>1236779890000</contentUpdateDate>
 <version>1.1</version>
-<title>The first post of your wiki's blog</title>
+<title>$doc.getValue("title")</title>
 <template>Blog.BlogPostTemplate</template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -191,7 +191,7 @@ Happy blogging!
 <published>1</published>
 </property>
 <property>
-<title>The first post of your wiki's blog</title>
+<title>First blog post</title>
 </property>
 </object>
 <content>#includeForm('Blog.BlogPostSheet')</content>

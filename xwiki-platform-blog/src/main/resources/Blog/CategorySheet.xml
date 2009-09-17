@@ -52,7 +52,7 @@ $xwiki.jsx.use("Blog.ManageCategories")##
 
     ## 1.1 Articles in this category
     #getEntriesForCategory($doc.fullName $entries $total)
-    #displayBlog($entries 'category' true)
+    #displayBlog($entries 'category' true true)
     ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
     ## document, as the macro fallbacks to 'paginated' in case the right setting cannot be determined.
     #displayNavigationLinks($doc)

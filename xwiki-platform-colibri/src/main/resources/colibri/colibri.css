@@ -773,7 +773,8 @@ body.mceContentBody {
 
 #xwikimaincontainer, body.hideright #xwikimaincontainer {
   line-height: 1.2em;
-  margin: 20px 0 0;
+  margin: 0;
+  padding-top: 20px;
   text-align: center;
   border: none;
 }

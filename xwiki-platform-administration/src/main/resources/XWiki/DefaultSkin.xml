@@ -200,7 +200,7 @@
 <view.vm></view.vm>
 </property>
 <property>
-<baseskin>toucan</baseskin>
+<baseskin>colibri</baseskin>
 </property>
 <property>
 <name>Default XWiki Skin</name>

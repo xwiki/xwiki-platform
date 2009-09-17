@@ -15,7 +15,7 @@
 <date>1227676277000</date>
 <contentUpdateDate>1227676277000</contentUpdateDate>
 <version>1.1</version>
-<title>Wiki blog</title>
+<title>$doc.getObject("Blog.BlogClass").get("title")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>

@@ -257,6 +257,14 @@ Messages
   color: #F00;
 }
 
+span.errormessage, span.warningmessage, span.infomessage, span.plainmessage {
+  background-position: 2px center;
+  overflow: visible;
+  padding: 0 2px 0 22px;
+  white-space: normal;
+  font-size: 100%;
+}
+
 span.messagetype{
   display: none;
 }

@@ -113,7 +113,7 @@
   #if($monthArticleCount &gt; 0)
     #foreach($entryDoc in $xwiki.wrapDocs($xwiki.searchDocuments("${query} order by publishDate.value")))
       #getEntryObject($entryDoc $entryObj)
-      #displayEntry($entryDoc $entryObj true)
+      #displayEntry($entryDoc $entryObj true true)
     #end
   #else
     #info($msg.get('xe.blog.archive.noarticlesmonth'))

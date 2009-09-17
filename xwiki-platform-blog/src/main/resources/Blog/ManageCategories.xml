@@ -15,7 +15,7 @@
 <date>1227250570000</date>
 <contentUpdateDate>1227250570000</contentUpdateDate>
 <version>1.1</version>
-<title>Manage blog categories</title>
+<title>$msg.get('xe.blog.manageCategories.title')</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -715,9 +715,6 @@ input.category-name-input {
 $xwiki.ssx.use('Blog.ManageCategories')##
 $xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##
 ##
-1 $msg.get('xe.blog.manageCategories.title')
-
 #displayCategoryManagementTree('' 'editable')
-
 #end</content>
 </xwikidoc>

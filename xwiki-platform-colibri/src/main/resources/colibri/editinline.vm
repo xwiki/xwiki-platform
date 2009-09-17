@@ -7,7 +7,15 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 <div class="main layoutsubsection">
 <div id="xwikicontent">
 #template("hierarchy.vm")
-  <div id="document-title"><h1>$tdoc.displayTitle</h1></div>
+## ----------------------------------------------------------------------------
+## Compute title to display and modify rendered content accordingly.
+## ----------------------------------------------------------------------------
+#set ($renderedContent = $cdoc.getRenderedContent())
+##template("titlevars.vm")
+## ----------------------------
+## Display the title
+## ----------------------------
+<div id="document-title"><h1>$titleToDisplay</h1></div>
 ##
 ##
 ## Can the document be edited?
@@ -44,7 +52,10 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 #if("$!request.title" != '')
   <input type="hidden" name="title" value="$xwiki.getXMLEncoded($!request.title)" />
 #end
-$cdoc.getRenderedContent()
+## ----------------------------
+## Display the rendered content
+## ----------------------------
+$renderedContent
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 </div> ## form

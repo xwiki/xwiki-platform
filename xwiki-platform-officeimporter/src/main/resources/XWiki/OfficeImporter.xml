@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <xwikidoc>
 <web>XWiki</web>
 <name>OfficeImporter</name>
@@ -11,10 +12,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1217261143000</creationDate>
-<date>1248766933000</date>
-<contentUpdateDate>1248766933000</contentUpdateDate>
-<version>2.1</version>
-<title>Office Importer</title>
+<date>1253186002000</date>
+<contentUpdateDate>1253186002000</contentUpdateDate>
+<version>1.1</version>
+<title>$msg.get("xe.officeimporter.import.title")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -259,8 +260,7 @@ select#childPagesNamingMethod {
 <use>onDemand</use>
 </property>
 </object>
-<content>
-#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
+<content>#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
 #if($isguest)
 #error($msg.get("xe.officeimporter.notallowed"))  
 #else
@@ -268,7 +268,6 @@ select#childPagesNamingMethod {
     #set($targetdoc = $xwiki.getDocument($request.page))
   #end
 &lt;div class="office_importer_box"&gt;
-&lt;h1&gt;$msg.get("xe.officeimporter.import.title")&lt;/h1&gt;
 &lt;form action="$xwiki.getURL('XWiki.OfficeImporterResults','view')" enctype="multipart/form-data" method="post"&gt;
 &lt;p class="office_importer_document"&gt;
 &lt;label for="filepath"&gt;$msg.get("xe.officeimporter.import.document") : &lt;/label&gt;
@@ -339,5 +338,4 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
 /* ]]&gt; */
 &lt;/script&gt;
 {/pre}
-</content>
-</xwikidoc>
+</content></xwikidoc>

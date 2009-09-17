@@ -3830,3 +3830,9 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
   background-image: url( $xwiki.getSkinFile('icons/silk/exclamation.gif') );
   color: #e14726;
 }
+
+span.errormessage, span.warningmessage, span.infomessage, span.plainmessage {
+  background-position: 2px center;
+  overflow: visible;
+  padding: 0 2px 0 22px;
+}

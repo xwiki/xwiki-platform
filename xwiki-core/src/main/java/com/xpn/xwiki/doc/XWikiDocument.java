@@ -709,7 +709,9 @@ public class XWikiDocument implements DocumentModelBridge
      * @return the document title. If a title has not been provided, look for a section title in the document's content
      *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
      *         use Velocity, Groovy, etc syntax within a title.
+     * @deprecated use {@link #getRenderedContentTitle(Syntax, XWikiContext)} instead
      */
+    @Deprecated
     public String getDisplayTitle(XWikiContext context)
     {
         try {
@@ -3303,16 +3305,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
     {
-        String[] whereParams = {
-            this.getWikiName() + ":" + this.getFullName(), 
-            this.getFullName(), 
-            this.getName(), 
-            this.getWikiName() + ":" + this.getName(), 
-            this.getSpace()
-        };
+        String[] whereParams =
+            {this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(),
+            this.getWikiName() + ":" + this.getName(), this.getSpace()};
 
         String whereStatement = "doc.parent=? or doc.parent=? or ((doc.parent=? or doc.parent=?) and doc.space=?)";
-        return context.getWiki().getStore().searchDocumentsNames(whereStatement, nb, start, Arrays.asList(whereParams), context);
+        return context.getWiki().getStore().searchDocumentsNames(whereStatement, nb, start, Arrays.asList(whereParams),
+            context);
     }
 
     public void renameProperties(String className, Map<String, String> fieldsToRename)

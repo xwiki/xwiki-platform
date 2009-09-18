@@ -33,7 +33,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
@@ -191,8 +190,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer =
-                Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
+            BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
             renderer.render(xdom, printer);
 
             return printer.toString();
@@ -210,8 +208,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
-        org.xwiki.xml.html.HTMLCleaner cleaner =
-            Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
+        org.xwiki.xml.html.HTMLCleaner cleaner = Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
         HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
         configuration.setParameters(cleaningParams);
         org.w3c.dom.Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
@@ -413,11 +410,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         throws XWikiGWTException
     {
         try {
-            List<String> documentNames =
-                getXWikiContext().getWiki().getStore().searchDocumentsNames(
-                    "where 1=1 and doc.author='" + getXWikiContext().getUser() + "' order by doc.date desc", count,
-                    start, getXWikiContext());
-            return prepareDocumentResultsList(documentNames);
+            List<XWikiDocument> docs =
+                getXWikiContext().getWiki().search(
+                    "select distinct doc from XWikiDocument doc where 1=1 and doc.author='"
+                        + getXWikiContext().getUser() + "' order by doc.date desc", count, start, getXWikiContext());
+            return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
             throw getXWikiGWTException(e);
         }
@@ -432,11 +429,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         try {
             // FIXME: this fullname comparison with the keyword does not contain the wiki name
             String escapedKeyword = keyword.replaceAll("'", "''").toLowerCase();
-            List<String> documentNames =
-                getXWikiContext().getWiki().getStore().searchDocumentsNames(
-                    "where lower(doc.title) like '%" + escapedKeyword + "%' or lower(doc.fullName) like '%"
-                        + escapedKeyword + "%'", count, start, getXWikiContext());
-            return prepareDocumentResultsList(documentNames);
+            List<XWikiDocument> docs =
+                getXWikiContext().getWiki().search(
+                    "select distinct doc from XWikiDocument as doc where lower(doc.title) like '%" + escapedKeyword
+                        + "%' or lower(doc.fullName) like '%" + escapedKeyword + "%'", count, start, getXWikiContext());
+            return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
             throw getXWikiGWTException(e);
         }
@@ -446,21 +443,20 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * Helper function to prepare a list of {@link com.xpn.xwiki.gwt.api.client.Document}s (with fullname, title, etc)
      * from a list of document names.
      * 
-     * @param docNames the list of names of the documents to include in the list
+     * @param docs the list of the documents to include in the list
      * @return the list of {@link com.xpn.xwiki.gwt.api.client.Document}s corresponding to the passed names
      * @throws XWikiException if anything goes wrong retrieving the documents
      */
-    private List<com.xpn.xwiki.gwt.api.client.Document> prepareDocumentResultsList(List<String> docNames)
+    private List<com.xpn.xwiki.gwt.api.client.Document> prepareDocumentResultsList(List<XWikiDocument> docs)
         throws XWikiException
     {
         List<com.xpn.xwiki.gwt.api.client.Document> results = new ArrayList<com.xpn.xwiki.gwt.api.client.Document>();
-        for (String docName : docNames) {
-            DocumentModelBridge doc = getXWikiContext().getWiki().getDocument(docName, getXWikiContext());
+        for (XWikiDocument doc : docs) {
             com.xpn.xwiki.gwt.api.client.Document xwikiDoc = new com.xpn.xwiki.gwt.api.client.Document();
             xwikiDoc.setFullName(doc.getFullName());
-            xwikiDoc.setTitle(doc.getTitle());
+            xwikiDoc.setTitle(doc.getDisplayTitle(getXWikiContext()));
             // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
-            xwikiDoc.setUploadURL(getDocumentAccessBridge().getURL(doc.getFullName(), VIEW_ACTION, "", ""));
+            xwikiDoc.setUploadURL(doc.getURL(VIEW_ACTION, getXWikiContext()));
             results.add(xwikiDoc);
         }
         return results;

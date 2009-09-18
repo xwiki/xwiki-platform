@@ -33,6 +33,7 @@ import org.xwiki.xmlrpc.model.XWikiExtendedId;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * This is an helper class containing some utility method for handling and setting up the XWiki and XMLRPC data objects
@@ -65,7 +66,7 @@ public class XWikiUtils
             if (token.equals("")) {
                 /* If no token is provided, then grant guest access or refuse it, depending on the current configuration */
                 if (allowGuest) {
-                    user = new XWikiXmlRpcUser("XWiki.XWikiGuest", ip);
+                    user = new XWikiXmlRpcUser(XWikiRightService.GUEST_USER_FULLNAME, ip);
                 } else {
                     throw new Exception(String.format("[Guest access denied from IP '%s']", ip));
                 }

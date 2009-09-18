@@ -34,6 +34,7 @@ import org.apache.xmlrpc.server.XmlRpcServer;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -273,7 +274,7 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (this.user != null) {
             return this.user.getUser();
         } else {
-            return "XWiki.XWikiGuest";
+            return XWikiRightService.GUEST_USER_FULLNAME;
         }
     }
 

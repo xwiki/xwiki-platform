@@ -39,6 +39,11 @@ public interface XWikiRightService
      */
     public static final String SUPERADMIN_USER_FULLNAME = "XWiki." + SUPERADMIN_USER;
     
+    /**
+     * The Guest full name.
+     */
+    public static final String GUEST_USER_FULLNAME = "XWiki.XWikiGuest";
+    
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)

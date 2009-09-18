@@ -26,6 +26,7 @@ import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
@@ -47,7 +48,7 @@ public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<
     /**
      * author of modification.
      */
-    private String  author    = "XWiki.XWikiGuest";
+    private String  author    = XWikiRightService.GUEST_USER_FULLNAME;
     /**
      * modification's comment.
      */

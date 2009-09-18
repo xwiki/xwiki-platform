@@ -26,6 +26,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for {@link XWikiDocumentArchive}.
@@ -144,7 +145,7 @@ public class XWikiDocumentArchiveTest extends AbstractBridgedXWikiComponentTestC
         
         XWikiDocument doc = new XWikiDocument("KnowledgeBase", "WebHome");
         doc.setContent(doc.getContent() + "\nsomething added");
-        archive.updateArchive(doc, "XWiki.XWikiGuest", new Date(), "some comment", null, context);
+        archive.updateArchive(doc, XWikiRightService.GUEST_USER_FULLNAME, new Date(), "some comment", null, context);
 
         // Try to construct again the archive from the last modification. This will happen when
         // XWiki loads a document from the database for example. We verify here that a username

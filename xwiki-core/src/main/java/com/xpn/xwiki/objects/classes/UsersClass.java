@@ -18,6 +18,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class UsersClass extends ListClass
 {
@@ -131,8 +132,8 @@ public class UsersClass extends ListClass
         }
 
         // Make sure we have guest
-        list.remove("XWiki.XWikiGuest");
-        list.add(0, "XWiki.XWikiGuest");
+        list.remove(XWikiRightService.GUEST_USER_FULLNAME);
+        list.add(0, XWikiRightService.GUEST_USER_FULLNAME);
 
         // Add options from Set
         for (String value : list) {

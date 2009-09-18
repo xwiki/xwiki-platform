@@ -139,7 +139,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (right.equals("login")) {
             user = context.getWiki().checkAuth(context);
             if (user == null) {
-                username = "XWiki.XWikiGuest";
+                username = XWikiRightService.GUEST_USER_FULLNAME;
             } else {
                 username = user.getUser();
             }
@@ -189,7 +189,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
 
             if (user == null) {
-                username = "XWiki.XWikiGuest";
+                username = XWikiRightService.GUEST_USER_FULLNAME;
             } else {
                 username = user.getUser();
             }
@@ -500,7 +500,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
             }
         }
 
-        if (name.equals("XWiki.XWikiGuest") || name.endsWith(":XWiki.XWikiGuest")) {
+        if (name.equals(XWikiRightService.GUEST_USER_FULLNAME) 
+            || name.endsWith(":" + XWikiRightService.GUEST_USER_FULLNAME)) {
             if (needsAuth(accessLevel, context)) {
                 return false;
             }

@@ -4690,7 +4690,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         int active = 1;
 
         // These users are necessarly active
-        if (user.equals("XWiki.XWikiGuest") 
+        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME) 
             || (user.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
             return active;
         }

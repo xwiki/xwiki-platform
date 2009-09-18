@@ -41,6 +41,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
+
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -115,11 +117,6 @@ public final class StatsUtil
      * The name of the cookie property containing the unique id of the visit object.
      */
     private static final String COOKPROP_VISITID = "visitid";
-
-    /**
-     * The full name of the guest virtual user.
-     */
-    private static final String GUEST_FULLNAME = "XWiki.XWikiGuest";
 
     /**
      * The list of cookie domains.
@@ -348,7 +345,8 @@ public final class StatsUtil
                 }
             }
 
-            if ((!context.getUser().equals(GUEST_FULLNAME)) && (visitObject.getUser().equals(GUEST_FULLNAME))) {
+            if ((!context.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME)) 
+                && (visitObject.getUser().equals(XWikiRightService.GUEST_USER_FULLNAME))) {
                 // The user has changed from guest to an authenticated user
                 // We want to record this
                 VisitStats newVisitObject = visitObject;

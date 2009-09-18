@@ -150,8 +150,8 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         this.context.setUser("XWiki.Programmer");
         assertTrue(this.rightService.hasProgrammingRights(this.context));
 
-        // XWiki.XWikiGuest should not have PR
-        this.context.setUser("XWiki.XWikiGuest");
+        // Guests should not have PR
+        this.context.setUser(XWikiRightService.GUEST_USER_FULLNAME);
         assertFalse(this.rightService.hasProgrammingRights(this.context));
 
         // superadmin should always have PR

@@ -29,6 +29,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,7 +70,7 @@ public class CaptchaPlugin extends XWikiDefaultPlugin
         StringBuffer output = new StringBuffer();
         String user = context.getUser();
         String actionuser = "";
-        if (user.equals("XWiki.XWikiGuest")) {
+        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
             actionuser = action + "_anonymous";
         } else if (user.equals("XWiki.Admin")) {
             return ""; // not captcha with admin
@@ -112,7 +113,7 @@ public class CaptchaPlugin extends XWikiDefaultPlugin
     {
         String user = context.getUser();
         String actionuser;
-        if (user.equals("XWiki.XWikiGuest")) {
+        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
             actionuser = action + "_anonymous";
         } else if (user.equals("XWiki.Admin")) {
             return Boolean.TRUE;  // If is admin then return TRUE for confirm captcha

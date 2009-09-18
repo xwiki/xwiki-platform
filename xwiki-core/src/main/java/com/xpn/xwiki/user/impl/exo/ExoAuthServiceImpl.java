@@ -24,6 +24,7 @@ package com.xpn.xwiki.user.impl.exo;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 import org.apache.commons.lang.StringUtils;
@@ -54,7 +55,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             String user = context.getRequest().getRemoteUser();
             if ((user == null) || user.equals(""))
-                user = "XWiki.XWikiGuest";
+                user = XWikiRightService.GUEST_USER_FULLNAME;
             else
                 user = "XWiki." + user;
             context.setUser(user);
@@ -62,7 +63,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
         } else {
             XWikiUser user = super.checkAuth(context);
             if (user == null)
-                return new XWikiUser("XWiki.XWikiGuest");
+                return new XWikiUser(XWikiRightService.GUEST_USER_FULLNAME);
             else
                 return new XWikiUser("XWiki." + user.getUser());
         }
@@ -72,7 +73,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             String user = context.getRequest().getRemoteUser();
             if ((user == null) || user.equals(""))
-                user = "XWiki.XWikiGuest";
+                user = XWikiRightService.GUEST_USER_FULLNAME;
             else
                 user = "XWiki." + user;
             context.setUser(user);
@@ -80,7 +81,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
         } else {
             XWikiUser user = super.checkAuth(username, password, rememberme, context);
             if (user == null)
-                return new XWikiUser("XWiki.XWikiGuest");
+                return new XWikiUser(XWikiRightService.GUEST_USER_FULLNAME);
             else
                 return new XWikiUser("XWiki." + user.getUser());
         }

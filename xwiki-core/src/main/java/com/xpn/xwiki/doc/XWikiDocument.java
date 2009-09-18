@@ -124,6 +124,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -4550,7 +4551,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public boolean isCreator(String username)
     {
-        if (username.equals("XWiki.XWikiGuest")) {
+        if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
             return false;
         }
 
@@ -4560,7 +4561,7 @@ public class XWikiDocument implements DocumentModelBridge
     public boolean isCurrentUserPage(XWikiContext context)
     {
         String username = context.getUser();
-        if (username.equals("XWiki.XWikiGuest")) {
+        if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
             return false;
         }
 
@@ -4570,7 +4571,7 @@ public class XWikiDocument implements DocumentModelBridge
     public boolean isCurrentLocalUserPage(XWikiContext context)
     {
         String username = context.getLocalUser();
-        if (username.equals("XWiki.XWikiGuest")) {
+        if (username.equals(XWikiRightService.GUEST_USER_FULLNAME)) {
             return false;
         }
 

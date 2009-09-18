@@ -3305,9 +3305,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
     {
-        String[] whereParams =
-            {this.getWikiName() + ":" + this.getFullName(), this.getFullName(), this.getName(),
-            this.getWikiName() + ":" + this.getName(), this.getSpace()};
+        String[] whereParams = {
+            this.getWikiName() + ":" + this.getFullName(), 
+            this.getFullName(), 
+            this.getName(), 
+            this.getWikiName() + ":" + this.getName(), 
+            this.getSpace()
+        };
 
         String whereStatement = "doc.parent=? or doc.parent=? or ((doc.parent=? or doc.parent=?) and doc.space=?)";
         return context.getWiki().getStore().searchDocumentsNames(whereStatement, nb, start, Arrays.asList(whereParams),

@@ -45,7 +45,7 @@
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.32</platform.tool.configuration.version>
-    <platform.core.version>2.0-rc-2</platform.core.version>
+    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.23</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.28</platform.skin.toucan.version>
     <platform.skin.colibri.version>1.2</platform.skin.colibri.version>

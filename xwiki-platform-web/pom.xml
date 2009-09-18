@@ -25,18 +25,18 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>27-SNAPSHOT</version>
+    <version>26</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>2.0-SNAPSHOT</version>
+  <version>2.0-rc-2</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/branches/xwiki-web-2.0</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.0-rc-2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.0-rc-2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/tags/xwiki-web-2.0-rc-2</url>
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
@@ -44,11 +44,11 @@
     <smartgwt.version>1.2</smartgwt.version>
     <junit.version>3.8.2</junit.version>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.configuration.version>1.32-SNAPSHOT</platform.tool.configuration.version>
-    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.23-SNAPSHOT</platform.skin.albatross.version>
-    <platform.skin.toucan.version>1.28-SNAPSHOT</platform.skin.toucan.version>
-    <platform.skin.colibri.version>1.2-SNAPSHOT</platform.skin.colibri.version>
+    <platform.tool.configuration.version>1.32</platform.tool.configuration.version>
+    <platform.core.version>2.0-rc-2</platform.core.version>
+    <platform.skin.albatross.version>1.23</platform.skin.albatross.version>
+    <platform.skin.toucan.version>1.28</platform.skin.toucan.version>
+    <platform.skin.colibri.version>1.2</platform.skin.colibri.version>
   </properties>
   <profiles>
     <profile>

@@ -11,7 +11,7 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 ## Compute title to display and modify rendered content accordingly.
 ## ----------------------------------------------------------------------------
 #set ($renderedContent = $cdoc.getRenderedContent())
-##template("titlevars.vm")
+#template("titlevars.vm")
 ## ----------------------------
 ## Display the title
 ## ----------------------------

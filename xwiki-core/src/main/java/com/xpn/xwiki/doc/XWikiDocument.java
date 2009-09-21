@@ -4272,10 +4272,13 @@ public class XWikiDocument implements DocumentModelBridge
             for (Vector<BaseObject> objects : objectclasses.values()) {
                 if (objects != null) {
                     for (BaseObject object : objects) {
-                        object.setName(newDocumentName);
-                        // Since GUIDs are supposed to be Unique, although this object holds the same data, it is not
-                        // exactly the same object, so it should have a different identifier.
-                        object.setGuid(UUID.randomUUID().toString());
+                        if (object != null) {
+                            object.setName(newDocumentName);
+                            // Since GUIDs are supposed to be Unique, although this object holds the same data, it is
+                            // not
+                            // exactly the same object, so it should have a different identifier.
+                            object.setGuid(UUID.randomUUID().toString());
+                        }
                     }
                 }
             }

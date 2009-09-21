@@ -143,8 +143,8 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
             ChartDataSource dataSource = componentManager.lookup(ChartDataSource.class, source);
             byte[] chart =
                 chartGenerator.generate(dataSource.buildModel(content, paramsMap), paramsMap);
-            chartFile = getChartImageFile(parameters, content);
-            FileOutputStream fos = new FileOutputStream(getChartImageFile(parameters, content));
+            chartFile = getChartImageFile(parameters);
+            FileOutputStream fos = new FileOutputStream(chartFile);
             fos.write(chart);
             fos.close();
         } catch (ComponentLookupException ex) {
@@ -161,10 +161,9 @@ public class ChartMacro extends AbstractMacro<ChartMacroParameters>
      * Returns the temporary file into which the chart image will be saved.
      * 
      * @param parameters macro parameters
-     * @param content macro content
      * @return the chart image file
      */
-    protected File getChartImageFile(ChartMacroParameters parameters, String content)
+    protected File getChartImageFile(ChartMacroParameters parameters)
     {
         File chartsDir = new File(container.getApplicationContext().getTemporaryDirectory(), "charts");
         return new File(chartsDir, Math.abs(parameters.hashCode()) + ".png");

@@ -36,7 +36,7 @@ public class TestChartMacro extends ChartMacro
     /**
      * {@inheritDoc}
      */
-    protected File getChartImageFile(ChartMacroParameters parameters, String content)
+    protected File getChartImageFile(ChartMacroParameters parameters)
     {
         return new File(System.getProperty("java.io.tmpdir") + "/chart.png");
     }    

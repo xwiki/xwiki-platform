@@ -72,6 +72,11 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Prefixed document fullName in which the event happened.
      */
     private final String prefixedFullName;
+    
+    /**
+     * The XWiki context.
+     */
+    private final XWikiContext context;
 
     /**
      * Type of the event (example: "update").
@@ -112,9 +117,11 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Constructor.
      * 
      * @param activityEvent activity stream event to wrap
+     * @param context the XWiki context
      */
-    public WatchListEvent(ActivityEvent activityEvent)
+    public WatchListEvent(ActivityEvent activityEvent, XWikiContext context)
     {
+        this.context = context;
         this.activityEvents.add(activityEvent);
         type = activityEvent.getType();
         prefixedSpace = activityEvent.getWiki() + WatchListStore.WIKI_SPACE_SEP + activityEvent.getSpace();
@@ -197,10 +204,9 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
     
     /**
-     * @param context The XWiki context
      * @return The URL of the document which has fired the event
      */
-    public String getUrl(XWikiContext context) 
+    public String getUrl() 
     {
         String url;
         
@@ -327,10 +333,9 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
 
     /**
-     * @param context The XWiki context
      * @return The version of the document which has generated the event, before the actual event.
      */
-    public String getPreviousVersion(XWikiContext context)
+    public String getPreviousVersion()
     {
         if (previousVersion == null) {
             String currentVersion = "";
@@ -446,15 +451,14 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     }
 
     /**
-     * @param context The XWiki context
      * @return The diff, formated in HTML, to display to the user when a document has been updated
      */
-    public String getHTMLDiff(XWikiContext context)
+    public String getHTMLDiff()
     {
         if (htmlDiff == null) {
             try {
                 XWikiDocument d2 = context.getWiki().getDocument(getPrefixedFullName(), context);
-                XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(context), context);
+                XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(), context);
                 DiffPluginApi diff = (DiffPluginApi) context.getWiki().getPluginApi("diff", context);
                 StringBuffer result = new StringBuffer();
                 List<AttachmentDiff> attachDiffs = d2.getAttachmentDiff(d1, d2, context);

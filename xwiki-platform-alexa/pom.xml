@@ -59,8 +59,8 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/alexa</url>
   </scm>
   <issueManagement>
-  	<system>jira</system>
-  	<url>http://jira.xwiki.org/jira/browse/XPALEXA</url>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XPALEXA</url>
   </issueManagement>
 </project>
         

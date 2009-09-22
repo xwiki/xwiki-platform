@@ -317,7 +317,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
     #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
     &lt;div class="document" style="$documentDivStyle"&gt;
     #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt; &lt;a href="$event.getUrl($context.context)"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/h3&gt;
+    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt; &lt;a href="$event.getUrl()"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/h3&gt;
     &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
   &lt;div style="$eventStyle"&gt;
@@ -337,14 +337,37 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
     #end
     #if ($event.getType() == "update")
       &lt;div class="diff"&gt;
-        #displayhtmldiff($event.getHTMLDiff($context.context))
+        #displayhtmldiff($event.getHTMLDiff())
       &lt;/div&gt;
     #end
   &lt;/div&gt;
   #set($previousEvent = $event)
   #set($previousDoc = $currentDoc)
 #end
-&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;</html>
+&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;!--
+We want to be able to use attached images in the HTML part of the email but we don't want them to be listed as attachments. We use a little trick here to make the mailsender plugin consider that we use all the attached images in this mail even if we don't (some images are used very rarely).
+
+src='cid:groups.png'
+src='cid:metadata.gif'
+src='cid:dblist.png'
+src='cid:attach.gif'
+src='cid:date.png'
+src='cid:boolean.png'
+src='cid:textarea.png'
+src='cid:string.png'
+src='cid:space.gif'
+src='cid:document.gif'
+src='cid:dbtreelist.png'
+src='cid:wiki.gif'
+src='cid:number.png'
+src='cid:class.gif'
+src='cid:users.png'
+src='cid:staticlist.png'
+src='cid:levels.png'
+src='cid:password.png'
+src='cid:object.gif'
+--&gt;</html>
 </property>
 <property>
 <language>en</language>

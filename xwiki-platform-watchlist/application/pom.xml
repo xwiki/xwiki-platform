@@ -50,4 +50,8 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/watchlist</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/watchlist</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XPWATCHLIST</url>
+  </issueManagement>
 </project>

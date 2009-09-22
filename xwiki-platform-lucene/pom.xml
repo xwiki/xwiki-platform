@@ -89,7 +89,7 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/lucene</url>
   </scm>
   <issueManagement>
-  	<system>jira</system>
-  	<url>http://jira.xwiki.org/jira/browse/XPLUCENE</url>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XPLUCENE</url>
   </issueManagement>
 </project>

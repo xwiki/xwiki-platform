@@ -38,6 +38,10 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XWIKI</url>
+  </issueManagement>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
     <gwt.version>1.7.0</gwt.version>

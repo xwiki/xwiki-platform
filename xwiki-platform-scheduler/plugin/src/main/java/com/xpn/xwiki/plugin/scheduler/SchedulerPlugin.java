@@ -46,6 +46,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
@@ -217,6 +218,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         XWikiServletRequest request = new XWikiServletRequest(dummy);
         scontext.setRequest(request);
 
+        // Force forged context response to a stub response, since the current context response
+        // will not mean anything anymore when running in the scheduler's thread, and can cause
+        // errors.
+        XWikiResponse stub = new XWikiServletResponseStub();
+        scontext.setResponse(stub);
+        
         // feed the dummy context
         scontext.setUser(cUser);
         scontext.setLanguage(cLang);

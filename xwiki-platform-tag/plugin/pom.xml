@@ -58,6 +58,10 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/tag</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/tag</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XATAG</url>
+  </issueManagement>
   <build>
     <plugins>
       <plugin>

@@ -82,6 +82,10 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/wiki-manager</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/wiki-manager</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XAWM</url>
+  </issueManagement>
   <build>
     <plugins>
       <plugin>

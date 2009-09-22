@@ -93,9 +93,9 @@ public class WatchListEventMatcher
             // diff from a deleted document. See WatchListEvent#addEvent(WatchListEvent) and 
             // WatchListEvent#equals(WatchListEvent).
             for (ActivityEvent rawEvent : rawEvents) {
-                WatchListEvent event = new WatchListEvent(rawEvent);
+                WatchListEvent event = new WatchListEvent(rawEvent, context);
                 if (!events.contains(event)) {
-                    events.add(new WatchListEvent(rawEvent));
+                    events.add(new WatchListEvent(rawEvent, context));
                 } else {
                     WatchListEvent existingCompositeEvent = events.get(events.indexOf(event));
                     existingCompositeEvent.addEvent(event);

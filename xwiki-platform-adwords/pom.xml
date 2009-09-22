@@ -59,8 +59,8 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/adwords</url>
   </scm>
   <issueManagement>
-  	<system>jira</system>
-  	<url>http://jira.xwiki.org/jira/browse/XPADWORDS</url>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XPADWORDS</url>
   </issueManagement>
 </project>
         

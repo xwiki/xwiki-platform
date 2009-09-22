@@ -63,8 +63,8 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/exoplatform</url>
   </scm>
   <issueManagement>
-  	<system>jira</system>
-  	<url>http://jira.xwiki.org/jira/browse/XPEXOPLATFORM</url>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XPEXOPLATFORM</url>
   </issueManagement>
 </project>
         

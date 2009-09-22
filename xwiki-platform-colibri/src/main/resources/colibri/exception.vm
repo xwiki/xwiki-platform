@@ -1,6 +1,6 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #set($message = $xwiki.parseMessage())
 #if($message)
   #xwikimessageboxstart($msg.get('notice') $message)
@@ -17,6 +17,6 @@
   </pre>
 #end
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

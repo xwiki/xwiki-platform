@@ -5,7 +5,7 @@
 #template("startpage.vm")
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #if($doc.getObject("XWikiUsers", 0))
 #set($i = $context.user.indexOf(":")+1)
 #if($context.user.substring($i) == $doc.fullName || $hasAdmin)
@@ -34,6 +34,6 @@ $response.setStatus(400)
 #xwikimessageboxstart($msg.get("platform.core.noticeMessageType") $msg.get("platform.core.profile.passwd.notaUser"))
 #xwikimessageboxend()
 #end
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

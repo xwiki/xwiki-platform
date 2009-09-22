@@ -4,11 +4,11 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #xwikimessageboxstart($msg.get("resetversions") $msg.get("resetversionsdone"))
 $!message
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

@@ -4,7 +4,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 <form id="edit" method="post" action="$doc.getURL("save")">
 #if ($captchaPlugin)
   $captchaPlugin.displayCaptcha("edit","wiki_captcha")
@@ -26,6 +26,6 @@
 </div>
 </form>
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

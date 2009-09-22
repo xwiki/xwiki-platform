@@ -5,7 +5,7 @@ $xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css')##
 #set($saveaction = "save")
 #set($previewenabled = true)
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #template("hierarchy.vm")
 ## ----------------------------------------------------------------------------
 ## Compute title to display and modify rendered content accordingly.
@@ -62,5 +62,5 @@ $renderedContent
 </form>
 #template("textarea_wysiwyg.vm")
 #end ## can edit
-</div> ## xwikicontent
+</div> ## mainContentArea
 </div> ## main

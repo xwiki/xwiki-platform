@@ -6,7 +6,7 @@
 #elseif($doc.isNew())
   $response.setStatus(404)
   #template("startpage.vm")
-  <div class="main layoutsubsection"><div id="xwikicontent">
+  <div class="main layoutsubsection"><div id="mainContentArea">
     #error("$msg.get('core.rename.nonexistingDocument')")
   </div></div>
   #template("endpage.vm")
@@ -21,7 +21,7 @@
   #end
   #set($step = $util.parseInt("$step"))
   <div class="main layoutsubsection">
-  <div id="xwikicontent">
+  <div id="mainContentArea">
     #if($step == 1)
       ## Display the rename form
       #template("renameStep1.vm")
@@ -60,7 +60,7 @@
       #end
     #end
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")
 #end

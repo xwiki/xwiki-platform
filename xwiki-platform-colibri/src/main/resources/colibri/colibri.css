@@ -960,11 +960,11 @@ body.content #contentcolumn .main {
     margin: 0 220px;
 }
 
-#xwikicontent {
+#mainContentArea {
     padding: 0;
     position: relative;
 }
-html>body #xwikicontent {
+html>body #mainContentArea {
   border: 1px solid transparent;
 }
 
@@ -3079,7 +3079,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
     background-image: none;
 }
 
-* html #xwikicontent {
+* html #mainContentArea {
     overflow-y: hidden;
     width: 100%;
 }
@@ -3434,7 +3434,7 @@ body.hideright #contentcolumn .main {
   margin:0 0 0 200px;
 }
 
-#xwikicontent {
+#mainContentArea {
   background: $theme.pageContentBackgroundColor;
   padding:0 25px 5px;
 }

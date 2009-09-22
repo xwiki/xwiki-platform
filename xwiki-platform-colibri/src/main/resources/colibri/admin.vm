@@ -62,7 +62,7 @@
 ##  Content (if empty wiki display Import)
 ##-----------------------------------------
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #set($force = $!request.get("force"))
 #if(!$hasAdmin)
   $response.setStatus(403)
@@ -108,7 +108,7 @@
   #end
 #end
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 ##-------------------------------------------------
 ##  End page

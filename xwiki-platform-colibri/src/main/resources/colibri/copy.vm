@@ -7,15 +7,15 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="xwikicontent">
+  <div id="mainContentArea">
     #error("$msg.get('core.rename.nonexistingDocument')")
-  </div>## xwikicontent
+  </div>## mainContentArea
   </div>## main
   #template("endpage.vm")
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-  <div id="xwikicontent">
+  <div id="mainContentArea">
     <h1><span>$msg.get("core.copy.copydoc")</span></h1>
     #set($sourcedoc = "$!{request.sourcedoc}")
     #set($targetdoc = "$!{request.targetdoc}")
@@ -62,7 +62,7 @@
     </form>
     #end
     <div class="clearfloats"></div>
-  </div>## xwikicontent
+  </div>## mainContentArea
   </div>## main
 #template("endpage.vm")
 #end

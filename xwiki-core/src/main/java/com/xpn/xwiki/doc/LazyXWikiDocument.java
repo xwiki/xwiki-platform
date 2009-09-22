@@ -70,7 +70,7 @@ public class LazyXWikiDocument extends XWikiDocument
                     this.document = context.getWiki().getDocument(doc, getVersion(), context);
                 }
             } catch (XWikiException e) {
-                throw new RuntimeException("Failed to get document [" + this + "]");
+                throw new RuntimeException("Failed to get document [" + this + "]", e);
             }
         }
 

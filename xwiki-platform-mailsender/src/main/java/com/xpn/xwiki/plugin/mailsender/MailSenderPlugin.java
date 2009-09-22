@@ -276,38 +276,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Add attachments to a multipart message
-     * 
-     * @param mpart Multipart message
-     * @param attachments List of attachments
-     */
-    public void addAttachments(Multipart mpart, List<Attachment> attachments, XWikiContext context)
-        throws XWikiException, IOException, MessagingException
-    {
-        if (attachments != null) {
-            for (Attachment at : attachments) {
-                String name = at.getFilename();
-                byte[] stream = at.getContent();
-                File temp = File.createTempFile("tmpfile", ".tmp");
-                FileOutputStream fos = new FileOutputStream(temp);
-                fos.write(stream);
-                fos.close();
-                MimeBodyPart part = new MimeBodyPart();
-                DataSource source = new FileDataSource(temp);
-                part.setDataHandler(new DataHandler(source));
-                part.setHeader("Content-ID", "<" + name + ">");
-                part.setHeader("Content-Disposition", "inline; filename=\"" + name + "\"");
-                String mimeType = MimeTypesUtil.getMimeTypeFromFilename(name);
-                part.setHeader("Content-Type", " " + mimeType + "; name=\"" + name + "\"");
-
-                part.setFileName(name);
-                mpart.addBodyPart(part);
-                temp.deleteOnExit();
-            }
-        }
-    }
-
-    /**
      * Creates a MIME message (message with binary content carrying capabilities) from an existing Mail
      * 
      * @param mail The original Mail object
@@ -379,6 +347,36 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         message.saveChanges();
         return message;
     }
+    
+    /**
+     * Add attachments to a multipart message
+     * 
+     * @param multipart Multipart message
+     * @param attachments List of attachments
+     */
+    public MimeBodyPart createAttachmentBodyPart(Attachment attachment, XWikiContext context) throws XWikiException, 
+        IOException, MessagingException
+    {
+        String name = attachment.getFilename();
+        byte[] stream = attachment.getContent();
+        File temp = File.createTempFile("tmpfile", ".tmp");
+        FileOutputStream fos = new FileOutputStream(temp);
+        fos.write(stream);
+        fos.close();                
+        DataSource source = new FileDataSource(temp);                
+        MimeBodyPart part = new MimeBodyPart();
+        String mimeType = MimeTypesUtil.getMimeTypeFromFilename(name);
+
+        part.setDataHandler(new DataHandler(source));
+        part.setHeader("Content-Type", mimeType);
+        part.setFileName(name);
+        part.setContentID("<" + name + ">");    
+        part.setDisposition("inline");
+        
+        temp.deleteOnExit();
+        
+        return part;
+    }
 
     /**
      * Creates a Multipart MIME Message (multiple content-types within the same message) from an existing mail
@@ -389,45 +387,82 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     public Multipart createMimeMultipart(Mail mail, XWikiContext context) throws MessagingException, XWikiException,
         IOException
     {
-        if (mail.getHtmlPart() == null && mail.getAttachments() != null) {
-
-            Multipart multipart = new MimeMultipart("mixed");
-            BodyPart part = new MimeBodyPart();
-            part.setContent(mail.getTextPart(), "text/plain; charset=" + EMAIL_ENCODING);
-            multipart.addBodyPart(part);
-            addAttachments(multipart, mail.getAttachments(), context);
-            return multipart;
-        } else {
-            Multipart alternativeMultipart = new MimeMultipart("alternative");
-
-            BodyPart part;
-
-            part = new MimeBodyPart();
-            part.setText(mail.getTextPart());
-            alternativeMultipart.addBodyPart(part);
-
-            // Multipart html_mp = new MimeMultipart("related");
-
-            part = new MimeBodyPart();
-
-            part.setContent(processImageUrls(mail.getHtmlPart()), "text/html; charset=" + EMAIL_ENCODING);
-            part.setHeader("Content-Disposition", "inline");
-            part.setHeader("Content-Transfer-Encoding", "quoted-printable");
-
-            alternativeMultipart.addBodyPart(part);
-
-            if (mail.getAttachments() != null && mail.getAttachments().size() > 0) {
-
-                Multipart mixedMultipart = new MimeMultipart("mixed");
-                part = new MimeBodyPart();
-                part.setContent(alternativeMultipart);
-                mixedMultipart.addBodyPart(part);
-
-                addAttachments(mixedMultipart, mail.getAttachments(), context);
-                return mixedMultipart;
+        Multipart multipart;
+        List<Attachment> rawAttachments = 
+            mail.getAttachments() != null ? mail.getAttachments() : new ArrayList<Attachment>();
+        
+        if (mail.getHtmlPart() == null && mail.getAttachments() != null) { 
+            multipart = new MimeMultipart("mixed");
+            
+            // Create the text part of the email
+            BodyPart textPart = new MimeBodyPart();            
+            textPart.setContent(mail.getTextPart(), "text/plain; charset=" + EMAIL_ENCODING);
+            multipart.addBodyPart(textPart);
+            
+            // Add attachments to the main multipart
+            for (Attachment attachment : rawAttachments) {
+                multipart.addBodyPart(createAttachmentBodyPart(attachment, context));
             }
-            return alternativeMultipart;
+        } else {            
+            multipart = new MimeMultipart("mixed");
+            List<Attachment> attachments = new ArrayList<Attachment>();
+            List<Attachment> embeddedImages = new ArrayList<Attachment>();
+
+            // Create the text part of the email
+            BodyPart textPart;
+            textPart = new MimeBodyPart();
+            textPart.setText(mail.getTextPart());
+            
+            // Create the HTML part of the email, define the html as a multipart/related in case there are images
+            Multipart htmlMultipart = new MimeMultipart("related");            
+            BodyPart htmlPart = new MimeBodyPart();
+            htmlPart.setContent(mail.getHtmlPart(), "text/html; charset=" + EMAIL_ENCODING);
+            htmlPart.setHeader("Content-Disposition", "inline");
+            htmlPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
+            htmlMultipart.addBodyPart(htmlPart);
+            
+            // Find images used with src="cid:" in the email HTML part
+            Pattern cidPattern =
+                Pattern.compile("src=('|\")cid:([^'\"]*)('|\")", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+            Matcher matcher = cidPattern.matcher(mail.getHtmlPart());
+            List<String> foundEmbeddedImages = new ArrayList<String>();            
+            while (matcher.find()) {
+                foundEmbeddedImages.add(matcher.group(2));             
+            }
+            
+            // Loop over the attachments of the email, add images used from the HTML to the list of attachments to be
+            // embedded with the HTML part, add the other attachements to the list of attachments to be attached to the
+            // email.
+            for (Attachment attachment : rawAttachments) {
+                if (foundEmbeddedImages.contains(attachment.getFilename())) {
+                    embeddedImages.add(attachment);
+                } else {
+                    attachments.add(attachment);
+                }
+            }
+            
+            // Add the images to the HTML multipart (they should be hidden from the mail reader attachment list)
+            for (Attachment image : embeddedImages) {
+                htmlMultipart.addBodyPart(createAttachmentBodyPart(image, context));
+            }
+            
+            // Wrap the HTML and text parts in an alternative body part and add it to the main multipart
+            Multipart alternativePart = new MimeMultipart("alternative");
+            BodyPart alternativeMultipartWrapper = new MimeBodyPart();            
+            BodyPart htmlMultipartWrapper = new MimeBodyPart();
+            alternativePart.addBodyPart(textPart);
+            htmlMultipartWrapper.setContent(htmlMultipart);
+            alternativePart.addBodyPart(htmlMultipartWrapper);
+            alternativeMultipartWrapper.setContent(alternativePart);
+            multipart.addBodyPart(alternativeMultipartWrapper);
+            
+            // Add attachments to the main multipart   
+            for (Attachment attachment : attachments) {
+                multipart.addBodyPart(createAttachmentBodyPart(attachment, context));
+            }
         }
+        
+        return multipart;
     }
 
     /**
@@ -595,32 +630,6 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         vcontext.put("bounce", fromAddr);
 
         return vcontext;
-    }
-
-    /**
-     * Transform Images URLs to point on Message parts (cid: MIME Multipart)
-     * 
-     * @param html The HTML message
-     * @return The Transformed HTML message
-     */
-    private String processImageUrls(String html)
-    {
-        // this method/design has to be improved
-
-        Pattern img =
-            Pattern.compile("src=[a-zA-Z0-9/_\"]*.(png|jpg|gif|jpeg){1}", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-        Matcher matcher = img.matcher(html);
-
-        StringBuffer sb = new StringBuffer();
-
-        while (matcher.find()) {
-            String found = matcher.group(0);
-            String replace = found.substring(found.lastIndexOf("/") + 1);
-            matcher.appendReplacement(sb, "src=\"cid:" + replace);
-        }
-        matcher.appendTail(sb);
-
-        return sb.toString();
     }
 
     /**

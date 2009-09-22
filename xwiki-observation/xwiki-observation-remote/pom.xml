@@ -39,7 +39,7 @@
       <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
-	  <dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-observation-local</artifactId>
       <version>${pom.version}</version>

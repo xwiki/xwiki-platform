@@ -37,17 +37,17 @@
       <artifactId>xwiki-core-component-default</artifactId>
       <version>${pom.version}</version>
     </dependency>  
-	<dependency>
+    <dependency>
       <groupId>jfree</groupId>
-  	  <artifactId>jfreechart</artifactId>
-  	  <version>1.0.11</version>
+      <artifactId>jfreechart</artifactId>
+      <version>1.0.11</version>
       <exclusions>
         <exclusion>
           <groupId>gnujaxp</groupId>
           <artifactId>gnujaxp</artifactId>
         </exclusion>
       </exclusions>             
-	</dependency>
+    </dependency>
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

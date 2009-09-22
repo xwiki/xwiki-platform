@@ -11,16 +11,16 @@
   <version>2.1-SNAPSHOT</version>
   <description>XWiki Platform - Core - Refactoring</description>
   <dependencies>
-  	<dependency>
-  		<groupId>org.xwiki.platform</groupId>
-  		<artifactId>xwiki-core-bridge</artifactId>
-  		<version>${pom.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.xwiki.platform</groupId>
-  		<artifactId>xwiki-core-rendering-api</artifactId>
-  		<version>${pom.version}</version>
-  	</dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-bridge</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>

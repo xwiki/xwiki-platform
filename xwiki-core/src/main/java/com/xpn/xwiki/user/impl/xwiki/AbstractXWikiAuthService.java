@@ -24,10 +24,13 @@ import java.security.Principal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Common methods useful to all Authentication services implementations.
@@ -52,10 +55,10 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
      */
     protected boolean isSuperAdmin(String username)
     {
-        String lowerUserName = username.toLowerCase();
-
-        return (lowerUserName.equals(XWikiRightService.SUPERADMIN_USER) 
-            || lowerUserName.endsWith("." + XWikiRightService.SUPERADMIN_USER));
+        // FIXME: this method should probably use a XWikiRightService#isSuperadmin(String) method, see 
+        // XWikiRightServiceImpl#isSuperadmin(String)
+        DocumentName documentName = Utils.getComponent(DocumentNameFactory.class).createDocumentName(username);
+        return documentName.getPage().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER);
     }
 
     /**

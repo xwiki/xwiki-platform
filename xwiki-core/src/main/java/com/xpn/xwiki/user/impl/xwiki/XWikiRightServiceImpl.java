@@ -33,6 +33,8 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,6 +46,7 @@ import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiRightServiceImpl implements XWikiRightService
 {
@@ -706,13 +709,26 @@ public class XWikiRightServiceImpl implements XWikiRightService
         return true;
     }
 
+    /**
+     * Check is the given user is a superadmin. 
+     * 
+     * @param username Any flavor of username. Examples: "xwiki:XWiki.superadmin", "XWiki.superAdmin", "superadmin", etc
+     * @return True if the user is a superadmin, false otherwise
+     */
+    // TODO: this method is a candidate for the the XWikiRightService API.
+    private boolean isSuperAdmin(String username)
+    {
+        DocumentName documentName = Utils.getComponent(DocumentNameFactory.class).createDocumentName(username);
+        return documentName.getPage().equalsIgnoreCase(SUPERADMIN_USER);
+    }
+    
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,
         XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
         boolean allow;
-        if (name.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME) 
-            || name.endsWith(":" + XWikiRightService.SUPERADMIN_USER_FULLNAME)) {
+        
+        if (isSuperAdmin(name)) {
             logAllow(name, resourceKey, accessLevel, "super admin level");
             return true;
         }

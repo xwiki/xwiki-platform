@@ -6,7 +6,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #if($doc.getObject("XWikiUsers", 0))
   #if($context.user == $doc.fullName || $hasAdmin)
     <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }"><div>
@@ -30,6 +30,6 @@
   #xwikimessageboxstart($msg.get('avatar') $msg.get('notauser'))
   #xwikimessageboxend()
 #end
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

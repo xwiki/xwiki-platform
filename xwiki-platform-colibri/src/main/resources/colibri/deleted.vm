@@ -4,7 +4,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #if($message)
 <div id="xwikimessage">$message</div>
 #end
@@ -12,6 +12,6 @@
 #template("recyclebinlist.vm")
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

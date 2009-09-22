@@ -13,23 +13,19 @@
   #if("$!viewer" == '')
     #set($viewer = 'content')
   #end
+  <div class="main layoutsubsection">
+  <div id="mainContentArea">
+  #template("hierarchy.vm")
   #if($viewer == 'content')
-    <div class="main layoutsubsection">
-    <div id="xwikicontent">
-    #template("hierarchy.vm")
     #template("contentview.vm")
-    <div class="clearfloats"></div>
-    </div>## xwikicontent
-    #template("docextra.vm")
-    </div>## main
   #else
-    <div class="main layoutsubsection">
-    <div id="xwikicontent">
-    #template("hierarchy.vm")
     #template("${viewer}.vm")
-    <div class="clearfloats"></div>
-    </div>## xwikicontent
-    </div>## main
   #end
+  <div class="clearfloats"></div>
+  </div>## mainContentArea
+  #if($viewer == 'content')
+    #template("docextra.vm")
+  #end
+  </div>## main
   #template("endpage.vm")
 #end

@@ -8,7 +8,7 @@ $msg.get('notallowed')
 #else
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<div id="xwikicontent">
+<div id="mainContentArea">
 #if ($xwiki.isReadOnly())
 #xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
 #else
@@ -17,7 +17,7 @@ $msg.get('notallowed')
 $!exception
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>## xwikicontent
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")
 #end

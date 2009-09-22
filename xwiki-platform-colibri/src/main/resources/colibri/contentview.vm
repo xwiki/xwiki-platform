@@ -36,7 +36,9 @@
 ## ----------------------------
 ## Display the rendered content
 ## ----------------------------
+<div id="xwikicontent">
 $renderedContent
+</div>
 ## -----------------------------------------------------------------------------------
 ## Display the footnotes if the document is in 1.0 syntax and if there are any defined
 ## -----------------------------------------------------------------------------------

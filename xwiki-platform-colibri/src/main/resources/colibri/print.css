@@ -1,5 +1,5 @@
 /* #template('initColorTheme.vm') */
-#body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent {
+#body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
   background-image: none !important;
   background-color: #FFF !important;
   float: none !important;

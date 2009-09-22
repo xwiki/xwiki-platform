@@ -92,4 +92,8 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/activitystream</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/activitystream</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XPAS</url>
+  </issueManagement>
 </project>      

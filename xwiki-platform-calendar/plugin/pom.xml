@@ -48,4 +48,8 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/calendar</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/calendar</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XACALENDAR</url>
+  </issueManagement>
 </project>

@@ -42,7 +42,7 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-applications/trunk/wiki-macro-bridge</url>
   </scm>
   <issueManagement>
-  	<system>jira</system>
-  	<url>http://jira.xwiki.org/jira/browse/XAWMB</url>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XAWMB</url>
   </issueManagement>
 </project>

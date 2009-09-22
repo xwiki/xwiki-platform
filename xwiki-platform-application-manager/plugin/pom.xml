@@ -77,8 +77,8 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/application-manager</url>
   </scm>
   <issueManagement>
-  	<system>jira</system>
-  	<url>http://jira.xwiki.org/jira/browse/XAAM</url>
+    <system>jira</system>
+    <url>http://jira.xwiki.org/jira/browse/XAAM</url>
   </issueManagement>
   <build>
     <plugins>

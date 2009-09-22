@@ -44,6 +44,10 @@
     <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
   </scm>
+  <issueManagement>
+  	<system>jira</system>
+  	<url>http://jira.xwiki.org/jira/browse/XWIKI</url>
+  </issueManagement>
   <dependencyManagement>
     <dependencies>
       <!-- Standard dependencies used in several modules -->

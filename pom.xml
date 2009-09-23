@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>26</version>
+    <version>27-SNAPSHOT</version>
     <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
@@ -72,7 +72,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
-        <version>2.5.1rc1-xwiki</version>
+        <version>2.5.1rc2-xwiki</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

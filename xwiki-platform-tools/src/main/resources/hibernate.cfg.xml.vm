@@ -33,31 +33,28 @@
          Comment out this section and uncomment other sections below if you want to use another database.
          Note that the database tables will be created automatically if they don't already exist.
     -->
-    ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
-    ## have preferred to use an empty value but I couldn't make that work with Maven. 
-    #if ($xwikiDbConnectionUrl != "none")
+## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
+## have preferred to use an empty value but I couldn't make that work with Maven. 
+#if ($xwikiDbConnectionUrl != "none")
     <property name="connection.url">$xwikiDbConnectionUrl</property>
     <property name="connection.username">$!xwikiDbConnectionUsername</property>
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>
-
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>
-
-    <!-- Mapping files -->
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmDefaultExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
-    #end
+#end
+#end
     
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
@@ -75,11 +72,11 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmMySQLExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
     -->
 
     <!-- HSQLDB configuration.
@@ -97,11 +94,11 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmHSQLDBExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
     -->
 
     <!-- PostgreSQL configuration.
@@ -119,11 +116,11 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmPostgreSQLExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
     -->
 
     <!-- Oracle configuration.
@@ -146,11 +143,11 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmOracleExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
     -->
 
     <!-- Derby configuration.
@@ -166,11 +163,11 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmDerbyExtraMappings.split(","))
     <mapping resource="$mapping"/>
-    #end
+#end
     -->
 
   </session-factory>

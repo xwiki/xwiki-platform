@@ -1,10 +1,20 @@
 <?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
-                                         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
-<!-- Template for hibernate configuration. processing by maven using profiles.
-     Replace original src/main/webapp/WEB-INF/hibernate.cfg.xml -->
+  "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+## Template for hibernate configuration. processing by maven using profiles.
+## Replace original src/main/webapp/WEB-INF/hibernate.cfg.xml
 <hibernate-configuration>
   <session-factory>
+
+    <!-- Please refer to the installation guide on
+         http://platform.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
+         database. You'll need to do 2 things:
+         1) Copy your database driver JAR in WEB-INF/lib or in some shared lib directory
+         2) Uncomment the properties below for your specific DB (and comment the default 
+            database configuration if it doesn't match your DB)
+    -->
+
+    <!-- Generic parameters common to all Databases -->
 
     <property name="show_sql">false</property>
     <property name="use_outer_join">true</property>
@@ -19,13 +29,10 @@
     <property name="dbcp.ps.maxWait">120000</property>
     <property name="dbcp.ps.maxIdle">20</property>
 
-    <!-- Please refer to the installation guide on
-         http://www.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
-         database. You'll need to do 2 things:
-         1) Copy your database driver JAR in WEB-INF/lib or in some shared lib directory
-         2) Uncomment the properties below for your specific DB
+    <!-- Configuration for the default database.
+         Comment out this section and uncomment other sections below if you want to use another database.
+         Note that the database tables will be created automatically if they don't already exist.
     -->
-
     ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
     ## have preferred to use an empty value but I couldn't make that work with Maven. 
     #if ($xwikiDbConnectionUrl != "none")
@@ -52,7 +59,6 @@
     
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
-         Note that the database will be created automatically if it doesn't already exist.
          We need to set the sql_mode to a less strict value, see XWIKI-1945
     <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;sessionVariables=sql_mode=''</property>
     <property name="connection.username">xwiki</property>
@@ -74,7 +80,6 @@
 
     <!-- HSQLDB configuration.
          Uncomment if you want to use HSQLDB and comment out other database configurations.
-         Note that the database will be created automatically if it doesn't already exist.
     <property name="connection.url">jdbc:hsqldb:file:/some/path/xwikidb;shutdown=true</property>
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
@@ -95,7 +100,6 @@
 
     <!-- PostgreSQL configuration.
          Uncomment if you want to use PostgreSQL and comment out other database configurations.
-         Note that the database will be created automatically if it doesn't already exist.
     <property name="connection.url">jdbc:postgresql:xwiki</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
@@ -141,7 +145,6 @@
 
     <!-- Derby configuration.
          Uncomment if you want to use Derby and comment out other database configurations.
-         Note that the database will be created automatically if it doesn't already exist.
     <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
     <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
     <property name="dialect">org.hibernate.dialect.DerbyDialect</property>

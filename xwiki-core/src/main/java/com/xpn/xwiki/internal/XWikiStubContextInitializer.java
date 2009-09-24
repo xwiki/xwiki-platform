@@ -33,16 +33,16 @@ public class XWikiStubContextInitializer implements ExecutionContextInitializer
      */
     public void initialize(ExecutionContext context) throws ExecutionContextException
     {
-        XWikiContext xcontext = (XWikiContext) context.getProperty("xwikicontext");
+        XWikiContext xcontext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
 
         if (xcontext == null) {
-            // if the XWikiConetxt is not provided in the Execution context it mean the Execution context is being
+            // if the XWikiContext is not provided in the Execution context it mean the Execution context is being
             // initialized by a daemon thread
-            XWikiContext stubContext = stubContextProvider.createStubContext();
+            XWikiContext stubContext = this.stubContextProvider.createStubContext();
 
             if (stubContext != null) {
                 // the stub context has been properly initialized, we inject it in the Execution context
-                context.setProperty("xwikicontext", stubContext);
+                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, stubContext);
             }
         }
     }

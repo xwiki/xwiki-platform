@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -41,6 +40,10 @@ import org.xwiki.observation.event.Event;
 
 /**
  * Default implementation of the {@link ObservationManager}.
+ * <p>
+ * This component use synchronized for concurrent protection instead of having
+ * {@link java.util.concurrent.ConcurrentHashMap} everywhere because it's more efficient since most of methods access to
+ * several maps and generally do enumerations.
  * 
  * @version $Id$
  */
@@ -53,14 +56,14 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @todo Should we allow event inheritance?
      */
-    private Map<Class< ? extends Event>, Map<String, RegisteredListener>> listenersByEvent = 
-        new ConcurrentHashMap<Class< ? extends Event>, Map<String, RegisteredListener>>();
+    private Map<Class< ? extends Event>, Map<String, RegisteredListener>> listenersByEvent =
+        new HashMap<Class< ? extends Event>, Map<String, RegisteredListener>>();
 
     /**
      * Registered listeners index by listener name. It makes it fast to perform operations on already
      * registered listeners.
      */
-    private Map<String, EventListener> listenersByName = new ConcurrentHashMap<String, EventListener>();
+    private Map<String, EventListener> listenersByName = new HashMap<String, EventListener>();
 
     /**
      * Used to find all components implementing {@link EventListener} to register them automatically.
@@ -140,7 +143,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#addListener(EventListener)
      */
-    public void addListener(EventListener eventListener)
+    public synchronized void addListener(EventListener eventListener)
     {
         // If the passed event listener name is already registered, log a warning
         if (this.listenersByName.containsKey(eventListener.getName())) {
@@ -171,7 +174,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#removeListener(String)
      */
-    public void removeListener(String listenerName)
+    public synchronized void removeListener(String listenerName)
     {
         this.listenersByName.remove(listenerName);
         for (Map.Entry<Class< ? extends Event>, Map<String, RegisteredListener>> entry 
@@ -188,7 +191,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * {@inheritDoc}
      * @see ObservationManager#addEvent(String, Event)
      */
-    public void addEvent(String listenerName, Event event)
+    public synchronized void addEvent(String listenerName, Event event)
     {
         Map<String, RegisteredListener> listeners = this.listenersByEvent.get(event.getClass());
         RegisteredListener listener = listeners.get(listenerName);
@@ -201,7 +204,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * {@inheritDoc}
      * @see ObservationManager#removeEvent(String, Event)
      */
-    public void removeEvent(String listenerName, Event event)
+    public synchronized void removeEvent(String listenerName, Event event)
     {
         Map<String, RegisteredListener> listeners = this.listenersByEvent.get(event.getClass());
         RegisteredListener listener = listeners.get(listenerName);
@@ -214,7 +217,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * {@inheritDoc}
      * @see ObservationManager#getListener(String)
      */
-    public EventListener getListener(String listenerName)
+    public synchronized EventListener getListener(String listenerName)
     {
         return this.listenersByName.get(listenerName);
     }
@@ -224,7 +227,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#notify(org.xwiki.observation.event.Event, Object, Object)
      */
-    public void notify(Event event, Object source, Object data)
+    public synchronized void notify(Event event, Object source, Object data)
     {
         // Find all listeners for this event
         Map<String, RegisteredListener> regListeners = this.listenersByEvent.get(event.getClass());

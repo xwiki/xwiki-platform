@@ -46,6 +46,25 @@
           </includes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>clirr-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>clirr-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>test</phase>
+            <configuration>
+              <comparisonVersion>2.0-milestone-rc2</comparisonVersion>
+              <excludes>
+                <!-- The excludes below need to be removed when 2.0 is released -->
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

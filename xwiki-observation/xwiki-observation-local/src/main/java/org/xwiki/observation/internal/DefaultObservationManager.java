@@ -51,8 +51,8 @@ import org.xwiki.observation.event.Event;
 public class DefaultObservationManager extends AbstractLogEnabled implements ObservationManager, Initializable
 {
     /**
-     * Registered listeners indexed on Event classes so that it's fast to find all the listeners
-     * registered for a given event, so that {@link #notify} calls execute fast and in a fixed amount a time.
+     * Registered listeners indexed on Event classes so that it's fast to find all the listeners registered for a given
+     * event, so that {@link #notify} calls execute fast and in a fixed amount a time.
      * 
      * @todo Should we allow event inheritance?
      */
@@ -60,22 +60,20 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
         new HashMap<Class< ? extends Event>, Map<String, RegisteredListener>>();
 
     /**
-     * Registered listeners index by listener name. It makes it fast to perform operations on already
-     * registered listeners.
+     * Registered listeners index by listener name. It makes it fast to perform operations on already registered
+     * listeners.
      */
     private Map<String, EventListener> listenersByName = new HashMap<String, EventListener>();
 
     /**
      * Used to find all components implementing {@link EventListener} to register them automatically.
-     * Note that 
      */
     @Requirement
     private ComponentManager componentManager;
 
     /**
-     * Helper class to store the list of events of a given type associated with a given listener.
-     * We need this for performance reasons and also in order to be able to add events after a
-     * listener has been registered.
+     * Helper class to store the list of events of a given type associated with a given listener. We need this for
+     * performance reasons and also in order to be able to add events after a listener has been registered.
      */
     private static class RegisteredListener
     {
@@ -92,14 +90,14 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
         /**
          * @param listener the listener associated with the events.
          * @param event the first event to associate with the passed listener. More events are added by calling
-         *       {@link #addEvent(Event)}
+         *            {@link #addEvent(Event)}
          */
         RegisteredListener(EventListener listener, Event event)
         {
             List<Event> list = new ArrayList<Event>();
             list.add(event);
             this.events = list;
-            
+
             this.listener = listener;
         }
 
@@ -110,7 +108,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
         {
             this.events.add(event);
         }
-        
+
         /**
          * @param event the event to remove
          */
@@ -119,11 +117,11 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
             this.events.remove(event);
         }
     }
-    
+
     /**
-     * Register all components implementing the {@link EventListener} interface.
-     * 
      * {@inheritDoc}
+     * <p>
+     * Register all components implementing the {@link EventListener} interface.
      * 
      * @see Initializable#initialize()
      */
@@ -149,13 +147,13 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
         if (this.listenersByName.containsKey(eventListener.getName())) {
             getLogger().warn("The [" + eventListener.getClass().getName() + "] listener has overwritten a previously "
                 + "registered listener [" + this.listenersByName.get(eventListener.getName()).getClass().getName()
-                + "] since they both are registered under the same id [" + eventListener.getName() + "]." 
+                + "] since they both are registered under the same id [" + eventListener.getName() + "]."
                 + " In the future consider removing a Listener first if you really want to register it again.");
         }
-        
+
         // Register the listener by name. If already registered, override it.
         this.listenersByName.put(eventListener.getName(), eventListener);
-        
+
         // For each event defined for this listener, add it to the Event Map.
         for (Event event : eventListener.getEvents()) {
             // Check if this is a new Event type not already registered
@@ -177,7 +175,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
     public synchronized void removeListener(String listenerName)
     {
         this.listenersByName.remove(listenerName);
-        for (Map.Entry<Class< ? extends Event>, Map<String, RegisteredListener>> entry 
+        for (Map.Entry<Class< ? extends Event>, Map<String, RegisteredListener>> entry
             : this.listenersByEvent.entrySet())
         {
             entry.getValue().remove(listenerName);
@@ -189,6 +187,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
 
     /**
      * {@inheritDoc}
+     * 
      * @see ObservationManager#addEvent(String, Event)
      */
     public synchronized void addEvent(String listenerName, Event event)
@@ -202,6 +201,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
 
     /**
      * {@inheritDoc}
+     * 
      * @see ObservationManager#removeEvent(String, Event)
      */
     public synchronized void removeEvent(String listenerName, Event event)
@@ -215,6 +215,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
 
     /**
      * {@inheritDoc}
+     * 
      * @see ObservationManager#getListener(String)
      */
     public synchronized EventListener getListener(String listenerName)
@@ -243,8 +244,8 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
     }
 
     /**
-     * Call the provided listeners matching the passed Event. 
-     * The definition of <em>source</em> and <em>data</em> is purely up to the communicating classes.
+     * Call the provided listeners matching the passed Event. The definition of <em>source</em> and <em>data</em> is
+     * purely up to the communicating classes.
      * 
      * @param listeners the listeners to notify
      * @param event the event to pass to the registered listeners

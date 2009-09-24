@@ -24,7 +24,7 @@
   #if ($tdoc.title.length() == 0 || ($xwiki.isTitleInCompatibilityMode() && $regexResult.get(2).group.equals($titleToDisplay)))
     ## We are extracting the title but putting it back but hidden since there are javascript code such as the
     ## javascript used to display section edition which needs the header to be there to work properly.
-    #set ($hiddenTitle = "<${regexResult.get(1).group} style=\"display:none\">${regexResult.get(2).group}</${regexResult.get(1).group}>")
+    #set ($hiddenTitle = "<${regexResult.get(1).group} style='display:none'>${regexResult.get(2).group}</${regexResult.get(1).group}>")
     #if ($regexResult.get(0).end < $mathtool.sub($renderedContent.length(), 1))
       #set ($renderedContent = "${renderedContent.substring(0, $regexResult.get(0).start)}${hiddenTitle}${renderedContent.substring($regexResult.get(0).end)}")
     #else

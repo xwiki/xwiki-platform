@@ -61,6 +61,8 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     public static final int MODE_GWT_DEBUG = 6;
 
+    public static final String EXECUTIONCONTEXT_KEY = "xwikicontext";
+
     private boolean finished = false;
 
     private XWiki wiki;

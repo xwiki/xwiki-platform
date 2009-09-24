@@ -67,7 +67,13 @@ public class LazyXWikiDocument extends XWikiDocument
                 if (this.version == null) {
                     this.document = context.getWiki().getDocument(doc, context);
                 } else {
-                    this.document = context.getWiki().getDocument(doc, getVersion(), context);
+                    try {
+                        this.document = context.getWiki().getDocument(doc, getVersion(), context);
+                    } catch (XWikiException e) {
+                        // FIXME: looks like there is a bug in the getDocument in a specific version, fallback on
+                        // getting last version of the document until a proper fix is found
+                        this.document = context.getWiki().getDocument(doc, context);
+                    }
                 }
             } catch (XWikiException e) {
                 throw new RuntimeException("Failed to get document [" + this + "]", e);

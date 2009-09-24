@@ -276,7 +276,7 @@ public class XWikiContext extends Hashtable<Object, Object>
         if (this.user != null) {
             return this.user.getUser();
         } else {
-            return XWikiRightService.GUEST_USER_FULLNAME;
+            return "XWiki.XWikiGuest";
         }
     }
 

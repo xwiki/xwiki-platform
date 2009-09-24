@@ -27,11 +27,13 @@ import java.util.Map;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.LazyXWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 /**
  * Provide some serialization tools for old apis like {@link XWikiDocument} and {@link XWikiContext}.
@@ -62,6 +64,12 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     private Execution execution;
 
     /**
+     * Generate stub XWikiContext.
+     */
+    @Requirement
+    private XWikiStubContextProvider stubContextProvider;
+
+    /**
      * @param context the XWiki context to serialize
      * @return the serialized version of the context
      */
@@ -76,21 +84,45 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     }
 
     /**
+     * @return a stub XWikiContext, null if none can be generated (XWiki has never been accessed yet)
+     */
+    private XWikiContext getXWikiStubContext()
+    {
+        ExecutionContext context = this.execution.getContext();
+        XWikiContext xcontext = (XWikiContext) context.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+        if (xcontext == null) {
+            xcontext = this.stubContextProvider.createStubContext();
+
+            if (xcontext != null) {
+                context.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+            }
+        }
+
+        return xcontext;
+    }
+
+    /**
      * @param remoteData the serialized version of the context
      * @return the XWiki context
      */
     protected XWikiContext unserializeXWikiContext(Serializable remoteData)
     {
+        XWikiContext xcontext = getXWikiStubContext();
+
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
-        XWikiContext context = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-
-        if (context != null) {
-            context.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
-            context.setUser((String) remoteDataMap.get(CONTEXT_USER));
+        if (xcontext != null) {
+            xcontext.setDatabase((String) remoteDataMap.get(CONTEXT_WIKI));
+            xcontext.setUser((String) remoteDataMap.get(CONTEXT_USER));
+        } else {
+            getLogger().warn(
+                "Can't get a proper XWikiContext."
+                    + " It generally mean that the wiki has never been fully initialized,"
+                    + " i.e. has never been accesses at least once");
         }
 
-        return context;
+        return xcontext;
     }
 
     /**

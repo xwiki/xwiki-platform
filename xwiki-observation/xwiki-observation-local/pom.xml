@@ -59,7 +59,7 @@
             </goals>
             <phase>test</phase>
             <configuration>
-              <comparisonVersion>2.0-milestone-rc2</comparisonVersion>
+              <comparisonVersion>2.0-rc-2</comparisonVersion>
               <excludes>
                 <exclude>**/internal/**</exclude>
                 <!-- The excludes below need to be removed when 2.0 is released -->

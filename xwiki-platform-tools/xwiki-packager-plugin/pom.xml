@@ -27,18 +27,18 @@
   <parent>
     <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>20</version>
   </parent>
   <artifactId>xwiki-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
-  <version>1.14-SNAPSHOT</version>
+  <version>1.14</version>
   <packaging>maven-plugin</packaging>
   <description>
     A packager tool to import/export XWiki pages into/from a database. This tool can be used either
     as a Maven2 plugin or directly from the command line.
    </description>
    <properties>
-    <platform.core.version>2.0-rc-2</platform.core.version>
+    <platform.core.version>2.0</platform.core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -60,9 +60,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-packager-plugin</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-packager-plugin</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk/xwiki-packager-plugin</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-packager-plugin-1.14</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-packager-plugin-1.14</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-packager-plugin-1.14</url>
   </scm>
   <build>
     <plugins>

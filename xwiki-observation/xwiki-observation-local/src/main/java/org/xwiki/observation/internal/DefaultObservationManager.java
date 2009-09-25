@@ -22,9 +22,9 @@ package org.xwiki.observation.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -57,13 +57,13 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * @todo Should we allow event inheritance?
      */
     private Map<Class< ? extends Event>, Map<String, RegisteredListener>> listenersByEvent =
-        new HashMap<Class< ? extends Event>, Map<String, RegisteredListener>>();
+        new ConcurrentHashMap<Class< ? extends Event>, Map<String, RegisteredListener>>();
 
     /**
      * Registered listeners index by listener name. It makes it fast to perform operations on already registered
      * listeners.
      */
-    private Map<String, EventListener> listenersByName = new HashMap<String, EventListener>();
+    private Map<String, EventListener> listenersByName = new ConcurrentHashMap<String, EventListener>();
 
     /**
      * Used to find all components implementing {@link EventListener} to register them automatically.
@@ -141,7 +141,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#addListener(EventListener)
      */
-    public synchronized void addListener(EventListener eventListener)
+    public void addListener(EventListener eventListener)
     {
         // If the passed event listener name is already registered, log a warning
         if (this.listenersByName.containsKey(eventListener.getName())) {
@@ -160,7 +160,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
             Map<String, RegisteredListener> eventListeners = this.listenersByEvent.get(event.getClass());
             if (eventListeners == null) {
                 // No listener registered for this event yet. Create a map to store listeners for this event.
-                eventListeners = new HashMap<String, RegisteredListener>();
+                eventListeners = new ConcurrentHashMap<String, RegisteredListener>();
                 this.listenersByEvent.put(event.getClass(), eventListeners);
             }
             eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event));
@@ -172,7 +172,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#removeListener(String)
      */
-    public synchronized void removeListener(String listenerName)
+    public void removeListener(String listenerName)
     {
         this.listenersByName.remove(listenerName);
         for (Map.Entry<Class< ? extends Event>, Map<String, RegisteredListener>> entry
@@ -190,7 +190,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#addEvent(String, Event)
      */
-    public synchronized void addEvent(String listenerName, Event event)
+    public void addEvent(String listenerName, Event event)
     {
         Map<String, RegisteredListener> listeners = this.listenersByEvent.get(event.getClass());
         RegisteredListener listener = listeners.get(listenerName);
@@ -204,7 +204,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#removeEvent(String, Event)
      */
-    public synchronized void removeEvent(String listenerName, Event event)
+    public void removeEvent(String listenerName, Event event)
     {
         Map<String, RegisteredListener> listeners = this.listenersByEvent.get(event.getClass());
         RegisteredListener listener = listeners.get(listenerName);
@@ -218,7 +218,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#getListener(String)
      */
-    public synchronized EventListener getListener(String listenerName)
+    public EventListener getListener(String listenerName)
     {
         return this.listenersByName.get(listenerName);
     }
@@ -228,7 +228,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      * 
      * @see ObservationManager#notify(org.xwiki.observation.event.Event, Object, Object)
      */
-    public synchronized void notify(Event event, Object source, Object data)
+    public void notify(Event event, Object source, Object data)
     {
         // Find all listeners for this event
         Map<String, RegisteredListener> regListeners = this.listenersByEvent.get(event.getClass());

@@ -27,17 +27,17 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>19-SNAPSHOT</version>
+    <version>19</version>
   </parent>
   <artifactId>xwiki-plugin-watchlist</artifactId>
   <name>XWiki Platform - Plugins - WatchList Manager</name>
-  <version>1.20-SNAPSHOT</version>
+  <version>1.20</version>
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <properties>
-    <platform.core.version>2.0-SNAPSHOT</platform.core.version>
-    <platform.plugin.scheduler.version>1.12-SNAPSHOT</platform.plugin.scheduler.version>
-    <platform.plugin.mailsender.version>1.13-SNAPSHOT</platform.plugin.mailsender.version>
-    <platform.plugin.activitystream.version>1.5-SNAPSHOT</platform.plugin.activitystream.version>
+    <platform.core.version>2.0</platform.core.version>
+    <platform.plugin.scheduler.version>1.12</platform.plugin.scheduler.version>
+    <platform.plugin.mailsender.version>1.13</platform.plugin.mailsender.version>
+    <platform.plugin.activitystream.version>1.4</platform.plugin.activitystream.version>
   </properties>
   <dependencies>
     <dependency>
@@ -45,7 +45,7 @@
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>
-    </dependency>          
+    </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
@@ -68,9 +68,9 @@
   <!-- We must configure SCM in each module. For more information see:
        http://svn.xwiki.org/svnroot/xwiki/platform/pom/trunk/pom.xml -->
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/watchlist</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/watchlist</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk/watchlist</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.20</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.20</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.20</url>
   </scm>
   <issueManagement>
     <system>jira</system>

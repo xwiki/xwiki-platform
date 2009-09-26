@@ -21,17 +21,12 @@ package com.xpn.xwiki.wysiwyg.client.editor;
 
 import org.xwiki.gwt.dom.client.Style;
 
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.HasLoadHandlers;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.widget.LoadingPanel;
 import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
 import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
@@ -42,7 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHandler
+public class RichTextEditor extends Composite implements LoadHandler
 {
     /**
      * The menu bar.
@@ -75,10 +70,7 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
     public RichTextEditor()
     {
         textArea = new RichTextArea();
-        // Workaround till GWT provides a way to detect when the rich text area has finished loading.
-        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof HasLoadHandlers) {
-            ((HasLoadHandlers) textArea.getBasicFormatter()).addLoadHandler(this);
-        }
+        textArea.addLoadHandler(this);
 
         loadingPanel = new LoadingPanel();
         loadingPanel.getElement().getStyle().setProperty(Style.BACKGROUND_COLOR, "white");
@@ -153,21 +145,6 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
     {
         // This rich text editor has been attached to the document but its rich text area might not be ready yet.
         setLoading(true);
-
-        if (textArea.getBasicFormatter() == null || !(textArea.getBasicFormatter() instanceof HasLoadHandlers)) {
-            // We defer the notification in order to allow the rich text area to complete its initialization.
-            DeferredCommand.addCommand(new Command()
-            {
-                public void execute()
-                {
-                    try {
-                        DomEvent.fireNativeEvent(Document.get().createLoadEvent(), RichTextEditor.this);
-                    } catch (Throwable t) {
-                        Console.getInstance().error(t, RichTextEditor.class.getName(), HasLoadHandlers.class.getName());
-                    }
-                }
-            });
-        }
     }
 
     /**
@@ -177,16 +154,15 @@ public class RichTextEditor extends Composite implements HasLoadHandlers, LoadHa
      */
     public void onLoad(LoadEvent event)
     {
-        DomEvent.fireNativeEvent(event.getNativeEvent(), this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasLoadHandlers#addLoadHandler(LoadHandler)
-     */
-    public HandlerRegistration addLoadHandler(LoadHandler handler)
-    {
-        return addHandler(handler, LoadEvent.getType());
+        if (event.getSource() == textArea) {
+            // Move out of the loading state after the rest of the listeners execute their code.
+            DeferredCommand.addCommand(new Command()
+            {
+                public void execute()
+                {
+                    setLoading(false);
+                }
+            });
+        }
     }
 }

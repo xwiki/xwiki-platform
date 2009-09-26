@@ -27,7 +27,11 @@ import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.HasDoubleClickHandlers;
+import com.google.gwt.event.dom.client.HasLoadHandlers;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
@@ -37,12 +41,18 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster;
  * 
  * @version $Id$
  */
-public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers
+public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers,
+    HasLoadHandlers, LoadHandler
 {
     /**
      * @see #setHTML(String)
      */
-    public static final String DIRTY = "dirty";
+    public static final String DIRTY = "__dirty";
+
+    /**
+     * @see #onLoad(LoadEvent)
+     */
+    public static final String LOADED = "__loaded";
 
     /**
      * The command manager that executes commands on this rich text area.
@@ -61,6 +71,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     public RichTextArea()
     {
+        addLoadHandler(this);
         cm = new DefaultCommandManager(this);
         adjuster.setTextArea(this);
     }
@@ -73,6 +84,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     public RichTextArea(CommandManager cm)
     {
+        addLoadHandler(this);
         this.cm = cm;
         adjuster.setTextArea(this);
     }
@@ -114,9 +126,9 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     public void setHTML(String html)
     {
-        // We add a dirty attribute and set its value to true in order to be able to overcome the Issue 3156. Precisely,
-        // we test this attribute in the setHTMLImpl to avoid overwriting the contents when setHTML haven't been called.
-        getElement().setAttribute(DIRTY, String.valueOf(true));
+        // We use a dirty flag to overcome the Issue 3156. Precisely, we test this flag in the setHTMLImpl to avoid
+        // overwriting the contents when setHTML haven't been called.
+        getElement().setPropertyBoolean(DIRTY, true);
         super.setHTML(html);
     }
 
@@ -159,4 +171,39 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     {
         return addDomHandler(handler, DoubleClickEvent.getType());
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HasLoadHandlers#addLoadHandler(LoadHandler)
+     */
+    public HandlerRegistration addLoadHandler(LoadHandler handler)
+    {
+        return addDomHandler(handler, LoadEvent.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadHandler#onLoad(LoadEvent)
+     * @see #onAttach()
+     */
+    public void onLoad(LoadEvent event)
+    {
+        // Initialize the element only after the document to be edited is loaded.
+        getElement().setPropertyBoolean(LOADED, true);
+        // The loaded flag is needed to distinguish between the case when initElement is called after the element is
+        // attached to the page and the case when initElement is called after the document to be edited is loaded.
+        getImpl().initElement();
+    }
+
+    /**
+     * NOTE: We need this method because {@link com.google.gwt.user.client.ui.RichTextArea#impl} is private.
+     * 
+     * @return the underlying rich text area browser-specific implementation
+     */
+    protected native RichTextAreaImpl getImpl()
+    /*-{
+        return this.@com.google.gwt.user.client.ui.RichTextArea::impl;
+    }-*/;
 }

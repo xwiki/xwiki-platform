@@ -140,7 +140,7 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
         }
         table.append("</tbody></table>");
 
-        Element container = doc.xCreateDivElement().cast();
+        Element container = doc.createDivElement().cast();
         container.setInnerHTML(table.toString());
         Element tableElement = (Element) container.getFirstChild();
         container.removeChild(tableElement);

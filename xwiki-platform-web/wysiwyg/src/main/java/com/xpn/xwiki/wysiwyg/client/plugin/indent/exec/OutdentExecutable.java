@@ -238,7 +238,7 @@ public class OutdentExecutable extends AbstractListExecutable
             Node currentChild = listItem.getFirstChild();
             if (!DOMUtils.getInstance().isBlock(currentChild)) {
                 if (wrappingP == null) {
-                    wrappingP = ((Document) listItem.getOwnerDocument()).xCreatePElement().cast();
+                    wrappingP = listItem.getOwnerDocument().createPElement().cast();
                 }
                 wrappingP.appendChild(currentChild);
             } else {

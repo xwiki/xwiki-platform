@@ -201,7 +201,7 @@ public class InlineStyleExecutable extends AbstractExecutable
 
         // If we haven't found the proper ancestor, we wrap the text in a span element.
         if (ancestor == null) {
-            ancestor = ((Document) text.getOwnerDocument()).xCreateSpanElement().cast();
+            ancestor = text.getOwnerDocument().createSpanElement().cast();
             text.getParentNode().replaceChild(ancestor, text);
             ancestor.appendChild(text);
         }

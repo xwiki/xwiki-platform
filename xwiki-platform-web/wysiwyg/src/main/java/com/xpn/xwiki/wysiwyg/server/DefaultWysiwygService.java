@@ -37,20 +37,12 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroCategoryManager;
 import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.MacroManager;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
@@ -154,51 +146,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#toHTML(String, String)
-     */
-    public String toHTML(String source, String syntax)
-    {
-        return getHTMLConverter(syntax).toHTML(source, syntax);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see WysiwygService#cleanHTML(String)
      */
     public String cleanHTML(String dirtyHTML)
     {
         return getHTMLCleaner().clean(dirtyHTML);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#parseAndRender(String, String)
-     */
-    public String parseAndRender(String html, String syntax)
-    {
-        try {
-            // Parse
-            Parser parser = Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
-            XDOM xdom = parser.parse(new StringReader(cleanHTML(html)));
-
-            // Execute macros
-            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-            TransformationManager txManager = Utils.getComponent(TransformationManager.class);
-            txManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
-
-            // Render
-            WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
-            renderer.render(xdom, printer);
-
-            return printer.toString();
-        } catch (ParseException e) {
-            throw new RuntimeException("Exception while parsing HTML", e);
-        } catch (TransformationException e) {
-            throw new RuntimeException("Exception while executing macros", e);
-        }
     }
 
     /**

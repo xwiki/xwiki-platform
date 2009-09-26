@@ -91,26 +91,10 @@ public interface WysiwygService extends RemoteService
     String fromHTML(String html, String syntax);
 
     /**
-     * @param source The text to be converted.
-     * @param syntax The syntax of the given text.
-     * @return The result of converting the given text from the specified syntax to HTML.
-     */
-    String toHTML(String source, String syntax);
-
-    /**
      * @param dirtyHTML The HTML fragment to be cleaned.
      * @return The result of cleaning the given HTML fragment.
      */
     String cleanHTML(String dirtyHTML);
-
-    /**
-     * Parses the given HTML fragment and renders the result in XHTML.
-     * 
-     * @param html the HTML fragment to be rendered
-     * @param syntax the storage syntax
-     * @return the XHTML result of rendering the given HTML fragment
-     */
-    String parseAndRender(String html, String syntax);
 
     /**
      * Cleans dirty html content produced from an office application like MsWord, MsExcel, OpenOffice Writer etc. This

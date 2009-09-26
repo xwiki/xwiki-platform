@@ -30,10 +30,7 @@ import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.TableCellElement;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.event.dom.client.HasLoadHandlers;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -44,7 +41,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class BehaviorAdjuster implements LoadHandler
+public class BehaviorAdjuster
 {
     /**
      * The name of the <code>&lt;li&gt;</code> tag.
@@ -92,10 +89,6 @@ public class BehaviorAdjuster implements LoadHandler
             throw new IllegalStateException("Text area has already been set!");
         }
         this.textArea = textArea;
-        // Workaround till GWT provides a way to detect when the rich text area has finished loading.
-        if (textArea.getBasicFormatter() != null && textArea.getBasicFormatter() instanceof HasLoadHandlers) {
-            ((HasLoadHandlers) textArea.getBasicFormatter()).addLoadHandler(this);
-        }
     }
 
     /**
@@ -137,6 +130,9 @@ public class BehaviorAdjuster implements LoadHandler
                 break;
             case Event.ONKEYPRESS:
                 onKeyPress(event);
+                break;
+            case Event.ONLOAD:
+                onLoad(event);
                 break;
             default:
                 break;
@@ -384,7 +380,7 @@ public class BehaviorAdjuster implements LoadHandler
         event.xPreventDefault();
 
         Document document = getTextArea().getDocument();
-        Node paragraph = document.xCreatePElement();
+        Node paragraph = document.createPElement();
         paragraph.appendChild(document.createTextNode(""));
 
         if (before) {
@@ -429,11 +425,11 @@ public class BehaviorAdjuster implements LoadHandler
     }
 
     /**
-     * {@inheritDoc}
+     * Executes custom code after the rich text area is loaded.
      * 
-     * @see LoadHandler#onLoad(LoadEvent)
+     * @param event the native event that was fired
      */
-    public void onLoad(LoadEvent event)
+    protected void onLoad(Event event)
     {
         adjustDragDrop(textArea.getDocument());
     }

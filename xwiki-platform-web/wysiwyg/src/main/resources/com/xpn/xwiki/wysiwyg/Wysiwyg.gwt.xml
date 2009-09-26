@@ -175,4 +175,13 @@
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
+
+  <!-- DOMImpl for widgets -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.IEDOMImpl">
+    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
+  </replace-with>
 </module>

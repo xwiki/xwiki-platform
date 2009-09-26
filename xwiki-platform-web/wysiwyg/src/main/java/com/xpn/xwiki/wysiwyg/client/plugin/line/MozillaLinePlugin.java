@@ -56,6 +56,6 @@ public class MozillaLinePlugin extends LinePlugin
         } while (leaf != null && container == domUtils.getNearestBlockContainer(leaf));
 
         // It seems there's no visible element on the new line. We should add one.
-        domUtils.insertAfter(getTextArea().getDocument().xCreateBRElement(), lastLeaf);
+        domUtils.insertAfter(getTextArea().getDocument().createBRElement(), lastLeaf);
     }
 }

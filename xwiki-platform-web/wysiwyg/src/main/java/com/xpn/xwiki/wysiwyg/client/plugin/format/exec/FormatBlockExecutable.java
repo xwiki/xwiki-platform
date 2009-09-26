@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
 
@@ -102,7 +101,7 @@ public class FormatBlockExecutable extends AbstractBlockExecutable
     public static void replace(Element element, String tagName)
     {
         // Create a new element with the specified tag name.
-        Element replacement = ((Document) element.getOwnerDocument()).xCreateElement(tagName);
+        Element replacement = (Element) element.getOwnerDocument().createElement(tagName);
         // Moves all the child nodes of the old element to the new element.
         replacement.appendChild(element.extractContents());
         // If the old element has in-line style, copy it.

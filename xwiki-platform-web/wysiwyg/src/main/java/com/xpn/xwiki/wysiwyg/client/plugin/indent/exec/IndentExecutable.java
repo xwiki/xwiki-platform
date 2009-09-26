@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 
@@ -144,7 +143,7 @@ public class IndentExecutable extends AbstractListExecutable
         // if there is no second level list, create a new list and add it to the previous list item
         if (lastSecondLevelList == null) {
             lastSecondLevelList =
-                ((Document) listItem.getOwnerDocument()).xCreateElement(listItem.getParentNode().getNodeName());
+                (Element) listItem.getOwnerDocument().createElement(listItem.getParentNode().getNodeName());
             previousListItem.appendChild(lastSecondLevelList);
         }
         // add the current list item as the last child of the lastSecondLevelList in the previous list item

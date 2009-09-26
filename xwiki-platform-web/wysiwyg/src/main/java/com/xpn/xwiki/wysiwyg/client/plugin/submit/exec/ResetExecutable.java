@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
+import org.xwiki.gwt.dom.client.Element;
+
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -41,7 +43,13 @@ public class ResetExecutable implements Executable
      */
     public boolean execute(RichTextArea rta, String parameter)
     {
-        rta.setHTML(parameter);
+        if (parameter != null) {
+            rta.setHTML(parameter);
+        } else {
+            // The content of the rich text area was changed without calling {@link RichTextArea#setHTML(String)} (e.g.
+            // the rich text area was reloaded) and we must notify the inner HTML listeners as though it was called.
+            rta.getDocument().fireInnerHTMLChange((Element) rta.getDocument().getDocumentElement());
+        }
         return true;
     }
 

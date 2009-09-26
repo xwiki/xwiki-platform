@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
@@ -187,7 +186,7 @@ public abstract class AbstractBlockExecutable extends AbstractExecutable
             && domUtils.isInline(parent.getChildNodes().getItem(endIndex))) {
             endIndex++;
         }
-        Element element = ((Document) parent.getOwnerDocument()).xCreateElement(tagName);
+        Element element = (Element) parent.getOwnerDocument().createElement(tagName);
         for (int i = startIndex; i < endIndex; i++) {
             element.appendChild(parent.getChildNodes().getItem(startIndex));
         }

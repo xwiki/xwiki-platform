@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
-import com.xpn.xwiki.wysiwyg.client.util.Console;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.xpn.xwiki.wysiwyg.client.widget.LoadingPanel;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.Reloader;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
@@ -42,24 +44,9 @@ public class RefreshExecutable extends AbstractExecutable
     private static final Command SUBMIT = new Command("submit");
 
     /**
-     * The syntax used for storing the edited document.
-     */
-    private final String syntax;
-
-    /**
      * Used to prevent typing in the rich text area while waiting for the updated content from the server.
      */
     private final LoadingPanel waiting = new LoadingPanel();
-
-    /**
-     * Creates a new refresh executable.
-     * 
-     * @param syntax the syntax used for storing the edited document
-     */
-    public RefreshExecutable(String syntax)
-    {
-        this.syntax = syntax;
-    }
 
     /**
      * {@inheritDoc}
@@ -77,55 +64,31 @@ public class RefreshExecutable extends AbstractExecutable
         waiting.startLoading(rta);
         waiting.setFocus(true);
 
-        // Allow other plug-ins to adjust the content before the refresh by executing a submit command.
-        CommandListener submitListener = new CommandListener()
-        {
-            public boolean onBeforeCommand(CommandManager sender, Command command, String param)
-            {
-                // The refresh is executed just before the submit command is executed.
-                if (SUBMIT.equals(command)) {
-                    refresh(rta);
-                }
-                return false;
-            }
-
-            public void onCommand(CommandManager sender, Command command, String param)
-            {
-                // ignore
-            }
-        };
-        // We add the listener now to be sure it is the last one called, after all the other plug-ins did their job.
-        rta.getCommandManager().addCommandListener(submitListener);
-        if (!rta.getCommandManager().execute(SUBMIT)) {
-            // Send the refresh request even if the submit command failed.
-            refresh(rta);
-        }
-        // We no longer need to lister to the submit command.
-        rta.getCommandManager().removeCommandListener(submitListener);
+        // Request the updated content.
+        CommandManager cmdManager = rta.getCommandManager();
+        refresh(rta, cmdManager.execute(SUBMIT) ? cmdManager.getStringValue(SUBMIT) : rta.getHTML());
 
         return true;
     }
 
     /**
-     * Sends a request to the server to parse and re-render the current content of the given rich text area.
+     * Sends a request to the server to parse and re-render the content of the given rich text area.
      * 
      * @param rta the rich text area whose content will be refreshed
+     * @param html the HTML content of the rich text area
      */
-    private void refresh(final RichTextArea rta)
+    private void refresh(final RichTextArea rta, String html)
     {
-        WysiwygService.Singleton.getInstance().parseAndRender(rta.getHTML(), syntax, new AsyncCallback<String>()
-        {
-            public void onFailure(Throwable caught)
-            {
-                rta.setFocus(true);
-                waiting.stopLoading();
-                Console.getInstance().error(caught.getMessage());
-            }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("html", html);
 
-            public void onSuccess(String result)
+        Reloader reloader = new Reloader(rta);
+        reloader.reload(params, new LoadHandler()
+        {
+            public void onLoad(LoadEvent event)
             {
                 // Reset the content of the rich text area.
-                rta.getCommandManager().execute(new Command("reset"), result);
+                rta.getCommandManager().execute(new Command("reset"));
                 // Store the initial value of the rich text area in case it is submitted without gaining focus.
                 rta.getCommandManager().execute(SUBMIT, true);
                 // Try to focus the rich text area.

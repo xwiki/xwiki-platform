@@ -24,7 +24,6 @@ import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.internal.ie.NativeSelection;
 
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.LoadEvent;
 
 /**
  * Adjusts the behavior of the rich text area in Internet Explorer browsers.
@@ -36,9 +35,9 @@ public class IEBehaviorAdjuster extends BehaviorAdjuster
     /**
      * {@inheritDoc}
      * 
-     * @see BehaviorAdjuster#onLoad(LoadEvent)
+     * @see BehaviorAdjuster#onLoad(Event)
      */
-    public void onLoad(LoadEvent event)
+    public void onLoad(Event event)
     {
         super.onLoad(event);
         NativeSelection.ensureSelectionIsPreserved(getTextArea().getDocument());

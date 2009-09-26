@@ -97,7 +97,8 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
      * The JavaScript object that catches the submit event and calls {@link #onSubmit()}. We couldn't use a FormPanel
      * because it overwrites the onsubmit property of the form element instead of registering itself as a listener.
      */
-    protected JavaScriptObject submitHandler;
+    @SuppressWarnings("unused")
+    private JavaScriptObject submitHandler;
 
     /**
      * Extends the root of the editor UI. Examples of similar root extensions are the tool bar and the menu bar.
@@ -156,14 +157,18 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
                 hookSubmitEvent(form);
             }
 
+            // Try to restore the content of the rich text area from the cache.
             cache = new Cache((Element) Document.get().getElementById(getConfig().getParameter("cacheId", "")));
             String content = cache.get(CACHE_KEY_CONTENT);
             if (content != null) {
                 getTextArea().getCommandManager().execute(RESET, content);
             }
 
+            // Cache and submit the content when the rich text area looses the focus or the user navigates away.
             saveRegistration(getTextArea().addBlurHandler(this));
             saveRegistration(Window.addWindowClosingHandler(this));
+
+            // Prevent the rich text area from being submitted when it is disabled.
             getTextArea().getCommandManager().addCommandListener(this);
         }
     }
@@ -178,13 +183,13 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         if (rootExtension.getFeatures().length > 0) {
             unhookSubmitEvent(form);
             form = null;
-            cache = null;
             hiddenConfig.removeFromParent();
             hiddenConfig = null;
             submitHandler = null;
             rootExtension.clearFeatures();
         }
 
+        cache = null;
         getTextArea().getCommandManager().removeCommandListener(this);
 
         super.destroy();
@@ -287,5 +292,11 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     {
         // Allow the browser to cache the content of the rich text area when the user navigates away from the edit page.
         onSubmit();
+        // Make sure the cache is up to date before the page unloads. We have to do this because the queue of deferred
+        // commands is discarded when the page unloads and the cache update command might not get executed.
+        // NOTE: This is more of a hack since we shouldn't be aware of the internal cache implementation but there's no
+        // easy way to schedule the cache update after all the window closing handlers and before the first window
+        // closed handler.
+        cache.update();
     }
 }

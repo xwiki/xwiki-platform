@@ -23,11 +23,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Properties;
 
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.Project;
@@ -179,28 +180,45 @@ public class XWikiExecutor
     {
         // Wait till the main page becomes available which means the server is started fine
         System.out.println("Checking that XWiki is up and running...");
-        URL url = new URL("http://localhost:" + getPort() + "/xwiki/bin/view/Main/WebHome");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        HttpClient client = new HttpClient();
+        String url = "http://localhost:" + getPort() + "/xwiki/bin/view/Main/WebHome";
+
         boolean connected = false;
         boolean timedOut = false;
         long startTime = System.currentTimeMillis();
         while (!connected && !timedOut) {
+            GetMethod method = new GetMethod(url);
+
+            // Don't retry automatically since we're doing that in the algorithm below
+            method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+                new DefaultHttpMethodRetryHandler(0, false));
+
             try {
-                connection.connect();
-                int responseCode = connection.getResponseCode();
+                // Execute the method.
+                int responseCode = client.executeMethod(method);
+
+                // We must always read the response body.
+                byte[] responseBody = method.getResponseBody();
+
                 if (DEBUG) {
                     System.out.println("Result of pinging [" + url + "] = [" + responseCode + "], Message = ["
-                        + connection.getResponseMessage() + "]");
+                        + new String(responseBody) + "]");
                 }
+
                 // check the http response code is either not an error, either "unauthorized"
                 // (which is the case for products that deny view for guest, for example).
                 connected = (responseCode < 400 || responseCode == 401);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 // Do nothing as it simply means the server is not ready yet...
+            } finally {
+                // Release the connection.
+                method.releaseConnection();
             }
-            Thread.sleep(100L);
+            Thread.sleep(500L);
             timedOut = (System.currentTimeMillis() - startTime > TIMEOUT_SECONDS * 1000L);
         }
+
         if (timedOut) {
             String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds";
             System.out.println(message);

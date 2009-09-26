@@ -109,14 +109,6 @@
       &lt;dt class="label"&gt;&lt;label&gt;$msg.get("platform.core.profile.company"):&lt;/label&gt;&lt;/dt&gt;
       &lt;dd#if($context.action=="view") class="org"#end&gt;$doc.display("company", $obj)&lt;/dd&gt;
     #end
-    #if(($obj.getProperty("city") &amp;&amp; $obj.getProperty("city").getValue() != "") || $context.action == "inline")
-      &lt;dt class="label"&gt;&lt;label&gt;$msg.get("platform.core.profile.city"):&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd#if($context.action=="view") class="locality"#end&gt;$doc.display("city", $obj)&lt;/dd&gt;
-    #end
-    #if(($obj.getProperty("country") &amp;&amp; $obj.getProperty("country").getValue() != "") || $context.action == "inline")
-     &lt;dt class="label"&gt;&lt;label&gt;$msg.get("platform.core.profile.country"):&lt;/label&gt;&lt;/dt&gt;
-     &lt;dd#if($context.action=="view") class="country-name"#end&gt;$doc.display("country", $obj)&lt;/dd&gt;
-    #end
   &lt;/dl&gt;
   #if(($obj.getProperty("comment") &amp;&amp; $obj.getProperty("comment").getValue().trim() != "") || $context.action == "inline")
     1.1 $msg.get("platform.core.profile.about")

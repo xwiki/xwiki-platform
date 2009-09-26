@@ -1309,4 +1309,29 @@ public abstract class DOMUtils
             && (BR.equalsIgnoreCase(node.getNodeName()) || (node.getNodeType() == Node.ELEMENT_NODE && Element.as(node)
                 .getElementsByTagName(BR).getLength() > 0));
     }
+
+    /**
+     * Puts the given document in design mode or in view-only mode.
+     * <p>
+     * NOTE: The standard implementation of this method sets the value of the {@code designMode} DOM document property.
+     * We set the value of the {@code contentEditable} property on the document's body instead, if the browser doesn't
+     * fully support the {@code designMode} property.
+     * 
+     * @param document a DOM document
+     * @param designMode {@code true} to enter design mode, {@code false} to go back to view-only mode
+     */
+    public native void setDesignMode(Document document, boolean designMode)
+    /*-{
+        document.designMode = designMode ? 'on' : 'off';
+    }-*/;
+
+    /**
+     * @param document a DOM document
+     * @return {@code true} if the given document is in design mode, {@code false} otherwise
+     * @see #setDesignMode(Document, boolean)
+     */
+    public native boolean isDesignMode(Document document)
+    /*-{
+        return document.designMode.toLowerCase() == 'on';
+    }-*/;
 }

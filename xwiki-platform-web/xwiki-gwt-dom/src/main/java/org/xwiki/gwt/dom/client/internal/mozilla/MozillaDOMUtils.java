@@ -20,7 +20,6 @@
 package org.xwiki.gwt.dom.client.internal.mozilla;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 
 import com.google.gwt.dom.client.Node;
@@ -96,6 +95,6 @@ public class MozillaDOMUtils extends DOMUtils
      */
     public void ensureBlockIsEditable(Element block)
     {
-        block.appendChild(((Document) block.getOwnerDocument()).xCreateBRElement());
+        block.appendChild(block.getOwnerDocument().createBRElement());
     }
 }

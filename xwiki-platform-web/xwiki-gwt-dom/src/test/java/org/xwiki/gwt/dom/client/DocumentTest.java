@@ -22,6 +22,9 @@ package org.xwiki.gwt.dom.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.user.client.Timer;
+
 /**
  * Unit tests for {@link Document}.
  * 
@@ -54,5 +57,35 @@ public class DocumentTest extends AbstractDOMTest
 
         assertEquals(1, elements.size());
         assertEquals(element, elements.get(0));
+    }
+
+    /**
+     * Unit test for {@link Document#setDesignMode(boolean)} and {@link Document#isDesignMode()}.
+     */
+    public void testDesignMode()
+    {
+        final IFrameElement iframe = getDocument().createIFrameElement();
+        iframe.setSrc("about:blank");
+        getContainer().appendChild(iframe);
+
+        // We have to delay the test finish because the in-line frame is loaded asynchronously.
+        delayTestFinish(400);
+        (new Timer()
+        {
+            public void run()
+            {
+                // The in-line frame should be loaded by now.
+                Document iframeDoc = (Document) iframe.getContentDocument();
+                assertFalse(iframeDoc.isDesignMode());
+
+                iframeDoc.setDesignMode(true);
+                assertTrue(iframeDoc.isDesignMode());
+
+                iframeDoc.setDesignMode(false);
+                assertFalse(iframeDoc.isDesignMode());
+
+                finishTest();
+            }
+        }).schedule(300);
     }
 }

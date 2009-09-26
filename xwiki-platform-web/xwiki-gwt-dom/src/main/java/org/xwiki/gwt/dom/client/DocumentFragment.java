@@ -42,7 +42,7 @@ public final class DocumentFragment extends Node
      */
     public String getInnerHTML()
     {
-        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
+        Element container = getOwnerDocument().createDivElement().cast();
         // We avoid attaching a clone to limit the memory used.
         container.appendChild(this);
         String innerHTML = container.xGetInnerHTML();
@@ -56,7 +56,7 @@ public final class DocumentFragment extends Node
      */
     public String getInnerText()
     {
-        Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
+        Element container = getOwnerDocument().createDivElement().cast();
         // We avoid attaching a clone to limit the memory used.
         container.appendChild(this);
         String innerText = container.xGetInnerText();

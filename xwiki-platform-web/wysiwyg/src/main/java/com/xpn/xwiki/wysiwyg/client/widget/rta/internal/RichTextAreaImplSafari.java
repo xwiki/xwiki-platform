@@ -22,13 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.internal;
 import org.xwiki.gwt.dom.client.Element;
 
 import com.google.gwt.dom.client.IFrameElement;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.dom.client.HasLoadHandlers;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.event.shared.GwtEvent;
-import com.google.gwt.event.shared.HandlerManager;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
@@ -36,18 +29,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari implements
-    HasLoadHandlers
+public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari
 {
-    /**
-     * The handler manager used to fire load events. We need it because this class is not a widget and we don't have
-     * access to the rich text area from its implementation.<br/>
-     * NOTE: Stop firing load events as soon as GWT provides a way to detect that a rich text area has finished loading.
-     * 
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3059
-     */
-    private final HandlerManager handlerManager = new HandlerManager(this);
-
     /**
      * {@inheritDoc}<br/>
      * NOTE: Remove this method as soon as Issue 3147 is fixed. <br />
@@ -59,8 +42,8 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
      */
     protected void setHTMLImpl(String html)
     {
-        if (String.valueOf(true).equals(elem.getAttribute(RichTextArea.DIRTY))) {
-            elem.removeAttribute(RichTextArea.DIRTY);
+        if (elem.getPropertyBoolean(RichTextArea.DIRTY)) {
+            elem.setPropertyBoolean(RichTextArea.DIRTY, false);
             ((Element) IFrameElement.as(elem).getContentDocument().getBody().cast()).xSetInnerHTML(html);
         }
     }
@@ -84,59 +67,21 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
     public native void initElement()
     /*-{
         var iframe = this.@com.google.gwt.user.client.ui.impl.RichTextAreaImpl::elem;
-        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::initializing = true;
+        if (!iframe[@com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea::LOADED]
+            || iframe.contentWindow.document.designMode.toLowerCase() == 'on') return;
 
-        var _this = this;
-        // Wait for the in-line frame to finish loading and then turn design mode on.
-        iframe.onload = function() {
-            // Make sure this function is called at most once.
-            iframe.onload = null;
+        iframe.contentWindow.document.designMode = 'on';
 
-            // Turn design mode on.
-            iframe.contentWindow.document.designMode = 'On';
-
-            // Send notification that the in-line frame has reached design mode.
-            _this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
-        };
-
-        // Check if the in-line frame is already loaded.
-        if (iframe.contentWindow.document.readyState == 'complete') {
-            iframe.onload();
+        var outer = this;
+        iframe.contentWindow.onunload = function() {
+            iframe.contentWindow.onunload = null;
+            iframe[@com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea::LOADED] = false;
+            outer.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::uninitElement()()
         }
+
+        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::initializing = true;
+        this.@com.google.gwt.user.client.ui.impl.RichTextAreaImplStandard::onElementInitialized()();
     }-*/;
-
-    /**
-     * {@inheritDoc}<br/>
-     * NOTE: Remove this method as soon as GWT provides a way to detect that a rich text area has finished loading.
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#onElementInitialized()
-     */
-    protected void onElementInitialized()
-    {
-        super.onElementInitialized();
-        // We fire a fake load event to notify that the rich text area has finished loading.
-        DomEvent.fireNativeEvent(IFrameElement.as(elem).getContentDocument().createLoadEvent(), this);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasLoadHandlers#addLoadHandler(LoadHandler)
-     */
-    public HandlerRegistration addLoadHandler(LoadHandler handler)
-    {
-        return handlerManager.addHandler(LoadEvent.getType(), handler);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see HasLoadHandlers#fireEvent(GwtEvent)
-     */
-    public void fireEvent(GwtEvent< ? > event)
-    {
-        handlerManager.fireEvent(event);
-    }
 
     /**
      * {@inheritDoc}

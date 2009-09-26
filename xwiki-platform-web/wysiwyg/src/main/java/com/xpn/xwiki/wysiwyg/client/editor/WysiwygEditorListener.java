@@ -20,94 +20,38 @@
 
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
-import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
+import com.xpn.xwiki.wysiwyg.client.util.Console;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.Reloader;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
- * Editor tab events handler.
+ * {@link WysiwygEditor} tab-switch handler.
  * 
  * @version $Id$
  */
 public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeSelectionHandler<Integer>
 {
     /**
-     * Switch from Wiki to WYSIWYG editor.
+     * Disables the rich text editor, enables the source editor and updates the source text.
      */
-    private class SwitchToWysiwygCallback implements AsyncCallback<String>
+    private class SwitchToSourceCallback implements AsyncCallback<String>
     {
         /**
-         * WysiwygEditor instance.
-         */
-        private WysiwygEditor editor;
-
-        /**
-         * Constructor.
+         * {@inheritDoc}
          * 
-         * @param editor WysiwygEditor instance.
-         */
-        SwitchToWysiwygCallback(WysiwygEditor editor)
-        {
-            this.editor = editor;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void onSuccess(String result)
-        {
-            editor.setLoading(false);
-            // Disable the plain text area.
-            editor.getPlainTextEditor().getTextArea().setEnabled(false);
-            // Enable the rich text area in order to be able to submit its content.
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
-            // Focus the rich text area.
-            editor.getRichTextEditor().getTextArea().setFocus(true);
-            // Reset the content of the rich text area.
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(new Command("reset"), result);
-            // Store the initial value of the rich text area in case it is submitted without gaining focus.
-            editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void onFailure(Throwable caught)
-        {
-            Window.alert(caught.getMessage());
-            editor.setLoading(false);
-        }
-    }
-
-    /**
-     * Switch from WYSIWYG to Wiki editor.
-     */
-    private class SwitchToWikiCallback implements AsyncCallback<String>
-    {
-        /**
-         * WysiwygEditor instance.
-         */
-        private WysiwygEditor editor;
-
-        /**
-         * Constructor.
-         * 
-         * @param editor WysiwygEditor instance.
-         */
-        SwitchToWikiCallback(WysiwygEditor editor)
-        {
-            this.editor = editor;
-        }
-
-        /**
-         * {@inheritDoc}
+         * @see AsyncCallback#onSuccess(Object)
          */
         public void onSuccess(String result)
         {
@@ -119,16 +63,20 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
             editor.getPlainTextEditor().getTextArea().setText(result);
             // Try giving focus to the plain text area (this might not work if the browser window is not focused).
             editor.getPlainTextEditor().getTextArea().setFocus(true);
+            // Place the caret at the start.
+            editor.getPlainTextEditor().getTextArea().setCursorPos(0);
             // Store the initial value of the plain text area in case it is submitted without gaining focus.
             editor.getPlainTextEditor().submit();
         }
 
         /**
          * {@inheritDoc}
+         * 
+         * @see AsyncCallback#onFailure(Throwable)
          */
         public void onFailure(Throwable caught)
         {
-            Window.alert(caught.getMessage());
+            Console.getInstance().error(caught);
             editor.setLoading(false);
         }
     }
@@ -139,24 +87,19 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     protected static final Command SUBMIT = new Command("submit");
 
     /**
-     * Disable command.
+     * The command used to enable or disable the rich text area.
      */
     protected static final Command ENABLE = new Command("enable");
 
     /**
-     * Field describing the syntax used in the editor configuration.
-     */
-    protected static final String SYNTAX_CONFIG_PARAMETER = "syntax";
-
-    /**
-     * WysiwygEditor instance.
+     * The underlying WYSIWYG editor instance.
      */
     private final WysiwygEditor editor;
 
     /**
-     * Constructor.
+     * Creates a new tab-switch handler for the given WYSIWYG editor.
      * 
-     * @param editor WysiwygEditor instance.
+     * @param editor the {@link WysiwygEditor} instance
      */
     WysiwygEditorListener(WysiwygEditor editor)
     {
@@ -173,7 +116,7 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
         TabPanel tabPanel = (TabPanel) event.getSource();
         if (tabPanel.getTabBar().getSelectedTab() == event.getItem()) {
             event.cancel();
-        } else if (event.getItem() == WysiwygEditor.WIKI_TAB_INDEX
+        } else if (event.getItem() == WysiwygEditor.SOURCE_TAB_INDEX
             && editor.getRichTextEditor().getTextArea().isEnabled()) {
             // Notify the plug-ins that the content of the rich text area is about to be submitted.
             // We have to do this before the tabs are actually switched because plug-ins can't access the computed style
@@ -190,23 +133,49 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     public void onSelection(SelectionEvent<Integer> event)
     {
         editor.setLoading(true);
-        WysiwygServiceAsync wysiwygService = WysiwygService.Singleton.getInstance();
         // We test if the rich text area is disabled to be sure that the editor is not already being switched.
         if (event.getSelectedItem() == WysiwygEditor.WYSIWYG_TAB_INDEX
             && !editor.getRichTextEditor().getTextArea().isEnabled()) {
-            wysiwygService.toHTML(editor.getPlainTextEditor().getTextArea().getText(), editor.getConfig().getParameter(
-                SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX), new SwitchToWysiwygCallback(editor));
+            onSwitchToWysiwyg();
         } else {
             // We test if the rich text area is enabled to be sure that the editor is not already being switched.
-            if (event.getSelectedItem() == WysiwygEditor.WIKI_TAB_INDEX
+            if (event.getSelectedItem() == WysiwygEditor.SOURCE_TAB_INDEX
                 && editor.getRichTextEditor().getTextArea().isEnabled()) {
                 // At this point we should have the HTML, adjusted by plug-ins, submitted.
                 // See #onBeforeSelection(BeforeSelectionEvent)
                 // Make the request to convert the HTML to source syntax.
-                wysiwygService.fromHTML(editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(
-                    SUBMIT), editor.getConfig().getParameter(SYNTAX_CONFIG_PARAMETER, WysiwygEditor.DEFAULT_SYNTAX),
-                    new SwitchToWikiCallback(editor));
+                WysiwygService.Singleton.getInstance().fromHTML(
+                    editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT),
+                    editor.getConfig().getParameter("syntax", WysiwygEditor.DEFAULT_SYNTAX),
+                    new SwitchToSourceCallback());
             }
         }
+    }
+
+    /**
+     * Disables the source editor, enables the rich text editor and updates the rich text.
+     */
+    private void onSwitchToWysiwyg()
+    {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("source", editor.getPlainTextEditor().getTextArea().getText());
+
+        Reloader reloader = new Reloader(editor.getRichTextEditor().getTextArea());
+        reloader.reload(params, new LoadHandler()
+        {
+            public void onLoad(LoadEvent event)
+            {
+                // Disable the plain text area.
+                editor.getPlainTextEditor().getTextArea().setEnabled(false);
+                // Enable the rich text area in order to be able to submit its content.
+                editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
+                // Focus the rich text area.
+                editor.getRichTextEditor().getTextArea().setFocus(true);
+                // Reset the content of the rich text area.
+                editor.getRichTextEditor().getTextArea().getCommandManager().execute(new Command("reset"));
+                // Store the initial value of the rich text area in case it is submitted without gaining focus.
+                editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
+            }
+        });
     }
 }

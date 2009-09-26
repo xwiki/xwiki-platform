@@ -63,7 +63,7 @@ public class InsertHRExecutable extends AbstractExecutable
         if (flowContainer == null) {
             return false;
         }
-        Node hr = rta.getDocument().xCreateHRElement();
+        Node hr = rta.getDocument().createHRElement();
         if (flowContainer == start) {
             domUtils.insertAt(flowContainer, hr, offset);
             range.setEndAfter(hr);

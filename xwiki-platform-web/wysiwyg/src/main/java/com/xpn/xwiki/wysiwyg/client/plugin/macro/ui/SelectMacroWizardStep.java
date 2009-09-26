@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 
 import com.google.gwt.dom.client.Node;
@@ -249,7 +248,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
 
             // Group all real categories (the categories that were sorted).
             Node select = categoryList.getElement();
-            Element group = ((Document) select.getOwnerDocument()).xCreateElement("optgroup");
+            Element group = select.getOwnerDocument().createOptGroupElement().cast();
             group.setAttribute("label", Strings.INSTANCE.macroCategories());
             while (select.getChildNodes().getLength() > 2) {
                 group.appendChild(select.getChildNodes().getItem(2));

@@ -93,8 +93,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
         selector = new MacroSelector(displayer);
         wizard = new MacroWizard(displayer, config);
 
-        getTextArea().getCommandManager().registerCommand(REFRESH,
-            new RefreshExecutable(getConfig().getParameter("syntax", "xhtml/1.0")));
+        getTextArea().getCommandManager().registerCommand(REFRESH, new RefreshExecutable());
         getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));
         getTextArea().getCommandManager().registerCommand(EXPAND, new CollapseExecutable(selector, false));
         getTextArea().getCommandManager().registerCommand(INSERT, new InsertExecutable(selector));

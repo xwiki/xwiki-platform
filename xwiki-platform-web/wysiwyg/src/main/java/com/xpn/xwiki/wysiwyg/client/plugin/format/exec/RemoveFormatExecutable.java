@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Text;
 import org.xwiki.gwt.dom.client.TextFragment;
@@ -134,7 +133,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
 
         // Group the left siblings and apply the in-line style to the whole group.
         if (child.getPreviousSibling() != null) {
-            Element left = ((Document) child.getOwnerDocument()).xCreateSpanElement().cast();
+            Element left = child.getOwnerDocument().createSpanElement().cast();
             left.appendChild(child.getPreviousSibling());
             while (child.getPreviousSibling() != null) {
                 left.insertBefore(child.getPreviousSibling(), left.getFirstChild());
@@ -145,7 +144,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
 
         // Group the right siblings and apply the style to the whole group.
         if (child.getNextSibling() != null) {
-            Element right = ((Document) child.getOwnerDocument()).xCreateSpanElement().cast();
+            Element right = child.getOwnerDocument().createSpanElement().cast();
             do {
                 right.appendChild(child.getNextSibling());
             } while (child.getNextSibling() != null);
@@ -154,7 +153,7 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
         }
 
         // Wrap the child node and apply the in-line style to the wrapper.
-        Element wrapper = ((Document) child.getOwnerDocument()).xCreateSpanElement().cast();
+        Element wrapper = child.getOwnerDocument().createSpanElement().cast();
         wrapper.getStyle().setProperty(CSS_TEXT, parent.getStyle().getProperty(CSS_TEXT));
         parent.replaceChild(wrapper, child);
         wrapper.appendChild(child);

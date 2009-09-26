@@ -47,7 +47,7 @@ public class InsertHTMLExecutable extends AbstractExecutable
      */
     public boolean execute(RichTextArea rta, String param)
     {
-        Element container = rta.getDocument().xCreateDivElement().cast();
+        Element container = rta.getDocument().createDivElement().cast();
         container.xSetInnerHTML(param);
 
         Selection selection = rta.getDocument().getSelection();

@@ -52,7 +52,7 @@ public class ImageMetaDataExtractorTest extends AbstractWysiwygClientTest
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
-        container = ((Document) Document.get()).xCreateDivElement().cast();
+        container = Document.get().createDivElement().cast();
         Document.get().getBody().appendChild(container);
         extractor = new ImageMetaDataExtractor();
     }

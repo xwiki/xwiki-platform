@@ -58,7 +58,7 @@ public class MozillaMacroDisplayer extends MacroDisplayer
      */
     private Node createCaretBlocker()
     {
-        ImageElement img = getTextArea().getDocument().xCreateImageElement();
+        ImageElement img = getTextArea().getDocument().createImageElement();
         img.setWidth(0);
         img.setHeight(0);
         return img;

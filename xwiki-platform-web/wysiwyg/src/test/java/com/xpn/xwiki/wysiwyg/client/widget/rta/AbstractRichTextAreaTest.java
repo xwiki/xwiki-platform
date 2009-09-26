@@ -23,7 +23,6 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
-import com.google.gwt.event.dom.client.HasLoadHandlers;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Timer;
@@ -65,10 +64,7 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
 
         if (rta == null) {
             rta = new RichTextArea();
-            // Workaround till GWT provides a way to detect when the rich text area has finished loading.
-            if (rta.getBasicFormatter() != null && rta.getBasicFormatter() instanceof HasLoadHandlers) {
-                ((HasLoadHandlers) rta.getBasicFormatter()).addLoadHandler(this);
-            }
+            rta.addLoadHandler(this);
         }
         RootPanel.get().add(rta);
     }

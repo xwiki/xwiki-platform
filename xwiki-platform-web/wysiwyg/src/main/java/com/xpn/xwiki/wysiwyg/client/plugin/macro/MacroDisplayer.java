@@ -209,7 +209,7 @@ public class MacroDisplayer implements InnerHTMLListener
             int startIndex = domUtils.getNodeIndex(start);
             int endIndex = startIndex + siblingCount + 1;
             // We need to put macro output inside a container to be able to hide it when the macro is collapsed.
-            Element output = (Element) textArea.getDocument().xCreateDivElement().cast();
+            Element output = textArea.getDocument().createDivElement().cast();
             output.setClassName("macro-output");
             output.appendChild(domUtils.extractNodeContents(start.getParentNode(), startIndex + 1, endIndex));
 
@@ -247,7 +247,7 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     protected Element createReadOnlyBox()
     {
-        Element container = textArea.getDocument().xCreateElement(getMacroContainerTagName()).cast();
+        Element container = (Element) textArea.getDocument().createElement(getMacroContainerTagName());
         container.setAttribute("contentEditable", "false");
         return container;
     }
@@ -290,7 +290,7 @@ public class MacroDisplayer implements InnerHTMLListener
     {
         Document document = textArea.getDocument();
 
-        Element placeHolder = document.xCreateSpanElement().cast();
+        Element placeHolder = document.createSpanElement().cast();
         placeHolder.appendChild(document.createTextNode(call.getName()));
         placeHolder.setClassName("macro-placeholder");
 

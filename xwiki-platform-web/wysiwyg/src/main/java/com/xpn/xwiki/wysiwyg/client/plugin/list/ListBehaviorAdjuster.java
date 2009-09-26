@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
@@ -137,7 +136,7 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
             previousListItem.appendChild(listElement);
         } else {
             // wrap this element in a list item
-            Element wrappingListItem = ((Document) listElement.getOwnerDocument()).xCreateLIElement().cast();
+            Element wrappingListItem = listElement.getOwnerDocument().createLIElement().cast();
             wrappingListItem.wrap(listElement);
         }
     }
@@ -150,7 +149,7 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
      */
     protected void handleEmptyListItem(Element li)
     {
-        DOMUtils.getInstance().insertAt(li, ((Document) li.getOwnerDocument()).xCreateBRElement(), 0);
+        DOMUtils.getInstance().insertAt(li, li.getOwnerDocument().createBRElement(), 0);
     }
 
     /**

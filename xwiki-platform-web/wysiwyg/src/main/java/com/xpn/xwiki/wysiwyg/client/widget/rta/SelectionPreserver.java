@@ -144,7 +144,7 @@ public class SelectionPreserver
             // * an image node cannot have child nodes so a range boundary cannot fall inside an image node.
             // * most web browsers (including FF and IE) allow a range boundary to be placed before and after an image
             // node.
-            ImageElement img = document.xCreateImageElement();
+            ImageElement img = document.createImageElement();
             // We have to make sure the range boundary markers don't appear in rich text area's HTML
             img.setAttribute(Element.META_DATA_ATTR, "");
             img.setWidth(0);

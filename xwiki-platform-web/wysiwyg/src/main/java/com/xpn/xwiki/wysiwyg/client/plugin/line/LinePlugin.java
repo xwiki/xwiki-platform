@@ -352,7 +352,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         }
         // Replace the empty lines with paragraphs.
         for (Node emptyLine : emptyLines) {
-            emptyLine.getParentNode().replaceChild(document.xCreatePElement(), emptyLine);
+            emptyLine.getParentNode().replaceChild(document.createPElement(), emptyLine);
         }
     }
 
@@ -490,7 +490,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
     protected void insertLineBreak(Node container, Range caret)
     {
         // Insert the line break.
-        Node lineBreak = getTextArea().getDocument().xCreateBRElement();
+        Node lineBreak = getTextArea().getDocument().createBRElement();
         switch (caret.getStartContainer().getNodeType()) {
             case DOMUtils.CDATA_NODE:
             case DOMUtils.COMMENT_NODE:
@@ -538,7 +538,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         }
 
         // Create a new paragraph.
-        Node paragraph = getTextArea().getDocument().xCreatePElement();
+        Node paragraph = getTextArea().getDocument().createPElement();
 
         // This is the node that will contain the caret after the split.
         Node start;
@@ -597,7 +597,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
     {
         Document document = getTextArea().getDocument();
         // Create a new empty line.
-        Element emptyLine = document.xCreatePElement().cast();
+        Element emptyLine = document.createPElement().cast();
 
         if (domUtils.isFlowContainer(container)) {
             // We are at the beginning of a flow container. Since it can contain block elements we insert the empty line

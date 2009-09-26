@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import java.util.List;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Property;
 import org.xwiki.gwt.dom.client.Range;
@@ -126,7 +125,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
             Element element = (Element) child;
             if (element.hasAttributes()) {
                 // We must keep the attributes. Let's rename the element.
-                Element replacement = ((Document) element.getOwnerDocument()).xCreateSpanElement().cast();
+                Element replacement = element.getOwnerDocument().createSpanElement().cast();
                 JsArrayString attributes = element.getAttributeNames();
                 for (int i = 0; i < attributes.length(); i++) {
                     replacement.setAttribute(attributes.get(i), element.getAttribute(attributes.get(i)));
@@ -140,7 +139,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         } else {
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 // Wrap the child with a span element.
-                Node wrapper = ((Document) child.getOwnerDocument()).xCreateSpanElement();
+                Node wrapper = child.getOwnerDocument().createSpanElement();
                 child.getParentNode().replaceChild(wrapper, child);
                 wrapper.appendChild(child);
 
@@ -222,7 +221,7 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
         // Make sure we apply the style only to the selected text.
         text.crop(firstCharIndex, lastCharIndex);
 
-        Element element = ((Document) text.getOwnerDocument()).xCreateElement(tagName);
+        Element element = (Element) text.getOwnerDocument().createElement(tagName);
         text.getParentNode().replaceChild(element, text);
         element.appendChild(text);
 

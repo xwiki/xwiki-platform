@@ -141,7 +141,7 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
     private void doTestRangeSetStartAfterWithEmptyBody()
     {
         rta.setHTML("");
-        getBody().appendChild(rta.getDocument().xCreateSpanElement());
+        getBody().appendChild(rta.getDocument().createSpanElement());
 
         Range range = rta.getDocument().createRange();
         range.setStartAfter(getBody().getFirstChild());

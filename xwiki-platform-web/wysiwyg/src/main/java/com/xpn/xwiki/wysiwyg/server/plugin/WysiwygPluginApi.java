@@ -19,16 +19,24 @@
  */
 package com.xpn.xwiki.wysiwyg.server.plugin;
 
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.ecs.xhtml.input;
+import java.io.StringReader;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
+import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 
 /**
  * Api for the WysiwygPlugin.
@@ -37,6 +45,11 @@ import org.xwiki.rendering.renderer.PrintRendererFactory;
  */
 public class WysiwygPluginApi extends Api
 {
+    /**
+     * Default XWiki logger to report errors correctly.
+     */
+    private static final Log LOG = LogFactory.getLog(WysiwygPluginApi.class);
+
     /**
      * The plugin instance.
      */
@@ -83,42 +96,44 @@ public class WysiwygPluginApi extends Api
      */
     public boolean isSyntaxSupported(String syntaxId)
     {
-        boolean isSupported = true;
-
         try {
             Utils.getComponent(Parser.class, syntaxId);
             Utils.getComponent(PrintRendererFactory.class, syntaxId);
+            return true;
         } catch (Exception e) {
-            isSupported = false;
+            return false;
         }
-
-        return isSupported;
     }
 
     /**
-     * Creates an HTML input hidden that could serve as the input for a WYSIWYG editor instance. The editor instance
-     * should be configured to have its inputId parameter equal to the id passed to this method.
+     * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
      * 
-     * @param id The id of the generated HTML input.
-     * @param source The text that will be converted to HTML and then filled in the value attribute.
-     * @param syntax The syntax of the source text.
-     * @return The HTML to be included in a page in order to use the input.
+     * @param html the HTML fragment to be rendered
+     * @param syntax the storage syntax
+     * @return the XHTML result of rendering the given HTML fragment
      */
-    public String getInput(String id, String source, String syntax)
+    public String parseAndRender(String html, String syntax)
     {
-        String value = ((HTMLConverter) Utils.getComponent(HTMLConverter.class)).toHTML(source, syntax);
+        try {
+            // Parse
+            Parser parser = Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
+            HTMLCleaner cleaner = Utils.getComponent(HTMLCleaner.class);
+            XDOM xdom = parser.parse(new StringReader(cleaner.clean(html)));
 
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String svalue = filter.process(value);
+            // Execute macros
+            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+            TransformationManager txManager = Utils.getComponent(TransformationManager.class);
+            txManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
 
-        input hidden = new input();
-        hidden.setType(input.hidden);
-        hidden.setFilter(filter);
-        hidden.setID(id);
-        hidden.setDisabled(true);
-        hidden.setValue(svalue);
+            // Render
+            WikiPrinter printer = new DefaultWikiPrinter();
+            BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
+            renderer.render(xdom, printer);
 
-        return hidden.toString();
+            return printer.toString();
+        } catch (Throwable t) {
+            LOG.error("Couldn't refresh WYSIWYG content!", t);
+            return html;
+        }
     }
 }

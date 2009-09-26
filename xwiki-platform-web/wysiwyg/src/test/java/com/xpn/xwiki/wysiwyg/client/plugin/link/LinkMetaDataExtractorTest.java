@@ -49,7 +49,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
      * The content of the end wiki link marker comment.
      */
     private static final String STOPWIKILINK_COMMENT = "stopwikilink";
-    
+
     /**
      * The DOM element in which we run the tests.
      */
@@ -68,7 +68,7 @@ public class LinkMetaDataExtractorTest extends AbstractWysiwygClientTest
     protected void gwtSetUp() throws Exception
     {
         super.gwtSetUp();
-        container = ((Document) Document.get()).xCreateDivElement().cast();
+        container = Document.get().createDivElement().cast();
         Document.get().getBody().appendChild(container);
         extractor = new LinkMetaDataExtractor();
     }

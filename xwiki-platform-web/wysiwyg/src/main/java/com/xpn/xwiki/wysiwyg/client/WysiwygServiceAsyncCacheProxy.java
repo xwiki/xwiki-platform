@@ -94,16 +94,6 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#parseAndRender(String, String, AsyncCallback)
-     */
-    public void parseAndRender(String html, String syntax, AsyncCallback<String> async)
-    {
-        service.parseAndRender(html, syntax, async);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see WysiwygServiceAsync#cleanOfficeHTML(String, String, Map, AsyncCallback)
      */
     public void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
@@ -141,16 +131,6 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
         AsyncCallback<SyncResult> async)
     {
         service.syncEditorContent(syncedRevision, pageName, version, syncReset, async);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygServiceAsync#toHTML(String, String, AsyncCallback)
-     */
-    public void toHTML(String source, String syntax, AsyncCallback<String> async)
-    {
-        service.toHTML(source, syntax, async);
     }
 
     /**

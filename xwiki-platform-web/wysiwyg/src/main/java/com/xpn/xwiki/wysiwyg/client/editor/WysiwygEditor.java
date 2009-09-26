@@ -119,9 +119,9 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     protected static final int WYSIWYG_TAB_INDEX = 0;
 
     /**
-     * Wiki tab index in the TabPanel.
+     * Source tab index in the TabPanel.
      */
-    protected static final int WIKI_TAB_INDEX = 1;
+    protected static final int SOURCE_TAB_INDEX = 1;
 
     /**
      * The string used to identify the tool bar extension point.
@@ -203,6 +203,12 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private final HandlerRegistrationCollection registrations = new HandlerRegistrationCollection();
 
     /**
+     * The features that have been placed on the tool bar. The key is the feature name and the value is the widget that
+     * has been placed on the tool bar.
+     */
+    private final Map<String, UIExtension> toolBarFeatures = new HashMap<String, UIExtension>();
+
+    /**
      * The plug-in manager.
      */
     private PluginManager pm;
@@ -218,10 +224,10 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private RichTextEditor richTextEditor;
 
     /**
-     * The features that have been placed on the tool bar. The key is the feature name and the value is the widget that
-     * has been placed on the tool bar.
+     * Flag indicating if the WYSIWYG editor has been loaded. It is needed in order to prevent reloading the UI when the
+     * edited document is reloaded.
      */
-    private Map<String, UIExtension> toolBarFeatures;
+    private boolean loaded;
 
     /**
      * Creates a new WYSIWYG editor.
@@ -304,17 +310,16 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     public void onLoad(LoadEvent event)
     {
-        if (event.getSource() == richTextEditor) {
+        if (event.getSource() == richTextEditor.getTextArea() && !loaded) {
+            loaded = true;
             loadPlugins();
             initEditor();
             fillMenu();
             fillToolBar();
+            // Store the initial content of the rich text area.
             richTextEditor.getTextArea().getCommandManager().execute(SUBMIT);
-            richTextEditor.setLoading(false);
-            // Focus the rich text area, if it's enabled, to be sure it has reached design mode.
-            if (richTextEditor.getTextArea().isEnabled()) {
-                richTextEditor.getTextArea().setFocus(true);
-            }
+            // Focus the rich text area to be sure it has reached design mode.
+            richTextEditor.getTextArea().setFocus(true);
         }
     }
 
@@ -369,7 +374,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
             tabs.selectTab(WYSIWYG_TAB_INDEX);
         } else {
             getRichTextEditor().getTextArea().setEnabled(false);
-            tabs.selectTab(WIKI_TAB_INDEX);
+            tabs.selectTab(SOURCE_TAB_INDEX);
         }
 
         registrations.add(tabs.addBeforeSelectionHandler(listener));
@@ -413,7 +418,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
         boolean uieNotFound = false;
         UIExtension verticalBar = null;
         UIExtension lineBreak = null;
-        toolBarFeatures = new HashMap<String, UIExtension>();
         for (int i = 0; i < toolBarFeatureNames.length; i++) {
             UIExtension uie = pm.getUIExtension(TOOLBAR_ROLE, toolBarFeatureNames[i]);
             if (uie != null) {
@@ -529,7 +533,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     {
         if (richTextEditor == null) {
             richTextEditor = new RichTextEditor();
-            registrations.add(richTextEditor.addLoadHandler(this));
+            registrations.add(richTextEditor.getTextArea().addLoadHandler(this));
             registrations.add(richTextEditor.getTextArea().addMouseUpHandler(this));
             registrations.add(richTextEditor.getTextArea().addKeyUpHandler(this));
             richTextEditor.getTextArea().getCommandManager().addCommandListener(this);
@@ -552,7 +556,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     public PlainTextEditor getPlainTextEditor()
     {
-        return isTabbed() ? (PlainTextEditor) ((TabPanel) ui).getWidget(WIKI_TAB_INDEX) : null;
+        return isTabbed() ? (PlainTextEditor) ((TabPanel) ui).getWidget(SOURCE_TAB_INDEX) : null;
     }
 
     /**

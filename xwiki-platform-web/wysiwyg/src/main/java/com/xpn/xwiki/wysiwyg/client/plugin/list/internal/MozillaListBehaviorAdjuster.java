@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list.internal;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 
@@ -57,7 +56,7 @@ public class MozillaListBehaviorAdjuster extends ListBehaviorAdjuster
         for (int i = 0; i < listItems.getLength(); i++) {
             Element currentListItem = (Element) listItems.getItem(i);
             if (currentListItem.getChildNodes().getLength() == 0) {
-                currentListItem.appendChild(((Document) element.getOwnerDocument()).xCreateBRElement());
+                currentListItem.appendChild(element.getOwnerDocument().createBRElement());
             }
         }
     }

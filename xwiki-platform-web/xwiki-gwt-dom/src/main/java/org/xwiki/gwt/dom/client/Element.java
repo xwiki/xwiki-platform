@@ -119,7 +119,7 @@ public class Element extends com.google.gwt.dom.client.Element
         if (getFirstChildElement() == null) {
             return getInnerHTML();
         } else {
-            Element container = ((Document) getOwnerDocument()).xCreateDivElement().cast();
+            Element container = getOwnerDocument().createDivElement().cast();
             StringBuffer innerHTML = new StringBuffer();
             Node child = getFirstChild();
             do {

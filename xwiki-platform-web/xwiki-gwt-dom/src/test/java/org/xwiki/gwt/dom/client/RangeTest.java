@@ -83,7 +83,7 @@ public class RangeTest extends AbstractDOMTest
         range.setEndBefore(getContainer().getLastChild());
         assertEquals("#b<ins>c</ins>", range.toHTML().toLowerCase());
 
-        range.insertNode(getDocument().xCreateImageElement());
+        range.insertNode(getDocument().createImageElement());
         assertEquals("<img>#b<ins>c</ins>", range.toHTML().toLowerCase());
     }
 
@@ -99,7 +99,7 @@ public class RangeTest extends AbstractDOMTest
         range.setEnd(getContainer().getChildNodes().getItem(1).getFirstChild(), 1);
 
         try {
-            range.surroundContents(getDocument().xCreateSpanElement());
+            range.surroundContents(getDocument().createSpanElement());
             fail("The range partially selects a non-Text node.");
         } catch (Throwable t) {
             assertTrue(t instanceof IllegalStateException);
@@ -113,7 +113,7 @@ public class RangeTest extends AbstractDOMTest
         range.setStart(getContainer().getFirstChild(), 1);
         range.setEnd(getContainer().getLastChild(), 1);
 
-        range.surroundContents(getDocument().xCreateSpanElement());
+        range.surroundContents(getDocument().createSpanElement());
         assertEquals("<span>b<sup>c</sup>d</span>", range.toHTML().toLowerCase());
         assertEquals("a<span>b<sup>c</sup>d</span>e", getContainer().getInnerHTML().toLowerCase());
     }

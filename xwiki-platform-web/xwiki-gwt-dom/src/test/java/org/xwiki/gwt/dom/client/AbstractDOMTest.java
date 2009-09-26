@@ -49,7 +49,7 @@ public abstract class AbstractDOMTest extends GWTTestCase
         super.gwtSetUp();
 
         document = Document.get().cast();
-        container = document.xCreateDivElement().cast();
+        container = document.createDivElement().cast();
         document.getBody().appendChild(container);
     }
 

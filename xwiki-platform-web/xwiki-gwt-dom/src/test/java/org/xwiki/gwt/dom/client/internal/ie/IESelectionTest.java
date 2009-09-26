@@ -309,7 +309,7 @@ public class IESelectionTest extends AbstractDOMTest
     {
         Range range = getRange("a|b<!--x--><em>c</em><ins>de|f</ins>");
         DocumentFragment contents = range.cloneContents();
-        Element wrapper = getDocument().xCreateDivElement().cast();
+        Element wrapper = getDocument().createDivElement().cast();
         wrapper.appendChild(contents);
         assertEquals("b<!--x--><em>c</em><ins>de</ins>", wrapper.getInnerHTML().toLowerCase());
     }

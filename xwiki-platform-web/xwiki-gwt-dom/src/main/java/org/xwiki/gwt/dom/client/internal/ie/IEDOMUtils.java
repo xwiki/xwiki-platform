@@ -57,7 +57,7 @@ public class IEDOMUtils extends DOMUtils
                 return doc.createTextNode(externalNode.getNodeValue());
             case Node.ELEMENT_NODE:
                 Element externalElement = Element.as(externalNode);
-                Element internalElement = doc.xCreateElement(externalElement.getTagName());
+                Element internalElement = (Element) doc.createElement(externalElement.getTagName());
                 JsArrayString attrNames = getAttributeNames(externalElement);
                 for (int i = 0; i < attrNames.length(); i++) {
                     String attrName = attrNames.get(i);
@@ -191,4 +191,24 @@ public class IEDOMUtils extends DOMUtils
             block.setInnerHTML("");
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#setDesignMode(Document, boolean)
+     */
+    public native void setDesignMode(Document document, boolean designMode)
+    /*-{
+        document.body.contentEditable = designMode ? true : 'inherit';
+    }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#isDesignMode(Document)
+     */
+    public native boolean isDesignMode(Document document)
+    /*-{
+        return document.body.isContentEditable;
+    }-*/;
 }

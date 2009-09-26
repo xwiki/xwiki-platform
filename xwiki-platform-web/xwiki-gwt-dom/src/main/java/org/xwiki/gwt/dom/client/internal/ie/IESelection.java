@@ -284,7 +284,7 @@ public class IESelection extends AbstractSelection
      */
     protected Element createBoundaryMarker()
     {
-        ImageElement marker = nativeSelection.getOwnerDocument().xCreateImageElement();
+        ImageElement marker = nativeSelection.getOwnerDocument().createImageElement();
         marker.setWidth(0);
         marker.setHeight(0);
         return marker.cast();

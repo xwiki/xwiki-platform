@@ -21,23 +21,11 @@ package org.xwiki.gwt.dom.client;
 
 import java.util.Iterator;
 
-import com.google.gwt.dom.client.BRElement;
-import com.google.gwt.dom.client.BaseElement;
-import com.google.gwt.dom.client.ButtonElement;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.HRElement;
-import com.google.gwt.dom.client.ImageElement;
-import com.google.gwt.dom.client.LIElement;
-import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.dom.client.ParagraphElement;
-import com.google.gwt.dom.client.ScriptElement;
-import com.google.gwt.dom.client.SpanElement;
 
 /**
- * Extends the document implementation provided by GWT to add support for multi-window, selection and range.
+ * Extends the document implementation provided by GWT to add support for selection and range.
  * 
- * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2772
  * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3006
  * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3053
  * @version $Id$
@@ -53,22 +41,6 @@ public class Document extends com.google.gwt.dom.client.Document
     }
 
     /**
-     * Creates a new element.<br/>
-     * We've added this method because at the time of writing {@link com.google.gwt.dom.client.Document} doesn't offer
-     * support for multi-window. This means that currently, using GWT's API we can create elements only within the
-     * document of the host page. Since {@link com.google.gwt.user.client.ui.RichTextArea} is based on an in-line frame
-     * which has its own window and document we have to be able to create elements within the edited document.
-     * 
-     * @param tagName the tag name of the element to be created
-     * @return the newly created element
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2772
-     */
-    public final native Element xCreateElement(String tagName)
-    /*-{
-        return this.createElement(tagName);
-    }-*/;
-
-    /**
      * @param data contains the data to be added to the comment.
      * @return the created comment node.
      */
@@ -78,112 +50,22 @@ public class Document extends com.google.gwt.dom.client.Document
     }-*/;
 
     /**
-     * Creates a &lt;link&gt; element.
+     * Creates an empty document fragment.<br/>
+     * A DocumentFragment is a minimal document object that has no parent. It supports the following DOM 2 methods:
+     * appendChild, cloneNode, hasAttributes, hasChildNodes, insertBefore, normalize, removeChild, replaceChild.<br/>
+     * It also supports the following DOM 2 properties: attributes, childNodes, firstChild, lastChild, localName,
+     * namespaceURI, nextSibling, nodeName, nodeType, nodeValue, ownerDocument, parentNode, prefix, previousSibling,
+     * textContent.<br/>
+     * Various other methods can take a document fragment as an argument (e.g. Node interface methods such as
+     * appendChild and insertBefore), in which case the children of the fragment are appended or inserted, not the
+     * fragment itself.
      * 
-     * @return the newly created element
+     * @return The newly created document fragment.
      */
-    public final LinkElement xCreateLinkElement()
-    {
-        return xCreateElement("link").cast();
-    }
-
-    /**
-     * Creates a &lt;script&gt; element.
-     * 
-     * @return the newly created element
-     */
-    public final ScriptElement xCreateScriptElement()
-    {
-        return xCreateElement("script").cast();
-    }
-
-    /**
-     * Creates a &lt;br&gt; element.
-     * 
-     * @return the newly created element
-     */
-    public final BRElement xCreateBRElement()
-    {
-        return xCreateElement("br").cast();
-    }
-
-    /**
-     * Creates a &lt;p&gt; element.
-     * 
-     * @return the newly created element
-     */
-    public final ParagraphElement xCreatePElement()
-    {
-        return xCreateElement("p").cast();
-    }
-
-    /**
-     * Creates a &lt;div&gt; element.
-     * 
-     * @return the newly created element.
-     */
-    public final DivElement xCreateDivElement()
-    {
-        return xCreateElement("div").cast();
-    }
-
-    /**
-     * Creates a &lt;span&gt; element.
-     * 
-     * @return the newly created element.
-     */
-    public final SpanElement xCreateSpanElement()
-    {
-        return xCreateElement("span").cast();
-    }
-
-    /**
-     * @return a new base element
-     */
-    public final BaseElement xCreateBaseElement()
-    {
-        return xCreateElement("base").cast();
-    }
-
-    /**
-     * Creates a &lt;hr&gt; element.
-     * 
-     * @return the newly create element.
-     */
-    public final HRElement xCreateHRElement()
-    {
-        return xCreateElement("hr").cast();
-    }
-
-    /**
-     * Creates a &lt;img&gt; element.
-     * 
-     * @return the newly create element.
-     */
-    public final ImageElement xCreateImageElement()
-    {
-        return xCreateElement("img").cast();
-    }
-
-    /**
-     * Creates a &lt;li&gt; element.
-     * 
-     * @return the newly created element.
-     */
-    public final LIElement xCreateLIElement()
-    {
-        return xCreateElement("li").cast();
-    }
-
-    /**
-     * Creates a &lt;button&gt; element.
-     * 
-     * @return the newly create element.
-     */
-    public final ButtonElement xCreateButtonElement()
-    {
-        return xCreateElement("button").cast();
-    }
+    public final native DocumentFragment createDocumentFragment()
+    /*-{
+        return this.createDocumentFragment();
+    }-*/;
 
     /**
      * We've added this method because at the time of writing {@link com.google.gwt.dom.client.Document} doesn't offer
@@ -318,24 +200,6 @@ public class Document extends com.google.gwt.dom.client.Document
     }-*/;
 
     /**
-     * Creates an empty document fragment.<br/>
-     * A DocumentFragment is a minimal document object that has no parent. It supports the following DOM 2 methods:
-     * appendChild, cloneNode, hasAttributes, hasChildNodes, insertBefore, normalize, removeChild, replaceChild.<br/>
-     * It also supports the following DOM 2 properties: attributes, childNodes, firstChild, lastChild, localName,
-     * namespaceURI, nextSibling, nodeName, nodeType, nodeValue, ownerDocument, parentNode, prefix, previousSibling,
-     * textContent.<br/>
-     * Various other methods can take a document fragment as an argument (e.g. Node interface methods such as
-     * appendChild and insertBefore), in which case the children of the fragment are appended or inserted, not the
-     * fragment itself.
-     * 
-     * @return The newly created document fragment.
-     */
-    public final native DocumentFragment createDocumentFragment()
-    /*-{
-        return this.createDocumentFragment();
-    }-*/;
-
-    /**
      * Opens a document stream for writing.
      */
     public final native void open()
@@ -392,12 +256,14 @@ public class Document extends com.google.gwt.dom.client.Document
     }-*/;
 
     /**
-     * Notify all listeners of the change to the given element's <code>innerHTML</code> property.<br/>
-     * NOTE: Keep this method accessible only from within this package because only {@link Element} should call it.
+     * Notify all listeners of the change to the given element's {@code innerHTML} property.
+     * <p>
+     * NOTE: Normally, only {@link Element#xSetInnerHTML(String)} should call this method.
      * 
      * @param element The element whose <code>innerHTML</code> property has changed.
+     * @see Element#xSetInnerHTML(String)
      */
-    final native void fireInnerHTMLChange(Element element)
+    public final native void fireInnerHTMLChange(Element element)
     /*-{
         if (this.innerHTMLListeners) {
             for (var i = 0; i < this.innerHTMLListeners.length; i++) {
@@ -406,4 +272,27 @@ public class Document extends com.google.gwt.dom.client.Document
             }
         }
     }-*/;
+
+    /**
+     * Puts this document in design mode or in view-only mode.
+     * <p>
+     * NOTE: The standard implementation of this method sets the value of the {@code designMode} DOM document property.
+     * We set the value of the {@code contentEditable} property on the document's body instead, if the browser doesn't
+     * fully support the {@code designMode} property.
+     * 
+     * @param designMode {@code true} to enter design mode, {@code false} to go back to view-only mode
+     */
+    public final void setDesignMode(boolean designMode)
+    {
+        DOMUtils.getInstance().setDesignMode(this, designMode);
+    }
+
+    /**
+     * @return {@code true} if this document is in design mode, {@code false} otherwise
+     * @see #setDesignMode(boolean)
+     */
+    public final boolean isDesignMode()
+    {
+        return DOMUtils.getInstance().isDesignMode(this);
+    }
 }

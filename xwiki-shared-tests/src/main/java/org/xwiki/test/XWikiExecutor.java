@@ -187,19 +187,23 @@ public class XWikiExecutor
         boolean connected = false;
         boolean timedOut = false;
         long startTime = System.currentTimeMillis();
+        int responseCode = -1;
+        byte[] responseBody = new byte[0];
         while (!connected && !timedOut) {
             GetMethod method = new GetMethod(url);
 
             // Don't retry automatically since we're doing that in the algorithm below
             method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
                 new DefaultHttpMethodRetryHandler(0, false));
-
+            // Set a socket timeout to ensure the server has no chance of not ansering to our request...
+            method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, new Integer(2000));
+            
             try {
                 // Execute the method.
-                int responseCode = client.executeMethod(method);
+                responseCode = client.executeMethod(method);
 
                 // We must always read the response body.
-                byte[] responseBody = method.getResponseBody();
+                responseBody = method.getResponseBody();
 
                 if (DEBUG) {
                     System.out.println("Result of pinging [" + url + "] = [" + responseCode + "], Message = ["
@@ -220,10 +224,13 @@ public class XWikiExecutor
         }
 
         if (timedOut) {
-            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds";
+            String message = "Failed to start XWiki in [" + TIMEOUT_SECONDS + "] seconds, last error code ["
+                + responseCode + ", message [" + new String(responseBody) + "]";
             System.out.println(message);
             stop();
             throw new RuntimeException(message);
+        } else {
+            System.out.println("Server is answering to [" + url + "]... cool"); 
         }
     }
 

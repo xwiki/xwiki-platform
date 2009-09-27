@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * Allows getting an Exoplatform JCR Session so that it becomes possible to get data out of JCR
  * and display it inside XWiki or store XWiki data in Exo's JCR.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class ExoPlatformPlugin extends XWikiDefaultPlugin
 {

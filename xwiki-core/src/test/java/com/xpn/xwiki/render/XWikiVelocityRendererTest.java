@@ -84,7 +84,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("Param").will(returnValue(""));
         this.mockXWiki.stubs().method("getIncludedMacros").will(returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
-        this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
+        this.mockDocument.stubs().method("getPrefixedFullName").will(returnValue("xwiki:Space2.Document"));
 
         String result = this.renderer.render("Simple content", this.contentDocument, this.document, getContext());
 
@@ -96,7 +96,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
         this.mockXWiki.stubs().method("Param").will(returnValue(""));
         this.mockXWiki.stubs().method("getIncludedMacros").will(returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
-        this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
+        this.mockDocument.stubs().method("getPrefixedFullName").will(returnValue("xwiki:Space2.Document"));
 
         String result =
             this.renderer.render("#set ($test = \"hello\")\n$test world\n## comment", this.contentDocument,

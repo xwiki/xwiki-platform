@@ -1960,7 +1960,8 @@ public class XWikiDocument implements DocumentModelBridge
             PropertyClass pclass = (PropertyClass) bclass.getField(propertyName);
             vcontext.put(pclass.getName(), pclass.getPrettyName());
         }
-        result.append(XWikiVelocityRenderer.evaluate(header, context.getDoc().getFullName(), vcontext, context));
+        result
+            .append(XWikiVelocityRenderer.evaluate(header, context.getDoc().getPrefixedFullName(), vcontext, context));
         if (linebreak) {
             result.append("\n");
         }
@@ -1973,7 +1974,8 @@ public class XWikiDocument implements DocumentModelBridge
                 for (String name : bclass.getPropertyList()) {
                     vcontext.put(name, display(name, object, context));
                 }
-                result.append(XWikiVelocityRenderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
+                result.append(XWikiVelocityRenderer.evaluate(format, context.getDoc().getPrefixedFullName(), vcontext,
+                    context));
                 if (linebreak) {
                     result.append("\n");
                 }

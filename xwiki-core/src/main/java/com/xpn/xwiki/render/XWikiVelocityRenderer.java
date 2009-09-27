@@ -82,7 +82,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
                 LOG.warn("Exception while pre-including macro topics", e);
             }
 
-            return evaluate(content, contextdoc.getFullName(), vcontext, context);
+            return evaluate(content, contextdoc.getPrefixedFullName(), vcontext, context);
         } finally {
             if (previousdoc != null) {
                 vcontext.put("doc", previousdoc);

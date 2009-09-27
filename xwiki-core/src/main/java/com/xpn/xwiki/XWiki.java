@@ -5273,7 +5273,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
                 text =
                     XWikiVelocityRenderer.evaluate(format, "<username formatting code in "
-                        + context.getDoc().getFullName() + ">", vcontext, context);
+                        + context.getDoc().getPrefixedFullName() + ">", vcontext, context);
             }
 
             if (link == false) {

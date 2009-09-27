@@ -76,7 +76,12 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     /** Milliseconds of sleep between checks for changed documents. */
     private int indexingInterval = 30000;
 
-    private boolean exit = false;
+    /**
+     * volatile forces the VM to check for changes every time the variable is accessed
+     * since it is not otherwise changed in the main loop the VM could "optimize" 
+     * the check out and possibly never exit
+     */
+    private volatile boolean exit = false;
 
     private IndexWriter writer;
 
@@ -117,14 +122,14 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     /**
      * Main loop. Polls the queue for documents to be indexed.
-     * 
+     *
      * @see java.lang.Runnable#run()
      */
     public void run()
     {
         MDC.put("url", "Lucene index updating thread");
 
-        // Since this is where a new thread is created this is where we need to initialize the Container 
+        // Since this is where a new thread is created this is where we need to initialize the Container
         // ThreadLocal variables and not in the init() method. Otherwise we would simply overwrite the
         // Container values for the main thread...
         try {
@@ -261,10 +266,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             try {
                 Thread.sleep(indexingInterval);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.warn("Error while sleeping", e);
             }
-        }        
+        }
     }
 
     private synchronized void closeSearcher()
@@ -457,7 +461,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         // Note: There's no need to open the Searcher here (with a call to
         // openSearcher()) as each task needing it will open it itself.
     }
-    
+
     public void cleanIndex() throws IOException
     {
         if (LOG.isInfoEnabled()) {

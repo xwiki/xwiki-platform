@@ -29,7 +29,7 @@ import com.xpn.xwiki.api.Api;
 /**
  * Permit to manipulate XWikiException in velocity code.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiExceptionApi extends Api
 {

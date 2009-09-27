@@ -13,7 +13,7 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 /**
  * Plugin internationalization service based {@link XWikiMessageTool}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiPluginMessageTool extends XWikiMessageTool
 {

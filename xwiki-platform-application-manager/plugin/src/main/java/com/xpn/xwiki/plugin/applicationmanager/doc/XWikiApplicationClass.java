@@ -40,7 +40,7 @@ import org.jfree.util.Log;
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
  * XAppClasses.XWikiApplicationClass class.
  * 
- * @version $Id: $
+ * @version $Id$
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager
  */

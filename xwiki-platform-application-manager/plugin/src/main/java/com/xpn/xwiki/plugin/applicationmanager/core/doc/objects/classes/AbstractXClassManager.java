@@ -47,7 +47,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  * </ul>
  * 
  * @param <T> the item class extending {@link XObjectDocument}.
- * @version $Id: $
+ * @version $Id$
  * @see XClassManager
  * @since Application Manager 1.0RC1
  */

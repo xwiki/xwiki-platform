@@ -44,7 +44,7 @@ import org.xwiki.observation.event.Event;
 /**
  * Entry point of the Application Manager plugin.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ApplicationManagerPlugin extends XWikiDefaultPlugin implements EventListener
 {

@@ -38,7 +38,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
  * (and then {@link XWikiDocument}) isNew concept considering as new a document that does not contains an XWiki object
  * of the provided XWiki class.
  * 
- * @version $Id: $
+ * @version $Id$
  * @see XObjectDocument
  * @see XClassManager
  * @since Application Manager 1.0RC1

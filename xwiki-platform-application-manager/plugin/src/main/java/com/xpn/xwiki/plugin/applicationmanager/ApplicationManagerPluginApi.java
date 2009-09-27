@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * Plugin for managing applications: installation, export, creation. The plugin uses the concept of an Application
  * Descriptor describing an application (its version, the documents it contains, the translations, etc).
  * 
- * @version $Id: $
+ * @version $Id$
  * @see com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
  */
 public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlugin>

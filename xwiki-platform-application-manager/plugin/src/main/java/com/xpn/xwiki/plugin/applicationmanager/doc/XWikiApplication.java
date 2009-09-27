@@ -38,7 +38,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * This class manage an XWiki document containing XApp.XWikiApplicationClass object. It add some specifics methods,
  * getters and setters for this type of object and fields.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiApplication extends DefaultXObjectDocument
 {

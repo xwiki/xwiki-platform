@@ -28,7 +28,7 @@ import com.xpn.xwiki.api.Object;
 /**
  * SuperDocument interface.
  * 
- * @version $Id: $
+ * @version $Id$
  * @see XClassManager
  * @since Application Manager 1.0RC1
  */

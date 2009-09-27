@@ -33,7 +33,7 @@ import java.util.List;
  * want to follow. At a frequency choosen by the user XWiki will send an email notification to him with a list of the
  * elements that has been modified since the last notification. This is the wrapper accessible from in-document scripts.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WatchListPluginApi extends PluginApi<WatchListPlugin>
 {

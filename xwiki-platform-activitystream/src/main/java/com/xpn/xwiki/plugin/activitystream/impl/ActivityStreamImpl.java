@@ -58,7 +58,7 @@ import com.sun.syndication.io.SyndFeedOutput;
 /**
  * Default implementation for {@link ActivityStream}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 @SuppressWarnings("serial")
 public class ActivityStreamImpl implements ActivityStream, EventListener

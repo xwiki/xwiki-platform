@@ -38,7 +38,7 @@ import com.xpn.xwiki.plugin.lucene.textextraction.XmlTextExtractor;
  * classes in Packages below <code>org.outerj.daisy</code> taken from the <a
  * href="http://new.cocoondev.org/daisy">Daisy project </a>.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class TextExtractor
 {

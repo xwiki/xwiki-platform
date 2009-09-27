@@ -54,7 +54,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 {

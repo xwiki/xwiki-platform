@@ -66,7 +66,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * </ul>
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class IndexRebuilder extends AbstractXWikiRunnable
 {

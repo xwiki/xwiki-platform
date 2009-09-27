@@ -36,7 +36,7 @@ import com.xpn.xwiki.plugin.PluginApi;
  * {@link LucenePlugin} class.
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class LucenePluginApi extends PluginApi<LucenePlugin>
 {

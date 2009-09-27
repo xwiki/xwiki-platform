@@ -35,7 +35,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Holds all data but the content of an attachment to be indexed. The content is retrieved at indexing time, which
  * should save us some memory especially when rebuilding an index for a big wiki.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class AttachmentData extends IndexData
 {

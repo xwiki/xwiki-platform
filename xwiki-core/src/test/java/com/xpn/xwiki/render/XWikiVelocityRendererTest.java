@@ -19,15 +19,15 @@
  */
 package com.xpn.xwiki.render;
 
+import java.util.Collections;
+
 import org.jmock.Mock;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.XWiki;
-
-import java.util.Collections;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiVelocityRenderer}.
@@ -53,6 +53,7 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
      * 
      * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
      */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -73,22 +74,19 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
         this.document = (XWikiDocument) this.mockDocument.proxy();
 
         Mock mockApiDocument =
-            mock(Document.class, new Class[] {XWikiDocument.class, XWikiContext.class},
-                new Object[] {this.document, getContext()});
-        this.mockDocument.stubs().method("newDocument")
-            .will(returnValue(mockApiDocument.proxy()));
+            mock(Document.class, new Class[] {XWikiDocument.class, XWikiContext.class}, new Object[] {this.document,
+            getContext()});
+        this.mockDocument.stubs().method("newDocument").will(returnValue(mockApiDocument.proxy()));
     }
 
     public void testRenderWithSimpleText()
     {
         this.mockXWiki.stubs().method("Param").will(returnValue(""));
-        this.mockXWiki.stubs().method("getIncludedMacros").will(
-            returnValue(Collections.EMPTY_LIST));
+        this.mockXWiki.stubs().method("getIncludedMacros").will(returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
         this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
 
-        String result =
-            renderer.render("Simple content", contentDocument, document, getContext());
+        String result = this.renderer.render("Simple content", this.contentDocument, this.document, getContext());
 
         assertEquals("Simple content", result);
     }
@@ -96,14 +94,13 @@ public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTest
     public void testRenderWithVelocityContent()
     {
         this.mockXWiki.stubs().method("Param").will(returnValue(""));
-        this.mockXWiki.stubs().method("getIncludedMacros").will(
-            returnValue(Collections.EMPTY_LIST));
+        this.mockXWiki.stubs().method("getIncludedMacros").will(returnValue(Collections.EMPTY_LIST));
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
         this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
 
         String result =
-            renderer.render("#set ($test = \"hello\")\n$test world\n## comment", contentDocument,
-                document, getContext());
+            this.renderer.render("#set ($test = \"hello\")\n$test world\n## comment", this.contentDocument,
+                this.document, getContext());
 
         assertEquals("hello world\n", result);
     }

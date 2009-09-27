@@ -44,7 +44,7 @@ import java.net.MalformedURLException;
  * {table}
  * </pre></code>
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class SwizzleJiraPluginApi extends Api
 {

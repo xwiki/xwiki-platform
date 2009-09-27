@@ -33,7 +33,7 @@ import java.net.MalformedURLException;
 /**
  * Implementation of the Velocity API defined in {@link com.xpn.xwiki.plugin.swizzle.SwizzleJiraPluginApi}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class SwizzleJiraPlugin extends XWikiDefaultPlugin
 {

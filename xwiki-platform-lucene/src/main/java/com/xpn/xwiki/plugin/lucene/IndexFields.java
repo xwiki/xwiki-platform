@@ -28,7 +28,7 @@ import org.apache.commons.lang.time.FastDateFormat;
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of
  * special field values like dates.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class IndexFields
 {

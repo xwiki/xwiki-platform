@@ -63,7 +63,7 @@ import com.xpn.xwiki.web.Utils;
  * by one or several document fields (besides the default sort by relevance), filter by one or
  * several languages, and search in one, several or all virtual wikis.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {

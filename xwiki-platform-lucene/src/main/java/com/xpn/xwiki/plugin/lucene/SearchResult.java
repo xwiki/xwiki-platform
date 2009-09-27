@@ -30,7 +30,7 @@ import com.xpn.xwiki.api.Document;
 /**
  * Result of a search. The Plugin will return a collection of these for display on the search page.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class SearchResult
 {

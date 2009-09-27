@@ -32,7 +32,7 @@ import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
  * is threadsafe, as usually several threads add elements and one thread removes them for
  * processing.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiDocumentQueue
 {

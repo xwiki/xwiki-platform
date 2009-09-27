@@ -651,8 +651,16 @@ public class XWikiDocument implements DocumentModelBridge
     public String getFullName()
     {
         StringBuffer buf = new StringBuffer();
-        buf.append(getSpace());
-        buf.append(".");
+        buf.append(getSpace()).append(".");
+        buf.append(getName());
+        return buf.toString();
+    }
+
+    public String getPrefixedFullName()
+    {
+        StringBuffer buf = new StringBuffer();
+        buf.append(getDatabase()).append(":");
+        buf.append(getSpace()).append(".");
         buf.append(getName());
         return buf.toString();
     }

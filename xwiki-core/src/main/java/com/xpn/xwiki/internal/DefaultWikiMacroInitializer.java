@@ -191,7 +191,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         needsUpdate |=
             bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
                 "Content description (Not applicable for \"No content\" type)", 40, 5);
-        needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 5);
+        needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);
 
         if (needsUpdate) {
             update(doc);

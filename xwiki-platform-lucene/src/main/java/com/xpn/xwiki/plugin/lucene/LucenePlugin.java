@@ -511,13 +511,21 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 
         indexRebuilder = null;
 
-        indexUpdaterThread.stop();
+        try {
+            // set the thread to exit
+            indexUpdater.doExit();
+            // wait for the thread to finish
+            indexUpdaterThread.join();
+        } catch (InterruptedException ex) {
+            LOG.warn("Error while waiting for indexUpdaterThread to die.", ex);
+        }
 
         try {
             closeSearchers(this.searchers);
         } catch (IOException e) {
-            LOG.warn("cannot close searchers");
+            LOG.warn("cannot close searchers", e);
         }
+
         indexUpdater = null;
         analyzer = null;
 

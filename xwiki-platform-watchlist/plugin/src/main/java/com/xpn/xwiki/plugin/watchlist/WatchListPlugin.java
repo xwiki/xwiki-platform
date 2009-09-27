@@ -34,7 +34,7 @@ import org.xwiki.observation.ObservationManager;
  * want to follow. At a frequency choosen by the user XWiki will send an email notification to him with a list of the
  * elements that has been modified since the last notification.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {

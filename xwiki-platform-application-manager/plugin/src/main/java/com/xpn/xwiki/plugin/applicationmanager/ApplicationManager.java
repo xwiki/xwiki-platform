@@ -40,7 +40,7 @@ import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
 /**
  * Hidden toolkit used by the plugin API that make all the plugins actions.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public final class ApplicationManager
 {

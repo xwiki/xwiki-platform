@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTestCase
 {

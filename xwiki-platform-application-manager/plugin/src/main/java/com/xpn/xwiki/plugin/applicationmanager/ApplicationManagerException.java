@@ -25,7 +25,7 @@ import com.xpn.xwiki.plugin.PluginException;
 /**
  * Application Manager plugin base exception.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ApplicationManagerException extends PluginException
 {

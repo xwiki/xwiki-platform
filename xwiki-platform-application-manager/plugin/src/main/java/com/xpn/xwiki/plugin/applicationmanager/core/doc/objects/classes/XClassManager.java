@@ -37,7 +37,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * </ul>
  * 
  * @param <T> the item class extending {@link XObjectDocument}.
- * @version $Id: $
+ * @version $Id$
  * @since Application Manager 1.0RC1
  */
 public interface XClassManager<T extends XObjectDocument>

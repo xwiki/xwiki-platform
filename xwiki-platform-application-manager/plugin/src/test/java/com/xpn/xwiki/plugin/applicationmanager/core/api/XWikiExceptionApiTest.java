@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiExceptionApiTest extends TestCase
 {

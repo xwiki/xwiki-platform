@@ -42,7 +42,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 {

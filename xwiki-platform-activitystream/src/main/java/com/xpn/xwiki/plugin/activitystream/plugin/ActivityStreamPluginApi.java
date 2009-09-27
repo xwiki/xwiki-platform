@@ -34,7 +34,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 /**
  * API for {@link ActivityStreamPlugin}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 {

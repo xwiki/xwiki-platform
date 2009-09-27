@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class ActivityEventImpl implements ActivityEvent
 {

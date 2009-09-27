@@ -30,7 +30,7 @@ import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
  * Plug-in for for managing streams of activity events.
  * 
  * @see ActivityStream
- * @version $Id: $
+ * @version $Id$
  */
 public class ActivityStreamPlugin extends XWikiDefaultPlugin
 {

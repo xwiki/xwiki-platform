@@ -30,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Manages the activity stream.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface ActivityStream
 {

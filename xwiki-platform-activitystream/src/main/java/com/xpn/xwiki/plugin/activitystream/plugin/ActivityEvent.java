@@ -27,7 +27,7 @@ import java.util.Date;
 /**
  * Api wrapper for a {@link com.xpn.xwiki.plugin.activitystream.api.ActivityEvent} to be exposed from velocity.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ActivityEvent extends Api
 {

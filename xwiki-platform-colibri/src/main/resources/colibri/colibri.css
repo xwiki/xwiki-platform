@@ -4057,7 +4057,7 @@ div#admin-page-content fieldset legend { /* These legends should be standardized
 
 #panelwizardbuttons, .bottombuttons {
   text-align: left;
-  margin-left: 20px;
+  padding-left: 20px;
 }
 
 #xwikieditcontent  {

@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
 import org.apache.commons.lang.StringUtils;
 
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -57,21 +62,42 @@ public class WatchListEventFeedManager
      * @return The watchlist RSS feed for the given user
      * @throws XWikiException if the retrieval of RSS entries fails
      */
+    @SuppressWarnings("unchecked")
     public SyndFeed getFeed(String user, int entryNumber, XWikiContext context) throws XWikiException
     {
         List<String> wikis = plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.WIKI, context);
         List<String> spaces = plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.SPACE, context);
-        List<String> pages = plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.DOCUMENT, context);
+        List<String> documents = 
+            plugin.getStore().getWatchedElements(user, WatchListStore.ElementType.DOCUMENT, context);
+        List<Object> parameters = new ArrayList<Object>(); 
         ActivityStreamPluginApi asApi =
             (ActivityStreamPluginApi) context.getWiki().getPluginApi("activitystream", context);
-        String listItemsJoint = "','";
-        List<ActivityEvent> events =
-            asApi.searchEvents("act.wiki in ('" + StringUtils.join(wikis, listItemsJoint) + "') or act.space in ('"
-                + StringUtils.join(spaces, listItemsJoint) + "') or act.page in ('"
-                + StringUtils.join(pages, listItemsJoint) + "')", false, true, entryNumber, 0);
-        String msgPrefix = WatchListPlugin.APP_RES_PREFIX + "rss.";
-        SyndFeed feed = asApi.getFeed(events);
         
+        parameters.addAll(wikis);        
+        parameters.addAll(spaces);
+        parameters.addAll(documents);
+        
+        Transformer transformer = new ConstantTransformer("?");
+        List<String> wikisPlaceholders = ListUtils.transformedList(new ArrayList<String>(), transformer);
+        wikisPlaceholders.addAll(wikis);        
+        List<String> spacesPlaceholders = ListUtils.transformedList(new ArrayList<String>(), transformer);
+        spacesPlaceholders.addAll(spaces);        
+        List<String> documentsPlaceholders = ListUtils.transformedList(new ArrayList<String>(), transformer);
+        documentsPlaceholders.addAll(documents);
+         
+        String listItemsJoint = ",";
+        String concatWiki = ") or concat(act.wiki,'";
+        List<ActivityEvent> events =
+            asApi.searchEvents("act.wiki in (" 
+                + StringUtils.join(wikisPlaceholders, listItemsJoint) 
+                + concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.space) in (" 
+                + StringUtils.join(spacesPlaceholders, listItemsJoint) 
+                + concatWiki + WatchListStore.WIKI_SPACE_SEP + "',act.page) in (" 
+                + StringUtils.join(documentsPlaceholders, listItemsJoint) 
+                + ")", false, true, entryNumber, 0, parameters);
+        
+        String msgPrefix = WatchListPlugin.APP_RES_PREFIX + "rss.";
+        SyndFeed feed = asApi.getFeed(events);        
         feed.setAuthor(context.getMessageTool().get(msgPrefix + "author"));
         feed.setTitle(context.getMessageTool().get(msgPrefix + "title")); 
         feed.setDescription(context.getMessageTool().get(msgPrefix + "description")); 

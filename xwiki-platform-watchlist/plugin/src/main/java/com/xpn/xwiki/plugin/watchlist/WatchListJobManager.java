@@ -248,7 +248,7 @@ public class WatchListJobManager
             
             if (StringUtils.isBlank(doc.getTitle())) {
                 needsUpdate = true;
-                doc.setTitle("$msg.get('" + nameResource +  "')");                
+                doc.setTitle("$msg.get(\"" + nameResource +  "\")");                
             }
 
             if (StringUtils.isBlank(doc.getContent())) {

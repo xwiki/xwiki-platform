@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
 <web>XWiki</web>
@@ -11,63 +11,33 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1108467450000</creationDate>
-<date>1166183159000</date>
-<contentUpdateDate>1169801141000</contentUpdateDate>
+<creationDate>1252454400000</creationDate>
+<date>1252454400000</date>
+<contentUpdateDate>1252454400000</contentUpdateDate>
 <version>1.1</version>
-<title></title>
+<title>Scheduler Job Sheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<object>
-<class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<cache>0</cache>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<name>tags</name>
-<number>1</number>
-<prettyName>Tags</prettyName>
-<relationalStorage>1</relationalStorage>
-<separator> </separator>
-<separators> ,|</separators>
-<size>30</size>
-<unmodifiable>0</unmodifiable>
-<values></values>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>XWiki.SchedulerJobSheet</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
-<content>#if($doc.getObject('XWiki.SchedulerJobClass'))
-*$msg.get("xe.scheduler.job.name")*
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<content>{{velocity}}
+#if($doc.getObject('XWiki.SchedulerJobClass'))
+**$msg.get("xe.scheduler.job.name")**
 
 $!doc.display('jobName')
 
-*$msg.get("xe.scheduler.job.description")*
+**$msg.get("xe.scheduler.job.description")**
 
 $!doc.display('jobDescription')
 
-*$msg.get("xe.scheduler.job.expression")*
+**$msg.get("xe.scheduler.job.expression")**
 
 $!doc.display('cron')
 
-*$msg.get("xe.scheduler.job.script")*
+**$msg.get("xe.scheduler.job.script")**
 
 #if($context.action=="inline")
 $!doc.display('script')
@@ -79,21 +49,22 @@ $codevar.toLowerCase()
 #end
 
 #if($context.action=="inline")
-#info($msg.get("xe.scheduler.job.scriptexplanation"))
+{{info}}$msg.get('xe.scheduler.job.scriptexplanation')){{/info}}
 
-#info("Below some example of valid cron expression, from the [official quartz scheduler documentation>http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html>_blank]:
-{table}
-Cron expression|Meaning
-*{pre}0 15 10 * * ?{/pre}*|Fire at 10:15am every day
-*{pre}0 15 10 ? * MON-FRI{/pre}*|Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday
-*{pre}0 0/5 14 * * ?{/pre}*|Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day
-*{pre}0 15 10 ? * 6L{/pre}*|Fire at 10:15am on the last Friday of every month
-{table}
-")
+{{info}}"Below some example of valid cron expression, from the [[official quartz scheduler documentation&gt;&gt;http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html&gt;_blank]]:
+
+|= Cron expression |= Meaning
+| **0 15 10 * * ?** | Fire at 10:15am every day
+| **0 15 10 ? * MON-FRI** | Fire at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday
+| ** 0 0/5 14 * * ?** | Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day
+| ** 0 15 10 ? * 6L** | Fire at 10:15am on the last Friday of every month
+{{/info}}
+
 #elseif($context.action=="view")
-[$msg.get("xe.scheduler.job.backtolist")&gt;Scheduler.WebHome]
+[[$msg.get("xe.scheduler.job.backtolist")&gt;&gt;Scheduler.WebHome]]
 #end
 #else
- #warning($msg.get("xe.scheduler.job.object"))
-#end</content>
+ {{warning}}$msg.get('xe.scheduler.job.object'){{/warning}}
+#end
+{{/velocity}}</content>
 </xwikidoc>

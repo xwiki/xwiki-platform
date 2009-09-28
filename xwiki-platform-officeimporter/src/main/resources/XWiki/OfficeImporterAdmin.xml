@@ -104,7 +104,7 @@ $msgParameter|$msgValue
 #end
 &lt;p&gt;$msgServerState&lt;/p&gt;|&lt;p&gt;$oomanager.serverState&lt;/p&gt;
 #if($hasAdmin)
-  &lt;p&gt;$msgActions&lt;/p&gt;|&lt;p&gt;&lt;input name="action" type="radio" value="start" checked="true"/&gt; $actionStart&lt;br/&gt;&lt;input name="action" type="radio" value="stop"/&gt; $actionStop&lt;br/&gt;#if($actionRestart)&lt;input name="action" type="radio" value="restart"/&gt; $actionRestart&lt;br/&gt;#end&lt;/p&gt;
+  &lt;p&gt;$msgActions&lt;/p&gt;|&lt;p&gt;&lt;input name="action" type="radio" value="start" checked="checked"/&gt; $actionStart&lt;br/&gt;&lt;input name="action" type="radio" value="stop"/&gt; $actionStop&lt;br/&gt;#if($actionRestart)&lt;input name="action" type="radio" value="restart"/&gt; $actionRestart&lt;br/&gt;#end&lt;/p&gt;
 #end
 {table}
 #if($hasAdmin)

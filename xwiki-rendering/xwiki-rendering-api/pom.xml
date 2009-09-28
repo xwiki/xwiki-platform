@@ -180,22 +180,11 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>clirr-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>clirr-check</id>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <phase>test</phase>
-            <configuration>
-              <comparisonVersion>2.0-milestone-4</comparisonVersion>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <!-- The excludes below need to be removed when 2.0RC1 is released -->
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <excludes>
+            <exclude>**/internal/**</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

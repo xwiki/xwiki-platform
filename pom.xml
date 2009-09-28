@@ -38,6 +38,7 @@
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
     <platform.tag.version>1.7</platform.tag.version>
+    <clirr.conf.previous.version>2.0</clirr.conf.previous.version>
   </properties>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
@@ -80,6 +81,28 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>clirr-maven-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>clirr-check</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <phase>test</phase>
+              <configuration>
+                <comparisonVersion>${clirr.conf.previous.version}</comparisonVersion>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <dependencies>
     <dependency>
       <groupId>jmock</groupId>

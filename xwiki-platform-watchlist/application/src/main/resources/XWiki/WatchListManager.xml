@@ -78,18 +78,21 @@
     &lt;div class="padded"&gt;
         &lt;div style="width:48%;float:left;"&gt;
         &lt;h2&gt;$msg.get("watchlist.staytuned.email")&lt;/h2&gt;
-        $msg.get("watchlist.staytuned.email.info")&lt;br/&gt;
-        &lt;br/&gt;
+        &lt;p&gt;
+        $msg.get("watchlist.staytuned.email.info")
+        &lt;/p&gt;
         &lt;form action="$profileDoc.getURL("save")" method="post"&gt;
-        $msg.get("watchlist.staytuned.email.frequency") :
-            $profileDoc.display("interval", "edit")
-            &lt;input type="hidden" name="xredirect" id="xredirect" value="$doc.getURL("view")"&gt;
-            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('watchlist.staytuned.email.frequency.save')" class="button"/&gt;&lt;/span&gt;
-        &lt;/div&gt;
+          &lt;fieldset&gt;
+          $msg.get("watchlist.staytuned.email.frequency"):
+          $profileDoc.display("interval", "edit")
+          &lt;input type="hidden" name="xredirect" id="xredirect" value="$doc.getURL("view")" /&gt;
+          &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('watchlist.staytuned.email.frequency.save')" class="button"/&gt;&lt;/span&gt;
+          &lt;/fieldset&gt;
         &lt;/form&gt;
+        &lt;/div&gt;        
         &lt;div style="width:48%;float:right;"&gt;
         &lt;h2&gt;$msg.get("watchlist.staytuned.rss")&lt;/h2&gt;
-        &lt;a target="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;outputSyntax=plain")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
+        &lt;a rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
         &lt;br/&gt;
         &lt;/div&gt;
         &lt;div style="clear:both;"&gt;&lt;/div&gt;
@@ -103,7 +106,7 @@
         ##
         1 $msg.get("watchlist.elements")
         &lt;h2&gt;$msg.get("watchlist.pages")&lt;/h2&gt;
-        &lt;table id="searchTable" class="grid sortable filterable doOddEven"&gt;
+        &lt;table id="searchTable1" class="grid sortable filterable doOddEven"&gt;
         &lt;tr class="sortHeader"&gt;
             &lt;th&gt;$msg.get("watchlist.page")&lt;/th&gt;
             &lt;th style="width:140px" class="selectFilter"&gt;$msg.get("watchlist.space")&lt;/th&gt;
@@ -133,7 +136,7 @@
         ## Spaces
         ##
         &lt;h2&gt;$msg.get("watchlist.spaces")&lt;/h2&gt;
-        &lt;table id="searchTable" class="grid sortable doOddEven"&gt;
+        &lt;table id="searchTable2" class="grid sortable doOddEven"&gt;
         &lt;tr class=""&gt;
             &lt;th&gt;$msg.get("watchlist.space")&lt;/th&gt;
             &lt;th style="width:180px" class="unsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;

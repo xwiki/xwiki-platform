@@ -27,8 +27,8 @@ import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.test.ComponentManagerTestSetup;
 
 /**
- * Rendering tests not requiring a {@link WikiModel} implementation (ie tests that don't need the notion
- * of Wiki to run).
+ * Rendering tests not requiring a {@link WikiModel} implementation (ie tests that don't need the notion of Wiki to
+ * run).
  * 
  * @version $Id$
  * @since 2.0M1

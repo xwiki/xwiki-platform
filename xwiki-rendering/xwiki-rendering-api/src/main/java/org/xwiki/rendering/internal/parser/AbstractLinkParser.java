@@ -95,7 +95,7 @@ public abstract class AbstractLinkParser  implements LinkParser
         // private static final Pattern REFERENCE_PATTERN = Pattern.compile(
         // "(mailto:.*|http:.*)|(?:([^?#]*)[?#]?)?(?:([^#]*)[#]?)?(.*)?");
 
-        StringBuffer content = new StringBuffer(rawLink.trim());
+        StringBuffer content = new StringBuffer(rawLink);
 
         Link link = new Link();
 

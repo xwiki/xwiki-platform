@@ -26,7 +26,7 @@ import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * Mock WikiModel implementation for integration tests.
- *  
+ * 
  * @version $Id$
  * @since 2.0M1
  */
@@ -39,17 +39,17 @@ public class MockWikiModel implements WikiModel
      */
     public static ComponentDescriptor<WikiModel> getComponentDescriptor()
     {
-        DefaultComponentDescriptor<WikiModel> componentDescriptor = 
-            new DefaultComponentDescriptor<WikiModel>();
+        DefaultComponentDescriptor<WikiModel> componentDescriptor = new DefaultComponentDescriptor<WikiModel>();
 
         componentDescriptor.setRole(WikiModel.class);
         componentDescriptor.setImplementation(MockWikiModel.class);
 
         return componentDescriptor;
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see WikiModel#getAttachmentURL(String, String)
      */
     public String getAttachmentURL(String documentName, String attachmentName)
@@ -60,6 +60,7 @@ public class MockWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
+     * 
      * @see WikiModel#getDocumentEditURL(String, String, String)
      */
     public String getDocumentEditURL(String documentName, String anchor, String queryString)
@@ -79,6 +80,7 @@ public class MockWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
+     * 
      * @see WikiModel#getDocumentViewURL(String, String, String)
      */
     public String getDocumentViewURL(String documentName, String anchor, String queryString)
@@ -96,6 +98,7 @@ public class MockWikiModel implements WikiModel
 
     /**
      * {@inheritDoc}
+     * 
      * @see WikiModel#isDocumentAvailable(String)
      */
     public boolean isDocumentAvailable(String documentName)

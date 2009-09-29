@@ -259,9 +259,16 @@ select#childPagesNamingMethod {
 <use>onDemand</use>
 </property>
 </object>
-<content>#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
+<content>
+#set($ok = $xwiki.ssx.use("XWiki.OfficeImporter"))
 #if($isguest)
-#error($msg.get("xe.officeimporter.notallowed"))  
+  #error($msg.get("xe.officeimporter.notallowed"))
+#elseif("$!{oomanager.serverState}" != "Connected")
+  #if($hasAdmin)
+    #error($msg.get("xe.officeimporter.error.adminuser"))
+  #else
+    #error($msg.get("xe.officeimporter.error.normaluser"))
+  #end
 #else
   #if($request.page)
     #set($targetdoc = $xwiki.getDocument($request.page))
@@ -337,4 +344,5 @@ $msg.get("xe.officeimporter.import.splitting.naming") : &lt;/span&gt;&lt;select 
 /* ]]&gt; */
 &lt;/script&gt;
 {/pre}
-</content></xwikidoc>
+</content>
+</xwikidoc>

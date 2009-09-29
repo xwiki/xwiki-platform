@@ -192,7 +192,9 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
             URL url = urls.nextElement();
 
             // Read all components definition from the URL
-            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+            // Always force UTF-8 as the encoding, since these files are read from the official jars, and those are
+            // generated on an 8-bit system.
+            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
             String inputLine;
             while ((inputLine = in.readLine()) != null) {
                 annotatedClassNames.add(inputLine);

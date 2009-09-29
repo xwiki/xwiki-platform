@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.LinkedHashSet;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.internal.RoleHint;
@@ -98,7 +98,7 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
 
                 // Look for ComponentRole annotations and register one component per ComponentRole found
                 for (Class< ? > componentRoleClass : findComponentRoleClasses(componentClass)) {
-                    for (ComponentDescriptor descriptor : factory.createComponentDescriptors(componentClass,
+                    for (ComponentDescriptor descriptor : this.factory.createComponentDescriptors(componentClass,
                         componentRoleClass)) {
                         // If there's already a existing role/hint in the list of descriptors then decide which one
                         // to keep by looking at the override list. Use those in the override list in priority.

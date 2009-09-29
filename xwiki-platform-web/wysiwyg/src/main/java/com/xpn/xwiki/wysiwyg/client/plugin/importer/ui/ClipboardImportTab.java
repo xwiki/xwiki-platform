@@ -19,30 +19,46 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
-import com.google.gwt.user.client.ui.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
+import com.xpn.xwiki.wysiwyg.client.util.Selectable;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 
 /**
  * Office Importer UI tab for importing clipboard content.
  * 
  * @version $Id$
  */
-public class ClipboardImportTab extends Composite
+public class ClipboardImportTab extends Composite implements Selectable, LoadHandler
 {
     /**
-     * Container panel.
+     * The text area where the user can paste his content.
      */
-    private FlowPanel mainPanel;
+    private RichTextArea textArea;
 
     /**
-     * Editor area (where the user can paste his content).
+     * Preserves the selection inside the {@link #textArea} while this tab is hidden.
      */
-    private RichTextArea editor;
+    private SelectionPreserver selectionPreserver;
+
+    /**
+     * Flag indicating if this tab is selected.
+     */
+    private boolean selected;
+
+    /**
+     * Flag indicating if the text area is loaded.
+     */
+    private boolean loaded;
 
     /**
      * Default constructor.
@@ -50,7 +66,7 @@ public class ClipboardImportTab extends Composite
     public ClipboardImportTab()
     {
         // Main container panel.
-        mainPanel = new FlowPanel();
+        FlowPanel mainPanel = new FlowPanel();
 
         // Info label.
         Panel infoLabel = new FlowPanel();
@@ -64,28 +80,87 @@ public class ClipboardImportTab extends Composite
         mainPanel.add(infoLabel);
         mainPanel.add(helpLabel);
 
-        // Editor panel.
-        editor = new RichTextArea();
-        editor.addStyleName("xImporterClipboardTabEditor");
-        mainPanel.add(editor);
+        // Text area panel.
+        textArea = new RichTextArea();
+        textArea.addLoadHandler(this);
+        textArea.addStyleName("xImporterClipboardTabEditor");
+        selectionPreserver = new SelectionPreserver(textArea);
+        mainPanel.add(textArea);
 
         // Finalize.
         initWidget(mainPanel);
     }
 
     /**
-     * Clears the content of the editor rta.
+     * Clears the content of the text area.
      */
-    public void resetEditor()
+    public void clearTextArea()
     {
-        editor.setHTML("");
+        textArea.setHTML("");
     }
 
     /**
-     * @return the html content of editor.
+     * @return the pasted HTML
      */
     public String getHtmlPaste()
     {
-        return editor.getHTML();
+        return textArea.getHTML();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see LoadHandler#onLoad(LoadEvent)
+     */
+    public void onLoad(LoadEvent event)
+    {
+        if (event.getSource() == textArea) {
+            loaded = true;
+            maybeFocusTextArea();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selectable#setSelected(boolean)
+     */
+    public void setSelected(boolean selected)
+    {
+        if (this.selected != selected) {
+            this.selected = selected;
+            if (selected) {
+                maybeFocusTextArea();
+            } else {
+                selectionPreserver.saveSelection();
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Selectable#isSelected()
+     */
+    public boolean isSelected()
+    {
+        return selected;
+    }
+
+    /**
+     * Focuses the text area if it is loaded and the tab is selected.
+     */
+    private void maybeFocusTextArea()
+    {
+        if (loaded && selected) {
+            DeferredCommand.addCommand(new FocusCommand(textArea)
+            {
+                public void execute()
+                {
+                    super.execute();
+                    selectionPreserver.restoreSelection();
+                }
+            });
+        }
     }
 }

@@ -34,6 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.TabPanelSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
 
 /**
@@ -102,6 +103,9 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
 
         // Tab panel.
         tabPanel = new TabPanel();
+        TabPanelSelector tabPanelSelector = new TabPanelSelector();
+        tabPanel.addBeforeSelectionHandler(tabPanelSelector);
+        tabPanel.addSelectionHandler(tabPanelSelector);
         clipboardImportTab = new ClipboardImportTab();
         tabPanel.add(clipboardImportTab, Strings.INSTANCE.importerClipboardTabCaption());
         String uploadUrl = "../../upload/" + space + "/" + page;
@@ -227,7 +231,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
      */
     public void center()
     {
-        clipboardImportTab.resetEditor();
+        clipboardImportTab.clearTextArea();
         enableControls(true);
         super.center();
     }

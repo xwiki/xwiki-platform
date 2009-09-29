@@ -37,11 +37,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 public class FileImportTab extends Composite
 {
     /**
-     * Container panel.
-     */
-    private FlowPanel mainPanel;
-
-    /**
      * A {@link FormPanel} to hold the fileUpload widget.
      */
     private FormPanel formPanel;
@@ -60,7 +55,7 @@ public class FileImportTab extends Composite
     public FileImportTab(String uploadUrl, SubmitCompleteHandler submitCompleteHandler)
     {
         // Main container panel.
-        mainPanel = new FlowPanel();
+        FlowPanel mainPanel = new FlowPanel();
 
         // Info label.
         Panel infoLabel = new FlowPanel();

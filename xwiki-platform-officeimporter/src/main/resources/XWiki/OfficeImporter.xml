@@ -168,7 +168,6 @@
 
 .office_importer_box p.office_importer_document {
   padding: 10px;
-  background-color: #ffc;
   margin: 0;
   position: relative;
 }

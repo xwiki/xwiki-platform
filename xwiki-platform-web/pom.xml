@@ -61,7 +61,6 @@
         <module>xwiki-gwt-dom</module>
         <module>wysiwyg</module>
         <module>standard</module>
-        <module>exo</module>
       </modules>
     </profile>
     <profile>

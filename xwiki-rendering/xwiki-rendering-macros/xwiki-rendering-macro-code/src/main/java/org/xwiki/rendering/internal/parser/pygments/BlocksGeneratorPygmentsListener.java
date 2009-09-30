@@ -19,19 +19,20 @@
  */
 package org.xwiki.rendering.internal.parser.pygments;
 
+import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.io.StringReader;
 
+import org.apache.commons.lang.StringUtils;
 import org.python.core.PyNone;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 
 /**
  * Transforms Pygments tokens into XWiki Rendering blocks. This class is overwritten in python an methods are called
@@ -46,11 +47,6 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
      * The highlighted result block.
      */
     private List<Block> blocks = new ArrayList<Block>();
-    
-    /**
-     * Methods for helping in parsing.
-     */
-    private ParserUtils parserUtils = new ParserUtils();
 
     /**
      * Used to parse Pygment token values into blocks.
@@ -58,7 +54,7 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
     private Parser plainTextParser;
 
     /**
-     * @param plainTextParser the parser we'll use to parse Pygment token values into blocks 
+     * @param plainTextParser the parser we'll use to parse Pygment token values into blocks
      */
     public BlocksGeneratorPygmentsListener(Parser plainTextParser)
     {
@@ -86,12 +82,17 @@ public class BlocksGeneratorPygmentsListener implements PygmentsListener
         }
 
         List<Block> blockList;
-        try {
-            blockList = this.plainTextParser.parse(new StringReader(value)).getChildren();
-        } catch (ParseException e) {
-            // This shouldn't happen since the parser cannot throw an exception since the source is a memory
-            // String.
-            throw new RuntimeException("Failed to parse [" + value + "] as plain text.", e);
+
+        if (StringUtils.isEmpty(value)) {
+            blockList = Collections.emptyList();
+        } else {
+            try {
+                blockList = this.plainTextParser.parse(new StringReader(value)).getChildren().get(0).getChildren();
+            } catch (ParseException e) {
+                // This shouldn't happen since the parser cannot throw an exception since the source is a memory
+                // String.
+                throw new RuntimeException("Failed to parse [" + value + "] as plain text.", e);
+            }
         }
 
         if (!blockList.isEmpty()) {

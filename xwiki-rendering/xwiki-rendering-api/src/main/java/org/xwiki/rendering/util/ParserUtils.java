@@ -42,7 +42,7 @@ public class ParserUtils
     {
         // Remove any top level paragraph so that the result of a macro can be used inline for example.
         // We only remove the paragraph if there's only one top level element and if it's a paragraph.
-        if ((blocks.size() == 1) && ParagraphBlock.class.isAssignableFrom(blocks.get(0).getClass())) {
+        if ((blocks.size() == 1) && blocks.get(0) instanceof ParagraphBlock) {
             Block paragraphBlock = blocks.remove(0);
             blocks.addAll(0, paragraphBlock.getChildren());
         }

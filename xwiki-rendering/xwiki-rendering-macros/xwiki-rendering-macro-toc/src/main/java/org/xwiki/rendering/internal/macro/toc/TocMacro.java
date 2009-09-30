@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
@@ -40,9 +39,9 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.TocMacroParameters;
 import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.parser.Parser;
 
 /**
  * Generate a Table Of Contents based on the document sections.
@@ -51,7 +50,7 @@ import org.xwiki.rendering.parser.Parser;
  * @since 1.5M2
  */
 @Component("toc")
-public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initializable
+public class TocMacro extends AbstractMacro<TocMacroParameters>
 {
     /**
      * The description of the macro.
@@ -97,6 +96,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     public void initialize() throws InitializationException
     {
         super.initialize();
+
         this.tocBlockFilter = new TocBlockFilter(this.plainTextParser, this.linkLabelGenerator);
     }
 
@@ -194,6 +194,7 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     private Block generateTree(List<HeaderBlock> headers, int start, int depth, boolean numbered)
     {
         Block tocBlock = null;
+
         int currentLevel = start - 1;
         Block currentBlock = null;
         for (HeaderBlock headerBlock : headers) {
@@ -281,8 +282,8 @@ public class TocMacro extends AbstractMacro<TocMacroParameters> implements Initi
     private ListBLock createChildListBlock(boolean numbered, Block parentBlock)
     {
         ListBLock childListBlock =
-            numbered ? new NumberedListBlock(Collections.<Block> emptyList()) : new BulletedListBlock(Collections
-                .<Block> emptyList());
+            numbered ? new NumberedListBlock(Collections.<Block> emptyList()) : new BulletedListBlock(
+                Collections.<Block> emptyList());
 
         if (parentBlock != null) {
             parentBlock.addChild(childListBlock);

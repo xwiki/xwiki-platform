@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.internal.macro.rss;
 
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.io.StringReader;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.SkinAccessBridge;
@@ -42,10 +42,11 @@ import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.BoxMacroParameters;
 import org.xwiki.rendering.macro.rss.RssMacroParameters;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
@@ -73,13 +74,13 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
      */
     @Requirement("box")
     protected Macro<BoxMacroParameters> boxMacro;
-    
+
     /**
      * Used to get the RSS icon.
      */
     @Requirement
     private SkinAccessBridge skinAccessBridge;
-    
+
     /**
      * Needed to parse the ordinary text.
      */
@@ -119,11 +120,11 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
         throws MacroExecutionException
     {
         SyndFeed feed = this.romeFeedFactory.createFeed(parameters);
-        
+
         BoxMacroParameters boxParameters = new BoxMacroParameters();
         boolean hasImage = parameters.isImage() && (feed.getImage() != null);
         boxParameters.setCssClass("rssfeed");
- 
+
         if (!StringUtils.isEmpty(parameters.getWidth())) {
             boxParameters.setWidth(parameters.getWidth());
         }
@@ -132,7 +133,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
         if (hasImage) {
             boxParameters.setImage(feed.getImage().getUrl());
-        } 
+        }
 
         List<Block> result = boxMacro.execute(boxParameters, content == null ? StringUtils.EMPTY : content, context);
         generaterEntries(result.get(0), feed, parameters, context);
@@ -158,18 +159,18 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             Link titleLink = new Link();
             titleLink.setReference(feed.getLink());
             titleLink.setType(LinkType.URI);
-            
+
             // Title text link.
             Block titleTextLinkBlock = new LinkBlock(parsePlainText(feed.getTitle()), titleLink, true);
-            
+
             // Rss icon.
             String imagePath = skinAccessBridge.getSkinFile("icons/black-rss.png");
             ImageBlock imageBlock = new ImageBlock(new URLImage(imagePath), false);
-            
+
             // Title rss icon link.
-            Block titleImageLinkBlock = new LinkBlock(Arrays.<Block>asList(imageBlock), titleLink, true);
-            
-            titleBlocks = Arrays.<Block>asList(titleTextLinkBlock, titleImageLinkBlock);            
+            Block titleImageLinkBlock = new LinkBlock(Arrays.<Block> asList(imageBlock), titleLink, true);
+
+            titleBlocks = Arrays.<Block> asList(titleTextLinkBlock, titleImageLinkBlock);
         }
         ParagraphBlock titleBlock = new ParagraphBlock(titleBlocks);
         titleBlock.setParameter(CLASS_ATTRIBUTE, cssClass);
@@ -179,7 +180,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
     /**
      * Renders the given RSS's entries.
-     *
+     * 
      * @param parentBlock the parent Block to which the output is going to be added
      * @param feed the RSS Channel we retrieved via the Feed URL
      * @param parameters our parameter helper object
@@ -220,7 +221,7 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
             }
         }
     }
-    
+
     /**
      * @param romeFeedFactory a custom implementation to use instead of the default, useful for tests
      */
@@ -231,15 +232,19 @@ public class RssMacro extends AbstractMacro<RssMacroParameters>
 
     /**
      * Convenience method to not have to handle exceptions in several places.
-     *
+     * 
      * @param content the content to parse as plain text
      * @return the parsed Blocks
      * @since 2.0M3
      */
     private List<Block> parsePlainText(String content)
     {
+        if (StringUtils.isEmpty(content)) {
+            return Collections.emptyList();
+        }
+
         try {
-            return this.plainTextParser.parse(new StringReader(content)).getChildren();
+            return this.plainTextParser.parse(new StringReader(content)).getChildren().get(0).getChildren();
         } catch (ParseException e) {
             // This shouldn't happen since the parser cannot throw an exception since the source is a memory
             // String.

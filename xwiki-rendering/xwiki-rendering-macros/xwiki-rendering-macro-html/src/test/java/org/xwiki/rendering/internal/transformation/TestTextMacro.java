@@ -19,22 +19,27 @@
  */
 package org.xwiki.rendering.internal.transformation;
 
-import java.util.List;
 import java.io.StringReader;
+import java.util.List;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.ParseException;
 
 @Component("testtextmacro")
 public class TestTextMacro extends AbstractNoParameterMacro
 {
+    /**
+     * Used to clean result of the parser syntax.
+     */
+    private ParserUtils parserUtils = new ParserUtils();
+
     @Requirement("plain/1.0")
     private Parser plainTextParser;
 
@@ -63,7 +68,13 @@ public class TestTextMacro extends AbstractNoParameterMacro
         throws MacroExecutionException
     {
         try {
-            return this.plainTextParser.parse(new StringReader(content)).getChildren();
+            List<Block> result = this.plainTextParser.parse(new StringReader(content)).getChildren();
+
+            if (context.isInline()) {
+                this.parserUtils.removeTopLevelParagraph(result);
+            }
+
+            return result;
         } catch (ParseException e) {
             // This shouldn't happen since the parser cannot throw an exception since the source is a memory
             // String.

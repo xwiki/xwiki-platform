@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.internal.renderer.xwiki;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +29,7 @@ import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.EventType;
 import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
-import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
+import org.xwiki.rendering.listener.chaining.LookaheadChainingListener.Event;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
@@ -53,13 +55,49 @@ public class XWikiSyntaxEscapeHandler
 
     public static final String ESCAPE_CHAR = "~";
 
+    /**
+     * Used to find the following visible element. For example it's used to escape trailing ) character if the following
+     * visible element is end of a group.
+     */
+    public static final Set<EventType> NOTPRINTED_ENDEVENTS = new HashSet<EventType>()
+    {
+        {
+            add(EventType.END_LIST);
+            add(EventType.END_LIST_ITEM);
+
+            add(EventType.END_TABLE);
+            add(EventType.END_TABLE_ROW);
+            add(EventType.END_TABLE_CELL);
+            add(EventType.END_TABLE_HEAD_CELL);
+
+            add(EventType.END_PARAGRAPH);
+
+            add(EventType.END_DEFINITION_DESCRIPTION);
+            add(EventType.END_DEFINITION_TERM);
+            add(EventType.END_DEFINITION_LIST);
+
+            add(EventType.END_SECTION);
+        }
+    };
+
     private boolean beforeLink = false;
+
+    private boolean onNewLine = true;
+
+    public void setOnNewLine(boolean onNewLine)
+    {
+        this.onNewLine = onNewLine;
+    }
+
+    public boolean isOnNewLine()
+    {
+        return this.onNewLine;
+    }
 
     public void escape(StringBuffer accumulatedBuffer, XWikiSyntaxListenerChain listenerChain, boolean escapeLastChar,
         Pattern escapeFirstIfMatching)
     {
         BlockStateChainingListener blockStateListener = listenerChain.getBlockStateChainingListener();
-        TextOnNewLineStateChainingListener textStateListener = listenerChain.getTextOnNewLineStateChainingListener();
         LookaheadChainingListener lookaheadListener = listenerChain.getLookaheadChainingListener();
         GroupStateChainingListener groupStateListener = listenerChain.getGroupStateChainingListener();
 
@@ -69,7 +107,7 @@ public class XWikiSyntaxEscapeHandler
 
         // When in a paragraph we need to escape symbols that are at beginning of lines and that could be confused
         // with list items, headers or tables.
-        if (blockStateListener.isInParagraph() && textStateListener.isTextOnNewLine()) {
+        if (blockStateListener.isInLine() && isOnNewLine()) {
 
             // Look for list pattern at beginning of line and escape the first character only (it's enough)
             escapeFirstMatchedCharacter(LIST_PATTERN, accumulatedBuffer);
@@ -125,10 +163,13 @@ public class XWikiSyntaxEscapeHandler
         escapeURI(accumulatedBuffer, "attach:");
         escapeURI(accumulatedBuffer, "mailto:");
 
-        if (groupStateListener.isInGroup() && accumulatedBuffer.charAt(accumulatedBuffer.length() - 1) == ')'
-            && lookaheadListener.getNextEvent() != null
-            && lookaheadListener.getNextEvent().eventType == EventType.END_GROUP) {
-            escapeLastChar = true;
+        if (groupStateListener.isInGroup() && accumulatedBuffer.charAt(accumulatedBuffer.length() - 1) == ')') {
+            Event nextPrintedEvent = nextPrintedEvent(lookaheadListener);
+
+            if (nextPrintedEvent != null && (nextPrintedEvent.eventType == EventType.END_GROUP)
+                || NOTPRINTED_ENDEVENTS.contains(nextPrintedEvent.eventType)) {
+                escapeLastChar = true;
+            }
         }
 
         // Escape last character if we're told to do so. This is to handle cases such as:
@@ -154,6 +195,17 @@ public class XWikiSyntaxEscapeHandler
             replaceAll(accumulatedBuffer, ">>", escape + ">" + escape + ">");
             replaceAll(accumulatedBuffer, "||", escape + "|" + escape + "|");
         }
+    }
+
+    private Event nextPrintedEvent(LookaheadChainingListener lookaheadListener)
+    {
+        Event event = lookaheadListener.getNextEvent();
+
+        for (int depth = 2; event != null && NOTPRINTED_ENDEVENTS.contains(event.eventType); ++depth) {
+            event = lookaheadListener.getNextEvent(depth);
+        }
+
+        return event;
     }
 
     private int getLinkLevel(XWikiSyntaxListenerChain listenerChain)

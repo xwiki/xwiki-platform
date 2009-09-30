@@ -179,8 +179,14 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         if (linkDepth < 2) {
             getLinkRenderer().beginRenderLink(getPrinter(), link, isFreeStandingURI, parameters);
 
+            XWikiSyntaxEscapeWikiPrinter linkLabelPrinter =
+                new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getXWikiSyntaxListenerChain());
+
+            // Make sure the escape handler knows there is already characters before
+            linkLabelPrinter.setOnNewLine(getXWikiPrinter().isOnNewLine());
+
             // Defer printing the link content since we need to gather all nested elements
-            pushPrinter(new XWikiSyntaxEscapeWikiPrinter(new DefaultWikiPrinter(), getXWikiSyntaxListenerChain()));
+            pushPrinter(linkLabelPrinter);
         } else if (isFreeStandingURI) {
             print(getLinkRenderer().renderLinkReference(link));
         }
@@ -726,16 +732,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     public void endTableCell(Map<String, String> parameters)
     {
         this.previousFormatParameters = null;
-    }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endTable(java.util.Map)
-     */
-    @Override
-    public void endTable(Map<String, String> parameters)
-    {
         // Ensure that any not printed characters are flushed.
         // TODO: Fix this better by introducing a state listener to handle escapes
         getXWikiPrinter().flush();

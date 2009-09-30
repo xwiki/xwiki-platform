@@ -267,7 +267,7 @@ public class BlockStateChainingListener extends AbstractChainingListener impleme
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#beginDefinitionList(java.util.Map)
-     * @since 2.0RC1 
+     * @since 2.0RC1
      */
     @Override
     public void beginDefinitionList(Map<String, String> parameters)

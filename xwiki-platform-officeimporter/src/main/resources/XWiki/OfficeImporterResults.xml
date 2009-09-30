@@ -14,7 +14,7 @@
 <date>1243418963000</date>
 <contentUpdateDate>1243418963000</contentUpdateDate>
 <version>2.1</version>
-<title>Office Importer Results</title>
+<title>$msg.get("xe.officeimporter.results.title")</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -26,8 +26,6 @@
 #if($isguest)
   #error($msg.get("xe.officeimporter.notallowed"))  
 #else
-  1 $msg.get("xe.officeimporter.results.title")
-
   #set($goBack = "[$msg.get('xe.officeimporter.results.goback')&gt;XWiki.OfficeImporter]")  
 
   ## Validate fileName

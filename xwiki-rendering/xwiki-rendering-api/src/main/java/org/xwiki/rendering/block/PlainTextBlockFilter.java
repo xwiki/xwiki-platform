@@ -19,17 +19,17 @@
  */
 package org.xwiki.rendering.block;
 
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.io.StringReader;
 
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.renderer.LinkLabelGenerator;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.renderer.LinkLabelGenerator;
 
 /**
  * Used to filter plain text blocks.
@@ -48,6 +48,7 @@ public class PlainTextBlockFilter implements BlockFilter
             add(WordBlock.class);
             add(SpaceBlock.class);
             add(SpecialSymbolBlock.class);
+            add(NewLineBlock.class);
         }
     };
 
@@ -85,12 +86,15 @@ public class PlainTextBlockFilter implements BlockFilter
             Link link = ((LinkBlock) block).getLink();
 
             try {
+                String label;
+
                 if (link.getType() == LinkType.DOCUMENT) {
-                    return this.plainTextParser.parse(
-                        new StringReader(this.linkLabelGenerator.generate(link))).getChildren();
+                    label = this.linkLabelGenerator.generate(link);
                 } else {
-                    return this.plainTextParser.parse(new StringReader(link.getReference())).getChildren();
+                    label = link.getReference();
                 }
+
+                return this.plainTextParser.parse(new StringReader(label)).getChildren().get(0).getChildren();
             } catch (ParseException e) {
                 // This shouldn't happen since the parser cannot throw an exception since the source is a memory
                 // String.

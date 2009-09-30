@@ -31,7 +31,6 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.script.XWikiURLClassLoader;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -255,9 +254,6 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
 
             // 3) If in inline mode remove any top level paragraph
             result = parsedDom.getChildren();
-            if (context.isInline()) {
-                this.parserUtils.removeTopLevelParagraph(result);
-            }
         } else {
             try {
                 result = this.plainTextParser.parse(new StringReader(content)).getChildren();
@@ -266,10 +262,10 @@ public abstract class AbstractScriptMacro<P extends ScriptMacroParameters> exten
                 // String.
                 throw new MacroExecutionException("Failed to parse link label as plain text", e);
             }
+        }
 
-            if (!context.isInline()) {
-                result = Collections.<Block> singletonList(new ParagraphBlock(result));
-            }
+        if (context.isInline()) {
+            this.parserUtils.removeTopLevelParagraph(result);
         }
 
         return result;

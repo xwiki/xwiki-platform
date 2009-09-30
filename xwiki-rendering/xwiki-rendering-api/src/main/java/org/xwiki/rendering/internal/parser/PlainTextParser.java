@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.parser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
@@ -33,13 +34,14 @@ import org.xwiki.component.annotation.Component;
 import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
  * Plain Text Parser to convert a text source into a XDOM object.
- *
+ * 
  * @version $Id$
  * @since 2.0M3
  */
@@ -53,6 +55,7 @@ public class PlainTextParser implements Parser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
      */
     public Syntax getSyntax()
@@ -62,6 +65,7 @@ public class PlainTextParser implements Parser
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.parser.Parser#parse(java.io.Reader)
      */
     public XDOM parse(Reader source) throws ParseException
@@ -105,12 +109,12 @@ public class PlainTextParser implements Parser
             blockList.add(new WordBlock(word.toString()));
         }
 
-        return new XDOM(blockList);
+        return new XDOM(Collections.<Block> singletonList(new ParagraphBlock(blockList)));
     }
 
     /**
      * Read a single char from an Reader source.
-     *
+     * 
      * @param source the input to read from
      * @return the char read
      * @throws ParseException in case of reading error

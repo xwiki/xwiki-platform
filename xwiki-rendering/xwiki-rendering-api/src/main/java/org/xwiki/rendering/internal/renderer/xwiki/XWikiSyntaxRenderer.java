@@ -60,7 +60,7 @@ public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implement
         // to write the XWiki Syntax chaining listener, for example for saving states (are we in a list, in a
         // paragraph, are we starting a new line, etc).
         chain.addListener(this);
-        chain.addListener(new LookaheadChainingListener(chain, 2));
+        chain.addListener(new LookaheadChainingListener(chain, 4));
         chain.addListener(new GroupStateChainingListener(chain));
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new ConsecutiveNewLineStateChainingListener(chain));

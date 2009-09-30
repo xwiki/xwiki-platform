@@ -57,6 +57,46 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         this.listenerChain = listenerChain;
     }
 
+    public XWikiSyntaxEscapeHandler getEscapeHandler()
+    {
+        return escapeHandler;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter#print(java.lang.String)
+     */
+    @Override
+    public void print(String text)
+    {
+        super.print(text);
+
+        int length = text.length();
+
+        if (length > 0) {
+            this.escapeHandler.setOnNewLine(text.charAt(length - 1) == '\n');
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter#println(java.lang.String)
+     */
+    @Override
+    public void println(String text)
+    {
+        super.println(text);
+
+        this.escapeHandler.setOnNewLine(true);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter#flush()
+     */
     @Override
     public void flush()
     {
@@ -85,6 +125,16 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         this.escapeHandler.setBeforeLink(beforeLink);
     }
 
+    public void setOnNewLine(boolean onNewLine)
+    {
+        this.escapeHandler.setOnNewLine(onNewLine);
+    }
+
+    public boolean isOnNewLine()
+    {
+        return this.escapeHandler.isOnNewLine();
+    }
+    
     public void printBeginItalic()
     {
         // If the lookahead buffer is not empty and the last character is ":" then we need to escape it

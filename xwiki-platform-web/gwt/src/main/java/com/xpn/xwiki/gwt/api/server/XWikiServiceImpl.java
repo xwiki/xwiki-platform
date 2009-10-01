@@ -66,8 +66,6 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 {
     private static final Log LOG = LogFactory.getLog(XWiki.class);
 
-    private ThreadLocal<XWikiContext> context;
-
     /**
      * We override the default processCall method in order to provide XWiki initialization before 
      * we handle the request. This allows us to initialize the XWiki Context and the new Container
@@ -87,9 +85,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             throw new SerializationException("Failed to initialize XWiki GWT subsystem", e);
         } finally {
             // Perform cleanup here
-            if (getXWikiContext() != null) {
-                cleanupContainerComponent(getXWikiContext());
-            }
+            cleanupContainerComponent();
         }
 
         return result;
@@ -131,7 +127,6 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
 
         context.put("ajax", new Boolean(true));
-        this.context.set(context);
     }
     
     private void initializeContainerComponent(XWikiContext context)
@@ -153,7 +148,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }            
     }
 
-    private void cleanupContainerComponent(XWikiContext context)
+    private void cleanupContainerComponent()
     {
         Container container = (Container) Utils.getComponent(Container.class);
         Execution execution = (Execution) Utils.getComponent(Execution.class);
@@ -166,9 +161,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         execution.removeContext();
     }    
     
+    /**
+     * Helper method to retrieve the {@link XWikiContext} from the {@link Execution} context.
+     * 
+     * @return this execution's {@link XWikiContext}, set upon initialization
+     */
     protected XWikiContext getXWikiContext()
     {
-        return this.context.get();
+        return (XWikiContext) Utils.getComponent(Execution.class).getContext().getProperty("xwikicontext");
     }
 
     protected XWikiGWTException getXWikiGWTException(Exception e) {

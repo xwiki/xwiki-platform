@@ -29,6 +29,7 @@ import net.sf.jodconverter.office.OfficeConnectionMode;
 import net.sf.jodconverter.office.OfficeException;
 import net.sf.jodconverter.office.OfficeManager;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -52,10 +53,16 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     private OpenOfficeConfiguration ooConfig;
 
     /**
+     * Used to query the context document's wiki.
+     */
+    @Requirement
+    private DocumentAccessBridge docBridge;
+
+    /**
      * The {@link OfficeManager} used to control / connect openoffice server.
      */
     private OfficeManager officeManager;
-    
+
     /**
      * Current oo server process state.
      */
@@ -64,40 +71,42 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     /**
      * Flag indicating whether the officeManager is initialized or not.
      */
-    private boolean officeManagerInitialized;
+    private boolean initialized;
 
     /**
      * The {@link OfficeDocumentConverter} used to convert office documents.
-     */    
+     */
     private OfficeDocumentConverter documentConverter;
 
     /**
      * Initializes the internal {@link OfficeManager}.
      */
-    private void initializeOfficeManager() throws OpenOfficeManagerException
+    private void initialize() throws OpenOfficeManagerException
     {
-        OfficeConnectionMode connectionMode = OfficeConnectionMode.socket(ooConfig.getServerPort());
-        if (ooConfig.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
-            File officeHome = new File(ooConfig.getHomePath());
-            File officeProfile = new File(ooConfig.getProfilePath());
-            ManagedProcessOfficeManagerConfiguration configuration =
-                new ManagedProcessOfficeManagerConfiguration(connectionMode);
-            configuration.setOfficeHome(officeHome);
-            configuration.setTemplateProfileDir(officeProfile);
-            configuration.setMaxTasksPerProcess(ooConfig.getMaxTasksPerProcess());
-            configuration.setTaskExecutionTimeout(ooConfig.getTaskExecutionTimeout());
-            this.officeManager = new ManagedProcessOfficeManager(configuration);
-        } else if (ooConfig.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalProcessOfficeManager externalProcessOfficeManager =
-                new ExternalProcessOfficeManager(connectionMode);
-            externalProcessOfficeManager.setConnectOnStart(true);
-            this.officeManager = externalProcessOfficeManager;
-        } else {
-            this.currentState = ManagerState.CONF_ERROR;
-            throw new OpenOfficeManagerException("Invalid configuration.");
+        if (!initialized) {
+            OfficeConnectionMode connectionMode = OfficeConnectionMode.socket(ooConfig.getServerPort());
+            if (ooConfig.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_INTERNAL) {
+                File officeHome = new File(ooConfig.getHomePath());
+                File officeProfile = new File(ooConfig.getProfilePath());
+                ManagedProcessOfficeManagerConfiguration configuration =
+                    new ManagedProcessOfficeManagerConfiguration(connectionMode);
+                configuration.setOfficeHome(officeHome);
+                configuration.setTemplateProfileDir(officeProfile);
+                configuration.setMaxTasksPerProcess(ooConfig.getMaxTasksPerProcess());
+                configuration.setTaskExecutionTimeout(ooConfig.getTaskExecutionTimeout());
+                this.officeManager = new ManagedProcessOfficeManager(configuration);
+            } else if (ooConfig.getServerType() == OpenOfficeConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
+                ExternalProcessOfficeManager externalProcessOfficeManager =
+                    new ExternalProcessOfficeManager(connectionMode);
+                externalProcessOfficeManager.setConnectOnStart(true);
+                this.officeManager = externalProcessOfficeManager;
+            } else {
+                this.currentState = ManagerState.CONF_ERROR;
+                throw new OpenOfficeManagerException("Invalid configuration.");
+            }
+            this.documentConverter = new OfficeDocumentConverter(officeManager);
+            this.initialized = true;
         }
-        this.documentConverter = new OfficeDocumentConverter(officeManager);
-        this.officeManagerInitialized = true;
     }
 
     /**
@@ -121,10 +130,10 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void start() throws OpenOfficeManagerException
     {
-        if (ManagerState.CONNECTED != currentState) {
-            if (!officeManagerInitialized) {
-                initializeOfficeManager();
-            }
+        if (isConnected()) {
+            return;
+        } else if (isMainXWiki()) {
+            initialize();
             try {
                 officeManager.start();
                 currentState = ManagerState.CONNECTED;
@@ -133,6 +142,8 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
                 currentState = ManagerState.ERROR;
                 throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", ex);
             }
+        } else {
+            throw new OpenOfficeManagerException("OpenOffice server administration is forbidden for sub-wikis.");
         }
     }
 
@@ -141,7 +152,9 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void stop() throws OpenOfficeManagerException
     {
-        if (ManagerState.CONNECTED == currentState) {
+        if (!isConnected()) {
+            return;
+        } else if (isMainXWiki()) {
             try {
                 officeManager.stop();
                 currentState = ManagerState.NOT_CONNECTED;
@@ -150,8 +163,31 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
                 currentState = ManagerState.ERROR;
                 throw new OpenOfficeManagerException("Error while disconnecting / shutting down openoffice.", ex);
             } finally {
-                this.officeManagerInitialized = false;
+                this.initialized = false;
             }
+        } else {
+            throw new OpenOfficeManagerException("OpenOffice server administration is forbidden for sub-wikis.");
         }
+    }
+
+    /**
+     * Utility method for checking if current context document is from main xwiki.
+     * 
+     * @return true if the current context document is from main xwiki.
+     */
+    private boolean isMainXWiki()
+    {
+        String currentWiki = docBridge.getCurrentDocumentName().getWiki();
+        return (currentWiki != null) && currentWiki.equals("xwiki");
+    }
+
+    /**
+     * Utility method for checking OpenOffice server instance state.
+     * 
+     * @return true if the OpenOffice server is connected.
+     */
+    private boolean isConnected()
+    {
+        return (currentState == ManagerState.CONNECTED);
     }
 }

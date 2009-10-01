@@ -53,6 +53,7 @@
 #set($msgDisconnect=$msg.get("xe.officeimporter.openoffice.actions.disconnect"))
 #set($msgRestart=$msg.get("xe.officeimporter.openoffice.actions.restart"))
 #set($msgUpdate=$msg.get("xe.officeimporter.openoffice.update"))
+#set($msgLimitedControl=$msg.get("xe.officeimporter.openoffice.limitedcontrol"))
 
 #if($hasAdmin)
   #set($currentAction = "$!{request.action}")
@@ -110,6 +111,10 @@ $msgParameter|$msgValue
 #if($enableControls)
  &lt;p&gt;&lt;input type="submit" value="$msgUpdate"/&gt;&lt;/p&gt;
  &lt;/form&gt;
+#end
+
+#if($hasAdmin &amp;&amp; !$context.isMainWiki())
+  #info($msgLimitedControl)
 #end
 </content>
 </xwikidoc>

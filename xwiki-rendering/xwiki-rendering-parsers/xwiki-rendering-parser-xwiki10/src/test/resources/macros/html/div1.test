@@ -9,15 +9,23 @@ text <div param="value1 value2">some content</div> text
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 (% param="value1 value2" %)
-(((some content)))
+(((
+some content
+)))
 
-(((some content)))
+(((
+some content
+)))
 
-((()))
+(((
+
+)))
 
 text 
 
 (% param="value1 value2" %)
-(((some content)))
+(((
+some content
+)))
 
 text

@@ -18,4 +18,6 @@ image:gamesigns.jpg image:Space.Page@gamesigns.jpg [[image:gamesigns.jpg||height
 image:gamesigns.jpg [[image:gamesigns.jpg||height="100" width="200"]] [[image:gamesigns.jpg||width="200"]]
 
 (% class="imgfloatleft" %)
-((([[image:pokemonimage.png||height="250" width="319"]])))
+(((
+[[image:pokemonimage.png||height="250" width="319"]]
+)))

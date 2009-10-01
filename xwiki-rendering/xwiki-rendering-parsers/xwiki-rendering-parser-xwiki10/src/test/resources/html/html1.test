@@ -32,6 +32,8 @@
 &
 
 (% class="customclass" %)
-(((**bold** & some text)))
+(((
+**bold** & some text
+)))
 
 &

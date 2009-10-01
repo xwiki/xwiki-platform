@@ -88,8 +88,7 @@
   #set($serverType=$msgServerTypeExternalRemote)
 #end
 
-#set($isMainXWiki=($context.database == "xwiki"))
-#set($enableControls=($hasAdmin &amp;&amp; $isMainXWiki))
+#set($enableControls=($hasAdmin &amp;&amp; $context.isMainWiki()))
 
 #if($enableControls)
   &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;

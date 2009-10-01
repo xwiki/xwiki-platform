@@ -260,7 +260,7 @@ xwiki.authentication.cookiedomains=
 #-# - /StrutsServletName/logout/ (this is usually /bin/logout/ and is the default setup)
 #-# - /logout/ (this works with the short URLs configuration)
 #-# - /wiki/SomeWikiName/logout/ (this works with path-based virtual wikis)
-xwiki.authentication.logoutpage=/(?:(?:wiki/)?(?:[^/]+)/)?logout/*
+xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 
 #-# The group management class.
 # xwiki.authentication.groupclass=com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl

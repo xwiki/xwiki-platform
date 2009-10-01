@@ -88,7 +88,10 @@
   #set($serverType=$msgServerTypeExternalRemote)
 #end
 
-#if($hasAdmin)
+#set($isMainXWiki=($context.database == "xwiki"))
+#set($enableControls=($hasAdmin &amp;&amp; $isMainXWiki))
+
+#if($enableControls)
   &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
 #end
 {table}
@@ -101,11 +104,11 @@ $msgParameter|$msgValue
   &lt;p&gt;$msgServerProfile&lt;/p&gt;|&lt;p&gt;$ooconfig.profilePath&lt;/p&gt;
 #end
 &lt;p&gt;$msgServerState&lt;/p&gt;|&lt;p&gt;$oomanager.serverState&lt;/p&gt;
-#if($hasAdmin)
+#if($enableControls)
   &lt;p&gt;$msgActions&lt;/p&gt;|&lt;p&gt;&lt;input name="action" type="radio" value="start" checked="checked"/&gt; $actionStart&lt;br/&gt;&lt;input name="action" type="radio" value="stop"/&gt; $actionStop&lt;br/&gt;#if($actionRestart)&lt;input name="action" type="radio" value="restart"/&gt; $actionRestart&lt;br/&gt;#end&lt;/p&gt;
 #end
 {table}
-#if($hasAdmin)
+#if($enableControls)
  &lt;p&gt;&lt;input type="submit" value="$msgUpdate"/&gt;&lt;/p&gt;
  &lt;/form&gt;
 #end

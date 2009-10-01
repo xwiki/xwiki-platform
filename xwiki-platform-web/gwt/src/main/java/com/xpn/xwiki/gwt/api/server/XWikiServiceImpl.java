@@ -66,7 +66,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
 {
     private static final Log LOG = LogFactory.getLog(XWiki.class);
 
-    private XWikiContext context;
+    private ThreadLocal<XWikiContext> context;
 
     /**
      * We override the default processCall method in order to provide XWiki initialization before 
@@ -131,7 +131,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         }
 
         context.put("ajax", new Boolean(true));
-        this.context = context;
+        this.context.set(context);
     }
     
     private void initializeContainerComponent(XWikiContext context)
@@ -168,7 +168,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     
     protected XWikiContext getXWikiContext()
     {
-        return this.context;
+        return this.context.get();
     }
 
     protected XWikiGWTException getXWikiGWTException(Exception e) {

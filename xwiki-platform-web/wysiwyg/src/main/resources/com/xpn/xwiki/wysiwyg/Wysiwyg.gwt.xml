@@ -184,4 +184,16 @@
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
+
+  <!-- Reloader -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.ReloaderImplMozillaOld">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.ReloaderImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="gecko"/>
+      <all>
+        <when-property-is name="user.agent" value="gecko1_8"/>
+        <when-property-is name="gecko1_9" value="no"/>
+      </all>
+    </any>
+  </replace-with>
 </module>

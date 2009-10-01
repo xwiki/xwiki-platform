@@ -21,13 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta;
 
 import java.util.Map;
 
-import org.xwiki.gwt.dom.client.JavaScriptObject;
-
-import com.google.gwt.dom.client.FormElement;
-import com.google.gwt.dom.client.InputElement;
-import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.internal.ReloaderImpl;
 
 /**
  * Reloads a rich text area.
@@ -37,16 +33,9 @@ import com.google.gwt.event.shared.HandlerRegistration;
 public class Reloader
 {
     /**
-     * The rich text area to be reloaded.
+     * The underlying implementation used by this reloader.
      */
-    private final RichTextArea rta;
-
-    /**
-     * This object is used to preserve the list of inner HTML listeners while the rich text area is reloading. Rich text
-     * area's document is renewed after each reload, the reference to the inner HTML listeners being thus lost along
-     * with the old document.
-     */
-    private Object innerHTMLListeners;
+    private final ReloaderImpl impl = GWT.create(ReloaderImpl.class);
 
     /**
      * Creates a new reloader for the specified rich text area.
@@ -55,7 +44,7 @@ public class Reloader
      */
     public Reloader(RichTextArea rta)
     {
-        this.rta = rta;
+        impl.setTextArea(rta);
     }
 
     /**
@@ -66,53 +55,6 @@ public class Reloader
      */
     public void reload(Map<String, String> params, final LoadHandler handler)
     {
-        final HandlerRegistration[] registrations = new HandlerRegistration[1];
-        registrations[0] = rta.addLoadHandler(new LoadHandler()
-        {
-            public void onLoad(LoadEvent event)
-            {
-                registrations[0].removeHandler();
-                // Restore the inner HTML listeners.
-                swapInnerHTMLListeners();
-                if (handler != null) {
-                    handler.onLoad(event);
-                }
-            }
-        });
-
-        // Save the inner HTML listeners.
-        swapInnerHTMLListeners();
-
-        FormElement form = rta.getDocument().createFormElement();
-        form.setAction("");
-        form.setMethod("post");
-
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            InputElement input = rta.getDocument().createHiddenInputElement();
-            input.setName(entry.getKey());
-            input.setValue(entry.getValue());
-            form.appendChild(input);
-        }
-
-        rta.getDocument().getBody().appendChild(form);
-        // The form is not submitted if the owner document is in design mode.
-        rta.getDocument().setDesignMode(false);
-        form.submit();
-    }
-
-    /**
-     * Saves or restores the inner HTML listeners by swapping the value of {@link #innerHTMLListeners} with the value of
-     * the {@code innerHTMLListeners} property of the document edited by the underlying rich text area.
-     * <p>
-     * NOTE: This method is more of a hack required to prevent loosing the inner HTML listeners when the rich text area
-     * is reloaded. The inner HTML listeners are saved on the DOM document and thus are lost each time the in-line frame
-     * used by the rich text area is reloaded because the document is renewed. We shouldn't be aware or depend on the
-     * way the inner HTML listeners are managed by a DOM document but since it's not the responsibility of the document
-     * to preserve its inner HTML listeners while the in-line frame reload we chose to use this hack.
-     */
-    private void swapInnerHTMLListeners()
-    {
-        JavaScriptObject doc = rta.getDocument().cast();
-        innerHTMLListeners = doc.set("innerHTMLListeners", innerHTMLListeners);
+        impl.reload(params, handler);
     }
 }

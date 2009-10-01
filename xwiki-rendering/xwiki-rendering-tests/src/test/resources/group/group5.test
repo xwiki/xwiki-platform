@@ -160,14 +160,16 @@ endDocument
 = The top-level document =
 
 |=Table Header 1|=Table Header 2|=Table Header 3
-|Cell One|Cell Two(((= This is a group =
+|Cell One|Cell Two(((
+= This is a group =
 
 The first paragraph of the group
 
 * list item one
 * list item two
 ** sub-item 1
-** sub-item 2)))| Cell Three
+** sub-item 2
+)))| Cell Three
 
 The next paragraph in the top-level document
 .#-----------------------------------------------------

@@ -1,23 +1,19 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that ) is escaped if last character of a group
+.# Verify that > is escaped if first character of a line
 .#---------------------------------------------------------------------------------------------------------
-~-~-verbose 'ftp://afp'
+~> text
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onSpecialSymbol [-]
-onSpecialSymbol [-]
-onWord [verbose]
+onSpecialSymbol [>]
 onSpace
-onSpecialSymbol [']
-beginLink [Reference = [ftp://afp']] [true]
-endLink [Reference = [ftp://afp']] [true]
+onWord [text]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-~-~-verbose 'ftp://afp'
+~> text

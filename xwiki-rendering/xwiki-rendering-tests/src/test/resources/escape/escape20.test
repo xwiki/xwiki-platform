@@ -1,19 +1,32 @@
 .#---------------------------------------------------------------------------------------------------------
 .input|xwiki/2.0
-.# Verify that > is escaped if first character of a line
+.# Verify that line beginning syntaxes like headers are escaped in a table cell
 .#---------------------------------------------------------------------------------------------------------
-~> text
+|x
+~= h =|y
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
-onSpecialSymbol [>]
+beginTable
+beginTableRow
+beginTableCell
+onWord [x]
+onNewLine
+onSpecialSymbol [=]
 onSpace
-onWord [text]
-endParagraph
+onWord [h]
+onSpace
+onSpecialSymbol [=]
+endTableCell
+beginTableCell
+onWord [y]
+endTableCell
+endTableRow
+endTable
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-~> text
+|x
+~= h =|y

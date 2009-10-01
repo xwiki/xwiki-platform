@@ -2,61 +2,22 @@
 .input|xwiki/2.0
 .# Verify that ) is escaped if last character of a group
 .#---------------------------------------------------------------------------------------------------------
-(((group~))))
-(((* group ~))))
-(((| cell 1 | cell2 ~))))
+~-~-verbose 'ftp://afp'
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginGroup
 beginParagraph
-onWord [group]
-onSpecialSymbol [)]
+onSpecialSymbol [-]
+onSpecialSymbol [-]
+onWord [verbose]
+onSpace
+onSpecialSymbol [']
+beginLink [Reference = [ftp://afp']] [true]
+endLink [Reference = [ftp://afp']] [true]
 endParagraph
-endGroup
-beginGroup
-beginList [BULLETED]
-beginListItem
-onWord [group]
-onSpace
-onSpecialSymbol [)]
-endListItem
-endList [BULLETED]
-endGroup
-beginGroup
-beginTable
-beginTableRow
-beginTableCell
-onSpace
-onWord [cell]
-onSpace
-onWord [1]
-onSpace
-endTableCell
-beginTableCell
-onSpace
-onWord [cell2]
-onSpace
-onSpecialSymbol [)]
-endTableCell
-endTableRow
-endTable
-endGroup
 endDocument
-.#-----------------------------------------------------
-.expect|xhtml/1.0
-.#-----------------------------------------------------
-<div><p>group)</p></div><div><ul><li>group )</li></ul></div><div><table><tr><td>&nbsp;cell 1&nbsp;</td><td>&nbsp;cell2 )</td></tr></table></div>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-(((group~))))
-
-(((* group ~))))
-
-(((| cell 1 | cell2 ~))))
-.#-----------------------------------------------------
-.input|xhtml/1.0
-.#-----------------------------------------------------
-<div><p>group)</p></div><div><ul><li>group )</li></ul></div><div><table><tr><td>&nbsp;cell 1&nbsp;</td><td>&nbsp;cell2 )</td></tr></table></div>
+~-~-verbose 'ftp://afp'

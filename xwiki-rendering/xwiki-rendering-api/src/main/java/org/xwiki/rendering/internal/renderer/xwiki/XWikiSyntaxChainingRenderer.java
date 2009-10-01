@@ -126,6 +126,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         }
 
         print("(((");
+        print("\n");
 
         // Create a new listener stack in order to preserve current states, to handle the group.
         getListenerChain().pushAllStackableListeners();
@@ -151,6 +152,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     @Override
     public void endGroup(Map<String, String> parameters)
     {
+        print("\n");
         print(")))");
 
         // Restore previous listeners that were stacked

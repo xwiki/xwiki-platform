@@ -1,9 +1,12 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-| Line One | First doc: (((
- inside ))) after
-|Line Two | Second doc: (((lkjlj))) skdjg
+| Line One | First doc:(((
+ inside
+)))after
+|Line Two | Second doc:(((
+lkjlj
+)))skdjg
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -62,8 +65,12 @@ endDocument
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-| Line One | First doc:((( inside)))after
-|Line Two | Second doc:(((lkjlj)))skdjg
+| Line One | First doc:(((
+ inside
+)))after
+|Line Two | Second doc:(((
+lkjlj
+)))skdjg
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------

@@ -24,7 +24,6 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.renderer.*;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ConsecutiveNewLineStateChainingListener;
 import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
@@ -32,6 +31,7 @@ import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
 import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
+import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
 /**
  * Generates XWiki Syntax from {@link org.xwiki.rendering.block.XDOM}. This is useful for example to convert other wiki
@@ -47,6 +47,7 @@ public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implement
 {
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      * @since 2.0M3
      */
@@ -56,11 +57,11 @@ public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implement
         setListenerChain(chain);
 
         // Construct the listener chain in the right order. Listeners early in the chain are called before listeners
-        // placed later in the chain. This chzin allows using several listeners that make it easier
+        // placed later in the chain. This chain allows using several listeners that make it easier
         // to write the XWiki Syntax chaining listener, for example for saving states (are we in a list, in a
         // paragraph, are we starting a new line, etc).
         chain.addListener(this);
-        chain.addListener(new LookaheadChainingListener(chain, 4));
+        chain.addListener(new LookaheadChainingListener(chain, 2));
         chain.addListener(new GroupStateChainingListener(chain));
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new ConsecutiveNewLineStateChainingListener(chain));

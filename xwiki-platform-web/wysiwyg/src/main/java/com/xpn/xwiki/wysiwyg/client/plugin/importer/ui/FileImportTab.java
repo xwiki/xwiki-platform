@@ -37,6 +37,11 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 public class FileImportTab extends Composite
 {
     /**
+     * Style identifier for help message labels.
+     */
+    private static final String HELP_LABEL_STYLE = "xHelpLabel";
+    
+    /**
      * A {@link FormPanel} to hold the fileUpload widget.
      */
     private FormPanel formPanel;
@@ -44,42 +49,50 @@ public class FileImportTab extends Composite
     /**
      * The {@link FileUpload} widget.
      */
-    private FileUpload fileUpload;
+    private FileUpload fileUpload;   
 
     /**
      * Default constructor.
      * 
+     * @param isOpenOfficeServerConnected if the OpenOffice server is available to handle file imports.
      * @param uploadUrl the url to be set for 'action' attribute of the internal form
      * @param submitCompleteHandler the {@link SubmitCompleteHandler} for handling the form submit complete event
      */
-    public FileImportTab(String uploadUrl, SubmitCompleteHandler submitCompleteHandler)
+    public FileImportTab(boolean isOpenOfficeServerConnected, String uploadUrl,
+        SubmitCompleteHandler submitCompleteHandler)
     {
         // Main container panel.
         FlowPanel mainPanel = new FlowPanel();
 
-        // Info label.
-        Panel infoLabel = new FlowPanel();
-        infoLabel.setStyleName("xInfoLabel");
-        infoLabel.add(new InlineLabel(Strings.INSTANCE.importerFileTabInfoLabel()));
-        InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
-        mandatoryLabel.addStyleName("xMandatory");
-        infoLabel.add(mandatoryLabel);
-        mainPanel.add(infoLabel);
+        if (!isOpenOfficeServerConnected) {
+            Label featureNotAvailableLabel = new Label(Strings.INSTANCE.importerFileTabNotAvailableLabel());
+            featureNotAvailableLabel.setStyleName(HELP_LABEL_STYLE);
+            mainPanel.add(featureNotAvailableLabel);
+        } else {
+            // Info label.
+            Panel infoLabel = new FlowPanel();
+            infoLabel.setStyleName("xInfoLabel");
+            infoLabel.add(new InlineLabel(Strings.INSTANCE.importerFileTabInfoLabel()));
+            InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
+            mandatoryLabel.addStyleName("xMandatory");
+            infoLabel.add(mandatoryLabel);
+            mainPanel.add(infoLabel);
 
-        Label helpLabel = new Label(Strings.INSTANCE.importerFileTabHelpLabel());
-        helpLabel.setStyleName("xHelpLabel");
-        mainPanel.add(helpLabel);
+            Label helpLabel = new Label(Strings.INSTANCE.importerFileTabHelpLabel());
+            helpLabel.setStyleName(HELP_LABEL_STYLE);
+            mainPanel.add(helpLabel);
 
-        // Form panel.
-        formPanel = new FormPanel();
-        formPanel.setAction(uploadUrl);
-        formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
-        formPanel.setMethod(FormPanel.METHOD_POST);
-        fileUpload = new FileUpload();
-        fileUpload.setName("filepath");
-        formPanel.add(fileUpload);
-        formPanel.addSubmitCompleteHandler(submitCompleteHandler);
-        mainPanel.add(formPanel);
+            // Form panel.
+            formPanel = new FormPanel();
+            formPanel.setAction(uploadUrl);
+            formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
+            formPanel.setMethod(FormPanel.METHOD_POST);
+            fileUpload = new FileUpload();
+            fileUpload.setName("filepath");
+            formPanel.add(fileUpload);
+            formPanel.addSubmitCompleteHandler(submitCompleteHandler);
+            mainPanel.add(formPanel);
+        }
 
         // Finalize.
         initWidget(mainPanel);

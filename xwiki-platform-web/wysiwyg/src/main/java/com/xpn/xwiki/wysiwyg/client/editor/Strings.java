@@ -378,6 +378,8 @@ public interface Strings extends Constants
     String importerFileTabInfoLabel();
 
     String importerFileTabHelpLabel();
+    
+    String importerFileTabNotAvailableLabel();
 
     String importerFilterStylesCheckBoxCaption();
 

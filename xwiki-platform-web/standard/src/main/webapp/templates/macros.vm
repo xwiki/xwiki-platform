@@ -2217,6 +2217,7 @@ var $jsVarName = {
   wiki: '$!{editedDocument.wiki.replace("'", "\'")}',
   space: '$!{editedDocument.space.replace("'", "\'")}',
   page: '$!{editedDocument.name.replace("'", "\'")}',
+  openofficeServerConnected:#if("$!{oomanager.serverState}" == "Connected")'true'#else'false'#end,
 #if($full && $request.sync)
   // Additional configuration for the real-time editing feature.
   syncPage: '$!{editedDocument.fullName.replace("'", "\'")}',

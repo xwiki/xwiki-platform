@@ -126,10 +126,8 @@ public class ImporterPlugin extends AbstractPlugin implements ClickHandler, Clos
      */
     private ImporterDialog getImporterDialog()
     {
-        if (null == importerDialog) {
-            importerDialog =
-                new ImporterDialog(getConfig().getParameter("space", "Main"), getConfig().getParameter("page",
-                    "WebHome"));
+        if (null == importerDialog) {            
+            importerDialog = new ImporterDialog(getConfig());
             saveRegistration(importerDialog.addCloseHandler(this));
         }
         return importerDialog;

@@ -1099,10 +1099,6 @@ body#body.editbody #globallinks #globalmenu .glink,
     width: 100%;
 }
 
-#companylogo {
-    width: 740px;
-}
-
 /*IE*/
 #companylogo {
     padding: 0;
@@ -3449,17 +3445,10 @@ body.hideright #contentcolumn .main {
 #headerglobal {
   background: $theme.pageHeaderBackgroundColor $!{theme.headerBackgroundImage} $!{theme.headerBackgroundPosition};
 }
-#headerglobal, #company, #companylogo, #companylogo a, #companylogo a img, #globallinks {
-  height: auto !important;
-}
-#companylogo a, #companylogo a img {
-  width: auto !important;
-}
 
 #companylogo {
   background: transparent;
   margin: 0px;
-  width: auto;
 }
 
 body.hideright #companylogo {

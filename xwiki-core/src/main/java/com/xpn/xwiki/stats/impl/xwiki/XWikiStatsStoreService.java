@@ -71,7 +71,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     public XWikiStatsStoreService(XWikiContext context)
     {
         long queueSize = context.getWiki().ParamAsLong("stats.queue.size", 200);
-        queue = new ArrayBlockingQueue<XWikiStatsStoreItem>((int) queueSize);
+        this.queue = new ArrayBlockingQueue<XWikiStatsStoreItem>((int) queueSize);
     }
 
     /**
@@ -79,11 +79,11 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
      */
     public void start()
     {
-        if (thread == null) {
-            thread = new Thread(this, "Statistics storing daemon");
+        if (this.thread == null) {
+            this.thread = new Thread(this, "Statistics storing daemon");
             // The JVM should be allowed to shutdown while this thread is running
-            thread.setDaemon(true);
-            thread.start();
+            this.thread.setDaemon(true);
+            this.thread.start();
         }
     }
 
@@ -92,11 +92,11 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
      */
     public void stop()
     {
-        queue.clear();
+        this.queue.clear();
         try {
-            queue.put(new StopStatsRegisterObject());
-            thread.join();
-            thread = null;
+            this.queue.put(new StopStatsRegisterObject());
+            this.thread.join();
+            this.thread = null;
         } catch (InterruptedException e) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Thread join has been interrupted", e);
@@ -135,7 +135,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
      */
     private void register() throws InterruptedException, StopStatsStoreException
     {
-        XWikiStatsStoreItem stat = queue.take();
+        XWikiStatsStoreItem stat = this.queue.take();
 
         List<List<XWikiStatsStoreItem>> statsList = new ArrayList<List<XWikiStatsStoreItem>>();
         Map<String, List<XWikiStatsStoreItem>> statsMap = new HashMap<String, List<XWikiStatsStoreItem>>();
@@ -158,7 +158,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
 
             stats.add(stat);
 
-            stat = queue.poll();
+            stat = this.queue.poll();
         } while (stat != null);
 
         for (List<XWikiStatsStoreItem> stats : statsList) {
@@ -178,7 +178,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     public void add(XWikiStatsStoreItem statsRegisterItem)
     {
         try {
-            queue.put(statsRegisterItem);
+            this.queue.put(statsRegisterItem);
         } catch (InterruptedException e) {
             LOG.error("Statistics storage thread has been interrupted", e);
         }
@@ -253,8 +253,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
         add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.MONTH, action, false, context));
         add(new DocumentStatsStoreItem(doc.getFullName(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit,
             context));
-        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit,
-            context));
+        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY, action, isVisit, context));
         add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.DAY, action, false, context));
     }
 

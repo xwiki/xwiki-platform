@@ -34,7 +34,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<blockquote>line1<br/>line2</blockquote><blockquote>line1<br/><br/>line3</blockquote>
+<blockquote><p>line1<br/>line2</p></blockquote><blockquote><p>line1<br/><br/>line3</p></blockquote>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -47,4 +47,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><blockquote>line1<br/>line2</blockquote><blockquote>line1<br/><br/>line3</blockquote></html>
+<blockquote><p>line1<br/>line2</p></blockquote><blockquote><p>line1<br/><br/>line3</p></blockquote>

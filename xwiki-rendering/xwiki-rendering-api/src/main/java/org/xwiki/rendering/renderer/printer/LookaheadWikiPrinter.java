@@ -37,16 +37,26 @@ public class LookaheadWikiPrinter extends WrappingWikiPrinter
         super(printer);
     }
 
+    protected void printInternal(String text)
+    {
+        super.print(text);
+    }
+
+    protected void printlnInternal(String text)
+    {
+        super.println(text);
+    }
+
     public void print(String text)
     {
         flush();
-        super.print(text);
+        printInternal(text);
     }
 
     public void println(String text)
     {
         flush();
-        super.println(text);
+        printlnInternal(text);
     }
 
     public void printDelayed(String text)
@@ -67,7 +77,7 @@ public class LookaheadWikiPrinter extends WrappingWikiPrinter
     public void flush()
     {
         if (getBuffer().length() > 0) {
-            getWrappedPrinter().print(getBuffer().toString());
+            printInternal(getBuffer().toString());
             getBuffer().setLength(0);
         }
     }

@@ -62,15 +62,10 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
         return escapeHandler;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter#print(java.lang.String)
-     */
     @Override
-    public void print(String text)
+    protected void printInternal(String text)
     {
-        super.print(text);
+        super.printInternal(text);
 
         int length = text.length();
 
@@ -85,9 +80,9 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
      * @see org.xwiki.rendering.renderer.printer.LookaheadWikiPrinter#println(java.lang.String)
      */
     @Override
-    public void println(String text)
+    protected void printlnInternal(String text)
     {
-        super.println(text);
+        super.printlnInternal(text);
 
         this.escapeHandler.setOnNewLine(true);
     }
@@ -110,8 +105,9 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 
     public void printBeginBold()
     {
-        boolean isOnNewLine =
-            this.listenerChain.getTextOnNewLineStateChainingListener().isTextOnNewLine() && getBuffer().length() == 0;
+        flush();
+
+        boolean isOnNewLine = this.escapeHandler.isOnNewLine();
 
         print("**");
 
@@ -134,7 +130,7 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
     {
         return this.escapeHandler.isOnNewLine();
     }
-    
+
     public void printBeginItalic()
     {
         // If the lookahead buffer is not empty and the last character is ":" then we need to escape it

@@ -57,8 +57,8 @@ public abstract class AbstractXWikiRunnable implements Runnable
      */
     protected ExecutionContext initExecutionContext() throws ExecutionContextException
     {
-        ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         ExecutionContext ec = new ExecutionContext();
 
@@ -73,7 +73,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void cleanupExecutionContext()
     {
-        Execution ech = (Execution) Utils.getComponent(Execution.class);
+        Execution ech = Utils.getComponent(Execution.class);
         // We must ensure we clean the ThreadLocal variables located in the Execution
         // component as otherwise we will have a potential memory leak.
         ech.removeContext();

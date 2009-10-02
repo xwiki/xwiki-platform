@@ -145,8 +145,6 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
                 startProgress();
                 fileImportTab.sumbit();
             }
-        } else if (event.getSource() == buttonPanel.getCancelButton()) {
-            hide();
         }
     }
 
@@ -198,7 +196,6 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     {
         buttonPanel.getFilterStylesCheckBox().setEnabled(enable);
         buttonPanel.getImportButton().setEnabled(enable);
-        buttonPanel.getCancelButton().setEnabled(enable);
     }
 
     /**

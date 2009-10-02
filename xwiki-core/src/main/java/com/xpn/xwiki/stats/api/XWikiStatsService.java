@@ -28,19 +28,18 @@ import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
-import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.criteria.impl.Duration;
 import com.xpn.xwiki.criteria.impl.Period;
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.Scope;
+import com.xpn.xwiki.stats.impl.DocumentStats;
 
 /**
  * Store and retrieve statistics.
  * 
  * @version $Id$
  */
-public interface XWikiStatsService extends XWikiActionNotificationInterface
+public interface XWikiStatsService
 {
     /**
      * Methods called just one time at XWiki initialization.
@@ -62,28 +61,23 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
     /**
      * Retrieves document statistics.
      * 
-     * @param action the action the results should be ordered by. It can be one of: "view", "save"
-     *            or "download". If the action is "view" then the documents are ordered by the
-     *            number of times they have been viewed so far.
+     * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
+     *            action is "view" then the documents are ordered by the number of times they have been viewed so far.
      * @param scope the set of documents for which to retrieve statistics.
      * @param period the period of time.
-     * @param range the sub-range to return from the entire result set. Use this parameter for
-     *            pagination.
+     * @param range the sub-range to return from the entire result set. Use this parameter for pagination.
      * @param context the XWiki context.
      * @return A list of DocumentStats objects
      */
-    List< ? > getDocumentStatistics(String action, Scope scope, Period period, Range range,
-        XWikiContext context);
+    List< ? > getDocumentStatistics(String action, Scope scope, Period period, Range range, XWikiContext context);
 
     /**
      * Retrieves visit statistics.
      * 
-     * @param action the action the results should be ordered by. It can be one of: "view", "save"
-     *            or "download". If the action is "view" then the visitors are ordered by the number
-     *            of pages they have viewed so far.
+     * @param action the action the results should be ordered by. It can be one of: "view", "save" or "download". If the
+     *            action is "view" then the visitors are ordered by the number of pages they have viewed so far.
      * @param period the period of time.
-     * @param range the sub-range to return from the entire result set. Use this parameter for
-     *            pagination.
+     * @param range the sub-range to return from the entire result set. Use this parameter for pagination.
      * @param context the XWiki context.
      * @return a list of VisitStats objects.
      */
@@ -92,17 +86,15 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
     /**
      * Retrieves referrer statistics.
      * 
-     * @param domain the domain for which to retrieve statistics. To retrieve statistics for all
-     *            domains use the empty string.
+     * @param domain the domain for which to retrieve statistics. To retrieve statistics for all domains use the empty
+     *            string.
      * @param scope the scope of referred documents to use for filtering the results.
      * @param period the period of time.
-     * @param range the sub-range to return from the entire result set. Use this parameter for
-     *            pagination.
+     * @param range the sub-range to return from the entire result set. Use this parameter for pagination.
      * @param context the XWiki context.
      * @return a list of RefererStats objects.
      */
-    List< ? > getRefererStatistics(String domain, Scope scope, Period period, Range range,
-        XWikiContext context);
+    List< ? > getRefererStatistics(String domain, Scope scope, Period period, Range range, XWikiContext context);
 
     /**
      * Retrieves back-link statistics.
@@ -110,17 +102,14 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
      * @param domain the domain used for filtering the results.
      * @param scope the scope of referred documents for which to retrieve statistics.
      * @param period the period of time.
-     * @param range the sub-range to return from the entire result set. Use this parameter for
-     *            pagination.
+     * @param range the sub-range to return from the entire result set. Use this parameter for pagination.
      * @param context the XWiki context.
      * @return a list of DocumentStats objects.
      */
-    List< ? > getBackLinkStatistics(String domain, Scope scope, Period period, Range range,
-        XWikiContext context);
+    List< ? > getBackLinkStatistics(String domain, Scope scope, Period period, Range range, XWikiContext context);
 
     /**
-     * Shows how the statistics for the specified action have evolved over the specified period of
-     * time.
+     * Shows how the statistics for the specified action have evolved over the specified period of time.
      * 
      * @param action the action for which to retrieve statistics.
      * @param scope the set of documents to consider.
@@ -129,8 +118,7 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
      * @param context the XWiki context.
      * @return a map of (date, actionCount) pairs.
      */
-    Map< ? , ? > getActionStatistics(String action, Scope scope, Period period, Duration step,
-        XWikiContext context);
+    Map< ? , ? > getActionStatistics(String action, Scope scope, Period period, Duration step, XWikiContext context);
 
     // ////////////////////////////////////////////////////////////////////////////////////////
     // Deprecated methods
@@ -143,8 +131,7 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
      * @param action can be "view", "edit", "save", etc..
      * @param context the XWiki context.
      * @return DocumentStats - statistics object.
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Range , XWikiContext)}
-     *             instead.
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Range , XWikiContext)} instead.
      */
     @Deprecated
     DocumentStats getDocTotalStats(String docname, String action, XWikiContext context);
@@ -157,8 +144,7 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
      * @param month the month.
      * @param context the XWiki context.
      * @return DocumentStats - statistics object.
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Range , XWikiContext)}
-     *             instead.
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Range , XWikiContext)} instead.
      */
     @Deprecated
     DocumentStats getDocMonthStats(String docname, String action, Date month, XWikiContext context);
@@ -171,8 +157,7 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
      * @param day the day.
      * @param context the XWiki context.
      * @return DocumentStats - statistics object.
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Range , XWikiContext)}
-     *             instead.
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Range , XWikiContext)} instead.
      */
     @Deprecated
     DocumentStats getDocDayStats(String docname, String action, Date day, XWikiContext context);
@@ -185,8 +170,7 @@ public interface XWikiStatsService extends XWikiActionNotificationInterface
      * @param context the XWiki context.
      * @return the monthly referer statistics.
      * @throws XWikiException error when searching for referer statistics.
-     * @deprecated use {@link #getRefererStatistics(String, Scope, Period, Range, XWikiContext)}
-     *             instead.
+     * @deprecated use {@link #getRefererStatistics(String, Scope, Period, Range, XWikiContext)} instead.
      */
     @Deprecated
     List getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException;

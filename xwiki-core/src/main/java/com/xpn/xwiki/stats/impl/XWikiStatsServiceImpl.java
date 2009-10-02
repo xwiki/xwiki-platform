@@ -21,6 +21,21 @@
 
 package com.xpn.xwiki.stats.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ActionExecutionEvent;
+import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.criteria.impl.Duration;
@@ -28,32 +43,20 @@ import com.xpn.xwiki.criteria.impl.Period;
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiActionRule;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.xwiki.XWikiStatsReader;
 import com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreService;
 import com.xpn.xwiki.web.DownloadAction;
 import com.xpn.xwiki.web.SaveAction;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.ViewAction;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Store and retrieve statistics.
  * 
  * @version $Id$
  */
-public class XWikiStatsServiceImpl implements XWikiStatsService
+public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
 {
     /**
      * Logging tools.
@@ -61,11 +64,21 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     private static final Log LOG = LogFactory.getLog(XWikiStatsServiceImpl.class);
 
     /**
+     * The name of the listener.
+     */
+    private static final String NAME = "statistics";
+
+    /**
      * User actions statistics module saves.
      */
-    private static final Set<String> SUPPORTED_ACTIONS =
-        new HashSet<String>(Arrays.asList(ViewAction.VIEW_ACTION, SaveAction.ACTION_NAME,
-            DownloadAction.ACTION_NAME));
+    private static final List<Event> EVENTS = new ArrayList<Event>()
+    {
+        {
+            add(new ActionExecutionEvent(ViewAction.VIEW_ACTION));
+            add(new ActionExecutionEvent(SaveAction.ACTION_NAME));
+            add(new ActionExecutionEvent(DownloadAction.ACTION_NAME));
+        }
+    };
 
     /**
      * The statistics storing thread.
@@ -80,6 +93,26 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.observation.EventListener#getName()
+     */
+    public String getName()
+    {
+        return NAME;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.observation.EventListener#getEvents()
+     */
+    public List<Event> getEvents()
+    {
+        return EVENTS;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.stats.api.XWikiStatsService#init(com.xpn.xwiki.XWikiContext)
      */
     public void init(XWikiContext context)
@@ -87,15 +120,14 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
         if (LOG.isInfoEnabled()) {
             LOG.info("Start statistics service initialization");
         }
-        
+
         if (StatsUtil.isStatsEnabled(context)) {
             // Start statistics store thread
-            statsRegister = new XWikiStatsStoreService(context);
-            statsRegister.start();
+            this.statsRegister = new XWikiStatsStoreService(context);
+            this.statsRegister.start();
 
             // Adding the rule which will allow this module to be called on each page view
-            context.getWiki().getNotificationManager().addGeneralRule(
-                new XWikiActionRule(this, true, true));
+            Utils.getComponent(ObservationManager.class).addListener(this);
         }
     }
 
@@ -113,18 +145,28 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.notify.XWikiActionNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument, java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
+     *      java.lang.Object)
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument doc, String action,
-        XWikiContext context)
+    public void onEvent(Event event, Object source, Object data)
     {
-        // 1) If the server is in read-only mode, forget about the statistics
-        // 2) Unless this is a "view", "save" or "download" action, we are not interested
-        if (context.getWiki().isReadOnly() || !SUPPORTED_ACTIONS.contains(action)
-            || StatsUtil.findCookie(context)) {
+        if (Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()) {
+            // we do nothing when the event comes from remote instance since the remote instance is supposed to already
+            // take care of this
             return;
         }
+
+        ActionExecutionEvent actionEvent = (ActionExecutionEvent) event;
+        XWikiDocument document = (XWikiDocument) source;
+        XWikiContext context = (XWikiContext) data;
+
+        // 1) If the server is in read-only mode, forget about the statistics
+        // 2) Unless this is a "view", "save" or "download" action, we are not interested
+        if (context.getWiki().isReadOnly() || StatsUtil.findCookie(context)) {
+            return;
+        }
+
+        String action = actionEvent.getActionName();
 
         // Let's save in the session the last elements view, saved
         synchronized (this) {
@@ -135,7 +177,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
                     StatsUtil.setRecentActionsFromSession(context, action, actions);
                 }
 
-                String element = context.getDatabase() + ":" + doc.getFullName();
+                String element = context.getDatabase() + ":" + document.getFullName();
                 if (actions.contains(element)) {
                     actions.remove(element);
                 }
@@ -144,7 +186,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
         }
 
         if (StatsUtil.isWikiStatsEnabled(context)) {
-            this.statsRegister.addStats(doc, action, context);
+            this.statsRegister.addStats(document, action, context);
         }
     }
 
@@ -154,8 +196,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
      * @see XWikiStatsService#getActionStatistics(String, Scope, com.xpn.xwiki.criteria.impl.Period ,
      *      com.xpn.xwiki.criteria.impl.Duration , XWikiContext)
      */
-    public Map< ? , ? > getActionStatistics(String action, Scope scope, Period period,
-        Duration step, XWikiContext context)
+    public Map< ? , ? > getActionStatistics(String action, Scope scope, Period period, Duration step,
+        XWikiContext context)
     {
         return this.statsReader.getActionStatistics(action, scope, period, step, context);
     }
@@ -165,8 +207,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
      * 
      * @see XWikiStatsService#getDocumentStatistics(String, Scope, Period, Range , XWikiContext)
      */
-    public List<DocumentStats> getDocumentStatistics(String action, Scope scope, Period period,
-        Range range, XWikiContext context)
+    public List<DocumentStats> getDocumentStatistics(String action, Scope scope, Period period, Range range,
+        XWikiContext context)
     {
         return this.statsReader.getDocumentStatistics(action, scope, period, range, context);
     }
@@ -176,8 +218,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
      * 
      * @see XWikiStatsService#getBackLinkStatistics(String, Scope, Period, Range , XWikiContext)
      */
-    public List<DocumentStats> getBackLinkStatistics(String domain, Scope scope, Period period,
-        Range range, XWikiContext context)
+    public List<DocumentStats> getBackLinkStatistics(String domain, Scope scope, Period period, Range range,
+        XWikiContext context)
     {
         return this.statsReader.getBackLinkStatistics(domain, scope, period, range, context);
     }
@@ -187,8 +229,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
      * 
      * @see XWikiStatsService#getRefererStatistics(String, Scope, Period, Range , XWikiContext)
      */
-    public List<RefererStats> getRefererStatistics(String domain, Scope scope, Period period,
-        Range range, XWikiContext context)
+    public List<RefererStats> getRefererStatistics(String domain, Scope scope, Period period, Range range,
+        XWikiContext context)
     {
         return this.statsReader.getRefererStatistics(domain, scope, period, range, context);
     }
@@ -196,11 +238,9 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiStatsService#getVisitStatistics(String, com.xpn.xwiki.criteria.impl.Period , Range ,
-     *      XWikiContext)
+     * @see XWikiStatsService#getVisitStatistics(String, com.xpn.xwiki.criteria.impl.Period , Range , XWikiContext)
      */
-    public List<VisitStats> getVisitStatistics(String action, Period period, Range range,
-        XWikiContext context)
+    public List<VisitStats> getVisitStatistics(String action, Period period, Range range, XWikiContext context)
     {
         return this.statsReader.getVisitStatistics(action, period, range, context);
     }
@@ -212,8 +252,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getDocTotalStats(java.lang.String,
-     *      java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getDocTotalStats(java.lang.String, java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
      */
     @Deprecated
     public DocumentStats getDocTotalStats(String docname, String action, XWikiContext context)
@@ -224,12 +264,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getDocMonthStats(java.lang.String,
-     *      java.lang.String, java.util.Date, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getDocMonthStats(java.lang.String, java.lang.String,
+     *      java.util.Date, com.xpn.xwiki.XWikiContext)
      */
     @Deprecated
-    public DocumentStats getDocMonthStats(String docname, String action, Date month,
-        XWikiContext context)
+    public DocumentStats getDocMonthStats(String docname, String action, Date month, XWikiContext context)
     {
         return this.statsReader.getDocMonthStats(docname, action, month, context);
     }
@@ -237,12 +276,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getDocDayStats(java.lang.String,
-     *      java.lang.String, java.util.Date, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getDocDayStats(java.lang.String, java.lang.String, java.util.Date,
+     *      com.xpn.xwiki.XWikiContext)
      */
     @Deprecated
-    public DocumentStats getDocDayStats(String docname, String action, Date day,
-        XWikiContext context)
+    public DocumentStats getDocDayStats(String docname, String action, Date day, XWikiContext context)
     {
         return new DocumentStats();
     }
@@ -250,12 +288,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getRefMonthStats(java.lang.String,
-     *      java.util.Date, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.stats.api.XWikiStatsService#getRefMonthStats(java.lang.String, java.util.Date,
+     *      com.xpn.xwiki.XWikiContext)
      */
     @Deprecated
-    public List< ? > getRefMonthStats(String docName, Date month, XWikiContext context)
-        throws XWikiException
+    public List< ? > getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException
     {
         return this.statsReader.getRefMonthStats(docName, month, context);
     }

@@ -45,11 +45,6 @@ public class ButtonPanel extends FlowPanel
     private Button importButton;
 
     /**
-     * Cancel button.
-     */
-    private Button cancelButton;
-
-    /**
      * Default constructor.
      * 
      * @param handler {@link ClickHandler} for buttons.
@@ -61,10 +56,6 @@ public class ButtonPanel extends FlowPanel
         importButton = new Button(Strings.INSTANCE.importerImportButtonCaption());
         importButton.addStyleName("xImporterImportButton");
         importButton.addClickHandler(handler);
-        cancelButton = new Button(Strings.INSTANCE.importerCancelButtonCaption());
-        cancelButton.addStyleName("xImporterCancelButton");
-        cancelButton.addClickHandler(handler);
-        add(cancelButton);
         add(importButton);
 
         // add a clear floats panel
@@ -87,13 +78,5 @@ public class ButtonPanel extends FlowPanel
     public Button getImportButton()
     {
         return importButton;
-    }
-
-    /**
-     * @return the cancelButton.
-     */
-    public Button getCancelButton()
-    {
-        return cancelButton;
     }
 }

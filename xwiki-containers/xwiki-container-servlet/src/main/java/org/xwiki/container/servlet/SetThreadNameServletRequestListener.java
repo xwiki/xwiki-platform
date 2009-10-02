@@ -48,8 +48,13 @@ public class SetThreadNameServletRequestListener implements ServletRequestListen
         if (servletRequest instanceof HttpServletRequest) {
             HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
 
-            Thread.currentThread().setName(
-                httpServletRequest.getRequestURL() + "?" + httpServletRequest.getQueryString());
+            String threadName = httpServletRequest.getRequestURL().toString();
+
+            if (httpServletRequest.getQueryString() != null) {
+                threadName += "?" + httpServletRequest.getQueryString();
+            }
+
+            Thread.currentThread().setName(threadName);
         }
     }
 

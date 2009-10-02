@@ -131,13 +131,10 @@
       <version>1.0-RC3</version>
     </dependency>
 
-    <!-- We need to figure out what version we're using. I think this ldap JAR comes from
-         http://developer.novell.com/wiki/index.php/Jldap. Then we need to check the license and see if we can
-         upload it to the central repository. -->
     <dependency>
-      <groupId>com.novell</groupId>
-      <artifactId>ldap</artifactId>
-      <version>UNKNOWN</version>
+      <groupId>com.novell.ldap</groupId>
+      <artifactId>jldap</artifactId>
+      <version>4.3</version>
     </dependency>
 
     <!-- Version 1.0.0-rc1 has some bad dependencies in the POM. This is fixed in 1.0.0 but unfortunately we're

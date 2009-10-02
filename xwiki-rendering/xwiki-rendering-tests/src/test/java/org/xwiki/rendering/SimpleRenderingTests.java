@@ -151,6 +151,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("list/definitionlist5", false);
         suite.addTestsFromResource("list/definitionlist6", false);
         suite.addTestsFromResource("list/definitionlist7", false);
+        suite.addTestsFromResource("list/definitionlist8", false);
 
         // Sections
         suite.addTestsFromResource("section/section1", false);
@@ -196,6 +197,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("quote/quote2", false);
         suite.addTestsFromResource("quote/quote3", false);
         suite.addTestsFromResource("quote/quote4", false);
+        suite.addTestsFromResource("quote/quote5", false);
         suite.addTestsFromResource("misc/misc1", false);
         suite.addTestsFromResource("misc/misc2", false);
         suite.addTestsFromResource("misc/misc3", false);

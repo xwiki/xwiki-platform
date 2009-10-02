@@ -596,7 +596,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             String where = createMatchUserOrGroupWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails) {
-                groups = context.getWiki().getStore().searchDocuments(where, nb, start, parameterValues, context);
+                groups = context.getWiki().getStore().searchDocuments(where, false, nb, start, parameterValues, context);
             } else {
                 groups = context.getWiki().getStore().searchDocumentsNames(where, nb, start, parameterValues, context);
             }
@@ -694,10 +694,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         StringBuffer queryString = new StringBuffer();
 
         // Add from clause
-        queryString.append(" FROM XWikiDocument as doc, BaseObject as obj, StringProperty as field");
+        queryString.append(" FROM BaseObject as obj, StringProperty as field");
 
         // Add where clause
-        queryString.append(" WHERE doc.fullName=:groupdocname and doc.fullName=obj.name "
+        queryString.append(" WHERE obj.name=:groupdocname "
             + "and obj.className=:groupclassname and obj.id=field.id.id");
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);

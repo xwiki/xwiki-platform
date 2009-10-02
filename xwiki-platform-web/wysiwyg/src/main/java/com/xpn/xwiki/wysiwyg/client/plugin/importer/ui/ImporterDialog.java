@@ -82,6 +82,11 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     private String result;
 
     /**
+     * Flag indicating whether file import operations are possible.
+     */
+    private boolean isOpenOfficeServerConnected;
+
+    /**
      * Default constructor.
      * 
      * @param wysiwygConfig the wysiwyg configuration object.
@@ -98,7 +103,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
         // Read current wysiwyg configuration.
         String currentSpace = wysiwygConfig.getParameter("space", "Main");
         String currentPage = wysiwygConfig.getParameter("page", "WebHome");
-        boolean openOfficeServerConnected =
+        this.isOpenOfficeServerConnected =
             wysiwygConfig.getParameter("openofficeServerConnected", "false").equals("true");
 
         this.fullPageName = currentSpace + "." + currentPage;
@@ -115,7 +120,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
         clipboardImportTab = new ClipboardImportTab();
         tabPanel.add(clipboardImportTab, Strings.INSTANCE.importerClipboardTabCaption());
         String uploadUrl = "../../upload/" + currentSpace + "/" + currentPage;
-        fileImportTab = new FileImportTab(openOfficeServerConnected, uploadUrl, this);
+        fileImportTab = new FileImportTab(isOpenOfficeServerConnected, uploadUrl, this);
         tabPanel.add(fileImportTab, Strings.INSTANCE.importerFileTabCaption());
         tabPanel.selectTab(0);
         tabPanel.addStyleName("xImporterTabPanel");
@@ -141,7 +146,8 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
             if (clipboardImportTab.isVisible() && !htmlPaste.trim().equals("")) {
                 startProgress();
                 wysiwygService.cleanOfficeHTML(htmlPaste, "wysiwyg", getCleaningParams(), this);
-            } else if (fileImportTab.isVisible() && !fileImportTab.getFileName().trim().equals("")) {
+            } else if (fileImportTab.isVisible() && isOpenOfficeServerConnected
+                && !fileImportTab.getFileName().trim().equals("")) {
                 startProgress();
                 fileImportTab.sumbit();
             }
@@ -246,7 +252,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     {
         return this.result;
     }
-    
+
     /**
      * Resets the importer dialog for a new import operation.
      */

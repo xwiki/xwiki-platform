@@ -39,7 +39,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>paragraph</p><blockquote>line1<blockquote>line2<blockquote>line3</blockquote><br/>line4</blockquote></blockquote><p>paragraph</p>
+<p>paragraph</p><blockquote><p>line1</p><blockquote><p>line2</p><blockquote><p>line3</p></blockquote><p><br/>line4</p></blockquote><p></p></blockquote><p>paragraph</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -65,4 +65,4 @@ paragraph
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>paragraph</p><blockquote>line1<blockquote>line2<blockquote>line3</blockquote><br/>line4</blockquote></blockquote><p>paragraph</p></html>
+<p>paragraph</p><blockquote><p>line1</p><blockquote><p>line2</p><blockquote><p>line3</p></blockquote><p><br/>line4</p></blockquote><p></p></blockquote><p>paragraph</p>

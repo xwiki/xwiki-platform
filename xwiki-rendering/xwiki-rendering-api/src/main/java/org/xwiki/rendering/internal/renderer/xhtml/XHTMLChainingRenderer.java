@@ -305,7 +305,7 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
             }
             attributes.put(classAttributeName, classValue);
         }
-        
+
         getXHTMLWikiPrinter().printXMLStartElement("h" + level.getAsInt(), attributes);
         // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
         // element. Like some IE6 magic and others.
@@ -558,7 +558,13 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void beginQuotation(Map<String, String> parameters)
     {
+        if (getBlockState().isInQuotationLine()) {
+            getXHTMLWikiPrinter().printXMLEndElement("p");
+        }
+
         getXHTMLWikiPrinter().printXMLStartElement("blockquote", parameters);
+
+        getXHTMLWikiPrinter().printXMLStartElement("p");
     }
 
     /**
@@ -569,7 +575,13 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void endQuotation(Map<String, String> parameters)
     {
+        getXHTMLWikiPrinter().printXMLEndElement("p");
+
         getXHTMLWikiPrinter().printXMLEndElement("blockquote");
+
+        if (getBlockState().isInQuotationLine()) {
+            getXHTMLWikiPrinter().printXMLStartElement("p");
+        }
     }
 
     /**

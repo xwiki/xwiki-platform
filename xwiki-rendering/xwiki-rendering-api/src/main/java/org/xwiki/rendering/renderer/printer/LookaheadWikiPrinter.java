@@ -20,34 +20,43 @@
 package org.xwiki.rendering.renderer.printer;
 
 /**
- * Wiki printer that allows deferring printing text and that instead can save it in some internal
- * buffer. This allows accumulating some content before it's flushed. This feature is used for
- * example in the XWiki Syntax Renderer to accumulate text so that it be reviewed and escaped
- * before printed (indeed some text has some characters that need to be escaped or they'd have
- * a wiki meaning otherwise). 
- *   
+ * Wiki printer that allows deferring printing text and that instead can save it in some internal buffer. This allows
+ * accumulating some content before it's flushed. This feature is used for example in the XWiki Syntax Renderer to
+ * accumulate text so that it be reviewed and escaped before printed (indeed some text has some characters that need to
+ * be escaped or they'd have a wiki meaning otherwise).
+ * 
  * @version $Id$
  * @since 1.7
  */
 public class LookaheadWikiPrinter extends WrappingWikiPrinter
 {
     private StringBuffer buffer = new StringBuffer();
-    
+
     public LookaheadWikiPrinter(WikiPrinter printer)
     {
         super(printer);
     }
 
+    protected void printInternal(String text)
+    {
+        super.print(text);
+    }
+
+    protected void printlnInternal(String text)
+    {
+        super.println(text);
+    }
+
     public void print(String text)
     {
         flush();
-        super.print(text);
+        printInternal(text);
     }
 
     public void println(String text)
     {
         flush();
-        super.println(text);
+        printlnInternal(text);
     }
 
     public void printDelayed(String text)
@@ -64,15 +73,15 @@ public class LookaheadWikiPrinter extends WrappingWikiPrinter
     {
         return this.buffer;
     }
-    
+
     public void flush()
     {
         if (getBuffer().length() > 0) {
-            getWrappedPrinter().print(getBuffer().toString());
+            printInternal(getBuffer().toString());
             getBuffer().setLength(0);
         }
     }
-    
+
     /**
      * This method is protected to allow classes extending this one to define what a new line is.
      * 

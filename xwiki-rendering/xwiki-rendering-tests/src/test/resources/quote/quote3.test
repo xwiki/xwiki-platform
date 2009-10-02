@@ -16,7 +16,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<blockquote param1="value1" param2="value2">line</blockquote>
+<blockquote param1="value1" param2="value2"><p>line</p></blockquote>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -25,4 +25,4 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><blockquote param1="value1" param2="value2">line</blockquote></html>
+<blockquote param1="value1" param2="value2"><p>line</p></blockquote>

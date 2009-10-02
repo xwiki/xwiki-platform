@@ -29,7 +29,6 @@ import org.xwiki.rendering.listener.chaining.ConsecutiveNewLineStateChainingList
 import org.xwiki.rendering.listener.chaining.GroupStateChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.listener.chaining.LookaheadChainingListener;
-import org.xwiki.rendering.listener.chaining.TextOnNewLineStateChainingListener;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
 import org.xwiki.rendering.renderer.XWikiSyntaxListenerChain;
 
@@ -65,7 +64,6 @@ public class XWikiSyntaxRenderer extends AbstractChainingPrintRenderer implement
         chain.addListener(new GroupStateChainingListener(chain));
         chain.addListener(new BlockStateChainingListener(chain));
         chain.addListener(new ConsecutiveNewLineStateChainingListener(chain));
-        chain.addListener(new TextOnNewLineStateChainingListener(chain));
         chain.addListener(new XWikiSyntaxChainingRenderer(chain));
     }
 }

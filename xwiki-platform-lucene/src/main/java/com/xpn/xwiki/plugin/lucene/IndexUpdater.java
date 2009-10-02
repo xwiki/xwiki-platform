@@ -77,9 +77,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private int indexingInterval = 30000;
 
     /**
-     * volatile forces the VM to check for changes every time the variable is accessed
-     * since it is not otherwise changed in the main loop the VM could "optimize" 
-     * the check out and possibly never exit
+     * volatile forces the VM to check for changes every time the variable is accessed since it is not otherwise changed
+     * in the main loop the VM could "optimize" the check out and possibly never exit
      */
     private volatile boolean exit = false;
 
@@ -90,10 +89,10 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private XWikiDocumentQueue queue = new XWikiDocumentQueue();
 
     /**
-     * Soft threshold after which no more documents will be added to the indexing queue. When the
-     * queue size gets larger than this value, the index rebuilding thread will sleep chuks of
-     * {@link IndexRebuilder#retryInterval} milliseconds until the queue size will get back bellow
-     * this threshold. This does not affect normal indexing through wiki updates.
+     * Soft threshold after which no more documents will be added to the indexing queue. When the queue size gets larger
+     * than this value, the index rebuilding thread will sleep chuks of {@link IndexRebuilder#retryInterval}
+     * milliseconds until the queue size will get back bellow this threshold. This does not affect normal indexing
+     * through wiki updates.
      */
     public int maxQueueSize = 1000;
 
@@ -122,7 +121,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     /**
      * Main loop. Polls the queue for documents to be indexed.
-     *
+     * 
      * @see java.lang.Runnable#run()
      */
     public void run()
@@ -177,8 +176,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                                     toDelete.add(id);
                                 } else {
                                     if (LOG.isDebugEnabled()) {
-                                        LOG.debug("Found " + id
-                                            + " already in list while adding it to remove list");
+                                        LOG.debug("Found " + id + " already in list while adding it to remove list");
                                     }
                                 }
                             }
@@ -188,8 +186,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         LOG.debug("Adding " + id + " to index list");
                         if (toIndex.containsKey(id)) {
                             if (LOG.isDebugEnabled()) {
-                                LOG.debug("Found " + id
-                                    + " already in list while adding it to index list");
+                                LOG.debug("Found " + id + " already in list while adding it to index list");
                             }
                             toIndex.remove(id);
                         }
@@ -234,8 +231,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         IndexData data = entry.getValue();
 
                         try {
-                            XWikiDocument doc =
-                                this.xwiki.getDocument(data.getFullName(), context);
+                            XWikiDocument doc = this.xwiki.getDocument(data.getFullName(), context);
 
                             if (data.getLanguage() != null && !data.getLanguage().equals("")) {
                                 doc = doc.getTranslatedDocument(data.getLanguage(), context);
@@ -289,8 +285,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     }
 
     /**
-     * Opens the index reader and searcher used for finding and deleting old versions of indexed
-     * documents.
+     * Opens the index reader and searcher used for finding and deleting old versions of indexed documents.
      */
     private synchronized void openSearcher()
     {
@@ -335,9 +330,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 retval.add(new Integer(hits.id(i)));
             }
         } catch (Exception e) {
-            LOG.error(String.format(
-                "Error looking for old versions of document [%s] with query [%s]", data, query),
-                e);
+            LOG.error(String.format("Error looking for old versions of document [%s] with query [%s]", data, query), e);
         }
 
         return retval;
@@ -361,7 +354,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 LOG.debug("successfully opened index writer : " + indexDir);
             }
         } catch (IOException e) {
-        	throw new IOExceptionWithCause("Error opening Lucene Index for writing at " + indexDir, e);
+            throw new IOExceptionWithCause("Error opening Lucene Index for writing at " + indexDir, e);
         }
     }
 
@@ -391,8 +384,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         }
     }
 
-    private void addToIndex(IndexData data, XWikiDocument doc, XWikiContext context)
-        throws IOException
+    private void addToIndex(IndexData data, XWikiDocument doc, XWikiContext context) throws IOException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("addToIndex: " + data);
@@ -452,11 +444,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             }
         }
 
-        this.indexingInterval =
-            1000 * Integer
-                .parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
-        this.maxQueueSize =
-            Integer.parseInt(config.getProperty(LucenePlugin.PROP_MAX_QUEUE_SIZE, "1000"));
+        this.indexingInterval = 1000 * Integer.parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
+        this.maxQueueSize = Integer.parseInt(config.getProperty(LucenePlugin.PROP_MAX_QUEUE_SIZE, "1000"));
 
         // Note: There's no need to open the Searcher here (with a call to
         // openSearcher()) as each task needing it will open it itself.
@@ -506,8 +495,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         if (document != null && attachment != null && context != null) {
             this.queue.add(new AttachmentData(document, attachment, context));
         } else {
-            LOG.error("invalid parameters given to add: " + document + ", " + attachment + ", "
-                + context);
+            LOG.error("invalid parameters given to add: " + document + ", " + attachment + ", " + context);
         }
     }
 

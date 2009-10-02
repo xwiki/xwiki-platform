@@ -72,13 +72,13 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
      */
     public String getId()
     {
-        return String.format("%s %s %s %s", getClass(), visitStats.getName(), visitStats
-            .getUniqueID(), visitStats.getCookie());
+        return String.format("%s %s %s %s", getClass(), this.visitStats.getName(), this.visitStats.getUniqueID(),
+            this.visitStats.getCookie());
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
      */
     public void store(List<XWikiStatsStoreItem> stats)
@@ -89,7 +89,7 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
         VisitStatsStoreItem lastItem = (VisitStatsStoreItem) stats.get(stats.size() - 1);
         VisitStats newVisitStats = lastItem.visitStats;
 
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
+        XWikiHibernateStore store = this.context.getWiki().getHibernateStore();
         if (store == null) {
             return;
         }
@@ -99,16 +99,15 @@ public class VisitStatsStoreItem extends AbstractStatsStoreItem
             // other one because the ID info have changed
             if (oldVisitStats != null) {
                 try {
-                    store.deleteXWikiCollection(oldVisitStats, context, true, true);
+                    store.deleteXWikiCollection(oldVisitStats, this.context, true, true);
                 } catch (Exception e) {
                     if (LOG.isWarnEnabled()) {
-                        LOG.warn("Failed to delete old visit statistics object from database ["
-                            + getId() + "]");
+                        LOG.warn("Failed to delete old visit statistics object from database [" + getId() + "]");
                     }
                 }
             }
 
-            store.saveXWikiCollection(newVisitStats, context, true);
+            store.saveXWikiCollection(newVisitStats, this.context, true);
         } catch (XWikiException e) {
             LOG.error("Failed to save visit statictics object [" + getId() + "]");
         }

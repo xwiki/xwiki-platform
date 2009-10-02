@@ -19,13 +19,6 @@
  */
 package org.xwiki.rendering.internal.macro.groovy;
 
-import java.io.PrintWriter;
-import java.io.Writer;
-
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro;
@@ -56,25 +49,5 @@ public class GroovyMacro extends AbstractJSR223ScriptMacro<JSR223ScriptMacroPara
     public GroovyMacro()
     {
         super("Groovy", DESCRIPTION, new DefaultContentDescriptor(CONTENT_DESCRIPTION));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.script.AbstractJSR223ScriptMacro#eval(java.lang.String,
-     *      javax.script.ScriptEngine, javax.script.ScriptContext)
-     */
-    @Override
-    protected Object eval(String content, ScriptEngine engine, ScriptContext scriptContext) throws ScriptException
-    {
-        // There is a bug in groovy that make it not take care of configured writer when there is something in
-        // "context"
-
-        Writer writer = scriptContext.getWriter();
-
-        scriptContext.setAttribute("out", (writer instanceof PrintWriter) ? writer : new PrintWriter(writer, true),
-            ScriptContext.ENGINE_SCOPE);
-
-        return super.eval(content, engine, scriptContext);
     }
 }

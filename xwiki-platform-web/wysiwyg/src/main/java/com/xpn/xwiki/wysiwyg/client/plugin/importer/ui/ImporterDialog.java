@@ -34,6 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.WysiwygServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.TabPanelSelector;
 import com.xpn.xwiki.wysiwyg.client.widget.ComplexDialogBox;
 
@@ -83,10 +84,9 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
     /**
      * Default constructor.
      * 
-     * @param space current space.
-     * @param page current page.
+     * @param wysiwygConfig the wysiwyg configuration object.
      */
-    public ImporterDialog(String space, String page)
+    public ImporterDialog(Config wysiwygConfig)
     {
         // Dialog box.
         super(false, true);
@@ -95,7 +95,13 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
         addStyleName("xImporterDialog");
         getHeader().clear();
 
-        this.fullPageName = space + "." + page;
+        // Read current wysiwyg configuration.
+        String currentSpace = wysiwygConfig.getParameter("space", "Main");
+        String currentPage = wysiwygConfig.getParameter("page", "WebHome");
+        boolean openOfficeServerConnected =
+            wysiwygConfig.getParameter("openofficeServerConnected", "false").equals("true");
+
+        this.fullPageName = currentSpace + "." + currentPage;
 
         // Main container panel.
         mainPanel = new FlowPanel();
@@ -108,8 +114,8 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
         tabPanel.addSelectionHandler(tabPanelSelector);
         clipboardImportTab = new ClipboardImportTab();
         tabPanel.add(clipboardImportTab, Strings.INSTANCE.importerClipboardTabCaption());
-        String uploadUrl = "../../upload/" + space + "/" + page;
-        fileImportTab = new FileImportTab(uploadUrl, this);
+        String uploadUrl = "../../upload/" + currentSpace + "/" + currentPage;
+        fileImportTab = new FileImportTab(openOfficeServerConnected, uploadUrl, this);
         tabPanel.add(fileImportTab, Strings.INSTANCE.importerFileTabCaption());
         tabPanel.selectTab(0);
         tabPanel.addStyleName("xImporterTabPanel");
@@ -159,7 +165,7 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
         // several namespaces. But the document itself doesn't contain the namespace definitions, which causes
         // the HTMLCleaner (the DomSerializer) to fail while performing it's operations. As a workaround we
         // force HTMLCleaner to avoid parsing of namespace information.
-        params.put("namespacesAware", "false");
+        params.put("namespacesAware", Boolean.toString(false));
         return params;
     }
 

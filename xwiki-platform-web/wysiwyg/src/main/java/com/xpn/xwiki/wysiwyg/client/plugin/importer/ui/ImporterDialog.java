@@ -244,6 +244,14 @@ public class ImporterDialog extends ComplexDialogBox implements AsyncCallback<St
      */
     public String getResult()
     {
-        return result;
+        return this.result;
+    }
+    
+    /**
+     * Resets the importer dialog for a new import operation.
+     */
+    public void reset()
+    {
+        this.result = null;
     }
 }

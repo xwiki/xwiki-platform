@@ -118,6 +118,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickHandler, Clos
         getTextArea().setFocus(true);
         if (importerDialog.getResult() != null) {
             getTextArea().getCommandManager().execute(Command.INSERT_HTML, importerDialog.getResult());
+            importerDialog.reset();
         }
     }
 

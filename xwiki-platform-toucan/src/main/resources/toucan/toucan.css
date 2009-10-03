@@ -360,6 +360,16 @@ table td {
     text-align: left;
 }
 
+/* Special formatting for YUI trees */
+.ygtvitem table {
+  border: none !important;
+  margin: 0 !important;
+}
+.ygtvitem td {
+  border: none !important;
+  padding: 0 !important;
+}
+
 /* special formatting of a wiki table */
 .mceContentBody table,
     .main table {

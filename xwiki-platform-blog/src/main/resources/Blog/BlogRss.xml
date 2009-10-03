@@ -30,5 +30,7 @@
 #getTargetBlog($blogDoc)
 #getBlogEntries($blogDoc $entries)
 #set($entries = $xwiki.wrapDocs($entries))
-#displayBlogRss($blogDoc $entries)</content>
+#if("$!{request.xpage}" == 'plain')
+  #displayBlogRss($blogDoc $entries)
+#end</content>
 </xwikidoc>

@@ -29,5 +29,7 @@
 ##
 #getGlobalBlogEntries($entries)
 #set($entries = $xwiki.wrapDocs($entries))
-#displayGlobalBlogRss($entries)</content>
+#if("$!{request.xpage}" == 'plain')
+  #displayGlobalBlogRss($entries)
+#end</content>
 </xwikidoc>

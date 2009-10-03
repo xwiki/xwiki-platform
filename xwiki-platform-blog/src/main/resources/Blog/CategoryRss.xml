@@ -40,5 +40,7 @@
 #getEntriesForCategory($tempCategoryDoc.fullName $entries $totalEntries)
 #set($categoryDoc = $tempCategoryDoc)
 #set($entries = $xwiki.wrapDocs($entries))
-#displayBlogCategoryRss($categoryDoc $categoryDoc $entries)</content>
+#if("$!{request.xpage}" == 'plain')
+  #displayBlogCategoryRss($categoryDoc $categoryDoc $entries)
+#end</content>
 </xwikidoc>

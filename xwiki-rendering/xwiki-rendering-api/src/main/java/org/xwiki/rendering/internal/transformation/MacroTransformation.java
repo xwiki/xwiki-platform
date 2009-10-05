@@ -173,8 +173,9 @@ public class MacroTransformation extends AbstractTransformation
                 return false;
             }
 
-            newBlocks = ((Macro<Object>) macroHolder.macro).execute(macroParameters, 
-                normalizeContent(macroHolder.macroBlock.getContent()), context);
+            newBlocks =
+                ((Macro<Object>) macroHolder.macro).execute(macroParameters,
+                    normalizeContent(macroHolder.macroBlock.getContent()), context);
         } catch (Throwable e) {
             // The Macro failed to execute.
             // The macro will not be executed and we generate an error message instead of the macro
@@ -201,11 +202,19 @@ public class MacroTransformation extends AbstractTransformation
 
     /**
      * Strip a single leading and trailing new line if any. We do this since we want that:
-     * <pre><code>{{macro}}
+     * 
+     * <pre>
+     * <code>{{macro}}
      * content
-     * {{/macro}}</code></pre>
+     * {{/macro}}</code>
+     * </pre>
+     * 
      * be equivalent to:
-     * <pre><code>{{macro}}content{{/macro}}</code></pre>
+     * 
+     * <pre>
+     * <code>{{macro}}content{{/macro}}</code>
+     * </pre>
+     * 
      * This is to make it easier for the user to not introduce significant new lines by error.
      * 
      * @param originalContent the content to normalize
@@ -220,7 +229,7 @@ public class MacroTransformation extends AbstractTransformation
             // Remove leading New Line
             if (normalizedContent.charAt(0) == '\n') {
                 normalizedContent = normalizedContent.substring(1);
-            } else if (normalizedContent.length() > 1 && normalizedContent.charAt(0) == '\r' 
+            } else if (normalizedContent.length() > 1 && normalizedContent.charAt(0) == '\r'
                 && normalizedContent.charAt(1) == '\n') 
             {
                 normalizedContent = normalizedContent.substring(2);

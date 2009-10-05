@@ -22,23 +22,25 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImporterListener;
+import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.util.Selectable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserver;
 
 /**
- * Office Importer UI tab for importing clipboard content.
+ * Office Importer for importing clipboard content.
  * 
  * @version $Id$
  */
-public class ClipboardImportTab extends Composite implements Selectable, LoadHandler
+public class ClipboardImporter extends AbstractImporter implements Selectable, LoadHandler, AsyncCallback<String>
 {
     /**
      * The text area where the user can paste his content.
@@ -62,11 +64,21 @@ public class ClipboardImportTab extends Composite implements Selectable, LoadHan
 
     /**
      * Default constructor.
+     * 
+     * @param wysiwygConfig wysiwyg configuration.
+     * @param importerListener importer listener.
      */
-    public ClipboardImportTab()
+    public ClipboardImporter(Config wysiwygConfig, ImporterListener importerListener)
     {
-        // Main container panel.
-        FlowPanel mainPanel = new FlowPanel();
+        super(wysiwygConfig, importerListener);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected Panel createContentPanel()
+    {
+        Panel contentPanel = new FlowPanel();
 
         // Info label.
         Panel infoLabel = new FlowPanel();
@@ -75,36 +87,53 @@ public class ClipboardImportTab extends Composite implements Selectable, LoadHan
         InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
         mandatoryLabel.addStyleName("xMandatory");
         infoLabel.add(mandatoryLabel);
+        contentPanel.add(infoLabel);
+
+        // Help label.
         Label helpLabel = new Label(Strings.INSTANCE.importerClipboardTabHelpLabel());
         helpLabel.setStyleName("xHelpLabel");
-        mainPanel.add(infoLabel);
-        mainPanel.add(helpLabel);
+        contentPanel.add(helpLabel);
 
         // Text area panel.
         textArea = new RichTextArea();
         textArea.addLoadHandler(this);
         textArea.addStyleName("xImporterClipboardTabEditor");
         selectionPreserver = new SelectionPreserver(textArea);
-        mainPanel.add(textArea);
+        contentPanel.add(textArea);
 
-        // Finalize.
-        initWidget(mainPanel);
+        return contentPanel;
     }
 
     /**
-     * Clears the content of the text area.
+     * {@inheritDoc}
      */
-    public void clearTextArea()
+    protected void onImportButtonClick()
     {
+        String htmlPaste = textArea.getHTML().trim();
+        if (!htmlPaste.equals("")) {
+            setBusy(true);
+            wysiwygService.cleanOfficeHTML(htmlPaste, "wysiwyg", getHTMLCleaningParams(), this);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onFailure(Throwable thrown)
+    {
+        this.importerListener.onFailure(thrown.getMessage());
+        setBusy(false);
         textArea.setHTML("");
     }
 
     /**
-     * @return the pasted HTML
+     * {@inheritDoc}
      */
-    public String getHtmlPaste()
+    public void onSuccess(String result)
     {
-        return textArea.getHTML();
+        this.importerListener.onSuccess(result);
+        setBusy(false);
+        textArea.setHTML("");
     }
 
     /**

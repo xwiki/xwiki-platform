@@ -21,8 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.CloseEvent;
-import com.google.gwt.event.logical.shared.CloseHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
@@ -40,7 +39,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
  * 
  * @version $Id$
  */
-public class ImporterPlugin extends AbstractPlugin implements ClickHandler, CloseHandler<CompositeDialogBox>
+public class ImporterPlugin extends AbstractPlugin implements ClickHandler, ImporterListener
 {
     /**
      * Import button placed on the tool bar.
@@ -50,7 +49,7 @@ public class ImporterPlugin extends AbstractPlugin implements ClickHandler, Clos
     /**
      * Importer dialog used to communicate with the user.
      */
-    private ImporterDialog importerDialog;
+    private CompositeDialogBox importerDialog;
 
     /**
      * The toolbar extension used to add the link buttons to the toolbar.
@@ -107,30 +106,33 @@ public class ImporterPlugin extends AbstractPlugin implements ClickHandler, Clos
             getImporterDialog().center();
         }
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CloseHandler#onClose(CloseEvent)
-     */
-    public void onClose(CloseEvent<CompositeDialogBox> event)
-    {
-        getTextArea().setFocus(true);
-        if (importerDialog.getResult() != null) {
-            getTextArea().getCommandManager().execute(Command.INSERT_HTML, importerDialog.getResult());
-            importerDialog.reset();
-        }
-    }
-
+    
     /**
      * @return The importer dialog instance.
      */
-    private ImporterDialog getImporterDialog()
+    private CompositeDialogBox getImporterDialog()
     {
         if (null == importerDialog) {            
-            importerDialog = new ImporterDialog(getConfig());
-            saveRegistration(importerDialog.addCloseHandler(this));
+            importerDialog = new ImporterDialog(getConfig(), this);
         }
         return importerDialog;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onFailure(String error)
+    {
+        Window.alert(error);
+        importerDialog.hide();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void onSuccess(String result)
+    {
+        getTextArea().getCommandManager().execute(Command.INSERT_HTML, result); 
+        importerDialog.hide();
+    }        
 }

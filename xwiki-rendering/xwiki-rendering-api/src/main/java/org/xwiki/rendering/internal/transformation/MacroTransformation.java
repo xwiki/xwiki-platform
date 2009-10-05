@@ -74,7 +74,7 @@ public class MacroTransformation extends AbstractTransformation
      */
     @Requirement
     private MacroManager macroManager;
-    
+
     /**
      * Used to populate automatically macros parameters classes with parameters specified in the Macro Block.
      */
@@ -159,9 +159,8 @@ public class MacroTransformation extends AbstractTransformation
             Object macroParameters;
             try {
                 macroParameters = macroHolder.macro.getDescriptor().getParametersBeanClass().newInstance();
-                // TODO: BeanUtils shouldn't be exposed to users of the Macro
-                beanManager.populate(macroParameters, macroHolder.macroBlock.getParameters());
-            } catch (Exception e) {
+                this.beanManager.populate(macroParameters, macroHolder.macroBlock.getParameters());
+            } catch (Throwable e) {
                 // One macro parameter was invalid.
                 // The macro will not be executed and we generate an error message instead of the macro
                 // execution result.
@@ -170,12 +169,13 @@ public class MacroTransformation extends AbstractTransformation
                 getLogger().debug(
                     "Invalid macro parameter for macro [" + macroHolder.macroBlock.getId() + "]. Internal error: ["
                         + e.getMessage() + "]");
+
                 return false;
             }
 
             newBlocks = ((Macro<Object>) macroHolder.macro).execute(macroParameters, 
                 normalizeContent(macroHolder.macroBlock.getContent()), context);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // The Macro failed to execute.
             // The macro will not be executed and we generate an error message instead of the macro
             // execution result.
@@ -184,6 +184,7 @@ public class MacroTransformation extends AbstractTransformation
             getLogger().debug(
                 "Failed to execute macro [" + macroHolder.macroBlock.getId() + "]. Internal error [" + e.getMessage()
                     + "]");
+
             return false;
         }
 
@@ -226,14 +227,14 @@ public class MacroTransformation extends AbstractTransformation
             } else if (normalizedContent.charAt(0) == '\r') {
                 normalizedContent = normalizedContent.substring(1);
             }
-            
+
             // Remove trailing New Line
             normalizedContent = StringUtils.chomp(normalizedContent);
         }
-        
+
         return normalizedContent;
     }
-    
+
     /**
      * @return the macro with the highest priority for the passed syntax or null if no macro is found
      */
@@ -264,8 +265,8 @@ public class MacroTransformation extends AbstractTransformation
 
     private Block wrapInMacroMarker(MacroBlock macroBlockToWrap, List<Block> newBlocks)
     {
-        return new MacroMarkerBlock(macroBlockToWrap.getId(), macroBlockToWrap
-            .getParameters(), macroBlockToWrap.getContent(), newBlocks, macroBlockToWrap.isInline());
+        return new MacroMarkerBlock(macroBlockToWrap.getId(), macroBlockToWrap.getParameters(),
+            macroBlockToWrap.getContent(), newBlocks, macroBlockToWrap.isInline());
     }
 
     private void generateError(MacroBlock macroToReplace, String message, String description)
@@ -279,10 +280,9 @@ public class MacroTransformation extends AbstractTransformation
         Block descriptionBlock = new VerbatimBlock(description, macroToReplace.isInline());
 
         if (macroToReplace.isInline()) {
-            errorBlocks.add(new FormatBlock(Arrays.<Block> asList(new WordBlock(message)), Format.NONE, 
+            errorBlocks.add(new FormatBlock(Arrays.<Block> asList(new WordBlock(message)), Format.NONE,
                 errorBlockParams));
-            errorBlocks.add(new FormatBlock(Arrays.asList(descriptionBlock), Format.NONE, 
-                errorDescriptionBlockParams));
+            errorBlocks.add(new FormatBlock(Arrays.asList(descriptionBlock), Format.NONE, errorDescriptionBlockParams));
         } else {
             errorBlocks.add(new GroupBlock(Arrays.<Block> asList(new WordBlock(message)), errorBlockParams));
             errorBlocks.add(new GroupBlock(Arrays.asList(descriptionBlock), errorDescriptionBlockParams));

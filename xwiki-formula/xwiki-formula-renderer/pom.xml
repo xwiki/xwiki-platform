@@ -45,6 +45,7 @@
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>
+
     <!-- Other XWiki modules -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -53,9 +54,15 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-component-default</artifactId>
+      <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-container-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+
     <!-- SnuggleTeX is a LaTeX to XHTML+MathML converter, which can be combined with JEuclid to transform equations into images -->
     <dependency>
       <groupId>uk.ac.ed.ph.snuggletex</groupId>

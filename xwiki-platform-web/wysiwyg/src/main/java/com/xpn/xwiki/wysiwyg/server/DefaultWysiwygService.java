@@ -302,14 +302,8 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                 getXWikiContext().setDatabase(wikiName);
             }
             spaceNamesList = getXWikiContext().getWiki().getSpaces(getXWikiContext());
-            // get the blacklisted spaces from the session as they've been set in xwikivars.vm, when the page edited
-            // with this wysiwyg was loaded
-            // TODO: remove this when the public API will exclude them by default, or they'll be set in the config
-            List<String> blacklistedSpaces =
-                (ArrayList<String>) getThreadLocalRequest().getSession().getAttribute("blacklistedSpaces");
-            if (blacklistedSpaces != null && blacklistedSpaces.size() > 0) {
-                spaceNamesList.removeAll(blacklistedSpaces);
-            }
+            // remove the blacklisted spaces from the all spaces list
+            spaceNamesList.removeAll(getBlackListedSpaces());
             Collections.sort(spaceNamesList);
         } catch (XWikiException e) {
             e.printStackTrace();
@@ -319,6 +313,26 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             }
         }
         return spaceNamesList;
+    }
+
+    /**
+     * Helper function to retrieve the blacklisted spaces in this session, as they've been set in xwikivars.vm, when the
+     * page edited with this wysiwyg was loaded. <br />
+     * TODO: remove this when the public API will exclude them by default, or they'll be set in the config.
+     * 
+     * @return the list of blacklisted spaces from the session
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> getBlackListedSpaces()
+    {
+        // get the blacklisted spaces from the session
+        List<String> blacklistedSpaces =
+            (ArrayList<String>) getThreadLocalRequest().getSession().getAttribute("blacklistedSpaces");
+        // always return a list, even if blacklisted spaces variable wasn't set
+        if (blacklistedSpaces == null) {
+            blacklistedSpaces = new ArrayList<String>();
+        }
+        return blacklistedSpaces;
     }
 
     /**
@@ -379,12 +393,31 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         throws XWikiGWTException
     {
         try {
+            String quote = "'";
+            String doubleQuote = "''";
             // FIXME: this fullname comparison with the keyword does not contain the wiki name
-            String escapedKeyword = keyword.replaceAll("'", "''").toLowerCase();
+            String escapedKeyword = keyword.replaceAll(quote, doubleQuote).toLowerCase();
+            // add condition for the doc to not be in the list of blacklisted spaces.
+            // TODO: might be a pb with scalability of this
+            String noBlacklistedSpaces = "";
+            List<String> blackListedSpaces = getBlackListedSpaces();
+            if (!blackListedSpaces.isEmpty()) {
+                StringBuffer spacesList = new StringBuffer();
+                for (String bSpace : blackListedSpaces) {
+                    if (spacesList.length() > 0) {
+                        spacesList.append(", ");
+                    }
+                    spacesList.append(quote);
+                    spacesList.append(bSpace.replaceAll(quote, doubleQuote));
+                    spacesList.append(quote);
+                }
+                noBlacklistedSpaces = "doc.web not in (" + spacesList.toString() + ")";
+            }
             List<XWikiDocument> docs =
                 getXWikiContext().getWiki().search(
-                    "select distinct doc from XWikiDocument as doc where lower(doc.title) like '%" + escapedKeyword
-                        + "%' or lower(doc.fullName) like '%" + escapedKeyword + "%'", count, start, getXWikiContext());
+                    "select distinct doc from XWikiDocument as doc where " + noBlacklistedSpaces
+                        + " and (lower(doc.title) like '%" + escapedKeyword + "%' or lower(doc.fullName) like '%"
+                        + escapedKeyword + "%')", count, start, getXWikiContext());
             return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
             throw getXWikiGWTException(e);
@@ -406,7 +439,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         for (XWikiDocument doc : docs) {
             com.xpn.xwiki.gwt.api.client.Document xwikiDoc = new com.xpn.xwiki.gwt.api.client.Document();
             xwikiDoc.setFullName(doc.getFullName());
-            xwikiDoc.setTitle(doc.getDisplayTitle(getXWikiContext()));
+            xwikiDoc.setTitle(doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext()));
             // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
             xwikiDoc.setUploadURL(doc.getURL(VIEW_ACTION, getXWikiContext()));
             results.add(xwikiDoc);

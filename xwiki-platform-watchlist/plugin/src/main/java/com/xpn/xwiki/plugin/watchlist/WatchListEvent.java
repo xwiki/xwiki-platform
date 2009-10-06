@@ -55,7 +55,17 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * Suffix used to insert images later in HTML diffs.
      */
     private static final String HTML_IMG_PLACEHOLDER_SUFFIX = "_WATCHLIST_IMG_PLACEHOLDER";
+    
+    /**
+     * Prefix used to insert the metadata icon later in HTML diffs.
+     */
+    private static final String HTML_IMG_METADATA_PREFIX = "metadata";
 
+    /**
+     * Prefix used to insert the attachment icon later in HTML diffs.
+     */
+    private static final String HTML_IMG_ATTACHMENT_PREFIX = "attach";
+    
     /**
      * Event hashcode.
      */
@@ -418,16 +428,20 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     mainDiv.addElement(prefix + HTML_IMG_PLACEHOLDER_SUFFIX);
                     mainDiv.addElement(objectName);
                     for (ObjectDiff oDiff : oList) {
-                        if (!StringUtils.isBlank(oDiff.getPropName())) {
+                        String propDiff =
+                            diff.getDifferencesAsHTML(oDiff.getPrevValue().toString(), oDiff.getNewValue().toString(), 
+                                false);
+                        if (!StringUtils.isBlank(oDiff.getPropName()) && !StringUtils.isBlank(propDiff)) {
                             Div propDiv = createDiffDiv("propDiffContainer");
                             Span propNameSpan = createDiffSpan("propName");                            
                             propNameSpan.addElement(oDiff.getPropName() + propSeparator);
-                            propDiv.addElement(StringUtils.removeEnd(oDiff.getPropType(), "Class").toLowerCase() 
-                                + HTML_IMG_PLACEHOLDER_SUFFIX);                            
+                            String shortPropType = StringUtils.removeEnd(oDiff.getPropType(), "Class").toLowerCase();
+                            if (StringUtils.isBlank(shortPropType)) {
+                                // When the diff shows a property that has been deleted, its type is not available.
+                                shortPropType = HTML_IMG_METADATA_PREFIX;
+                            }
+                            propDiv.addElement(shortPropType + HTML_IMG_PLACEHOLDER_SUFFIX);                            
                             propDiv.addElement(propNameSpan);
-                            String propDiff =
-                                diff.getDifferencesAsHTML(oDiff.getPrevValue().toString(), oDiff.getNewValue()
-                                    .toString(), false);
                             Div propDiffDiv = createDiffDiv("propDiff");
                             propDiffDiv.addElement(propDiff);
                             propDiv.addElement(propDiffDiv);
@@ -470,7 +484,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                                 
                 for (AttachmentDiff aDiff : attachDiffs) {
                     Div attachmentDiv = createDiffDiv("attachmentDiff");
-                    attachmentDiv.addElement("attach" + HTML_IMG_PLACEHOLDER_SUFFIX);
+                    attachmentDiv.addElement(HTML_IMG_ATTACHMENT_PREFIX + HTML_IMG_PLACEHOLDER_SUFFIX);
                     attachmentDiv.addElement(aDiff.toString());
                     result.append(attachmentDiv);
                 }
@@ -480,7 +494,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                 
                 for (MetaDataDiff mDiff : metaDiffs) {
                     Div metaDiv = createDiffDiv("metaDiff");
-                    metaDiv.addElement("metadata" + HTML_IMG_PLACEHOLDER_SUFFIX);
+                    metaDiv.addElement(HTML_IMG_METADATA_PREFIX + HTML_IMG_PLACEHOLDER_SUFFIX);
                     metaDiv.addElement(mDiff.toString());
                     result.append(metaDiv);
                 }

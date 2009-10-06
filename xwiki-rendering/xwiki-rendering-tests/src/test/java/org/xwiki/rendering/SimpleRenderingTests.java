@@ -51,6 +51,7 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("group/group9", false);
         suite.addTestsFromResource("group/group10", false);
         suite.addTestsFromResource("group/group11", false);
+        suite.addTestsFromResource("group/group12", false);
 
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);

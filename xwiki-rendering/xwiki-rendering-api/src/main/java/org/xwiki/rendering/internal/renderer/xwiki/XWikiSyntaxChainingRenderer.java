@@ -22,7 +22,6 @@ package org.xwiki.rendering.internal.renderer.xwiki;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.internal.renderer.printer.XWikiSyntaxEscapeWikiPrinter;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
@@ -51,7 +50,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
     private XWikiSyntaxImageRenderer imageRenderer;
 
-    private XWikiMacroPrinter macroPrinter;
+    private XWikiSyntaxMacroRenderer macroPrinter;
 
     // Custom States
 
@@ -67,7 +66,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
         this.linkRenderer = new XWikiSyntaxLinkRenderer();
         this.imageRenderer = new XWikiSyntaxImageRenderer();
-        this.macroPrinter = new XWikiMacroPrinter();
+        this.macroPrinter = new XWikiSyntaxMacroRenderer();
     }
 
     // State
@@ -104,7 +103,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
         return this.imageRenderer;
     }
 
-    private XWikiMacroPrinter getMacroPrinter()
+    private XWikiSyntaxMacroRenderer getMacroPrinter()
     {
         return this.macroPrinter;
     }
@@ -362,9 +361,9 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
     {
         if (!isInline) {
             printEmptyLine();
-            print(getMacroPrinter().print(id, parameters, content));
+            print(getMacroPrinter().renderMacro(id, parameters, content));
         } else {
-            getXWikiPrinter().printInlineMacro(getMacroPrinter().print(id, parameters, content));
+            getXWikiPrinter().printInlineMacro(getMacroPrinter().renderMacro(id, parameters, content));
         }
     }
 
@@ -525,7 +524,7 @@ public class XWikiSyntaxChainingRenderer extends AbstractChainingPrintRenderer i
 
         popPrinter();
 
-        print(getMacroPrinter().print(name, parameters, content));
+        print(getMacroPrinter().renderMacro(name, parameters, content));
     }
 
     /**

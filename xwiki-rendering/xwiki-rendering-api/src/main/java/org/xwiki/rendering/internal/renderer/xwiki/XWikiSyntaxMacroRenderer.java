@@ -17,21 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.renderer;
+package org.xwiki.rendering.internal.renderer.xwiki;
 
 import java.util.Map;
+
+import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 
 /**
  * Generates XWiki Syntax for a Macro Block.
  * 
  * @version $Id$
- * @since 1.5RC1
+ * @since 2.0.1
  */
-public class XWikiMacroPrinter
+public class XWikiSyntaxMacroRenderer
 {
     private ParametersPrinter parametersPrinter = new ParametersPrinter();
 
-    public String print(String id, Map<String, String> parameters, String content)
+    public String renderMacro(String id, Map<String, String> parameters, String content)
     {
         StringBuffer buffer = new StringBuffer();
 
@@ -42,7 +44,7 @@ public class XWikiMacroPrinter
         // Print parameters
         if (!parameters.isEmpty()) {
             buffer.append(' ');
-            buffer.append(printParameters(parameters));
+            buffer.append(renderMacroParameters(parameters));
         }
 
         // Print content and end macro
@@ -57,8 +59,8 @@ public class XWikiMacroPrinter
         return buffer.toString();
     }
 
-    public String printParameters(Map<String, String> parameters)
+    public String renderMacroParameters(Map<String, String> parameters)
     {
-        return this.parametersPrinter.print(parameters, '~');
+        return this.parametersPrinter.print(parameters, '~').replace("}}", "~}~}");
     }
 }

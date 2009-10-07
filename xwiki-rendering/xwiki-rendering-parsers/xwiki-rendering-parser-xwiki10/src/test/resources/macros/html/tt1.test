@@ -1,10 +1,10 @@
 .#-----------------------------------------------------
 .input|xwiki/1.0
 .#-----------------------------------------------------
-<span param="value">some content</span>
-<span>some content</span>
-<span/>
+<tt param="value">some content</tt>
+<tt>some content</tt>
+<tt/>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
-(% param="value" %)some content(%%) some content
+{{html clean="false" wiki="true"}}<tt param="value">some content</tt>{{/html}} ##some content##

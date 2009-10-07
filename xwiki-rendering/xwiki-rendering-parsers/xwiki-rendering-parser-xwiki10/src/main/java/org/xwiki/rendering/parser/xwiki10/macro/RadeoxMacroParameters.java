@@ -24,6 +24,8 @@ import java.util.Map;
 
 public class RadeoxMacroParameters extends LinkedHashMap<String, RadeoxMacroParameter>
 {
+    private static final long serialVersionUID = 1L;
+
     public RadeoxMacroParameters()
     {
 

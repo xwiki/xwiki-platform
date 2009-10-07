@@ -52,11 +52,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public String toXMLString()
     {
-        try {
-            return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")).format(getValue());
-        } catch (Exception e) {
-            return "";
-        }
+        return toText();
     }
 
     @Override
@@ -68,9 +64,11 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public String toText()
     {
-        Date d = (Date) getValue();
-
-        return (d == null) ? "" : d.toString();
+        if (getValue() == null) {
+            return "";
+        }
+        
+        return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")).format(getValue());        
     }
 
     @Override

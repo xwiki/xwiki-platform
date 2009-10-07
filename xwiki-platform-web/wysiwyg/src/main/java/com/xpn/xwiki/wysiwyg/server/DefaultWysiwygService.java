@@ -330,7 +330,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             (ArrayList<String>) getThreadLocalRequest().getSession().getAttribute("blacklistedSpaces");
         // always return a list, even if blacklisted spaces variable wasn't set
         if (blacklistedSpaces == null) {
-            blacklistedSpaces = new ArrayList<String>();
+            blacklistedSpaces = Collections.emptyList();
         }
         return blacklistedSpaces;
     }
@@ -411,12 +411,12 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                     spacesList.append(bSpace.replaceAll(quote, doubleQuote));
                     spacesList.append(quote);
                 }
-                noBlacklistedSpaces = "doc.web not in (" + spacesList.toString() + ")";
+                noBlacklistedSpaces = "doc.web not in (" + spacesList.toString() + ") and ";
             }
             List<XWikiDocument> docs =
                 getXWikiContext().getWiki().search(
                     "select distinct doc from XWikiDocument as doc where " + noBlacklistedSpaces
-                        + " and (lower(doc.title) like '%" + escapedKeyword + "%' or lower(doc.fullName) like '%"
+                        + "(lower(doc.title) like '%" + escapedKeyword + "%' or lower(doc.fullName) like '%"
                         + escapedKeyword + "%')", count, start, getXWikiContext());
             return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {

@@ -2050,7 +2050,11 @@ public class Document extends Api
      */
     public void rename(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
-        this.doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
+        if (hasAccessLevel("delete")
+            && this.context.getWiki().checkAccess("edit",
+                this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+            this.doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
+        }
     }
 
     /**

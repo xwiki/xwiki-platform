@@ -32,6 +32,7 @@ org.xwiki.rendering.internal.parser.xwiki10.UnescapeFilter
 org.xwiki.rendering.internal.parser.xwiki10.HTMLFilter
 org.xwiki.rendering.internal.parser.xwiki10.macro.DivHTMLElementConverter
 org.xwiki.rendering.internal.parser.xwiki10.macro.BrHTMLElementConverter
+org.xwiki.rendering.internal.parser.xwiki10.macro.TeletypeHTMLElementConverter
 org.xwiki.rendering.internal.parser.xwiki10.UnescapeHTMLFilter
 org.xwiki.rendering.internal.parser.xwiki10.StandaloneNewLineCleaningFilter
 org.xwiki.rendering.internal.parser.xwiki10.SpacesCleaningFilter

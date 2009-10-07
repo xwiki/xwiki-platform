@@ -79,7 +79,7 @@ public class SectionSyntaxFilter extends AbstractFilter implements Initializable
             CleanUtil.setTrailingNewLines(result, 2);
 
             String headerSyntax =
-                filterContext.addProtectedContent(StringUtils.repeat("=", (matcher.group(2).length() + 1) / 2));
+                filterContext.addProtectedContent(StringUtils.repeat("=", (matcher.group(2).length() + 1) / 2), false);
 
             String headerContent = headerSyntax + ' ' + matcher.group(4) + ' ' + headerSyntax;
 

@@ -97,18 +97,6 @@ public class FilterContext
      * process.
      * 
      * @param content the content to protect/register.
-     * @return the content identifier to insert in place of provided content.
-     */
-    public String addProtectedContent(String content)
-    {
-        return addProtectedContent(content, false);
-    }
-
-    /**
-     * Register a content and return the corresponding identifier to be able the reinsert it after the conversion
-     * process.
-     * 
-     * @param content the content to protect/register.
      * @param inline indicate if i's a inline or not inline string.
      * @return the content identifier to insert in place of provided content.
      */

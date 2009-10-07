@@ -167,10 +167,10 @@ public class ListSyntaxFilter extends AbstractFilter implements Initializable
 
                 if (listStyle.length() > 0) {
                     listItemResult.append(filterContext.addProtectedContent(MessageFormat.format(
-                        "(% style=\"list-style-type: {0}\" %)\n", listStyle)));
+                        "(% style=\"list-style-type: {0}\" %)\n", listStyle), false));
                 }
             }
-            listItemResult.append(filterContext.addProtectedContent(matcher.group(1) + listString));
+            listItemResult.append(filterContext.addProtectedContent(matcher.group(1) + listString, false));
 
             listItemResult.append(matcher.group(3));
 

@@ -26,6 +26,8 @@ package org.xwiki.rendering.parser.xwiki10;
  */
 public class FilterException extends Exception
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The file that caused the ParseException..
      */

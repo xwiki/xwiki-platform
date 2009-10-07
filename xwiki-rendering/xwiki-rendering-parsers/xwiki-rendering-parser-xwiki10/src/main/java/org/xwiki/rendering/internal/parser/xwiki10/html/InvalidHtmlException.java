@@ -26,5 +26,6 @@ package org.xwiki.rendering.internal.parser.xwiki10.html;
  */
 public class InvalidHtmlException extends Exception
 {
+    private static final long serialVersionUID = 1L;
 
 }

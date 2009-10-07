@@ -58,7 +58,7 @@ public class HrFilter extends AbstractFilter implements Initializable
     {
         StringBuffer result = new StringBuffer();
 
-        String hr20 = filterContext.addProtectedContent("----");
+        String hr20 = filterContext.addProtectedContent("----", false);
 
         Matcher matcher = HR_PATTERN.matcher(content);
         int currentIndex = 0;

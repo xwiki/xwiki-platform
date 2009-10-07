@@ -87,7 +87,7 @@ public class CodeMacroFilter extends AbstractFilter implements Initializable
                     matcher.group(2)), matcher.group(3), filterContext);
 
             result.append(before);
-            result.append(filterContext.addProtectedContent(macroResult));
+            result.append(filterContext.addProtectedContent(macroResult, false));
         }
 
         if (currentIndex == 0) {

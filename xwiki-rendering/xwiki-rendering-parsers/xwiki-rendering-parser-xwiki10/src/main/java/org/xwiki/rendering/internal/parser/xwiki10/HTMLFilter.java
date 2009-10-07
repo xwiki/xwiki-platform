@@ -377,8 +377,10 @@ public class HTMLFilter extends AbstractFilter implements Initializable
 
             convertedElement = currentMacro.convert(name, parameters, content, context);
 
-            context.setConversion(true);
-            context.setInline(currentMacro.isInline());
+            if (convertedElement != null) {
+                context.setConversion(true);
+                context.setInline(currentMacro.isInline());
+            }
         } catch (ComponentLookupException e) {
             if (getLogger().isDebugEnabled()) {
                 getLogger().debug("Can't find macro converter [" + name + "]", e);
@@ -635,12 +637,12 @@ public class HTMLFilter extends AbstractFilter implements Initializable
     public static void appendHTMLOpen(StringBuffer result, FilterContext filterContext, boolean nl)
     {
         result.append(filterContext.addProtectedContent("{{html clean=\"false\" wiki=\"true\"}}" + (nl ? "\n" : ""),
-            HTMLOPEN_SUFFIX, false));
+            HTMLOPEN_SUFFIX, true));
     }
 
     public static void appendHTMLClose(StringBuffer result, FilterContext filterContext, boolean nl)
     {
-        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}", HTMLCLOSE_SUFFIX, false));
+        result.append(filterContext.addProtectedContent((nl ? "\n" : "") + "{{/html}}", HTMLCLOSE_SUFFIX, true));
     }
 
     public static class HTMLFilterContext

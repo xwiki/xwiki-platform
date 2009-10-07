@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,9 +34,8 @@ import org.jboss.cache.config.Configuration;
 import org.jboss.cache.config.EvictionConfig;
 import org.jboss.cache.config.EvictionRegionConfig;
 import org.jboss.cache.config.CacheLoaderConfig.IndividualCacheLoaderConfig;
-import org.jboss.cache.eviction.LRUConfiguration;
-import org.jboss.cache.eviction.LRUPolicy;
-import org.jboss.cache.factories.XmlConfigurationParser;
+import org.jboss.cache.config.parsing.XmlConfigurationParser;
+import org.jboss.cache.eviction.LRUAlgorithmConfig;
 import org.jboss.cache.loader.FileCacheLoaderConfig;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
@@ -132,12 +132,11 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
                     this.jbossConfiguration.setEvictionConfig(ec);
                 }
 
-                ec.setDefaultEvictionPolicyClass(LRUPolicy.class.getName());
-
                 if (eec.containsKey(CONFX_EVICTION_WAKEUPINTERVAL)) {
-                    ec.setWakeupIntervalSeconds(((Number) eec.get(CONFX_EVICTION_WAKEUPINTERVAL)).intValue());
+                    ec.setWakeupInterval(((Number) eec.get(CONFX_EVICTION_WAKEUPINTERVAL)).intValue(),
+                        TimeUnit.SECONDS);
                 } else {
-                    ec.setWakeupIntervalSeconds(DEFAULT_WAKEUPINTERVAL);
+                    ec.setWakeupInterval(DEFAULT_WAKEUPINTERVAL, TimeUnit.SECONDS);
                 }
 
                 List<EvictionRegionConfig> ercList = ec.getEvictionRegionConfigs();
@@ -145,13 +144,15 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
                 EvictionRegionConfig erc = null;
                 if (ercList != null && ercList.size() > 0) {
                     erc = ercList.get(0);
+                    erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
+                    setLRUConfiguration(erc, eec);
                 } else {
                     erc = new EvictionRegionConfig();
+                    erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
+                    setLRUConfiguration(erc, eec);
+
                     ec.setEvictionRegionConfigs(Collections.singletonList(erc));
                 }
-                erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
-
-                setLRUConfiguration(erc, eec);
             }
         }
 
@@ -168,24 +169,24 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
      */
     private void setLRUConfiguration(EvictionRegionConfig erc, EntryEvictionConfiguration eec)
     {
-        LRUConfiguration lru = null;
+        LRUAlgorithmConfig lruc = null;
 
-        if (erc.getEvictionPolicyConfig() instanceof LRUConfiguration) {
-            lru = (LRUConfiguration) erc.getEvictionPolicyConfig();
+        if (erc.getEvictionAlgorithmConfig() instanceof LRUAlgorithmConfig) {
+            lruc = (LRUAlgorithmConfig) erc.getEvictionAlgorithmConfig();
         } else {
-            lru = new LRUConfiguration();
-            lru.setTimeToLiveSeconds(0);
+            lruc = new LRUAlgorithmConfig();
+            lruc.setTimeToLive(0);
         }
 
         if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
-            lru.setMaxNodes(((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue());
+            lruc.setMaxNodes(((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue());
         }
 
         if (eec.getTimeToLive() > 0) {
-            lru.setTimeToLiveSeconds(eec.getTimeToLive());
+            lruc.setTimeToLive(eec.getTimeToLive(), TimeUnit.SECONDS);
         }
 
-        erc.setEvictionPolicyConfig(lru);
+        erc.setEvictionAlgorithmConfig(lruc);
     }
 
     /**

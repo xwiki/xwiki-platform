@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD//EN"
+                                         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!-- Template for hibernate configuration. processing by maven using profiles.
+     Replace original src/main/webapp/WEB-INF/hibernate.cfg.xml -->
+<hibernate-configuration>
+  <session-factory>
+
+    <property name="show_sql">false</property>
+    <property name="use_outer_join">true</property>
+
+    <property name="dbcp.defaultAutoCommit">false</property>
+    <property name="dbcp.maxActive">50</property>
+    <property name="dbcp.maxIdle">5</property>
+    <property name="dbcp.maxWait">30000</property>
+    <property name="dbcp.whenExhaustedAction">1</property>
+    <property name="dbcp.ps.whenExhaustedAction">1</property>
+    <property name="dbcp.ps.maxActive">20</property>
+    <property name="dbcp.ps.maxWait">120000</property>
+    <property name="dbcp.ps.maxIdle">20</property>
+
+    <!-- Please refer to the installation guide on
+         http://www.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
+         database -->
+
+    <property name="connection.url">jdbc:derby:/media/data/projets/xwiki/workspaces/debug/xwiki/xem-trunk/database_derby;create=true</property>
+    <property name="connection.username"></property>
+    <property name="connection.password"></property>
+    <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+    <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
+
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+
+    <!-- Mapping files -->
+    <mapping resource="xwiki.derby.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+    <mapping resource="activitystream.hbm.xml"/>
+
+    <!-- MySQL configuration.
+         Uncomment if you want to use MySQL and comment out other database configurations.
+         Note that the database will be created automatically if it doesn't already exist.
+    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false</property>
+    <property name="connection.username">xwiki</property>
+    <property name="connection.password">xwiki</property>
+    <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+    -->
+
+    <!-- HSQLDB configuration.
+         Uncomment if you want to use HSQLDB and comment out other database configurations.
+         Note that the database will be created automatically if it doesn't already exist.
+    <property name="connection.url">jdbc:hsqldb:file:/some/path/xwikidb;shutdown=true</property>
+    <property name="connection.username">sa</property>
+    <property name="connection.password"></property>
+    <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>
+    <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+    -->
+
+    <!-- Oracle configuration.
+         Uncomment if you want to use Oracle and comment out other database configurations.
+    <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
+    <property name="connection.username">xwiki</property>
+    <property name="connection.password">xwiki</property>
+    <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
+    <property name="dialect">org.hibernate.dialect.OracleDialect</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+    <mapping resource="xwiki.oracle.hbm.xml"/>
+    <mapping resource="feeds.oracle.hbm.xml"/>
+    -->
+
+    <!-- Derby configuration.
+         Uncomment if you want to use Derby and comment out other database configurations.
+         Note that the database will be created automatically if it doesn't already exist.
+    <property name="connection.url">jdbc:derby:/some/path/xwikidb;create=true</property>
+    <property name="connection.driver_class">org.apache.derby.jdbc.EmbeddedDriver</property>
+    <property name="dialect">org.hibernate.dialect.DerbyDialect</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+    <mapping resource="xwiki.derby.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+    -->
+
+  </session-factory>
+</hibernate-configuration>

@@ -67,6 +67,16 @@
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/cache</locationURI>
 		</link>
 		<link>
+			<name>WebContent/WEB-INF/cactus.properties</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/cactus.properties</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/commons-logging.properties</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/commons-logging.properties</locationURI>
+		</link>
+		<link>
 			<name>WebContent/WEB-INF/fonts</name>
 			<type>2</type>
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/fonts</locationURI>
@@ -77,9 +87,44 @@
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/observation</locationURI>
 		</link>
 		<link>
+			<name>WebContent/WEB-INF/portlet.xml</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/portlet.xml</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/struts-bean.tld</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts-bean.tld</locationURI>
+		</link>
+		<link>
 			<name>WebContent/WEB-INF/struts-config.xml</name>
 			<type>1</type>
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts-config.xml</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/struts-form.tld</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts-form.tld</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/struts-html.tld</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts-html.tld</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/struts-logic.tld</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts-logic.tld</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/struts-template.tld</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts-template.tld</locationURI>
+		</link>
+		<link>
+			<name>WebContent/WEB-INF/struts.tld</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/WEB-INF/struts.tld</locationURI>
 		</link>
 		<link>
 			<name>WebContent/WEB-INF/web.xml</name>

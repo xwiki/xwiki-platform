@@ -31,7 +31,7 @@ import org.xwiki.component.internal.ReflectionUtils;
 /**
  * Unit tests for {@link DocumentName}.
  * 
- * @version $Id: DocumentNameTest.java 19382 2009-05-05 11:49:36Z tmortagne $
+ * @version $Id$
  */
 public class DefaultAttachmentNameFactoryTest
 {

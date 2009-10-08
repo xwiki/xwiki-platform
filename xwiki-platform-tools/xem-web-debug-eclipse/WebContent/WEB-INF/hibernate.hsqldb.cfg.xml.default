@@ -23,7 +23,7 @@
          http://www.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
          database -->
 
-    <property name="connection.url">jdbc:hsqldb:file:/home/tuska/workspaces/debug/xwiki/xem-trunk/database_hsqldb/xwiki_db;shutdown=true</property>
+    <property name="connection.url">jdbc:hsqldb:file:eclipse/debug/database_hsqldb/xwiki_db;shutdown=true</property>
     <property name="connection.username">sa</property>
     <property name="connection.password"></property>
     <property name="connection.driver_class">org.hsqldb.jdbcDriver</property>

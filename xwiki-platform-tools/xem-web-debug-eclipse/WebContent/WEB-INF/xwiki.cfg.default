@@ -28,8 +28,12 @@ xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 #-# since we want to be independend of the underlying system.
 xwiki.encoding=UTF-8
 
-#-# This parameter will activate the sectional editing
+#-# This parameter will activate the sectional editing.
 xwiki.section.edit=1
+
+#-# This parameter controls the depth of sections that have section editing.
+#-# By default level 1 and level 2 sections have section editing.
+xwiki.section.depth=2
 
 #-# Enable backlinks storage, which increases the update time, but allows to keep track of inter document links.
 xwiki.backlinks=1
@@ -447,16 +451,21 @@ xwiki.authentication.ldap.trylocal=1
 
 
 #---------------------------------------
-# Skin configuration
+# Skins & Templates configuration
 #
 
 #-# The default skin to use when there's no value specified in the wiki preferences document. Note that the default
 #-# wiki already specifies a skin, so this setting is only valid for empty wikis.
-xwiki.defaultskin=toucan
+xwiki.defaultskin=albatross
 
 #-# The default base for skins that don't specify a base skin. This is also the last place where a skin file is searched
 #-# if not found in the more specific skins.
 xwiki.defaultbaseskin=albatross
+
+#-# Defines whether title handling should be using the compatibility mode or not. When the compatibility
+#-# mode is active, if the document's content first header (level 1 or level 2) matches the document's title
+#-# the first header is stripped.
+xwiki.title.compatibility=1
 
 #---------------------------------------
 # Extensions
@@ -464,39 +473,39 @@ xwiki.defaultbaseskin=albatross
 
 #-# List of active plugins.
 xwiki.plugins=\
-                    com.xpn.xwiki.monitor.api.MonitorPlugin,\
-                    com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
-                    com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
-                    com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
-                    com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
-                    com.xpn.xwiki.plugin.feed.FeedPlugin,\
-                    com.xpn.xwiki.plugin.ldap.LDAPPlugin,\
-                    com.xpn.xwiki.plugin.google.GooglePlugin,\
-                    com.xpn.xwiki.plugin.flickr.FlickrPlugin,\
-                    com.xpn.xwiki.plugin.mail.MailPlugin,\
-                    com.xpn.xwiki.plugin.packaging.PackagePlugin,\
-                    com.xpn.xwiki.plugin.query.QueryPlugin,\
-                    com.xpn.xwiki.plugin.svg.SVGPlugin,\
-                    com.xpn.xwiki.plugin.charts.ChartingPlugin,\
-                    com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
-                    com.xpn.xwiki.plugin.image.ImagePlugin,\
-                    com.xpn.xwiki.plugin.captcha.CaptchaPlugin,\
-                    com.xpn.xwiki.plugin.userdirectory.UserDirectoryPlugin,\
-                    com.xpn.xwiki.plugin.usertools.XWikiUserManagementToolsImpl,\
-                    com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
-                    com.xpn.xwiki.plugin.autotag.AutoTagPlugin,\
-                    com.xpn.xwiki.plugin.lucene.LucenePlugin,\
-                    com.xpn.xwiki.plugin.diff.DiffPlugin,\
-                    com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
-                    com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
-                    com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
-                    com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
-                    com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
-                    com.xpn.xwiki.plugin.watchlist.WatchListPlugin, \
-                    com.xpn.xwiki.wysiwyg.server.plugin.WysiwygPlugin, \
-                    com.xpn.xwiki.plugin.tag.TagPlugin,\
-                    com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin,\
-                    com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin
+                  com.xpn.xwiki.monitor.api.MonitorPlugin,\
+                  com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
+                  com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
+                  com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
+                  com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
+                  com.xpn.xwiki.plugin.feed.FeedPlugin,\
+                  com.xpn.xwiki.plugin.ldap.LDAPPlugin,\
+                  com.xpn.xwiki.plugin.google.GooglePlugin,\
+                  com.xpn.xwiki.plugin.flickr.FlickrPlugin,\
+                  com.xpn.xwiki.plugin.mail.MailPlugin,\
+                  com.xpn.xwiki.plugin.packaging.PackagePlugin,\
+                  com.xpn.xwiki.plugin.query.QueryPlugin,\
+                  com.xpn.xwiki.plugin.svg.SVGPlugin,\
+                  com.xpn.xwiki.plugin.charts.ChartingPlugin,\
+                  com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,\
+                  com.xpn.xwiki.plugin.image.ImagePlugin,\
+                  com.xpn.xwiki.plugin.captcha.CaptchaPlugin,\
+                  com.xpn.xwiki.plugin.userdirectory.UserDirectoryPlugin,\
+                  com.xpn.xwiki.plugin.usertools.XWikiUserManagementToolsImpl,\
+                  com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin,\
+                  com.xpn.xwiki.plugin.autotag.AutoTagPlugin,\
+                  com.xpn.xwiki.plugin.lucene.LucenePlugin,\
+                  com.xpn.xwiki.plugin.diff.DiffPlugin,\
+                  com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,\
+                  com.xpn.xwiki.plugin.jodatime.JodaTimePlugin,\
+                  com.xpn.xwiki.plugin.scheduler.SchedulerPlugin,\
+                  com.xpn.xwiki.plugin.mailsender.MailSenderPlugin,\
+                  com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin, \
+                  com.xpn.xwiki.plugin.watchlist.WatchListPlugin, \
+                  com.xpn.xwiki.wysiwyg.server.plugin.WysiwygPlugin, \
+                  com.xpn.xwiki.plugin.tag.TagPlugin,\
+                  com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin,\
+                  com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
 
 #-# Enable light monitoring of the wiki performance. Records various statistics, like number of requests processed,
 #-# time spent in rendering or in the database, medium time for a request, etc. Disable for a minor increase of

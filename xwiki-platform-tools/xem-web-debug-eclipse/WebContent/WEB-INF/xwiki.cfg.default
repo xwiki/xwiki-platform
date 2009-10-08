@@ -456,7 +456,7 @@ xwiki.authentication.ldap.trylocal=1
 
 #-# The default skin to use when there's no value specified in the wiki preferences document. Note that the default
 #-# wiki already specifies a skin, so this setting is only valid for empty wikis.
-xwiki.defaultskin=albatross
+xwiki.defaultskin=colibri
 
 #-# The default base for skins that don't specify a base skin. This is also the last place where a skin file is searched
 #-# if not found in the more specific skins.

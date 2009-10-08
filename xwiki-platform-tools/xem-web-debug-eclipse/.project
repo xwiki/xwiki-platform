@@ -47,11 +47,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>WebContent/META-INF</name>
-			<type>2</type>
-			<locationURI>XWIKI_WEB/standard/src/main/webapp/META-INF</locationURI>
-		</link>
-		<link>
 			<name>WebContent/redirect</name>
 			<type>1</type>
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/redirect</locationURI>

@@ -25,9 +25,9 @@ import java.util.List;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocumentDoesNotExistException;
-import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 
@@ -272,6 +272,18 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     /**
      * {@inheritDoc}
      * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#forceValidDocumentName()
+     */
+    @Override
+    public boolean forceValidDocumentName()
+    {
+        // All wiki descriptors are of the form <code>XWiki.XWikiServer%</code>
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#check(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -394,8 +406,9 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         try {
             return getXObjectDocument(wikiName, objectId, validate, context);
         } catch (XObjectDocumentDoesNotExistException e) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, WikiManagerMessageTool
-                .getDefault(context).get(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS, wikiName), e);
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                WikiManagerMessageTool.getDefault(context).get(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS,
+                    wikiName), e);
         }
     }
 
@@ -416,8 +429,9 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         XWikiServer wiki = getWikiAlias(wikiName, objectId, validate, context);
 
         if (validate && !wiki.isWikiTemplate()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, WikiManagerMessageTool
-                .getDefault(context).get(WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                WikiManagerMessageTool.getDefault(context).get(
+                    WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
         }
 
         return wiki;
@@ -426,7 +440,7 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     /**
      * {@inheritDoc}
      * <p>
-     * Override abstract method using XWikiApplication as {@link XObjectDocument}.
+     * Override abstract method using XWikiApplication as {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument}.
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
      *      int, com.xpn.xwiki.XWikiContext)

@@ -42,8 +42,8 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  * This class has to be extended with at least :
  * <ul>
  * <li>overload {@link #updateBaseClass(BaseClass)}
- * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the
- * documents and spaces needed.
+ * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the documents
+ * and spaces needed.
  * </ul>
  * 
  * @param <T> the item class extending {@link XObjectDocument}.
@@ -353,6 +353,16 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
     public String getClassSheetFullName()
     {
         return this.classSheetFullName;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#forceValidDocumentName()
+     */
+    public boolean forceValidDocumentName()
+    {
+        return false;
     }
 
     /**
@@ -727,7 +737,8 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public boolean isInstance(XWikiDocument doc)
     {
-        return doc.getObjectNumbers(getClassFullName()) > 0;
+        return doc.getObjectNumbers(getClassFullName()) > 0
+            && (!forceValidDocumentName() || isValidName(doc.getFullName()));
     }
 
     /**
@@ -737,7 +748,18 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public boolean isInstance(Document doc)
     {
-        return doc.getObjectNumbers(getClassFullName()) > 0;
+        return doc.getObjectNumbers(getClassFullName()) > 0
+            && (!forceValidDocumentName() || isValidName(doc.getFullName()));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#isValidName(java.lang.String)
+     */
+    public boolean isValidName(String fullName)
+    {
+        return getItemDefaultName(fullName) != null;
     }
 
     /**
@@ -747,9 +769,11 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getItemDocumentDefaultName(String itemName, XWikiContext context)
     {
-        String name = context.getWiki().clearName(itemName, true, true, context);
+        String cleanedItemName =
+            context != null ? context.getWiki().clearName(itemName, true, true, context) : itemName;
 
-        return getClassPrefix() + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+        return getClassPrefix() + cleanedItemName.substring(0, 1).toUpperCase()
+            + cleanedItemName.substring(1).toLowerCase();
     }
 
     /**
@@ -770,8 +794,13 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getItemDefaultName(String docFullName)
     {
-        return docFullName.substring(
-            (getClassSpacePrefix() + XObjectDocument.SPACE_DOC_SEPARATOR + getClassPrefix()).length()).toLowerCase();
+        String prefix = getClassSpacePrefix() + XObjectDocument.SPACE_DOC_SEPARATOR + getClassPrefix();
+
+        if (!docFullName.startsWith(prefix)) {
+            return null;
+        }
+
+        return docFullName.substring(prefix.length()).toLowerCase();
     }
 
     /**
@@ -804,11 +833,15 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
     {
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
-        StringBuffer where =
-            new StringBuffer(" where doc.fullName=obj.name and obj.className=" + HQL_PARAMETER_STRING);
+        StringBuffer where = new StringBuffer(" where doc.fullName=obj.name and obj.className=" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassFullName());
 
-        where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
+        if (forceValidDocumentName()) {
+            where.append(" and doc.fullName LIKE" + HQL_PARAMETER_STRING);
+            parameterValues.add(getItemDocumentDefaultFullName("%", null));
+        }
+
+        where.append(" and doc.fullName <>" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassTemplateFullName());
 
         String andSymbol = " and ";

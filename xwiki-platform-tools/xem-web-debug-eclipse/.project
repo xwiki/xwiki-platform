@@ -47,6 +47,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>WebContent/redirect</name>
+			<type>1</type>
+			<locationURI>XWIKI_WEB/standard/src/main/webapp/redirect</locationURI>
+		</link>
+		<link>
 			<name>WebContent/resources</name>
 			<type>2</type>
 			<locationURI>XWIKI_WEB/standard/src/main/webapp/resources</locationURI>

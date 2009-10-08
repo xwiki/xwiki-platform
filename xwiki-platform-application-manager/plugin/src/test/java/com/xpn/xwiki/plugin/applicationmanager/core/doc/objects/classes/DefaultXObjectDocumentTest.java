@@ -168,7 +168,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
         // ///
 
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
+        XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc = (DefaultXObjectDocument) sclass.newXObjectDocument(getContext());
 
         assertNotNull(sdoc);
@@ -186,7 +186,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
         // ///
 
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
+        XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =
             (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, getContext());
 
@@ -208,7 +208,7 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
         XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, getContext());
         xwiki.saveDocument(doc, getContext());
 
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
+        XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc =
             (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, getContext());
 
@@ -223,24 +223,24 @@ public class DefaultXObjectDocumentTest extends AbstractBridgedXWikiComponentTes
 
     public void testMergeObject() throws XWikiException
     {
-        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(getContext());
+        XClassManager sclass = XClassManagerTest.DispatchXClassManager.getInstance(getContext());
         DefaultXObjectDocument sdoc1 = (DefaultXObjectDocument) sclass.newXObjectDocument(getContext());
 
         DefaultXObjectDocument sdoc2 = (DefaultXObjectDocument) sclass.newXObjectDocument(getContext());
 
-        sdoc1.setStringValue(TestAbstractXClassManagerTest.FIELD_string, "valuesdoc1");
-        sdoc1.setStringValue(TestAbstractXClassManagerTest.FIELD_string2, "value2sdoc1");
+        sdoc1.setStringValue(XClassManagerTest.FIELD_string, "valuesdoc1");
+        sdoc1.setStringValue(XClassManagerTest.FIELD_string2, "value2sdoc1");
 
-        sdoc2.setStringValue(TestAbstractXClassManagerTest.FIELD_string, "valuesdoc2");
-        sdoc2.setIntValue(TestAbstractXClassManagerTest.FIELD_int, 2);
+        sdoc2.setStringValue(XClassManagerTest.FIELD_string, "valuesdoc2");
+        sdoc2.setIntValue(XClassManagerTest.FIELD_int, 2);
 
         sdoc1.mergeObject(sdoc2);
 
-        assertEquals("The field is not overwritten", sdoc1.getStringValue(TestAbstractXClassManagerTest.FIELD_string),
-            sdoc2.getStringValue(TestAbstractXClassManagerTest.FIELD_string));
+        assertEquals("The field is not overwritten", sdoc1.getStringValue(XClassManagerTest.FIELD_string),
+            sdoc2.getStringValue(XClassManagerTest.FIELD_string));
         assertEquals("The field is removed", "value2sdoc1", sdoc1
-            .getStringValue(TestAbstractXClassManagerTest.FIELD_string2));
-        assertEquals("The field is not added", sdoc1.getIntValue(TestAbstractXClassManagerTest.FIELD_int), sdoc1
-            .getIntValue(TestAbstractXClassManagerTest.FIELD_int));
+            .getStringValue(XClassManagerTest.FIELD_string2));
+        assertEquals("The field is not added", sdoc1.getIntValue(XClassManagerTest.FIELD_int), sdoc1
+            .getIntValue(XClassManagerTest.FIELD_int));
     }
 }

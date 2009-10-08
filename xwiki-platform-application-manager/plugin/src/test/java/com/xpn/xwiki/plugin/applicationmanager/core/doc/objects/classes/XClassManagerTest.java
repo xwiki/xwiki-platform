@@ -44,7 +44,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * 
  * @version $Id$
  */
-public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponentTestCase
+public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWiki xwiki;
 
@@ -107,7 +107,7 @@ public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponent
                 return invocation.parameterValues.get(0);
             }
         });
-        
+
         this.xwiki = (XWiki) mockXWiki.proxy();
         getContext().setWiki(this.xwiki);
     }
@@ -561,26 +561,29 @@ public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponent
 
     public void testGetItemDocumentDefaultNameDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(getContext()).getItemDocumentDefaultName(
-            DEFAULT_ITEM_NAME, getContext()));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME,
+            DispatchXClassManager.getInstance(getContext()).getItemDocumentDefaultName(DEFAULT_ITEM_NAME, getContext()));
     }
 
     public void testGetItemDocumentDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchXClassManager.getInstance(getContext())
-            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, getContext()));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME,
+            NoDispatchXClassManager.getInstance(getContext()).getItemDocumentDefaultName(DEFAULT_ITEM_NAME,
+                getContext()));
     }
 
     public void testGetItemDocumentDefaultFullNameDispatch() throws XWikiException
     {
-        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchXClassManager.getInstance(getContext())
-            .getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, getContext()));
+        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME,
+            DispatchXClassManager.getInstance(getContext()).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME,
+                getContext()));
     }
 
     public void testGetItemDocumentDefaultFullNameNoDispatch() throws XWikiException
     {
-        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchXClassManager.getInstance(getContext())
-            .getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, getContext()));
+        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME,
+            NoDispatchXClassManager.getInstance(getContext()).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME,
+                getContext()));
     }
 
     public void testIsInstanceNoDispatch() throws XWikiException
@@ -629,7 +632,8 @@ public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponent
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
+        String where =
+            DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
 
         assertEquals(WHERECLAUSE_doc_multi, where);
     }
@@ -647,7 +651,8 @@ public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponent
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
+        String where =
+            DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
 
         assertEquals(WHERECLAUSE_obj_multi, where);
     }
@@ -656,7 +661,8 @@ public class TestAbstractXClassManagerTest extends AbstractBridgedXWikiComponent
     {
         List<Object> list = new ArrayList<Object>();
 
-        String where = DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
+        String where =
+            DispatchXClassManager.getInstance(getContext()).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
 
         assertEquals(WHERECLAUSE_objdoc, where);
     }

@@ -170,6 +170,12 @@ public interface XClassManager<T extends XObjectDocument>
      */
     String getClassSheetFullName();
 
+    /**
+     * @return indicate if the document names has to respect the default generated name style. This is used in the
+     *         search to limit to valid results.
+     */
+    boolean forceValidDocumentName();
+
     // ///
 
     /**
@@ -231,6 +237,12 @@ public interface XClassManager<T extends XObjectDocument>
     boolean isInstance(Document doc);
 
     /**
+     * @param fullName the full name of the document
+     * @return true if the document name follow the default rule
+     */
+    boolean isValidName(String fullName);
+
+    /**
      * Get document name from item name <code>item</code>. Usually a Document name is DocumentTypeItemName.
      * 
      * @param itemName the name of the item to find.
@@ -288,8 +300,8 @@ public interface XClassManager<T extends XObjectDocument>
     String createWhereClause(Object[][] fieldDescriptors, List<Object> parameterValues);
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it
-     * is returned with new object if it does not contains any.
+     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it is
+     * returned with new object if it does not contains any.
      * 
      * @param doc the XWiki document to manage.
      * @param objId the id of the XWiki object included in the document to manage.
@@ -301,8 +313,8 @@ public interface XClassManager<T extends XObjectDocument>
     T newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it
-     * is returned with new object if it does not contains any.
+     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it is
+     * returned with new object if it does not contains any.
      * 
      * @param context the XWiki context.
      * @return a new T instance.
@@ -312,8 +324,8 @@ public interface XClassManager<T extends XObjectDocument>
     T newXObjectDocument(XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it
-     * is returned with new object if it does not contains any.
+     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it is
+     * returned with new object if it does not contains any.
      * 
      * @param docFullName the full name of document to manage.
      * @param objId the id of the XWiki object included in the document to manage.

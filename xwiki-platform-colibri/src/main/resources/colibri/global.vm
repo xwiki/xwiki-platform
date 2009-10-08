@@ -23,14 +23,14 @@
 #end
     <img src="$!logourl" alt="XWiki"/>
     </a>
-  </div>
-  </div>
+  </div> ## companylogo
+  </div> ## company
   <div id="globallinks">
     <form action="$xwiki.getURL('Main.WebSearch')" style="margin: 0; padding: 0;">
       <div id="globalsearch">
         <input id="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" class="withTip"/><input class="button" value="$msg.get('panels.search.submit')" type="image" src="$xwiki.getSkinFile('icons/xwiki/search.png')"/>
-    </div>
-  </form>
+      </div>
+    </form>
 #if($xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">
   #set($defaultLanguage = "$!{doc.getDefaultLanguage()}")
@@ -46,8 +46,8 @@
   #end
   </span>
 #end
-  </div>
+  </div> ## globallinks
   <div class="clearfloats"></div>
-</div>
+</div> ## headerglobal
 #end
 ### TODO: Format the header for pdf output

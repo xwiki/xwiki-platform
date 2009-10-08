@@ -26,7 +26,6 @@ import java.util.Comparator;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 public class Class extends Collection
@@ -84,8 +83,12 @@ public class Class extends Collection
      */
     public Element get(String name)
     {
-        return new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name),
-            getXWikiContext());
+        com.xpn.xwiki.objects.classes.PropertyClass property =
+            (com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name);
+        if (property != null) {
+            return new PropertyClass(property, getXWikiContext());
+        }
+        return null;
     }
 
     /**

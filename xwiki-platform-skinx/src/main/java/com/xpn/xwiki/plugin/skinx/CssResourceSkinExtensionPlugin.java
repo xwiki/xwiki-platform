@@ -20,11 +20,7 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Skin Extension plugin to use css files from JAR resources.
@@ -32,7 +28,7 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 1.3
  */
-public class CssResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
+public class CssResourceSkinExtensionPlugin extends AbstractResourceSkinExtensionPlugin
 {
     /**
      * XWiki plugin constructor.
@@ -45,7 +41,6 @@ public class CssResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
     public CssResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-        init(context);
     }
 
     /**
@@ -61,47 +56,22 @@ public class CssResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
 
     /**
      * {@inheritDoc}
-     * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
+     *
+     * @see AbstractSkinExtensionPlugin#getAction()
      */
-    @Override
-    public String getLink(String documentName, XWikiContext context)
+    protected String getAction()
     {
-        String result = "";
-        // If the current user has access to Main.WebHome, we will use this document in the URL
-        // to serve the css resource. This way, the resource can be efficiently cached, since it has a
-        // common URL for any page.
-        try {
-            String page = context.getWiki().getDefaultWeb(context) + "." + context.getWiki().getDefaultPage(context);
-            if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), page, context)) {
-                page = context.getDoc().getFullName();
-            }
-            String url =
-                context.getWiki().getURL(page, "ssx",
-                    "resource=" + documentName + parametersAsQueryString(documentName, context), context);
-            result = "<link rel='stylesheet' type='text/css' href='" + url + "'/>";
-        } catch (XWikiException e) {
-            // Do nothing here; we can't access the wiki, so don't link to this resource at all.
-        }
-        return result;
+        return "ssx";
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * There is no support for always used resource-based extensions yet.
-     * </p>
-     * 
-     * @see AbstractSkinExtensionPlugin#getAlwaysUsedExtensions(XWikiContext)
+     *
+     * @see AbstractSkinExtensionPlugin#generateLink()
      */
-    @Override
-    public Set<String> getAlwaysUsedExtensions(XWikiContext context)
+    protected String generateLink(String url)
     {
-        // There is no mean to define an always used extension for something else than a document extension now,
-        // so for resources-based extensions, we return an emtpy set.
-        // An idea for the future could be to have an API for plugins and components to register always used resources
-        // extensions.
-        return Collections.emptySet();
+        return "<link rel='stylesheet' type='text/css' href='" + url + "'/>\n";
     }
 
     /**

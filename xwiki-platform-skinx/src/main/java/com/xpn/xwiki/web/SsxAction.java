@@ -20,19 +20,12 @@
  */
 package com.xpn.xwiki.web;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.sx.AbstractSxAction;
 import com.xpn.xwiki.web.sx.CssExtension;
 import com.xpn.xwiki.web.sx.Extension;
-import com.xpn.xwiki.web.sx.SxDocumentSource;
-import com.xpn.xwiki.web.sx.SxResourceSource;
-import com.xpn.xwiki.web.sx.SxSource;
 
 /**
  * <p>
@@ -44,46 +37,28 @@ import com.xpn.xwiki.web.sx.SxSource;
  */
 public class SsxAction extends AbstractSxAction
 {
+    /** The extension type of this action. */
+    public static final CssExtension CSSX = new CssExtension();
+
     /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(SsxAction.class);
 
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiAction#render(XWikiContext)
+     * @see AbstractSxAction#getExtensionType()
      */
-    @Override
-    public String render(XWikiContext context) throws XWikiException
+    public Extension getExtensionType()
     {
-        SxSource sxSource;
-
-        Extension sxType = new CssExtension();
-
-        if (context.getRequest().getParameter("resource") != null) {
-            sxSource = new SxResourceSource(context.getRequest().getParameter("resource"));
-        }
-
-        else {
-            if (context.getDoc().isNew()) {
-                context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return "docdoesnotexist";
-            }
-            sxSource = new SxDocumentSource(context, sxType);
-        }
-
-        try {
-            super.renderExtension(sxSource, sxType, context);
-        } catch (IllegalArgumentException e) {
-            // Simply set a 404 status code and return null, so that no unneeded bytes are transfered
-            context.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-        return null;
+        return CSSX;
     }
 
+    /**
+     * @return the logging object for this class.
+     */
     @Override
     protected Log getLog()
     {
         return LOG;
     }
-
 }

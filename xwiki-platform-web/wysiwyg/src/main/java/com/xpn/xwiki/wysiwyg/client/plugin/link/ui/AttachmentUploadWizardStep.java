@@ -132,7 +132,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
      * {@inheritDoc}
      */
     @Override
-    protected void onAttachmentUploaded(Attachment attach)
+    protected void onAttachmentUploaded(Attachment attach, AsyncCallback<Boolean> async)
     {
         // commit the attachment data in the link config
         // commit relative reference
@@ -140,5 +140,6 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
         // FIXME: move the reference setting logic in a controller
         linkData.setReference("attach:" + ref.getRelativeTo(editedResource).toString());
         linkData.setUrl(attach.getDownloadUrl());
+        async.onSuccess(true);
     }
 }

@@ -27,28 +27,28 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
  * 
  * @version $Id$
  */
-public final class ImporterPluginFactory extends AbstractPluginFactory
+public final class ImportPluginFactory extends AbstractPluginFactory
 {
     /**
      * Private instance of the plugin factory. Plugin factory is a singleton.
      */
-    private static ImporterPluginFactory instance;
+    private static ImportPluginFactory instance;
 
     /**
      * Private constructor.
      */
-    private ImporterPluginFactory()
+    private ImportPluginFactory()
     {
-        super("importer");
+        super("import");
     }
 
     /**
      * @return The singleton instance of the plugin factory.
      */
-    public static synchronized ImporterPluginFactory getInstance()
+    public static synchronized ImportPluginFactory getInstance()
     {
         if (null == instance) {
-            instance = new ImporterPluginFactory();
+            instance = new ImportPluginFactory();
         }
         return instance;
     }
@@ -58,6 +58,6 @@ public final class ImporterPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return new ImporterPlugin();
+        return new ImportPlugin();
     }
 }

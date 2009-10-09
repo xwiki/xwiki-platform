@@ -86,12 +86,13 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
      * {@inheritDoc}
      */
     @Override
-    protected void onAttachmentUploaded(Attachment attach)
+    protected void onAttachmentUploaded(Attachment attach, AsyncCallback<Boolean> async)
     {
         // upload is done successfully, commit the data in the image config
         imageData.setImageURL(attach.getDownloadUrl());
         ResourceName ref = new ResourceName(attach.getReference(), true);
         imageData.setReference(ref.getRelativeTo(editedResource).toString());
+        async.onSuccess(true);
     }
 
     /**

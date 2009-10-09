@@ -159,8 +159,8 @@
 <property>
 <content>This is your wiki's blog first post. Its goal is to provide a short description of your blog's main features.
 
-* You can *create new blog posts* through the input field located on [your Blog's homepage&gt;Blog.WebHome]. A post can have one of the following statuses:
-** ~~Unpublished~~: your post is still a draft. It can be seen by its creator &amp;amp; by admins. Once you've clicked published once, you cannot unpublish a post. However, you can choose to hide it.
+* You can *create new blog posts* through the input field located on [your Blog's homepage&gt;Blog.WebHome]. The status of a blog post may be any one of the following:
+** ~~Unpublished~~: your post is still a draft. It can be seen by its creator &amp;amp; by administrators. Once you have clicked publish, you cannot unpublish a post. However, you can choose to hide it.
 ** ~~Published~~: your post can be read by every user that has access to your blog.
 ** ~~Published &amp;amp; hidden~~: your post is published but only its creator &amp;amp; admins can see it. This is useful if you need to make modifications on a post that has already been published by mistake.
 

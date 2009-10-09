@@ -53,8 +53,17 @@ public interface Images extends ImageBundle
     @Resource("image.gif")
     AbstractImagePrototype image();
 
-    @Resource("importer.gif")
-    AbstractImagePrototype importer();
+    @Resource("import.gif")
+    AbstractImagePrototype importMenuEntryIcon();
+    
+    @Resource("import.gif")
+    AbstractImagePrototype importWizardIcon();
+    
+    @Resource("import_office_file.gif")
+    AbstractImagePrototype importOfficeFileMenuEntryIcon();
+    
+    @Resource("import_office_paste.gif")
+    AbstractImagePrototype importOfficePasteMenuEntryIcon();                        
 
     @Resource("indent.gif")
     AbstractImagePrototype indent();

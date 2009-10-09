@@ -361,31 +361,29 @@ public interface Strings extends Constants
 
     String tableInsertDialogTitle();
 
-    String tableInsertStrictPositiveIntegerRequired();
-
-    String importerToolTip();
-
-    String importerCaption();
-
-    String importerClipboardTabCaption();
-
-    String importerClipboardTabInfoLabel();
-
-    String importerClipboardTabHelpLabel();
-
-    String importerFileTabCaption();
-
-    String importerFileTabInfoLabel();
-
-    String importerFileTabHelpLabel();
+    String tableInsertStrictPositiveIntegerRequired();    
     
-    String importerFileTabNotAvailableLabel();
-
-    String importerFilterStylesCheckBoxCaption();
-
-    String importerImportButtonCaption();
-
-    String importerCancelButtonCaption();
+    String importMenuEntryCaption();
+    
+    String importWizardTitle();
+    
+    String importWizardImportButtonCaption();
+    
+    String importOfficeFileMenuItemCaption();
+    
+    String importOfficeFileFeatureNotAvailable();
+    
+    String importOfficeFileWizardStepTitle();
+    
+    String importOfficeFileHelpLabel();
+    
+    String importOfficePasteMenuItemCaption();                            
+    
+    String importOfficePasteWizardStepTitle();
+    
+    String importOfficePasteInfoLabel();
+    
+    String importOfficePasteHelpLabel();        
 
     String wizardCancel();
 

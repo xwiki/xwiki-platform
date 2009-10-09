@@ -260,8 +260,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
                         displayError(Strings.INSTANCE.fileUploadSubmitError());
                         async.onSuccess(false);
                     } else {
-                        onAttachmentUploaded(result);
-                        async.onSuccess(true);
+                        onAttachmentUploaded(result, async);
                     }
                 }
 
@@ -276,8 +275,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      * Notifies the successful completion of a file upload, to be overridden by subclasses to provide specific behavior.
      * 
      * @param attach the successfully uploaded attachment
+     * @param async the call-back used to indicate the completion of this method. It's required that the sub-classes
+     *            invoke async.onSuccess(true); method once they are done with processing the attachment. Without this
+     *            method being invoked, the submission of this wizard step will not complete.
      */
-    protected abstract void onAttachmentUploaded(Attachment attach);
+    protected abstract void onAttachmentUploaded(Attachment attach, AsyncCallback<Boolean> async);
 
     /**
      * @return the wiki of the document to upload this file to, or null if the default wiki should be used.

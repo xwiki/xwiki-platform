@@ -1,21 +1,5 @@
-.xImporterPanel {
-  width: 100%;
-  height: 100%;
-  /* hidden overflow since the IE browsers detect badly the size of some tables */
-  overflow: hidden;
-}
-
-.xImporterTabPanel {
-  width: 459px;
-  height: auto;
-}
-
-.xImporterClipboardTabEditor {
-  height: 240px;
-}
-
-.xImporterDialog .xDialogFooter .gwt-CheckBox {
-  float: left;
-  padding-top: 0;
-  margin-bottom: 0;
+.xImportOfficeContentEditor {
+  width: 450px;
+  height: 250px;
+  border: 1px solid;
 }

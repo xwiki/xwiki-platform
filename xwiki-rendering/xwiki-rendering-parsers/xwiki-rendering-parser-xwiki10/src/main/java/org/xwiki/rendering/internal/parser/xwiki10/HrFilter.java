@@ -36,7 +36,7 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 @Component("hr")
 public class HrFilter extends AbstractFilter implements Initializable
 {
-    private static final Pattern HR_PATTERN = Pattern.compile("(?<=^| )----++(?=$| )");
+    private static final Pattern HR_PATTERN = Pattern.compile("(?<=^| )----++(?=$| )", Pattern.MULTILINE);
 
     /**
      * {@inheritDoc}

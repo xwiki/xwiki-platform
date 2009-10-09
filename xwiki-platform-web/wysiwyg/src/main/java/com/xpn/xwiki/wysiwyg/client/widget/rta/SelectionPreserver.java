@@ -135,6 +135,19 @@ public class SelectionPreserver
         }
 
         /**
+         * Specifies if the start/end boundary is between DOM nodes or inside a text node.
+         * 
+         * @param startBoundary which boundary
+         * @return {@code true} if the specified boundary is between DOM nodes, {@code false} otherwise
+         */
+        public boolean hasBoundaryBetweenNodes(boolean startBoundary)
+        {
+            Node container = startBoundary ? start.getNextSibling() : end.getPreviousSibling();
+            int offset = startBoundary ? startOffset : endOffset;
+            return offset < 0 || container == null || container.getNodeType() == Node.ELEMENT_NODE;
+        }
+
+        /**
          * @param document the document which includes the range.
          * @return a new DOM node to be used as a marker for a DOM Range boundary.
          */
@@ -234,7 +247,7 @@ public class SelectionPreserver
 
             Node startContainer = placeHolder.getStart().getNextSibling();
             int startOffset = placeHolder.getStartOffset();
-            if (startOffset <= 0) {
+            if (placeHolder.hasBoundaryBetweenNodes(true)) {
                 startContainer = placeHolder.getStart().getParentNode();
                 startOffset = DOMUtils.getInstance().getNodeIndex(placeHolder.getStart()) + delta;
             }
@@ -244,11 +257,11 @@ public class SelectionPreserver
 
             Node endContainer = placeHolder.getEnd().getPreviousSibling();
             int endOffset;
-            if (placeHolder.getEndOffset() > 0) {
-                endOffset = DOMUtils.getInstance().getLength(endContainer) - placeHolder.getEndOffset();
-            } else {
+            if (placeHolder.hasBoundaryBetweenNodes(false)) {
                 endContainer = placeHolder.getEnd().getParentNode();
                 endOffset = DOMUtils.getInstance().getNodeIndex(placeHolder.getEnd());
+            } else {
+                endOffset = DOMUtils.getInstance().getLength(endContainer) - placeHolder.getEndOffset();
             }
             if (reset) {
                 DOMUtils.getInstance().detach(placeHolder.getEnd());

@@ -20,11 +20,7 @@
  */
 package com.xpn.xwiki.plugin.skinx;
 
-import java.util.Collections;
-import java.util.Set;
-
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 
 /**
  * Skin Extension plugin that allows pulling javascript files from JAR resources.
@@ -32,7 +28,7 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 1.3
  */
-public class JsResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
+public class JsResourceSkinExtensionPlugin extends AbstractResourceSkinExtensionPlugin
 {
     /**
      * XWiki plugin constructor.
@@ -44,53 +40,38 @@ public class JsResourceSkinExtensionPlugin extends AbstractSkinExtensionPlugin
      */
     public JsResourceSkinExtensionPlugin(String name, String className, XWikiContext context)
     {
-        super("jsrx", className, context);
-        init(context);
+        super(name, className, context);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
     @Override
-    public String getLink(String documentName, XWikiContext context)
+    public String getName()
     {
-        String result = "";
-        // If the current user has access to Main.WebHome, we will use this document in the URL
-        // to serve the js resource. This way, the resource can be efficiently cached, since it has a
-        // common URL for any page.
-        try {
-            String page = context.getWiki().getDefaultWeb(context) + "." + context.getWiki().getDefaultPage(context);
-            if (!context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), page, context)) {
-                page = context.getDoc().getFullName();
-            }
-            String url =
-                context.getWiki().getURL(page, "jsx",
-                    "resource=" + documentName + parametersAsQueryString(documentName, context), context);
-            result = "<script type=\"text/javascript\" src=\"" + url + "\"></script>";
-        } catch (XWikiException e) {
-            // Do nothing here; we can't access the wiki, so don't link to this resource at all.
-        }
-        return result;
+        return "jsrx";
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * There is no support for always used resource-based extensions yet.
-     * </p>
-     * 
-     * @see AbstractSkinExtensionPlugin#getAlwaysUsedExtensions(XWikiContext)
+     *
+     * @see AbstractSkinExtensionPlugin#getAction()
      */
-    @Override
-    public Set<String> getAlwaysUsedExtensions(XWikiContext context)
+    protected String getAction()
     {
-        // There is no mean to define an always used extension for something else than a document extension now,
-        // so for resources-based extensions, we return an emtpy set.
-        // An idea for the future could be to have an API for plugins and components to register always used resources
-        // extensions.
-        return Collections.emptySet();
+        return "jsx";
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see AbstractSkinExtensionPlugin#generateLink()
+     */
+    protected String generateLink(String url)
+    {
+        return "<script type=\"text/javascript\" src=\"" + url + "\"></script>\n";
     }
 
     /**

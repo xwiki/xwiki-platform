@@ -971,7 +971,6 @@ body.content #contentcolumn .main {
 }
 
 #mainContentArea {
-    padding: 0;
     position: relative;
 }
 html>body #mainContentArea {
@@ -3442,7 +3441,7 @@ body.hideright #contentcolumn .main {
 
 #mainContentArea {
   background: $theme.pageContentBackgroundColor;
-  padding:0 25px 5px;
+  padding: 25px 25px 5px;
 }
 
 
@@ -3465,7 +3464,6 @@ body.hideright #companylogo {
   margin: 0px;
 }
 #hierarchy {
-  padding-top: 25px;
   font-size: 90%;
 }
 

@@ -310,12 +310,22 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     }
 
     /**
+     * Method for retrieving the main UI (panel) by sub-classes so that they can customize it.
+     * 
+     * @return the main ui panel.
+     */
+    protected Panel getMainPanel()
+    {
+        return this.mainPanel;
+    }
+    
+    /**
      * @return the fileUploadInput
      */
     public FileUpload getFileUploadInput()
     {
         return fileUploadInput;
-    }
+    }        
 
     /**
      * Displays the error message and markers for this dialog.

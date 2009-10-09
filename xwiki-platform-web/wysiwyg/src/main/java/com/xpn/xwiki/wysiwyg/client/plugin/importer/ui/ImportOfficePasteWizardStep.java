@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
@@ -59,6 +60,11 @@ public class ImportOfficePasteWizardStep implements WizardStep
     private Object result;
 
     /**
+     * Checkbox allowing the user to select whether he wants to filter out office styles or not.
+     */
+    private CheckBox filterStylesCheckBox;
+
+    /**
      * Creates an instance of {@link ImportOfficePasteWizardStep}.
      */
     public ImportOfficePasteWizardStep()
@@ -83,6 +89,10 @@ public class ImportOfficePasteWizardStep implements WizardStep
         textArea = new RichTextArea();
         textArea.addStyleName("xImportOfficeContentEditor");
         mainPanel.add(textArea);
+
+        // Filter styles check box.
+        this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
+        mainPanel.add(filterStylesCheckBox);
     }
 
     /**
@@ -97,7 +107,7 @@ public class ImportOfficePasteWizardStep implements WizardStep
      * {@inheritDoc}
      */
     public void init(Object data, AsyncCallback< ? > cb)
-    {        
+    {
         textArea.setHTML("");
         textArea.setFocus(true);
         cb.onSuccess(null);
@@ -137,7 +147,7 @@ public class ImportOfficePasteWizardStep implements WizardStep
     {
         return this.result;
     }
-    
+
     /**
      * Sets the result of this wizard step.
      * 
@@ -198,7 +208,9 @@ public class ImportOfficePasteWizardStep implements WizardStep
     protected Map<String, String> getHTMLCleaningParams()
     {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("filterStyles", "strict");
+        if (filterStylesCheckBox.getValue()) {
+            params.put("filterStyles", "strict");
+        }
         // For Office2007: Office2007 generates an xhtml document (when copied) which has attributes and tags of
         // several namespaces. But the document itself doesn't contain the namespace definitions, which causes
         // the HTMLCleaner (the DomSerializer) to fail while performing it's operations. As a workaround we

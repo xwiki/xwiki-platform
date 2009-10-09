@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -50,6 +51,11 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     private Object result;
 
     /**
+     * Checkbox allowing the user to select whether he wants to filter out office styles or not.
+     */
+    private CheckBox filterStylesCheckBox;
+
+    /**
      * Instantiates the office document import wizard step.
      * 
      * @param config wysiwyg configuration.
@@ -57,7 +63,11 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     public ImportOfficeFileWizardStep(Config config)
     {
         this.config = config;
-    }
+        
+        // Add filter styles check box.
+        this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
+        getMainPanel().add(filterStylesCheckBox);
+    }   
 
     /**
      * {@inheritDoc}
@@ -181,7 +191,9 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     protected Map<String, String> getHTMLCleaningParams()
     {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("filterStyles", "strict");
+        if (filterStylesCheckBox.getValue()) {
+            params.put("filterStyles", "strict");
+        }
         // For Office2007: Office2007 generates an xhtml document (when copied) which has attributes and tags of
         // several namespaces. But the document itself doesn't contain the namespace definitions, which causes
         // the HTMLCleaner (the DomSerializer) to fail while performing it's operations. As a workaround we

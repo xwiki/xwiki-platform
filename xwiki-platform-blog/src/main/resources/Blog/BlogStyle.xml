@@ -201,7 +201,7 @@
 .blog-entry-toolbox {
   float: right;
   position: relative;
-  z-index: 1000;
+  z-index: 2;
 }
 /* Add a space + line between consecutive blog entries */
 .hentry + .hentry {

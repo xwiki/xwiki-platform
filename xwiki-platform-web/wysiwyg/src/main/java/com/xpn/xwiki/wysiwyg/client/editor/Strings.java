@@ -369,6 +369,8 @@ public interface Strings extends Constants
     
     String importWizardImportButtonCaption();
     
+    String importOfficeContentFilterStylesCheckBoxLabel();
+    
     String importOfficeFileMenuItemCaption();
     
     String importOfficeFileFeatureNotAvailable();

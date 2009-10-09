@@ -23,9 +23,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
+import org.xwiki.rendering.parser.xwiki10.Filter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 
@@ -37,6 +39,9 @@ import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 public class LinkSyntaxFilter extends AbstractFilter implements Initializable
 {
     private static final Pattern LINKSYNTAX_PATTERN = Pattern.compile("\\[(.+?)\\]");
+
+    @Requirement("escape20")
+    private Filter escape20Filter;
 
     /**
      * {@inheritDoc}
@@ -71,13 +76,6 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
 
             String str = matcher.group(1);
             if (str != null) {
-                // TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
-                // The only unescaping done should be %xx => char,
-                // since &#nnn; must be preserved (the active encoding cannot handle the character)
-                // and + should be preserved (for "Doc.C++ examples").
-                // Anyway, this unescaper only treats &#nnn;
-                // trim the name and unescape it
-                // str = Encoder.unescape(str.trim());
                 str = str.trim();
                 String text = null, href = null, target = null;
 
@@ -117,7 +115,8 @@ public class LinkSyntaxFilter extends AbstractFilter implements Initializable
 
                 // Done, now print the link
                 if (text != null) {
-                    linkResult.append(text);
+                    linkResult.append(this.escape20Filter.filter(text, filterContext).replace("~", "~~").replace(">>",
+                        "~>~>").replace("||", "~|~|"));
                     linkResult.append(">>");
                 }
 

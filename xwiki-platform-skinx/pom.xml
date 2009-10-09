@@ -71,14 +71,11 @@
         <artifactId>maven-checkstyle-plugin</artifactId>
         <configuration>
           <excludes>
-            **/web/JsxAction.java,
-            **/web/SsxAction.java,
             **/web/sx/JsExtension.java,
             **/web/sx/SxSource.java,
             **/web/sx/SxDocumentSource.java,
             **/web/sx/SxResourceSource.java,
             **/web/sx/SxCompressor.java,
-            **/web/sx/AbstractSxAction.java,
           </excludes>
         </configuration>
       </plugin>

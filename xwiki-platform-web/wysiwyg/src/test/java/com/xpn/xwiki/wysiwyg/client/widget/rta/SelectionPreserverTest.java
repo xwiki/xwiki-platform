@@ -509,4 +509,51 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
         rta.getCommandManager().execute(Command.UNDO);
         assertEquals(content, rta.getHTML());
     }
+
+    /**
+     * Tests if the caret is preserved when it is placed inside an empty text node.
+     */
+    public void testPreserveCaretInsideEmptyTextNode()
+    {
+        delayTestFinish(FINISH_DELAY);
+        (new Timer()
+        {
+            public void run()
+            {
+                doTestPreserveCaretInsideEmptyTextNode();
+                finishTest();
+            }
+        }).schedule(START_DELAY);
+    }
+
+    /**
+     * Tests if the caret is preserved when it is placed inside an empty text node.
+     */
+    private void doTestPreserveCaretInsideEmptyTextNode()
+    {
+        // Create a heading,
+        rta.setHTML("<p>x</p><h1></h1>");
+        // with an empty text node inside.
+        getBody().getLastChild().appendChild(rta.getDocument().createTextNode(""));
+
+        // Place the caret inside the empty text node.
+        Range range = rta.getDocument().createRange();
+        range.setStart(getBody().getLastChild().getFirstChild(), 0);
+        range.collapse(true);
+
+        Selection selection = rta.getDocument().getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        assertTrue(selection.isCollapsed());
+
+        preserver.saveSelection();
+        range.selectNodeContents(getBody().getFirstChild());
+        selection.removeAllRanges();
+        selection.addRange(range);
+        assertEquals("x", selection.toString());
+
+        preserver.restoreSelection();
+        assertTrue(selection.isCollapsed());
+        assertEquals(getBody().getLastChild(), selection.getRangeAt(0).getStartContainer().getParentNode());
+    }
 }

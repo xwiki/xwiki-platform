@@ -95,6 +95,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("strikeout/strikeout1", false);
         suite.addTestsFromResource("link/link1", false);
         suite.addTestsFromResource("link/link2", false);
+        suite.addTestsFromResource("link/link3", false);
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
         suite.addTestsFromResource("list/list3", false);

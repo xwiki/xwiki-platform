@@ -190,9 +190,10 @@
   background-position: -4px center;
   background-repeat: no-repeat;
   cursor: default;
+  display: inline-block;
   width: 10px;
   height: 10px;
-  padding-left: 10px;
+  vertical-align: middle;
 }
 #xwikiobjects .collapsable dd {
   padding-left: 10px;

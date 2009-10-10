@@ -97,28 +97,13 @@
 }
 
 
-*+html #lb-top .roundedlight, * html #lb-top .roundedlight {
-  margin-top: -1em;
-}
-
 * html #lb-bottom .roundedlight {
   margin-top: -1em;
 }
 
-*+html #lb-top .rounded, * html #lb-top .rounded {
-  margin-top: -1em;
-}
-
-
 /* *+html #lb-bottom .rounded, */
 * html #lb-bottom .rounded {
   margin-top: 0em; /* avant -1em*/
-}
-
-
-*+html #lb-top .rounded .b1, * html #lb-top .rounded .b1, *+html
-#lb-top .roundedlight .b1, * html #lb-top .roundedlight .b1 {
-  margin-bottom: -0.15em;
 }
 
 *+html #lb-bottom .rounded .b12b, * html #lb-bottom .rounded .b12b,

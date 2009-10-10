@@ -158,6 +158,10 @@
 	text-align: right;
 	cursor: default;
 }
+/* For IE7 */
+*+html #close-wrap {
+  top: 22px;
+}
 
 #lb-close {
 	margin-left: auto;

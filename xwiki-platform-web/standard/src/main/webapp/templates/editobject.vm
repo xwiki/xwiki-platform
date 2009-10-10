@@ -10,7 +10,7 @@
 ##
 #macro(displayObject $obj $class $props $firstfield)
   <div id="xobject_${class.name}_${obj.number}" class="xobject">
-  <div id="xobject_${class.name}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}:</strong> $doc.display($firstfield, $obj)
+  <div id="xobject_${class.name}_${obj.number}_title" class="xobject-title"><h3>#cleanClassname(${class.name}) ${obj.number}: $doc.display($firstfield, $obj)
     <a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${doc.getURL('edit', 'editor=object')}")" class="xobject-action delete" title="Remove this object">$msg.get("removethisobject")</a>
     #if(!$hasCustomObject) <a href="$doc.getURL("edit", "editor=object&amp;classname=${class.name}&amp;object=${obj.number}")" class="xobject-action edit" title="Edit only this object">$msg.get("editthisobject")</a> #end
   </h3></div>

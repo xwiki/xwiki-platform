@@ -2517,8 +2517,12 @@ public class XWikiDocument implements DocumentModelBridge
                 return false;
             }
             for (int i = 0; i < myObjects.size(); i++) {
-                if ((myObjects.get(i) == null) && (otherObjects.get(i) != null)) {
+                if ((myObjects.get(i) == null && otherObjects.get(i) != null)
+                    || (myObjects.get(i) != null && otherObjects.get(i) == null)) {
                     return false;
+                }
+                if (myObjects.get(i) == null && otherObjects.get(i) == null) {
+                    continue;
                 }
                 if (!myObjects.get(i).equals(otherObjects.get(i))) {
                     return false;

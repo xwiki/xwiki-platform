@@ -70,6 +70,7 @@ public class VelocityParser extends AbstractLogEnabled
         VELOCITYDIRECTIVE_PARAM.add("elseif");
         VELOCITYDIRECTIVE_PARAM.add("define");
         VELOCITYDIRECTIVE_PARAM.add("evaluate");
+        VELOCITYDIRECTIVE_PARAM.add("include");
 
         VELOCITYDIRECTIVE_NOPARAM.addAll(VELOCITYDIRECTIVE_END);
         VELOCITYDIRECTIVE_NOPARAM.add("else");
@@ -140,7 +141,9 @@ public class VelocityParser extends AbstractLogEnabled
         StringBuffer directiveNameBuffer = new StringBuffer();
         i = getDirectiveName(array, i, directiveNameBuffer, null, context);
 
-        if (!VELOCITYDIRECTIVE_NOPARAM.contains(directiveNameBuffer.toString())) {
+        String directiveName = directiveNameBuffer.toString();
+
+        if (!VELOCITYDIRECTIVE_NOPARAM.contains(directiveName)) {
             // Skip spaces
             while (i < array.length && array[i] == ' ') {
                 ++i;
@@ -154,13 +157,19 @@ public class VelocityParser extends AbstractLogEnabled
             }
         }
 
-        if (VELOCITYDIRECTIVE_ALL.contains(directiveNameBuffer.toString())) {
+        if (VELOCITYDIRECTIVE_ALL.contains(directiveName)) {
+            if (VELOCITYDIRECTIVE_BEGIN.contains(directiveName)) {
+                context.pushVelocityElement(new VelocityBlock(directiveName, VelocityBlock.VelocityType.DIRECTIVE));
+            } else if (VELOCITYDIRECTIVE_END.contains(directiveName)) {
+                context.popVelocityElement();
+            }
+
             // consume the end of the line
             i = getDirectiveEndOfLine(array, i, null, context);
 
-            context.setType(VelocityParserContext.VelocityType.DIRECTIVE);
+            context.setType(VelocityBlock.VelocityType.DIRECTIVE);
         } else {
-            context.setType(VelocityParserContext.VelocityType.MACRO);
+            context.setType(VelocityBlock.VelocityType.MACRO);
         }
 
         if (velocityBlock != null) {
@@ -303,7 +312,7 @@ public class VelocityParser extends AbstractLogEnabled
             velocityBlock.append(array, currentIndex, i - currentIndex);
         }
 
-        context.setType(VelocityParserContext.VelocityType.COMMENT);
+        context.setType(VelocityBlock.VelocityType.COMMENT);
 
         return i;
     }
@@ -330,7 +339,7 @@ public class VelocityParser extends AbstractLogEnabled
             velocityBlock.append(array, currentIndex, i - currentIndex);
         }
 
-        context.setType(VelocityParserContext.VelocityType.COMMENT);
+        context.setType(VelocityBlock.VelocityType.COMMENT);
 
         return i;
     }
@@ -403,13 +412,13 @@ public class VelocityParser extends AbstractLogEnabled
             velocityBlock.append(array, currentIndex, i - currentIndex);
         }
 
-        context.setType(VelocityParserContext.VelocityType.VAR);
+        context.setType(VelocityBlock.VelocityType.VAR);
 
         return i;
     }
 
     /**
-     * Look in previous elements of the array to find if the current var is escaped (like \$var).
+     * Look in previous characters of the array to find if the current var is escaped (like \$var).
      * 
      * @param array the source to parse
      * @param currentIndex the current index in the <code>array</code>
@@ -617,6 +626,8 @@ public class VelocityParser extends AbstractLogEnabled
     }
 
     /**
+     * Match a group of {@link Character#isWhitespace(char)}.
+     * 
      * @param array the source to parse
      * @param currentIndex the current index in the <code>array</code>
      * @param velocityBlock the buffer where to append matched velocity block
@@ -624,6 +635,31 @@ public class VelocityParser extends AbstractLogEnabled
      * @return the index in the <code>array</code> after the matched block
      */
     public int getWhiteSpaces(char[] array, int currentIndex, StringBuffer velocityBlock, VelocityParserContext context)
+    {
+        int i = currentIndex;
+
+        while (i < array.length && Character.isWhitespace(array[i])) {
+            ++i;
+        }
+
+        if (velocityBlock != null) {
+            velocityBlock.append(array, currentIndex, i - currentIndex);
+        }
+
+        return i;
+    }
+
+    /**
+     * Match a group of space characters (ASCII 32).
+     * 
+     * @param array the source to parse
+     * @param currentIndex the current index in the <code>array</code>
+     * @param velocityBlock the buffer where to append matched velocity block
+     * @param context the parser context to put some informations
+     * @return the index in the <code>array</code> after the matched block
+     */
+    public int getSpaces(char[] array, int currentIndex, StringBuffer velocityBlock,
+        VelocityParserContext context)
     {
         int i = currentIndex;
 

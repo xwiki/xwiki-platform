@@ -32,6 +32,7 @@ import org.xwiki.rendering.parser.xwiki10.AbstractFilter;
 import org.xwiki.rendering.parser.xwiki10.FilterContext;
 import org.xwiki.rendering.parser.xwiki10.util.CleanUtil;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
+import org.xwiki.velocity.internal.util.VelocityBlock;
 
 /**
  * Register all Velocity comments in order to protect them from following filters. Protect velocity comments, convert
@@ -53,8 +54,7 @@ public class VelocityFilter extends AbstractFilter implements Initializable
 
     public static final String VELOCITYCLOSE_SF = VELOCITY_SF + "close";
 
-    public static final String VELOCITYCOMMENT_SF =
-        VELOCITYNOOUTPUT_SF + ExtendedVelocityParserContext.VelocityType.COMMENT;
+    public static final String VELOCITYCOMMENT_SF = VELOCITYNOOUTPUT_SF + VelocityBlock.VelocityType.COMMENT;
 
     public static final String VELOCITY_SPATTERN =
         "(?:" + FilterContext.XWIKI1020TOKEN_OP + FilterContext.XWIKI1020TOKEN_SF_SPATTERN + VELOCITY_SF
@@ -169,10 +169,10 @@ public class VelocityFilter extends AbstractFilter implements Initializable
                     }
                 }
 
-                velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(velocityBlock
-                    .toString(), (velocityBlock.charAt(velocityBlock.length() - 1) == '\n' ? VELOCITYNOOUTPUT_SF
-                    : VELOCITY_SF)
-                    + context.getType(), context.isInline()) : velocityBlock);
+                velocityBuffer.append(context.isProtectedBlock() ? filterContext.addProtectedContent(
+                    velocityBlock.toString(), (velocityBlock.charAt(velocityBlock.length() - 1) == '\n'
+                        ? VELOCITYNOOUTPUT_SF : VELOCITY_SF)
+                        + context.getType(), context.isInline()) : velocityBlock);
             } else {
                 StringBuffer nonVelocityBuffer = inVelocityMacro ? afterVelocityBuffer : beforeVelocityBuffer;
 
@@ -192,13 +192,13 @@ public class VelocityFilter extends AbstractFilter implements Initializable
             }
         }
 
-        // fix not closed #if, #foreach
-        if (context.getVelocityDepth() > 0) {
+        // fix not closed #if, #foreach, etc.
+        if (context.isInVelocityBlock()) {
             velocityBuffer.append(afterVelocityBuffer);
             afterVelocityBuffer.setLength(0);
 
             // fix unclosed velocity blocks
-            for (; context.getVelocityDepth() > 0; context.popVelocityDepth()) {
+            for (; context.isInVelocityBlock(); context.popVelocityElement()) {
                 velocityBuffer.append(filterContext.addProtectedContent("#end\n", VELOCITYNOOUTPUT_SF, true));
             }
         }

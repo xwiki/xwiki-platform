@@ -25,8 +25,10 @@ import java.util.List;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.internal.parser.xwiki10.HTMLFilter;
 import org.xwiki.rendering.parser.xwiki10.macro.VelocityMacroConverter;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
+import org.xwiki.velocity.internal.util.VelocityBlock;
 import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
 
@@ -66,21 +68,22 @@ public class ExtendedVelocityParser extends VelocityParser
         String directiveName = directiveNameBuffer.toString();
 
         StringBuffer directiveBuffer = new StringBuffer();
-        directiveBuffer.append(array, currentIndex, i - currentIndex);
 
         if (VELOCITYDIRECTIVE_ALL.contains(directiveName)) {
             // get the velocity directive
-            if (VELOCITYDIRECTIVE_BEGIN.contains(directiveName)) {
-                context.pushVelocityDepth();
-            } else if (VELOCITYDIRECTIVE_END.contains(directiveName)) {
-                context.popVelocityDepth();
+            if (VELOCITYDIRECTIVE_END.contains(directiveName)) {
+                if (context.getCurrentElement().getName().equals("macro")) {
+                    HTMLFilter.appendHTMLClose(directiveBuffer, econtext.getFilterContext(), true);
+                }
+
+                context.popVelocityElement();
             }
+
+            directiveBuffer.append(array, currentIndex, i - currentIndex);
 
             if (!VELOCITYDIRECTIVE_NOPARAM.contains(directiveName)) {
                 // Skip spaces
-                for (; i < array.length && array[i] == ' '; ++i) {
-                    directiveBuffer.append(array[i]);
-                }
+                i = getSpaces(array, i, directiveBuffer, context);
 
                 if (i < array.length && array[i] == '(') {
                     // Skip condition
@@ -94,12 +97,20 @@ public class ExtendedVelocityParser extends VelocityParser
             i = getDirectiveEndOfLine(array, i, directiveBuffer, context);
 
             econtext.setVelocity(true);
-            context.setType(VelocityParserContext.VelocityType.DIRECTIVE);
-        } else {
-            // Skip spaces
-            for (; i < array.length && array[i] == ' '; ++i) {
-                directiveBuffer.append(array[i]);
+            context.setType(VelocityBlock.VelocityType.DIRECTIVE);
+
+            if (VELOCITYDIRECTIVE_BEGIN.contains(directiveName)) {
+                context.pushVelocityElement(new VelocityBlock(directiveName, VelocityBlock.VelocityType.DIRECTIVE));
+
+                if (directiveName.equals("macro")) {
+                    HTMLFilter.appendHTMLOpen(directiveBuffer, econtext.getFilterContext(), true);
+                }
             }
+        } else {
+            directiveBuffer.append(array, currentIndex, i - currentIndex);
+
+            // Skip spaces
+            i = getSpaces(array, i, directiveBuffer, context);
 
             if (i < array.length && array[i] == '(') {
                 ((ExtendedVelocityParserContext) context).setInline(true);
@@ -115,7 +126,7 @@ public class ExtendedVelocityParser extends VelocityParser
                     directiveBuffer.append(convertedMacro);
                 } else {
                     econtext.setVelocity(true);
-                    context.setType(ExtendedVelocityParserContext.VelocityType.MACRO);
+                    context.setType(VelocityBlock.VelocityType.MACRO);
                 }
             } else {
                 throw new InvalidVelocityException();
@@ -136,10 +147,12 @@ public class ExtendedVelocityParser extends VelocityParser
 
             convertedMacro = currentMacro.convert(name, parameters, context.getFilterContext());
 
-            context.setInline(currentMacro.isInline());
-            context.setProtectedBlock(currentMacro.protectResult());
+            if (convertedMacro != null) {
+                context.setInline(currentMacro.isInline());
+                context.setProtectedBlock(currentMacro.protectResult());
 
-            context.setConversion(true);
+                context.setConversion(true);
+            }
         } catch (ComponentLookupException e) {
             if (getLogger().isDebugEnabled()) {
                 getLogger().debug("Can't find macro converter [" + name + "]", e);

@@ -77,20 +77,17 @@ public class RenderingTests extends TestCase
         descriptorEMC.setRole(FormulaMacroConfiguration.class);
         componentManager.registerComponent(descriptorEMC, mockConfiguration);
 
-        context.checking(new Expectations()
-        {
-            {
-                atLeast(2).of(mockDocumentAccessBridge).getURL(null, "tex", null, null);
-                will(returnValue("/xwiki/bin/view/Main/"));
+        context.checking(new Expectations() {{
+            atLeast(2).of(mockDocumentAccessBridge).getURL(null, "tex", null, null);
+            will(returnValue("/xwiki/bin/view/Main/"));
 
-                atLeast(2).of(mockConfiguration).getRenderer();
-                will(returnValue("snuggletex"));
+            atLeast(2).of(mockConfiguration).getRenderer();
+            will(returnValue("snuggletex"));
 
-                atLeast(2).of(mockImageStorage).get(with(any(String.class)));
-                will(returnValue(null));
+            atLeast(2).of(mockImageStorage).get(with(any(String.class)));
+            will(returnValue(null));
 
-                atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
-            }
-        });
+            atLeast(2).of(mockImageStorage).put(with(any(String.class)), with(any(ImageData.class)));
+        }});
     }
 }

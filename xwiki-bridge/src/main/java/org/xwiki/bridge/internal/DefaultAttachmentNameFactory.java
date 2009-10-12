@@ -39,7 +39,7 @@ public class DefaultAttachmentNameFactory implements AttachmentNameFactory
     /**
      * Character to separate document name from filename, see {@link #createAttachmentName(String)}.
      */
-    private static final String FILENAME_SEPARATOR = "@";
+    public static final String FILENAME_SEPARATOR = "@";
 
     /**
      * Factory that uses the current document name (if set) to create a document name from a raw reference.

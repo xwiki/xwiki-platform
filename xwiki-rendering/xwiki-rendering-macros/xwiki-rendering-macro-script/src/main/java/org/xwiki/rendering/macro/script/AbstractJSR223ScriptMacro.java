@@ -178,7 +178,7 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
         if (engineName != null) {
 
             try {
-                ScriptEngine engine = getScriptEngine(engineName, parameters.getJars());
+                ScriptEngine engine = getScriptEngine(engineName);
                 
                 if (engine != null) {
                     ScriptContext scriptContext = getScriptContext();
@@ -211,15 +211,21 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
 
     /**
      * @param engineName the script engine name (eg "groovy", etc)
-     * @param jarsParameterValue the value of the jars parameter for passing JAR URLs
      * @return the Script engine to use to evaluate the script 
      * @throws MacroExecutionException in case of an error in parsing the jars parameter
      */
-    private ScriptEngine getScriptEngine(String engineName, String jarsParameterValue)
+    private ScriptEngine getScriptEngine(String engineName)
         throws MacroExecutionException
     {
         // Look for a script engine in the Execution Context since we want the same engine to be used
         // for all evals during the same execution lifetime.
+        // We must use the same engine because that engine may create an internal ClassLoader in which
+        // it loads new classes defined in the script and if we create a new engine then defined classes
+        // will be lost.
+        // However we also need to be able to execute several script Macros during a single execution request
+        // and for example the second macro could have jar parameters. In order to support this use case
+        // we ensure in AbstractScriptMacro to reuse the same thread context ClassLoader during the whole
+        // request execution.
         ExecutionContext executionContext = this.execution.getContext();
         Map<String, ScriptEngine> scriptEngines = 
             (Map<String, ScriptEngine>) executionContext.getProperty(EXECUTION_CONTEXT_ENGINE_KEY);
@@ -228,22 +234,10 @@ public abstract class AbstractJSR223ScriptMacro<P extends JSR223ScriptMacroParam
             executionContext.setProperty(EXECUTION_CONTEXT_ENGINE_KEY, scriptEngines);
         }
         ScriptEngine engine = scriptEngines.get(engineName);
+        
         if (engine == null) {
             ScriptEngineManager sem = new ScriptEngineManager();
-
-            // Some engines will create their class loader when the engine is instantiated and use the context
-            // classloader as the parent class loader. Thus we must set our own class loader at this point so
-            // that we can add other URLs to it later on if some JARs are specified in other script macro
-            // executions.
-            ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(getClassLoader(jarsParameterValue));
-                engine = sem.getEngineByName(engineName);
-            } finally {
-                // Restore original class loader
-                Thread.currentThread().setContextClassLoader(originalClassLoader);
-            }
-
+            engine = sem.getEngineByName(engineName);
             scriptEngines.put(engineName, engine);
         }
 

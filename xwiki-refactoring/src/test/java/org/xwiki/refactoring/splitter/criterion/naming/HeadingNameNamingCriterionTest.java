@@ -21,16 +21,12 @@ package org.xwiki.refactoring.splitter.criterion.naming;
 
 import java.io.StringReader;
 
-import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
+import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.test.AbstractComponentTestCase;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -39,34 +35,8 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.9M1
  */
-public class HeadingNameNamingCriterionTest extends AbstractComponentTestCase
+public class HeadingNameNamingCriterionTest extends AbstractRefactoringTestCase
 {
-    /**
-     * The {@link Parser} component.
-     */
-    private Parser xwikiParser;
-
-    /**
-     * The {@link DocumentAccessBridge} component.
-     */
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractComponentTestCase#setUp()
-     */
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
-
-        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
-    }
-
     /**
      * Tests document names generated.
      * 

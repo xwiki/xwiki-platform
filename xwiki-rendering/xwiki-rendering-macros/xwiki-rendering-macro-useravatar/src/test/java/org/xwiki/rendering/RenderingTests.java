@@ -19,16 +19,15 @@
  */
 package org.xwiki.rendering;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
-import org.xwiki.rendering.internal.MockSkinAccessBridge;
-import org.xwiki.rendering.scaffolding.MockWikiModel;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.SkinAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -47,12 +46,40 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrouseravatar1", true);
         suite.addTestsFromResource("macrouseravatar2", true);
         suite.addTestsFromResource("macrouseravatar3", true);
-        
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
-        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
-        mocks.add(MockSkinAccessBridge.getComponentDescriptor());
-        mocks.add(MockWikiModel.getComponentDescriptor());
 
-        return new ComponentManagerTestSetup(suite, mocks);
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
+
+        return testSetup;
     }
+    
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
+        Mockery context = new Mockery();
+
+        // Skin Access Bridge Mock
+        final SkinAccessBridge mockSkinAccessBridge = context.mock(SkinAccessBridge.class);
+        DefaultComponentDescriptor<SkinAccessBridge> descriptorSAB = new DefaultComponentDescriptor<SkinAccessBridge>();
+        descriptorSAB.setRole(SkinAccessBridge.class);
+        componentManager.registerComponent(descriptorSAB, mockSkinAccessBridge);
+
+        context.checking(new Expectations() {{
+            allowing(mockSkinAccessBridge).getSkinFile("noavatar.png"); will(returnValue("/xwiki/noavatar.png"));
+        }});        
+
+        // Document Access Bridge Mock
+        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
+
+        context.checking(new Expectations() {{
+            allowing(mockDocumentAccessBridge).exists("XWiki.Admin"); will(returnValue(true));
+            allowing(mockDocumentAccessBridge).exists("XWiki.ExistingUserWithoutAvatar"); will(returnValue(true));
+            allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(false));
+            allowing(mockDocumentAccessBridge).getProperty("XWiki.Admin", "XWiki.XWikiUsers", "avatar"); will(returnValue("mockAvatar.png"));
+            allowing(mockDocumentAccessBridge).getProperty("XWiki.ExistingUserWithoutAvatar", "XWiki.XWikiUsers", "avatar"); will(returnValue(null));
+        }});        
+    }    
 }

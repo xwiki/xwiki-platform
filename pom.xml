@@ -151,5 +151,6 @@
     <module>xwiki-chart</module>
     <module>xwiki-properties</module>
     <module>xwiki-formula</module>
+    <module>xwiki-classloader</module>
   </modules>
 </project>

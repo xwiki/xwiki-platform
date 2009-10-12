@@ -17,31 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.script;
-
-import java.net.URL;
-import java.util.List;
+package org.xwiki.bridge;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Create JAR URLs to be used in the script Class Loader when executing scripts, see {@link #createJARURLs(String)}
- * for more details.
+ * Generate a fully qualified attachment reference string (ie of the form
+ * {@code wiki:space.page@filename}) out of an {@link AttachmentName}.
  * 
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.0.1
  */
 @ComponentRole
-public interface ScriptJARURLFactory
+public interface AttachmentNameSerializer
 {
     /**
-     * Create a list of JAR URLs to be put in the Class Loader used when executing scripts. The URLs are created based
-     * on some passed reference specifying a list of JARs to be made available in the created class loader. The format
-     * is not defined and left to implementation classes.
-     * 
-     * @param scriptJars the list of JARs to make available in the returned class loader
-     * @return the JAR URLs
-     * @throws Exception if the URLs fail to be created for any reason (eg some invalid URL reference passed)
+     * @param attachmentName the attachment name to serialize
+     * @return the fully qualified attachment reference string (ie of the form {@code wiki:space.page@filename})
      */
-    List<URL> createJARURLs(String scriptJars) throws Exception;
+    String serialize(AttachmentName attachmentName);
 }

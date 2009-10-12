@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.scaffolding;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -191,6 +192,22 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      */
     public void setProperty(String documentName, String className, String propertyName, Object propertyValue)
         throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public InputStream getAttachmentContent(AttachmentName attachmentName) throws Exception
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<AttachmentName> getAttachments(DocumentName documentName) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }

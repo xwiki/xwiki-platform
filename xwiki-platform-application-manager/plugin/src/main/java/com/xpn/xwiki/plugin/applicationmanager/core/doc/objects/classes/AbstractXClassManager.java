@@ -841,7 +841,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             parameterValues.add(getItemDocumentDefaultFullName("%", null));
         }
 
-        where.append(" and doc.fullName <>" + HQL_PARAMETER_STRING);
+        where.append(" and doc.fullName<>" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassTemplateFullName());
 
         String andSymbol = " and ";

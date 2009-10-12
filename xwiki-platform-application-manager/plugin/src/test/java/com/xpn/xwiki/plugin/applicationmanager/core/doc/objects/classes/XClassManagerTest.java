@@ -217,7 +217,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * Result of {@link AbstractXClassManager#createWhereClause(Object[][], List)} with no parameters.
      */
     public static final String WHERECLAUSE_null =
-        ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>?";
+        ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and doc.fullName<>?";
 
     public static final String[] WHERECLAUSE_doc0 = {"df0", null, "dv0"};
 
@@ -231,7 +231,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * Result of {@link AbstractXClassManager#createWhereClause(Object[][], List)} with doc filter.
      */
     public static final String WHERECLAUSE_doc =
-        ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=?";
+        ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and doc.fullName<>? and lower(doc.df0)=?";
 
     public static final String[][] WHERECLAUSE_PARAM_doc = {WHERECLAUSE_doc0};
 
@@ -239,7 +239,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * Result of {@link AbstractXClassManager#createWhereClause(Object[][], List)} with more than one docs filters.
      */
     public static final String WHERECLAUSE_doc_multi =
-        ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and lower(doc.df1)=?";
+        ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and doc.fullName<>? and lower(doc.df0)=? and lower(doc.df1)=?";
 
     public static final String[][] WHERECLAUSE_PARAM_doc_multi = {WHERECLAUSE_doc0, WHERECLAUSE_doc1};
 
@@ -247,7 +247,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * Result of {@link AbstractXClassManager#createWhereClause(Object[][], List)} with object filter.
      */
     public static final String WHERECLAUSE_obj =
-        ", BaseObject as obj, String as field0 where doc.fullName=obj.name and obj.className=? and obj.name<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=?";
+        ", BaseObject as obj, String as field0 where doc.fullName=obj.name and obj.className=? and doc.fullName<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=?";
 
     public static final String[][] WHERECLAUSE_PARAM_obj = {WHERECLAUSE_obj0};
 
@@ -255,7 +255,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * Result of {@link AbstractXClassManager#createWhereClause(Object[][], List)} with more than one objects filters.
      */
     public static final String WHERECLAUSE_obj_multi =
-        ", BaseObject as obj, String as field0, Int as field1 where doc.fullName=obj.name and obj.className=? and obj.name<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
+        ", BaseObject as obj, String as field0, Int as field1 where doc.fullName=obj.name and obj.className=? and doc.fullName<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
 
     public static final String[][] WHERECLAUSE_PARAM_obj_multi = {WHERECLAUSE_obj0, WHERECLAUSE_obj1};
 
@@ -263,7 +263,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * Result of {@link AbstractXClassManager#createWhereClause(Object[][], List)} with object and doc filter.
      */
     public static final String WHERECLAUSE_objdoc =
-        ", BaseObject as obj, String as field1 where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
+        ", BaseObject as obj, String as field1 where doc.fullName=obj.name and obj.className=? and doc.fullName<>? and lower(doc.df0)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
 
     public static final String[][] WHERECLAUSE_PARAM_objdoc = {WHERECLAUSE_doc0, WHERECLAUSE_obj0};
 
@@ -272,7 +272,7 @@ public class XClassManagerTest extends AbstractBridgedXWikiComponentTestCase
      * filters.
      */
     public static final String WHERECLAUSE_objdoc_multi =
-        ", BaseObject as obj, String as field2, Int as field3 where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and lower(doc.df1)=? and obj.id=field2.id.id and field2.name=? and lower(field2.value)=? and obj.id=field3.id.id and field3.name=? and lower(field3.value)=?";
+        ", BaseObject as obj, String as field2, Int as field3 where doc.fullName=obj.name and obj.className=? and doc.fullName<>? and lower(doc.df0)=? and lower(doc.df1)=? and obj.id=field2.id.id and field2.name=? and lower(field2.value)=? and obj.id=field3.id.id and field3.name=? and lower(field3.value)=?";
 
     public static final String[][] WHERECLAUSE_PARAM_objdoc_multi =
         {WHERECLAUSE_doc0, WHERECLAUSE_doc1, WHERECLAUSE_obj0, WHERECLAUSE_obj1};

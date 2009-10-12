@@ -17,35 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.splitter.criterion.naming;
+package org.xwiki.bridge;
 
-import java.io.StringReader;
-
-import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
-import org.xwiki.rendering.block.XDOM;
-import org.junit.Assert;
-import org.junit.Test;
+import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Test case for {@link PageIndexNamingCriterion}.
+ * Generate a fully qualified attachment reference string (ie of the form
+ * {@code wiki:space.page@filename}) out of an {@link AttachmentName}.
  * 
  * @version $Id$
- * @since 1.9M1
+ * @since 2.0.1
  */
-public class PageIndexNamingCriterionTest extends AbstractRefactoringTestCase
+@ComponentRole
+public interface AttachmentNameSerializer
 {
     /**
-     * Tests document names generated.
-     * 
-     * @throws Exception
+     * @param attachmentName the attachment name to serialize
+     * @return the fully qualified attachment reference string (ie of the form {@code wiki:space.page@filename})
      */
-    @Test
-    public void testDocumentNamesGeneration() throws Exception
-    {
-        XDOM xdom = xwikiParser.parse(new StringReader("=Test="));
-        NamingCriterion namingCriterion = new PageIndexNamingCriterion("Main.Test", docBridge);
-        for (int i = 1; i < 10; i++) {
-            Assert.assertEquals("Main.Test-" + i, namingCriterion.getDocumentName(xdom));
-        }
-    }
+    String serialize(AttachmentName attachmentName);
 }

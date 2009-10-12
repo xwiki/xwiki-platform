@@ -25,40 +25,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-macros-parent</artifactId>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <artifactId>xwiki-core-parent</artifactId>
     <version>2.1-SNAPSHOT</version>
-    <relativePath>../../xwiki-rendering/xwiki-rendering-macros/pom.xml</relativePath>
   </parent>
-  <artifactId>xwiki-core-rendering-macro-chart</artifactId>
-  <name>XWiki Platform - Core - Rendering - Macro - Chart</name>
-  <description>Macro for displaying charts</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>   
-        <configuration>
-          <includes>
-            <include>**/RenderingTests.java</include>
-          </includes>
-        </configuration>     
-      </plugin>      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
+  <groupId>org.xwiki.platform</groupId>
+  <artifactId>xwiki-core-classloader</artifactId>
+  <name>XWiki Platform - Core - ClassLoader</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Core - ClassLoader</description>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-chart-renderer</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
+      <artifactId>xwiki-core-component-api</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>
@@ -67,9 +46,15 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
+      <groupId>edu.emory.mathcs.util</groupId>
+      <artifactId>emory-util-classloader</artifactId>
+      <version>2.1</version>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-macro-include</artifactId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
       <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>

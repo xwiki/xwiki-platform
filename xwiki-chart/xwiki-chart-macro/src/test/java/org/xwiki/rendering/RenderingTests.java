@@ -19,15 +19,17 @@
  */
 package org.xwiki.rendering;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
-import org.xwiki.rendering.internal.MockDocumentNameSerializer;
+import org.apache.commons.io.IOUtils;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -54,10 +56,44 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrochart3", true);
         suite.addTestsFromResource("macrochart4", true);
 
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
-        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
-        mocks.add(MockDocumentNameSerializer.getComponentDescriptor());
-        
-        return new ComponentManagerTestSetup(suite, mocks);
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
+
+        return testSetup;
     }
+    
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
+        Mockery context = new Mockery();
+        
+        // Document Access Bridge Mock
+        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
+
+        final DocumentName documentName = new DocumentName(null, "Test", "Test");
+        
+        context.checking(new Expectations() {{
+            allowing(mockDocumentAccessBridge).getURL(with(any(String.class)), with(any(String.class)), 
+                with(any(String.class)), with(any(String.class))); will(returnValue("http://localhost/charts"));
+            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); will(returnValue(documentName));
+            allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(true));
+            allowing(mockDocumentAccessBridge).getDocumentSyntaxId(with(any(String.class))); will(returnValue("xwiki/2.0"));
+            allowing(mockDocumentAccessBridge).getDocumentContent("Test.Test");
+                will(returnValue(IOUtils.toString(RenderingTests.class.getClassLoader().getResourceAsStream("wiki.txt"))));
+        }});
+        
+        // Document Name Serializer Mock
+        final DocumentNameSerializer mockDocumentNameSerializer = context.mock(DocumentNameSerializer.class);
+        DefaultComponentDescriptor<DocumentNameSerializer> descriptorDNS =
+            new DefaultComponentDescriptor<DocumentNameSerializer>();
+        descriptorDNS.setRole(DocumentNameSerializer.class);
+        componentManager.registerComponent(descriptorDNS, mockDocumentNameSerializer);
+
+        context.checking(new Expectations() {{
+            allowing(mockDocumentNameSerializer).serialize(documentName); will(returnValue("Test.Test"));
+        }});
+    }    
 }

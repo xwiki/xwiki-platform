@@ -60,6 +60,19 @@ public class ClassLoadingTest extends AbstractComponentTestCase
     }
 
     @Test
+    public void testDefineClassInOneExecutionAndUseInAnother() throws Exception
+    {
+        // First execution: define a class
+        JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();
+        // TODO: Groovy bug: We need to have a statement after the class declaration, see
+        // http://jira.codehaus.org/browse/GROOVY-3711
+        this.macro.execute(params, "class MyClass {}\ndef var", this.context);
+
+        // Second execution: use the defined class
+        this.macro.execute(params, "def var = new MyClass()", this.context);
+    }
+
+    @Test
     public void testExtraJarLocatedAtURL() throws Exception
     {
         // Use a dummy JAR to verify that some passed URL is indeed added to the CL. That JAR only contains
@@ -79,12 +92,35 @@ public class ClassLoadingTest extends AbstractComponentTestCase
     @Test
     public void testJarParamsInSecondMacro() throws Exception
     {
+        JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();
+
         // Execute a first macro without any jars param passed
-        this.macro.execute(new JSR223ScriptMacroParameters(), "def var", this.context);
+        this.macro.execute(params, "def var", this.context);
 
         // Execute a second macro this time with jars param and verify it works
-        JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();
         params.setJars(getClass().getClassLoader().getResource("dummy.jar").toString());
         this.macro.execute(params, "def var = new Dummy()", this.context);
+    }
+
+    /**
+     * Verify that it works if we define an interface in a first macro execution and then define a second
+     * macro execution which uses the defined interface and also has jar params different from the first
+     * macro execution. Also test if a third execution with no params but using a previously defined
+     * interface also works.
+     */
+    @Test
+    public void testDefineClassInFirstExecutionAndJarParamsInAnother() throws Exception
+    {
+        // TODO: Groovy bug: We need to have a statement after the class declaration, see
+        // http://jira.codehaus.org/browse/GROOVY-3711
+        this.macro.execute(new JSR223ScriptMacroParameters(), "class MyClass {}\ndef var", this.context);
+
+        // Second execution: use the defined class but with different jar params
+        JSR223ScriptMacroParameters params = new JSR223ScriptMacroParameters();
+        params.setJars(getClass().getClassLoader().getResource("dummy.jar").toString());
+        this.macro.execute(params, "def var = new MyClass()", this.context);
+        
+        // Third execution without 
+        this.macro.execute(new JSR223ScriptMacroParameters(), "def var = new MyClass()", this.context);
     }
 }

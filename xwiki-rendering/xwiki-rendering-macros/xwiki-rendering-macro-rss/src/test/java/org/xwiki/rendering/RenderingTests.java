@@ -26,6 +26,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.SkinAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -44,23 +45,24 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrorss1", true);
         suite.addTestsFromResource("macrorss2", true);
 
-        ComponentManagerTestSetup setup = new ComponentManagerTestSetup(suite);
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
 
+        return testSetup;
+    }
+    
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
         Mockery context = new Mockery();
 
         final SkinAccessBridge mockSkinAccessBridge = context.mock(SkinAccessBridge.class);
         DefaultComponentDescriptor<SkinAccessBridge> descriptorSAB = new DefaultComponentDescriptor<SkinAccessBridge>();
         descriptorSAB.setRole(SkinAccessBridge.class);
-        setup.getComponentManager().registerComponent(descriptorSAB, mockSkinAccessBridge);
+        componentManager.registerComponent(descriptorSAB, mockSkinAccessBridge);
 
-        context.checking(new Expectations()
-        {
-            {
-                allowing(mockSkinAccessBridge).getSkinFile(with(any(String.class)));
+        context.checking(new Expectations() {{
+            allowing(mockSkinAccessBridge).getSkinFile(with(any(String.class)));
                 will(returnValue("/xwiki/skins/albatross/icons/black-rss.png"));
-            }
-        });
-
-        return setup;
-    }
+        }});
+    }    
 }

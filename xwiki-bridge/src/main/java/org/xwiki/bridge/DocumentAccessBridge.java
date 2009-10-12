@@ -19,6 +19,7 @@
  */
 package org.xwiki.bridge;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -222,9 +223,21 @@ public interface DocumentAccessBridge
      * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
      *         not exist.
      * @throws Exception If the document cannot be accessed.
+     * @deprecated use {@link #getAttachmentContent(AttachmentName)} instead
      */
     byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception;
 
+    /**
+     * Returns the content of a document attachment.
+     * 
+     * @param attachmentName the name of the attachment to access
+     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
+     *         not exist
+     * @throws Exception If the document cannot be accessed.
+     * @since 2.0.1
+     */
+    InputStream getAttachmentContent(AttachmentName attachmentName) throws Exception;
+    
     /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
      * newly.
@@ -251,12 +264,22 @@ public interface DocumentAccessBridge
     String getURL(String documentName, String action, String queryString, String anchor);
 
     /**
+     * Retrieves all attachments in the passed document.
+     * 
+     * @param documentName the document for which to retrieve all attachment names
+     * @return the list of attachment names in the passed document
+     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
+     * @since 2.0.1
+     */
+    List<AttachmentName> getAttachments(DocumentName documentName) throws Exception;
+
+    /**
      * Retrieves the relative URL (ie the path without the hostname and port) that can be used to access an attachment.
      * 
      * @param documentName the full name of the document containing the attachment (eg "wiki:Space.Page")
      * @param attachmentName the attachment name (eg "my.png")
      * @return the attachment URL
-     * @deprecated use {@link #getAttachmentURL(AttachmentName)} instead
+     * @deprecated use {@link #getAttachmentURL(AttachmentName, boolean)} instead
      */
     String getAttachmentURL(String documentName, String attachmentName);
 
@@ -277,7 +300,8 @@ public interface DocumentAccessBridge
      * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full 
      *         URL) for all attachments in the passed document  
      * @since 2.0RC1
-     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name 
+     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
+     * @deprecated use {@link #getAttachments(DocumentName)} instead 
      */
     List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception;
     

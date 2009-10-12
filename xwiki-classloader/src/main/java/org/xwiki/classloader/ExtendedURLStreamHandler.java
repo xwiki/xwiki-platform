@@ -17,31 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.script;
-
-import java.net.URL;
-import java.util.List;
+package org.xwiki.classloader;
 
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Create JAR URLs to be used in the script Class Loader when executing scripts, see {@link #createJARURLs(String)}
- * for more details.
+ * Adds the ability for a {@link java.net.URLStreamHandler.URLStreamHandler} implementation to return the protocol
+ * it's managing.
+ * 
+ * Note that unfortunately we cannot extend {@link java.net.URLStreamHandler.URLStreamHandler} since it's an abstract
+ * class and not an interface. Thus components implementing this interface need also to extend 
+ * {@link java.net.URLStreamHandler.URLStreamHandler} and user code need to cast looked up instance as 
+ * {@link java.net.URLStreamHandler.URLStreamHandler} instances to use them as proper stream handlers.
  * 
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.0.1
  */
 @ComponentRole
-public interface ScriptJARURLFactory
+public interface ExtendedURLStreamHandler
 {
     /**
-     * Create a list of JAR URLs to be put in the Class Loader used when executing scripts. The URLs are created based
-     * on some passed reference specifying a list of JARs to be made available in the created class loader. The format
-     * is not defined and left to implementation classes.
-     * 
-     * @param scriptJars the list of JARs to make available in the returned class loader
-     * @return the JAR URLs
-     * @throws Exception if the URLs fail to be created for any reason (eg some invalid URL reference passed)
+     * @return the URL protocol supported by the current stream handler (eg "jar", "http", "attachmentjar", etc)
      */
-    List<URL> createJARURLs(String scriptJars) throws Exception;
+    String getProtocol();
 }

@@ -21,13 +21,10 @@ package org.xwiki.refactoring.splitter.criterion;
 
 import java.io.StringReader;
 
-import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
+import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractComponentTestCase;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -36,26 +33,8 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.9M1
  */
-public class HeadingLevelSplittingCriterionTest extends AbstractComponentTestCase
+public class HeadingLevelSplittingCriterionTest extends AbstractRefactoringTestCase
 {
-    /**
-     * The {@link Parser} component.
-     */
-    private Parser xwikiParser;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Before
-    public void setUp() throws Exception
-    {
-        super.setUp();
-
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-
-        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
-    }
-
     /**
      * Tests the iterate condition.
      * 

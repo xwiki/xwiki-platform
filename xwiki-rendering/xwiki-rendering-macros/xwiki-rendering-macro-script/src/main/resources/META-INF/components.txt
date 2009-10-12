@@ -1,2 +1,2 @@
 org.xwiki.rendering.internal.macro.script.DefaultScriptMacro
-org.xwiki.rendering.internal.macro.script.DefaultScriptJARURLFactory
+org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory

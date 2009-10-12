@@ -29,7 +29,7 @@ import org.xwiki.bridge.internal.DefaultAttachmentNameFactory;
 import org.xwiki.component.internal.ReflectionUtils;
 
 /**
- * Unit tests for {@link DocumentName}.
+ * Unit tests for {@link DefaultAttachmentNameFactory}.
  * 
  * @version $Id$
  */
@@ -37,7 +37,7 @@ public class DefaultAttachmentNameFactoryTest
 {
     private Mockery context;
     
-    private DefaultAttachmentNameFactory attachmentNamefactory;
+    private DefaultAttachmentNameFactory attachmentNameFactory;
     
     private DocumentAccessBridge bridge;
     
@@ -49,16 +49,16 @@ public class DefaultAttachmentNameFactoryTest
     public void setUp()
     {
         context = new Mockery();
-        attachmentNamefactory = new DefaultAttachmentNameFactory();
+        attachmentNameFactory = new DefaultAttachmentNameFactory();
         
         cdnf = context.mock(DocumentNameFactory.class, "current");
-        ReflectionUtils.setFieldValue(attachmentNamefactory, "currentDocumentNameFactory", cdnf);
+        ReflectionUtils.setFieldValue(attachmentNameFactory, "currentDocumentNameFactory", cdnf);
 
         ddnf = context.mock(DocumentNameFactory.class, "default");
-        ReflectionUtils.setFieldValue(attachmentNamefactory, "defaultDocumentNameFactory", ddnf);
+        ReflectionUtils.setFieldValue(attachmentNameFactory, "defaultDocumentNameFactory", ddnf);
 
         bridge = context.mock(DocumentAccessBridge.class);
-        ReflectionUtils.setFieldValue(attachmentNamefactory, "documentAccessBridge", bridge);
+        ReflectionUtils.setFieldValue(attachmentNameFactory, "documentAccessBridge", bridge);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class DefaultAttachmentNameFactoryTest
         }});
         
         // Test when there isn't the "@" separator.
-        AttachmentName attachmentName = attachmentNamefactory.createAttachmentName("filename");
+        AttachmentName attachmentName = attachmentNameFactory.createAttachmentName("filename");
         Assert.assertEquals("filename", attachmentName.getFileName());
         Assert.assertEquals(expectedDocumentName, attachmentName.getDocumentName());
     }
@@ -84,7 +84,7 @@ public class DefaultAttachmentNameFactoryTest
         }});
         
         // Test with the "@" separator
-        AttachmentName attachmentName = attachmentNamefactory.createAttachmentName("somepage@filename");
+        AttachmentName attachmentName = attachmentNameFactory.createAttachmentName("somepage@filename");
         Assert.assertEquals("filename", attachmentName.getFileName());
         Assert.assertEquals(expectedDocumentName, attachmentName.getDocumentName());
     }
@@ -98,7 +98,7 @@ public class DefaultAttachmentNameFactoryTest
             allowing(ddnf).createDocumentName(null); will(returnValue(expectedDocumentName));
         }});
         
-        AttachmentName attachmentName = attachmentNamefactory.createAttachmentName("filename");
+        AttachmentName attachmentName = attachmentNameFactory.createAttachmentName("filename");
         Assert.assertEquals("filename", attachmentName.getFileName());
         Assert.assertEquals(expectedDocumentName, attachmentName.getDocumentName());
     }

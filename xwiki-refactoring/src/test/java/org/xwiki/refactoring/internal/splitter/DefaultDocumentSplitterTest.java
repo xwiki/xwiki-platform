@@ -22,19 +22,15 @@ package org.xwiki.refactoring.internal.splitter;
 import java.io.StringReader;
 import java.util.List;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.refactoring.WikiDocument;
-import org.xwiki.refactoring.internal.MockDocumentAccessBridge;
+import org.xwiki.refactoring.internal.AbstractRefactoringTestCase;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
 import org.xwiki.refactoring.splitter.criterion.HeadingLevelSplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.SplittingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.NamingCriterion;
 import org.xwiki.refactoring.splitter.criterion.naming.PageIndexNamingCriterion;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.test.AbstractComponentTestCase;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -43,18 +39,8 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.9M1
  */
-public class DefaultDocumentSplitterTest extends AbstractComponentTestCase
+public class DefaultDocumentSplitterTest extends AbstractRefactoringTestCase
 {
-    /**
-     * The {@link Parser} component.
-     */
-    private Parser xwikiParser;
-
-    /**
-     * The {@link DocumentAccessBridge} component.
-     */
-    private DocumentAccessBridge docBridge;
-
     /**
      * The {@link DocumentSplitter} component.
      */
@@ -63,15 +49,11 @@ public class DefaultDocumentSplitterTest extends AbstractComponentTestCase
     /**
      * {@inheritDoc}
      */
-    @Before
-    public void setUp() throws Exception
+    @Override
+    protected void registerComponents() throws Exception
     {
-        super.setUp();
+        super.registerComponents();
 
-        getComponentManager().registerComponent(MockDocumentAccessBridge.getComponentDescriptor());
-        docBridge = getComponentManager().lookup(DocumentAccessBridge.class, "default");
-
-        xwikiParser = getComponentManager().lookup(Parser.class, "xwiki/2.0");
         splitter = getComponentManager().lookup(DocumentSplitter.class, "default");
     }
 

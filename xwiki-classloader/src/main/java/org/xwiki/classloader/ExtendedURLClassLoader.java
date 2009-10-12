@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.macro.script;
+package org.xwiki.classloader;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -29,9 +29,9 @@ import java.util.List;
  * adding URLs in the constructor).
  *  
  * @version $Id$
- * @since 2.0RC1
+ * @since 2.0.1
  */
-public class XWikiURLClassLoader extends URLClassLoader
+public class ExtendedURLClassLoader extends URLClassLoader
 {
     /**
      * See {@link URLClassLoader#URLClassLoader(URL[], ClassLoader, URLStreamHandlerFactory)}.
@@ -40,7 +40,7 @@ public class XWikiURLClassLoader extends URLClassLoader
      * @param parent the parent class loader for delegation
      * @param factory the URLStreamHandlerFactory to use when creating URLs 
      */
-    public XWikiURLClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory)
+    public ExtendedURLClassLoader(URL[] urls, ClassLoader parent, URLStreamHandlerFactory factory)
     {
         super(urls, parent, factory);
     }
@@ -51,7 +51,7 @@ public class XWikiURLClassLoader extends URLClassLoader
      * @param urls the URLs from which to load classes and resources 
      * @param parent the parent class loader for delegation
      */
-    public XWikiURLClassLoader(URL[] urls, ClassLoader parent)
+    public ExtendedURLClassLoader(URL[] urls, ClassLoader parent)
     {
         super(urls, parent);
     }
@@ -61,9 +61,14 @@ public class XWikiURLClassLoader extends URLClassLoader
      * 
      * @param urls the URLs from which to load classes and resources 
      */
-    public XWikiURLClassLoader(URL[] urls)
+    public ExtendedURLClassLoader(URL[] urls)
     {
         super(urls);
+    }
+    
+    public ExtendedURLClassLoader(ClassLoader parent, URLStreamHandlerFactory factory)
+    {
+        this(new URL[0], parent, factory);
     }
 
     /**

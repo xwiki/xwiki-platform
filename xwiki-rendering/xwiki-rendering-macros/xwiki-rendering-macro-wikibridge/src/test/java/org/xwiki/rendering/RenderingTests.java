@@ -20,14 +20,14 @@
 
 package org.xwiki.rendering;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.embed.EmbeddableComponentManager;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -50,10 +50,26 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Test Wiki Macro Bridge");
         
         suite.addTestsFromResource("wikimacro1", true);
-        
-        List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor<?>>();
-        mocks.add(MockDocumentAccessBridge.getComponentDescriptor());
-        
-        return new ComponentManagerTestSetup(suite, mocks);
+
+        ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
+        setUpMocks(testSetup.getComponentManager());
+
+        return testSetup;
     }
+    
+    public static void setUpMocks(EmbeddableComponentManager componentManager) throws Exception
+    {
+        Mockery context = new Mockery();
+
+        // Document Access Bridge Mock
+        final DocumentAccessBridge mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
+            new DefaultComponentDescriptor<DocumentAccessBridge>();
+        descriptorDAB.setRole(DocumentAccessBridge.class);
+        componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
+
+        context.checking(new Expectations() {{
+            oneOf(mockDocumentAccessBridge).getDocument("xwiki:Main.TestWikiMacro"); will(returnValue(null));
+        }});
+    }    
 }

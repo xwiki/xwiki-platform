@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -328,11 +330,27 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentContent(String, String)
+     * @deprecated use {@link #getAttachmentContent(AttachmentName)} instead
      */
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         XWikiContext xcontext = getContext();
         return xcontext.getWiki().getDocument(documentName, xcontext).getAttachment(attachmentName).getContent(xcontext);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getAttachmentContent(AttachmentName)
+     * @since 2.0.1
+     */
+    public InputStream getAttachmentContent(AttachmentName attachmentName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        XWikiDocument attachmentDocument = xcontext.getWiki().getDocument(
+            this.documentNameSerializer.serialize(attachmentName.getDocumentName()), xcontext);
+        return new ByteArrayInputStream(
+            attachmentDocument.getAttachment(attachmentName.getFileName()).getContent(xcontext));
     }
 
     /**
@@ -367,6 +385,28 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
+     * @see DocumentAccessBridge#getAttachments(DocumentName)
+     * @since 2.0.1
+     */
+    public List<AttachmentName> getAttachments(DocumentName documentName) throws Exception
+    {
+        List<AttachmentName> attachmentNames = new ArrayList<AttachmentName>();
+        XWikiContext xcontext = getContext();
+        DocumentName resolvedName = documentName;
+        if (documentName == null) {
+            resolvedName = this.documentNameFactory.createDocumentName(xcontext.getDoc().getFullName()); 
+        }
+        List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
+            this.documentNameSerializer.serialize(resolvedName), xcontext).getAttachmentList();
+        for (XWikiAttachment attachment : attachments) {
+            attachmentNames.add(new AttachmentName(resolvedName, attachment.getFilename()));
+        }
+        return attachmentNames;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see DocumentAccessBridge#getURL(String, String, String, String)
      */
     public String getURL(String documentName, String action, String queryString, String anchor)
@@ -382,11 +422,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         return xcontext.getWiki().getURL(computedDocumentName, action, queryString, anchor, xcontext);
     }
 
+
     /**
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentURL(String, String)
-     * @deprecated use {@link #getAttachmentURL(AttachmentName)} instead
+     * @deprecated use {@link #getAttachmentURL(org.xwiki.bridge.AttachmentName, boolean)} instead
      */
     public String getAttachmentURL(String documentName, String attachmentName)
     {
@@ -429,19 +470,13 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * 
      * @see DocumentAccessBridge#getAttachmentURLs(DocumentName, boolean)
      * @since 2.0RC1
+     * @deprecated use {@link #getAttachments(DocumentName)} instead 
      */
     public List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception
     {
         List<String> urls = new ArrayList<String>();
-        XWikiContext xcontext = getContext();
-        DocumentName resolvedName = documentName;
-        if (documentName == null) {
-            resolvedName = this.documentNameFactory.createDocumentName(xcontext.getDoc().getFullName()); 
-        }
-        List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
-            this.documentNameSerializer.serialize(resolvedName), xcontext).getAttachmentList();
-        for (XWikiAttachment attachment : attachments) {
-            urls.add(getAttachmentURL(new AttachmentName(resolvedName, attachment.getFilename()), isFullURL));
+        for (AttachmentName attachmentName : getAttachments(documentName)) {
+            urls.add(getAttachmentURL(attachmentName, isFullURL));
         }
         return urls;
     }

@@ -175,7 +175,6 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
             lruc = (LRUAlgorithmConfig) erc.getEvictionAlgorithmConfig();
         } else {
             lruc = new LRUAlgorithmConfig();
-            lruc.setTimeToLive(0);
         }
 
         if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {

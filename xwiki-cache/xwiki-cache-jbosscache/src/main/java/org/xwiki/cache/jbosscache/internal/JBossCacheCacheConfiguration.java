@@ -114,12 +114,15 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     {
         this.jbossConfiguration = loadConfig(getCacheConfiguration().getConfigurationId());
 
+        // If no custom configuration is set, use the provided CacheConfiguration to set one
         if (this.jbossConfiguration == null) {
             this.jbossConfiguration = getDefaultConfig();
 
             if (this.jbossConfiguration == null) {
                 this.jbossConfiguration = new Configuration();
             }
+
+            // Set eviction configuration
 
             EntryEvictionConfiguration eec =
                 (EntryEvictionConfiguration) getCacheConfiguration().get(EntryEvictionConfiguration.CONFIGURATIONID);
@@ -132,9 +135,9 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
                     this.jbossConfiguration.setEvictionConfig(ec);
                 }
 
+                // handle eviction thread timer
                 if (eec.containsKey(CONFX_EVICTION_WAKEUPINTERVAL)) {
-                    ec.setWakeupInterval(((Number) eec.get(CONFX_EVICTION_WAKEUPINTERVAL)).intValue(),
-                        TimeUnit.SECONDS);
+                    ec.setWakeupInterval(((Number) eec.get(CONFX_EVICTION_WAKEUPINTERVAL)).longValue());
                 } else {
                     ec.setWakeupInterval(DEFAULT_WAKEUPINTERVAL, TimeUnit.SECONDS);
                 }
@@ -143,10 +146,12 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
 
                 EvictionRegionConfig erc = null;
                 if (ercList != null && ercList.size() > 0) {
+                    // Overwrite the default eviction configuration
                     erc = ercList.get(0);
                     erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
                     setLRUConfiguration(erc, eec);
                 } else {
+                    // Set a new eviction configuration
                     erc = new EvictionRegionConfig();
                     erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
                     setLRUConfiguration(erc, eec);
@@ -156,13 +161,14 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
             }
         }
 
+        // set unique name of the cache
         this.jbossConfiguration.setClusterName(getCacheConfiguration().getConfigurationId());
 
         completeCacheLoaderConfiguration();
     }
 
     /**
-     * Add or update the {@link LRUConfiguration}.
+     * Add or update the {@link LRUAlgorithmConfig}.
      * 
      * @param erc the JBoss eviction configuration.
      * @param eec the XWiki eviction configuration.
@@ -189,7 +195,7 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     }
 
     /**
-     * Add missing configuration needed by some JBossCache {@link CacheLoader} implementations.
+     * Add missing configuration needed by some JBossCache {@link org.jboss.cache.loader.CacheLoader} implementations.
      */
     private void completeCacheLoaderConfiguration()
     {

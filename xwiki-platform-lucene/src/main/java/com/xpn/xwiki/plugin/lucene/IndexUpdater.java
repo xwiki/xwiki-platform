@@ -63,6 +63,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     private static final String NAME = "lucene";
 
+    /** The maximum number of milliseconds we have to wait before this thread is safely closed. */
+    private static final int EXIT_INTERVAL = 3000;
+
     private static final List<Event> EVENTS = new ArrayList<Event>()
     {
         {
@@ -75,6 +78,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     /** Milliseconds of sleep between checks for changed documents. */
     private int indexingInterval = 30000;
+
+    /** Milliseconds left till the next check for changed documents. */
+    private int indexingTimer = 0;
 
     /**
      * volatile forces the VM to check for changes every time the variable is accessed since it is not otherwise changed
@@ -148,122 +154,137 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     private void runMainLoop()
     {
         while (!this.exit) {
-            if (this.queue.isEmpty()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("IndexUpdater: queue empty, nothing to do");
-                }
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("IndexUpdater: documents in queue, start indexing");
-                }
-
-                Map<String, IndexData> toIndex = new HashMap<String, IndexData>();
-                List<Integer> toDelete = new ArrayList<Integer>();
-                activesIndexedDocs = 0;
-
-                try {
-                    openSearcher();
-                    while (!this.queue.isEmpty()) {
-                        IndexData data = this.queue.remove();
-                        List<Integer> oldDocs = getOldIndexDocIds(data);
-                        if (oldDocs != null) {
-                            for (Integer id : oldDocs) {
-                                if (LOG.isDebugEnabled()) {
-                                    LOG.debug("Adding " + id + " to remove list");
-                                }
-
-                                if (!toDelete.contains(id)) {
-                                    toDelete.add(id);
-                                } else {
-                                    if (LOG.isDebugEnabled()) {
-                                        LOG.debug("Found " + id + " already in list while adding it to remove list");
-                                    }
-                                }
-                            }
-                        }
-
-                        String id = data.getId();
-                        LOG.debug("Adding " + id + " to index list");
-                        if (toIndex.containsKey(id)) {
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("Found " + id + " already in list while adding it to index list");
-                            }
-                            toIndex.remove(id);
-                        }
-                        ++activesIndexedDocs;
-                        toIndex.put(id, data);
-                    }
-                } catch (Exception e) {
-                    LOG.error("error preparing index queue", e);
-                } finally {
-                    closeSearcher();
-                }
-
-                // Let's delete
-                try {
-                    openSearcher();
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("deleting " + toDelete.size() + " docs from lucene index");
-                    }
-                    int nb = deleteOldDocs(toDelete);
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("deleted " + nb + " docs from lucene index");
-                    }
-                } catch (Exception e) {
-                    LOG.error("error deleting previous documents", e);
-                } finally {
-                    closeSearcher();
-                }
-
-                // Let's index
-                try {
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("indexing " + toIndex.size() + " docs to lucene index");
-                    }
-
-                    XWikiContext context = (XWikiContext) this.context.clone();
-                    context.getWiki().getStore().cleanUp(context);
-                    openWriter(false);
-
-                    int nb = 0;
-                    for (Map.Entry<String, IndexData> entry : toIndex.entrySet()) {
-                        String id = entry.getKey();
-                        IndexData data = entry.getValue();
-
-                        try {
-                            XWikiDocument doc = this.xwiki.getDocument(data.getFullName(), context);
-
-                            if (data.getLanguage() != null && !data.getLanguage().equals("")) {
-                                doc = doc.getTranslatedDocument(data.getLanguage(), context);
-                            }
-
-                            addToIndex(data, doc, context);
-                            ++nb;
-                            --activesIndexedDocs;
-                        } catch (Exception e) {
-                            LOG.error("error indexing document " + id, e);
-                        }
-                    }
-
-                    if (LOG.isInfoEnabled()) {
-                        LOG.info("indexed " + nb + " docs to lucene index");
-                    }
-
-                    writer.flush();
-                } catch (Exception e) {
-                    LOG.error("error indexing documents", e);
-                } finally {
-                    this.context.getWiki().getStore().cleanUp(this.context);
-                    closeWriter();
-                }
-
-                plugin.openSearchers();
+            // Check if the indexing interval elapsed.
+            if (indexingTimer == 0) {
+                // Reset the indexing timer.
+                indexingTimer = indexingInterval;
+                // Poll the queue for documents to be indexed.
+                updateIndex();
             }
+            // Remove the exit interval from the indexing timer.
+            int sleepInterval = Math.min(EXIT_INTERVAL, indexingTimer);
+            indexingTimer -= sleepInterval;
             try {
-                Thread.sleep(indexingInterval);
+                Thread.sleep(sleepInterval);
             } catch (InterruptedException e) {
                 LOG.warn("Error while sleeping", e);
             }
+        }
+    }
+
+    /** Polls the queue for documents to be indexed. */
+    private void updateIndex()
+    {
+        if (this.queue.isEmpty()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("IndexUpdater: queue empty, nothing to do");
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("IndexUpdater: documents in queue, start indexing");
+            }
+
+            Map<String, IndexData> toIndex = new HashMap<String, IndexData>();
+            List<Integer> toDelete = new ArrayList<Integer>();
+            activesIndexedDocs = 0;
+
+            try {
+                openSearcher();
+                while (!this.queue.isEmpty()) {
+                    IndexData data = this.queue.remove();
+                    List<Integer> oldDocs = getOldIndexDocIds(data);
+                    if (oldDocs != null) {
+                        for (Integer id : oldDocs) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Adding " + id + " to remove list");
+                            }
+
+                            if (!toDelete.contains(id)) {
+                                toDelete.add(id);
+                            } else {
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("Found " + id + " already in list while adding it to remove list");
+                                }
+                            }
+                        }
+                    }
+
+                    String id = data.getId();
+                    LOG.debug("Adding " + id + " to index list");
+                    if (toIndex.containsKey(id)) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Found " + id + " already in list while adding it to index list");
+                        }
+                        toIndex.remove(id);
+                    }
+                    ++activesIndexedDocs;
+                    toIndex.put(id, data);
+                }
+            } catch (Exception e) {
+                LOG.error("error preparing index queue", e);
+            } finally {
+                closeSearcher();
+            }
+
+            // Let's delete
+            try {
+                openSearcher();
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("deleting " + toDelete.size() + " docs from lucene index");
+                }
+                int nb = deleteOldDocs(toDelete);
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("deleted " + nb + " docs from lucene index");
+                }
+            } catch (Exception e) {
+                LOG.error("error deleting previous documents", e);
+            } finally {
+                closeSearcher();
+            }
+
+            // Let's index
+            try {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("indexing " + toIndex.size() + " docs to lucene index");
+                }
+
+                XWikiContext context = (XWikiContext) this.context.clone();
+                context.getWiki().getStore().cleanUp(context);
+                openWriter(false);
+
+                int nb = 0;
+                for (Map.Entry<String, IndexData> entry : toIndex.entrySet()) {
+                    String id = entry.getKey();
+                    IndexData data = entry.getValue();
+
+                    try {
+                        XWikiDocument doc = this.xwiki.getDocument(data.getFullName(), context);
+
+                        if (data.getLanguage() != null && !data.getLanguage().equals("")) {
+                            doc = doc.getTranslatedDocument(data.getLanguage(), context);
+                        }
+
+                        addToIndex(data, doc, context);
+                        ++nb;
+                        --activesIndexedDocs;
+                    } catch (Exception e) {
+                        LOG.error("error indexing document " + id, e);
+                    }
+                }
+
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("indexed " + nb + " docs to lucene index");
+                }
+
+                writer.flush();
+            } catch (Exception e) {
+                LOG.error("error indexing documents", e);
+            } finally {
+                this.context.getWiki().getStore().cleanUp(this.context);
+                closeWriter();
+            }
+
+            plugin.openSearchers();
         }
     }
 

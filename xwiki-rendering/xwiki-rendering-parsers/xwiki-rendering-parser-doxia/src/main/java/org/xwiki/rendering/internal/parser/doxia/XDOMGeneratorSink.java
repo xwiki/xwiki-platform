@@ -85,22 +85,22 @@ public class XDOMGeneratorSink implements Sink
      * Used to parse Doxia raw text into XDOM blocks.
      */
     private Parser plainTextParser;
-    
+
     private Stack<Block> stack = new Stack<Block>();
 
-    private final MarkerBlock marker = new MarkerBlock();
+    private final MarkerBlock defaultMarker = new MarkerBlock();
 
     private IdGenerator idGenerator = new IdGenerator();
 
     private class MarkerBlock extends AbstractBlock
     {
         public Object param1;
-        
+
         public void traverse(Listener listener)
         {
         }
     }
-    
+
     private MarkerBlock currentMarker;
 
     /**
@@ -120,6 +120,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#enableLogging(Log)
      */
     public void enableLogging(Log arg0)
@@ -129,6 +130,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#anchor(String, SinkEventAttributes)
      */
     public void anchor(String name, SinkEventAttributes attributes)
@@ -139,6 +141,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#anchor(String)
      */
     public void anchor(String name)
@@ -148,6 +151,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#anchor_()
      */
     public void anchor_()
@@ -158,6 +162,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#author(SinkEventAttributes)
      */
     public void author(SinkEventAttributes attributes)
@@ -167,6 +172,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#author()
      */
     public void author()
@@ -176,6 +182,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#author_()
      */
     public void author_()
@@ -185,6 +192,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#body(SinkEventAttributes)
      */
     public void body(SinkEventAttributes attributes)
@@ -194,6 +202,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#body()
      */
     public void body()
@@ -203,6 +212,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#body_()
      */
     public void body_()
@@ -212,15 +222,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#bold()
      */
     public void bold()
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#bold_()
      */
     public void bold_()
@@ -230,6 +242,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#close()
      */
     public void close()
@@ -239,6 +252,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#comment(String)
      */
     public void comment(String comment)
@@ -248,6 +262,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#date(SinkEventAttributes)
      */
     public void date(SinkEventAttributes attributes)
@@ -257,6 +272,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#date()
      */
     public void date()
@@ -266,6 +282,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#date_()
      */
     public void date_()
@@ -275,15 +292,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definedTerm(SinkEventAttributes)
      */
     public void definedTerm(SinkEventAttributes attributes)
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definedTerm()
      */
     public void definedTerm()
@@ -293,6 +312,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definedTerm_()
      */
     public void definedTerm_()
@@ -303,15 +323,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definition(SinkEventAttributes)
      */
     public void definition(SinkEventAttributes attributes)
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definition()
      */
     public void definition()
@@ -321,6 +343,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definition()
      */
     public void definition_()
@@ -331,15 +354,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definitionList(SinkEventAttributes)
      */
     public void definitionList(SinkEventAttributes attributes)
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definitionList()
      */
     public void definitionList()
@@ -349,6 +374,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definitionList_()
      */
     public void definitionList_()
@@ -359,6 +385,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definitionListItem(SinkEventAttributes)
      */
     public void definitionListItem(SinkEventAttributes attributes)
@@ -368,6 +395,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definitionListItem()
      */
     public void definitionListItem()
@@ -377,6 +405,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#definitionListItem_()
      */
     public void definitionListItem_()
@@ -386,6 +415,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figure(SinkEventAttributes)
      */
     public void figure(SinkEventAttributes attributes)
@@ -395,6 +425,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figure()
      */
     public void figure()
@@ -404,6 +435,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figure_()
      */
     public void figure_()
@@ -413,6 +445,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figureCaption(SinkEventAttributes)
      */
     public void figureCaption(SinkEventAttributes attributes)
@@ -422,6 +455,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figureCaption()
      */
     public void figureCaption()
@@ -431,6 +465,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figureCaption_()
      */
     public void figureCaption_()
@@ -440,6 +475,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figureGraphics(String, SinkEventAttributes)
      */
     public void figureGraphics(String source, SinkEventAttributes attributes)
@@ -451,6 +487,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#figureGraphics(String)
      */
     public void figureGraphics(String source)
@@ -460,6 +497,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#flush()
      */
     public void flush()
@@ -469,6 +507,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#head(SinkEventAttributes)
      */
     public void head(SinkEventAttributes sinkEventAttributes)
@@ -478,6 +517,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#head()
      */
     public void head()
@@ -487,6 +527,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#head_()
      */
     public void head_()
@@ -496,6 +537,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#horizontalRule(SinkEventAttributes)
      */
     public void horizontalRule(SinkEventAttributes attributes)
@@ -506,6 +548,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#horizontalRule()
      */
     public void horizontalRule()
@@ -515,15 +558,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#italic()
      */
     public void italic()
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#italic_()
      */
     public void italic_()
@@ -533,6 +578,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#lineBreak(SinkEventAttributes)
      */
     public void lineBreak(SinkEventAttributes attributes)
@@ -542,8 +588,7 @@ public class XDOMGeneratorSink implements Sink
             EmptyLinesBlock block = (EmptyLinesBlock) this.stack.peek();
             block.setEmptyLinesCount(block.getEmptyLinesCount() + 1);
         } else if ((this.stack.peek() instanceof NewLineBlock)
-            && (this.stack.get(this.stack.size() - 1) instanceof NewLineBlock))
-        {
+            && (this.stack.get(this.stack.size() - 1) instanceof NewLineBlock)) {
             // If the past 2 blocks are already linebreaks, then send an EmptyLinesBlock
             this.stack.push(new EmptyLinesBlock(1));
         } else {
@@ -553,6 +598,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#lineBreak()
      */
     public void lineBreak()
@@ -562,6 +608,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#link(String, SinkEventAttributes)
      */
     public void link(String name, SinkEventAttributes attributes)
@@ -574,6 +621,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#link(String)
      */
     public void link(String name)
@@ -583,6 +631,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#link_()
      */
     public void link_()
@@ -599,16 +648,18 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#list()
      */
     public void list(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#list()
      */
     public void list()
@@ -618,6 +669,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#list_()
      */
     public void list_()
@@ -627,16 +679,18 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#listItem(SinkEventAttributes)
      */
     public void listItem(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#listItem()
      */
     public void listItem()
@@ -646,6 +700,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#listItem_()
      */
     public void listItem_()
@@ -655,15 +710,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#monospaced()
      */
     public void monospaced()
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#monospaced_()
      */
     public void monospaced_()
@@ -673,6 +730,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#nonBreakingSpace()
      */
     public void nonBreakingSpace()
@@ -683,6 +741,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#numberedList(int, SinkEventAttributes)
      */
     public void numberedList(int numbering, SinkEventAttributes sinkEventAttributes)
@@ -695,6 +754,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#numberedList(int)
      */
     public void numberedList(int numbering)
@@ -704,6 +764,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#numberedList_()
      */
     public void numberedList_()
@@ -715,16 +776,18 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#numberedListItem(SinkEventAttributes)
      */
     public void numberedListItem(SinkEventAttributes attributes)
     {
         // TODO: handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#numberedListItem()
      */
     public void numberedListItem()
@@ -734,6 +797,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#numberedListItem_()
      */
     public void numberedListItem_()
@@ -743,6 +807,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#pageBreak()
      */
     public void pageBreak()
@@ -752,16 +817,18 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#paragraph(SinkEventAttributes)
      */
     public void paragraph(SinkEventAttributes attributes)
     {
         // TODO: handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#paragraph()
      */
     public void paragraph()
@@ -771,6 +838,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#paragraph_()
      */
     public void paragraph_()
@@ -780,6 +848,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#rawText(String)
      */
     public void rawText(String text)
@@ -798,15 +867,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section(int, SinkEventAttributes)
      */
     public void section(int level, SinkEventAttributes attributes)
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section_(int)
      */
     public void section_(int level)
@@ -816,6 +887,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section1()
      */
     public void section1()
@@ -825,6 +897,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section1_()
      */
     public void section1_()
@@ -834,6 +907,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section2()
      */
     public void section2()
@@ -843,6 +917,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section2_()
      */
     public void section2_()
@@ -852,6 +927,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section3()
      */
     public void section3()
@@ -861,6 +937,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section3_()
      */
     public void section3_()
@@ -870,6 +947,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section4()
      */
     public void section4()
@@ -879,6 +957,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section4_()
      */
     public void section4_()
@@ -888,6 +967,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section5()
      */
     public void section5()
@@ -897,6 +977,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#section5_()
      */
     public void section5_()
@@ -906,15 +987,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle(int, SinkEventAttributes)
      */
     public void sectionTitle(int level, SinkEventAttributes attributes)
     {
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle()
      */
     public void sectionTitle()
@@ -924,6 +1007,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle_(int)
      */
     public void sectionTitle_(int level)
@@ -934,12 +1018,13 @@ public class XDOMGeneratorSink implements Sink
         String id = "H" + this.idGenerator.generateUniqueId(printer.toString());
 
         List<Block> headerTitleBlocks = generateListFromStack();
-        
+
         this.stack.push(new HeaderBlock(headerTitleBlocks, HeaderLevel.parseInt(level), id));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle_()
      */
     public void sectionTitle_()
@@ -949,6 +1034,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle1()
      */
     public void sectionTitle1()
@@ -958,6 +1044,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle1_()
      */
     public void sectionTitle1_()
@@ -967,6 +1054,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle2()
      */
     public void sectionTitle2()
@@ -976,6 +1064,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle2_()
      */
     public void sectionTitle2_()
@@ -985,6 +1074,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle3()
      */
     public void sectionTitle3()
@@ -994,6 +1084,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle3_()
      */
     public void sectionTitle3_()
@@ -1003,6 +1094,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle4()
      */
     public void sectionTitle4()
@@ -1012,6 +1104,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle4_()
      */
     public void sectionTitle4_()
@@ -1021,6 +1114,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle5()
      */
     public void sectionTitle5()
@@ -1030,6 +1124,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#sectionTitle5_()
      */
     public void sectionTitle5_()
@@ -1039,16 +1134,18 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#table(SinkEventAttributes)
      */
     public void table(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#table()
      */
     public void table()
@@ -1058,15 +1155,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#table_()
      */
     public void table_()
     {
-        this.stack.push(new TableBlock(generateListFromStack(), Collections.<String, String>emptyMap()));
+        this.stack.push(new TableBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCaption(SinkEventAttributes)
      */
     public void tableCaption(SinkEventAttributes attributes)
@@ -1076,6 +1175,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCaption()
      */
     public void tableCaption()
@@ -1085,6 +1185,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCaption_()
      */
     public void tableCaption_()
@@ -1094,16 +1195,18 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCell(SinkEventAttributes)
      */
     public void tableCell(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCell()
      */
     public void tableCell()
@@ -1113,6 +1216,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCell(String)
      */
     public void tableCell(String width)
@@ -1123,25 +1227,28 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableCell_()
      */
     public void tableCell_()
     {
-        this.stack.push(new TableCellBlock(generateListFromStack(), Collections.<String, String>emptyMap()));
+        this.stack.push(new TableCellBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableHeaderCell(SinkEventAttributes)
      */
     public void tableHeaderCell(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableHeaderCell()
      */
     public void tableHeaderCell()
@@ -1151,6 +1258,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableHeaderCell(String)
      */
     public void tableHeaderCell(String width)
@@ -1161,25 +1269,28 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableHeaderCell_()
      */
     public void tableHeaderCell_()
     {
-        this.stack.push(new TableHeadCellBlock(generateListFromStack(), Collections.<String, String>emptyMap()));
+        this.stack.push(new TableHeadCellBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableRow(SinkEventAttributes)
      */
     public void tableRow(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.marker);
+        this.stack.push(this.defaultMarker);
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableRow()
      */
     public void tableRow()
@@ -1189,15 +1300,17 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableRow_()
      */
     public void tableRow_()
     {
-        this.stack.push(new TableRowBlock(generateListFromStack(), Collections.<String, String>emptyMap()));
+        this.stack.push(new TableRowBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableRows(int[], boolean)
      */
     public void tableRows(int[] arg0, boolean arg1)
@@ -1207,6 +1320,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#tableRows_()
      */
     public void tableRows_()
@@ -1216,6 +1330,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#text(String, SinkEventAttributes)
      */
     public void text(String text, SinkEventAttributes attributes)
@@ -1228,6 +1343,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#text(String)
      */
     public void text(String text)
@@ -1237,6 +1353,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#title(SinkEventAttributes)
      */
     public void title(SinkEventAttributes attributes)
@@ -1246,6 +1363,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#title()
      */
     public void title()
@@ -1255,6 +1373,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#title_()
      */
     public void title_()
@@ -1264,6 +1383,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#verbatim(SinkEventAttributes)
      */
     public void verbatim(SinkEventAttributes attributes)
@@ -1273,6 +1393,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#verbatim(boolean)
      */
     public void verbatim(boolean boxed)
@@ -1282,6 +1403,7 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#verbatim_()
      */
     public void verbatim_()
@@ -1291,18 +1413,19 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
+     * 
      * @see Sink#unknown(String, Object[], SinkEventAttributes)
      */
     public void unknown(String arg0, Object[] arg1, SinkEventAttributes arg2)
     {
-        // TODO: Not supported yet by the XDOM. 
+        // TODO: Not supported yet by the XDOM.
     }
 
     private List<Block> generateListFromStack()
     {
         List<Block> blocks = new ArrayList<Block>();
         while (!this.stack.empty()) {
-            if (this.stack.peek() != this.marker) {
+            if (!(this.stack.peek() instanceof MarkerBlock)) {
                 blocks.add(this.stack.pop());
             } else {
                 // Remove marker and save it so that it can be accessed

@@ -4,7 +4,6 @@
 .#--------------------------------------------------------
 {{groovy}}
 class MyClass {}
-def dummy
 {{/groovy}}
 {{groovy}}
 .# An error would be raised here if MyClass was not visible
@@ -16,11 +15,9 @@ def var = new MyClass()
 beginDocument
 beginMacroMarkerStandalone [groovy] [] [
 class MyClass {}
-def dummy
 ]
 endMacroMarkerStandalone [groovy] [] [
 class MyClass {}
-def dummy
 ]
 beginMacroMarkerStandalone [groovy] [] [
 def var = new MyClass()

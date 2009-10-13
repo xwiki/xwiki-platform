@@ -56,7 +56,7 @@
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>1.6.5</version>
+        <version>1.7-beta-2</version>
         <!-- Remove Transitive dependencies drawn by Groovy that we don't want -->
         <exclusions>
           <exclusion>

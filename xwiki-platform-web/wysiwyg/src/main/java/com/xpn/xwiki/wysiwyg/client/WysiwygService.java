@@ -117,8 +117,22 @@ public interface WysiwygService extends RemoteService
      * @param cleaningParams additional parameters for the import operation.
      * @return the xhtml result from the office importer.
      * @throws XWikiGWTException if the import operation fails.
+     * @deprecated depricated since 2.0.1, use {@link #officeToXHTML(Attachment, Map)} instead.
      */
+    @Deprecated
     String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException;
+
+    /**
+     * Imports the given office attachment into XHTML/1.0. This method returns the resulting xhtml content while if
+     * there are non-textual content in the office attachment, they will be attached to the owner wiki page. Note that
+     * this operation does not alter the content of the wiki page.
+     * 
+     * @param attachment office attachment to be imported into xhtml/1.0.
+     * @param cleaningParams additional parameters for the import operation.
+     * @return the xhtml result from the office importer.
+     * @throws XWikiGWTException if the import operation fails.
+     */
+    String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams) throws XWikiGWTException;
 
     /**
      * @param syncedRevision The changes to this editor's content, since the last update.

@@ -111,6 +111,16 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     {
         service.officeToXHTML(pageName, cleaningParams, async);
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygServiceAsync#officeToXHTML(Attachment, Map, AsyncCallback)
+     */
+    public void officeToXHTML(Attachment attachment, Map<String, String> cleaningParams, AsyncCallback<String> async)
+    {
+        service.officeToXHTML(attachment, cleaningParams, async);
+    }
 
     /**
      * {@inheritDoc}

@@ -135,9 +135,7 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
      */
     protected void onAttachmentUploaded(Attachment attach, final AsyncCallback<Boolean> async)
     {
-
-        String fullPageName = getSpace() + "." + getPage();
-        WysiwygService.Singleton.getInstance().officeToXHTML(fullPageName, getHTMLCleaningParams(),
+        WysiwygService.Singleton.getInstance().officeToXHTML(attach, getHTMLCleaningParams(),
             new AsyncCallback<String>()
             {
                 public void onSuccess(String result)

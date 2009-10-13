@@ -30,7 +30,7 @@ import org.xwiki.rendering.macro.velocity.filter.VelocityMacroFilter;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
 import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
-import org.xwiki.velocity.internal.util.VelocityParserContext.VelocityType;
+import org.xwiki.velocity.internal.util.VelocityBlock.VelocityType;
 
 /**
  * Replace each white space/new lines group by a space and inject $nl and $sp bindings in {@link VelocityContext} which

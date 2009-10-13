@@ -64,6 +64,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
@@ -205,6 +206,26 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         } catch (OfficeImporterException ex) {
             throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
         } catch (XWikiException ex) {
+            throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see WysiwygService#officeToXHTML(Attachment, Map)
+     */
+    public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams) throws XWikiGWTException
+    {
+        try {
+            OfficeImporter officeImporter = Utils.getComponent(OfficeImporter.class);
+            ResourceName resourceName = new ResourceName();
+            resourceName.fromString(attachment.getReference(), true);
+            // TODO: Following should be avoided. For this we need to improve officeimporter API.
+            String documentName = resourceName.getWiki() + ":" + resourceName.getSpace() +"." + resourceName.getPage();
+            return officeImporter.importAttachment(documentName, resourceName.getFile(), cleaningParams);
+        } catch (OfficeImporterException ex) {
+            ex.printStackTrace();
             throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
         }
     }

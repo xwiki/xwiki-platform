@@ -25,6 +25,10 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Panel;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -56,6 +60,16 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     private CheckBox filterStylesCheckBox;
 
     /**
+     * Flag indicating whether an active openoffice server is available or not.
+     */
+    private boolean isOpenOfficeServerConnected;
+
+    /**
+     * Panel to be used as the UI of this wizard step in case we cannot locate an active openoffice server.
+     */
+    private Panel errorMessagePanel;
+
+    /**
      * Instantiates the office document import wizard step.
      * 
      * @param config wysiwyg configuration.
@@ -63,16 +77,31 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     public ImportOfficeFileWizardStep(Config config)
     {
         this.config = config;
-        
+
         // Add filter styles check box.
         this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
         getMainPanel().add(filterStylesCheckBox);
-    }   
+
+        // Read wysiwyg configuration for openoffice server availability.
+        isOpenOfficeServerConnected = config.getParameter("openofficeServerConnected", "false").equals("true");
+    }
 
     /**
      * {@inheritDoc}
      */
-    public String getPage()
+    public Widget display()
+    {
+        if (isOpenOfficeServerConnected) {
+            return super.display();
+        } else {
+            return getErrorMessagePanel();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected String getPage()
     {
         return config.getParameter("page", "WebHome");
     }
@@ -80,7 +109,7 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     /**
      * {@inheritDoc}
      */
-    public String getSpace()
+    protected String getSpace()
     {
         return config.getParameter("space", "Main");
     }
@@ -88,7 +117,7 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     /**
      * {@inheritDoc}
      */
-    public String getWiki()
+    protected String getWiki()
     {
         return config.getParameter("wiki", "xwiki");
     }
@@ -180,7 +209,11 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
      */
     public EnumSet<NavigationDirection> getValidDirections()
     {
-        return EnumSet.of(NavigationDirection.FINISH);
+        if (isOpenOfficeServerConnected) {
+            return EnumSet.of(NavigationDirection.CANCEL, NavigationDirection.FINISH);
+        } else {
+            return EnumSet.of(NavigationDirection.CANCEL);
+        }
     }
 
     /**
@@ -200,5 +233,21 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
         // force HTMLCleaner to avoid parsing of namespace information.
         params.put("namespacesAware", Boolean.toString(false));
         return params;
+    }
+
+    /**
+     * Returns a UI widget with an error message explaining the unavailability of this import feature.
+     * 
+     * @return a UI panel with the given error message placed on it.
+     */
+    private Panel getErrorMessagePanel()
+    {
+        if (null == errorMessagePanel) {
+            errorMessagePanel = new FlowPanel();
+            Label errorMessageLabel = new Label(Strings.INSTANCE.importOfficeFileFeatureNotAvailable());
+            errorMessageLabel.addStyleName("xErrorMsg");
+            errorMessagePanel.add(errorMessageLabel);
+        }
+        return errorMessagePanel;
     }
 }

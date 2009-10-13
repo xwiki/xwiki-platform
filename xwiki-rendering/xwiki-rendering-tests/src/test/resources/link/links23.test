@@ -1,0 +1,9 @@
+.#-----------------------------------------------------
+.input|twiki/1.0
+.# Validate link support in twiki syntax parser
+.#-----------------------------------------------------
+http://reference
+.#-----------------------------------------------------
+.expect|xhtml/1.0
+.#-----------------------------------------------------
+<p><span class="wikiexternallink"><a href="http://reference"><p>http://reference</p></a></span></p>

@@ -19,9 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
-import com.google.gwt.user.client.Window;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard.ImportWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
@@ -63,15 +61,9 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener
      */
     public void onImportOfficeFile()
     {
-        boolean isOpenOfficeServerConnected =
-            getConfig().getParameter("openofficeServerConnected", "false").equals("true");
-        if (isOpenOfficeServerConnected) {
-            getImportWizard().start(ImportWizardStep.OFFICE_FILE.toString(), null);
-        } else {
-            Window.alert(Strings.INSTANCE.importOfficeFileFeatureNotAvailable());
-        }
+        getImportWizard().start(ImportWizardStep.OFFICE_FILE.toString(), null);
     }
-    
+
     /**
      * Method invoked by {@link ImportMenuExtension} when "Import -> Office Content" menu item is clicked.
      */

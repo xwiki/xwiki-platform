@@ -118,7 +118,7 @@ public class ImportOfficePasteWizardStep implements WizardStep
      */
     public EnumSet<NavigationDirection> getValidDirections()
     {
-        return EnumSet.of(NavigationDirection.FINISH);
+        return EnumSet.of(NavigationDirection.CANCEL, NavigationDirection.FINISH);
     }
 
     /**

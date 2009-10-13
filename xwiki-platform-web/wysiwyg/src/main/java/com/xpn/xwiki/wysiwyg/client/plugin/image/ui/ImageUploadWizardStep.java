@@ -59,7 +59,7 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
      * {@inheritDoc}
      */
     @Override
-    public String getPage()
+    protected String getPage()
     {
         return imageData.getPage();
     }
@@ -68,7 +68,7 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
      * {@inheritDoc}
      */
     @Override
-    public String getSpace()
+    protected String getSpace()
     {
         return imageData.getSpace();
     }
@@ -77,7 +77,7 @@ public class ImageUploadWizardStep extends AbstractFileUploadWizardStep
      * {@inheritDoc}
      */
     @Override
-    public String getWiki()
+    protected String getWiki()
     {
         return imageData.getWiki();
     }

@@ -284,17 +284,17 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * @return the wiki of the document to upload this file to, or null if the default wiki should be used.
      */
-    public abstract String getWiki();
+    protected abstract String getWiki();
 
     /**
      * @return the space of the document to upload this file to, or null if the default space should be used.
      */
-    public abstract String getSpace();
+    protected abstract String getSpace();
 
     /**
      * @return the document to upload this file to, or null if the default document should be used.
      */
-    public abstract String getPage();
+    protected abstract String getPage();
 
     /**
      * @return the filename set in the file upload field.
@@ -322,7 +322,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * @return the fileUploadInput
      */
-    public FileUpload getFileUploadInput()
+    protected FileUpload getFileUploadInput()
     {
         return fileUploadInput;
     }        

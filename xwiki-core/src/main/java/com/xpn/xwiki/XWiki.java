@@ -756,20 +756,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Make sure these classes exists
         if (noupdate) {
-            getPrefsClass(context);
-            getUserClass(context);
-            getTagClass(context);
-            getGroupClass(context);
-            getRightsClass(context);
-            getCommentsClass(context);
-            getSkinClass(context);
-            getGlobalRightsClass(context);
-            getSheetClass(context);
+            initializeMandatoryClasses(context);
             getStatsService(context);
-            if (context.getDatabase().equals(context.getMainXWiki())
-                && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
-                getRedirectClass(context);
-            }
         }
 
         // Add a notification for notifications
@@ -787,6 +775,28 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Initialize all wiki macros
         initWikiMacros();
+    }
+
+    /**
+     * Ensure that mandatory classes (ie classes XWiki needs to work properly) exist and create
+     * them if they don't exist.
+     */
+    private void initializeMandatoryClasses(XWikiContext context) throws XWikiException
+    {
+        getPrefsClass(context);
+        getUserClass(context);
+        getTagClass(context);
+        getGroupClass(context);
+        getRightsClass(context);
+        getCommentsClass(context);
+        getSkinClass(context);
+        getGlobalRightsClass(context);
+        getSheetClass(context);
+
+        if (context.getDatabase().equals(context.getMainXWiki())
+            && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
+            getRedirectClass(context);
+        }
     }
 
     protected void initWikiMacros()
@@ -857,14 +867,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                 // Make sure these classes exists
                 if (initClasses) {
-                    getPrefsClass(context);
-                    getUserClass(context);
-                    getGroupClass(context);
-                    getRightsClass(context);
-                    getCommentsClass(context);
-                    getSkinClass(context);
-                    getGlobalRightsClass(context);
-                    getTagClass(context);
+                    initializeMandatoryClasses(context);
                     getPluginManager().virtualInit(context);
                     getRenderingEngine().virtualInit(context);
                 }

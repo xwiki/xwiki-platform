@@ -72,7 +72,7 @@ public interface WysiwygServiceAsync
      * @param pageName the wiki page into which the office document is attached.
      * @param cleaningParams additional parameters for the import operation.
      * @param async the callback to be used for notifying the caller after receiving the response from the server.
-     * @deprecated depricated since 2.0.1, use {@link #officeToXHTML(Attachment, Map, AsyncCallback)} instead.
+     * @deprecated deprecated since 2.0.1, use {@link #officeToXHTML(Attachment, Map, AsyncCallback)} instead.
      */
     @Deprecated
     void officeToXHTML(String pageName, Map<String, String> cleaningParams, AsyncCallback<String> async);

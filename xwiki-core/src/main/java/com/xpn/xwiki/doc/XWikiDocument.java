@@ -76,6 +76,10 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
 import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextException;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -86,12 +90,14 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.rendering.util.ParserUtils;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.CoreConfiguration;
@@ -124,6 +130,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
@@ -132,11 +139,6 @@ import com.xpn.xwiki.web.ObjectAddForm;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContextException;
 
 public class XWikiDocument implements DocumentModelBridge
 {
@@ -320,6 +322,11 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private DocumentNameSerializer compactDocumentNameSerializer =
         Utils.getComponent(DocumentNameSerializer.class, "compact");
+
+    /*
+     * Used to emulate an inline parsing.
+     */
+    private ParserUtils parserUtils = new ParserUtils();
 
     /**
      * Used to create proper {@link Syntax} objects.
@@ -816,7 +823,15 @@ public class XWikiDocument implements DocumentModelBridge
         String title = getTitle();
 
         if (!StringUtils.isEmpty(title)) {
-            return context.getWiki().getRenderingEngine().interpretText(title, this, context);
+            title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
+
+            if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
+                XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), title);
+                this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
+                title = renderXDOM(xdom, outputSyntax);
+            }
+
+            return title;
         }
 
         // 2) If not, then try to extract the title from the first document section title

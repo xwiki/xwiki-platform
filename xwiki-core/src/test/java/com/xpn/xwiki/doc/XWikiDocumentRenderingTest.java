@@ -169,6 +169,11 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         assertEquals("**title**", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
 
+        this.document.setTitle("<strong>title</strong>");
+
+        assertEquals("<strong>title</strong>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("title", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+
         this.document.setTitle("#set($key = \"title\")$key");
         this.mockXWikiRenderingEngine.stubs().method("interpretText").with(eq("#set($key = \"title\")$key"), ANYTHING,
             ANYTHING).will(returnValue("title"));

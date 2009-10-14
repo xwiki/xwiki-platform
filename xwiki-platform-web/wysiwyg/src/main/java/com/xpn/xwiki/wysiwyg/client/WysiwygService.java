@@ -117,7 +117,7 @@ public interface WysiwygService extends RemoteService
      * @param cleaningParams additional parameters for the import operation.
      * @return the xhtml result from the office importer.
      * @throws XWikiGWTException if the import operation fails.
-     * @deprecated depricated since 2.0.1, use {@link #officeToXHTML(Attachment, Map)} instead.
+     * @deprecated deprecated since 2.0.1, use {@link #officeToXHTML(Attachment, Map)} instead.
      */
     @Deprecated
     String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException;

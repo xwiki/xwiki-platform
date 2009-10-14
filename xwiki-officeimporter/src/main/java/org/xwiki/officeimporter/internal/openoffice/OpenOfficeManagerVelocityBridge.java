@@ -79,16 +79,18 @@ public class OpenOfficeManagerVelocityBridge
     public boolean startServer()
     {
         boolean success = false;
-        if (docBridge.hasProgrammingRights()) {
+        if (!isMainXWiki()) {
+            setErrorMessage("OpenOffice server administration is forbidden for sub-wikis.");
+        } else if(!docBridge.hasProgrammingRights()) {
+            setErrorMessage("Inadequate privileges.");
+        } else {
             try {
                 ooManager.start();
                 success = true;
             } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
-                execution.getContext().setProperty(OFFICE_MANAGER_ERROR, ex.getMessage());
+                setErrorMessage(ex.getMessage());
             }
-        } else {
-            execution.getContext().setProperty(OFFICE_MANAGER_ERROR, "Inadequate privileges.");
         }
         return success;
     }
@@ -101,17 +103,19 @@ public class OpenOfficeManagerVelocityBridge
     public boolean stopServer()
     {
         boolean success = false;
-        if (docBridge.hasProgrammingRights()) {
+        if (!isMainXWiki()) {
+            setErrorMessage("OpenOffice server administration is forbidden for sub-wikis.");
+        } else if(!docBridge.hasProgrammingRights()) {
+            setErrorMessage("Inadequate privileges.");
+        } else {
             try {
                 ooManager.stop();
                 success = true;
             } catch (OpenOfficeManagerException ex) {
                 logger.error(ex.getMessage(), ex);
-                execution.getContext().setProperty(OFFICE_MANAGER_ERROR, ex.getMessage());
+                setErrorMessage(ex.getMessage());
             }
-        } else {
-            execution.getContext().setProperty(OFFICE_MANAGER_ERROR, "Inadequate privileges.");
-        }
+        } 
         return success;
     }
 
@@ -130,5 +134,25 @@ public class OpenOfficeManagerVelocityBridge
     {
         Object error = execution.getContext().getProperty(OFFICE_MANAGER_ERROR);
         return (error != null) ? (String) error : null;
+    }
+    
+    /**
+     * Sets an error message inside the execution context.
+     */
+    private void setErrorMessage(String message)
+    {
+        execution.getContext().setProperty(OFFICE_MANAGER_ERROR, message);
+    }
+    
+    /**
+     * Utility method for checking if current context document is from main xwiki.
+     * 
+     * @return true if the current context document is from main xwiki.
+     */
+    private boolean isMainXWiki()
+    {
+        String currentWiki = docBridge.getCurrentDocumentName().getWiki();
+        // TODO: Remove the hard-coded main wiki name when a fix becomes available.  
+        return (currentWiki != null) && currentWiki.equals("xwiki");
     }
 }

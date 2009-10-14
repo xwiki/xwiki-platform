@@ -29,7 +29,6 @@ import net.sf.jodconverter.office.OfficeConnectionMode;
 import net.sf.jodconverter.office.OfficeException;
 import net.sf.jodconverter.office.OfficeManager;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -51,12 +50,6 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     @Requirement
     private OpenOfficeConfiguration ooConfig;
-
-    /**
-     * Used to query the context document's wiki.
-     */
-    @Requirement
-    private DocumentAccessBridge docBridge;
 
     /**
      * The {@link OfficeManager} used to control / connect openoffice server.
@@ -130,9 +123,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void start() throws OpenOfficeManagerException
     {
-        if (isConnected()) {
-            return;
-        } else if (isMainXWiki()) {
+        if (!isConnected()) {
             initialize();
             try {
                 officeManager.start();
@@ -142,8 +133,6 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
                 currentState = ManagerState.ERROR;
                 throw new OpenOfficeManagerException("Error while connecting / starting openoffice.", ex);
             }
-        } else {
-            throw new OpenOfficeManagerException("OpenOffice server administration is forbidden for sub-wikis.");
         }
     }
 
@@ -152,9 +141,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     public void stop() throws OpenOfficeManagerException
     {
-        if (!isConnected()) {
-            return;
-        } else if (isMainXWiki()) {
+        if (isConnected()) {
             try {
                 officeManager.stop();
                 currentState = ManagerState.NOT_CONNECTED;
@@ -165,20 +152,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
             } finally {
                 this.initialized = false;
             }
-        } else {
-            throw new OpenOfficeManagerException("OpenOffice server administration is forbidden for sub-wikis.");
         }
-    }
-
-    /**
-     * Utility method for checking if current context document is from main xwiki.
-     * 
-     * @return true if the current context document is from main xwiki.
-     */
-    private boolean isMainXWiki()
-    {
-        String currentWiki = docBridge.getCurrentDocumentName().getWiki();
-        return (currentWiki != null) && currentWiki.equals("xwiki");
     }
 
     /**

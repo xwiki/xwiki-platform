@@ -6,7 +6,7 @@
     #set($discard = $parents.add($parent))
     #set($pdoc = $xwiki.getDocument($parent).getTranslatedDocument())
     #set($pdocurl = $pdoc.getURL("view"))
-    #set($nstring = "<a href='$pdocurl'>$xwiki.getXMLEncoded(${pdoc.displayTitle})</a> <span class='separator'>&raquo;</span> $result")
+    #set($nstring = "<a href='$pdocurl'>$xwiki.getXMLEncoded(${pdoc.getRenderedTitle('plain/1.0')})</a> <span class='separator'>&raquo;</span> $result")
     #set($level = $level + 1)
     #computeHierarchy($pdoc $nstring $level)
   #else
@@ -16,6 +16,6 @@
 #if($context.getMode()==0) ## Visible only in a page
   <div id="hierarchy">
     <span class="currentSpace"><a href="$spaceViewUrl">$xwiki.getXMLEncoded(${doc.space})</a>: </span>
-#computeHierarchy($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.displayTitle)</a>" 0)
+#computeHierarchy($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
   </div>
 #end

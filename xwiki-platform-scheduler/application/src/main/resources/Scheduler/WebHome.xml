@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1252454400000</creationDate>
-<date>1252454400000</date>
-<contentUpdateDate>1252454400000</contentUpdateDate>
+<date>1255534745000</date>
+<contentUpdateDate>1255534745000</contentUpdateDate>
 <version>1.1</version>
 <title>$msg.get("xe.scheduler")</title>
 <template></template>
@@ -213,33 +213,42 @@
 $msg.get('xe.scheduler.welcome')
 
 = $msg.get('xe.scheduler.jobs.list') =
+
 ##
 ## Retrieve all scheduler jobs living in this space
-## Display their name, status, possible next fire time, and avaible actions
+## Display their name, status, possible next fire time, and available actions
 ##
-|= $msg.get('xe.scheduler.jobs.name') |= $msg.get('xe.scheduler.jobs.status') |= $msg.get('xe.scheduler.jobs.next') |= $msg.get('xe.scheduler.jobs.actions')
+|=$msg.get('xe.scheduler.jobs.name')|=$msg.get('xe.scheduler.jobs.status')|=$msg.get('xe.scheduler.jobs.next')|=$msg.get('xe.scheduler.jobs.actions')
 #set($hql = ", BaseObject as job where doc.space='Scheduler' and job.name=doc.fullName and job.className='XWiki.SchedulerJobClass' ")
 #foreach($docName in $xwiki.searchDocuments($hql))
- #set($actions = $util.hashMap) ## get a hash to store action urls
- #set($jobHolder = $xwiki.getDocument($docName))
- #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
- #set($status = "") #set($status = $job.get('status')) #if($status=="") #set($status="None") #end
- #set($firetime = "") #if($status!="None") #set($firetime = $scheduler.getNextFireTime($job))  #else #set($firetime="N/A") #end
-  #if($status=="None") 
-   #set( $ok = $!actions.put("schedule",$doc.getExternalURL("view","do=schedule&amp;which=${jobHolder.fullName}")) )
-  #elseif($status=="Normal")
-   #set( $ok = $!actions.put("pause",$doc.getExternalURL("view","do=pause&amp;which=${jobHolder.fullName}")) )
-   #set( $ok = $!actions.put("unschedule",$doc.getExternalURL("view","do=unschedule&amp;which=${jobHolder.fullName}")) )
-  #elseif($status=="Paused")
-   #set( $ok = $!actions.put("resume",$doc.getExternalURL("view","do=resume&amp;which=${jobHolder.fullName}")) )
-   #set( $ok = $!actions.put("unschedule",$doc.getExternalURL("view","do=unschedule&amp;which=${jobHolder.fullName}")) )
+  #set($actions = $util.hashMap)## get a hash to store action urls
+  #set($jobHolder = $xwiki.getDocument($docName))
+  #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
+  #set($status = "")
+  #set($status = $job.get('status'))
+  #if($status == "")
+    #set($status="None")
   #end
-  #set($ok = $!actions.put("delete",$doc.getExternalURL("view","do=delete&amp;which=${jobHolder.fullName}")) )
-  #set($ok = $!actions.put("trigger",$doc.getExternalURL("view","do=trigger&amp;which=${jobHolder.fullName}")) )
-  
-| $job.get("jobName") | $status | $firetime | **$msg.get('xe.scheduler.jobs.infos')** : [[view&gt;&gt;$jobHolder.fullName]] #if($jobHolder.hasAccessLevel("programming")) [[$msg.get("edit")&gt;&gt;${jobHolder.getExternalURL('inline')}]] #end **$msg.get('job')** : #foreach($action in $actions.keySet()) [[$action&gt;&gt;${actions.get($action)}]] #end
-#end
+  #set($firetime = "")
+  #if($status != "None")
+    #set($firetime = $scheduler.getNextFireTime($job))
+  #else
+    #set($firetime="N/A")
+  #end
+  #if($status == "None") 
+    #set($ok = $!actions.put("schedule",$doc.getExternalURL("view","do=schedule&amp;which=${jobHolder.fullName}")))
+  #elseif($status == "Normal")
+    #set($ok = $!actions.put("pause",$doc.getExternalURL("view","do=pause&amp;which=${jobHolder.fullName}")))
+    #set($ok = $!actions.put("unschedule",$doc.getExternalURL("view","do=unschedule&amp;which=${jobHolder.fullName}")))
+  #elseif($status == "Paused")
+    #set($ok = $!actions.put("resume",$doc.getExternalURL("view","do=resume&amp;which=${jobHolder.fullName}")))
+    #set($ok = $!actions.put("unschedule",$doc.getExternalURL("view","do=unschedule&amp;which=${jobHolder.fullName}")))
+  #end
+  #set($ok = $!actions.put("delete",$doc.getExternalURL("view","do=delete&amp;which=${jobHolder.fullName}")))
+  #set($ok = $!actions.put("trigger",$doc.getExternalURL("view","do=trigger&amp;which=${jobHolder.fullName}")))
+|$job.get("jobName")|$status|$firetime|**$msg.get('xe.scheduler.jobs.infos')**: [[view&gt;&gt;$jobHolder.fullName]]#if($jobHolder.hasAccessLevel("programming")) [[$msg.get("edit")&gt;&gt;${jobHolder.getExternalURL('inline')}]]#end **$msg.get('job')**:#foreach($action in $actions.keySet()) [[$action&gt;&gt;${actions.get($action)}]]#end
 
+#end
 #if($doc.hasAccessLevel("programming"))
 ##
 ## Job creation is offered only for programmers, because the job page needs to be saved 
@@ -253,8 +262,7 @@ $msg.get('xe.scheduler.welcome')
 ##
 ## Form to create a new Job
 ##
- 
-{{info}}$msg.get('xe.scheduler.jobs.explaincreate')){{/info}}
+{{info}}$msg.get('xe.scheduler.jobs.explaincreate'){{/info}}
 
 {{html}}
 &lt;form action="" id="newdoc"&gt;

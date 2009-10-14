@@ -139,7 +139,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
 
         // Prepare the result.
         Map<String, byte[]> result = new HashMap<String, byte[]>();
-        
+
         // Create temporary storage.
         File tempDir = container.getApplicationContext().getTemporaryDirectory();
         OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, docBridge.getCurrentUser());
@@ -154,8 +154,14 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
             throw new OfficeImporterException("Error while writing temporary files.", ex);
         }
 
-        // Make the conversion.
-        ooManager.getDocumentConverter().convert(storage.getInputFile(), storage.getOutputFile(), htmlFormat);
+        // Make the conversion. Ideally jodconverter should have a checked exception it it's convert() method because
+        // it could throw an exception (it does). As a workaround we have to catch a generic Exception instance.
+        try {
+            ooManager.getDocumentConverter().convert(storage.getInputFile(), storage.getOutputFile(), htmlFormat);
+        } catch (Exception ex) {
+            storage.cleanUp();
+            throw new OfficeImporterException("Error while performing conversion.", ex);
+        }
 
         // Collect the resulting artifacts
         File[] artifacts = storage.getOutputDir().listFiles();
@@ -175,7 +181,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
                 // Skip the artifact.
             }
         }
-        
+
         // Cleanup the storage.
         storage.cleanUp();
 

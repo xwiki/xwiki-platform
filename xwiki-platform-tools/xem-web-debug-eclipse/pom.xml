@@ -39,7 +39,7 @@
     <smartgwt.version>1.2</smartgwt.version>
     <!-- XEM dependencies -->
     <platform.plugin.applicationmanager.version>1.11-SNAPSHOT</platform.plugin.applicationmanager.version>
-    <platform.plugin.wikimanager.version>1.15-SNAPSHOT</platform.plugin.wikimanager.version>
+    <platform.plugin.wikimanager.version>1.16-SNAPSHOT</platform.plugin.wikimanager.version>
   </properties>
   <dependencies>
     <!-- needed for slf4j clients such as QueryPlugin and JCRStore 

@@ -75,7 +75,7 @@ public class XWikiServer extends DefaultXObjectDocument
      */
     public void setWikiName(String wikiName)
     {
-        getDoc().setFullName(sclass.getItemDocumentDefaultFullName(wikiName, context));
+        getDoc().setFullName(context.getMainXWiki() + ":" + sclass.getItemDocumentDefaultFullName(wikiName, context));
     }
 
     /**

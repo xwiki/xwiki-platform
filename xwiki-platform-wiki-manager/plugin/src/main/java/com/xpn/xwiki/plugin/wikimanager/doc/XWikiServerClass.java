@@ -354,21 +354,6 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     /**
      * {@inheritDoc}
      * <p>
-     * Make sure it return main wiki document.
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#getItemDocumentDefaultFullName(java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
-     * @since 1.5
-     */
-    @Override
-    public String getItemDocumentDefaultFullName(String itemName, XWikiContext context)
-    {
-        return context.getMainXWiki() + ":" + super.getItemDocumentDefaultFullName(itemName, context);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
      * Make sure it return main wiki documents.
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#searchXObjectDocumentsByFields(java.lang.Object[][],
@@ -439,8 +424,30 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
 
     /**
      * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#getXObjectDocument(java.lang.String,
+     *      int, boolean, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public XWikiServer getXObjectDocument(String itemName, int objectId, boolean validate, XWikiContext context)
+        throws XWikiException
+    {
+        String wiki = context.getDatabase();
+
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            return super.getXObjectDocument(itemName, objectId, validate, context);
+        } finally {
+            context.setDatabase(wiki);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
      * <p>
-     * Override abstract method using XWikiApplication as {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument}.
+     * Override abstract method using XWikiApplication as
+     * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument}.
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
      *      int, com.xpn.xwiki.XWikiContext)

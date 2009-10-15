@@ -220,8 +220,8 @@ public final class WikiManager
      */
     public Wiki getWikiFromName(String wikiName, XWikiContext context) throws XWikiException
     {
-        return getWikiFromDocumentName(XWikiServerClass.getInstance(context).getItemDocumentDefaultFullName(wikiName,
-            context), context);
+        return getWikiFromDocumentName(context.getMainXWiki() + ":"
+            + XWikiServerClass.getInstance(context).getItemDocumentDefaultFullName(wikiName, context), context);
     }
 
     /**
@@ -495,8 +495,8 @@ public final class WikiManager
         XWiki xwiki = context.getWiki();
 
         if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL, msg
-                .get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
+                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }
 
         String newWikiName = userWikiSuperDoc.getWikiName();
@@ -623,8 +623,8 @@ public final class WikiManager
         XWiki xwiki = context.getWiki();
 
         if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL, msg
-                .get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
+                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }
 
         // Create database/schema
@@ -665,8 +665,8 @@ public final class WikiManager
         XWiki xwiki = context.getWiki();
 
         if (!xwiki.isVirtualMode()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL, msg
-                .get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL,
+                msg.get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }
 
         // Prepare to import
@@ -694,7 +694,6 @@ public final class WikiManager
                 throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg.get(
                     WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
             }
-
 
             // Install imported documents
             if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
@@ -724,8 +723,8 @@ public final class WikiManager
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
 
         if (!XWikiServerClass.getInstance(context).isInstance(wiki)) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, getMessageTool(context)
-                .get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS, wikiNameToDelete));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                getMessageTool(context).get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS, wikiNameToDelete));
         }
 
         wiki.delete(deleteDatabase);

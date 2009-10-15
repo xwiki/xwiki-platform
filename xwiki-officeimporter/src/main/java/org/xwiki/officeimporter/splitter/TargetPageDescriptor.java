@@ -33,6 +33,11 @@ import org.xwiki.component.manager.ComponentManager;
 public class TargetPageDescriptor
 {
     /**
+     * The "default" component role hint.
+     */
+    private static final String DEFAULT_COMPONENT_HINT = "default";
+
+    /**
      * Name of the target wiki page.
      */
     private DocumentName pageName;
@@ -66,13 +71,13 @@ public class TargetPageDescriptor
     {
         return this.pageName;
     }
-    
+
     /**
      * @return target page name as a string.
      */
     public String getPageNameAsString()
     {
-        return serializeDocumentName(pageName, "default");
+        return serializeDocumentName(pageName, DEFAULT_COMPONENT_HINT);
     }
 
     /**
@@ -80,15 +85,15 @@ public class TargetPageDescriptor
      */
     public DocumentName getParentName()
     {
-       return this.parentName; 
+        return this.parentName;
     }
-    
+
     /**
      * @return name of the parent wiki page.
      */
     public String getParentNameAsString()
     {
-        return (null != parentName) ? serializeDocumentName(parentName, "default") : null;
+        return (null != parentName) ? serializeDocumentName(parentName, DEFAULT_COMPONENT_HINT) : null;
     }
 
     /**

@@ -52,12 +52,13 @@ public interface XDOMOfficeDocumentSplitter
      *            <li>mainPageNameAndHeading - Base document name followed by heading name.</li>
      *            <li>mainPageNameAndNumbering - Base document name followed by index.</li>
      *            </ul>
-     * @param baseDocumentName base (root) page name to be used when generating target page names for child (newly split)
-     *            documents.
+     * @param baseDocumentName base (root) page name to be used when generating target page names for child 
+     *            (newly split) documents.
      * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
      *         name for the corresponding xdom office document.
      * @throws OfficeImporterException if an error occurs while splitting.
      */
     Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, DocumentName baseDocumentName) throws OfficeImporterException;
+        int[] headingLevelsToSplit, String namingCriterionHint, DocumentName baseDocumentName)
+        throws OfficeImporterException;
 }

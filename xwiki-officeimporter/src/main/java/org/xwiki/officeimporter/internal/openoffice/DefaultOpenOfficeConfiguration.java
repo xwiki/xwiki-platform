@@ -41,12 +41,6 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
     private static final String PREFIX = "openoffice.";
 
     /**
-     * Defines from where to read the rendering configuration data. 
-     */
-    @Requirement
-    private ConfigurationSource configuration;
-
-    /**
      * @see OpenOfficeConfiguration#getServerType()
      */
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
@@ -80,6 +74,12 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
      * @see OpenOfficeConfiguration#getTaskExecutionTimeout()
      */
     private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
+    
+    /**
+     * Defines from where to read the rendering configuration data. 
+     */
+    @Requirement
+    private ConfigurationSource configuration;
 
     /**
      * {@inheritDoc}

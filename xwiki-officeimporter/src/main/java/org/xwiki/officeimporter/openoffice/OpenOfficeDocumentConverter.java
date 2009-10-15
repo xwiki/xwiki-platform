@@ -43,9 +43,11 @@ public interface OpenOfficeDocumentConverter
      * @param in the {@link InputStream} of the office document.
      * @param storage temporary disk storage to hold the resulting artifacts.
      * @return map of file names to file streams resulting from the conversion.
+     * @throws OfficeImporterException if an error occurs during the conversion.
+     * @deprecated deprecated since 2.1M1m use {@link #convert(byte[])} instead.
      */
     @Deprecated
-    public Map<String, InputStream> convert(InputStream in, OfficeImporterFileStorage storage)
+    Map<String, InputStream> convert(InputStream in, OfficeImporterFileStorage storage)
         throws OfficeImporterException;
 
     /**
@@ -55,7 +57,8 @@ public interface OpenOfficeDocumentConverter
      * 
      * @param officeFileData binary data of the office document.
      * @return map of file names to file contents resulting from the conversion.
+     * @throws OfficeImporterException if an error occurs during the conversion.
      * @since 2.1M1
      */
-    public Map<String, byte[]> convert(byte[] officeFileData) throws OfficeImporterException;
+    Map<String, byte[]> convert(byte[] officeFileData) throws OfficeImporterException;
 }

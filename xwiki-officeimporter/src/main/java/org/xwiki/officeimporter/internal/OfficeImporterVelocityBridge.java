@@ -64,7 +64,10 @@ public class OfficeImporterVelocityBridge
     /**
      * Default constructor.
      * 
-     * @param importer internal {@link OfficeImporter} component.
+     * @param execution current execution.
+     * @param importer internal office importer component.
+     * @param docBridge document access bridge.
+     * @param logger logger.
      */
     public OfficeImporterVelocityBridge(Execution execution, OfficeImporter importer, DocumentAccessBridge docBridge,
         Logger logger)
@@ -109,6 +112,7 @@ public class OfficeImporterVelocityBridge
      * user. And if this is not an append request, the target document should not exist.
      * 
      * @param targetDocument the target document.
+     * @param options additional parameters passed in for the import operation.
      * @throws OfficeImporterException if the request is invalid.
      */
     private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException

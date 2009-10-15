@@ -42,8 +42,8 @@ public class TableFilter extends AbstractHTMLFilter
     /**
      * If these tags are found within a cell item (td), cell's content will be considered as an embedded document.
      */
-    private static final String[] FILTER_TAGS =
-        new String[] {TAG_P, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_BR, TAG_UL, TAG_OL, TAG_IMG, TAG_TABLE};
+    private static final String[] FILTER_TAGS = new String[] {
+        TAG_P, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_BR, TAG_UL, TAG_OL, TAG_IMG, TAG_TABLE};
 
     /**
      * {@inheritDoc}

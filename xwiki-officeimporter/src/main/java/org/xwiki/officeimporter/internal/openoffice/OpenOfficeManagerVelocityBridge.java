@@ -39,6 +39,16 @@ public class OpenOfficeManagerVelocityBridge
     public static final String OFFICE_MANAGER_ERROR = "OFFICE_MANAGER_ERROR";
 
     /**
+     * Error message used to indicate that openoffice server administration is restricted for main xwiki.
+     */
+    private static final String ERROR_FORBIDDEN = "OpenOffice server administration is forbidden for sub-wikis.";
+
+    /**
+     * Error message used to indicate that the current user does not have enough rights to perform the requested action.
+     */
+    private static final String ERROR_PRIVILEGES = "Inadequate privileges.";
+
+    /**
      * Provides access to the request context.
      */
     private Execution execution;
@@ -59,8 +69,12 @@ public class OpenOfficeManagerVelocityBridge
     private Logger logger;
 
     /**
-     * Creates a new {@link OpenOfficeManagerVelocityBridge} with the provided {@link OpenOfficeManager}
-     * component.
+     * Creates a new {@link OpenOfficeManagerVelocityBridge} with the provided {@link OpenOfficeManager} component.
+     * 
+     * @param oomanager openoffice manager component.
+     * @param docBridge document access bridge component.
+     * @param execution current execution.
+     * @param logger logger.
      */
     public OpenOfficeManagerVelocityBridge(OpenOfficeManager oomanager, DocumentAccessBridge docBridge,
         Execution execution, Logger logger)
@@ -80,9 +94,9 @@ public class OpenOfficeManagerVelocityBridge
     {
         boolean success = false;
         if (!isMainXWiki()) {
-            setErrorMessage("OpenOffice server administration is forbidden for sub-wikis.");
-        } else if(!docBridge.hasProgrammingRights()) {
-            setErrorMessage("Inadequate privileges.");
+            setErrorMessage(ERROR_FORBIDDEN);
+        } else if (!docBridge.hasProgrammingRights()) {
+            setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
                 ooManager.start();
@@ -104,9 +118,9 @@ public class OpenOfficeManagerVelocityBridge
     {
         boolean success = false;
         if (!isMainXWiki()) {
-            setErrorMessage("OpenOffice server administration is forbidden for sub-wikis.");
-        } else if(!docBridge.hasProgrammingRights()) {
-            setErrorMessage("Inadequate privileges.");
+            setErrorMessage(ERROR_FORBIDDEN);
+        } else if (!docBridge.hasProgrammingRights()) {
+            setErrorMessage(ERROR_PRIVILEGES);
         } else {
             try {
                 ooManager.stop();
@@ -115,7 +129,7 @@ public class OpenOfficeManagerVelocityBridge
                 logger.error(ex.getMessage(), ex);
                 setErrorMessage(ex.getMessage());
             }
-        } 
+        }
         return success;
     }
 
@@ -135,15 +149,17 @@ public class OpenOfficeManagerVelocityBridge
         Object error = execution.getContext().getProperty(OFFICE_MANAGER_ERROR);
         return (error != null) ? (String) error : null;
     }
-    
+
     /**
      * Sets an error message inside the execution context.
+     * 
+     * @param message error message.
      */
     private void setErrorMessage(String message)
     {
         execution.getContext().setProperty(OFFICE_MANAGER_ERROR, message);
     }
-    
+
     /**
      * Utility method for checking if current context document is from main xwiki.
      * 
@@ -152,7 +168,7 @@ public class OpenOfficeManagerVelocityBridge
     private boolean isMainXWiki()
     {
         String currentWiki = docBridge.getCurrentDocumentName().getWiki();
-        // TODO: Remove the hard-coded main wiki name when a fix becomes available.  
+        // TODO: Remove the hard-coded main wiki name when a fix becomes available.
         return (currentWiki != null) && currentWiki.equals("xwiki");
     }
 }

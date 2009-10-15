@@ -70,19 +70,19 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      */
     @Requirement
     private DocumentNameSerializer nameSerializer;
-    
+
     /**
      * Requierd for converting string document names to {@link DocumentName} instances.
      */
     @Requirement
     private DocumentNameFactory nameFactory;
-    
+
     /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
      */
     @Requirement
     private DocumentSplitter documentSplitter;
-    
+
     /**
      * Used by {@link TargetPageDescriptor}.
      */
@@ -99,24 +99,24 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
         String strBaseDoc = nameSerializer.serialize(baseDocumentName);
         Map<TargetPageDescriptor, XDOMOfficeDocument> result = new HashMap<TargetPageDescriptor, XDOMOfficeDocument>();
-        
+
         // Create splitting and naming criterion for refactoring.
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(headingLevelsToSplit);
         NamingCriterion namingCriterion = getNamingCriterion(namingCriterionHint, strBaseDoc);
-        
+
         // Create the root document required by refactoring module.
         WikiDocument rootDoc = new WikiDocument(strBaseDoc, officeDocument.getContentDocument(), null);
-        List<WikiDocument> documents = documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);                        
-        
+        List<WikiDocument> documents = documentSplitter.split(rootDoc, splittingCriterion, namingCriterion);
+
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
-            DocumentName targetName = nameFactory.createDocumentName(doc.getFullName());            
-            TargetPageDescriptor targetPageDescriptor = new TargetPageDescriptor(targetName, this.componentManager);                        
+            DocumentName targetName = nameFactory.createDocumentName(doc.getFullName());
+            TargetPageDescriptor targetPageDescriptor = new TargetPageDescriptor(targetName, this.componentManager);
             if (doc.getParent() != null) {
                 DocumentName targetParent = nameFactory.createDocumentName(doc.getParent().getFullName());
                 targetPageDescriptor.setParentName(targetParent);
             }
-            
+
             // Rewire artifacts.
             Map<String, byte[]> artifacts = new HashMap<String, byte[]>();
             List<ImageBlock> imageBlocks = doc.getXdom().getChildrenByType(ImageBlock.class, true);
@@ -124,21 +124,22 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
                 String imageName = imageBlock.getImage().getName();
                 artifacts.put(imageName, officeDocument.getArtifacts().remove(imageName));
             }
-            
+
             // Create the resulting XDOMOfficeDocument.
             XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifacts, this.componentManager);
             result.put(targetPageDescriptor, splitDocument);
         }
-        
+
         return result;
     }
 
     /**
      * Utility method for building a {@link NamingCriterion} based on the parameters provided.
      * 
-     * @param targetWikiDocument name of the master wiki page.
-     * @param params parameters provided for the splitting function.
+     * @param namingCriterionId naming criterion identifier.
+     * @param baseDocument reference document name to be used when generating names.
      * @return a {@link NamingCriterion} based on the parameters provided.
+     * @throws OfficeImporterException if there is no naming criterion matching the given naming criterion id.
      */
     private NamingCriterion getNamingCriterion(String namingCriterionId, String baseDocument)
         throws OfficeImporterException

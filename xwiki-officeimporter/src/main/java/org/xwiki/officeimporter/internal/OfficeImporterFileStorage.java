@@ -32,30 +32,30 @@ import org.xwiki.officeimporter.OfficeImporterException;
 public class OfficeImporterFileStorage
 {
     /**
-     * Top-level temporary working directory.
-     */
-    private File storageDir = null;
-
-    /**
-     * Storage for input document.
-     */
-    private File inputFile = null;
-
-    /**
-     * Output directory (inside tempDir). All the by-products (artifacts) + outputFile will land here.
-     */
-    private File outputDir = null;
-
-    /**
-     * Output file (html).
-     */
-    private File outputFile = null;
-
-    /**
      * Some characters are not allowed as file names under the windows platform. Following regular expression is used to
      * match such characters.
      */
     public static final String INVALID_FILE_NAME_CHARS = "[/\\\\:\\*\\?\"<>|]";
+    
+    /**
+     * Top-level temporary working directory.
+     */
+    private File storageDir;
+
+    /**
+     * Storage for input document.
+     */
+    private File inputFile;
+
+    /**
+     * Output directory (inside tempDir). All the by-products (artifacts) + outputFile will land here.
+     */
+    private File outputDir;
+
+    /**
+     * Output file (html).
+     */
+    private File outputFile;    
 
     /**
      * Creates a new {@link OfficeImporterFileStorage} instance.

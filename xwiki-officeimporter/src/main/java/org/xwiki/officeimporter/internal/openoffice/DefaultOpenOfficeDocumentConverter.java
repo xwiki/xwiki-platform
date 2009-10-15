@@ -55,6 +55,21 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
     Initializable
 {
     /**
+     * Error message used to signal a missing openoffice server.
+     */
+    private static final String ERROR_SERVER_NOT_FOUND = "OpenOffice server not found.";
+    
+    /**
+     * Error message used to signal that there is a problem writing to temporary files.
+     */
+    private static final String ERROR_WRITING_TEMP_FILES = "Error while writing temporary files.";
+    
+    /**
+     * Error message used to signal that there is a problem reading an OOo generated artifact file.
+     */
+    private static final String ERROR_READING_ARTIFACT = "Error while reading artifact : %s";
+    
+    /**
      * The {@link OpenOfficeManager} component.
      */
     @Requirement
@@ -95,7 +110,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
     {
         // Make sure the openoffice server is connected.
         if (ooManager.getState() != OpenOfficeManager.ManagerState.CONNECTED) {
-            throw new OfficeImporterException("openoffice server not found.");
+            throw new OfficeImporterException(ERROR_SERVER_NOT_FOUND);
         }
         // Prepare the result.
         Map<String, InputStream> result = new HashMap<String, InputStream>();
@@ -109,7 +124,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
             }
             fos.close();
         } catch (IOException ex) {
-            throw new OfficeImporterException("Error while writing temporary files.", ex);
+            throw new OfficeImporterException(ERROR_WRITING_TEMP_FILES, ex);
         }
         // Make the conversion.
         ooManager.getDocumentConverter().convert(storage.getInputFile(), storage.getOutputFile(), htmlFormat);
@@ -120,7 +135,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
                 FileInputStream fis = new FileInputStream(artifact);
                 result.put(artifact.getName(), fis);
             } catch (IOException ex) {
-                getLogger().error("Internal error while reading artifact : " + artifact.getName(), ex);
+                getLogger().error(String.format(ERROR_READING_ARTIFACT, artifact.getName()), ex);
                 // Skip the artifact.
             }
         }
@@ -134,7 +149,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
     {
         // Make sure the openoffice server is connected.
         if (ooManager.getState() != OpenOfficeManager.ManagerState.CONNECTED) {
-            throw new OfficeImporterException("openoffice server not found.");
+            throw new OfficeImporterException(ERROR_SERVER_NOT_FOUND);
         }
 
         // Prepare the result.
@@ -151,7 +166,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
             fos.close();
         } catch (IOException ex) {
             storage.cleanUp();
-            throw new OfficeImporterException("Error while writing temporary files.", ex);
+            throw new OfficeImporterException(ERROR_WRITING_TEMP_FILES, ex);
         }
 
         // Make the conversion. Ideally jodconverter should have a checked exception it it's convert() method because
@@ -177,7 +192,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
                 result.put(artifact.getName(), bos.toByteArray());
                 bos.reset();
             } catch (IOException ex) {
-                getLogger().error("Internal error while reading artifact : " + artifact.getName(), ex);
+                getLogger().error(String.format(ERROR_READING_ARTIFACT, artifact.getName()), ex);
                 // Skip the artifact.
             }
         }

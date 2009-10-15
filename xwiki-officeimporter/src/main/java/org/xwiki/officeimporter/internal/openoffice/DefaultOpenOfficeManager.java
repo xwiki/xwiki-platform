@@ -73,6 +73,8 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
 
     /**
      * Initializes the internal {@link OfficeManager}.
+     * 
+     * @throws OpenOfficeManagerException if an invalid configuration is detected.
      */
     private void initialize() throws OpenOfficeManagerException
     {

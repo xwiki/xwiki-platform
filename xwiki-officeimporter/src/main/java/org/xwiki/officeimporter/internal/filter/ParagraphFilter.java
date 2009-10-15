@@ -33,13 +33,18 @@ import org.xwiki.xml.html.filter.ElementSelector;
 
 /**
  * Open Office server creates a new paragraph element for every line break (enter) in the original office document. For
- * an example: <br/><br/> {@code<P STYLE="margin-bottom: 0in">Line - 1</P>}<br/>
- * {@code<P STYLE="margin-bottom: 0in">Line - 2</P>}<br/> {@code<P STYLE="margin-bottom: 0in">Line - 3</P>}<br/><br/> Is
- * the output produced by open office for a simple document containing only three consecutive lines. Further, to
- * represent empty lines, Open Office uses following element: <br/><br/> {@code<P STYLE="margin-bottom: 0in"><BR></P>}
- * <br/><br/> These constructs when rendered on browsers doesn't resemble the original document at all, and when parsed
+ * an example: <br/>
+ * {@code<P STYLE="margin-bottom: 0in">Line - 1</P>}<br/>
+ * {@code<P STYLE="margin-bottom: 0in">Line - 2</P>}<br/>
+ * {@code<P STYLE="margin-bottom: 0in">Line - 3</P>}<br/>
+ * Is the output produced by open office for a simple document containing only three consecutive lines. Further, to
+ * represent empty lines, Open Office uses following element: <br/>
+ * {@code<P STYLE="margin-bottom: 0in"><BR></P>} <br/>
+ * These constructs when rendered on browsers doesn't resemble the original document at all, and when parsed
  * into xwiki/2.0 syntax the generated xwiki syntax is also invalid (obviously). The purpose of this filter is to clean
  * up such html content by merging consecutive paragraph sequences and appropriately inserting {@code<br/>} elements.
+ * 
+ * @version $Id$
  */
 @Component("officeimporter/paragraph")
 public class ParagraphFilter extends AbstractHTMLFilter

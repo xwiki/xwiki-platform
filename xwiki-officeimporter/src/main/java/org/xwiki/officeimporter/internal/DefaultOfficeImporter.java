@@ -61,6 +61,11 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * File extensions corresponding to slide presentations.
      */
     public static final List<String> PRESENTATION_FORMAT_EXTENSIONS = Arrays.asList("ppt", "odp");
+    
+    /**
+     * Error message to be used for indicating invalid splitting criterion.
+     */
+    private static final String ERROR_INVALID_SPLITTING_CRITERION = "Unable to determine splitting criterion.";
 
     /**
      * Document access bridge used to access wiki documents.
@@ -131,13 +136,13 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 Map<TargetPageDescriptor, XDOMOfficeDocument> results =
                     xdomOfficeDocumentSplitter.split(xdomDoc, headingLevels, namingCriterionHint, baseDocument);
                 for (Map.Entry<TargetPageDescriptor, XDOMOfficeDocument> result : results.entrySet()) {
-                    boolean append = result.getKey().getPageName().equals(baseDocument);                    
+                    boolean append = result.getKey().getPageName().equals(baseDocument);
                     saveDocument(result.getValue(), result.getKey(), importerFilter, append, true);
                 }
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -145,18 +150,19 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         throws OfficeImporterException
     {
         String result = null;
-        DocumentName baseDocument = nameFactory.createDocumentName(documentName);               
-        byte[] data = readAttachment(documentName, attachmentName);                
+        DocumentName baseDocument = nameFactory.createDocumentName(documentName);
+        byte[] data = readAttachment(documentName, attachmentName);
         if (isPresentation(attachmentName)) {
             XDOMOfficeDocument presentation = presentationBuilder.build(data);
             result = presentation.getContentAsString("xhtml/1.0");
             attachArtifacts(documentName, presentation.getArtifacts());
         } else {
-            XHTMLOfficeDocument xhtmlDoc = xhtmlOfficeDocumentBuilder.build(data, baseDocument, shouldFilterStyles(params));
+            XHTMLOfficeDocument xhtmlDoc =
+                xhtmlOfficeDocumentBuilder.build(data, baseDocument, shouldFilterStyles(params));
             HTMLUtils.stripHTMLEnvelope(xhtmlDoc.getContentDocument());
             result = xhtmlDoc.getContentAsString();
             attachArtifacts(documentName, xhtmlDoc.getArtifacts());
-        }        
+        }
         return result;
     }
 
@@ -168,6 +174,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * @param importerFilter filter to be used on the final content just before saving.
      * @param append whether content should be appended if the target document already exists.
      * @param isSplit if this document is a newly split one.
+     * @throws OfficeImporterException if an error occurs while saving into the xwiki page.
      */
     private void saveDocument(XDOMOfficeDocument document, TargetPageDescriptor targetDescriptor,
         OfficeImporterFilter importerFilter, boolean append, boolean isSplit) throws OfficeImporterException
@@ -202,7 +209,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             throw new OfficeImporterException("Error while saving office document.", ex);
         }
     }
-    
+
     /**
      * Utility method for attaching artifacts into a wiki page.
      * 
@@ -226,6 +233,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * 
      * @param is input stream.
      * @return a byte array containing data read from the stream.
+     * @throws OfficeImporterException if an error occurs while reading the stream.
      */
     private byte[] readStream(InputStream is) throws OfficeImporterException
     {
@@ -241,7 +249,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         }
         return bos.toByteArray();
     }
-    
+
     /**
      * Utility method for reading an attachment.
      * 
@@ -257,7 +265,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         } catch (Exception ex) {
             throw new OfficeImporterException("Error while reading attachment.", ex);
         }
-    }    
+    }
 
     /**
      * Utility method for building a {@link OfficeImporterFilter} suitable for this import operation. If no external
@@ -283,7 +291,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         importerFilter.setDocBridge(docBridge);
         return importerFilter;
     }
-    
+
     /**
      * Utility method for extracting heading levels used for splitting.
      * 
@@ -303,11 +311,11 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 }
                 return headingLevelsIntArray;
             } catch (NumberFormatException ex) {
-                throw new OfficeImporterException("Unable to determine splitting criterion.");
+                throw new OfficeImporterException(ERROR_INVALID_SPLITTING_CRITERION);
             }
         }
-        throw new OfficeImporterException("Unable to determine splitting criterion.");
-    }    
+        throw new OfficeImporterException(ERROR_INVALID_SPLITTING_CRITERION);
+    }
 
     /**
      * Utility method for checking if a file name corresponds to an office presentation.
@@ -329,8 +337,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      */
     private boolean isSplitRequest(Map<String, String> params)
     {
-        String splitDocumentParam = params.get("splitDocument");
-        return (splitDocumentParam != null) ? splitDocumentParam.equals("true") : false;
+        String splitDocumentParam = params.get("splitDocument");        
+        return (splitDocumentParam != null) ? splitDocumentParam.equals(Boolean.toString(true)) : false;
     }
 
     /**
@@ -342,7 +350,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     private boolean isAppendRequest(Map<String, String> params)
     {
         String appendParam = params.get("appendContent");
-        return (appendParam != null) ? appendParam.equals("true") : false;
+        return (appendParam != null) ? appendParam.equals(Boolean.toString(true)) : false;
     }
 
     /**
@@ -355,5 +363,5 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     {
         String filterStylesParam = params.get("filterStyles");
         return (filterStylesParam != null) ? filterStylesParam.equals("strict") : false;
-    }   
+    }
 }

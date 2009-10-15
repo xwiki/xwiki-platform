@@ -57,7 +57,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     @Requirement("xwiki/2.0")
     private Parser xwikiParser;
-    
+
     /**
      * Component manager used by {@link XDOMOfficeDocument}.
      */
@@ -72,7 +72,7 @@ public class DefaultPresentationBuilder implements PresentationBuilder
         Map<String, byte[]> artifacts = documentConverter.convert(officeFileData);
         byte[] presentationArchive = buildPresentationArchive(artifacts);
         artifacts.clear();
-        artifacts.put("presentation.zip", presentationArchive);        
+        artifacts.put("presentation.zip", presentationArchive);
         return new XDOMOfficeDocument(buildPresentationXDOM(), artifacts, componentManager);
     }
 
@@ -105,16 +105,19 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      * Utility method for building the presentation XDOM.
      * 
      * @return presentation XDOM.
+     * @throws OfficeImporterException if an error occurs while building the presentation xdom.
      */
     private XDOM buildPresentationXDOM() throws OfficeImporterException
     {
+        String newLine = "\n";
         StringBuffer buffer = new StringBuffer();
-        buffer.append("{{velocity}}").append("\n");
-        buffer.append("#set($url=$xwiki.zipexplorer.getFileLink($doc, 'presentation.zip', 'output.html'))").append("\n\n");
-        buffer.append("{{html}}").append("\n");
-        buffer.append("<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>").append("\n");
-        buffer.append("{{/html}}").append("\n\n");
-        buffer.append("{{/velocity}}");        
+        buffer.append("{{velocity}}").append(newLine);
+        buffer.append("#set($url=$xwiki.zipexplorer.getFileLink($doc, 'presentation.zip', 'output.html'))");
+        buffer.append(newLine).append(newLine);
+        buffer.append("{{html}}").append(newLine);
+        buffer.append("<iframe src=\"$url\" frameborder=0 width=800px height=600px></iframe>").append(newLine);
+        buffer.append("{{/html}}").append(newLine).append(newLine);
+        buffer.append("{{/velocity}}");
         try {
             return xwikiParser.parse(new StringReader(buffer.toString()));
         } catch (ParseException ex) {

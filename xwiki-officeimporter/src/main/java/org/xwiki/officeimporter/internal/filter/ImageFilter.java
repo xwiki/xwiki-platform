@@ -41,7 +41,7 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 public class ImageFilter extends AbstractHTMLFilter
 {
     /**
-     * The {@link DocumentAccessBridge}
+     * The {@link DocumentAccessBridge} component.
      */
     @Requirement
     private DocumentAccessBridge docBridge;

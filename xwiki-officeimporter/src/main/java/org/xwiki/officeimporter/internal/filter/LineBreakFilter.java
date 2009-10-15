@@ -44,14 +44,14 @@ public class LineBreakFilter extends AbstractHTMLFilter
      */
     private static final String[] BLOCK_ELEMENT_TAGS =
         new String[] {TAG_P, TAG_UL, TAG_OL, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6, TAG_TABLE};
-    
+
     /**
      * Sort the block elements tag name array.
      */
     static {
         Arrays.sort(BLOCK_ELEMENT_TAGS);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -62,14 +62,8 @@ public class LineBreakFilter extends AbstractHTMLFilter
             {
                 public boolean isSelected(Element element)
                 {
-                    Node prev = element.getPreviousSibling();
-                    while (prev != null && (isLineBreak(prev) || isEmptyTextNode(prev) || isCommentNode(prev))) {
-                        prev = prev.getPreviousSibling();
-                    }
-                    Node next = element.getNextSibling();
-                    while (next != null && (isLineBreak(next) || isEmptyTextNode(next) || isCommentNode(next))) {
-                        next = next.getNextSibling();
-                    }
+                    Node prev = findPreviousNode(element);
+                    Node next = findNextNode(element);
                     return !(null == prev && null == next) && (isBlockElement(prev) || isBlockElement(next));
                 }
             });
@@ -83,12 +77,46 @@ public class LineBreakFilter extends AbstractHTMLFilter
     }
 
     /**
+     * Finds the previous sibling of the given element which is not a {@code <br/>}, an empty text node or a comment
+     * node.
+     * 
+     * @param element the element to be analysed.
+     * @return previous sibling of the given element which is not a html line-break, an empty text node or a comment
+     *         node.
+     */
+    private Node findPreviousNode(Element element)
+    {
+        Node prev = element.getPreviousSibling();
+        while (prev != null && (isLineBreak(prev) || isEmptyTextNode(prev) || isCommentNode(prev))) {
+            prev = prev.getPreviousSibling();
+        }
+        return prev;
+    }
+
+    /**
+     * Finds the next sibling of the given element which is not a {@code <br/>}, an empty text node or a comment
+     * node.
+     * 
+     * @param element the element to be analysed.
+     * @return next sibling of the given element which is not a html line-break, an empty text node or a comment
+     *         node.
+     */
+    private Node findNextNode(Element element)
+    {
+        Node next = element.getNextSibling();
+        while (next != null && (isLineBreak(next) || isEmptyTextNode(next) || isCommentNode(next))) {
+            next = next.getNextSibling();
+        }
+        return next;
+    }
+
+    /**
      * Check whether the given node represents a block element.
      * 
-     * @param element the {@link Node}.
+     * @param node the node to be checked.
      * @return true if the node represents a block element.
      */
-    public boolean isBlockElement(Node node)
+    private boolean isBlockElement(Node node)
     {
         boolean isBlockElement = false;
         if (null != node) {

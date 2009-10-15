@@ -19,7 +19,9 @@
  */
 package org.xwiki.officeimporter.internal.filter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Document;
@@ -39,6 +41,11 @@ import org.xwiki.xml.html.filter.AbstractHTMLFilter;
 @Component("officeimporter/style")
 public class StyleFilter extends AbstractHTMLFilter
 {
+    /**
+     * Separator character used for grouping attribute names.
+     */
+    private static final String ATTRIBUTE_SEPARATOR = "|";
+
     /**
      * The html_tag_name->allowed_attribute_names mappings for strict filtering mode. This is used to filter out all
      * unnecessary attributes. The mapped object is a '|' separated string of all allowed attributes. If a particular
@@ -72,9 +79,10 @@ public class StyleFilter extends AbstractHTMLFilter
     /**
      * Removes style attributes from this node and it's children recursively.
      * 
-     * @param node The node being filtered.
+     * @param node node being filtered.
+     * @param attributeMappings attribute map to be used for filtering.
      */
-    private final void filter(Node node, Map<String, String> attributeMappings)
+    private void filter(Node node, Map<String, String> attributeMappings)
     {
         if (node instanceof Element) {
             Element element = (Element) node;
@@ -85,14 +93,20 @@ public class StyleFilter extends AbstractHTMLFilter
                 while (currentAttributes.getLength() > 0) {
                     currentAttributes.removeNamedItem(currentAttributes.item(0).getNodeName());
                 }
-            } else {
-                // Strip all attributes except those allowed.
+            } else {                
+                // Collect those attributes that need to be removed.
+                List<String> attributesToBeRemoved = new ArrayList<String>();                                
                 for (int i = 0; i < currentAttributes.getLength(); i++) {
                     String attributeName = currentAttributes.item(i).getNodeName();
-                    if (allowedAttributes.indexOf("|" + attributeName.toLowerCase() + "|") == -1) {
-                        currentAttributes.removeNamedItem(attributeName);
-                        i--;
+                    String pattern = ATTRIBUTE_SEPARATOR + attributeName.toLowerCase() + ATTRIBUTE_SEPARATOR;
+                    if (allowedAttributes.indexOf(pattern) == -1) {
+                        attributesToBeRemoved.add(attributeName);
                     }
+                }
+                
+                // Remove those attributes collected above.
+                for (String attribute : attributesToBeRemoved) {
+                    currentAttributes.removeNamedItem(attribute);
                 }
             }
             if (node.hasChildNodes()) {

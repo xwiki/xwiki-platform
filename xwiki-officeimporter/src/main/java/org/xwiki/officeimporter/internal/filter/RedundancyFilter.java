@@ -31,7 +31,7 @@ import org.xwiki.xml.html.filter.ElementSelector;
 /**
  * This filter is used to remove those tags that doesn't play any role with the representation of information. This type
  * of tags can result from other filters (like the style filter) or Open Office specific formatting choices (like
- * newlines being represented by empty paragraphs). For an example, empty {@code <span>} or {@code <div>} tags will be
+ * newlines being represented by empty paragraphs). For an example, empty {@code <span/>} or {@code <div/>} tags will be
  * ripped off within this filter.
  * 
  * @version $Id$
@@ -48,8 +48,8 @@ public class RedundancyFilter extends AbstractHTMLFilter
     /**
      * List of those tags which will be filtered if no textual content is present inside them.
      */
-    private static final String[] FILTERED_IF_NO_CONTENT_TAGS =
-        new String[] {TAG_EM, TAG_STRONG, TAG_DFN, TAG_CODE, TAG_SAMP, TAG_KBD, TAG_VAR, TAG_CITE, TAG_ABBR,
+    private static final String[] FILTERED_IF_NO_CONTENT_TAGS = new String[] {
+        TAG_EM, TAG_STRONG, TAG_DFN, TAG_CODE, TAG_SAMP, TAG_KBD, TAG_VAR, TAG_CITE, TAG_ABBR,
         TAG_ACRONYM, TAG_ADDRESS, TAG_BLOCKQUOTE, TAG_Q, TAG_PRE, TAG_H1, TAG_H2, TAG_H3, TAG_H4, TAG_H5, TAG_H6};
 
     /**

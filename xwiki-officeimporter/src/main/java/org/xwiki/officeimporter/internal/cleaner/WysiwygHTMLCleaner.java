@@ -31,7 +31,6 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.filter.HTMLFilter;
-import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
 /**
  * {@link HTMLCleaner} for cleaning HTML coming from an wysiwyg office importer plugin.
@@ -43,7 +42,7 @@ import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 public class WysiwygHTMLCleaner extends AbstractLogEnabled implements HTMLCleaner
 {
     /**
-     * The {@link DefaultHTMLCleaner} used internally.
+     * Default html cleaner component used internally. 
      */
     @Requirement
     private HTMLCleaner defaultHtmlCleaner;

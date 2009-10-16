@@ -308,7 +308,7 @@ Object.extend(XWiki, {
       content = document.body;
     }
     $(content).select(".xwikirenderingerror").each(function(error) {
-        if(error.nextSibling.innerHTML !== "" && error.nextSibling.hasClassName("xwikirenderingerrordescription")) {
+        if(error.next().innerHTML !== "" && error.next().hasClassName("xwikirenderingerrordescription")) {
             error.style.cursor="pointer";
             error.title = "$msg.get('platform.core.rendering.error.readTechnicalInformation')";
             Event.observe(error, "click", function(event){

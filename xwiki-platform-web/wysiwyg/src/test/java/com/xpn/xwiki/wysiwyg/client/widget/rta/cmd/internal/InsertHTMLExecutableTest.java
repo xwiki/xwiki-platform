@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal;
 
 import org.xwiki.gwt.dom.client.Range;
 
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -57,33 +57,22 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertBetweenChildren()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestInsertBetweenChildren();
-                finishTest();
+                rta.setHTML("<em>ab</em><strong>cd</strong><ins>ef</ins>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStartBefore(getBody().getChildNodes().getItem(1));
+                range.setEndAfter(getBody().getChildNodes().getItem(1));
+                select(range);
+
+                assertEquals("cd", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "<!--x-->y<del>z</del>"));
+                assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests the {@link InsertHTMLExecutable} when the caret goes between DOM child nodes after the selection is
-     * deleted.
-     */
-    private void doTestInsertBetweenChildren()
-    {
-        rta.setHTML("<em>ab</em><strong>cd</strong><ins>ef</ins>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStartBefore(getBody().getChildNodes().getItem(1));
-        range.setEndAfter(getBody().getChildNodes().getItem(1));
-        select(range);
-
-        assertEquals("cd", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, "<!--x-->y<del>z</del>"));
-        assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", clean(rta.getHTML()));
+        });
     }
 
     /**
@@ -92,33 +81,22 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertAfterLastChild()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestInsertAfterLastChild();
-                finishTest();
+                rta.setHTML("<em>ab</em><strong>ij</strong>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStartBefore(getBody().getChildNodes().getItem(1));
+                range.setEndAfter(getBody().getChildNodes().getItem(1));
+                select(range);
+
+                assertEquals("ij", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "#"));
+                assertEquals("<em>ab</em>#", clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests the {@link InsertHTMLExecutable} when the caret goes at the end of an element after the selection is
-     * deleted.
-     */
-    private void doTestInsertAfterLastChild()
-    {
-        rta.setHTML("<em>ab</em><strong>ij</strong>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStartBefore(getBody().getChildNodes().getItem(1));
-        range.setEndAfter(getBody().getChildNodes().getItem(1));
-        select(range);
-
-        assertEquals("ij", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, "#"));
-        assertEquals("<em>ab</em>#", clean(rta.getHTML()));
+        });
     }
 
     /**
@@ -126,32 +104,22 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertInTextNode()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestInsertInTextNode();
-                finishTest();
+                rta.setHTML("xyz");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild(), 1);
+                range.setEnd(getBody().getFirstChild(), 2);
+                select(range);
+
+                assertEquals("y", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "*2<em>=</em>1+"));
+                assertEquals("x*2<em>=</em>1+z", clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests the {@link InsertHTMLExecutable} when the caret goes inside a text node after the selection is deleted.
-     */
-    private void doTestInsertInTextNode()
-    {
-        rta.setHTML("xyz");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild(), 1);
-        range.setEnd(getBody().getFirstChild(), 2);
-        select(range);
-
-        assertEquals("y", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, "*2<em>=</em>1+"));
-        assertEquals("x*2<em>=</em>1+z", clean(rta.getHTML()));
+        });
     }
 
     /**
@@ -159,32 +127,22 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
      */
     public void testReplaceCrossListItemSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestReplaceCrossListItemSelection();
-                finishTest();
+                rta.setHTML("<ul><li>foo</li><li>bar</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 1);
+                range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
+                select(range);
+
+                assertEquals("oob", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "<img/>"));
+                assertEquals("<ul><li>f<img>ar</li></ul>", clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests the {@link InsertHTMLExecutable} when the selection spans multiple list items.
-     */
-    private void doTestReplaceCrossListItemSelection()
-    {
-        rta.setHTML("<ul><li>foo</li><li>bar</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 1);
-        range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
-        select(range);
-
-        assertEquals("oob", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, "<img/>"));
-        assertEquals("<ul><li>f<img>ar</li></ul>", clean(rta.getHTML()));
+        });
     }
 
     /**
@@ -192,15 +150,13 @@ public class InsertHTMLExecutableTest extends AbstractRichTextAreaTest
      */
     public void testSelectionContractionAfterInsertion()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestSelectionContractionAfterInsertion();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**

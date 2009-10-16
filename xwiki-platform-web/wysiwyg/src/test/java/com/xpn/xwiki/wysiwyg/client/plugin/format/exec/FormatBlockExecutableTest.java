@@ -25,7 +25,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
@@ -71,29 +71,19 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertHeaderOnEmptyDocument()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestInsertHeaderOnEmptyDocument();
-                finishTest();
+                rta.setHTML("");
+                assertEquals("", rta.getHTML());
+                assertTrue(executable.execute(rta, H1));
+                assertEquals("<h1></h1>", clean(rta.getHTML()));
+                assertTrue(new InsertHTMLExecutable().execute(rta, "title 1"));
+                assertEquals("<h1>title 1</h1>", clean(rta.getHTML()));
+                assertEquals(H1, executable.getParameter(rta));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see http://jira.xwiki.org/jira/browse/XWIKI-2730
-     */
-    private void doTestInsertHeaderOnEmptyDocument()
-    {
-        rta.setHTML("");
-        assertEquals("", rta.getHTML());
-        assertTrue(executable.execute(rta, H1));
-        assertEquals("<h1></h1>", clean(rta.getHTML()));
-        assertTrue(new InsertHTMLExecutable().execute(rta, "title 1"));
-        assertEquals("<h1>title 1</h1>", clean(rta.getHTML()));
-        assertEquals(H1, executable.getParameter(rta));
+        });
     }
 
     /**
@@ -101,15 +91,13 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertHeaderAroundCaret()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestInsertHeaderAroundCaret();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -147,15 +135,13 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertHeaderAroundSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestInsertHeaderAroundSelection();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -189,15 +175,13 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveParagraph()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRemoveParagraph();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -227,15 +211,13 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
      */
     public void testChangeBlock()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestChangeBlock();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -272,15 +254,13 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
      */
     public void testDetectHeaderFromASpanWithDisplayBlock()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestDetectHeaderFromASpanWithDisplayBlock();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**

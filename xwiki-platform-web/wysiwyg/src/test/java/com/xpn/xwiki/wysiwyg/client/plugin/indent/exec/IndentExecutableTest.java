@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Range;
 
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -57,33 +57,23 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentNoSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentNoSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one</li><li>two</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>two</li></ul></li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple list (with no sublists), when a list item should be indented as the sublist of its parent.
-     */
-    private void doTestIndentNoSublist()
-    {
-        rta.setHTML("<ul><li>one</li><li>two</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>one<ul><li>two</li></ul></li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -92,15 +82,13 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentDisabledOnFirstItem()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestIndentDisabledOnFirstItem();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -145,37 +133,26 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentDisabledOutsideList()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentDisabledOutsideList();
-                finishTest();
+                String rtaInnerHTML = "<p>xwiki rocks!</p><ul><li>foo<ul><li>bar</li></ul></li></ul>";
+                rta.setHTML(rtaInnerHTML);
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
+                range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0), 4);
+                select(range);
+
+                // is not enabled
+                assertFalse(executable.isEnabled(rta));
+                // does not execute
+                assertFalse(executable.execute(rta, null));
+                // doesn't change HTML at all
+                assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is outside a list.
-     */
-    private void doTestIndentDisabledOutsideList()
-    {
-        String rtaInnerHTML = "<p>xwiki rocks!</p><ul><li>foo<ul><li>bar</li></ul></li></ul>";
-        rta.setHTML(rtaInnerHTML);
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
-        range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0), 4);
-        select(range);
-
-        // is not enabled
-        assertFalse(executable.isEnabled(rta));
-        // does not execute
-        assertFalse(executable.execute(rta, null));
-        // doesn't change HTML at all
-        assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -186,15 +163,13 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentDisabledWhenEntireListIsSelected()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestIndentDisabledWhenEntireListIsSelected();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -227,36 +202,27 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentDisabledWhenEntireSublistIsSelected()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentDisabledWhenEntireSublistIsSelected();
-                finishTest();
+                String rtaInnerHTML =
+                    "<ul><li>foo</li><li>bar<ul><li>one</li><li>two</li><li>three</li></ul></li></ul>";
+                rta.setHTML(rtaInnerHTML);
+
+                // set the selection around all the items of the sublist of "bar"
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1)
+                    .getFirstChild().getFirstChild(), 0);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1)
+                    .getChildNodes().getItem(2).getFirstChild(), 5);
+                select(range);
+
+                assertFalse(executable.isEnabled(rta));
+                assertFalse(executable.execute(rta, null));
+                assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testIndentDisabledWhenEntireSublistIsSelected()
-     */
-    private void doTestIndentDisabledWhenEntireSublistIsSelected()
-    {
-        String rtaInnerHTML = "<ul><li>foo</li><li>bar<ul><li>one</li><li>two</li><li>three</li></ul></li></ul>";
-        rta.setHTML(rtaInnerHTML);
-
-        // set the selection around all the items of the sublist of "bar"
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
-            .getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
-        range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
-            .getChildNodes().getItem(2).getChildNodes().getItem(0), 5);
-        select(range);
-
-        assertFalse(executable.isEnabled(rta));
-        assertFalse(executable.execute(rta, null));
-        assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -265,34 +231,23 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentWithSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentWithSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one</li><li>two<ul><li>three</li></ul></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>two<ul><li>three</li></ul></li></ul></li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a list with sublists.
-     */
-    private void doTestIndentWithSublist()
-    {
-        rta.setHTML("<ul><li>one</li><li>two<ul><li>three</li></ul></li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>one<ul><li>two<ul><li>three</li></ul></li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -301,35 +256,25 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentEntirelySelectedItemWithSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentEntirelySelectedItemWithSublist();
-                finishTest();
+                rta.setHTML("<ul><li>foo</li><li>bar<ul><li>foobar</li></ul></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1)
+                    .getFirstChild().getFirstChild(), 5);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>foo<ul><li>bar<ul><li>foobar</li></ul></li></ul></li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testIndentEntirelySelectedItemWithSublist()
-     */
-    private void doTestIndentEntirelySelectedItemWithSublist()
-    {
-        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>foobar</li></ul></li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild()
-            .getFirstChild(), 5);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo<ul><li>bar<ul><li>foobar</li></ul></li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -339,35 +284,23 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentUnderSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentUnderSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one<ul><li>one plus one</li></ul></li><li>two</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>one plus one</li><li>two</li></ul></li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple list (with no sublists), under a list item with a sublist, when the indented item should become the last
-     * child in its previous sibling's sublist.
-     */
-    private void doTestIndentUnderSublist()
-    {
-        rta.setHTML("<ul><li>one<ul><li>one plus one</li></ul></li><li>two</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>one<ul><li>one plus one</li><li>two</li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -376,34 +309,24 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentListFragment()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentListFragment();
-                finishTest();
+                rta.setHTML("<ol><li>one</li><li>two</li><li>three</li><li>four</li></ol>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+
+                assertEquals("<ol><li>one<ol><li>two</li><li>three</li></ol></li><li>four</li></ol>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testIndentListFragment()
-     */
-    private void doTestIndentListFragment()
-    {
-        rta.setHTML("<ol><li>one</li><li>two</li><li>three</li><li>four</li></ol>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
-        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-
-        assertEquals("<ol><li>one<ol><li>two</li><li>three</li></ol></li><li>four</li></ol>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -413,36 +336,25 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentListUnderSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentListUnderSublist();
-                finishTest();
+                rta.setHTML("<ol><li>one<ul><li>under 1</li><li>under 2</li></ul>"
+                    + "</li><li>two</li><li>three</li><li>four</li></ol>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+
+                assertEquals("<ol><li>one<ul><li>under 1</li><li>under 2</li><li>two</li><li>three</li></ul>"
+                    + "</li><li>four</li></ol>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testIndentListUnderSublist()
-     */
-    private void doTestIndentListUnderSublist()
-    {
-        rta.setHTML("<ol><li>one<ul><li>under 1</li><li>under 2</li></ul></li><li>two</li><li>three</li><li>four</li>"
-            + "</ol>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
-        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-
-        assertEquals(
-            "<ol><li>one<ul><li>under 1</li><li>under 2</li><li>two</li><li>three</li></ul></li><li>four</li></ol>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -453,36 +365,26 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentAlignsSublists()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestIndentAlignsSublists();
-                finishTest();
+                rta.setHTML("<ol><li>one<ul><li>under</li></ul></li><li>two</li><li>three</li>" + "<li>four</li></ol>");
+
+                Range range = rta.getDocument().createRange();
+                // put the selection from under to the end of "two"
+                range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getFirstChild()
+                    .getFirstChild(), 0);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 3);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+
+                assertEquals("<ol><li>one<ul><li>under</li><li>two</li></ul></li><li>three</li><li>four</li></ol>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testIndentListUnderSublist()
-     */
-    private void doTestIndentAlignsSublists()
-    {
-        rta.setHTML("<ol><li>one<ul><li>under</li></ul></li><li>two</li><li>three</li>" + "<li>four</li></ol>");
-
-        Range range = rta.getDocument().createRange();
-        // put the selection from under to the end of "two"
-        range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getFirstChild()
-            .getFirstChild(), 0);
-        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 3);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-
-        assertEquals("<ol><li>one<ul><li>under</li><li>two</li></ul></li><li>three</li><li>four</li></ol>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -493,15 +395,13 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentSublistFragmentAndListFragment()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestIndentSublistFragmentAndListFragment();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -535,15 +435,13 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testIndentSublistFragmentWithTrailingTextAndListFragment()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestIndentSublistFragmentWithTrailingTextAndListFragment();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -564,8 +462,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
 
-        assertEquals("<ul><li>one one<ul><li>one two<ul><li>two one<ul><li>two two</li></ul></li></ul>after</li>"
-            + "<li>one three</li><li>one four</li></ul></li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta
-                .getHTML())));
+        assertEquals("<ul><li>one one<ul><li>one two<ul><li>two one<ul><li>two two</li></ul></li></ul>"
+            + "after</li><li>one three</li><li>one four</li></ul></li><li>one five</li></ul>",
+            removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 }

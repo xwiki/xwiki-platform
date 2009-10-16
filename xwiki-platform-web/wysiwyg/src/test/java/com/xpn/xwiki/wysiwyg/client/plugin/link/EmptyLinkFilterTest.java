@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -62,30 +61,20 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
      */
     public void testEmptyLinkIsFiltered()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestEmptyLinkIsFiltered();
-                finishTest();
+                rta.setHTML("This is a test <a metadata='<!--startwikilink:http://www.xwiki.org-->"
+                    + "<span class=\"wikiexternallink\">org.xwiki.gwt.dom.client.Element#placeholder</span>"
+                    + "<!--stopwikilink-->' href=\"http://www.xwiki.org\"></a>with an empty link");
+
+                // simulate a submit command
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+
+                assertEquals("this is a test with an empty link", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testEmptyLinkIsFiltered()
-     */
-    private void doTestEmptyLinkIsFiltered()
-    {
-        rta.setHTML("This is a test <a metadata='<!--startwikilink:http://www.xwiki.org-->"
-            + "<span class=\"wikiexternallink\">org.xwiki.gwt.dom.client.Element#placeholder</span>"
-            + "<!--stopwikilink-->' href=\"http://www.xwiki.org\"></a>with an empty link");
-
-        // simulate a submit command
-        linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
-
-        assertEquals("this is a test with an empty link", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -93,31 +82,21 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
      */
     public void testEmptyLinkWithSpanInsideIsFiltered()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestEmptyLinkWithSpanInsideIsFiltered();
-                finishTest();
+                rta.setHTML("Testing a link <a href=\"http://www.xwiki.org\" class=\"wikimodel-freestanding\" "
+                    + "metadata='<!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
+                    + "org.xwiki.gwt.dom.client.Element#placeholder</span><!--stopwikilink-->'>"
+                    + "<span class=\"wikigeneratedlinkcontent\"></span></a>with a span inside");
+
+                // simulate a submit command
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+
+                assertEquals("testing a link with a span inside", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testEmptyLinkWithSpanInsideIsFiltered()
-     */
-    public void doTestEmptyLinkWithSpanInsideIsFiltered()
-    {
-        rta.setHTML("Testing a link <a href=\"http://www.xwiki.org\" class=\"wikimodel-freestanding\" "
-            + "metadata='<!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
-            + "org.xwiki.gwt.dom.client.Element#placeholder</span><!--stopwikilink-->'>"
-            + "<span class=\"wikigeneratedlinkcontent\"></span></a>with a span inside");
-
-        // simulate a submit command
-        linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
-
-        assertEquals("testing a link with a span inside", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -125,34 +104,24 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
      */
     public void testMultipleEmptyLinksAreRemoved()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestMultipleEmptyLinksAreRemoved();
-                finishTest();
+                rta.setHTML("Testing one link <a href=\"http://xwiki.org\" class=\"wikimodel-freestanding\" "
+                    + "metadata='<!--startwikilink:http://xwiki.org--><span class=\"wikiexternallink\">"
+                    + "org.xwiki.gwt.dom.client.Element#placeholder</span>"
+                    + "<!--stopwikilink-->'><span class=\"wikigeneratedlinkcontent\"></span></a>and another "
+                    + "<a metadata='<!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
+                    + "org.xwiki.gwt.dom.client.Element#placeholder</span><!--stopwikilink-->' "
+                    + "href=\"http://www.xwiki.org\"></a>link");
+
+                // simulate a submit command
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+
+                assertEquals("testing one link and another link", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testEmptyLinkWithSpanInsideIsFiltered()
-     */
-    public void doTestMultipleEmptyLinksAreRemoved()
-    {
-        rta.setHTML("Testing one link <a href=\"http://xwiki.org\" class=\"wikimodel-freestanding\" "
-            + "metadata='<!--startwikilink:http://xwiki.org--><span class=\"wikiexternallink\">"
-            + "org.xwiki.gwt.dom.client.Element#placeholder</span>"
-            + "<!--stopwikilink-->'><span class=\"wikigeneratedlinkcontent\"></span></a>and another "
-            + "<a metadata='<!--startwikilink:http://www.xwiki.org--><span class=\"wikiexternallink\">"
-            + "org.xwiki.gwt.dom.client.Element#placeholder</span><!--stopwikilink-->' "
-            + "href=\"http://www.xwiki.org\"></a>link");
-
-        // simulate a submit command
-        linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
-
-        assertEquals("testing one link and another link", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -160,15 +129,13 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
      */
     public void testNonEmptyLinkIsNotFiltered()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestNonEmptyLinkIsNotFiltered();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -200,34 +167,24 @@ public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
      */
     public void testAnchorIsNotFiltered()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestAnchorIsNotFiltered();
-                finishTest();
+                String nameAttribute = "name";
+                rta.setHTML("This is an anchor <a name=\"anchor\"></a> which shouldn't be filtered");
+                Element anchorBefore = rta.getDocument().getElementsByTagName(ANCHOR_TAG).getItem(0);
+
+                // simulate a submit command
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+
+                // try to find the anchor in a manner which is browser independent, since the inner HTML is different on
+                // the various browsers
+                NodeList<Element> anchorsAfter = rta.getDocument().getElementsByTagName(ANCHOR_TAG);
+                assertTrue(anchorsAfter.getLength() > 0);
+                Element anchorAfter = anchorsAfter.getItem(0);
+                assertEquals(anchorBefore.getAttribute(nameAttribute), anchorAfter.getAttribute(nameAttribute));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testAnchorIsNotFiltered()
-     */
-    private void doTestAnchorIsNotFiltered()
-    {
-        String nameAttribute = "name";
-        rta.setHTML("This is an anchor <a name=\"anchor\"></a> which shouldn't be filtered");
-        Element anchorBefore = rta.getDocument().getElementsByTagName(ANCHOR_TAG).getItem(0);
-
-        // simulate a submit command
-        linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
-
-        // try to find the anchor in a manner which is browser independent, since the inner HTML is different on
-        // the various browsers
-        NodeList<Element> anchorsAfter = rta.getDocument().getElementsByTagName(ANCHOR_TAG);
-        assertTrue(anchorsAfter.getLength() > 0);
-        Element anchorAfter = anchorsAfter.getItem(0);
-        assertEquals(anchorBefore.getAttribute(nameAttribute), anchorAfter.getAttribute(nameAttribute));
+        });
     }
 }

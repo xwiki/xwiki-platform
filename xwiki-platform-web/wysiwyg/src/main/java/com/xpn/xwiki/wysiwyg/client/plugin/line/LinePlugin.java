@@ -369,6 +369,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
             // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
             // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
             // the Delete command instead which is HTML-aware.
+            // NOTE: The Delete command can have side-effects like the insertion of a bogus BR tag. Be aware!
             getTextArea().getDocument().execCommand(Command.DELETE.toString(), null);
         }
 
@@ -482,6 +483,57 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
     }
 
     /**
+     * Adjusts the line break position so that:
+     * <ul>
+     * <li>Anchors don't start or end with a line break.</li>
+     * </ul>
+     * 
+     * @param container the block-level element containing the line break
+     * @param br the line break
+     * @see XWIKI-4193: When hitting Return at the end of the link the new line should not be a link
+     */
+    protected void adjustLineBreak(Node container, Node br)
+    {
+        Node anchor = domUtils.getFirstAncestor(br, "a");
+        if (anchor != null) {
+            // NOTE: We assume the anchor is inside the container because the anchor is an in-line element while the
+            // container is a block-level element. We could test if the container is or has child the anchor but let's
+            // keep things simple for now.
+            // Check if the anchor starts with the given line break.
+            Node firstLeaf = domUtils.getFirstLeaf(anchor);
+            Node leaf = br;
+            boolean startsWithLineBreak = true;
+            while (leaf != firstLeaf) {
+                leaf = domUtils.getPreviousLeaf(leaf);
+                if (needsSpace(leaf)) {
+                    startsWithLineBreak = false;
+                    break;
+                }
+            }
+            if (startsWithLineBreak) {
+                // Move the line break before the anchor.
+                anchor.getParentNode().insertBefore(br, anchor);
+            } else {
+                // Check if the anchor ends with the given line break.
+                Node lastLeaf = domUtils.getLastLeaf(anchor);
+                leaf = br;
+                boolean endsWithLineBreak = true;
+                while (leaf != lastLeaf) {
+                    leaf = domUtils.getNextLeaf(leaf);
+                    if (needsSpace(leaf)) {
+                        endsWithLineBreak = false;
+                        break;
+                    }
+                }
+                if (endsWithLineBreak) {
+                    // Move the line break after the anchor.
+                    domUtils.insertAfter(br, anchor);
+                }
+            }
+        }
+    }
+
+    /**
      * Inserts a line break at the specified position in the document.
      * 
      * @param container a block-level element containing the caret
@@ -536,6 +588,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         } else {
             br = domUtils.getPreviousLeaf(caret.getStartContainer());
         }
+        adjustLineBreak(container, br);
 
         // Create a new paragraph.
         Node paragraph = getTextArea().getDocument().createPElement();

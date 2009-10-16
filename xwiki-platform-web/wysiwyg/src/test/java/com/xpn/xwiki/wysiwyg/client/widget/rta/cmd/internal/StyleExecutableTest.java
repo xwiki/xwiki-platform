@@ -23,7 +23,7 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Style;
 
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -64,32 +64,22 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenBodyIsEmpty()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestStyleWhenBodyIsEmpty();
-                finishTest();
+                rta.setHTML("");
+                assertFalse(executable.isExecuted(rta));
+                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isExecuted(rta));
+                assertTrue(insertHTML.execute(rta, "a"));
+                assertTrue(executable.isExecuted(rta));
+                assertEquals("<em>a</em>", rta.getHTML().toLowerCase());
+                assertTrue(executable.execute(rta, null));
+                assertFalse(executable.isExecuted(rta));
+                assertEquals("<em></em>a<em></em>", rta.getHTML().toLowerCase());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Apply style when the document is empty and the caret is inside body.
-     */
-    private void doTestStyleWhenBodyIsEmpty()
-    {
-        rta.setHTML("");
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
-        assertTrue(insertHTML.execute(rta, "a"));
-        assertTrue(executable.isExecuted(rta));
-        assertEquals("<em>a</em>", rta.getHTML().toLowerCase());
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
-        assertEquals("<em></em>a<em></em>", rta.getHTML().toLowerCase());
+        });
     }
 
     /**
@@ -97,15 +87,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenCaretIsInsideText()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleWhenCaretIsInsideText();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -136,15 +124,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenCaretIsBeforeText()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleWhenCaretIsBeforeText();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -174,15 +160,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenCaretIsAfterText()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleWhenCaretIsAfterText();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -213,15 +197,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenCaretIsAfterImage()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleWhenCaretIsAfterImage();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -251,15 +233,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenCaretIsBeforeImage()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleWhenCaretIsBeforeImage();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -290,15 +270,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleWhenSelectionIsInsideText()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleWhenSelectionIsInsideText();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -330,36 +308,24 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveStyleWhenSelectionWrapsTheStyleElement()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestRemoveStyleWhenSelectionWrapsTheStyleElement();
-                finishTest();
+                String text = "x<em>y</em>z";
+                rta.setHTML(text);
+
+                Range range = ((Document) rta.getDocument()).createRange();
+                range.setStart(getBody().getFirstChild(), 1);
+                range.setEnd(getBody().getLastChild(), 0);
+                select(range);
+
+                assertTrue(executable.isExecuted(rta));
+                assertTrue(executable.execute(rta, null));
+                assertFalse(executable.isExecuted(rta));
+                assertEquals("xyz", rta.getHTML());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Remove the style when the selection wraps the style element.
-     * 
-     * @see XWIKI-3110: Cannot unbold a bold word selected with double-click
-     */
-    private void doTestRemoveStyleWhenSelectionWrapsTheStyleElement()
-    {
-        String text = "x<em>y</em>z";
-        rta.setHTML(text);
-
-        Range range = ((Document) rta.getDocument()).createRange();
-        range.setStart(getBody().getFirstChild(), 1);
-        range.setEnd(getBody().getLastChild(), 0);
-        select(range);
-
-        assertTrue(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
-        assertEquals("xyz", rta.getHTML());
+        });
     }
 
     /**
@@ -367,15 +333,13 @@ public class StyleExecutableTest extends AbstractRichTextAreaTest
      */
     public void testStyleCrossParagraphSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestStyleCrossParagraphSelection();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**

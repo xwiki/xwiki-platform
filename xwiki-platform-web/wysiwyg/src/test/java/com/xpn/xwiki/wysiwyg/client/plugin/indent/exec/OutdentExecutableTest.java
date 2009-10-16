@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Range;
 
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -57,15 +57,13 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentDisabledOutsideList()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestOutdentDisabledOutsideList();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -97,34 +95,24 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentEntireFirstLevelList()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentEntireFirstLevelList();
-                finishTest();
+                String rtaInnerHTML = "<ul><li>foo</li><li>bar</li></ul>";
+                rta.setHTML(rtaInnerHTML);
+
+                // set the selection around the two list items
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 0);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 3);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<p>foo</p><p>bar</p>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testOutdentEntireFirstLevelList()
-     */
-    private void doTestOutdentEntireFirstLevelList()
-    {
-        String rtaInnerHTML = "<ul><li>foo</li><li>bar</li></ul>";
-        rta.setHTML(rtaInnerHTML);
-
-        // set the selection around the two list items
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
-        range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 3);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<p>foo</p><p>bar</p>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -133,35 +121,24 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentLastItemNoSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentLastItemNoSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes()
+                    .getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple sublist list item (with no other sublists), and which is the last item in its sublist.
-     */
-    private void doTestOutdentLastItemNoSublist()
-    {
-        rta.setHTML("<ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(1)
-            .getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>", removeNonBreakingSpaces(clean(rta
-            .getHTML())));
+        });
     }
 
     /**
@@ -170,35 +147,24 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentLastItemWithSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentLastItemWithSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one<ul><li>two</li><li>three<ul><li>four</li></ul></li></ul></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes()
+                    .getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul></li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a sublist list item with sublists which is the last item in its sublist.
-     */
-    private void doTestOutdentLastItemWithSublist()
-    {
-        rta.setHTML("<ul><li>one<ul><li>two</li><li>three<ul><li>four</li></ul></li></ul></li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(1)
-            .getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -208,36 +174,24 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentSplitNoSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentSplitNoSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one<ul><li>two</li><li>three</li><li>three plus one</li></ul></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes()
+                    .getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>three plus one"
+                    + "</li></ul></li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple sublist list item (with no other sublists), which is in the middle of its sublist and on outdent it
-     * needs to be split in two sublists.
-     */
-    private void doTestOutdentSplitNoSublist()
-    {
-        rta.setHTML("<ul><li>one<ul><li>two</li><li>three</li><li>three plus one</li></ul></li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(1)
-            .getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>three plus one</li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -247,38 +201,25 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentSplitWithSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentSplitWithSublist();
-                finishTest();
+                rta.setHTML("<ul><li>one<ul><li>two</li><li>three<ul><li>four</li></ul></li>"
+                    + "<li>three plus one</li></ul></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(1).getChildNodes()
+                    .getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>four</li><li>three plus "
+                    + "one</li></ul></li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple sublist list item with a sublist, which is in the middle of its sublist and on outdent it needs to be
-     * split in two sublists.
-     */
-    private void doTestOutdentSplitWithSublist()
-    {
-        rta.setHTML("<ul><li>one<ul><li>two</li><li>three<ul><li>four</li></ul></li>"
-            + "<li>three plus one</li></ul></li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(1)
-            .getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals(
-            "<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>four</li><li>three plus one</li></ul></li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -288,15 +229,13 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentSplitWithSublistEntirelySelected()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestOutdentSplitWithSublistEntirelySelected();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -317,9 +256,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals(
-            "<ol><li>one<ol><li>two</li></ol></li><li>three<ol><li>four</li><li>three plus one</li></ol></li></ol>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<ol><li>one<ol><li>two</li></ol></li><li>three<ol><li>four</li><li>three plus "
+            + "one</li></ol></li></ol>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -329,37 +267,25 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentSplitWithContentAfter()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentSplitWithContentAfter();
-                finishTest();
+                rta.setHTML("<ul><li>one<br />before<ul><li>two</li><li>three</li><li>four</li></ul>after</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getChildNodes().getItem(3).getChildNodes()
+                    .getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+
+                assertEquals("<ul><li>one<br>before<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul>"
+                    + "after</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the outdented item is in a sublist and content is present in the parent list item after the
-     * sublist.
-     */
-    private void doTestOutdentSplitWithContentAfter()
-    {
-        rta.setHTML("<ul><li>one<br />before<ul><li>two</li><li>three</li><li>four</li></ul>after</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(3)
-            .getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-
-        assertEquals("<ul><li>one<br>before<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul>after</li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -368,33 +294,23 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentFirstLevelItemAtListTop()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentFirstLevelItemAtListTop();
-                finishTest();
+                rta.setHTML("<ul><li>one</li><li>two</li><li>three</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<p>one</p><ul><li>two</li><li>three</li></ul>", removeNonBreakingSpaces(clean(rta
+                    .getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is the first item in its list.
-     */
-    private void doTestOutdentFirstLevelItemAtListTop()
-    {
-        rta.setHTML("<ul><li>one</li><li>two</li><li>three</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<p>one</p><ul><li>two</li><li>three</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -403,34 +319,23 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentFirstLevelItemSplitList()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentFirstLevelItemSplitList();
-                finishTest();
+                rta.setHTML("<ul><li>foo</li><li>bar</li><li>far</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta
+                    .getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is in the middle of its list and outdent needs to split it in two.
-     */
-    private void doTestOutdentFirstLevelItemSplitList()
-    {
-        rta.setHTML("<ul><li>foo</li><li>bar</li><li>far</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta
-            .getHTML())));
+        });
     }
 
     /**
@@ -439,34 +344,23 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentFirstLevelItemWithSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentFirstLevelItemWithSublist();
-                finishTest();
+                rta.setHTML("<ul><li>foo</li><li>bar<ul><li>bar plus one</li></ul></li><li>far</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li><li>far</li></ul>",
+                    removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is in the middle of its list and outdent needs to split it in two.
-     */
-    private void doTestOutdentFirstLevelItemWithSublist()
-    {
-        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>bar plus one</li></ul></li><li>far</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li><li>far</li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -477,33 +371,23 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentFirstLevelItemWithSublistAndContentAfter()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentFirstLevelItemWithSublistAndContentAfter();
-                finishTest();
+                rta.setHTML("<ul><li>foo</li><li>bar<ul><li>bar plus one</li></ul>after</li><li>far</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li></ul><p>after</p>"
+                    + "<ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * @see #testOutdentFirstLevelItemWithSublistAndContentAfter()
-     */
-    private void doTestOutdentFirstLevelItemWithSublistAndContentAfter()
-    {
-        rta.setHTML("<ul><li>foo</li><li>bar<ul><li>bar plus one</li></ul>after</li><li>far</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li></ul><p>after</p><ul><li>far</li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -512,34 +396,23 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentFirstLevelItemAtListEnd()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestOutdentFirstLevelItemAtListEnd();
-                finishTest();
+                rta.setHTML("<ul><li>first</li><li>second</li><li>third</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 0);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(executable.isEnabled(rta));
+                assertTrue(executable.execute(rta, null));
+                assertEquals("<ul><li>first</li><li>second</li></ul><p>third</p>", removeNonBreakingSpaces(clean(rta
+                    .getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is the last item in its list.
-     */
-    private void doTestOutdentFirstLevelItemAtListEnd()
-    {
-        rta.setHTML("<ul><li>first</li><li>second</li><li>third</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(2).getChildNodes().getItem(0), 0);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
-        assertEquals("<ul><li>first</li><li>second</li></ul><p>third</p>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -548,15 +421,13 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentEntireSublist()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestOutdentEntireSublist();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -568,10 +439,10 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         // set the selection around all the items of the sublist of "bar"
         Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
-            .getChildNodes().getItem(0).getChildNodes().getItem(0), 0);
-        range.setEnd(getBody().getChildNodes().getItem(0).getChildNodes().getItem(1).getChildNodes().getItem(1)
-            .getChildNodes().getItem(2).getChildNodes().getItem(0), 5);
+        range.setStart(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild()
+            .getFirstChild(), 0);
+        range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getChildNodes().getItem(1).getChildNodes()
+            .getItem(2).getFirstChild(), 5);
         select(range);
 
         assertTrue(executable.isEnabled(rta));
@@ -586,15 +457,13 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentSublistFragmentWithFollowingListFragment()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestOutdentSublistFragmentWithFollowingListFragment();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -616,9 +485,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
 
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
-        assertEquals(
-            "<ul><li>foo<ul><li>one</li><li>two</li><li>three</li></ul></li><li>two plus one</li><li>bar</li></ul>",
-            removeNonBreakingSpaces(clean(rta.getHTML())));
+        assertEquals("<ul><li>foo<ul><li>one</li><li>two</li><li>three</li></ul></li><li>two plus one</li>"
+            + "<li>bar</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 
     /**
@@ -630,15 +498,13 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
      */
     public void testOutdentSublistFragmentWithTrailingTextAndListFragment()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestIndentSublistFragmentWithTrailingTextAndListFragment();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -659,8 +525,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
         assertTrue(executable.isEnabled(rta));
         assertTrue(executable.execute(rta, null));
 
-        assertEquals("<ul><li>one one</li></ul><p>one two</p><ul><li>two one</li><li>two twoafter</li></ul>"
-            + "<p>one three</p><ul><li>one four</li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta
-                .getHTML())));
+        assertEquals("<ul><li>one one</li></ul><p>one two</p><ul><li>two one</li><li>two twoafter</li></ul><p>one "
+            + "three</p><ul><li>one four</li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
 }

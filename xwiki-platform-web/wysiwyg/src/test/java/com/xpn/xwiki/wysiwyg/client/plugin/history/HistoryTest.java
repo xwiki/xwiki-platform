@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
 import org.xwiki.gwt.dom.client.Range;
 
-import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.RedoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
@@ -56,21 +55,19 @@ public class HistoryTest extends AbstractRichTextAreaTest
      */
     public void testRestoreSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRestoreSelection();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
      * Tests if undo and redo operations restore the previous selection.
      */
-    public void doTestRestoreSelection()
+    private void doTestRestoreSelection()
     {
         rta.setHTML("<span>ab</span><span>cde</span>");
 
@@ -95,21 +92,19 @@ public class HistoryTest extends AbstractRichTextAreaTest
      */
     public void testRestoreSelectionEndingInAComment()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRestoreSelectionEndingInAComment();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
      * Tests if undo and redo operations restore the previous selection even when it ends within a comment node.
      */
-    public void doTestRestoreSelectionEndingInAComment()
+    private void doTestRestoreSelectionEndingInAComment()
     {
         rta.setHTML("ab<!--x-->c");
 
@@ -137,21 +132,19 @@ public class HistoryTest extends AbstractRichTextAreaTest
      */
     public void testUndoInsideParagraph()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestUndoInsideParagraph();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
      * @see XWIKI-3047: Undo fails in IE when called inside a paragraph
      */
-    public void doTestUndoInsideParagraph()
+    private void doTestUndoInsideParagraph()
     {
         String html = "<p>xyz</p>";
         rta.setHTML(html);

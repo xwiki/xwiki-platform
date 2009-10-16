@@ -25,9 +25,12 @@ import org.xwiki.gwt.dom.client.Selection;
 
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
+import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 
 /**
  * Base class for tests running on a rich text area.
@@ -37,16 +40,10 @@ import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implements LoadHandler
 {
     /**
-     * The number of milliseconds we delay the test finish. This delay is needed because in some browsers the rich text
-     * area is initialized after a timeout.
+     * The number of milliseconds we delay the test finish. This delay is needed because the test start is delayed till
+     * the rich text area is fully initialized.
      */
     public static final int FINISH_DELAY = 400;
-
-    /**
-     * The number of milliseconds we delay the test start. This delay is needed because in some browsers the rich text
-     * area is initialized after a timeout and we want to start the test after the rich text area is fully initialized.
-     */
-    public static final int START_DELAY = 300;
 
     /**
      * The rich text area on which we run the tests.
@@ -78,13 +75,7 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
     {
         // http://wiki.codetalks.org/wiki/index.php/Docs/Keyboard_navigable_JS_widgets
         // #Use_setTimeout_with_element.focus.28.29_to_set_focus
-        (new Timer()
-        {
-            public void run()
-            {
-                rta.setFocus(true);
-            }
-        }).schedule(1);
+        DeferredCommand.addCommand(new FocusCommand(rta));
     }
 
     /**
@@ -97,6 +88,34 @@ public class AbstractRichTextAreaTest extends AbstractWysiwygClientTest implemen
         super.gwtTearDown();
 
         RootPanel.get().remove(rta);
+    }
+
+    /**
+     * Runs the test specified by the given command after the rich text area finished loading.
+     * 
+     * @param command the test to be deferred
+     */
+    protected void deferTest(final Command command)
+    {
+        delayTestFinish(FINISH_DELAY);
+        final HandlerRegistration[] registrations = new HandlerRegistration[1];
+        registrations[0] = rta.addLoadHandler(new LoadHandler()
+        {
+            public void onLoad(LoadEvent event)
+            {
+                // Make sure this handler is called only once.
+                registrations[0].removeHandler();
+                // Run the test after the rich text area is focused.
+                DeferredCommand.addCommand(new Command()
+                {
+                    public void execute()
+                    {
+                        command.execute();
+                        finishTest();
+                    }
+                });
+            }
+        });
     }
 
     /**

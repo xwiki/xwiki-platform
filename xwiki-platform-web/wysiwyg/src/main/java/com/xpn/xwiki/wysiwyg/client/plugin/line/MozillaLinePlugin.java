@@ -55,7 +55,11 @@ public class MozillaLinePlugin extends LinePlugin
             leaf = domUtils.getNextLeaf(leaf);
         } while (leaf != null && container == domUtils.getNearestBlockContainer(leaf));
 
-        // It seems there's no visible element on the new line. We should add one.
-        domUtils.insertAfter(getTextArea().getDocument().createBRElement(), lastLeaf);
+        // It seems there's no visible element on the new line. We should add a spacer up in the tree.
+        Node ancestor = lastLeaf;
+        while (ancestor.getParentNode() != container && ancestor.getNextSibling() == null) {
+            ancestor = ancestor.getParentNode();
+        }
+        domUtils.insertAfter(getTextArea().getDocument().createBRElement(), ancestor);
     }
 }

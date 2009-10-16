@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
 import org.xwiki.gwt.dom.client.Range;
 
-import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
@@ -56,15 +56,13 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveFormattingTag()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRemoveFormattingTag();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -112,15 +110,13 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveFormattingTags()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRemoveFormattingTags();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -161,15 +157,13 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveInlineStyle()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRemoveInlineStyle();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -210,15 +204,13 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveNestedInlineStyle()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRemoveNestedInlineStyle();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -241,9 +233,8 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
         range.setEnd(getBody().getLastChild().getLastChild().getFirstChild(), 1);
         select(range);
         assertTrue(executable.execute(rta, null));
-        assertEquals("1<span style=\"color: red\">2</span>34"
-            + "<span style=\"color: red\"><span style=\"font-size: 14pt\">5</span></span>", clean(rta.getHTML())
-                .replace(String.valueOf(';'), ""));
+        assertEquals("1<span style=\"color: red\">2</span>34<span style=\"color: red\">"
+            + "<span style=\"font-size: 14pt\">5</span></span>", clean(rta.getHTML()).replace(String.valueOf(';'), ""));
 
         // Selection includes a part of the elements with in-line style.
         rta.setHTML("1<span style=\"color: red\">2<span style=\"font-size: 14pt\">34</span></span>");
@@ -261,15 +252,13 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
      */
     public void testRemoveMixedStyle()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRemoveMixedStyle();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -312,15 +301,13 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
      */
     public void testLinksAreNotSplit()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestLinksAreNotSplit();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -344,9 +331,8 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
         range.setEnd(getBody().getLastChild().getFirstChild().getLastChild().getFirstChild(), 1);
         select(range);
         assertTrue(executable.execute(rta, null));
-        assertEquals("1<a href=\"about:blank\"><strong style=\"font-size: 18pt\"><span style=\"color: red\">"
-            + "2</span></strong>34<strong style=\"font-size: 18pt\"><span style=\"color: red\">"
-            + "<em>5</em></span></strong></a><strong style=\"font-size: 18pt\">6</strong>", clean(rta.getHTML())
-                .replace(String.valueOf(';'), ""));
+        assertEquals("1<a href=\"about:blank\"><strong style=\"font-size: 18pt\"><span style=\"color: red\">2</span>"
+            + "</strong>34<strong style=\"font-size: 18pt\"><span style=\"color: red\"><em>5</em></span></strong></a>"
+            + "<strong style=\"font-size: 18pt\">6</strong>", clean(rta.getHTML()).replace(String.valueOf(';'), ""));
     }
 }

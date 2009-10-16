@@ -24,7 +24,6 @@ import org.xwiki.gwt.dom.client.Selection;
 
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
-import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.plugin.text.exec.BoldExecutable;
@@ -61,15 +60,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testPlainTextSelectionWithoutModification()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestPlainTextSelectionWithoutModification();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -104,15 +101,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testPlainTextSelectionWithHTMLInsertion()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestPlainTextSelectionWithHTMLInsertion();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -147,15 +142,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testTextRangeSelectionWithHTMLInsertion()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestTextRangeSelectionWithHTMLInsertion();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -188,15 +181,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testReplaceElement()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestReplaceElement();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -227,29 +218,19 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testEmptyDocumentWithoutAction()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestEmptyDocumentWithoutAction();
-                finishTest();
+                rta.setHTML("");
+                assertEquals("", rta.getDocument().getSelection().toString());
+                preserver.saveSelection();
+                preserver.restoreSelection();
+                // We need to trim the selected text because the IE range implementation adds and selects a single-space
+                // text when we try to place the caret inside an empty DOM element.
+                assertEquals("", rta.getDocument().getSelection().toString().trim());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests the preserver when the edited document is empty and the user takes no action between save and restore.
-     */
-    private void doTestEmptyDocumentWithoutAction()
-    {
-        rta.setHTML("");
-        assertEquals("", rta.getDocument().getSelection().toString());
-        preserver.saveSelection();
-        preserver.restoreSelection();
-        // We need to trim the selected text because the IE range implementation adds and selects a single-space text
-        // when we try to place the caret inside an empty DOM element.
-        assertEquals("", rta.getDocument().getSelection().toString().trim());
+        });
     }
 
     /**
@@ -258,29 +239,18 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testEmptyDocumentWithAction()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestEmptyDocumentWithAction();
-                finishTest();
+                rta.setHTML("");
+                preserver.saveSelection();
+                String symbol = "*";
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, symbol));
+                preserver.restoreSelection();
+                assertEquals(symbol, rta.getDocument().getSelection().toString());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests the preserver when the edited document is empty and the user takes an editing action which affects the
-     * selected content, between save and restore.
-     */
-    private void doTestEmptyDocumentWithAction()
-    {
-        rta.setHTML("");
-        preserver.saveSelection();
-        String symbol = "*";
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, symbol));
-        preserver.restoreSelection();
-        assertEquals(symbol, rta.getDocument().getSelection().toString());
+        });
     }
 
     /**
@@ -288,15 +258,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testPreserveImageSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestPreserveImageSelection();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -328,33 +296,23 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testSelectTextNodeAndReplaceItWithEmptyString()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestSelectTextNodeAndReplaceItWithEmptyString();
-                finishTest();
+                rta.setHTML("<p>123</p>");
+
+                Range range = rta.getDocument().createRange();
+                range.selectNodeContents(getBody().getFirstChild().getFirstChild());
+                select(range);
+
+                preserver.saveSelection();
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, ""));
+                preserver.restoreSelection();
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "%"));
+                assertEquals("<p>%</p>", rta.getHTML().toLowerCase());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Test the preserver when we select a text node and we replace it with the empty string.
-     */
-    private void doTestSelectTextNodeAndReplaceItWithEmptyString()
-    {
-        rta.setHTML("<p>123</p>");
-
-        Range range = rta.getDocument().createRange();
-        range.selectNodeContents(getBody().getFirstChild().getFirstChild());
-        select(range);
-
-        preserver.saveSelection();
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, ""));
-        preserver.restoreSelection();
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "%"));
-        assertEquals("<p>%</p>", rta.getHTML().toLowerCase());
+        });
     }
 
     /**
@@ -362,34 +320,24 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testSelectTextNodeAndDeleteIt()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestSelectTextNodeAndDeleteIt();
-                finishTest();
+                rta.setHTML("<p>321</p>");
+                Node text = getBody().getFirstChild().getFirstChild();
+
+                Range range = rta.getDocument().createRange();
+                range.selectNodeContents(text);
+                select(range);
+
+                preserver.saveSelection();
+                text.getParentNode().removeChild(text);
+                preserver.restoreSelection();
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "+"));
+                assertEquals("<p>+</p>", rta.getHTML().toLowerCase());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Test the preserver when we select a text node and then we delete it.
-     */
-    private void doTestSelectTextNodeAndDeleteIt()
-    {
-        rta.setHTML("<p>321</p>");
-        Node text = getBody().getFirstChild().getFirstChild();
-
-        Range range = rta.getDocument().createRange();
-        range.selectNodeContents(text);
-        select(range);
-
-        preserver.saveSelection();
-        text.getParentNode().removeChild(text);
-        preserver.restoreSelection();
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "+"));
-        assertEquals("<p>+</p>", rta.getHTML().toLowerCase());
+        });
     }
 
     /**
@@ -397,34 +345,24 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testSelectImageAndDeleteIt()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestSelectImageAndDeleteIt();
-                finishTest();
+                rta.setHTML("<div><img src=\"clear.cache.gif\" height=\"10\" width=\"10\"/></div>");
+                Node image = getBody().getFirstChild().getFirstChild();
+
+                Range range = rta.getDocument().createRange();
+                range.selectNode(image);
+                select(range);
+
+                preserver.saveSelection();
+                image.getParentNode().removeChild(image);
+                preserver.restoreSelection();
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "@"));
+                assertEquals("<div>@</div>", rta.getHTML().toLowerCase());
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Test the preserver when we select an image and then delete that image.
-     */
-    private void doTestSelectImageAndDeleteIt()
-    {
-        rta.setHTML("<div><img src=\"clear.cache.gif\" height=\"10\" width=\"10\"/></div>");
-        Node image = getBody().getFirstChild().getFirstChild();
-
-        Range range = rta.getDocument().createRange();
-        range.selectNode(image);
-        select(range);
-
-        preserver.saveSelection();
-        image.getParentNode().removeChild(image);
-        preserver.restoreSelection();
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "@"));
-        assertEquals("<div>@</div>", rta.getHTML().toLowerCase());
+        });
     }
 
     /**
@@ -433,15 +371,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testSelectionAfterImageInsertion()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestSelectionAfterImageInsertion();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -474,15 +410,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testRangeBoundaryMarkersAreHidden()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestRangeBoundaryMarkersAreHidden();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -515,15 +449,13 @@ public class SelectionPreserverTest extends AbstractRichTextAreaTest
      */
     public void testPreserveCaretInsideEmptyTextNode()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestPreserveCaretInsideEmptyTextNode();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**

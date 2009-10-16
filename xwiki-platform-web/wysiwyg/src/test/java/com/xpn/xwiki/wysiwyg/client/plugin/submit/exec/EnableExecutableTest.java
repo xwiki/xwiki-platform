@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
-import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
@@ -52,29 +51,19 @@ public class EnableExecutableTest extends AbstractRichTextAreaTest
      */
     public void testEnableDisable()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestEnableDisable();
-                finishTest();
+                assertTrue(rta.getCommandManager().isSupported(ENABLE));
+                assertTrue(rta.getCommandManager().isEnabled(ENABLE));
+
+                assertTrue(rta.getCommandManager().isExecuted(ENABLE));
+                assertTrue(rta.getCommandManager().execute(ENABLE, false));
+                assertFalse(rta.getCommandManager().isExecuted(ENABLE));
+                assertTrue(rta.getCommandManager().execute(ENABLE, true));
+                assertTrue(rta.getCommandManager().isExecuted(ENABLE));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Tests if the rich text area can be enabled or disabled.
-     */
-    private void doTestEnableDisable()
-    {
-        assertTrue(rta.getCommandManager().isSupported(ENABLE));
-        assertTrue(rta.getCommandManager().isEnabled(ENABLE));
-
-        assertTrue(rta.getCommandManager().isExecuted(ENABLE));
-        assertTrue(rta.getCommandManager().execute(ENABLE, false));
-        assertFalse(rta.getCommandManager().isExecuted(ENABLE));
-        assertTrue(rta.getCommandManager().execute(ENABLE, true));
-        assertTrue(rta.getCommandManager().isExecuted(ENABLE));
+        });
     }
 }

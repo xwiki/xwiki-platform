@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.separator.exec;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 
-import com.google.gwt.user.client.Timer;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
@@ -54,33 +53,22 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertAtCaret()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestInsertAtCaret();
-                finishTest();
+                rta.setHTML("a<p>b<ins><!--x-->cd</ins></p>e");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getChildNodes().getItem(1).getChildNodes().getItem(1).getLastChild(), 1);
+                range.collapse(true);
+                select(range);
+
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
+                assertEquals("a<p>b<ins><!--x-->c</ins></p><hr><p><ins>d</ins></p>e", removeNonBreakingSpaces(clean(rta
+                    .getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when there is no text selected.
-     */
-    private void doTestInsertAtCaret()
-    {
-        rta.setHTML("a<p>b<ins><!--x-->cd</ins></p>e");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getChildNodes().getItem(1).getChildNodes().getItem(1).getLastChild(), 1);
-        range.collapse(true);
-        select(range);
-
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
-        assertEquals("a<p>b<ins><!--x-->c</ins></p><hr><p><ins>d</ins></p>e", removeNonBreakingSpaces(clean(rta
-            .getHTML())));
+        });
     }
 
     /**
@@ -89,15 +77,13 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testReplaceSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
                 doTestReplaceSelection();
-                finishTest();
             }
-        }).schedule(START_DELAY);
+        });
     }
 
     /**
@@ -129,27 +115,16 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testEmptyDocument()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestEmptyDocument();
-                finishTest();
+                rta.setHTML("");
+
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
+                assertEquals("<hr>", clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when the rich text area is empty.
-     */
-    private void doTestEmptyDocument()
-    {
-        rta.setHTML("");
-
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
-        assertEquals("<hr>", clean(rta.getHTML()));
+        });
     }
 
     /**
@@ -158,33 +133,22 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testReplaceElementText()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestReplaceElementText();
-                finishTest();
+                rta.setHTML("a<strong>b</strong>c");
+
+                Range range = rta.getDocument().getSelection().getRangeAt(0);
+                range.setEnd(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
+                range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 0);
+                select(range);
+
+                assertEquals("b", rta.getDocument().getSelection().toString());
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
+                assertEquals("a<strong></strong><hr><strong></strong>c", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when the selection wraps an element's inner text.
-     */
-    private void doTestReplaceElementText()
-    {
-        rta.setHTML("a<strong>b</strong>c");
-
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-        range.setEnd(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
-        range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 0);
-        select(range);
-
-        assertEquals("b", rta.getDocument().getSelection().toString());
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
-        assertEquals("a<strong></strong><hr><strong></strong>c", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -194,34 +158,22 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testReplaceCrossListItemSelection()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestReplaceCrossListItemSelection();
-                finishTest();
+                rta.setHTML("<ul><li>foo</li><li>bar</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 1);
+                range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
+                select(range);
+
+                assertEquals("oob", rta.getDocument().getSelection().toString());
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
+                assertEquals("<ul><li>f<hr>ar</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Inserts a horizontal rule in place of a selection that spans multiple list items.
-     * 
-     * @see XWIKI-2993: Insert horizontal line on a selection of unordered list
-     */
-    private void doTestReplaceCrossListItemSelection()
-    {
-        rta.setHTML("<ul><li>foo</li><li>bar</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 1);
-        range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
-        select(range);
-
-        assertEquals("oob", rta.getDocument().getSelection().toString());
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
-        assertEquals("<ul><li>f<hr>ar</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
+        });
     }
 
     /**
@@ -231,34 +183,22 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testReplaceSelectedList()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestReplaceSelectedList();
-                finishTest();
+                rta.setHTML("x<ul><li>one</li><li>two</li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getLastChild().getFirstChild().getFirstChild(), 0);
+                range.setEnd(getBody().getLastChild().getLastChild().getFirstChild(), 3);
+                select(range);
+
+                assertEquals("onetwo", rta.getDocument().getSelection().toString());
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
+                assertEquals("x<hr>", clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Inserts a horizontal rule in place of a selection that spans all the list items of a list.
-     * 
-     * @see XWIKI-2993: Insert horizontal line on a selection of unordered list
-     */
-    private void doTestReplaceSelectedList()
-    {
-        rta.setHTML("x<ul><li>one</li><li>two</li></ul>");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getLastChild().getFirstChild().getFirstChild(), 0);
-        range.setEnd(getBody().getLastChild().getLastChild().getFirstChild(), 3);
-        select(range);
-
-        assertEquals("onetwo", rta.getDocument().getSelection().toString());
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
-        assertEquals("x<hr>", clean(rta.getHTML()));
+        });
     }
 
     /**
@@ -266,33 +206,23 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
      */
     public void testInsertAndUndo()
     {
-        delayTestFinish(FINISH_DELAY);
-        (new Timer()
+        deferTest(new com.google.gwt.user.client.Command()
         {
-            public void run()
+            public void execute()
             {
-                doTestInsertAndUndo();
-                finishTest();
+                String html = "<ul><li><!--x-->alice</li><li><em></em>bob</li></ul>";
+                rta.setHTML(html);
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getLastChild(), 5);
+                range.setEnd(getBody().getFirstChild().getLastChild().getLastChild(), 3);
+                select(range);
+
+                assertEquals("bob", rta.getDocument().getSelection().toString());
+                assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
+                assertTrue(rta.getCommandManager().execute(Command.UNDO));
+                assertEquals(html, clean(rta.getHTML()));
             }
-        }).schedule(START_DELAY);
-    }
-
-    /**
-     * Inserts a horizontal rule and then reverts.
-     */
-    private void doTestInsertAndUndo()
-    {
-        String html = "<ul><li><!--x-->alice</li><li><em></em>bob</li></ul>";
-        rta.setHTML(html);
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild().getFirstChild().getLastChild(), 5);
-        range.setEnd(getBody().getFirstChild().getLastChild().getLastChild(), 3);
-        select(range);
-
-        assertEquals("bob", rta.getDocument().getSelection().toString());
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE));
-        assertTrue(rta.getCommandManager().execute(Command.UNDO));
-        assertEquals(html, clean(rta.getHTML()));
+        });
     }
 }

@@ -182,7 +182,6 @@ public class XWikiCommentHandler extends CommentHandler
             WikiParameter alt = parameters.getParameter("alt");
             if (alt != null && alt.getValue().equals(image.getName())) {
                 parameters = parameters.remove("alt");
-                alt = null;
             }
 
             WikiReference reference = new WikiReference(imageComment, null, parameters);

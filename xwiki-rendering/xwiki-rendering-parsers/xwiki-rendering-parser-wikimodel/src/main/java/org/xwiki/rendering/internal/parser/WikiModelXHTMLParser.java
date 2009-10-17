@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,17 +99,6 @@ public class WikiModelXHTMLParser extends AbstractWikiModelParser
         return Syntax.XHTML_1_0;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WikiModelXHTMLParser#parse(Reader)
-     */
-    @Override
-    public XDOM parse(Reader source) throws ParseException
-    {
-        return super.parse(source);
-    }
-    
     /**
      * {@inheritDoc}
      * 

@@ -105,12 +105,16 @@ public class XDOMGeneratorListener implements IWemListener
     private IdGenerator idGenerator = new IdGenerator();
 
     /**
-     * Used to render Bocks into plain text for computing unique HTML ids for Headers.
+     * Used to render Blocks into plain text for computing unique HTML ids for Headers.
      */
     private BlockRenderer plainTextBlockRenderer;
 
-    private class MarkerBlock extends AbstractBlock
+    private static class MarkerBlock extends AbstractBlock
     {
+    	/**
+    	 * {@inheritDoc}
+    	 * @see AbstractBlock#traverse(Listener)
+    	 */
         public void traverse(Listener listener)
         {
             // Nothing to do since this block is only used as a marker.
@@ -156,6 +160,11 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginDefinitionTerm()
+     */
     public void beginDefinitionTerm()
     {
         this.stack.push(this.marker);
@@ -166,6 +175,11 @@ public class XDOMGeneratorListener implements IWemListener
         beginDocument(WikiParameters.EMPTY);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginDocument(WikiParameters)
+     */
     public void beginDocument(WikiParameters params)
     {
         if (this.documentLevel > 0) {
@@ -184,6 +198,11 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginHeader(int, WikiParameters)
+     */
     public void beginHeader(int level, WikiParameters params)
     {
         int sectionLevel = this.currentSectionLevel.peek();
@@ -204,71 +223,138 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#beginInfoBlock(String, WikiParameters)
+     */
     public void beginInfoBlock(String infoType, WikiParameters params)
     {
-        throw new RuntimeException("beginInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginList(WikiParameters, boolean)
+     */
     public void beginList(WikiParameters params, boolean ordered)
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginListItem()
+     */
     public void beginListItem()
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginParagraph(WikiParameters)
+     */
     public void beginParagraph(WikiParameters params)
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#beginPropertyBlock(String, boolean)
+     */
     public void beginPropertyBlock(String propertyUri, boolean doc)
     {
-        throw new RuntimeException("beginPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#beginPropertyInline(String)
+     */
     public void beginPropertyInline(String str)
     {
-        throw new RuntimeException("beginPropertyInline(" + str + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginQuotation(WikiParameters)
+     */
     public void beginQuotation(WikiParameters params)
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginQuotationLine()
+     */
     public void beginQuotationLine()
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginTable(WikiParameters)
+     */
     public void beginTable(WikiParameters params)
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginTableCell(boolean, WikiParameters)
+     */
     public void beginTableCell(boolean tableHead, WikiParameters params)
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginTableRow(WikiParameters)
+     */
     public void beginTableRow(WikiParameters params)
     {
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endDefinitionDescription()
+     */
     public void endDefinitionDescription()
     {
         this.stack.push(new DefinitionDescriptionBlock(generateListFromStack()));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endDefinitionList(WikiParameters)
+     */
     public void endDefinitionList(WikiParameters params)
     {
         this.stack.push(new DefinitionListBlock(generateListFromStack(), convertParameters(params)));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endDefinitionTerm()
+     */
     public void endDefinitionTerm()
     {
         this.stack.push(new DefinitionTermBlock(generateListFromStack()));
@@ -279,6 +365,11 @@ public class XDOMGeneratorListener implements IWemListener
         endDocument(WikiParameters.EMPTY);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endDocument(WikiParameters)
+     */
     public void endDocument(WikiParameters params)
     {
         // Close sections
@@ -387,6 +478,11 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endHeader(int, WikiParameters)
+     */
     public void endHeader(int level, WikiParameters params)
     {
         List<Block> children = generateListFromStack();
@@ -400,11 +496,20 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(new HeaderBlock(children, headerLevel, parameters, id));
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#endInfoBlock(String, WikiParameters)
+     */
     public void endInfoBlock(String infoType, WikiParameters params)
     {
-        throw new RuntimeException("endInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endList(WikiParameters, boolean)
+     */
     public void endList(WikiParameters params, boolean ordered)
     {
         ListBLock listBlock;
@@ -416,42 +521,80 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(listBlock);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endListItem()
+     */
     public void endListItem()
     {
         // Note: This means we support Paragraphs inside lists.
         this.stack.push(new ListItemBlock(generateListFromStack()));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endParagraph(WikiParameters)
+     */
     public void endParagraph(WikiParameters params)
     {
         this.stack.push(new ParagraphBlock(generateListFromStack(), convertParameters(params)));
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#endPropertyBlock(String, boolean)
+     */
     public void endPropertyBlock(String propertyUri, boolean doc)
     {
-        throw new RuntimeException("endPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#endPropertyInline(String)
+     */
     public void endPropertyInline(String inlineProperty)
     {
-        throw new RuntimeException("endPropertyInline(" + inlineProperty + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endQuotation(WikiParameters)
+     */
     public void endQuotation(WikiParameters params)
     {
         this.stack.push(new QuotationBlock(generateListFromStack(), convertParameters(params)));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endQuotationLine()
+     */
     public void endQuotationLine()
     {
         this.stack.push(new QuotationLineBlock(generateListFromStack()));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endTable(WikiParameters)
+     */
     public void endTable(WikiParameters params)
     {
         this.stack.push(new TableBlock(generateListFromStack(), convertParameters(params)));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endTableCell(boolean, WikiParameters)
+     */
     public void endTableCell(boolean tableHead, WikiParameters params)
     {
         if (tableHead) {
@@ -461,6 +604,11 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endTableRow(WikiParameters)
+     */
     public void endTableRow(WikiParameters params)
     {
         this.stack.push(new TableRowBlock(generateListFromStack(), convertParameters(params)));
@@ -484,6 +632,11 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(new EmptyLinesBlock(count));
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#onEscape(String)
+     */
     public void onEscape(String str)
     {
         // The WikiModel XWiki parser has been modified not to generate any onEscape event so do nothing here.
@@ -491,14 +644,22 @@ public class XDOMGeneratorListener implements IWemListener
         // responsibility of Renderers to perform escaping as required.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#onExtensionBlock(String, WikiParameters)
+     */
     public void onExtensionBlock(String extensionName, WikiParameters params)
     {
-        throw new RuntimeException("onExtensionBlock(" + extensionName + ", " + params + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
+    /**
+     * {@inheritDoc}
+     * @see IWemListener#onExtensionInline(String, WikiParameters)
+     */
     public void onExtensionInline(String extensionName, WikiParameters params)
     {
-        throw new RuntimeException("onExtensionInline(" + extensionName + ", " + params + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -540,7 +701,9 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * @see #onMacroBlock(String, org.wikimodel.wem.WikiParameters, String)
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#onMacroInline(String, WikiParameters, String)
      */
     public void onMacroInline(String macroName, WikiParameters params, String content)
     {
@@ -647,12 +810,11 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.wikimodel.wem.IWemListener#onTableCaption(String)
+     * @see IWemListener#onTableCaption(String)
      */
     public void onTableCaption(String str)
     {
-        throw new RuntimeException("onTableCaption(" + str + ") (not handled yet)");
+    	// Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -788,27 +950,43 @@ public class XDOMGeneratorListener implements IWemListener
         return resultBlock;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginSection(int, int, WikiParameters)
+     */
     public void beginSection(int docLevel, int headerLevel, WikiParameters params)
     {
         // TODO add support for it
-
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginSectionContent(int, int, WikiParameters)
+     */
     public void beginSectionContent(int docLevel, int headerLevel, WikiParameters params)
     {
         // TODO add support for it
-
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endSection(int, int, WikiParameters)
+     */
     public void endSection(int docLevel, int headerLevel, WikiParameters params)
     {
         // TODO add support for it
-
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#endSectionContent(int, int, WikiParameters)
+     */
     public void endSectionContent(int docLevel, int headerLevel, WikiParameters params)
     {
         // TODO add support for it
-
     }
 }

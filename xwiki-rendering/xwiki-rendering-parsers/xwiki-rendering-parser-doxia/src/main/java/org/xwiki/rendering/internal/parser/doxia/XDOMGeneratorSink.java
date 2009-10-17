@@ -92,7 +92,7 @@ public class XDOMGeneratorSink implements Sink
 
     private IdGenerator idGenerator = new IdGenerator();
 
-    private class MarkerBlock extends AbstractBlock
+    private static class MarkerBlock extends AbstractBlock
     {
         public Object param1;
 

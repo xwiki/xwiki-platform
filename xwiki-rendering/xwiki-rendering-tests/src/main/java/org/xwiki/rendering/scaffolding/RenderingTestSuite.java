@@ -34,14 +34,14 @@ import junit.framework.TestSuite;
  */
 public class RenderingTestSuite extends TestSuite
 {
-    private class Data
+    private static class Data
     {
         public Map<String, String> inputs = new HashMap<String, String>();
 
         public Map<String, String> expectations = new HashMap<String, String>();
     }
 
-    public RenderingTestSuite(String name) throws Exception
+    public RenderingTestSuite(String name)
     {
         super(name);
     }

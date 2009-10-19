@@ -74,8 +74,7 @@ public class ImageMetaDataExtractorTest extends AbstractWysiwygClientTest
      */
     public void testOnInnerHTMLChange()
     {
-        String imageInnerHTML =
-            "<!--startimage:Space.Page@my.png--><img src=\"/xwiki/bin/download/Space/Page/my.png\" /><!--stopimage-->";
+        String imageInnerHTML = "<!--startimage:Space.Page@my.png--><img/><!--stopimage-->";
         container.xSetInnerHTML(imageInnerHTML);
         extractor.onInnerHTMLChange(container);
         Element imgElement = (Element) container.getFirstChild();

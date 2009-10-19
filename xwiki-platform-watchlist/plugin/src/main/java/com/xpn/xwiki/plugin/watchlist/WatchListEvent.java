@@ -34,6 +34,7 @@ import com.xpn.xwiki.doc.AttachmentDiff;
 import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.ObjectDiff;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEventType;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 import com.xpn.xwiki.plugin.diff.DiffPluginApi;
@@ -407,6 +408,28 @@ public class WatchListEvent implements Comparable<WatchListEvent>
 
         return span;
     }
+    
+    /**
+     * Compute the HTML diff for a given property.
+     * 
+     * @param objectDiff object diff object
+     * @param diff  the diff plugin API 
+     * @return the HTML diff
+     * @throws XWikiException if the diff plugin fails to compute the HTML diff
+     */
+    private String getPropertyHTMLDiff(ObjectDiff objectDiff, DiffPluginApi diff) throws XWikiException
+    {
+        String propDiff =
+            diff.getDifferencesAsHTML(objectDiff.getPrevValue().toString(), objectDiff.getNewValue().toString(), 
+                false);
+        
+        if (objectDiff.getPropType().equals(StringUtils.substringAfterLast(PasswordClass.class.getName(), ".")) 
+            && !StringUtils.isBlank(propDiff)) {
+            propDiff = "******************";
+        }
+         
+        return propDiff;
+    }
 
     /**
      * @param objectDiffs List of object diff
@@ -416,7 +439,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
      * @param diff the diff plugin API
      * @return The HTML diff
      */
-    private String getHTMLObjectsDiff(List<List<ObjectDiff>> objectDiffs, boolean isXWikiClass, 
+    private String getObjectsHTMLDiff(List<List<ObjectDiff>> objectDiffs, boolean isXWikiClass, 
         String documentFullName, DiffPluginApi diff)
     {
         StringBuffer result = new StringBuffer();
@@ -436,9 +459,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     mainDiv.addElement(prefix + HTML_IMG_PLACEHOLDER_SUFFIX);
                     mainDiv.addElement(objectName);
                     for (ObjectDiff oDiff : oList) {
-                        String propDiff =
-                            diff.getDifferencesAsHTML(oDiff.getPrevValue().toString(), oDiff.getNewValue().toString(), 
-                                false);
+                        String propDiff = getPropertyHTMLDiff(oDiff, diff);
                         if (!StringUtils.isBlank(oDiff.getPropName()) && !StringUtils.isBlank(propDiff)) {
                             Div propDiv = createDiffDiv("propDiffContainer");
                             Span propNameSpan = createDiffSpan("propName");                            
@@ -497,8 +518,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     result.append(attachmentDiv);
                 }
 
-                result.append(getHTMLObjectsDiff(objectDiffs, false, getFullName(), diff));
-                result.append(getHTMLObjectsDiff(classDiffs, true, getFullName(), diff));
+                result.append(getObjectsHTMLDiff(objectDiffs, false, getFullName(), diff));
+                result.append(getObjectsHTMLDiff(classDiffs, true, getFullName(), diff));
                 
                 for (MetaDataDiff mDiff : metaDiffs) {
                     Div metaDiv = createDiffDiv("metaDiff");

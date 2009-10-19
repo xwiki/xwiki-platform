@@ -4292,6 +4292,7 @@ public class XWikiDocument implements DocumentModelBridge
         loadArchive(context);
 
         XWikiDocument newdoc = (XWikiDocument) clone();
+        newdoc.setOriginalDocument(null);
         newdoc.setFullName(newDocumentName, context);
         newdoc.setContentDirty(true);
         newdoc.getxWikiClass().setName(newDocumentName);

@@ -4110,6 +4110,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     tdoc = sdoc.copyDocument(targetdocname, context);
                     // forget past versions
                     if (reset) {
+                        tdoc.setNew(true);
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
@@ -4183,6 +4184,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                         // forget past versions
                         if (reset) {
+                            ttdoc.setNew(true);
                             ttdoc.setVersion("1.1");
                         }
                         if (resetCreationData) {
@@ -4229,6 +4231,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     tdoc.setLanguage("");
                     // forget past versions
                     if (reset) {
+                        tdoc.setNew(true);
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {

@@ -17,12 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.gwt.dom.client;
+package org.xwiki.gwt.dom;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.xwiki.gwt.dom.client.internal.ie.IESelectionTest;
+import org.xwiki.gwt.dom.client.DOMUtilsTest;
+import org.xwiki.gwt.dom.client.DepthFirstPreOrderIteratorTest;
+import org.xwiki.gwt.dom.client.DocumentFragmentTest;
+import org.xwiki.gwt.dom.client.DocumentTest;
+import org.xwiki.gwt.dom.client.ElementTest;
+import org.xwiki.gwt.dom.client.JavaScriptObjectTest;
+import org.xwiki.gwt.dom.client.RangeTest;
+import org.xwiki.gwt.dom.client.SelectionTest;
+import org.xwiki.gwt.dom.client.StyleTest;
+import org.xwiki.gwt.dom.client.TextTest;
+import org.xwiki.gwt.dom.client.internal.ie.IERangeTest;
 
 import com.google.gwt.junit.tools.GWTTestSuite;
 
@@ -31,8 +41,12 @@ import com.google.gwt.junit.tools.GWTTestSuite;
  * derived tests are slow. This is because the JUnitShell has to load the module for each test (create the shell, hook
  * into it, etc). GWTTestSuite mitigates this by grouping all the tests that are for the same module (those that return
  * the same value for getModuleName) together and running them via the same shell instance.
+ * <p>
+ * As described in GWT issue 2486, GWTTestSuite is not a translatable class and in order to prevent reports of harmless
+ * errors we moved our test suite class out of module's source path.
  * 
  * @version $Id$
+ * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2486
  */
 public class DOMTestSuite extends GWTTestSuite
 {
@@ -50,10 +64,10 @@ public class DOMTestSuite extends GWTTestSuite
         suite.addTestSuite(ElementTest.class);
         suite.addTestSuite(TextTest.class);
         suite.addTestSuite(RangeTest.class);
+        suite.addTestSuite(IERangeTest.class);
         suite.addTestSuite(SelectionTest.class);
         suite.addTestSuite(StyleTest.class);
         suite.addTestSuite(DepthFirstPreOrderIteratorTest.class);
-        suite.addTestSuite(IESelectionTest.class);
 
         return suite;
     }

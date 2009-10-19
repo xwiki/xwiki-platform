@@ -40,7 +40,7 @@ public class JavaScriptObjectTest extends AbstractDOMTest
         assertNull(object.get(color));
 
         object.set(color, green);
-        assertSame(green, object.get(color));
+        assertEquals(green, object.get(color));
 
         object.remove(color);
         assertNull(object.get(color));
@@ -82,9 +82,9 @@ public class JavaScriptObjectTest extends AbstractDOMTest
         object.set(owner, bob);
         assertEquals(2, object.getKeys().length());
 
-        assertSame(dog, object.remove(pet));
+        assertEquals(dog, object.remove(pet));
         assertEquals(1, object.getKeys().length());
-        assertSame(bob, object.remove(owner));
+        assertEquals(bob, object.remove(owner));
         assertEquals(0, object.getKeys().length());
     }
 

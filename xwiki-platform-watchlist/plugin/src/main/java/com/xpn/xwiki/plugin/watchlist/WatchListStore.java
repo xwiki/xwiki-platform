@@ -176,13 +176,19 @@ public class WatchListStore implements EventListener
         StaticListClass intervalClass = (StaticListClass) bclass.get(WATCHLIST_CLASS_INTERVAL_PROP);
         List<String> intervalValues = intervalClass.getList(context);
         List<String> newInterval = new ArrayList<String>();
-        newInterval.addAll(intervalValues);
         boolean intervalNeedsUpdate = false;
 
         // Look for missing jobs, build a complete list
         for (String jobName : jobDocumentNames) {
             if (!newInterval.contains(jobName)) {
                 newInterval.add(jobName);
+                intervalNeedsUpdate = true;
+            }
+        }
+        
+        // Look for outdated jobs
+        for (String jobName : intervalValues) {
+            if (!newInterval.contains(jobName)) {
                 intervalNeedsUpdate = true;
             }
         }
@@ -255,22 +261,33 @@ public class WatchListStore implements EventListener
     /**
      * Retrieves all the users with a WatchList object in their profile.
      * 
+     * @param jobName name of the job to init the cache for
      * @param context the XWiki context
      */
-    private void initSubscribersCache(XWikiContext context)
+    private void initSubscribersCache(String jobName, XWikiContext context)
     {
         // init subscribers cache
-        for (String jobName : jobDocumentNames) {
-            List<Object> queryParams = new ArrayList<Object>();
-            queryParams.add(WATCHLIST_CLASS);
-            queryParams.add(jobName);
+        List<Object> queryParams = new ArrayList<Object>();
+        queryParams.add(WATCHLIST_CLASS);
+        queryParams.add(jobName);
 
-            List<String> subscribersForJob =
-                globalSearchDocuments(
-                    ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?"
-                        + " and obj.id=prop.id.id and prop.value=?", 0, 0, queryParams, context);
-            subscribers.put(jobName, subscribersForJob);
-        }
+        List<String> subscribersForJob =
+            globalSearchDocuments(
+                ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?"
+                    + " and obj.id=prop.id.id and prop.value=?", 0, 0, queryParams, context);
+        subscribers.put(jobName, subscribersForJob);
+    }
+    
+    /**
+     * Destroy subscribers cache for the given job.
+     * 
+     * @param jobName name of the job for which the cache must be destroyed
+     * @param context the XWiki context
+     */
+    private void destroySubscribersCache(String jobName, XWikiContext context)
+    {
+        // init subscribers cache        
+        subscribers.remove(jobName);
     }
 
     /**
@@ -288,7 +305,10 @@ public class WatchListStore implements EventListener
                     + WatchListJobManager.WATCHLIST_JOB_CLASS + "'", context);
 
         initWatchListClass(context);
-        initSubscribersCache(context);
+        
+        for (String jobDocumentName : jobDocumentNames) {
+            initSubscribersCache(jobDocumentName, context);
+        }
     }
 
     /**
@@ -573,6 +593,94 @@ public class WatchListStore implements EventListener
     }
 
     /**
+     * Manage events affecting watchlist job objects.
+     * 
+     * @param originalDoc document version before the event occurred
+     * @param currentDoc document version after event occurred
+     * @param context the XWiki context
+     */
+    private void watchListJobObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, 
+        XWikiContext context)
+    {
+        boolean reinitWatchListClass = false;
+
+        BaseObject originalJob = originalDoc.getObject(WatchListJobManager.WATCHLIST_JOB_CLASS);
+        BaseObject currentJob = currentDoc.getObject(WatchListJobManager.WATCHLIST_JOB_CLASS);
+
+        if (originalJob != null && currentJob == null) {
+            if (jobDocumentNames.contains(originalDoc.getFullName())) {
+                int index = jobDocumentNames.indexOf(originalDoc.getFullName());
+                jobDocumentNames.remove(index);
+                destroySubscribersCache(originalDoc.getFullName(), context);
+                reinitWatchListClass = true;
+            }
+        }
+
+        if (originalJob == null && currentJob != null) {
+            jobDocumentNames.add(currentDoc.getFullName());
+            initSubscribersCache(currentDoc.getFullName(), context);
+            reinitWatchListClass = true;
+        }
+
+        if (reinitWatchListClass) {
+            try {
+                initWatchListClass(context);
+            } catch (XWikiException e) {
+                // Do nothing
+            }
+        }
+    }
+    
+    /**
+     * Manage events affecting watchlist objects.
+     * 
+     * @param originalDoc document version before the event occurred
+     * @param currentDoc document version after event occurred
+     * @param context the XWiki context
+     */
+    private void watchListObjectsEventHandler(XWikiDocument originalDoc, XWikiDocument currentDoc, 
+        XWikiContext context) 
+    {
+        String wiki = context.getDatabase();
+        BaseObject originalWatchListObj = originalDoc.getObject(WATCHLIST_CLASS);
+        BaseObject currentWatchListObj = currentDoc.getObject(WATCHLIST_CLASS);        
+        
+        if (originalWatchListObj != null) {
+            // Existing subscriber
+
+            String oriInterval = originalWatchListObj.getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
+
+            // If a subscriber has been deleted, remove it from our cache and exit
+            if (currentWatchListObj == null) {
+                removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
+                return;
+            }
+
+            // If the subscription object has been deleted, remove the subscriber from our cache and exit
+            if (originalWatchListObj != null && currentDoc.getObject(WATCHLIST_CLASS) == null) {
+                removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
+                return;
+            }
+
+            // Modification of the interval
+            String newInterval = currentWatchListObj.getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
+            
+            if (!newInterval.equals(oriInterval)) {
+                removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
+                addSubscriberForJob(newInterval, wiki + WIKI_SPACE_SEP + currentDoc.getFullName());
+            }
+        }
+
+        if ((originalWatchListObj == null || originalDoc == null) && currentWatchListObj != null) {
+            // New subscriber
+            String newInterval = currentWatchListObj.getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
+            
+            addSubscriberForJob(newInterval, wiki + WIKI_SPACE_SEP + currentDoc.getFullName());
+        }
+    }
+    
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.observation.EventListener#onEvent(org.xwiki.observation.event.Event, java.lang.Object,
@@ -583,41 +691,9 @@ public class WatchListStore implements EventListener
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
         XWikiContext context = (XWikiContext) data;
-        String wiki = context.getDatabase();
-
-        if (originalDoc.getObject(WATCHLIST_CLASS) != null) {
-            // Existing subscriber
-
-            String oriInterval = originalDoc.getObject(WATCHLIST_CLASS).getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
-
-            // If a subscriber has been deleted, remove it from our cache and exit
-            if (event.getClass().equals(DocumentDeleteEvent.class)) {
-                removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
-                return;
-            }
-
-            // If the subscription object has been deleted, remove the subscriber from our cache and exit
-            if (originalDoc.getObject(WATCHLIST_CLASS) != null && currentDoc.getObject(WATCHLIST_CLASS) == null) {
-                removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
-                return;
-            }
-
-            // Modification of the interval
-            String newInterval = currentDoc.getObject(WATCHLIST_CLASS).getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
-            
-            if (!newInterval.equals(oriInterval)) {
-                removeSubscriberForJob(oriInterval, wiki + WIKI_SPACE_SEP + originalDoc.getFullName());
-                addSubscriberForJob(newInterval, wiki + WIKI_SPACE_SEP + currentDoc.getFullName());
-            }
-        }
-
-        if ((originalDoc.getObject(WATCHLIST_CLASS) == null || originalDoc == null)
-            && currentDoc.getObject(WATCHLIST_CLASS) != null) {
-            // New subscriber
-            String newInterval = currentDoc.getObject(WATCHLIST_CLASS).getStringValue(WATCHLIST_CLASS_INTERVAL_PROP);
-            
-            addSubscriberForJob(newInterval, wiki + WIKI_SPACE_SEP + currentDoc.getFullName());
-        }
+        
+        watchListJobObjectsEventHandler(originalDoc, currentDoc, context);
+        watchListObjectsEventHandler(originalDoc, currentDoc, context);
     }
 
     /**

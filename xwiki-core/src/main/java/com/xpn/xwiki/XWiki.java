@@ -3206,6 +3206,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         needsUpdate |= bclass.addTextField("name", "Name", 30);
         needsUpdate |= bclass.addTextField("baseskin", "Base Skin", 30);
+        needsUpdate |= bclass.addTextField("logo", "Logo", 30);
         needsUpdate |= bclass.addTemplateField("style.css", "Style");
         needsUpdate |= bclass.addTemplateField("header.vm", "Header");
         needsUpdate |= bclass.addTemplateField("footer.vm", "Footer");

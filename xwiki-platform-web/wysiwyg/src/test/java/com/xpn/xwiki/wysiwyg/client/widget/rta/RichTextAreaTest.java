@@ -23,6 +23,7 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -493,6 +494,11 @@ public class RichTextAreaTest extends AbstractRichTextAreaTest
      */
     public void testReadWriteHiddenSelection()
     {
+        if (!GWT.isScript()) {
+            // When running in hosted mode the edited document has no defaultView if the in-line frame is hidden. This
+            // doesn't happen in web mode. Let's skip this test for now when we run in hosted mode.
+            return;
+        }
         deferTest(new Command()
         {
             public void execute()

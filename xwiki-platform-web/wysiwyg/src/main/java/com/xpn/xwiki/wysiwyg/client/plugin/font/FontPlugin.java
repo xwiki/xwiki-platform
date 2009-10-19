@@ -29,7 +29,6 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.user.client.ui.FocusWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
@@ -71,11 +70,11 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractStatefulPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractStatefulPlugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
 
         // Register custom executables.
         getTextArea().getCommandManager().registerCommand(Command.FONT_NAME,

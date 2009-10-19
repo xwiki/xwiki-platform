@@ -29,7 +29,6 @@ import com.google.gwt.event.dom.client.BlurHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.ClosingEvent;
 import com.google.gwt.user.client.Window.ClosingHandler;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatelessUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.EnableExecutable;
@@ -123,11 +122,11 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractPlugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
 
         String hookId = getConfig().getParameter("hookId");
         getTextArea().getCommandManager().registerCommand(SUBMIT, new SubmitExecutable(hookId));

@@ -24,7 +24,6 @@ import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Range;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
@@ -38,11 +37,11 @@ public class IELinePlugin extends LinePlugin implements InnerHTMLListener
     /**
      * {@inheritDoc}
      * 
-     * @see LinePlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see LinePlugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
         getTextArea().getDocument().addInnerHTMLListener(this);
     }
 

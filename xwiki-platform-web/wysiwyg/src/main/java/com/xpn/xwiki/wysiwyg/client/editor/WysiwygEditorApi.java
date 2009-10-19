@@ -28,7 +28,6 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.NativeAsyncCallback;
@@ -78,7 +77,7 @@ public class WysiwygEditorApi
         container.setId(containerId);
         hook.getParentElement().insertBefore(container, hook);
 
-        editor = WysiwygEditorFactory.getInstance().newEditor(config, Wysiwyg.getInstance());
+        editor = WysiwygEditorFactory.getInstance().newEditor(config);
 
         // Attach the editor to the browser's document.
         if (Boolean.TRUE.toString().equals(editor.getConfig().getParameter("debug", "false"))) {

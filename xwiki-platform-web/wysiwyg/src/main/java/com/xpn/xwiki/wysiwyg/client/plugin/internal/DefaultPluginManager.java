@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
@@ -54,11 +53,6 @@ public class DefaultPluginManager implements PluginManager
     private final Map<String, Map<String, UIExtension>> uiExtensions;
 
     /**
-     * The application context.
-     */
-    private final Wysiwyg wysiwyg;
-
-    /**
      * The rich text area of the editor served by this plugin manager.
      */
     private final RichTextArea textArea;
@@ -76,13 +70,11 @@ public class DefaultPluginManager implements PluginManager
     /**
      * Creates a new default plugin manager.
      * 
-     * @param wysiwyg The context of the application.
      * @param textArea The text area of the editor served by the newly created manager.
      * @param config The configuration object associated with the editor served by the newly created manager.
      */
-    public DefaultPluginManager(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public DefaultPluginManager(RichTextArea textArea, Config config)
     {
-        this.wysiwyg = wysiwyg;
         this.textArea = textArea;
         this.config = config;
         loadedPlugins = new HashMap<String, Plugin>();
@@ -128,7 +120,7 @@ public class DefaultPluginManager implements PluginManager
         // create a new plug-in instance and initialize it
         Plugin plugin = factory.newInstance();
         loadedPlugins.put(pluginName, plugin);
-        plugin.init(wysiwyg, textArea, config);
+        plugin.init(textArea, config);
         // cache new plug-in's UI extensions
         UIExtension[] newUIExtensions = plugin.getUIExtensions();
         for (int i = 0; i < newUIExtensions.length; i++) {

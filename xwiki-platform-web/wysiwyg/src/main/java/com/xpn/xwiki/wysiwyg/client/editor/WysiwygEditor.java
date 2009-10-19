@@ -40,7 +40,6 @@ import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
@@ -168,11 +167,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private final Widget ui;
 
     /**
-     * The WYSIWYG entry point.
-     */
-    private final Wysiwyg wysiwyg;
-
-    /**
      * The configuration object.
      */
     private final Config config;
@@ -232,14 +226,12 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     /**
      * Creates a new WYSIWYG editor.
      * 
-     * @param wysiwyg The application context.
      * @param config The configuration object.
      * @param svm The syntax validation manager used for enabling or disabling plugin features.
      * @param pfm The plugin factory manager used to instantiate plugins.
      */
-    public WysiwygEditor(Wysiwyg wysiwyg, Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
+    public WysiwygEditor(Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
-        this.wysiwyg = wysiwyg;
         this.config = config;
         this.svm = svm;
         this.pfm = pfm;
@@ -543,7 +535,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
 
             sv = svm.getSyntaxValidator(getConfig().getParameter("syntax", DEFAULT_SYNTAX));
 
-            pm = new DefaultPluginManager(wysiwyg, richTextEditor.getTextArea(), config);
+            pm = new DefaultPluginManager(richTextEditor.getTextArea(), config);
             pm.setPluginFactoryManager(pfm);
         }
         return richTextEditor;

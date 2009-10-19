@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
@@ -34,14 +33,13 @@ public interface Plugin
      * Initialize the plug-in. Plug-ins need to know the text area in order to provide only those feature that are
      * supported.
      * 
-     * @param wysiwyg The WYSIWYG application context.
-     * @param textArea The text area of the editor.
-     * @param config The configuration.
+     * @param textArea the text area of the editor
+     * @param config the configuration object
      */
-    void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config);
+    void init(RichTextArea textArea, Config config);
 
     /**
-     * @return All the user interface extensions that are provided by this plug-in.
+     * @return all the user interface extensions that are provided by this plug-in
      */
     UIExtension[] getUIExtensions();
 

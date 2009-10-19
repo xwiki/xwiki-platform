@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.InsertExecutable;
@@ -82,11 +81,11 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractPlugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
 
         displayer = GWT.create(MacroDisplayer.class);
         displayer.setTextArea(getTextArea());

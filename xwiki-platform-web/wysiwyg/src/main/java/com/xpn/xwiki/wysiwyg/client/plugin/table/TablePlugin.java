@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.DeleteCol;
@@ -74,11 +73,11 @@ public class TablePlugin extends AbstractPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(XRichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea rta, Config config)
+    public void init(RichTextArea rta, Config config)
     {
-        super.init(wysiwyg, rta, config);
+        super.init(rta, config);
 
         addFeature(rta, new InsertTable(this));
         addFeature(rta, new InsertRowBefore(this));

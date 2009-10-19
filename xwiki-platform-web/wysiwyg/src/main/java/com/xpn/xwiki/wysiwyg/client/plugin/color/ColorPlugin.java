@@ -31,7 +31,6 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable;
@@ -92,11 +91,11 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractPlugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
 
         // Register custom executables.
         getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR,

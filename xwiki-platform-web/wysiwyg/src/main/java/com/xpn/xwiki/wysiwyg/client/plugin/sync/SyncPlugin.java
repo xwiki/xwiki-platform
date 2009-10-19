@@ -85,11 +85,11 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, RichTextArea, Config)
+     * @see AbstractPlugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
 
         // init the plugin id
         id = Math.abs(Random.nextInt());
@@ -113,7 +113,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
 
         timer = new Timer();
         timer.addTimerListener(this);
-        timer.scheduleRepeating(wysiwyg.getParamAsInt("sync_delay", DEFAULT_SYNC_DELAY));
+        timer.scheduleRepeating(Wysiwyg.getInstance().getParamAsInt("sync_delay", DEFAULT_SYNC_DELAY));
     }
 
     /**
@@ -442,7 +442,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
     public void showDialog(String title, String message, AsyncCallback cb)
     {
         try {
-            MessageDialog messageDialog = new MessageDialog(getWysiwyg(), title, Dialog.BUTTON_CANCEL);
+            MessageDialog messageDialog = new MessageDialog(Wysiwyg.getInstance(), title, Dialog.BUTTON_CANCEL);
             if (cb != null) {
                 messageDialog.setAsyncCallback(cb);
             }
@@ -463,10 +463,12 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
             XWikiGWTException exp = ((XWikiGWTException) caught);
             if (exp.getCode() == 9002) {
                 // This is a login error
-                showDialog(getWysiwyg().getTranslation("appname"), getWysiwyg().getTranslation("login_first"), cb);
+                showDialog(Wysiwyg.getInstance().getTranslation("appname"), Wysiwyg.getInstance().getTranslation(
+                    "login_first"), cb);
             } else if (exp.getCode() == 9001) {
                 // This is a right error
-                showDialog(getWysiwyg().getTranslation("appname"), getWysiwyg().getTranslation("missing_rights"), cb);
+                showDialog(Wysiwyg.getInstance().getTranslation("appname"), Wysiwyg.getInstance().getTranslation(
+                    "missing_rights"), cb);
             } else {
                 showError("" + exp.getCode(), exp.getFullMessage(), cb);
             }
@@ -490,9 +492,8 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
         String[] args = new String[1];
         args[0] = code;
         debugMessage("Error ready to display");
-        String message = getWysiwyg().getTranslation("errorwithcode", args) + "\r\n\r\n" + text;
+        String message = Wysiwyg.getInstance().getTranslation("errorwithcode", args) + "\r\n\r\n" + text;
         debugMessage("Error displaying: " + message);
-        showDialog(getWysiwyg().getTranslation("appname"), message, cb);
+        showDialog(Wysiwyg.getInstance().getTranslation("appname"), message, cb);
     }
-
 }

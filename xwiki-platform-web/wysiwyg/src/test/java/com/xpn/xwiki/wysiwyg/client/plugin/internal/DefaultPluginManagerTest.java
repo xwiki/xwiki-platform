@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
-import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.AbstractPluginManagerTest;
+import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 
 /**
  * Unit tests for {@link DefaultPluginManager}.
@@ -36,6 +36,6 @@ public class DefaultPluginManagerTest extends AbstractPluginManagerTest
      */
     protected PluginManager newPluginManager()
     {
-        return new DefaultPluginManager(null, null, null);
+        return new DefaultPluginManager(null, null);
     }
 }

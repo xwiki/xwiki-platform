@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.editor;
 
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.font.FontPluginFactory;
@@ -119,12 +118,11 @@ public final class WysiwygEditorFactory
     /**
      * Creates a new editor for the given configuration in the specified context.
      * 
-     * @param config The configuration object.
-     * @param wysiwyg The application context.
-     * @return the newly created WYSIWYG editor.
+     * @param config the configuration object
+     * @return the newly created WYSIWYG editor
      */
-    public WysiwygEditor newEditor(Config config, Wysiwyg wysiwyg)
+    public WysiwygEditor newEditor(Config config)
     {
-        return new WysiwygEditor(wysiwyg, config, svm, pfm);
+        return new WysiwygEditor(config, svm, pfm);
     }
 }

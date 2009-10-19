@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.event.shared.HandlerRegistration;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -38,11 +37,6 @@ import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 public abstract class AbstractPlugin implements Plugin
 {
     /**
-     * The application context.
-     */
-    private Wysiwyg wysiwyg;
-
-    /**
      * The rich text area on which this plugin operates.
      */
     private RichTextArea textArea;
@@ -55,7 +49,7 @@ public abstract class AbstractPlugin implements Plugin
 
     /**
      * Flag that indicates if this plugin has been loaded. In order to load a plugin the
-     * {@link #init(Wysiwyg, RichTextArea, Config)} method must be called.
+     * {@link #init(RichTextArea, Config)} method must be called.
      */
     private boolean loaded;
 
@@ -78,14 +72,6 @@ public abstract class AbstractPlugin implements Plugin
     }
 
     /**
-     * @return {@link #wysiwyg}
-     */
-    protected Wysiwyg getWysiwyg()
-    {
-        return wysiwyg;
-    }
-
-    /**
      * @return {@link #uiExtensions}
      */
     protected List<UIExtension> getUIExtensionList()
@@ -96,15 +82,14 @@ public abstract class AbstractPlugin implements Plugin
     /**
      * {@inheritDoc}
      * 
-     * @see Plugin#init(Wysiwyg, RichTextArea, Config)
+     * @see Plugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
         if (loaded) {
             throw new IllegalStateException();
         }
         loaded = true;
-        this.wysiwyg = wysiwyg;
         this.textArea = textArea;
         this.config = config;
     }
@@ -155,7 +140,6 @@ public abstract class AbstractPlugin implements Plugin
      */
     public void destroy()
     {
-        wysiwyg = null;
         textArea = null;
         config = null;
         uiExtensions.clear();

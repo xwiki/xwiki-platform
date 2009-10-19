@@ -19,57 +19,163 @@
  */
 package org.xwiki.gwt.dom.client.internal.ie;
 
-import org.xwiki.gwt.dom.client.AbstractDOMTest;
+import java.util.Iterator;
+
+import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.RangeCompare;
-import org.xwiki.gwt.dom.client.Text;
+import org.xwiki.gwt.dom.client.SelectionTest;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Node;
 
 /**
- * Unit tests for {@link IERange}.
+ * Unit tests for {@link IERange}. These tests are useful only when running in IE browser because the range
+ * implementation has to map the W3C Range API to IE's text range API. We test in fact this mapping. If there's no
+ * mapping, like in browsers that support the W3C Range specification, then there's no point in running these tests.
+ * <p>
+ * We have to use a trick to ensure these tests run well in other browsers because we can't make them run only in IE. We
+ * use GWT's deferred binding mechanism to instantiate a test range factory. Unfortunately we can't use deferred binding
+ * outside the tests, when creating the test suite for instance.
  * 
  * @version $Id$
  */
-public class IESelectionTest extends AbstractDOMTest
+public class IERangeTest extends SelectionTest
 {
     /**
-     * Used to mark the start or end of a text range.
+     * A range factory to be used in tests. It allows us to use deferred binding and load a IE specific implementation
+     * that creates ranges without using our range API allowing us to test the mapping between W3C Range API and IE's
+     * text range API.
+     * <p>
+     * The default implementation is not really useful since it creates ranges using our range API. The IE specific
+     * implementation is our focus. The default implementation should just ensure the tests run well in other browsers.
      */
-    public static final String PIPE = "|";
+    private static class TestRangeFactory
+    {
+        /**
+         * Used to mark the start or end of a text range.
+         */
+        protected static final String PIPE = "|";
+
+        /**
+         * Creates a new range with the end points specified by {@link #PIPE} occurrences inside the given HTML
+         * fragment.
+         * 
+         * @param container the element whose inner HTML will be set to the given HTML fragment
+         * @param html a HTML fragment in which {@link #PIPE} symbols mark the range that needs to be created
+         * @return a range that matches the {@link #PIPE} symbols in the given HTML fragment
+         */
+        public Range createRange(Element container, String html)
+        {
+            Document document = (Document) container.getOwnerDocument().cast();
+            Range range = document.createRange();
+            container.xSetInnerHTML(html);
+            Iterator<Node> iterator = document.getIterator(container);
+            // Look for the start point.
+            while (iterator.hasNext()) {
+                Node node = iterator.next();
+                if (node.getNodeType() != Node.TEXT_NODE) {
+                    continue;
+                }
+                int index = node.getNodeValue().indexOf(PIPE);
+                if (index < 0) {
+                    continue;
+                }
+                range.setStart(node, index);
+                node.setNodeValue(node.getNodeValue().substring(0, index) + node.getNodeValue().substring(index + 1));
+                // Maybe the end point is in the same text node.
+                index = node.getNodeValue().indexOf(PIPE, index);
+                if (index < 0) {
+                    break;
+                } else {
+                    range.setEnd(node, index);
+                    node.setNodeValue(node.getNodeValue().substring(0, index)
+                        + node.getNodeValue().substring(index + 1));
+                    return range;
+                }
+            }
+            // Look for the end point. End container is different than start container.
+            while (iterator.hasNext()) {
+                Node node = iterator.next();
+                if (node.getNodeType() == Node.TEXT_NODE) {
+                    int index = node.getNodeValue().indexOf(PIPE);
+                    if (index >= 0) {
+                        range.setEnd(node, index);
+                        node.setNodeValue(node.getNodeValue().substring(0, index)
+                            + node.getNodeValue().substring(index + 1));
+                        return range;
+                    }
+                }
+            }
+            range.collapse(true);
+            if (range.getStartContainer().getNodeValue().length() == 0) {
+                // The caret is inside an empty text node. Remove the text node.
+                range.selectNode(range.getStartContainer());
+                range.collapse(true);
+                range.getStartContainer().removeChild(
+                    range.getStartContainer().getChildNodes().getItem(range.getStartOffset()));
+            }
+            return range;
+        }
+    }
+
+    /**
+     * IE specific implementation of {@link TestRangeFactory}.
+     */
+    @SuppressWarnings("unused")
+    private static class IETestRangeFactory extends TestRangeFactory
+    {
+        /**
+         * {@inheritDoc}
+         * 
+         * @see TestRangeFactory#createRange(Element, String)
+         */
+        public Range createRange(Element container, String html)
+        {
+            container.xSetInnerHTML(html);
+
+            TextRange textRange = TextRange.newInstance((Document) container.getOwnerDocument().cast());
+
+            TextRange refRange = textRange.duplicate();
+            refRange.moveToElementText(container);
+            if (refRange.findText(PIPE, 0, 0)) {
+                refRange.setText("");
+                textRange.setEndPoint(RangeCompare.END_TO_START, refRange);
+                refRange.findText(PIPE, html.length() - html.indexOf(PIPE), 0);
+                refRange.setText("");
+                textRange.setEndPoint(RangeCompare.START_TO_END, refRange);
+            } else {
+                textRange.moveToElementText(container);
+            }
+
+            // We cannot select the textRange because IE doesn't support collapsed selection in view mode (which is
+            // somehow normal since you cannot have the caret in view mode). Instead we use a mock native selection
+            // which returns our textRange like it has been selected.
+            return (new IESelection(MockNativeSelection.newInstance(textRange))).getRangeAt(0);
+        }
+    }
+
+    /**
+     * The range factory used in these tests.
+     */
+    private TestRangeFactory factory;
 
     /**
      * Sets the given HTML fragment as the inner HTML of the {@link #container} and creates a new range. The range is
      * specified using | (pipe) symbol. For instance, in the following HTML fragment "&lt;em&gt;fo|o&lt;/em&gt; ba|r"
      * the returned range will contain "&lt;em&gt;o&lt;/em&gt; ba".
      * 
-     * @param html The HTML fragment containing the range.
-     * @return The newly created range.
+     * @param html the HTML fragment containing the range
+     * @return the newly created range
      */
     protected Range getRange(String html)
     {
-        getContainer().xSetInnerHTML(html);
-
-        TextRange textRange = TextRange.newInstance(getDocument());
-
-        TextRange refRange = textRange.duplicate();
-        refRange.moveToElementText(getContainer());
-        if (refRange.findText(PIPE, 0, 0)) {
-            refRange.setText("");
-            textRange.setEndPoint(RangeCompare.END_TO_START, refRange);
-            refRange.findText(PIPE, html.length() - html.indexOf(PIPE), 0);
-            refRange.setText("");
-            textRange.setEndPoint(RangeCompare.START_TO_END, refRange);
-        } else {
-            textRange.moveToElementText(getContainer());
+        if (factory == null) {
+            factory = GWT.create(TestRangeFactory.class);
         }
-
-        // We cannot select the textRange because IE doesn't support collapsed selection in view mode (which is somehow
-        // normal since you cannot have the caret in view mode). Instead we use a mock native selection which returns
-        // our textRange like it has been selected.
-        return (new IESelection(MockNativeSelection.newInstance(textRange))).getRangeAt(0);
+        return factory.createRange(getContainer(), html);
     }
 
     /**
@@ -181,7 +287,7 @@ public class IESelectionTest extends AbstractDOMTest
      */
     public void testCaretBeforeACommentNode()
     {
-        Range range = getRange("a|<!--x--><img src=\"none.ong\"/><em>#</em>");
+        Range range = getRange("a|<!--x--><img/><em>#</em>");
         assertCollapsed(range);
         assertEquals(getContainer().getFirstChild(), range.getStartContainer());
         assertEquals(range.getStartContainer().getNodeValue().length(), range.getStartOffset());
@@ -192,7 +298,7 @@ public class IESelectionTest extends AbstractDOMTest
      */
     public void testCaretAfterACommentNode()
     {
-        Range range = getRange("<em>#</em><img src=\"none.ong\"/><!--x-->|a");
+        Range range = getRange("<em>#</em><img/><!--x-->|a");
         assertCollapsed(range);
         assertEquals(getContainer().getChildNodes().getItem(3), range.getStartContainer());
         assertEquals(0, range.getStartOffset());
@@ -246,14 +352,14 @@ public class IESelectionTest extends AbstractDOMTest
         assertEquals("<em>y</em>", range.toHTML().toLowerCase());
         assertEquals(getContainer(), range.getCommonAncestorContainer());
         assertEquals(getContainer().getFirstChild(), range.getStartContainer());
-        // assertEquals(getContainer().getLastChild(), range.getEndContainer());
+        assertEquals(getContainer().getFirstChild().getNodeValue().length(), range.getStartOffset());
         // The end point is found correctly in the first place, but as soon as the text range is created the end point
         // moves after the last selected character.
-        assertEquals(getContainer().getChildNodes().getItem(1).getFirstChild(), range.getEndContainer());
-        assertEquals(getContainer().getFirstChild().getNodeValue().length(), range.getStartOffset());
-        // assertEquals(0, range.getEndOffset());
-        assertEquals(((Text) getContainer().getChildNodes().getItem(1).getFirstChild()).getLength(), range
-            .getEndOffset());
+        // assertEquals(getContainer().getChildNodes().getItem(1).getFirstChild(), range.getEndContainer());
+        // assertEquals(((Text) getContainer().getChildNodes().getItem(1).getFirstChild()).getLength(),
+        // range.getEndOffset());
+        assertEquals(getContainer().getLastChild(), range.getEndContainer());
+        assertEquals(0, range.getEndOffset());
     }
 
     /**
@@ -267,11 +373,12 @@ public class IESelectionTest extends AbstractDOMTest
         Range range = getRange("ab|<ins style=\"width: 30px\"></ins>|c");
         assertFalse(range.isCollapsed());
         assertEquals("", range.toString());
-        assertEquals("<ins style=\"width: 30px\"></ins>", range.toHTML().toLowerCase());
+        // Some browsers add ; after the last CSS rule. We need to remove it.
+        assertEquals("<ins style=\"width: 30px\"></ins>", range.toHTML().toLowerCase().replace(";", ""));
         assertEquals(getContainer(), range.getCommonAncestorContainer());
         assertEquals(getContainer().getFirstChild(), range.getStartContainer());
-        // assertEquals(getContainer().getLastChild(), range.getEndContainer());
-        assertEquals(getContainer().getChildNodes().getItem(1), range.getEndContainer());
+        assertEquals(getContainer().getLastChild(), range.getEndContainer());
+        // assertEquals(getContainer().getChildNodes().getItem(1), range.getEndContainer());
         assertEquals(getContainer().getFirstChild().getNodeValue().length(), range.getStartOffset());
         assertEquals(0, range.getEndOffset());
     }

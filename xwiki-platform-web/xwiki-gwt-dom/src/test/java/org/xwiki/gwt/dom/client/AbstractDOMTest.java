@@ -42,7 +42,7 @@ public abstract class AbstractDOMTest extends GWTTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractDOMTest#gwtSetUp()
+     * @see GWTTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -56,7 +56,7 @@ public abstract class AbstractDOMTest extends GWTTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractDOMTest#gwtTearDown()
+     * @see GWTTestCase#gwtTearDown()
      */
     protected void gwtTearDown() throws Exception
     {

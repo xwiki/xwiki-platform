@@ -82,4 +82,17 @@
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
+
+  <!-- TestRangeFactory -->
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory"/>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.IETestRangeFactory">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.ie.IERangeTest.TestRangeFactory"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
+  </replace-with>
 </module>

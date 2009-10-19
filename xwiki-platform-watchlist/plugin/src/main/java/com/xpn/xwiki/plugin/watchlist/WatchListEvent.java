@@ -410,21 +410,29 @@ public class WatchListEvent implements Comparable<WatchListEvent>
 
     /**
      * @param objectDiffs List of object diff
-     * @param prefix prefix to apply to HTML classnames
+     * @param isXWikiClass is the diff to compute the diff for a xwiki class, the other possibility being a plain xwiki 
+     *        object
+     * @param documentFullName full name of the document the diff is computed for       
      * @param diff the diff plugin API
      * @return The HTML diff
      */
-    private String getHTMLObjectsDiff(List<List<ObjectDiff>> objectDiffs, String prefix, DiffPluginApi diff)
+    private String getHTMLObjectsDiff(List<List<ObjectDiff>> objectDiffs, boolean isXWikiClass, 
+        String documentFullName, DiffPluginApi diff)
     {
         StringBuffer result = new StringBuffer();
         String propSeparator = ": ";
+        String prefix = (isXWikiClass) ? "class" : "object";
 
         try {
             for (List<ObjectDiff> oList : objectDiffs) {
                 if (oList.size() > 0) {
                     Div mainDiv = createDiffDiv(prefix + "Diff");
                     Span objectName = createDiffSpan(prefix + "ClassName");
-                    objectName.addElement(oList.get(0).getClassName());
+                    if (isXWikiClass) {
+                        objectName.addElement(getFullName());
+                    } else {
+                        objectName.addElement(oList.get(0).getClassName());
+                    }
                     mainDiv.addElement(prefix + HTML_IMG_PLACEHOLDER_SUFFIX);
                     mainDiv.addElement(objectName);
                     for (ObjectDiff oDiff : oList) {
@@ -489,8 +497,8 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     result.append(attachmentDiv);
                 }
 
-                result.append(getHTMLObjectsDiff(objectDiffs, "object", diff));
-                result.append(getHTMLObjectsDiff(classDiffs, "class", diff));
+                result.append(getHTMLObjectsDiff(objectDiffs, false, getFullName(), diff));
+                result.append(getHTMLObjectsDiff(classDiffs, true, getFullName(), diff));
                 
                 for (MetaDataDiff mDiff : metaDiffs) {
                     Div metaDiv = createDiffDiv("metaDiff");

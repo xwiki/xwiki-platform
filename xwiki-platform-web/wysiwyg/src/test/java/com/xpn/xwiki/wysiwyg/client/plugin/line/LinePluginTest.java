@@ -66,7 +66,7 @@ public class LinePluginTest extends AbstractRichTextAreaTest
         super.onLoad(event);
 
         plugin = GWT.create(LinePlugin.class);
-        plugin.init(null, rta, null);
+        plugin.init(rta, null);
     }
 
     /**

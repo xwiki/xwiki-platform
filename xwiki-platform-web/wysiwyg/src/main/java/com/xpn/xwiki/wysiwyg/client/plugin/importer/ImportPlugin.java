@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard.ImportWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
@@ -49,9 +48,9 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener
     /**
      * {@inheritDoc}
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
         this.importMenuExtension = new ImportMenuExtension(this);
         getUIExtensionList().add(importMenuExtension);
     }

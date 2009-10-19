@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -70,9 +69,9 @@ public class MockPlugin implements Plugin
     /**
      * {@inheritDoc}
      * 
-     * @see Plugin#init(Wysiwyg, RichTextArea, Config)
+     * @see Plugin#init(RichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
         // ignore
     }

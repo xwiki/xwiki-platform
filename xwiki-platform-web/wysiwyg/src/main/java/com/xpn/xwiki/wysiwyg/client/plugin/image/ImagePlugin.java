@@ -24,7 +24,6 @@ import org.xwiki.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.exec.InsertImageExecutable;
@@ -80,11 +79,11 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     * @see AbstractPlugin#init(XRichTextArea, Config)
      */
-    public void init(Wysiwyg wysiwyg, RichTextArea textArea, Config config)
+    public void init(RichTextArea textArea, Config config)
     {
-        super.init(wysiwyg, textArea, config);
+        super.init(textArea, config);
 
         // register the custom command
         textArea.getCommandManager().registerCommand(Command.INSERT_IMAGE, new InsertImageExecutable());

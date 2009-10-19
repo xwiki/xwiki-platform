@@ -41,7 +41,7 @@ public interface PluginManager
     /**
      * Loads the specified plug-in. A new instance of this plug-in is obtained using the current plug-in factory
      * manager. The
-     * {@link Plugin#init(com.xpn.xwiki.wysiwyg.client.Wysiwyg, com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, com.xpn.xwiki.wysiwyg.client.util.Config)}
+     * {@link Plugin#init(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, com.xpn.xwiki.wysiwyg.client.util.Config)}
      * method is called.
      * 
      * @param pluginName The name of the plug-in to be loaded. This name should match the value returned by

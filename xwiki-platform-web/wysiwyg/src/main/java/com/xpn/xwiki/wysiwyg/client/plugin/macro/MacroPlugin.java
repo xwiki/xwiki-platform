@@ -79,6 +79,21 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
     private MacroMenuExtension menuExtension;
 
     /**
+     * The macro service used to retrieve macro descriptors.
+     */
+    private final MacroServiceAsync macroService;
+
+    /**
+     * Creates a new macro plug-in that uses the specified macro service.
+     * 
+     * @param macroService the macro service to be used for retrieving the macro descriptors
+     */
+    public MacroPlugin(MacroServiceAsync macroService)
+    {
+        this.macroService = macroService;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractPlugin#init(RichTextArea, Config)
@@ -90,7 +105,7 @@ public class MacroPlugin extends AbstractPlugin implements DoubleClickHandler
         displayer = GWT.create(MacroDisplayer.class);
         displayer.setTextArea(getTextArea());
         selector = new MacroSelector(displayer);
-        wizard = new MacroWizard(displayer, config);
+        wizard = new MacroWizard(displayer, config, macroService);
 
         getTextArea().getCommandManager().registerCommand(REFRESH, new RefreshExecutable());
         getTextArea().getCommandManager().registerCommand(COLLAPSE, new CollapseExecutable(selector, true));

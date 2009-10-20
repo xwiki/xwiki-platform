@@ -25,10 +25,10 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCall;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDisplayer;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
@@ -39,7 +39,7 @@ import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
  * 
  * @version $Id$
  */
-public class EditMacroWizardStep extends AbstractNavigationAwareWizardStep
+public class EditMacroWizardStep extends AbstractMacroWizardStep
 {
     /**
      * The call-back used by the edit dialog to be notified when a macro descriptor is being received from the server.
@@ -125,10 +125,11 @@ public class EditMacroWizardStep extends AbstractNavigationAwareWizardStep
      * Creates a new wizard step for editing macro parameters and content.
      * 
      * @param config the object used to configure the newly created wizard step
+     * @param macroService the macro service used to retrieve macro descriptors
      */
-    public EditMacroWizardStep(Config config)
+    public EditMacroWizardStep(Config config, MacroServiceAsync macroService)
     {
-        super(config);
+        super(config, macroService);
     }
 
     /**
@@ -169,8 +170,8 @@ public class EditMacroWizardStep extends AbstractNavigationAwareWizardStep
         parameterDisplayers.clear();
         contentDisplayer = null;
 
-        WysiwygService.Singleton.getInstance().getMacroDescriptor(macroCall.getName(),
-            getConfig().getParameter("syntax"), new MacroDescriptorAsyncCallback(cb));
+        getMacroService().getMacroDescriptor(macroCall.getName(), getConfig().getParameter("syntax"),
+            new MacroDescriptorAsyncCallback(cb));
     }
 
     /**

@@ -26,7 +26,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
@@ -76,7 +75,7 @@ public interface WysiwygServiceAsync
      */
     @Deprecated
     void officeToXHTML(String pageName, Map<String, String> cleaningParams, AsyncCallback<String> async);
-    
+
     /**
      * Imports the given office attachment into XHTML/1.0.
      * 
@@ -199,21 +198,4 @@ public interface WysiwygServiceAsync
      * @param async object used for asynchronous communication between server and client.
      */
     void getAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
-
-    /**
-     * Makes a request to the server to get the descriptor for the specified macro.
-     * 
-     * @param macroId a macro identifier
-     * @param syntaxId a syntax identifier
-     * @param async the call-back to be used for notifying the caller after receiving the response from the server
-     */
-    void getMacroDescriptor(String macroId, String syntaxId, AsyncCallback<MacroDescriptor> async);
-
-    /**
-     * Makes a request to the server to get all the macro descriptors for the specified syntax.
-     * 
-     * @param syntaxId a syntax identifier
-     * @param async the call-back to be used for notifying the caller after receiving the response from the server
-     */
-    void getMacroDescriptors(String syntaxId, AsyncCallback<List<MacroDescriptor>> async);
 }

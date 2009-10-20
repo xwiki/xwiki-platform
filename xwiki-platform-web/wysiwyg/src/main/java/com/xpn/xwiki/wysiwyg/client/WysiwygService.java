@@ -31,7 +31,6 @@ import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
@@ -239,20 +238,4 @@ public interface WysiwygService extends RemoteService
      * @throws XWikiGWTException if something goes wrong on the server
      */
     List<Attachment> getAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException;
-
-    /**
-     * @param macroId a macro identifier
-     * @param syntaxId a syntax identifier
-     * @return an object describing the specified macro
-     * @throws XWikiGWTException if the descriptor of the specified macro is not found or an exception occurs while
-     *             looking for it
-     */
-    MacroDescriptor getMacroDescriptor(String macroId, String syntaxId) throws XWikiGWTException;
-
-    /**
-     * @param syntaxId a syntax identifier
-     * @return the list of all the macro descriptors for the specified syntax
-     * @throws XWikiGWTException if an exception is caught while retrieving the macro descriptors
-     */
-    List<MacroDescriptor> getMacroDescriptors(String syntaxId) throws XWikiGWTException;
 }

@@ -48,42 +48,9 @@ public abstract class DOMUtils
     public static final String BR = "br";
 
     /**
-     * The list of all HTML elements that can have both in-line and block-level content, as specified by the XHTML 1.0
-     * strict DTD.
-     * <p>
-     * NOTE: We added the {@code body} and {@code blockquote} elements since the editor allows us to write text directly
-     * inside them. We also kept only the most important (used) flow containers to improve the search speed.
+     * The {@code <hr/>} tag name.
      */
-    public static final String[] HTML_FLOW_CONTAINERS =
-        new String[] {"body", "li", "td", "th", "dd", "div", "blockquote"};
-
-    /**
-     * The list of all block-level HTML elements that can have only in-line content, as specified by the XHTML 1.0
-     * strict DTD.
-     * <p>
-     * NOTE: We kept only the most important (used) elements to improve the search speed.
-     */
-    public static final String[] HTML_BLOCK_LEVEL_INLINE_CONTAINERS =
-        new String[] {"p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "dt", "address"};
-
-    /**
-     * The list of all block-level HTML elements that can have only special content, or no content at all, as specified
-     * by the XHTML 1.0 strict DTD.
-     */
-    public static final String[] HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS =
-        new String[] {"hr", "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr"};
-
-    /**
-     * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
-     * code.<br/>
-     * NOTE: We had to move this array from Element because there is a problem with static field initialization for
-     * classes extending JavaScriptObject.
-     * 
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3192
-     */
-    public static final String[] HTML_EMPTY_TAGS =
-        new String[] {"area", "base", "basefont", BR, "col", "frame", "hr", "img", "input", "isindex", "link",
-            "meta", "param", "nextid", "bgsound", "embed", "keygen", "spacer", "wbr"};
+    public static final String HR = "hr";
 
     /**
      * Constant for the comment node type.
@@ -99,6 +66,44 @@ public abstract class DOMUtils
      * Constant for the DocumentFragment node type.
      */
     public static final short DOCUMENT_FRAGMENT_NODE = 11;
+
+    /**
+     * The list of all HTML tags that must be empty. All of them appear as <code>&lt;tagName/&gt;</code> in the HTML
+     * code.<br/>
+     * NOTE: We had to move this array from Element because there is a problem with static field initialization for
+     * classes extending JavaScriptObject.
+     * 
+     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3192
+     */
+    protected static final String[] HTML_EMPTY_TAGS =
+        new String[] {"area", "base", "basefont", BR, "col", "frame", HR, "img", "input", "isindex", "link", "meta",
+            "param", "nextid", "bgsound", "embed", "keygen", "spacer", "wbr"};
+
+    /**
+     * The list of all HTML elements that can have both in-line and block-level content, as specified by the XHTML 1.0
+     * strict DTD.
+     * <p>
+     * NOTE: We added the {@code body} and {@code blockquote} elements since the editor allows us to write text directly
+     * inside them. We also kept only the most important (used) flow containers to improve the search speed.
+     */
+    private static final String[] HTML_FLOW_CONTAINERS =
+        new String[] {"body", "li", "td", "th", "dd", "div", "blockquote"};
+
+    /**
+     * The list of all block-level HTML elements that can have only in-line content, as specified by the XHTML 1.0
+     * strict DTD.
+     * <p>
+     * NOTE: We kept only the most important (used) elements to improve the search speed.
+     */
+    private static final String[] HTML_BLOCK_LEVEL_INLINE_CONTAINERS =
+        new String[] {"p", "h1", "h2", "h3", "h4", "h5", "h6", "pre", "dt", "address"};
+
+    /**
+     * The list of all block-level HTML elements that can have only special content, or no content at all, as specified
+     * by the XHTML 1.0 strict DTD.
+     */
+    private static final String[] HTML_SPECIAL_BLOCK_LEVEL_ELEMENTS =
+        new String[] {HR, "ul", "ol", "dl", "table", "tbody", "thead", "tfoot", "tr"};
 
     /**
      * The instance in use.
@@ -310,7 +315,7 @@ public abstract class DOMUtils
             case Node.TEXT_NODE:
                 return node.getNodeValue().length() > 0;
             case Node.ELEMENT_NODE:
-                Element element = (Element) node;
+                Element element = Element.as(node);
                 return !element.hasAttribute(Element.META_DATA_ATTR)
                     || !"".equals(element.xGetAttribute(Element.META_DATA_ATTR));
             default:
@@ -1037,7 +1042,7 @@ public abstract class DOMUtils
     public short comparePoints(Node alice, int aliceOffset, Node bob, int bobOffset)
     {
         if (alice == bob) {
-            return (short) (aliceOffset < bobOffset ? -1 : aliceOffset > bobOffset ? 1 : 0);
+            return (short) Integer.signum(aliceOffset - bobOffset);
         }
 
         // Build the chain of parents.

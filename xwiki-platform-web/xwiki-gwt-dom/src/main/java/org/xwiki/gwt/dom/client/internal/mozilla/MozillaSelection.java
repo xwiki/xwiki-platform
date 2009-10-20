@@ -51,7 +51,7 @@ public class MozillaSelection extends DefaultSelection
      */
     public void addRange(Range range)
     {
-        NativeRangeWrapper wrapper = ((NativeRangeWrapper) range);
+        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
         Document doc = (Document) range.getStartContainer().getOwnerDocument();
         if (wrapper.getNativeRange() == null) {
             wrapper.setNativeRange(NativeRange.newInstance(doc));

@@ -346,6 +346,19 @@ public class ResourceNameTest extends AbstractWysiwygClientTest
 
         assertRelative(wiki1, space1, page1, null);
     }
+    
+    /**
+     * Tests {@link ResourceName#fromString(String, boolean)} method.
+     */
+    public void testBuildResourceNameFromString()
+    {
+        ResourceName resource = new ResourceName();
+        resource.fromString("wiki:space.page@file", true);
+        assertEquals(wiki1, resource.getWiki());
+        assertEquals(space1, resource.getSpace());
+        assertEquals(page1, resource.getPage());
+        assertEquals(file1, resource.getFile());
+    }
 
     /**
      * Tests {@link ResourceName#getRelativeTo(ResourceName)} for the cases when the whole reference should be returned

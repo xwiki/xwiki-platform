@@ -63,7 +63,7 @@ public class RenderingTestSuite extends TestSuite
                 String parserId = entry.getKey();
                 String input = entry.getValue();
 
-                if (parserId.equals("xhtml/1.0") && !input.startsWith("<?xml") && !input.startsWith("<!DOCTYPE")) {
+                if ("xhtml/1.0".equals(parserId) && !input.startsWith("<?xml") && !input.startsWith("<!DOCTYPE")) {
                     input =
                         "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
                             + "<html>" + input + "</html>";

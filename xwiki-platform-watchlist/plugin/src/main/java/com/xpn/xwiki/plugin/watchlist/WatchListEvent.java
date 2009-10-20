@@ -68,6 +68,16 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     private static final String HTML_IMG_ATTACHMENT_PREFIX = "attach";
     
     /**
+     * Default document version on creation.
+     */
+    private static final String INITIAL_DOCUMENT_VERSION = "1.1";
+    
+    /**
+     * The version before the initial version used for document, used to get empty versions of documents.
+     */
+    private static final String PREINITIAL_DOCUMENT_VERSION = "1.0";
+    
+    /**
      * Event hashcode.
      */
     private final int hashCode;
@@ -345,7 +355,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     {
         if (previousVersion == null) {
             String currentVersion = "";
-            previousVersion = "1.1";
+            previousVersion = INITIAL_DOCUMENT_VERSION;
 
             try {
                 if (!isComposite()) {
@@ -365,6 +375,10 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     if (version != null) {
                         previousVersion = version.toString();
                     }
+                }
+                
+                if (currentVersion.equals(INITIAL_DOCUMENT_VERSION)) {
+                    previousVersion = PREINITIAL_DOCUMENT_VERSION;
                 }
             } catch (XWikiException e) {
                 // Catch the exception to be sure we won't send emails containing stacktraces to users.
@@ -495,10 +509,15 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     {
         if (htmlDiff == null) {
             try {
-                XWikiDocument d2 = context.getWiki().getDocument(getPrefixedFullName(), context);
-                XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(), context);
                 DiffPluginApi diff = (DiffPluginApi) context.getWiki().getPluginApi("diff", context);
                 StringBuffer result = new StringBuffer();
+                XWikiDocument d2 = context.getWiki().getDocument(getPrefixedFullName(), context);
+                
+                if (getType().equals(WatchListEventType.CREATE)) {
+                    d2 = context.getWiki().getDocument(d2, INITIAL_DOCUMENT_VERSION, context);                    
+                }
+                
+                XWikiDocument d1 = context.getWiki().getDocument(d2, getPreviousVersion(), context);
                 List<AttachmentDiff> attachDiffs = d2.getAttachmentDiff(d1, d2, context);
                 List<List<ObjectDiff>> objectDiffs = d2.getObjectDiff(d1, d2, context);
                 List<List<ObjectDiff>> classDiffs = d2.getClassDiff(d1, d2, context);

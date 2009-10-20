@@ -335,7 +335,7 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
       #set($firstDate = $xwiki.formatDate($event.getDates().get($firstDateIndex)))
       &lt;h4 style="$h4Style"&gt;$msg.get("watchlist.event.update.multiple", [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])&lt;/h4&gt;
     #end
-    #if ($event.getType() == "update")
+    #if ($event.getType() == "update" || $event.getType() == "create")
       &lt;div class="diff"&gt;
         #displayhtmldiff($event.getHTMLDiff())
       &lt;/div&gt;

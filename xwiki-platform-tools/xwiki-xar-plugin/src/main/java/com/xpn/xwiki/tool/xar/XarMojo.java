@@ -45,7 +45,7 @@ import org.dom4j.io.XMLWriter;
  * Note that the generated descriptor currently doesn't handle translations.
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  * @goal xar
  * @phase package
  * @requiresDependencyResolution runtime

@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * Export a set of XWiki documents from an existing database into the file system.
  * 
- * @version $Id: Importer.java 1632 2006-11-23 16:34:23Z vmassol $
+ * @version $Id$
  */
 public class Exporter extends AbstractPackager
 {

@@ -30,7 +30,7 @@ import junit.framework.TestCase;
 /**
  * Tests for {@link AbstractDocumentMojo}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DocumentUpdateMojoTest extends TestCase
 {

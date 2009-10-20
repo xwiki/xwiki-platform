@@ -24,7 +24,7 @@ import java.io.File;
 /**
  * Class to call from the command line to import XWiki documents into database.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public final class ImporterMain
 {

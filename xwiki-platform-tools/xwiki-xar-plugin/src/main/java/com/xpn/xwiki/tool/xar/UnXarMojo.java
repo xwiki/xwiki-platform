@@ -31,7 +31,7 @@ import java.util.Set;
 /**
  * Expand a XAR file.
  * 
- * @version $Id: $
+ * @version $Id$
  * @goal unxar
  * @requiresDependencyResolution runtime
  */

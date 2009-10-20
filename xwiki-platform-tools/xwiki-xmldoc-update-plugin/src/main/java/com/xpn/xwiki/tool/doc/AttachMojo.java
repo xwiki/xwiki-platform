@@ -32,7 +32,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Attach a file to a XWiki document
  * 
- * @version $Id: $
+ * @version $Id$
  * @goal attach
  */
 public class AttachMojo extends AbstractDocumentMojo

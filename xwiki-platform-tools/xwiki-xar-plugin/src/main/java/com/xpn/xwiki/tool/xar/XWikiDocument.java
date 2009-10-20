@@ -29,7 +29,7 @@ import org.dom4j.io.SAXReader;
 /**
  * Parse XWiki document from XML.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiDocument
 {

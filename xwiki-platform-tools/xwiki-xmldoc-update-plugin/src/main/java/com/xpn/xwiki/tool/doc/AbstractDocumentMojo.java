@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 /**
  * An abstract Mojo that knows how to load a XWikiDocument from XML and to write XML from a XWikiDocument
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractDocumentMojo extends AbstractMojo
 {

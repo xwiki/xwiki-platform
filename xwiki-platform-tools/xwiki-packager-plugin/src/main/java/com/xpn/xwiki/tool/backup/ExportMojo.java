@@ -28,7 +28,7 @@ import java.io.File;
 /**
  * Maven 2 plugin to export a set of XWiki documents from an existing database to the file system.
  * 
- * @version $Id: ImportMojo.java 1632 2006-11-23 16:34:23Z vmassol $
+ * @version $Id$
  * @goal export
  */
 public class ExportMojo extends AbstractMojo

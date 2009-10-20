@@ -17,7 +17,7 @@ import org.codehaus.plexus.logging.console.ConsoleLogger;
 /**
  * Base class for xar and unxar mojos.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 abstract class AbstractXarMojo extends AbstractMojo
 {

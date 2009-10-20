@@ -25,7 +25,10 @@ import org.apache.jackrabbit.server.io.IOUtil;
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavServletResponse;
+import org.apache.jackrabbit.webdav.io.InputContext;
 import org.apache.jackrabbit.webdav.io.OutputContext;
+
+import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 
 
 /**
@@ -74,5 +77,29 @@ public abstract class AbstractDavView extends AbstractDavResource
     public void spool(OutputContext outputContext) throws IOException
     {
         throw new IOException("Views cannot be spooled.");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public void addMember(DavResource resource, InputContext inputContext) throws DavException
+    {
+        if (resource instanceof DavTempFile) {
+            addVirtualMember(resource, inputContext);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void removeMember(DavResource member) throws DavException
+    {
+        if (member instanceof DavTempFile) {
+            removeVirtualMember(member);
+        } else {
+            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+        }
     }
 }

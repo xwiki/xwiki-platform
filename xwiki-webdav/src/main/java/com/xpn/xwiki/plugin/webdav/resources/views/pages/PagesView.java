@@ -33,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
-import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 
 /**
@@ -91,16 +90,14 @@ public class PagesView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        if (resource instanceof DavTempFile) {
-            addVirtualMember(resource, inputContext);
-        } else if (resource instanceof PagesBySpaceNameSubView) {
+        if (resource instanceof PagesBySpaceNameSubView) {
             String homePage = resource.getDisplayName() + ".WebHome";
             getContext().checkAccess("edit", homePage);
             XWikiDocument doc = getContext().getDocument(resource.getDisplayName() + ".WebHome");
             doc.setContent("This page was created through the WebDAV interface.");
             getContext().saveDocument(doc);
         } else {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+            super.addMember(resource, inputContext);
         }
     }
 
@@ -110,9 +107,7 @@ public class PagesView extends AbstractDavView
     public void removeMember(DavResource member) throws DavException
     {
         XWikiDavResource davResource = (XWikiDavResource) member;
-        if (davResource instanceof DavTempFile) {
-            removeVirtualMember(davResource);
-        } else if (davResource instanceof PagesBySpaceNameSubView) {
+        if (davResource instanceof PagesBySpaceNameSubView) {
             PagesBySpaceNameSubView space = (PagesBySpaceNameSubView) davResource;
             String sql = "where doc.web='" + space.getDisplayName() + "'";
             List<String> docNames = getContext().searchDocumentsNames(sql);
@@ -125,7 +120,7 @@ public class PagesView extends AbstractDavView
                 getContext().deleteDocument(doc);
             }
         } else {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+            super.removeMember(member);
         }
         davResource.clearCache();
     }

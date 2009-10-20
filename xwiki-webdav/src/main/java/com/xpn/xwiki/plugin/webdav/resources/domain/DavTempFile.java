@@ -58,9 +58,9 @@ public class DavTempFile extends AbstractDavResource
     private byte[] data;
 
     /**
-     * Indicates if this resource has been created or not. Here creation means if the resource has
-     * been actually PUT / MKCOL by the client as opposed to being initialized. This flag will be
-     * set to true once setModified() has been invoked for the first time.
+     * Indicates if this resource has been created or not. Here creation means if the resource has been actually PUT /
+     * MKCOL by the client as opposed to being initialized. This flag will be set to true once setModified() has been
+     * invoked for the first time.
      */
     private boolean created;
 
@@ -86,32 +86,25 @@ public class DavTempFile extends AbstractDavResource
     /**
      * {@inheritDoc}
      */
-    public void init(XWikiDavResource parent, String name, String relativePath)
-        throws DavException
+    public void init(XWikiDavResource parent, String name, String relativePath) throws DavException
     {
         super.init(parent, name, relativePath);
         String strTimeOfCreation = DavConstants.creationDateFormat.format(timeOfCreation);
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.CREATIONDATE, strTimeOfCreation));
-        String strTimeOfModification =
-            DavConstants.modificationDateFormat.format(timeOfLastModification);
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, strTimeOfModification));
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETETAG, strTimeOfModification));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, strTimeOfCreation));
+        String strTimeOfModification = DavConstants.modificationDateFormat.format(timeOfLastModification);
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, strTimeOfModification));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETETAG, strTimeOfModification));
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLANGUAGE, "en"));
         String contentType = isCollection() ? "text/directory" : "application/octet-stream";
         getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTTYPE, contentType));
         int contentLength = (data != null) ? data.length : 0;
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, contentLength));
     }
 
     /**
      * {@inheritDoc}
      */
-    public XWikiDavResource decode(String[] tokens, int next)
-        throws DavException
+    public XWikiDavResource decode(String[] tokens, int next) throws DavException
     {
         return super.decode(tokens, next);
     }
@@ -131,8 +124,7 @@ public class DavTempFile extends AbstractDavResource
     {
         outputContext.setContentLanguage("en");
         outputContext.setContentLength(data != null ? data.length : 0);
-        outputContext.setContentType(isCollection() ? "text/directory"
-            : "application/octet-stream");
+        outputContext.setContentType(isCollection() ? "text/directory" : "application/octet-stream");
         outputContext.setETag(DavConstants.modificationDateFormat.format(getModificationTime()));
         outputContext.setModificationTime(getModificationTime());
         if (exists() && !isCollection()) {
@@ -183,9 +175,8 @@ public class DavTempFile extends AbstractDavResource
      */
     public void move(DavResource destination) throws DavException
     {
-        if (destination instanceof DavTempFile
-            && destination.getCollection().equals(getCollection()) && !destination.isCollection()
-            && !isCollection()) {
+        if (destination instanceof DavTempFile && destination.getCollection().equals(getCollection())
+            && !destination.isCollection() && !isCollection()) {
             // A file rename operation
             DavTempFile destTempFile = (DavTempFile) destination;
             parentResource.getVirtualMembers().remove(this);
@@ -205,9 +196,7 @@ public class DavTempFile extends AbstractDavResource
     {
         this.data = data.clone();
         setModified(modificationTime);
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, (data != null) ? data.length
-                : 0));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETCONTENTLENGTH, this.data.length));
     }
 
     /**
@@ -220,18 +209,13 @@ public class DavTempFile extends AbstractDavResource
         if (!created) {
             timeOfCreation = (Date) modificationTime.clone();
             String strTimeOfCreation = DavConstants.creationDateFormat.format(timeOfCreation);
-            getProperties().add(
-                new DefaultDavProperty(DavPropertyName.CREATIONDATE, strTimeOfCreation));
+            getProperties().add(new DefaultDavProperty(DavPropertyName.CREATIONDATE, strTimeOfCreation));
             created = true;
         }
         timeOfLastModification = (Date) modificationTime.clone();
-        String strTimeOfModification =
-            DavConstants.modificationDateFormat.format(timeOfLastModification);
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, strTimeOfModification));
-        getProperties().add(
-            new DefaultDavProperty(DavPropertyName.GETETAG, String
-                .valueOf(timeOfLastModification)));
+        String strTimeOfModification = DavConstants.modificationDateFormat.format(timeOfLastModification);
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETLASTMODIFIED, strTimeOfModification));
+        getProperties().add(new DefaultDavProperty(DavPropertyName.GETETAG, String.valueOf(timeOfLastModification)));
     }
 
     /**

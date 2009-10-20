@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
-import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 import com.xpn.xwiki.plugin.webdav.utils.XWikiDavUtils;
 
@@ -142,9 +141,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
      */
     public void addMember(DavResource resource, InputContext inputContext) throws DavException
     {
-        if (resource instanceof DavTempFile) {
-            addVirtualMember(resource, inputContext);
-        } else if (resource instanceof DavPage) {
+        if (resource instanceof DavPage) {
             String pName = resource.getDisplayName();
             if (getContext().hasAccess("edit", pName)) {
                 XWikiDocument childDoc = getContext().getDocument(pName);
@@ -152,7 +149,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 getContext().saveDocument(childDoc);
             }
         } else {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+            super.addMember(resource, inputContext);
         }
     }
 
@@ -162,9 +159,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
     public void removeMember(DavResource member) throws DavException
     {
         XWikiDavResource davResource = (XWikiDavResource) member;
-        if (davResource instanceof DavTempFile) {
-            removeVirtualMember(davResource);
-        } else if (davResource instanceof DavPage) {
+        if (davResource instanceof DavPage) {
             String pName = davResource.getDisplayName();
             getContext().checkAccess("delete", pName);
             XWikiDocument childDoc = getContext().getDocument(pName);
@@ -193,7 +188,7 @@ public class PagesBySpaceNameSubView extends AbstractDavView
                 getContext().deleteDocument(getContext().getDocument(docName));
             }
         } else {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST);
+            super.removeMember(member);
         }
         davResource.clearCache();
     }

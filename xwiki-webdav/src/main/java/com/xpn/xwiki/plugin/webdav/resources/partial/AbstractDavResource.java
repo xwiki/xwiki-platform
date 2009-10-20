@@ -512,6 +512,14 @@ public abstract class AbstractDavResource implements XWikiDavResource
     {
         return resourceName.startsWith(".") || resourceName.endsWith("~");
     }
+    
+    /**
+     * {@inheritDoc}    
+     */
+    public int hashCode()
+    {
+        return getResourcePath().hashCode();
+    }
 
     /**
      * {@inheritDoc}

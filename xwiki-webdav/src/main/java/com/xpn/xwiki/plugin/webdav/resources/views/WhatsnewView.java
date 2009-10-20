@@ -27,13 +27,11 @@ import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceIterator;
 import org.apache.jackrabbit.webdav.DavResourceIteratorImpl;
 import org.apache.jackrabbit.webdav.DavServletResponse;
-import org.apache.jackrabbit.webdav.io.InputContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
-import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 
 /**
@@ -87,29 +85,5 @@ public class WhatsnewView extends AbstractDavView
         }
         children.addAll(getVirtualMembers());
         return new DavResourceIteratorImpl(children);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void addMember(DavResource resource, InputContext inputContext) throws DavException
-    {
-        if (resource instanceof DavTempFile) {
-            addVirtualMember(resource, inputContext);
-        } else {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void removeMember(DavResource member) throws DavException
-    {
-        if (member instanceof DavTempFile) {
-            removeVirtualMember(member);
-        } else {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN);
-        }
     }
 }

@@ -84,7 +84,7 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
     public Wizard getWizard()
     {
         if (wizard == null) {
-            TableConfigWizardStep configStep = new TableConfigWizardStep(null);
+            TableConfigWizardStep configStep = new TableConfigWizardStep();
             configStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.tableInsertButton());
             configStep.setValidDirections(EnumSet.of(NavigationDirection.FINISH));
 

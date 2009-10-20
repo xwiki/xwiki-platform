@@ -43,10 +43,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCall;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
 import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
@@ -65,8 +65,8 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationD
  * 
  * @version $Id$
  */
-public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep implements DoubleClickHandler,
-    KeyUpHandler, SourcesNavigationEvents, Updatable
+public class SelectMacroWizardStep extends AbstractMacroWizardStep implements DoubleClickHandler, KeyUpHandler,
+    SourcesNavigationEvents, Updatable
 {
     /**
      * Creates the macro list items that will fill the macro list. The user will be able to filter this list items by
@@ -334,10 +334,11 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
      * Creates a new wizard step for selecting one of the available macros.
      * 
      * @param config the object used to configure the newly created wizard step
+     * @param macroService the macro service used to retrieve macro descriptors
      */
-    public SelectMacroWizardStep(Config config)
+    public SelectMacroWizardStep(Config config, MacroServiceAsync macroService)
     {
-        super(config, new VerticalResizePanel());
+        super(config, macroService, new VerticalResizePanel());
 
         macroFilter = new MacroFilter();
         getPanel().add(macroFilter);
@@ -429,7 +430,7 @@ public class SelectMacroWizardStep extends AbstractNavigationAwareWizardStep imp
                     }
                 }
             };
-            WysiwygService.Singleton.getInstance().getMacroDescriptors(getSyntax(), macroDescriptorsCallback);
+            getMacroService().getMacroDescriptors(getSyntax(), macroDescriptorsCallback);
         }
     }
 

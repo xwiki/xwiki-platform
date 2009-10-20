@@ -34,7 +34,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.AbstractNavigationAwareWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableDescriptor;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.util.TextBoxNumberFilter;
@@ -124,13 +123,9 @@ public class TableConfigWizardStep extends AbstractNavigationAwareWizardStep imp
 
     /**
      * Creates a new wizard step for configuring a table before inserting it.
-     * 
-     * @param config the object used to configure the newly created wizard step
      */
-    public TableConfigWizardStep(Config config)
+    public TableConfigWizardStep()
     {
-        super(config);
-
         descriptor = new TableDescriptor();
         descriptor.setRowCount(2);
         descriptor.setColumnCount(2);

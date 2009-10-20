@@ -82,16 +82,23 @@ public class MacroWizard implements WizardListener
     private final Config config;
 
     /**
+     * The macro service used to retrieve macro descriptors.
+     */
+    private final MacroServiceAsync macroService;
+
+    /**
      * Creates a new macro wizard.
      * 
      * @param displayer the object used to get information about the displayed macros and to access the rich text area
      *            on which the spells are cast
      * @param config the object used to configure this wizard
+     * @param macroService the macro service used to retrieve macro descriptors
      */
-    public MacroWizard(MacroDisplayer displayer, Config config)
+    public MacroWizard(MacroDisplayer displayer, Config config, MacroServiceAsync macroService)
     {
         this.displayer = displayer;
         this.config = config;
+        this.macroService = macroService;
     }
 
     /**
@@ -147,7 +154,7 @@ public class MacroWizard implements WizardListener
     private Wizard getEditWizard()
     {
         if (editWizard == null) {
-            EditMacroWizardStep editStep = new EditMacroWizardStep(config);
+            EditMacroWizardStep editStep = new EditMacroWizardStep(config, macroService);
             editStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.apply());
             editStep.setValidDirections(EnumSet.of(NavigationDirection.FINISH));
 
@@ -168,12 +175,12 @@ public class MacroWizard implements WizardListener
     private Wizard getInsertWizard()
     {
         if (insertWizard == null) {
-            SelectMacroWizardStep selectStep = new SelectMacroWizardStep(config);
+            SelectMacroWizardStep selectStep = new SelectMacroWizardStep(config, macroService);
             selectStep.setNextStep(EDIT_STEP_NAME);
             selectStep.setValidDirections(EnumSet.of(NavigationDirection.NEXT));
             selectStep.setDirectionName(NavigationDirection.NEXT, Strings.INSTANCE.select());
 
-            EditMacroWizardStep editStep = new EditMacroWizardStep(config);
+            EditMacroWizardStep editStep = new EditMacroWizardStep(config, macroService);
             editStep.setDirectionName(NavigationDirection.FINISH, Strings.INSTANCE.macroInsertActionLabel());
             editStep.setValidDirections(EnumSet.of(NavigationDirection.PREVIOUS, NavigationDirection.FINISH));
 

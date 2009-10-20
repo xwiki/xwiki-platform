@@ -21,10 +21,8 @@ package com.xpn.xwiki.wysiwyg.server;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,12 +35,7 @@ import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
-import org.xwiki.rendering.macro.Macro;
-import org.xwiki.rendering.macro.MacroCategoryManager;
-import org.xwiki.rendering.macro.MacroId;
-import org.xwiki.rendering.macro.MacroManager;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 
@@ -59,8 +52,6 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -222,7 +213,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             ResourceName resourceName = new ResourceName();
             resourceName.fromString(attachment.getReference(), true);
             // TODO: Following should be avoided. For this we need to improve officeimporter API.
-            String documentName = resourceName.getWiki() + ":" + resourceName.getSpace() +"." + resourceName.getPage();
+            String documentName = resourceName.getWiki() + ":" + resourceName.getSpace() + "." + resourceName.getPage();
             return officeImporter.importAttachment(documentName, resourceName.getFile(), cleaningParams);
         } catch (OfficeImporterException ex) {
             ex.printStackTrace();
@@ -649,125 +640,5 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
             throw getXWikiGWTException(e);
         }
         return attachments;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#getMacroDescriptor(String, String)
-     */
-    public MacroDescriptor getMacroDescriptor(String macroId, String syntaxId) throws XWikiGWTException
-    {
-        try {
-            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-            MacroManager manager = Utils.getComponentManager().lookup(MacroManager.class);
-            MacroId macroIdObject = new MacroId(macroId, syntaxFactory.createSyntaxFromIdString(syntaxId));
-            Macro< ? > macro = manager.getMacro(macroIdObject);
-            org.xwiki.rendering.macro.descriptor.MacroDescriptor descriptor = macro.getDescriptor();
-
-            ParameterDescriptor contentDescriptor = null;
-            if (descriptor.getContentDescriptor() != null) {
-                contentDescriptor = new ParameterDescriptor();
-                contentDescriptor.setName("content");
-                contentDescriptor.setDescription(descriptor.getContentDescriptor().getDescription());
-                // Just a hack to distinguish between regular strings and large strings.
-                contentDescriptor.setType(StringBuffer.class.getName());
-                contentDescriptor.setMandatory(descriptor.getContentDescriptor().isMandatory());
-            }
-
-            Map<String, ParameterDescriptor> parameterDescriptorMap = new HashMap<String, ParameterDescriptor>();
-            for (Map.Entry<String, org.xwiki.rendering.macro.descriptor.ParameterDescriptor> entry : descriptor
-                .getParameterDescriptorMap().entrySet()) {
-                parameterDescriptorMap.put(entry.getKey(), createMacroParameterDescriptor(entry.getValue()));
-            }
-
-            MacroDescriptor result = new MacroDescriptor();
-            result.setId(macroIdObject.getId());
-            result.setName(descriptor.getName());
-            result.setDescription(descriptor.getDescription());
-            // NOTE: we should set the category also, but we need a new method in MacroCategoryManager.
-            result.setContentDescriptor(contentDescriptor);
-            result.setParameterDescriptorMap(parameterDescriptorMap);
-
-            return result;
-        } catch (Throwable t) {
-            LOG.error("Exception while retrieving macro descriptor.", t);
-            throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);
-        }
-    }
-
-    /**
-     * Creates a {@link ParameterDescriptor} from a {@link org.xwiki.rendering.macro.descriptor.ParameterDescriptor}.
-     * 
-     * @param descriptor a macro parameter descriptor from the rendering package
-     * @return a macro parameter descriptor from the WYSIWYG package
-     */
-    private ParameterDescriptor createMacroParameterDescriptor(
-        org.xwiki.rendering.macro.descriptor.ParameterDescriptor descriptor)
-    {
-        ParameterDescriptor result = new ParameterDescriptor();
-        result.setName(descriptor.getName());
-        result.setDescription(descriptor.getDescription());
-        result.setType(getMacroParameterType(descriptor.getType()));
-        Object defaultValue = descriptor.getDefaultValue();
-        if (defaultValue != null) {
-            result.setDefaultValue(String.valueOf(defaultValue));
-        }
-        result.setMandatory(descriptor.isMandatory());
-        return result;
-    }
-
-    /**
-     * NOTE: We can't send the {@link Class} instance to the client side because it isn't serializable, its source file
-     * is not available at build time and currently GWT doesn't support reflection.
-     * 
-     * @param parameterClass a {@link Class} that defines the values a macro parameter can have
-     * @return a {@link String} representation of the specified class that can be used on the client side to assert that
-     *         a value is of this type
-     */
-    private String getMacroParameterType(Class< ? > parameterClass)
-    {
-        if (parameterClass.isEnum()) {
-            return "enum" + Arrays.asList(parameterClass.getEnumConstants());
-        } else {
-            return parameterClass.getName();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#getMacroDescriptors(String)
-     */
-    public List<MacroDescriptor> getMacroDescriptors(String syntaxId) throws XWikiGWTException
-    {
-        try {
-            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
-            MacroCategoryManager manager = Utils.getComponentManager().lookup(MacroCategoryManager.class);
-
-            List<MacroDescriptor> descriptors = new ArrayList<MacroDescriptor>();
-            for (String category : manager.getMacroCategories(syntax)) {
-                for (MacroId macroId : manager.getMacroIds(category, syntax)) {
-                    MacroDescriptor descriptor = getMacroDescriptor(macroId.getId(), syntaxId);
-                    descriptor.setCategory(category);
-                    descriptors.add(descriptor);
-                }
-            }
-
-            Collections.sort(descriptors, new Comparator<MacroDescriptor>()
-            {
-                public int compare(MacroDescriptor alice, MacroDescriptor bob)
-                {
-                    return alice.getName().compareTo(bob.getName());
-                }
-            });
-
-            return descriptors;
-        } catch (Throwable t) {
-            LOG.error(String
-                .format("Exception while retrieving the list of macro descriptors for syntax %s.", syntaxId), t);
-            throw new XWikiGWTException(t.getLocalizedMessage(), t.toString(), -1, -1);
-        }
     }
 }

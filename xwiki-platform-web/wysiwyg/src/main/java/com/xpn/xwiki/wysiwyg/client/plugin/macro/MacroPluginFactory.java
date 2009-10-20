@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import java.util.MissingResourceException;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.Dictionary;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
@@ -35,11 +40,30 @@ public final class MacroPluginFactory extends AbstractPluginFactory
     private static MacroPluginFactory instance;
 
     /**
+     * The macro service used to retrieve macro descriptors.
+     */
+    private MacroServiceAsync macroService;
+
+    /**
      * Default constructor.
      */
     private MacroPluginFactory()
     {
         super("macro");
+
+        String serviceURL;
+        try {
+            // Look in the global configuration object.
+            serviceURL = Dictionary.getDictionary("GWTConfig").get("serviceURL");
+        } catch (MissingResourceException e) {
+            serviceURL = "/MacroService";
+        }
+
+        macroService = GWT.create(MacroService.class);
+        ((ServiceDefTarget) macroService).setServiceEntryPoint(serviceURL);
+
+        // We cache the service calls.
+        macroService = new MacroServiceAsyncCacheProxy(macroService);
     }
 
     /**
@@ -60,6 +84,6 @@ public final class MacroPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return new MacroPlugin();
+        return new MacroPlugin(macroService);
     }
 }

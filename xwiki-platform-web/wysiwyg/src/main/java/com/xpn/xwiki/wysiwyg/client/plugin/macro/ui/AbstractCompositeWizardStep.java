@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro.ui;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 
 /**
@@ -33,30 +32,20 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 public abstract class AbstractCompositeWizardStep extends Composite implements WizardStep
 {
     /**
-     * The object used to configure the wizard step.
-     */
-    private final Config config;
-
-    /**
      * Creates a new composite wizard step.
-     * 
-     * @param config the object used to configure the newly created wizard step
      */
-    public AbstractCompositeWizardStep(Config config)
+    public AbstractCompositeWizardStep()
     {
-        this(config, new FlowPanel());
+        this(new FlowPanel());
     }
 
     /**
      * Creates a new composite wizard step that uses the given panel to hold its widgets.
      * 
-     * @param config the object used to configure the newly created wizard step
      * @param panel the panel where this wizard step will add its widgets
      */
-    public AbstractCompositeWizardStep(Config config, FlowPanel panel)
+    public AbstractCompositeWizardStep(FlowPanel panel)
     {
-        this.config = config;
-
         initWidget(panel);
     }
 
@@ -68,14 +57,6 @@ public abstract class AbstractCompositeWizardStep extends Composite implements W
     public Widget display()
     {
         return this;
-    }
-
-    /**
-     * @return the object used to configure the wizard step
-     */
-    public Config getConfig()
-    {
-        return config;
     }
 
     /**

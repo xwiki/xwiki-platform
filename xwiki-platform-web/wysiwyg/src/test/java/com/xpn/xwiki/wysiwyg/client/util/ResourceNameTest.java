@@ -346,7 +346,7 @@ public class ResourceNameTest extends AbstractWysiwygClientTest
 
         assertRelative(wiki1, space1, page1, null);
     }
-    
+
     /**
      * Tests {@link ResourceName#fromString(String, boolean)} method.
      */
@@ -355,6 +355,34 @@ public class ResourceNameTest extends AbstractWysiwygClientTest
         ResourceName resource = new ResourceName();
         resource.fromString("wiki:space.page@file", true);
         assertEquals(wiki1, resource.getWiki());
+        assertEquals(space1, resource.getSpace());
+        assertEquals(page1, resource.getPage());
+        assertEquals(file1, resource.getFile());
+    }
+
+    /**
+     * Tests the {@link ResourceName#fromString(String, boolean)} method for the case when the reference is an
+     * attachment reference with the {@code attach: } protocol and a wiki.
+     */
+    public void testFromAttachReferenceWithProtocol()
+    {
+        ResourceName resource = new ResourceName();
+        resource.fromString("attach:wiki:space.page@file", true);
+        assertEquals(wiki1, resource.getWiki());
+        assertEquals(space1, resource.getSpace());
+        assertEquals(page1, resource.getPage());
+        assertEquals(file1, resource.getFile());
+    }
+
+    /**
+     * Tests the {@link ResourceName#fromString(String, boolean)} method for the case when the reference is an
+     * attachment reference with the {@code attach: } protocol but without a wiki.
+     */
+    public void testFromAttachReferenceWithProtocolNoWiki()
+    {
+        ResourceName resource = new ResourceName();
+        resource.fromString("attach:space.page@file", true);
+        assertEquals(null, resource.getWiki());
         assertEquals(space1, resource.getSpace());
         assertEquals(page1, resource.getPage());
         assertEquals(file1, resource.getFile());

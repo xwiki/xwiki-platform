@@ -29,7 +29,6 @@ import org.apache.jackrabbit.webdav.property.DavPropertySet;
 
 import com.xpn.xwiki.plugin.webdav.resources.XWikiDavResource;
 import com.xpn.xwiki.plugin.webdav.resources.domain.DavPage;
-import com.xpn.xwiki.plugin.webdav.resources.domain.DavTempFile;
 import com.xpn.xwiki.plugin.webdav.resources.partial.AbstractDavView;
 
 /**
@@ -100,10 +99,8 @@ public class HomeView extends AbstractDavView
     {
         if (mPage.exists()) {
             mPage.addMember(resource, inputContext);
-        } else if (resource instanceof DavTempFile) {
-            addVirtualMember(resource, inputContext);
         } else {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+            super.addVirtualMember(resource, inputContext);
         }
     }
 
@@ -114,10 +111,8 @@ public class HomeView extends AbstractDavView
     {
         if (mPage.exists()) {
             mPage.removeMember(member);
-        } else if (member instanceof DavTempFile) {
-            removeVirtualMember(member);
         } else {
-            throw new DavException(DavServletResponse.SC_FORBIDDEN);
+            super.removeMember(member);
         }
     }
 }

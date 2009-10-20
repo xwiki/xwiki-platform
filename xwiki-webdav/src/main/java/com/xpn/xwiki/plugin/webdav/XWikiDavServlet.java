@@ -74,17 +74,17 @@ public class XWikiDavServlet extends AbstractWebdavServlet
     /**
      * Locator factory. {@link DavLocatorFactory}
      */
-    private DavLocatorFactory locatorFactory;
+    private transient DavLocatorFactory locatorFactory;
 
     /**
      * Resource factory. {@link DavResourceFactory}
      */
-    private DavResourceFactory resourceFactory;
+    private transient DavResourceFactory resourceFactory;
 
     /**
      * Session provider. {@link DavSessionProvider}
      */
-    private DavSessionProvider sessionProvider;
+    private transient DavSessionProvider sessionProvider;
 
     /**
      * {@inheritDoc}
@@ -233,7 +233,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
         container.removeResponse();
         container.removeSession();
         execution.removeContext();
-        sessionProvider.releaseSession(request);
+        getDavSessionProvider().releaseSession(request);
         if (context != null) {
             context.cleanUp();
         }

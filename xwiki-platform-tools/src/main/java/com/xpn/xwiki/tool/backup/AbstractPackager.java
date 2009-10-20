@@ -40,7 +40,7 @@ import org.xwiki.context.ExecutionContextManager;
 /**
  * Common code for importing and exporting.
  * 
- * @version $Id: Importer.java 1632 2006-11-23 16:34:23Z vmassol $
+ * @version $Id$
  */
 public class AbstractPackager
 {

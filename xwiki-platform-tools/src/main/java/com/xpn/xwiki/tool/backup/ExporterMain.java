@@ -24,7 +24,7 @@ import java.io.File;
 /**
  * Class to call from the command line to export XWiki documents found in a database to the file system.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public final class ExporterMain
 {

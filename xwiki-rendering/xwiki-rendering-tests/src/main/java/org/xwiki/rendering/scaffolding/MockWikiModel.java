@@ -103,6 +103,6 @@ public class MockWikiModel implements WikiModel
      */
     public boolean isDocumentAvailable(String documentName)
     {
-        return documentName.equals("Space.ExistingPage");
+        return "Space.ExistingPage".equals(documentName);
     }
 }

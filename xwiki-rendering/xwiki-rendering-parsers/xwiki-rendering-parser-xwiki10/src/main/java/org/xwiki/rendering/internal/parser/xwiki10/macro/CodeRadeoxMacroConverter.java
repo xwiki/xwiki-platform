@@ -42,7 +42,7 @@ public class CodeRadeoxMacroConverter extends AbstractRadeoxMacroConverter
     @Override
     protected void convertParameter(Map<String, String> parameters20, String key, String value)
     {
-        if (key.equals("")) {
+        if ("".equals(key)) {
             super.convertParameter(parameters20, "language", value);
         } else {
             super.convertParameter(parameters20, key, value);

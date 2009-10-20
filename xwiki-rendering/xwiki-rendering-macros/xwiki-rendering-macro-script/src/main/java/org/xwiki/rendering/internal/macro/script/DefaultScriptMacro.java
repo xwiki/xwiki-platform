@@ -73,7 +73,7 @@ public class DefaultScriptMacro extends AbstractJSR223ScriptMacro<DefaultScriptM
         if (this.language == null) {
             String macroName = context.getCurrentMacroBlock().getId().toLowerCase();
 
-            if (macroName.equals("script")) {
+            if ("script".equals(macroName)) {
                 engineName = parameters.getLanguage();
             } else {
                 engineName = macroName;

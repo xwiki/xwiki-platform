@@ -336,7 +336,7 @@ public class HTMLFilter extends AbstractFilter implements Initializable
         String elementName = elementNameBuffer.toString();
 
         // force <br> as full element instead of just begin element
-        if (context.peekType() == HTMLType.BEGIN && elementName.equals("br")) {
+        if (context.peekType() == HTMLType.BEGIN && "br".equals(elementName)) {
             context.setType(HTMLType.ELEMENT);
         }
 

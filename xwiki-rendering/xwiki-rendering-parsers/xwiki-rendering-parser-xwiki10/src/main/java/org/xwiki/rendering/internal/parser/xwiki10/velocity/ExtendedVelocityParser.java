@@ -72,7 +72,7 @@ public class ExtendedVelocityParser extends VelocityParser
         if (VELOCITYDIRECTIVE_ALL.contains(directiveName)) {
             // get the velocity directive
             if (VELOCITYDIRECTIVE_END.contains(directiveName)) {
-                if (context.getCurrentElement().getName().equals("macro")) {
+                if ("macro".equals(context.getCurrentElement().getName())) {
                     HTMLFilter.appendHTMLClose(directiveBuffer, econtext.getFilterContext(), true);
                 }
 

@@ -207,7 +207,7 @@ public class RadeoxMacrosFilter extends AbstractFilter implements Initializable
                 if (parameterType != RadeoxMacroConverter.PARAMETER_SIMPLE
                     && ((parameterType & RadeoxMacroConverter.PARAMETER_NOTEMPTY) != 0 && parameterValue.trim()
                         .length() == 0)
-                    || (((parameterType & RadeoxMacroConverter.PARAMETER_NOTNONE) != 0 && parameterValue.equals("none")))) {
+                    || (((parameterType & RadeoxMacroConverter.PARAMETER_NOTNONE) != 0 && "none".equals(parameterValue)))) {
                     parameterValue = null;
                 }
 

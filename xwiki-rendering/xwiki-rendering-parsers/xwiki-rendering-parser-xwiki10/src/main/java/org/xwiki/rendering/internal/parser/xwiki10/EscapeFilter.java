@@ -71,7 +71,7 @@ public class EscapeFilter extends AbstractFilter implements Initializable
 
             if (matcher.group(2) != null) {
                 String escaped = matcher.group(2);
-                if (escaped.equals("\\")) {
+                if ("\\".equals(escaped)) {
                     result.append("\\\\");
                 } else {
                     result.append(filterContext.addProtectedContent(matcher.group(2), ESCAPE_SUFFIX, true));

@@ -209,7 +209,6 @@ public class ResourceName
                 if (strippedRef.startsWith("attach:")) {
                     strippedRef = strippedRef.substring(7);
                 }
-                strippedRef = reference.substring(reference.indexOf(':') + 1);
                 // parse the file name
                 strippedRef = parseFileName(strippedRef);
             }

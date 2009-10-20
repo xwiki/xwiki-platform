@@ -64,7 +64,7 @@ public class DefaultSelection extends AbstractSelection
      */
     public void addRange(Range range)
     {
-        NativeRangeWrapper wrapper = ((NativeRangeWrapper) range);
+        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
         if (wrapper.getNativeRange() == null) {
             Document doc = (Document) range.getStartContainer().getOwnerDocument();
             wrapper.setNativeRange(NativeRange.newInstance(doc));

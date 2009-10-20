@@ -564,7 +564,7 @@ public class DefaultRange implements Range
     private boolean isAfterOrDisconnected(Node alice, int aliceOffset, Node bob, int bobOffset)
     {
         try {
-            return domUtils.comparePoints(alice, aliceOffset, bob, bobOffset) == 1;
+            return domUtils.comparePoints(alice, aliceOffset, bob, bobOffset) > 0;
         } catch (IllegalArgumentException e) {
             // The given boundary points are disconnected.
             return true;

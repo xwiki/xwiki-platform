@@ -282,7 +282,7 @@ public class IESelection extends AbstractSelection
     /**
      * @return an element that can be used a range boundary marker for this selection
      */
-    protected Element createBoundaryMarker()
+    private Element createBoundaryMarker()
     {
         ImageElement marker = nativeSelection.getOwnerDocument().createImageElement();
         marker.setWidth(0);

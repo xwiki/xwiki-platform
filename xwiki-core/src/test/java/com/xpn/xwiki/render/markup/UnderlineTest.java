@@ -135,13 +135,13 @@ public class UnderlineTest extends AbstractSyntaxTest
         // time. If the build takes a lot, then the regular expression is not in linear time, thus
         // wrong.
         String text = "__";
-        for (int i = 0; i < 1000; ++i) {
+        for (int i = 0; i < 200; ++i) {
             text += "abc_";
         }
         tests.add(text);
         expects.add(text);
         text = "__";
-        for (int i = 0; i < 1000; ++i) {
+        for (int i = 0; i < 200; ++i) {
             text += "abc _ ";
         }
         tests.add(text);

@@ -92,9 +92,9 @@ public class XWikiDavServlet extends AbstractWebdavServlet
     public void init() throws ServletException
     {
         super.init();
-        locatorFactory = new LocatorFactoryImplEx("");
-        resourceFactory = new XWikiDavResourceFactory(getServletContext());
-        sessionProvider = new XWikiDavSessionProvider();
+        setLocatorFactory(new LocatorFactoryImplEx(""));
+        setResourceFactory(new XWikiDavResourceFactory(getServletContext()));
+        setDavSessionProvider(new XWikiDavSessionProvider());
     }
 
     /**
@@ -151,9 +151,8 @@ public class XWikiDavServlet extends AbstractWebdavServlet
      */
     protected boolean execute(WebdavRequest request, WebdavResponse response, int method,
         DavResource resource) throws ServletException, IOException, DavException
-    {
-        logger.debug("Resource : [" + resource.getDisplayName() + "] Method : [" + request.getMethod()
-            + "]");
+    {        
+        logger.debug(String.format("Resource: [%s] Method: [%s]", resource.getDisplayName(), request.getMethod()));
         return super.execute(request, response, method, resource);
     }
 
@@ -178,7 +177,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
      */
     public DavLocatorFactory getLocatorFactory()
     {        
-        return locatorFactory;
+        return this.locatorFactory;
     }
     
     /**
@@ -194,7 +193,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
      */
     public DavResourceFactory getResourceFactory()
     {        
-        return resourceFactory;
+        return this.resourceFactory;
     }
     
     /**
@@ -210,7 +209,7 @@ public class XWikiDavServlet extends AbstractWebdavServlet
      */
     public synchronized DavSessionProvider getDavSessionProvider()
     {        
-        return sessionProvider;
+        return this.sessionProvider;
     }
     
     /**

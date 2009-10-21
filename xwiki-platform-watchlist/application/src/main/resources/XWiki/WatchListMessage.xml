@@ -379,7 +379,7 @@ src='cid:object.gif'
 <text>## Note: usage of indentation in this template is prohibited since we're doing
 ##       ASCII formatting.
 
-$msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
+$msg.get("watchlist.notification.email.greeting", [$first_name])
 
 #if($modifiedDocuments.size() == 1)
 $msg.get("watchlist.notification.email.singleUpdate.intro")

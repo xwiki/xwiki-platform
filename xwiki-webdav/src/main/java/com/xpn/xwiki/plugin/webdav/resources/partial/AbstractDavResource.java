@@ -174,7 +174,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
      */
     public ActiveLock getLock(Type type, Scope scope)
     {
-        return getContext().getLock(type, scope, this);
+        return getContext().getLockManager().getLock(type, scope, this);
     }
 
     /**
@@ -201,7 +201,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
     {
         ActiveLock lock = null;
         if (isLockable(reqLockInfo.getType(), reqLockInfo.getScope())) {
-            lock = getContext().createLock(reqLockInfo, this);
+            lock = getContext().getLockManager().createLock(reqLockInfo, this);
         } else {
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
         }
@@ -220,7 +220,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
         if (lock == null) {
             throw new DavException(DavServletResponse.SC_PRECONDITION_FAILED);
         }
-        return getContext().refreshLock(reqLockInfo, lockToken, this);
+        return getContext().getLockManager().refreshLock(reqLockInfo, lockToken, this);
     }
 
     /**
@@ -230,7 +230,7 @@ public abstract class AbstractDavResource implements XWikiDavResource
     {
         ActiveLock lock = getLock(Type.WRITE, Scope.EXCLUSIVE);
         if (lock != null && lock.isLockedByToken(lockToken)) {
-            getContext().releaseLock(lockToken, this);
+            getContext().getLockManager().releaseLock(lockToken, this);
         }
     }
 

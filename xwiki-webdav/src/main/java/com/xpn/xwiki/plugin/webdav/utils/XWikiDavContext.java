@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.webdav.utils;
 
 import java.io.IOException;
@@ -8,16 +27,11 @@ import javax.servlet.ServletContext;
 
 import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavMethods;
-import org.apache.jackrabbit.webdav.DavResource;
 import org.apache.jackrabbit.webdav.DavResourceFactory;
 import org.apache.jackrabbit.webdav.DavServletRequest;
 import org.apache.jackrabbit.webdav.DavServletResponse;
 import org.apache.jackrabbit.webdav.DavSession;
-import org.apache.jackrabbit.webdav.lock.ActiveLock;
-import org.apache.jackrabbit.webdav.lock.LockInfo;
 import org.apache.jackrabbit.webdav.lock.LockManager;
-import org.apache.jackrabbit.webdav.lock.Scope;
-import org.apache.jackrabbit.webdav.lock.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.cache.Cache;
@@ -46,31 +60,63 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.xmlrpc.XWikiXmlRpcResponse;
 
-public class XWikiDavContext implements LockManager
+/**
+ * Holds context information about a webdav request. 
+ * 
+ * TODO: Get rid of this class (Move to components).
+ * 
+ * @version $Id$
+ */
+public class XWikiDavContext
 {
     /**
      * Logger instance.
      */
-    private static final Logger logger = LoggerFactory.getLogger(XWikiDavContext.class);
-
-    private DavServletRequest request;
-
-    private XWikiContext xwikiContext;
-
-    private DavResourceFactory resourceFactory;
-
-    private DavSession davSession;
-
-    private LockManager lockManager;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDavContext.class);
+    
     /**
      * Global per-user based storage.
      */
     private static Cache<XWikiDavUserStorage> davCache;
 
-    public XWikiDavContext(DavServletRequest request, DavServletResponse response,
-        ServletContext servletContext, DavResourceFactory resourceFactory, DavSession davSession,
-        LockManager lockManager) throws DavException
+    /**
+     * Dav request.
+     */
+    private DavServletRequest request;
+
+    /**
+     * XWiki context.
+     */
+    private XWikiContext xwikiContext;
+
+    /**
+     * DAV resource factory.
+     */
+    private DavResourceFactory resourceFactory;
+
+    /**
+     * DAV session.
+     */
+    private DavSession davSession;
+
+    /**
+     * Lock manager.
+     */
+    private LockManager lockManager;    
+
+    /**
+     * Creates a new xwiki webdav context.
+     * 
+     * @param request dav request.
+     * @param response dav response.
+     * @param servletContext servlet context.
+     * @param resourceFactory dav resource factory.
+     * @param davSession dav session.
+     * @param lockManager lock manager.
+     * @throws DavException if an error occurs while initializing the xwiki context.
+     */
+    public XWikiDavContext(DavServletRequest request, DavServletResponse response, ServletContext servletContext,
+        DavResourceFactory resourceFactory, DavSession davSession, LockManager lockManager) throws DavException
     {
         this.request = request;
         this.resourceFactory = resourceFactory;
@@ -87,20 +133,14 @@ public class XWikiDavContext implements LockManager
             xwikiContext.setDatabase("xwiki");
 
             ServletContainerInitializer containerInitializer =
-                (ServletContainerInitializer) Utils
-                    .getComponent(ServletContainerInitializer.class);
-            containerInitializer.initializeRequest(xwikiContext.getRequest()
-                .getHttpServletRequest(), xwikiContext);
-            containerInitializer.initializeResponse(xwikiContext.getResponse()
-                .getHttpServletResponse());
-            containerInitializer.initializeSession(xwikiContext.getRequest()
-                .getHttpServletRequest());
+                (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.class);
+            containerInitializer.initializeRequest(xwikiContext.getRequest().getHttpServletRequest(), xwikiContext);
+            containerInitializer.initializeResponse(xwikiContext.getResponse().getHttpServletResponse());
+            containerInitializer.initializeSession(xwikiContext.getRequest().getHttpServletRequest());
             containerInitializer.initializeApplicationContext(servletContext);
 
             XWiki xwiki = XWiki.getXWiki(xwikiContext);
-            XWikiURLFactory urlf =
-                xwiki.getURLFactoryService().createURLFactory(xwikiContext.getMode(),
-                    xwikiContext);
+            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(xwikiContext.getMode(), xwikiContext);
             xwikiContext.setURLFactory(urlf);
             xwiki.prepareResources(xwikiContext);
 
@@ -126,11 +166,15 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Initializes global webdav cache.
+     * 
+     * @throws DavException if an error occurs while initializing the cache.
+     */
     private static void initCache() throws DavException
     {
         try {
-            CacheManager cacheManager =
-                (CacheManager) Utils.getComponent(CacheManager.class, "default");
+            CacheManager cacheManager = (CacheManager) Utils.getComponent(CacheManager.class, "default");
             CacheFactory factory = cacheManager.getCacheFactory();
             CacheConfiguration conf = new CacheConfiguration();
             LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
@@ -163,8 +207,7 @@ public class XWikiDavContext implements LockManager
      * 
      * @param right Access level.
      * @param fullDocName Name of the document.
-     * @return True if the user has the given access level for the document in question, false
-     *         otherwise.
+     * @return True if the user has the given access level for the document in question, false otherwise.
      */
     public boolean hasAccess(String right, String fullDocName)
     {
@@ -173,24 +216,24 @@ public class XWikiDavContext implements LockManager
             if (right.equals("overwrite")) {
                 String overwriteAccess = exists(fullDocName) ? "delete" : "edit";
                 hasAccess = hasAccess(overwriteAccess, fullDocName);
-            } else if (xwikiContext.getWiki().getRightService().hasAccessLevel(right,
-                xwikiContext.getUser(), fullDocName, xwikiContext)) {
+            } else if (xwikiContext.getWiki().getRightService().hasAccessLevel(right, xwikiContext.getUser(),
+                fullDocName, xwikiContext)) {
                 hasAccess = true;
             }
         } catch (XWikiException ex) {
-            logger.error("Error while validating access level.", ex);
+            LOGGER.error("Error while validating access level.", ex);
         }
         return hasAccess;
     }
 
     /**
-     * Validates if the user (in the context) has the given access level on the document in
-     * question, if not, throws a {@link DavException}.
+     * Validates if the user (in the context) has the given access level on the document in question, if not, throws a
+     * {@link DavException}.
      * 
      * @param right Access level.
      * @param fullDocName Name of the document.
-     * @throws DavException If the user doesn't have enough access rights on the given document or
-     *             if the access verification code fails.
+     * @throws DavException If the user doesn't have enough access rights on the given document or if the access
+     *             verification code fails.
      */
     public void checkAccess(String right, String fullDocName) throws DavException
     {
@@ -199,11 +242,24 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Returns the mime type of the given attachment.
+     * 
+     * @param attachment xwiki attachment.
+     * @return a mime type string.
+     */
     public String getMimeType(XWikiAttachment attachment)
     {
         return attachment.getMimeType(xwikiContext);
     }
 
+    /**
+     * Returns the content of the attachment.
+     * 
+     * @param attachment xwiki attachment.
+     * @return attachment content as a byte array.
+     * @throws DavException if an error occurs while reading the attachment.
+     */
     public byte[] getContent(XWikiAttachment attachment) throws DavException
     {
         try {
@@ -213,6 +269,13 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Utility method for reading a given input stream into a byte array.
+     * 
+     * @param in input stream.
+     * @return a byte array holding data from the given stream.
+     * @throws DavException if an error occurs while reading the input stream.
+     */
     public byte[] getFileContentAsBytes(InputStream in) throws DavException
     {
         try {
@@ -228,14 +291,13 @@ public class XWikiDavContext implements LockManager
      * @param attachmentName Name of this attachment.
      * @param data Data to be put into the attachment (file content).
      * @param doc The document to which the attachment is made.
-     * @throws XWikiException Indicates an internal error.
+     * @throws DavException Indicates an internal error.
      */
-    public void addAttachment(XWikiDocument doc, byte[] data, String attachmentName)
-        throws DavException
+    public void addAttachment(XWikiDocument doc, byte[] data, String attachmentName) throws DavException
     {
         int i = attachmentName.indexOf("\\");
         if (i == -1) {
-            i = attachmentName.indexOf("/");
+            i = attachmentName.indexOf(XWikiDavUtils.URL_SEPARATOR);
         }
         String filename = attachmentName.substring(i + 1);
 
@@ -258,15 +320,22 @@ public class XWikiDavContext implements LockManager
         attachment.setDoc(doc);
         try {
             doc.saveAttachmentContent(attachment, xwikiContext);
-            xwikiContext.getWiki().saveDocument(doc,
-                "[WEBDAV] Attachment " + filename + " added.", xwikiContext);
+            xwikiContext.getWiki().saveDocument(doc, "[WEBDAV] Attachment " + filename + " added.", xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }
     }
 
-    public void moveAttachment(XWikiAttachment attachment, XWikiDocument destinationDoc,
-        String newAttachmentName) throws DavException
+    /**
+     * Moves the given attachment under the target document.
+     * 
+     * @param attachment xwiki attachment.
+     * @param destinationDoc target document.
+     * @param newAttachmentName new attachment name.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
+    public void moveAttachment(XWikiAttachment attachment, XWikiDocument destinationDoc, String newAttachmentName)
+        throws DavException
     {
         try {
             // Delete the current attachment
@@ -278,13 +347,18 @@ public class XWikiDavContext implements LockManager
             attachment.setDoc(destinationDoc);
             // Save the attachment.
             destinationDoc.saveAttachmentContent(attachment, xwikiContext);
-            xwikiContext.getWiki().saveDocument(destinationDoc,
-                "[WEBDAV] Attachment moved / renamed.", xwikiContext);
+            xwikiContext.getWiki().saveDocument(destinationDoc, "[WEBDAV] Attachment moved / renamed.", xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }
     }
 
+    /**
+     * Deletes the given attachment from it's document.
+     * 
+     * @param attachment xwiki attachment.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public void deleteAttachment(XWikiAttachment attachment) throws DavException
     {
         try {
@@ -294,11 +368,24 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Checks whether the specified xwiki document exists or not.
+     * 
+     * @param fullDocName name of the document.
+     * @return true if the documents exists.
+     */
     public boolean exists(String fullDocName)
     {
         return xwikiContext.getWiki().exists(fullDocName, xwikiContext);
     }
 
+    /**
+     * Finds the xwiki document matching the given document name.
+     * 
+     * @param fullDocName name of the xwiki document.
+     * @return xwiki document matching the given document name.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public XWikiDocument getDocument(String fullDocName) throws DavException
     {
         try {
@@ -308,6 +395,13 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Converts the given xwiki document into an xml representation.
+     * 
+     * @param document xwiki document.
+     * @return the xml representation of the document.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public String toXML(XWikiDocument document) throws DavException
     {
         try {
@@ -317,17 +411,14 @@ public class XWikiDavContext implements LockManager
         }
     }
 
-    public void fromXML(XWikiDocument document, String xml) throws DavException
-    {
-        try {
-            document.fromXML(xml);
-        } catch (XWikiException ex) {
-            throw new DavException(DavServletResponse.SC_BAD_REQUEST, ex);
-        }
-    }
-
-    public void renameDocument(XWikiDocument document, String newDocumentName)
-        throws DavException
+    /**
+     * Renames the given xwiki document into the new document name provided.
+     * 
+     * @param document xwiki document to be renamed.
+     * @param newDocumentName new document name.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
+    public void renameDocument(XWikiDocument document, String newDocumentName) throws DavException
     {
         if (document.isCurrentUserPage(xwikiContext)) {
             throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
@@ -340,28 +431,49 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * A shortcut to {@linkXWikiStoreInterface#searchDocumentsNames(String, int, int, XWikiContext)}, returns all the
+     * results found.
+     * 
+     * @param sql the HQL query string.
+     * @return document names matching the given criterion.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public List<String> searchDocumentsNames(String sql) throws DavException
     {
         try {
-            return xwikiContext.getWiki().getStore()
-                .searchDocumentsNames(sql, 0, 0, xwikiContext);
+            return xwikiContext.getWiki().getStore().searchDocumentsNames(sql, 0, 0, xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }
     }
 
+    /**
+     * A shortcut to {@linkXWikiStoreInterface#searchDocumentsNames(String, int, int, XWikiContext)}.
+     * 
+     * @param sql the HQL where clause.
+     * @param nb number of results expected.
+     * @param start offset.
+     * @return document names matching the given criterion.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public List<String> searchDocumentsNames(String sql, int nb, int start) throws DavException
     {
         try {
-            return xwikiContext.getWiki().getStore().searchDocumentsNames(sql, nb, start,
-                xwikiContext);
+            return xwikiContext.getWiki().getStore().searchDocumentsNames(sql, nb, start, xwikiContext);
         } catch (XWikiException ex) {
             throw new DavException(DavServletResponse.SC_INTERNAL_SERVER_ERROR, ex);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public List search(String sql) throws DavException
+    /**
+     * A shortcut to {@link XWikiStoreInterface#search(String, int, int, XWikiContext)}.
+     * 
+     * @param sql the HQL query.
+     * @return search results.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
+    public List<Object> search(String sql) throws DavException
     {
         try {
             return xwikiContext.getWiki().getStore().search(sql, 0, 0, xwikiContext);
@@ -370,6 +482,12 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Saves the given xwiki document into current xwiki.
+     * 
+     * @param document xwiki document to be saved.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public void saveDocument(XWikiDocument document) throws DavException
     {
         try {
@@ -379,6 +497,12 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * Deletes the specified xwiki document from the current xwiki.
+     * 
+     * @param document the xwiki document.
+     * @throws DavException if an error occurs while accessing the wiki. 
+     */
     public void deleteDocument(XWikiDocument document) throws DavException
     {
         if (document.isCurrentUserPage(xwikiContext)) {
@@ -392,6 +516,10 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * @return a list of spaces available in the current xwiki.
+     * @throws DavException if an error occurs while accessing the wiki.
+     */
     public List<String> getSpaces() throws DavException
     {
         try {
@@ -401,107 +529,127 @@ public class XWikiDavContext implements LockManager
         }
     }
 
+    /**
+     * @return true if the current webdav request is trying to create a collection resource (DAV_MKCOL).
+     */
     public boolean isCreateCollectionRequest()
     {
         return DavMethods.isCreateCollectionRequest(request);
     }
 
+    /**
+     * @return true if the current webdav request is trying to create a file resource (DAV_PUT or DAV_POST).
+     */
     public boolean isCreateFileRequest()
     {
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_PUT || methodCode == DavMethods.DAV_POST;
     }
 
+    /**
+     * @return true if the current webdav request is trying to create a resource.
+     */
     public boolean isCreateResourceRequest()
     {
         return isCreateCollectionRequest() || isCreateFileRequest();
     }
 
+    /**
+     * @return true if the current webdav request is trying to move (rename) a resource.
+     */
     public boolean isMoveResourceRequest()
     {
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_MOVE;
     }
 
+    /**
+     * @return true if the current webdav request is trying to create or move (rename) a resource.
+     */
     public boolean isCreateOrMoveRequest()
     {
         return isMoveResourceRequest() || isCreateResourceRequest();
     }
 
+    /**
+     * Utility method for checking whether the current webdav request is trying to move / rename an attachment.
+     * 
+     * @param doc the xwiki document to which the attachment belongs to.
+     * @return true if the current webdav request is about moving (or renaming) an attachment from the given xwiki
+     *         document.
+     */
     public boolean isMoveAttachmentRequest(XWikiDocument doc)
     {
         int methodCode = DavMethods.getMethodCode(getMethod());
         if (methodCode == DavMethods.DAV_MOVE) {
             String rPath = request.getRequestLocator().getResourcePath();
-            rPath = (rPath.endsWith("/")) ? rPath.substring(0, rPath.length() - 1) : rPath;
-            String resourceName = rPath.substring(rPath.lastIndexOf("/") + 1);
+            rPath = (rPath.endsWith(XWikiDavUtils.URL_SEPARATOR)) ? rPath.substring(0, rPath.length() - 1) : rPath;
+            String resourceName = rPath.substring(rPath.lastIndexOf(XWikiDavUtils.URL_SEPARATOR) + 1);
             return doc.getAttachment(resourceName) != null;
         }
         return false;
     }
 
+    /**
+     * @return true if the current webdav request is a DAV_DELETE request.
+     */
     public boolean isDeleteResourceRequest()
     {
         int methodCode = DavMethods.getMethodCode(getMethod());
         return methodCode == DavMethods.DAV_DELETE;
     }
 
-    public ActiveLock getLock(Type type, Scope scope, DavResource resource)
-    {
-        return lockManager.getLock(type, scope, resource);
-    }
-
-    public ActiveLock createLock(LockInfo lockInfo, DavResource resource) throws DavException
-    {
-        return lockManager.createLock(lockInfo, resource);
-    }
-
-    public boolean hasLock(String lockToken, DavResource resource)
-    {
-        return lockManager.hasLock(lockToken, resource);
-    }
-
-    public ActiveLock refreshLock(LockInfo lockInfo, String lockToken, DavResource resource)
-        throws DavException
-    {
-        return lockManager.refreshLock(lockInfo, lockToken, resource);
-    }
-
-    public void releaseLock(String lockToken, DavResource resource) throws DavException
-    {
-        lockManager.releaseLock(lockToken, resource);
-    }
-
+    /**
+     * @return name of the webdav method executed by the current request.
+     */
     public String getMethod()
     {
         return request.getMethod();
     }
 
+    /**
+     * @return current xwiki user name.
+     */
     public String getUser()
     {
         return xwikiContext.getUser();
     }
 
+    /**
+     * @return dav resource factory.
+     */
     public DavResourceFactory getResourceFactory()
     {
         return resourceFactory;
     }
 
+    /**
+     * @return the dav session.
+     */
     public DavSession getDavSession()
     {
         return davSession;
     }
 
+    /**
+     * @return global lock manager.
+     */
     public LockManager getLockManager()
     {
         return lockManager;
     }
 
+    /**
+     * @return the internal xwiki context.
+     */
     public XWikiContext getXwikiContext()
     {
         return xwikiContext;
     }
 
+    /**
+     * Release any resources acquired.
+     */
     public void cleanUp()
     {
         if ((xwikiContext != null) && (xwikiContext.getWiki() != null)) {

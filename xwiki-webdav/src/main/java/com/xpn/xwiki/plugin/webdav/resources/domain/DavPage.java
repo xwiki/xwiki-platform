@@ -188,18 +188,6 @@ public class DavPage extends AbstractDavResource
                 getContext().saveDocument(doc);
             } else if (fName.equals(DavWikiFile.WIKI_XML)) {
                 throw new DavException(DavServletResponse.SC_METHOD_NOT_ALLOWED);
-                /*
-                 * // These values should not be writable. String oldVersion = doc.getVersion(); String oldContentAuthor
-                 * = doc.getContentAuthor(); // Keep for determining if the content was changed or not. String
-                 * oldContent = doc.getContent(); getContext().fromXML(doc, new String(data)); // Ignore the version
-                 * received in the XML. It will be automatically increased // when saving the doc.
-                 * doc.setVersion(oldVersion); // Don't allow setting the contentAuthor, as it determines the
-                 * programming // right. doc.setContentAuthor(oldContentAuthor); if (!StringUtils.equals(oldContent,
-                 * doc.getContent())) { // Force setting the contentUpdateDate and contentAuthor if the content was //
-                 * changed. doc.setContentDirty(true); } // Force setting the current date and increasing the version
-                 * doc.setMetaDataDirty(true); // Force setting the author. doc.setAuthor(getContext().getUser());
-                 * getContext().saveDocument(doc);
-                 */
             } else {
                 getContext().addAttachment(doc, data, fName);
             }

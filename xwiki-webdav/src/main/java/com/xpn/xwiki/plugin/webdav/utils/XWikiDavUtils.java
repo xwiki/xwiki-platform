@@ -28,7 +28,12 @@ import com.xpn.xwiki.api.Document;
  * @version $Id$.
  */
 public final class XWikiDavUtils
-{
+{    
+    /**
+     * Path separator character.
+     */
+    public static final String URL_SEPARATOR = "/";            
+    
     /**
      * Prefix used to indicate the beginning of a virtual grouping.
      */
@@ -37,7 +42,7 @@ public final class XWikiDavUtils
     /**
      * Post-fix used to indicate the beginning of a virtual grouping.
      */
-    public static final String VIRTUAL_DIRECTORY_POSTFIX = "_";
+    public static final String VIRTUAL_DIRECTORY_POSTFIX = VIRTUAL_DIRECTORY_PREFIX;
 
     /**
      * Signature used to identify an attachment url.
@@ -57,32 +62,32 @@ public final class XWikiDavUtils
         /**
          * Root view.
          */
-        public static final String ROOT = "root";
+        String ROOT = "root";
 
         /**
          * Pages view.
          */
-        public static final String PAGES = "spaces";
+        String PAGES = "spaces";
 
         /**
          * Attachments view.
          */
-        public static final String ATTACHMENTS = "attachments";
+        String ATTACHMENTS = "attachments";
 
         /**
          * Home view.
          */
-        public static final String HOME = "home";
+        String HOME = "home";
 
         /**
          * Orphans view.
          */
-        public static final String ORPHANS = "orphans";
+        String ORPHANS = "orphans";
 
         /**
          * Whatsnew view.
          */
-        public static final String WHATSNEW = "whatsnew";
+        String WHATSNEW = "whatsnew";
     }    
     
     /**
@@ -119,9 +124,8 @@ public final class XWikiDavUtils
     public static String getDavURL(Document doc, Attachment attachment)
     {
         String docDownloadURL = doc.getExternalURL("download");
-        String httpUrl =
-            docDownloadURL.endsWith("/") ? docDownloadURL + attachment.getFilename()
-                : docDownloadURL + "/" + attachment.getFilename();
+        String httpUrl = docDownloadURL.endsWith(URL_SEPARATOR) ? docDownloadURL + attachment.getFilename()
+                : docDownloadURL + URL_SEPARATOR + attachment.getFilename();
         return getDavURL(httpUrl);
     }
 
@@ -135,10 +139,9 @@ public final class XWikiDavUtils
         String webDAVUrl = "";
         if (httpUrl.contains(XWIKI_ATTACHMENT_SIGNATURE)) {
             String[] parts = httpUrl.split(XWIKI_ATTACHMENT_SIGNATURE);
-            String[] elements = parts[1].split("/");
-            webDAVUrl =
-                parts[0] + XWIKI_WEBDAV_SIGNATURE + elements[0] + "/" + elements[1] + "/"
-                    + elements[2];
+            String[] elements = parts[1].split(URL_SEPARATOR);
+            webDAVUrl = parts[0] + XWIKI_WEBDAV_SIGNATURE + elements[0]
+                + URL_SEPARATOR + elements[1] + URL_SEPARATOR + elements[2];
         }
         return webDAVUrl;
     }

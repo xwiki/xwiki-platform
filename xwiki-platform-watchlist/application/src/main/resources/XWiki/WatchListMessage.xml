@@ -376,7 +376,64 @@ src='cid:object.gif'
 <subject>#set($date=$xwiki.formatDate($previousFireTime))#set($nb=$modifiedDocuments.size())#if($nb==1)$msg.get("watchlist.notification.email.singleUpdate.subject", [$date])#else$msg.get("watchlist.notification.email.multipleUpdates.subject", [$nb, $date])#end</subject>
 </property>
 <property>
-<text></text>
+<text>## Note: usage of indentation in this template is prohibited since we're doing
+##       ASCII formatting.
+
+$msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
+
+#if($modifiedDocuments.size() == 1)
+$msg.get("watchlist.notification.email.singleUpdate.intro")
+#else
+$msg.get("watchlist.notification.email.multipleUpdates.intro")
+#end
+
+#set($previousEvent = $util.getNull())
+#set($previousDoc = $util.getNull())
+#foreach ($event in $events)
+#set($firstEntry = ($previousEvent == $util.getNull()))
+#set($prefixedFullName = $event.getPrefixedFullName())
+#set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
+#set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
+#set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
+#if ($newWiki)
+#if (!$firstEntry)
+
+#end
++ $event.getWiki()
+|
+#end
+#if ($newSpace)
+#if (!$firstEntry &amp;&amp; !$newWiki)
+|
+#end
+| + $event.getSpace()
+| |
+#end
+#if($newDocument)
+#if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace)
+| |
+#end
+#set($currentDoc = $xwiki.getDocument($prefixedFullName))
+| | + $currentDoc.getDisplayTitle() ($event.getFullName()): $event.getUrl()
+| | |
+#end
+#if(!$event.isComposite())
+| | | - $msg.get("watchlist.event.${event.getType()}", [$xwiki.formatDate($event.getDate()), $xwiki.getLocalUserName($event.getAuthor(), false)])
+#else
+#set($authors = "")
+#foreach($author in $event.getAuthors())
+#set($authors = "${authors}${xwiki.getLocalUserName($author, false)}")
+#if($event.getAuthors().indexOf($author) &lt; $event.getAuthors().size() - 1)
+#set($authors = "${authors}, ")  
+#end
+#end
+#set($firstDateIndex = $event.getDates().size() - 1)
+#set($firstDate = $xwiki.formatDate($event.getDates().get($firstDateIndex)))
+| | | - $msg.get("watchlist.event.update.multiple", [$firstDate, $xwiki.formatDate($event.getDate()), $event.getVersions().size(), $event.getAuthors().size(), $authors])
+#end
+#set($previousEvent = $event)
+#set($previousDoc = $currentDoc)
+#end</text>
 </property>
 </object>
 <object>

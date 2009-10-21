@@ -9,6 +9,8 @@
 		<project>xwiki-core-rendering-macro-include</project>
 		<project>xwiki-core-observation-remote</project>
 		<project>xwiki-core-observation-local</project>
+		<project>xwiki-core-rendering-parser-doxia</project>
+		<project>xwiki-plugin-application-manager</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -23,8 +23,6 @@ import org.apache.jackrabbit.webdav.DavException;
 import org.apache.jackrabbit.webdav.DavSession;
 import org.apache.jackrabbit.webdav.DavSessionProvider;
 import org.apache.jackrabbit.webdav.WebdavRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Responsible for associating / detaching session information into incoming WebDAV requests.
@@ -33,11 +31,6 @@ import org.slf4j.LoggerFactory;
  */
 public class XWikiDavSessionProvider implements DavSessionProvider
 {
-    /**
-     * Logger instance.
-     */
-    private static final Logger logger = LoggerFactory.getLogger(XWikiDavSessionProvider.class);
-
     /**
      * {@inheritDoc}
      */
@@ -50,7 +43,6 @@ public class XWikiDavSessionProvider implements DavSessionProvider
             workspaceName = null;
         }
         DavSession ds = new XWikiDavSession();
-        logger.debug("Attaching session '" + ds + "' to request '" + request + "'");
         request.setDavSession(ds);
         return true;
     }
@@ -67,7 +59,6 @@ public class XWikiDavSessionProvider implements DavSessionProvider
             for (String token : lockTokens) {
                 session.removeLockToken(token);
             }
-            logger.debug("Releasing session '" + ds + "' from request '" + request + "'");
         } else {
             // session is null. nothing to be done.
         }

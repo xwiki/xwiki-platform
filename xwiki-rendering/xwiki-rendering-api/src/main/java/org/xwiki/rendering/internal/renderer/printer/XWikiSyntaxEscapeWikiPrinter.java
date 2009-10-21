@@ -144,6 +144,12 @@ public class XWikiSyntaxEscapeWikiPrinter extends LookaheadWikiPrinter
 
     public void printEndItalic()
     {
+        // If the lookahead buffer is not empty and the last character is ":" then we need to escape it
+        // since otherwise we would get "://" which could be confused for a URL.
+        if (getBuffer().length() > 0 && getBuffer().charAt(getBuffer().length() - 1) == ':') {
+            this.escapeLastChar = true;
+        }
+
         print("//");
     }
 

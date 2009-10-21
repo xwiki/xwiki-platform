@@ -366,8 +366,8 @@ public class ListBehaviorAdjuster implements KeyDownHandler, KeyUpHandler, KeyPr
         Node refNode = descendant;
         // go up to parentListItem and find the node which does not contain before, on parent relation
         while (refNode.getParentNode() != parentListItem
-            && !(refNode.getParentNode().getNodeType() == Node.ELEMENT_NODE && ((Element) refNode.getParentNode())
-                .isOrHasChild((Element) before))) {
+            && !(refNode.getParentNode().getNodeType() == Node.ELEMENT_NODE && Element.as(refNode.getParentNode())
+                .isOrHasChild(Element.as(before)))) {
             refNode = refNode.getParentNode();
         }
         return refNode;

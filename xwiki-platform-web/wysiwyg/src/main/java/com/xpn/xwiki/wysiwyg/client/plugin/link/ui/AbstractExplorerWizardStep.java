@@ -149,10 +149,7 @@ public abstract class AbstractExplorerWizardStep extends AbstractSelectorWizardS
     /**
      * @return the default error message for this wizard step form
      */
-    protected String getDefaultErrorText()
-    {
-        return "";
-    }
+    protected abstract String getDefaultErrorText();
 
     /**
      * Invalidates the cache on the explorer, so that it will be reloaded on next display. To be used to request an

@@ -62,8 +62,8 @@ public final class ClickCommand implements com.google.gwt.user.client.Command
     {
         try {
             DomEvent.fireNativeEvent(nativeClickEvent, clickable);
-        } catch (Throwable t) {
-            Console.getInstance().error(t, ClickCommand.class.getName());
+        } catch (Exception e) {
+            Console.getInstance().error(e, ClickCommand.class.getName());
         }
     }
 }

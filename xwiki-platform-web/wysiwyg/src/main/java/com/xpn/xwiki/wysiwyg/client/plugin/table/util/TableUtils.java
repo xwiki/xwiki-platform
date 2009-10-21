@@ -96,18 +96,6 @@ public final class TableUtils
     }
 
     /**
-     * Inspect a node to determine if it has a valid parent. A valid parent must be different from null and from the
-     * editable area root node.
-     * 
-     * @param node Node to inspect.
-     * @return true if the node has a valid parent, false otherwise.
-     */
-    private boolean hasParent(Node node)
-    {
-        return node.getParentNode() != null && !BODY_NODENAME.equals(node.getParentNode().getNodeName());
-    }
-
-    /**
      * Inspect a Document to get the currently selected Range.
      * 
      * @param doc Document to inspect.

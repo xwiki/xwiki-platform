@@ -112,7 +112,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         // initialize selectors, mainPanel
         mainPanel.addStyleName("xImagesExplorer");
         this.displayWikiSelector = displayWikiSelector;
-        mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace(), editedResource.getPage()));
+        mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace()));
         pageWizardStep = new CurrentPageImageSelectorWizardStep(editedResource);
         mainPanel.add(pageWizardStep.display());
         mainPanel.setExpandingWidget(pageWizardStep.display(), true);
@@ -121,10 +121,9 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     /**
      * @param currentWiki the current wiki from which to start selection
      * @param currentSpace the current space from which to start selection
-     * @param currentPage the current page from which to start selection
      * @return the panel with the selectors to choose the source for the attachments panel.
      */
-    private Panel getSelectorsPanel(final String currentWiki, String currentSpace, String currentPage)
+    private Panel getSelectorsPanel(final String currentWiki, String currentSpace)
     {
         // create selectors for the page to get images from
         FlowPanel selectorsPanel = new FlowPanel();
@@ -326,9 +325,6 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
      */
     public void onChange(ChangeEvent event)
     {
-        if (event.getSource() == pageSelector) {
-            // nothing
-        }
         if (event.getSource() == wikiSelector) {
             spaceSelector.setWiki(wikiSelector.getSelectedWiki());
             spaceSelector.refreshList(spaceSelector.getSelectedSpace(), new AsyncCallback<List<String>>()
@@ -344,8 +340,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
                     pageSelector.refreshList(pageSelector.getSelectedPage());
                 }
             });
-        }
-        if (event.getSource() == spaceSelector) {
+        } else if (event.getSource() == spaceSelector) {
             pageSelector.setWiki(wikiSelector.getSelectedWiki());
             pageSelector.setSpace(spaceSelector.getSelectedSpace());
             pageSelector.refreshList(pageSelector.getSelectedPage());

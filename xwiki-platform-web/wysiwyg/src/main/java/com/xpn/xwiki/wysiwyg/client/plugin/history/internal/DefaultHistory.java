@@ -313,11 +313,9 @@ public class DefaultHistory implements History, KeyDownHandler, CommandListener
      */
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
-        if (sender == textArea.getCommandManager()) {
-            if (!IGNORED_COMMANDS.contains(command)) {
-                save();
-                previousKeyboardAction = null;
-            }
+        if (sender == textArea.getCommandManager() && !IGNORED_COMMANDS.contains(command)) {
+            save();
+            previousKeyboardAction = null;
         }
         return false;
     }

@@ -64,7 +64,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * default behavior is either incomplete, unnatural, browser specific or buggy. This custom behavior can still be
      * prevented from a listener by calling {@link Event#preventDefault()} on the {@link #getCurrentEvent()}.
      */
-    private final BehaviorAdjuster adjuster = (BehaviorAdjuster) GWT.create(BehaviorAdjuster.class);
+    private final BehaviorAdjuster adjuster = GWT.create(BehaviorAdjuster.class);
 
     /**
      * Creates a new rich text area.

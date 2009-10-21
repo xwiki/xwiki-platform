@@ -35,11 +35,13 @@ public class NativeAsyncCallback<T> implements AsyncCallback<T>
     /**
      * The JavaScript function to call on success.
      */
+    @SuppressWarnings("unused")
     private final JavaScriptObject onSuccess;
 
     /**
      * The JavaScript function to call on failure.
      */
+    @SuppressWarnings("unused")
     private final JavaScriptObject onFailure;
 
     /**

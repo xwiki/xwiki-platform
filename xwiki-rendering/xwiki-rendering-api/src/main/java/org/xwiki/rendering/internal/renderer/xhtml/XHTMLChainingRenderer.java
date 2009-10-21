@@ -418,13 +418,16 @@ public class XHTMLChainingRenderer extends AbstractChainingPrintRenderer
     @Override
     public void onId(String name)
     {
+    	// Don't use the "name" attribute (see http://www.w3.org/TR/html4/struct/links.html#h-12.2.3).
+    	// If the id s in a paragraph use <span id="..."> and if in a standalone block then use
+    	// <div id="...">.
         if (getBlockState().isInParagraph()) {
-            // Note: We're using <a><a/> and not <a/> since some browsers do not support the <a/> syntax (FF3)
-            // when the content type is set to HTML instead of XHTML.
-            getXHTMLWikiPrinter().printXMLStartElement("a", new String[][] { {"id", name}, {"name", name}});
-            getXHTMLWikiPrinter().printXMLEndElement("a");
+            // Note: We're using <span><span/> and not <span/> since some browsers do not support the 
+        	// <span/> syntax (FF3) when the content type is set to HTML instead of XHTML.
+            getXHTMLWikiPrinter().printXMLStartElement("span", new String[][] {{"id", name}});
+            getXHTMLWikiPrinter().printXMLEndElement("span");
         } else {
-            getXHTMLWikiPrinter().printXMLStartElement("div", new String[][] { {"id", name}, {"name", name}});
+            getXHTMLWikiPrinter().printXMLStartElement("div", new String[][] {{"id", name}});
             getXHTMLWikiPrinter().printXMLEndElement("div");
         }
     }

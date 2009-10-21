@@ -6,7 +6,7 @@ some text {{id name="idname"/}} and other
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>some text <a id="idname" name="idname"></a> and other</p>
+<p>some text <span id="idname"></span> and other</p>
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------

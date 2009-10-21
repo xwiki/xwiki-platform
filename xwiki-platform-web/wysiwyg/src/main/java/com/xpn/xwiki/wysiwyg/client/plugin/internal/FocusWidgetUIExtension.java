@@ -49,7 +49,7 @@ public class FocusWidgetUIExtension extends AbstractUIExtension
     public boolean isEnabled(String feature)
     {
         UIObject uiObject = getUIObject(feature);
-        if (uiObject != null && uiObject instanceof FocusWidget) {
+        if (uiObject instanceof FocusWidget) {
             return ((FocusWidget) uiObject).isEnabled();
         }
         return false;
@@ -63,7 +63,7 @@ public class FocusWidgetUIExtension extends AbstractUIExtension
     public void setEnabled(String feature, boolean enabled)
     {
         UIObject uiObject = getUIObject(feature);
-        if (uiObject != null && uiObject instanceof FocusWidget) {
+        if (uiObject instanceof FocusWidget) {
             ((FocusWidget) uiObject).setEnabled(enabled);
         }
     }

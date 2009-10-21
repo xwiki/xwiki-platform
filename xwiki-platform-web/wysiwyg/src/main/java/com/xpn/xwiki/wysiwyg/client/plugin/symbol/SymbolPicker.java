@@ -35,7 +35,7 @@ public class SymbolPicker extends CompositeDialogBox implements SelectionHandler
     /**
      * The default list of symbols.
      */
-    public static final Object[][] SYMBOLS = {
+    private static final Object[][] SYMBOLS = {
         {"&nbsp;", "&#160;", true, "no-break space"},
         {"&amp;", "&#38;", true, "ampersand"},
         {"&quot;", "&#34;", true, "quotation mark"},

@@ -100,8 +100,8 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
                 } else {
                     return false;
                 }
-            } catch (Throwable t) {
-                Console.getInstance().error(t, WysiwygEditor.class.getName(), SyntaxValidationCommand.class.getName());
+            } catch (Exception e) {
+                Console.getInstance().error(e, WysiwygEditor.class.getName(), SyntaxValidationCommand.class.getName());
                 return false;
             }
         }
@@ -348,7 +348,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      * 
      * @return the newly created tab panel
      */
-    public TabPanel createTabPanel()
+    private TabPanel createTabPanel()
     {
         final Cache cache = new Cache((Element) DOM.getElementById(config.getParameter("cacheId", "")).cast());
         PlainTextEditor plainTextEditor = new PlainTextEditor(getHook(), cache);

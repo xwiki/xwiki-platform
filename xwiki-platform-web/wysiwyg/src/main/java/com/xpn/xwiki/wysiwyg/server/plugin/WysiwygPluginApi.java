@@ -131,8 +131,8 @@ public class WysiwygPluginApi extends Api
             renderer.render(xdom, printer);
 
             return printer.toString();
-        } catch (Throwable t) {
-            LOG.error("Couldn't refresh WYSIWYG content!", t);
+        } catch (Exception e) {
+            LOG.error("Couldn't refresh WYSIWYG content!", e);
             return html;
         }
     }

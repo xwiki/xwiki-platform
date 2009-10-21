@@ -113,7 +113,9 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
     }
 
     /**
-     * {@inheritDoc}. Expose the show error function to calling classes.
+     * {@inheritDoc}
+     * <p>
+     * Expose the protected {@link ComplexDialogBox#showError(Throwable)} method.
      * 
      * @see ComplexDialogBox#showError(Throwable)
      */
@@ -200,19 +202,13 @@ public class WizardDialog extends ComplexDialogBox implements SourcesNavigationE
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Expose the protected {@link ComplexDialogBox#setCanceled(boolean)} method.
+     * 
+     * @see ComplexDialogBox#setCanceled(boolean)
      */
-    @Override
     public void setCanceled(boolean canceled)
     {
         super.setCanceled(canceled);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isCanceled()
-    {
-        return super.isCanceled();
     }
 }

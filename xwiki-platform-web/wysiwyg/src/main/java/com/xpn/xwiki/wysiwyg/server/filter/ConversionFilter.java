@@ -118,9 +118,9 @@ public class ConversionFilter implements Filter
                     HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.class);
                     mreq.setParameter(parameterName, converter.fromHTML(cleaner.clean(req.getParameter(parameterName)),
                         syntax));
-                } catch (Throwable t) {
-                    LOG.error(t.getMessage(), t);
-                    errors.put(parameterName, t);
+                } catch (Exception e) {
+                    LOG.error(e.getLocalizedMessage(), e);
+                    errors.put(parameterName, e);
                 }
                 // If the conversion fails the output contains the value before the conversion.
                 output.put(parameterName, mreq.getParameter(parameterName));

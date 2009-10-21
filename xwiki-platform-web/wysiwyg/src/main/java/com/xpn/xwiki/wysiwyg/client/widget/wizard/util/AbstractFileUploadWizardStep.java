@@ -121,10 +121,7 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     /**
      * @return the help label for the file input
      */
-    protected String getFileHelpLabel()
-    {
-        return null;
-    }
+    protected abstract String getFileHelpLabel();
 
     /**
      * Builds the form upload URL for this form, to be called before form submission.
@@ -200,9 +197,12 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
 
     /**
      * {@inheritDoc}
+     * 
+     * @see WizardStep#onCancel()
      */
     public void onCancel()
     {
+        // ignore
     }
 
     /**
@@ -318,14 +318,14 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     {
         return this.mainPanel;
     }
-    
+
     /**
      * @return the fileUploadInput
      */
     protected FileUpload getFileUploadInput()
     {
         return fileUploadInput;
-    }        
+    }
 
     /**
      * Displays the error message and markers for this dialog.

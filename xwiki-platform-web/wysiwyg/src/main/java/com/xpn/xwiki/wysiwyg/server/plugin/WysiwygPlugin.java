@@ -40,7 +40,6 @@ public class WysiwygPlugin extends XWikiDefaultPlugin
     public WysiwygPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-        init(context);
     }
 
     /**
@@ -61,13 +60,5 @@ public class WysiwygPlugin extends XWikiDefaultPlugin
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new WysiwygPluginApi((WysiwygPlugin) plugin, context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void init(XWikiContext context)
-    {
-        super.init(context);
     }
 }

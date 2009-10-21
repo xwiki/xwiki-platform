@@ -56,11 +56,6 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             // We're running in hosted mode so we need to login first.
             getXWikiServiceInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
             {
-                public void onFailure(Throwable caught)
-                {
-                    super.onFailure(caught);
-                }
-
                 public void onSuccess(Object result)
                 {
                     super.onSuccess(result);

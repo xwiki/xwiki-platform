@@ -384,7 +384,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         }
         if (container == null) {
             // Look for the nearest block-level element that contains the caret.
-            container = domUtils.getNearestBlockContainer((caret.getStartContainer()));
+            container = domUtils.getNearestBlockContainer(caret.getStartContainer());
         }
 
         String containerName = container.getNodeName().toLowerCase();
@@ -681,7 +681,7 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         Range caret = selection.getRangeAt(0);
 
         // Look for the nearest block-level element that contains the caret.
-        Node container = domUtils.getNearestBlockContainer((caret.getStartContainer()));
+        Node container = domUtils.getNearestBlockContainer(caret.getStartContainer());
         // See if the found container is preceded by an empty line.
         if (domUtils.isBlockLevelInlineContainer(container) && isAtStart(container, caret)
             && isEmptyLine(container.getPreviousSibling())) {

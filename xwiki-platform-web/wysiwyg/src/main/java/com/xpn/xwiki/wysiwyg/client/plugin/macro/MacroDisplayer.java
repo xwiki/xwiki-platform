@@ -347,7 +347,7 @@ public class MacroDisplayer implements InnerHTMLListener
     public boolean isMacroContainer(Node node)
     {
         return getMacroContainerTagName().equalsIgnoreCase(node.getNodeName())
-            && ((Element) node).hasClassName(MACRO_STYLE_NAME);
+            && Element.as(node).hasClassName(MACRO_STYLE_NAME);
     }
 
     /**

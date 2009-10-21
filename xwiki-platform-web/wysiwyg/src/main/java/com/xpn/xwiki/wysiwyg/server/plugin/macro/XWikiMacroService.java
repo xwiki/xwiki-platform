@@ -108,9 +108,9 @@ public class XWikiMacroService implements MacroService
             result.setParameterDescriptorMap(parameterDescriptorMap);
 
             return result;
-        } catch (Throwable t) {
-            LOG.error("Exception while retrieving macro descriptor.", t);
-            throw new RuntimeException(t.getLocalizedMessage());
+        } catch (Exception e) {
+            LOG.error("Exception while retrieving macro descriptor.", e);
+            throw new RuntimeException(e.getLocalizedMessage());
         }
     }
 
@@ -179,10 +179,10 @@ public class XWikiMacroService implements MacroService
             });
 
             return descriptors;
-        } catch (Throwable t) {
+        } catch (Exception e) {
             LOG.error(String
-                .format("Exception while retrieving the list of macro descriptors for syntax %s.", syntaxId), t);
-            throw new RuntimeException(t.getLocalizedMessage());
+                .format("Exception while retrieving the list of macro descriptors for syntax %s.", syntaxId), e);
+            throw new RuntimeException(e.getLocalizedMessage());
         }
     }
 }

@@ -28,7 +28,7 @@ public class MenuItemUIExtension extends AbstractUIExtension
     public boolean isEnabled(String feature)
     {
         UIObject uiObject = getUIObject(feature);
-        if (uiObject != null && uiObject instanceof MenuItem) {
+        if (uiObject instanceof MenuItem) {
             return ((MenuItem) uiObject).isEnabled();
         }
         return false;
@@ -42,7 +42,7 @@ public class MenuItemUIExtension extends AbstractUIExtension
     public void setEnabled(String feature, boolean enabled)
     {
         UIObject uiObject = getUIObject(feature);
-        if (uiObject != null && uiObject instanceof MenuItem) {
+        if (uiObject instanceof MenuItem) {
             ((MenuItem) uiObject).setEnabled(enabled);
         }
     }

@@ -17,9 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.macro;
-
-import java.util.List;
+package com.xpn.xwiki.wysiwyg.client.converter;
 
 import org.xwiki.component.annotation.ComponentRole;
 
@@ -27,24 +25,38 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
- * The service interface used on the server.
+ * Converts HTML to/from a specified syntax.
  * 
  * @version $Id$
  */
 @ComponentRole
-@RemoteServiceRelativePath("MacroService.gwtrpc")
-public interface MacroService extends RemoteService
+@RemoteServiceRelativePath("HTMLConverter.gwtrpc")
+public interface HTMLConverter extends RemoteService
 {
     /**
-     * @param macroId a macro identifier
-     * @param syntaxId a syntax identifier
-     * @return an object describing the specified macro
+     * Converts the given source text from the specified syntax to HTML.
+     * 
+     * @param source the text to be converted
+     * @param syntaxId the syntax identifier
+     * @return the HTML result of the conversion
      */
-    MacroDescriptor getMacroDescriptor(String macroId, String syntaxId);
+    String toHTML(String source, String syntaxId);
 
     /**
-     * @param syntaxId a syntax identifier
-     * @return the list of all the macro descriptors for the specified syntax
+     * Cleans and converts the given HTML fragment to the specified syntax.
+     * 
+     * @param html the HTML text to be converted
+     * @param syntaxId the syntax identifier
+     * @return the result on the conversion
      */
-    List<MacroDescriptor> getMacroDescriptors(String syntaxId);
+    String fromHTML(String html, String syntaxId);
+
+    /**
+     * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
+     * 
+     * @param html the HTML fragment to be parsed and rendered
+     * @param syntax the storage syntax
+     * @return the XHTML result of rendering the given HTML fragment
+     */
+    String parseAndRender(String html, String syntax);
 }

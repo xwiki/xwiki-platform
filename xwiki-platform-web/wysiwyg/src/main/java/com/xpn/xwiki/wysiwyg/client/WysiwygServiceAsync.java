@@ -38,23 +38,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 public interface WysiwygServiceAsync
 {
     /**
-     * Makes a request to the server to convert the given HTML fragment to the specified syntax.
-     * 
-     * @param html The HTML fragment to be converted.
-     * @param syntax The syntax of the result.
-     * @param async The callback to be used for notifying the caller after receiving the response from the server.
-     */
-    void fromHTML(String html, String syntax, AsyncCallback<String> async);
-
-    /**
-     * Makes a request to the server to clean the given HTML fragment.
-     * 
-     * @param dirtyHTML The HTML fragment to be cleaned.
-     * @param async The callback to be used for notifying the caller after receiving the response from the server.
-     */
-    void cleanHTML(String dirtyHTML, AsyncCallback<String> async);
-
-    /**
      * Makes a request to the server to clean the given HTML fragment which comes from an office application.
      * 
      * @param htmlPaste Dirty html pasted by the user.

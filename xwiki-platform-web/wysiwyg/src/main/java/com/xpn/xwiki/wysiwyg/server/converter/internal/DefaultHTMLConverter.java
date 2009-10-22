@@ -21,47 +21,92 @@ package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
 import java.io.StringReader;
 
-import org.xwiki.component.annotation.Component;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
 import org.xwiki.rendering.transformation.TransformationManager;
 
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
+import com.xpn.xwiki.wysiwyg.client.cleaner.HTMLCleaner;
+import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 
 /**
  * Converts HTML into/from xwiki/2.0 syntax.
  * 
  * @version $Id$
  */
-@Component
 public class DefaultHTMLConverter implements HTMLConverter
 {
+    /**
+     * Default XWiki logger to report errors correctly.
+     */
+    private static final Log LOG = LogFactory.getLog(DefaultHTMLConverter.class);
+
+    /**
+     * The component used to clean the HTML before the conversion.
+     */
+    @Requirement()
+    private HTMLCleaner htmlCleaner;
+
+    /**
+     * The component used to parse the XHTML obtained after cleaning.
+     */
+    @Requirement("xhtml/1.0")
+    private Parser xhtmlParser;
+
+    /**
+     * The component used to create syntax instances from syntax identifiers.
+     */
+    @Requirement
+    private SyntaxFactory syntaxFactory;
+
+    /**
+     * The component used to execute the XDOM transformations before rendering to XHTML.
+     */
+    @Requirement
+    private TransformationManager transformationManager;
+
+    /**
+     * The component used to render a XDOM to XHTML.
+     */
+    @Requirement("annotatedxhtml/1.0")
+    private BlockRenderer xhtmlRenderer;
+
+    /**
+     * The component manager. We need it because we have to access some components dynamically based on the input
+     * syntax.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
     /**
      * {@inheritDoc}
      * 
      * @see HTMLConverter#fromHTML(String, String)
      */
-    public String fromHTML(String html, String syntaxId)
+    public String fromHTML(String dirtyHTML, String syntaxId)
     {
         try {
+            // Clean
+            String html = htmlCleaner.clean(dirtyHTML);
+
             // Parse
-            Parser parser = (Parser) Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
-            XDOM xdom = parser.parse(new StringReader(html));
+            XDOM xdom = xhtmlParser.parse(new StringReader(html));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = (BlockRenderer) Utils.getComponent(BlockRenderer.class, syntaxId);
+            BlockRenderer renderer = componentManager.lookup(BlockRenderer.class, syntaxId);
             renderer.render(xdom, printer);
 
             return printer.toString();
-        } catch (ParseException e) {
+        } catch (Exception e) {
+            LOG.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while parsing HTML", e);
         }
     }
@@ -75,24 +120,48 @@ public class DefaultHTMLConverter implements HTMLConverter
     {
         try {
             // Parse
-            Parser parser = (Parser) Utils.getComponent(Parser.class, syntaxId);
+            Parser parser = componentManager.lookup(Parser.class, syntaxId);
             XDOM xdom = parser.parse(new StringReader(source));
 
             // Execute transformations
-            TransformationManager txManager = (TransformationManager) Utils.getComponent(TransformationManager.class);
-            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.class);
-            Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
-            txManager.performTransformations(xdom, syntax);
+            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntaxId));
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer =
-                (BlockRenderer) Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
-            renderer.render(xdom, printer);
+            xhtmlRenderer.render(xdom, printer);
 
             return printer.toString();
         } catch (Exception e) {
+            LOG.error(e.getLocalizedMessage(), e);
             throw new RuntimeException("Exception while rendering HTML", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HTMLConverter#parseAndRender(String, String)
+     */
+    public String parseAndRender(String dirtyHTML, String syntax)
+    {
+        try {
+            // Clean
+            String html = htmlCleaner.clean(dirtyHTML);
+
+            // Parse
+            XDOM xdom = xhtmlParser.parse(new StringReader(html));
+
+            // Execute transformations
+            transformationManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
+
+            // Render
+            WikiPrinter printer = new DefaultWikiPrinter();
+            xhtmlRenderer.render(xdom, printer);
+
+            return printer.toString();
+        } catch (Exception e) {
+            LOG.error(e.getLocalizedMessage(), e);
+            throw new RuntimeException("Exception while refreshing HTML", e);
         }
     }
 }

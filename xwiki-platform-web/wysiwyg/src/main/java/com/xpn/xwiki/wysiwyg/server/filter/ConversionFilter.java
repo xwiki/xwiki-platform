@@ -36,8 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
-import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
+import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 
 /**
  * This filter is used to convert the values of request parameters that require HTML conversion before being processed.
@@ -114,10 +113,8 @@ public class ConversionFilter implements Filter
                 // Remove the syntax parameter from the request to avoid interference with further request processing.
                 String syntax = mreq.removeParameter(parameterName + "_syntax");
                 try {
-                    HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.class);
-                    HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.class);
-                    mreq.setParameter(parameterName, converter.fromHTML(cleaner.clean(req.getParameter(parameterName)),
-                        syntax));
+                    HTMLConverter converter = Utils.getComponent(HTMLConverter.class);
+                    mreq.setParameter(parameterName, converter.fromHTML(req.getParameter(parameterName), syntax));
                 } catch (Exception e) {
                     LOG.error(e.getLocalizedMessage(), e);
                     errors.put(parameterName, e);

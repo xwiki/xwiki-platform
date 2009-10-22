@@ -72,7 +72,7 @@ public interface WysiwygService extends RemoteService
                     serviceURL = "/WysiwygService";
                 }
 
-                instance = (WysiwygServiceAsync) GWT.create(WysiwygService.class);
+                instance = GWT.create(WysiwygService.class);
                 ((ServiceDefTarget) instance).setServiceEntryPoint(serviceURL);
 
                 // We cache the service calls.
@@ -81,19 +81,6 @@ public interface WysiwygService extends RemoteService
             return instance;
         }
     }
-
-    /**
-     * @param html The HTML fragment to be converted.
-     * @param syntax The syntax of the result.
-     * @return The result of converting the given HTML fragment to the specified syntax.
-     */
-    String fromHTML(String html, String syntax);
-
-    /**
-     * @param dirtyHTML The HTML fragment to be cleaned.
-     * @return The result of cleaning the given HTML fragment.
-     */
-    String cleanHTML(String dirtyHTML);
 
     /**
      * Cleans dirty html content produced from an office application like MsWord, MsExcel, OpenOffice Writer etc. This

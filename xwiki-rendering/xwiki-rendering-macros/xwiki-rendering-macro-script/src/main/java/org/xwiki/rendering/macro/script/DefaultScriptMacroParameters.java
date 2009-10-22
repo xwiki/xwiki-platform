@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.script;
 import org.xwiki.properties.annotation.PropertyDescription;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.macro.script.DefaultScriptMacroParameters} Macro.
+ * Parameters for the Script Macro.
  * 
  * @version $Id$
  * @since 1.9M1

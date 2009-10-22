@@ -37,14 +37,14 @@ public class XWikiSyntaxImageRenderer
     {
         String result;
         if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = (DocumentImage) image;
+            DocumentImage documentImage = DocumentImage.class.cast(image);
             if (documentImage.getDocumentName() != null) {
                 result = documentImage.getDocumentName() + "@" + documentImage.getAttachmentName();
             } else {
                 result = documentImage.getAttachmentName();
             }
         } else {
-            URLImage urlImage = (URLImage) image;
+            URLImage urlImage = URLImage.class.cast(image);
             result = urlImage.getURL();
         }
 

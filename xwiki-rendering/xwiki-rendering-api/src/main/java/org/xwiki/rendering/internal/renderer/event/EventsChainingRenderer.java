@@ -602,14 +602,14 @@ public class EventsChainingRenderer extends AbstractChainingPrintRenderer
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         if (image.getType() == ImageType.DOCUMENT) {
-            DocumentImage documentImage = (DocumentImage) image;
+            DocumentImage documentImage = DocumentImage.class.cast(image);
             getPrinter().println(
                 "onImage: "
                     + (documentImage.getDocumentName() != null ? "[" + documentImage.getDocumentName() + "] " : "")
                     + "[" + documentImage.getAttachmentName() + "] [" + isFreeStandingURI + "]"
                     + serializeParameters(parameters));
         } else {
-            URLImage urlImage = (URLImage) image;
+            URLImage urlImage = URLImage.class.cast(image);
             getPrinter().println(
                 "onImage: [" + urlImage.getURL() + "] [" + isFreeStandingURI + "]" + serializeParameters(parameters));
         }

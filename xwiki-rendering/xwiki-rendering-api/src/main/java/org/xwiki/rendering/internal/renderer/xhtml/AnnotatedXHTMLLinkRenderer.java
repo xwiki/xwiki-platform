@@ -25,6 +25,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.rendering.internal.renderer.BasicLinkRenderer;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
 import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
@@ -46,6 +47,11 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
     @Requirement
     private XHTMLLinkRenderer defaultLinkRenderer;
 
+    /**
+     * To generate a string representation of a link that we save as an XHTML annotation.
+     */
+    private BasicLinkRenderer linkRenderer = new BasicLinkRenderer();
+    
     /**
      * {@inheritDoc}
      * 
@@ -74,28 +80,10 @@ public class AnnotatedXHTMLLinkRenderer implements XHTMLLinkRenderer
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        StringBuilder buffer = new StringBuilder();
-
-        if (link.getReference() != null) {
-            buffer.append(link.getReference());
-        }
-        if (link.getAnchor() != null) {
-            buffer.append('#');
-            buffer.append(link.getAnchor());
-        }
-        if (link.getQueryString() != null) {
-            buffer.append('?');
-            buffer.append(link.getQueryString());
-        }
-        if (link.getInterWikiAlias() != null) {
-            buffer.append('@');
-            buffer.append(link.getInterWikiAlias());
-        }
-
         // Add an XML comment as a placeholder so that the XHTML parser can find the document name.
         // Otherwise it would be too difficult to transform a URL into a document name especially since
         // a link can refer to an external URL.
-        getXHTMLWikiPrinter().printXMLComment("startwikilink:" + buffer, true);
+        getXHTMLWikiPrinter().printXMLComment("startwikilink:" + this.linkRenderer.renderLinkReference(link), true);
 
         this.defaultLinkRenderer.beginLink(link, isFreeStandingURI, parameters);
     }

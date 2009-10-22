@@ -52,6 +52,6 @@ public abstract class AbstractTransformation extends AbstractLogEnabled implemen
      */
     public int compareTo(Transformation transformation)
     {
-    	return getPriority() - transformation.getPriority();
+        return getPriority() - transformation.getPriority();
     }
 }

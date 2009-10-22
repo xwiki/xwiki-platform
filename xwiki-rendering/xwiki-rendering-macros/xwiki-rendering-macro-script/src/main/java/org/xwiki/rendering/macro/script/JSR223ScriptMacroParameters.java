@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro.script;
 
 /**
- * Parameters for the {@link AbstractScriptMacro} Macro.
+ * Parameters for the {@link AbstractJSR223ScriptMacro} Macro.
  * 
  * @version $Id$
  * @since 1.7M3

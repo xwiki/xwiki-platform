@@ -161,6 +161,58 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
     }
     
     /**
+     * Test that macro with same priorities execute in the order in which they are defined.
+     */
+    public void testMacroWithSamePriorityExecuteOnPageOrder() throws Exception
+    {
+        // Both macros have the same priorities and thus "testsimplemacro" should be executed first and generate
+        // "simplemacro0".
+    	XDOM dom = new XDOM(Arrays.<Block>asList(
+            new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
+            new MacroBlock("testcontentmacro", Collections.<String, String>emptyMap(), "content", false)));
+
+        this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
+
+        String expected = "beginDocument\n"
+            + "beginMacroMarkerStandalone [testsimplemacro] []\n"
+            + "beginParagraph\n"
+            + "onWord [simplemacro0]\n"
+            + "endParagraph\n"
+            + "endMacroMarkerStandalone [testsimplemacro] []\n"
+            + "beginMacroMarkerStandalone [testcontentmacro] [] [content]\n"
+            + "onWord [content]\n"
+            + "endMacroMarkerStandalone [testcontentmacro] [] [content]\n"
+            + "endDocument";
+        assertEquals(expected, printer.toString());
+
+        // We must also test the other order ("testcontentmacro" before "testsimplemacro") to ensure for example that 
+        // there's no lexical order on Macro class names for example.
+    	dom = new XDOM(Arrays.<Block>asList(
+			new MacroBlock("testcontentmacro", Collections.<String, String>emptyMap(), "content", false),
+            new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false)));
+
+        this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
+
+        printer = new DefaultWikiPrinter();
+        getComponentManager().lookup(BlockRenderer.class, Syntax.EVENT_1_0.toIdString()).render(dom, printer);
+
+        expected = "beginDocument\n"
+            + "beginMacroMarkerStandalone [testcontentmacro] [] [content]\n"
+            + "onWord [content]\n"
+            + "endMacroMarkerStandalone [testcontentmacro] [] [content]\n"
+            + "beginMacroMarkerStandalone [testsimplemacro] []\n"
+            + "beginParagraph\n"
+            + "onWord [simplemacro1]\n"
+            + "endParagraph\n"
+            + "endMacroMarkerStandalone [testsimplemacro] []\n"
+            + "endDocument";
+        assertEquals(expected, printer.toString());
+    }
+    
+    /**
      * Verify that
      * <pre><code>{{macro}}
      * content

@@ -238,7 +238,7 @@
 
   <servlet-mapping>
     <servlet-name>gwtrpc</servlet-name>
-    <url-pattern>/gwtrpc</url-pattern>
+    <url-pattern>*.gwtrpc</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>

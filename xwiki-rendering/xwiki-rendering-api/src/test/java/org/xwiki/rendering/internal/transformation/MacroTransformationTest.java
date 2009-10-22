@@ -144,6 +144,11 @@ public class MacroTransformationTest extends AbstractXWikiComponentTestCase
             + "endMacroMarkerStandalone [testprioritymacro] []\n"
             + "endDocument";
 
+        // "testprioritymacro" has a highest priority than "testsimplemacro" and will be executed first.
+        // This is verified as follows:
+        // - "testprioritymacro" generates a WordBlock
+        // - "testsimplemacro" outputs "simplemacro" followed by the number of WordBlocks that exist in the document
+        // Thus if "testsimplemacro" is executed before "testprioritymacro" it would print "simplemacro0"
         XDOM dom = new XDOM(Arrays.<Block>asList(
             new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap(), false),
             new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap(), false)));

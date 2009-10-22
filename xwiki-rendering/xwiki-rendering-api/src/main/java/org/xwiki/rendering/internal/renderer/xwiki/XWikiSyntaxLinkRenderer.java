@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.internal.renderer.BasicLinkRenderer;
 import org.xwiki.rendering.internal.renderer.ParametersPrinter;
 
 /**
@@ -32,31 +33,13 @@ import org.xwiki.rendering.internal.renderer.ParametersPrinter;
  * @version $Id$
  * @since 2.0M3
  */
-public class XWikiSyntaxLinkRenderer
+public class XWikiSyntaxLinkRenderer extends BasicLinkRenderer
 {
     ParametersPrinter parametersPrinter = new ParametersPrinter();
 
     public String renderLinkReference(Link link)
     {
-        StringBuilder buffer = new StringBuilder();
-
-        if (link.getReference() != null) {
-            buffer.append(link.getReference());
-        }
-        if (link.getAnchor() != null) {
-            buffer.append('#');
-            buffer.append(link.getAnchor());
-        }
-        if (link.getQueryString() != null) {
-            buffer.append('?');
-            buffer.append(link.getQueryString());
-        }
-        if (link.getInterWikiAlias() != null) {
-            buffer.append('@');
-            buffer.append(link.getInterWikiAlias());
-        }
-
-        return buffer.toString().replace(">>", "~>~>").replace("||", "~|~|");
+        return super.renderLinkReference(link).replace(">>", "~>~>").replace("||", "~|~|");
     }
 
     public void beginRenderLink(WikiPrinter printer, Link link, boolean isFreeStandingURI,

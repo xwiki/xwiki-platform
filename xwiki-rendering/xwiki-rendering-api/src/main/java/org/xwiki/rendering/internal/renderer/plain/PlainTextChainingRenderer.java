@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.renderer.plain;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.rendering.internal.renderer.BasicLinkRenderer;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
@@ -46,6 +47,12 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
      * New Line character.
      */
     private static final String NL = "\n";
+    
+    /**
+     * To generate a string representation of a link that we output when no link label generator exist or when
+     * the link is an external link (ie not a document link).
+     */
+    private BasicLinkRenderer linkRenderer = new BasicLinkRenderer();
     
     private boolean isFirstElementRendered;
 
@@ -113,10 +120,10 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
             if (this.linkLabelGenerator != null) {
                 getPrinter().print(this.linkLabelGenerator.generate(link));
             } else {
-                getPrinter().print(link.getReference());
+                getPrinter().print(this.linkRenderer.renderLinkReference(link));
             }
         } else {
-            getPrinter().print(link.getReference());
+            getPrinter().print(this.linkRenderer.renderLinkReference(link));
         }
     }
 

@@ -66,16 +66,6 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#cleanHTML(String, AsyncCallback)
-     */
-    public void cleanHTML(String dirtyHTML, AsyncCallback<String> async)
-    {
-        service.cleanHTML(dirtyHTML, async);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see WysiwygServiceAsync#cleanOfficeHTML(String, String, Map, AsyncCallback)
      */
     public void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
@@ -102,16 +92,6 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     public void officeToXHTML(Attachment attachment, Map<String, String> cleaningParams, AsyncCallback<String> async)
     {
         service.officeToXHTML(attachment, cleaningParams, async);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygServiceAsync#fromHTML(String, String, AsyncCallback)
-     */
-    public void fromHTML(String html, String syntax, AsyncCallback<String> async)
-    {
-        service.fromHTML(html, syntax, async);
     }
 
     /**

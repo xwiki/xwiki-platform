@@ -19,24 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.server.plugin;
 
-import java.io.StringReader;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.syntax.SyntaxFactory;
-import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
+import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 
 /**
  * Api for the WysiwygPlugin.
@@ -45,11 +34,6 @@ import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
  */
 public class WysiwygPluginApi extends Api
 {
-    /**
-     * Default XWiki logger to report errors correctly.
-     */
-    private static final Log LOG = LogFactory.getLog(WysiwygPluginApi.class);
-
     /**
      * The plugin instance.
      */
@@ -115,24 +99,9 @@ public class WysiwygPluginApi extends Api
     public String parseAndRender(String html, String syntax)
     {
         try {
-            // Parse
-            Parser parser = Utils.getComponent(Parser.class, Syntax.XHTML_1_0.toIdString());
-            HTMLCleaner cleaner = Utils.getComponent(HTMLCleaner.class);
-            XDOM xdom = parser.parse(new StringReader(cleaner.clean(html)));
-
-            // Execute macros
-            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
-            TransformationManager txManager = Utils.getComponent(TransformationManager.class);
-            txManager.performTransformations(xdom, syntaxFactory.createSyntaxFromIdString(syntax));
-
-            // Render
-            WikiPrinter printer = new DefaultWikiPrinter();
-            BlockRenderer renderer = Utils.getComponent(BlockRenderer.class, Syntax.ANNOTATED_XHTML_1_0.toIdString());
-            renderer.render(xdom, printer);
-
-            return printer.toString();
+            return Utils.getComponent(HTMLConverter.class).parseAndRender(html, syntax);
         } catch (Exception e) {
-            LOG.error("Couldn't refresh WYSIWYG content!", e);
+            // Leave the previous HTML in case of an exception.
             return html;
         }
     }

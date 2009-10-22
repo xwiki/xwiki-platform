@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.w3c.dom.Document;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 import org.xwiki.xml.html.HTMLUtils;
 import org.xwiki.xml.html.filter.HTMLFilter;
 
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
+import com.xpn.xwiki.wysiwyg.client.cleaner.HTMLCleaner;
 
 /**
  * Default HTML cleaner for the WYSIWYG editor's output.
@@ -39,15 +39,18 @@ import com.xpn.xwiki.wysiwyg.server.cleaner.HTMLCleaner;
 public class DefaultHTMLCleaner implements HTMLCleaner
 {
     /**
+     * The component used to clean the HTML.
+     */
+    @Requirement
+    private org.xwiki.xml.html.HTMLCleaner cleaner;
+
+    /**
      * {@inheritDoc}
      * 
      * @see HTMLCleaner#clean(String)
      */
     public String clean(String dirtyHTML)
     {
-        org.xwiki.xml.html.HTMLCleaner cleaner =
-            (org.xwiki.xml.html.HTMLCleaner) Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class);
-
         // We have to remove or replace the HTML elements that were added by the WYSIWYG editor only for internal
         // reasons, before any cleaning filter is applied. Otherwise cleaning filters might transform these
         // WYSIWYG-specific HTML elements making their removal difficult. We cannot transform the WYSIWYG output on the
@@ -59,7 +62,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         filters.add(new EmptyLineFilter());
         filters.add(new StandAloneMacroFilter());
         filters.add(new EmptyAttributeFilter());
-        filters.add(new NestedAnchorsFilter());        
+        filters.add(new NestedAnchorsFilter());
         filters.addAll(config.getFilters());
         config.setFilters(filters);
 

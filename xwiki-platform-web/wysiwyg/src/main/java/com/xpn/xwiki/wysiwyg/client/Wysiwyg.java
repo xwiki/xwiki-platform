@@ -28,6 +28,7 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
+import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManagerApi;
 
 /**
  * The class responsible for loading the WYSIWYG editors. It can be also viewed as the application context.
@@ -63,6 +64,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                 }
             });
         } else {
+            CommandManagerApi.publish();
             WysiwygEditorApi.publish();
         }
     }

@@ -24,8 +24,10 @@ import org.xwiki.rendering.listener.Link;
 
 /**
  * Interface for parsing wiki links for various wiki syntaxes.
- * <p>Note: Since WikiModel doesn't parse link content we need to do it.
- *    See http://code.google.com/p/wikimodel/issues/detail?id=20</p>
+ * <p>
+ * Note: Since WikiModel doesn't parse link content we need to do it. See
+ * http://code.google.com/p/wikimodel/issues/detail?id=20
+ * </p>
  * 
  * @version $Id$
  * @since 1.5M2
@@ -33,5 +35,12 @@ import org.xwiki.rendering.listener.Link;
 @ComponentRole
 public interface LinkParser
 {
+    /**
+     * Parses a link represented as a String into a {@link Link} object.
+     * 
+     * @param rawLink the string representation of the link to parse (the supported syntax depends on the parser
+     *            implementation used)
+     * @return the parsed link
+     */
     Link parse(String rawLink);
 }

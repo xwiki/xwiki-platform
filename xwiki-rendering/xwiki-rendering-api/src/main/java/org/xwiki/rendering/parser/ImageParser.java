@@ -31,5 +31,12 @@ import org.xwiki.rendering.listener.Image;
 @ComponentRole
 public interface ImageParser
 {
+    /**
+     * Parses an image represented as a String into an {@link Image} object.
+     * 
+     * @param imageLocation the string representation of the image to parse (the supported syntax depends on the parser
+     *            implementation used)
+     * @return the parsed image
+     */
     Image parse(String imageLocation);
 }

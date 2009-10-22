@@ -140,6 +140,7 @@
             **/rendering/listener/chaining/ListenerChain.java,
             **/rendering/listener/xml/*.java,
             **/rendering/macro/**/*.java,
+            **/rendering/parser/*.java,
             **/rendering/renderer/*.java,
             **/rendering/renderer/chaining/*.java,
             **/rendering/renderer/printer/DefaultWikiPrinter.java,

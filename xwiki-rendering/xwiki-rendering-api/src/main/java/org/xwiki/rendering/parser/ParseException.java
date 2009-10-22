@@ -21,6 +21,8 @@ package org.xwiki.rendering.parser;
 
 /**
  * Encapsulate a parsing error.
+ * 
+ * @version $Id$
  */
 public class ParseException extends Exception
 {
@@ -43,8 +45,8 @@ public class ParseException extends Exception
      * Construct a new ParseException with the specified detail message and cause.
      * 
      * @param message The detailed message. This can later be retrieved by the Throwable.getMessage() method.
-     * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value is permitted,
-     *            and indicates that the cause is nonexistent or unknown.)
+     * @param throwable the cause. This can be retrieved later by the Throwable.getCause() method. (A null value 
+     *        is permitted, and indicates that the cause is nonexistent or unknown)
      */
     public ParseException(String message, Throwable throwable)
     {

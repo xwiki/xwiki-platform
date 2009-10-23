@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
-import java.util.Map;
 import java.util.MissingResourceException;
 
 import com.google.gwt.core.client.GWT;
@@ -81,44 +80,6 @@ public interface WysiwygService extends RemoteService
             return instance;
         }
     }
-
-    /**
-     * Cleans dirty html content produced from an office application like MsWord, MsExcel, OpenOffice Writer etc. This
-     * method is primarily utilized by the office importer wysiwyg plugin.
-     * 
-     * @param htmlPaste dirty html pasted by the user.
-     * @param cleanerHint role hint for which cleaner to be used.
-     * @param cleaningParams additional parameters to be used when cleaning.
-     * @return The cleaned html content.
-     */
-    String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams);
-
-    /**
-     * Imports the most recent office attachment of the given wiki page into XHTML/1.0. This method should be invoked
-     * right after the attachment has finished uploading. The resulting xhtml content will be returned from this method
-     * while if there are non-textual content in the original office document, they will be attached to the wiki page
-     * identified by pageName. Note that this method does not alter the content of the wiki page.
-     * 
-     * @param pageName the wiki page into which the office document is attached.
-     * @param cleaningParams additional parameters for the import operation.
-     * @return the xhtml result from the office importer.
-     * @throws XWikiGWTException if the import operation fails.
-     * @deprecated deprecated since 2.0.1, use {@link #officeToXHTML(Attachment, Map)} instead.
-     */
-    @Deprecated
-    String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException;
-
-    /**
-     * Imports the given office attachment into XHTML/1.0. This method returns the resulting xhtml content while if
-     * there are non-textual content in the office attachment, they will be attached to the owner wiki page. Note that
-     * this operation does not alter the content of the wiki page.
-     * 
-     * @param attachment office attachment to be imported into xhtml/1.0.
-     * @param cleaningParams additional parameters for the import operation.
-     * @return the xhtml result from the office importer.
-     * @throws XWikiGWTException if the import operation fails.
-     */
-    String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams) throws XWikiGWTException;
 
     /**
      * @param syncedRevision The changes to this editor's content, since the last update.

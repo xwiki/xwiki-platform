@@ -19,12 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.server;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -33,11 +30,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
-import org.xwiki.officeimporter.OfficeImporter;
-import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.xml.html.HTMLCleanerConfiguration;
-import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -55,7 +48,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
 import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
 
@@ -101,82 +93,6 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     private DocumentAccessBridge getDocumentAccessBridge()
     {
         return Utils.getComponent(DocumentAccessBridge.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#cleanOfficeHTML(String, String, java.util.Map)
-     */
-    public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
-    {
-        org.xwiki.xml.html.HTMLCleaner cleaner = Utils.getComponent(org.xwiki.xml.html.HTMLCleaner.class, cleanerHint);
-        HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
-        configuration.setParameters(cleaningParams);
-        org.w3c.dom.Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
-        HTMLUtils.stripHTMLEnvelope(cleanedDocument);
-        return HTMLUtils.toString(cleanedDocument);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#officeToXHTML(String, Map)
-     */
-    public String officeToXHTML(String pageName, Map<String, String> cleaningParams) throws XWikiGWTException
-    {
-        OfficeImporter officeImporter = Utils.getComponent(OfficeImporter.class);
-        XWikiContext context = getXWikiContext();
-        try {
-            List<XWikiAttachment> attachments = context.getWiki().getDocument(pageName, context).getAttachmentList();
-            XWikiAttachment latestAttachment = Collections.max(attachments, new Comparator<XWikiAttachment>()
-            {
-                public int compare(XWikiAttachment firstAttachment, XWikiAttachment secondAttachment)
-                {
-                    String currentAuthor = "";
-                    try {
-                        currentAuthor = getUser().getAuthor();
-                    } catch (XWikiGWTException e) {
-                        // Do nothing.
-                    }
-                    if (firstAttachment.getAuthor().equals(currentAuthor)
-                        && secondAttachment.getAuthor().equals(currentAuthor)) {
-                        return firstAttachment.getDate().compareTo(secondAttachment.getDate());
-                    } else if (firstAttachment.getAuthor().equals(currentAuthor)) {
-                        return +1;
-                    } else if (secondAttachment.getAuthor().equals(currentAuthor)) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                }
-            });
-            return officeImporter.importAttachment(pageName, latestAttachment.getFilename(), cleaningParams);
-        } catch (OfficeImporterException ex) {
-            throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
-        } catch (XWikiException ex) {
-            throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#officeToXHTML(Attachment, Map)
-     */
-    public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams) throws XWikiGWTException
-    {
-        try {
-            OfficeImporter officeImporter = Utils.getComponent(OfficeImporter.class);
-            ResourceName resourceName = new ResourceName();
-            resourceName.fromString(attachment.getReference(), true);
-            // TODO: Following should be avoided. For this we need to improve officeimporter API.
-            String documentName = resourceName.getWiki() + ":" + resourceName.getSpace() + "." + resourceName.getPage();
-            return officeImporter.importAttachment(documentName, resourceName.getFile(), cleaningParams);
-        } catch (OfficeImporterException ex) {
-            LOG.error(ex.getLocalizedMessage(), ex);
-            throw new XWikiGWTException(ex.getMessage(), ex.getMessage(), -1, -1);
-        }
     }
 
     /**

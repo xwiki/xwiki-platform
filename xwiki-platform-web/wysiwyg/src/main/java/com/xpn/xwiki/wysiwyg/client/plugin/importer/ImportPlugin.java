@@ -46,6 +46,22 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener
     private ImportMenuExtension importMenuExtension;
 
     /**
+     * The component used to clean content pasted from office documents and to import office documents.
+     */
+    private final ImportServiceAsync importService;
+
+    /**
+     * Creates a new import plug-in that used the given import service.
+     * 
+     * @param importService the component used to clean content pasted from office documents and to import office
+     *            documents
+     */
+    public ImportPlugin(ImportServiceAsync importService)
+    {
+        this.importService = importService;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public void init(RichTextArea textArea, Config config)
@@ -105,7 +121,7 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener
     private Wizard getImportWizard()
     {
         if (null == importWizard) {
-            importWizard = new ImportWizard(getConfig());
+            importWizard = new ImportWizard(getConfig(), importService);
             importWizard.addWizardListener(this);
         }
         return importWizard;

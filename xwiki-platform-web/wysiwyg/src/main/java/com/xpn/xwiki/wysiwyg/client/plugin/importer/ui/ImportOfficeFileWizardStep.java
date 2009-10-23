@@ -29,8 +29,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
@@ -70,13 +70,20 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
     private Panel errorMessagePanel;
 
     /**
+     * The component used to import office documents.
+     */
+    private final ImportServiceAsync importService;
+
+    /**
      * Instantiates the office document import wizard step.
      * 
-     * @param config wysiwyg configuration.
+     * @param config the object used to configure this wizard step
+     * @param importService the component used to import office documents
      */
-    public ImportOfficeFileWizardStep(Config config)
+    public ImportOfficeFileWizardStep(Config config, ImportServiceAsync importService)
     {
         this.config = config;
+        this.importService = importService;
 
         // Add filter styles check box.
         this.filterStylesCheckBox = new CheckBox(Strings.INSTANCE.importOfficeContentFilterStylesCheckBoxLabel());
@@ -135,26 +142,25 @@ public class ImportOfficeFileWizardStep extends AbstractFileUploadWizardStep
      */
     protected void onAttachmentUploaded(Attachment attach, final AsyncCallback<Boolean> async)
     {
-        WysiwygService.Singleton.getInstance().officeToXHTML(attach, getHTMLCleaningParams(),
-            new AsyncCallback<String>()
+        importService.officeToXHTML(attach, getHTMLCleaningParams(), new AsyncCallback<String>()
+        {
+            public void onSuccess(String result)
             {
-                public void onSuccess(String result)
-                {
-                    setResult(result);
+                setResult(result);
 
-                    // Resume the wizard step submit operation.
-                    async.onSuccess(true);
-                }
+                // Resume the wizard step submit operation.
+                async.onSuccess(true);
+            }
 
-                public void onFailure(Throwable thrown)
-                {
-                    setResult(null);
+            public void onFailure(Throwable thrown)
+            {
+                setResult(null);
 
-                    // Display the error and avoid submit operation from continuing.
-                    displayError(thrown.getMessage());
-                    async.onSuccess(false);
-                }
-            });
+                // Display the error and avoid submit operation from continuing.
+                displayError(thrown.getMessage());
+                async.onSuccess(false);
+            }
+        });
     }
 
     /**

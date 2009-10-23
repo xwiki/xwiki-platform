@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
@@ -37,37 +36,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Attachment;
  */
 public interface WysiwygServiceAsync
 {
-    /**
-     * Makes a request to the server to clean the given HTML fragment which comes from an office application.
-     * 
-     * @param htmlPaste Dirty html pasted by the user.
-     * @param cleanerHint Role hint for which cleaner to be used.
-     * @param cleaningParams additional parameters to be used when cleaning.
-     * @param async The callback to be used for notifying the caller after receiving the response from the server.
-     */
-    void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
-        AsyncCallback<String> async);
-
-    /**
-     * Imports the most recent office document attached to a wiki page into XHTML/1.0.
-     * 
-     * @param pageName the wiki page into which the office document is attached.
-     * @param cleaningParams additional parameters for the import operation.
-     * @param async the callback to be used for notifying the caller after receiving the response from the server.
-     * @deprecated deprecated since 2.0.1, use {@link #officeToXHTML(Attachment, Map, AsyncCallback)} instead.
-     */
-    @Deprecated
-    void officeToXHTML(String pageName, Map<String, String> cleaningParams, AsyncCallback<String> async);
-
-    /**
-     * Imports the given office attachment into XHTML/1.0.
-     * 
-     * @param attachment office attachment to be imported into xhtml/1.0.
-     * @param cleaningParams additional parameters for the import operation.
-     * @param async the callback to be used for notifying the caller after receiving the response from the server.
-     */
-    void officeToXHTML(Attachment attachment, Map<String, String> cleaningParams, AsyncCallback<String> async);
-
     /**
      * Synchronizes this editor with others that edit the same page.
      * 

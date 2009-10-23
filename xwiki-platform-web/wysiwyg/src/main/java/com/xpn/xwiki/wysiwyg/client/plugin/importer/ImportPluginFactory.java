@@ -19,23 +19,29 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
+import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
 /**
- * {@link PluginFactory} class for the office importer wysiwyg plugin.
+ * Factory for {@link ImportPlugin}.
  * 
  * @version $Id$
  */
 public final class ImportPluginFactory extends AbstractPluginFactory
 {
     /**
-     * Private instance of the plugin factory. Plugin factory is a singleton.
+     * The singleton factory instance.
      */
     private static ImportPluginFactory instance;
 
     /**
-     * Private constructor.
+     * The service used to clean content pasted from office document and to import office documents.
+     */
+    private final ImportServiceAsync importService = GWT.create(ImportService.class);
+
+    /**
+     * Default constructor.
      */
     private ImportPluginFactory()
     {
@@ -43,7 +49,7 @@ public final class ImportPluginFactory extends AbstractPluginFactory
     }
 
     /**
-     * @return The singleton instance of the plugin factory.
+     * @return the singleton factory instance
      */
     public static synchronized ImportPluginFactory getInstance()
     {
@@ -55,9 +61,11 @@ public final class ImportPluginFactory extends AbstractPluginFactory
 
     /**
      * {@inheritDoc}
+     * 
+     * @see AbstractPluginFactory#newInstance()
      */
     public Plugin newInstance()
     {
-        return new ImportPlugin();
+        return new ImportPlugin(importService);
     }
 }

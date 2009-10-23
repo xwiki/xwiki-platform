@@ -25,6 +25,7 @@ import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
@@ -50,9 +51,9 @@ public class ImportWizard extends Wizard implements WizardStepProvider
          * Office file import wizard step.
          */
         OFFICE_FILE,
-        
+
         /**
-         * Office paste import wizard step. 
+         * Office paste import wizard step.
          */
         OFFICE_PASTE
     };
@@ -63,19 +64,27 @@ public class ImportWizard extends Wizard implements WizardStepProvider
     private Map<ImportWizardStep, WizardStep> stepsMap = new HashMap<ImportWizardStep, WizardStep>();
 
     /**
-     * The wysiwyg configuration.
+     * The object used to configure this wizard.
      */
-    private Config config;
+    private final Config config;
+
+    /**
+     * The component used to clean content pasted from office documents and to import office documents.
+     */
+    private final ImportServiceAsync importService;
 
     /**
      * Instantiates the import wizard.
      * 
-     * @param config wysiwyg configuration.
+     * @param config the object used to configure this wizard
+     * @param importService the component used to clean content pasted from office documents and to import office
+     *            documents
      */
-    public ImportWizard(Config config)
+    public ImportWizard(Config config, ImportServiceAsync importService)
     {
         super(Strings.INSTANCE.importWizardTitle(), Images.INSTANCE.importWizardIcon().createImage());
         this.config = config;
+        this.importService = importService;
         this.setProvider(this);
     }
 
@@ -89,10 +98,10 @@ public class ImportWizard extends Wizard implements WizardStepProvider
         if (null == step) {
             switch (requestedStep) {
                 case OFFICE_FILE:
-                    step = new ImportOfficeFileWizardStep(this.config);
+                    step = new ImportOfficeFileWizardStep(config, importService);
                     break;
                 case OFFICE_PASTE:
-                    step = new ImportOfficePasteWizardStep();
+                    step = new ImportOfficePasteWizardStep(importService);
                     break;
                 default:
                     // nothing here, leave it null

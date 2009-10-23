@@ -30,8 +30,8 @@ import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
@@ -65,10 +65,19 @@ public class ImportOfficePasteWizardStep implements WizardStep
     private CheckBox filterStylesCheckBox;
 
     /**
-     * Creates an instance of {@link ImportOfficePasteWizardStep}.
+     * The component used to clean content copy&pasted from office documents.
      */
-    public ImportOfficePasteWizardStep()
+    private final ImportServiceAsync importService;
+
+    /**
+     * Creates an instance of {@link ImportOfficePasteWizardStep}.
+     * 
+     * @param importService the component used to clean content copy&pasted from office documents
+     */
+    public ImportOfficePasteWizardStep(ImportServiceAsync importService)
     {
+        this.importService = importService;
+
         mainPanel = new FlowPanel();
 
         // Info label.
@@ -183,20 +192,19 @@ public class ImportOfficePasteWizardStep implements WizardStep
         if (officeHTML.trim().equals("")) {
             async.onSuccess(false);
         } else {
-            WysiwygService.Singleton.getInstance().cleanOfficeHTML(officeHTML, "wysiwyg", getHTMLCleaningParams(),
-                new AsyncCallback<String>()
+            importService.cleanOfficeHTML(officeHTML, "wysiwyg", getHTMLCleaningParams(), new AsyncCallback<String>()
+            {
+                public void onSuccess(String result)
                 {
-                    public void onSuccess(String result)
-                    {
-                        setResult(result);
-                        async.onSuccess(true);
-                    }
+                    setResult(result);
+                    async.onSuccess(true);
+                }
 
-                    public void onFailure(Throwable thrown)
-                    {
-                        async.onFailure(thrown);
-                    }
-                });
+                public void onFailure(Throwable thrown)
+                {
+                    async.onFailure(thrown);
+                }
+            });
         }
     }
 

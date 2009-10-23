@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
-import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
@@ -61,37 +60,6 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     public WysiwygServiceAsyncCacheProxy(WysiwygServiceAsync service)
     {
         this.service = service;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygServiceAsync#cleanOfficeHTML(String, String, Map, AsyncCallback)
-     */
-    public void cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams,
-        AsyncCallback<String> async)
-    {
-        service.cleanOfficeHTML(htmlPaste, cleanerHint, cleaningParams, async);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygServiceAsync#officeToXHTML(String, Map, AsyncCallback)
-     */
-    public void officeToXHTML(String pageName, Map<String, String> cleaningParams, AsyncCallback<String> async)
-    {
-        service.officeToXHTML(pageName, cleaningParams, async);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygServiceAsync#officeToXHTML(Attachment, Map, AsyncCallback)
-     */
-    public void officeToXHTML(Attachment attachment, Map<String, String> cleaningParams, AsyncCallback<String> async)
-    {
-        service.officeToXHTML(attachment, cleaningParams, async);
     }
 
     /**

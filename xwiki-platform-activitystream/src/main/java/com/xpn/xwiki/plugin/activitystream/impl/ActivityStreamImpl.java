@@ -113,7 +113,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             }
 
             if (event.getUrl() == null) {
-                event.setUrl(doc.getURL("view", context));
+                // Protection against NPEs, events can happen before the URL factory gets created. 
+                if (context.getURLFactory() != null) {
+                    event.setUrl(doc.getURL("view", context));
+                }
             }
         }
     }

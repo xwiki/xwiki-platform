@@ -22,9 +22,7 @@ package com.xpn.xwiki.wysiwyg.client;
 import java.util.MissingResourceException;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.Dictionary;
-import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi;
 import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
@@ -51,22 +49,12 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
     {
         // This method should be called only once.
         instance = this;
+
         setName("Wysiwyg");
-        // Test to see if we're running in hosted mode or web mode.
-        if (!GWT.isScript()) {
-            // We're running in hosted mode so we need to login first.
-            getXWikiServiceInstance().login("Admin", "admin", true, new XWikiAsyncCallback(this)
-            {
-                public void onSuccess(Object result)
-                {
-                    super.onSuccess(result);
-                    WysiwygEditorApi.publish();
-                }
-            });
-        } else {
-            CommandManagerApi.publish();
-            WysiwygEditorApi.publish();
-        }
+
+        // Publish the JavaScript API.
+        CommandManagerApi.publish();
+        WysiwygEditorApi.publish();
     }
 
     /**

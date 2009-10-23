@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.widget;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.Element;
@@ -37,11 +37,17 @@ public class MenuBar extends com.google.gwt.user.client.ui.MenuBar
 {
     /**
      * An empty menu item list. This is temporary used till GWT issue 3884 gets fixed.
+     * <p>
+     * NOTE: We don't use {@code Collections.emptyList()} because apparently it doesn't return an {@link ArrayList} and
+     * the {@code items} field in GWT's MenuBar implementation has this concrete type, instead of being a generic list
+     * of menu items. If we don't use the same concrete type we get a {@link ClassCastException} when running in hosted
+     * mode.
      * 
      * @see #onBrowserEvent(Event)
      * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=3884
      */
-    private static final List<com.google.gwt.user.client.ui.MenuItem> EMPTY_LIST = Collections.emptyList();
+    private static final List<com.google.gwt.user.client.ui.MenuItem> EMPTY_LIST =
+        new ArrayList<com.google.gwt.user.client.ui.MenuItem>();
 
     /**
      * Creates an empty horizontal menu bar.

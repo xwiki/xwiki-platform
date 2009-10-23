@@ -18,19 +18,31 @@
   <script type='text/javascript' src='/xwiki/bin/skin/resources/js/xwiki/xwikiexplorer/xwikiexplorer.js'></script>
   <script type="text/javascript" src="xwe.nocache.js"></script>
 </head>
-<body onload="onLoad();">
-  <textarea id="demo" rows="25" cols="80"></textarea>
+<body>
+  <button onclick="load(this)">Load</button>
   <script type="text/javascript">
     // Configure the GWT module.
     var Wysiwyg = {
       xwikiservice: '/xwiki/XWikiService',
       wysiwygServiceURL: '/xwiki/WysiwygService'
     };
-    function onLoad() {
-        // Create a new editor instance.
-        new WysiwygEditor({hookId: 'demo', debug: true, 
-            plugins: 'submit line separator text valign list indent history format symbol link image table macro importer#if($full && $request.sync) sync#end',
-            menu: 'link image table macro'});
+    function load(hook) {
+      // Create a plain text area.
+      var textArea = document.createElement('textarea');
+      textArea.id = 'demo';
+      textArea.rows = 25;
+      textArea.cols = 80;
+      hook.parentNode.replaceChild(textArea, hook);
+      // Create a new editor instance.
+      new WysiwygEditor({
+        hookId: 'demo',
+        syntax: 'xwiki/2.0',
+        displayTabs: true,
+        defaultEditor: 'wysiwyg',
+        plugins: 'submit line separator text valign list indent history format symbol link image table macro import',
+        menu: 'link image table macro import',
+        debug: true
+      });
     }
   </script>
 </body>

@@ -146,9 +146,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private static final String DEFAULT_TOOLBAR =
         "bold italic underline strikethrough teletype | subscript superscript"
             + " | justifyleft justifycenter justifyright justifyfull | unorderedlist orderedlist | outdent indent"
-            + " | undo redo | format | fontname fontsize forecolor backcolor | hr removeformat symbol"
-            + " | inserttable deletetable | insertrowbefore insertrowafter deleterow"
-            + " | insertcolbefore insertcolafter deletecol";
+            + " | undo redo | format | fontname fontsize forecolor backcolor | hr removeformat symbol";
 
     /**
      * The regular expression used to express the separator for tool bar and menu bar feature names in configuration.

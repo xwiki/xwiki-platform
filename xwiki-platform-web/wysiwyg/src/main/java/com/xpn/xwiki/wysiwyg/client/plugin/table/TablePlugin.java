@@ -37,7 +37,7 @@ import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
- * Plug-in allowing to manipulate tables in the WYSIWYG editor. 
+ * Plug-in allowing to manipulate tables in the WYSIWYG editor.
  * 
  * @version $Id$
  */
@@ -67,7 +67,7 @@ public class TablePlugin extends AbstractPlugin
     private void addFeature(RichTextArea rta, TableFeature feature)
     {
         rta.getCommandManager().registerCommand(feature.getCommand(), feature);
-        features.add(feature);        
+        features.add(feature);
     }
 
     /**
@@ -90,14 +90,14 @@ public class TablePlugin extends AbstractPlugin
 
         menuExtension = new TableMenuExtension(this);
         getUIExtensionList().add(menuExtension);
-        
+
         // Disable the standard table editing features of Firefox since they don't take
         // table headings (th) into account.
-        rta.getDocument().execCommand("enableInlineTableEditing", "false");          
+        rta.getDocument().execCommand("enableInlineTableEditing", "false");
 
         getUIExtensionList().add(toolBarExtension);
     }
-    
+
     /**
      * @return The list of the features exposed by the plugin.
      */
@@ -115,8 +115,8 @@ public class TablePlugin extends AbstractPlugin
     {
         for (TableFeature feature : features) {
             feature.destroy();
-            features.remove(feature);
         }
+        features.clear();
         toolBarExtension.clearFeatures();
         super.destroy();
     }

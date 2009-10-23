@@ -24,28 +24,27 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.listener.Attachment;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.parser.AttachmentParser;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
-import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.renderer.printer.XHTMLWikiPrinter;
+import org.xwiki.rendering.renderer.xhtml.XHTMLLinkRenderer;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
  * Default implementation for rendering links as XHTML. We handle both cases:
  * <ul>
  * <li>when inside a wiki (ie when an implementation of {@link WikiModel} is provided.</li>
- * <li>when outside of a wiki. In this case we only handle external links and document links don't 
- *     display anything.</li>
+ * <li>when outside of a wiki. In this case we only handle external links and document links don't display anything.</li>
  * </ul>
  * 
  * @version $Id$
@@ -69,7 +68,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
      * The link reference prefix indicating that the link is targeting an attachment.
      */
     private static final String ATTACH = "attach:";
-    
+
     /**
      * The class attribute 'wikilink'.
      */
@@ -107,6 +106,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -163,7 +163,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
             beginInternalLink(link, isFreeStandingURI, parameters);
         }
     }
-    
+
     /**
      * Start of an external link.
      * 
@@ -178,7 +178,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
 
         // Add all parameters to the A attributes
         aAttributes.putAll(parameters);
-        
+
         spanAttributes.put(CLASS, "wikiexternallink");
         if (isFreeStandingURI) {
             aAttributes.put(CLASS, "wikimodel-freestanding");
@@ -197,11 +197,11 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
                 aAttributes.put(HREF, link.getReference());
             }
         }
-        
+
         getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
         getXHTMLWikiPrinter().printXMLStartElement(ANCHOR, aAttributes);
     }
-    
+
     /**
      * Start of an internal link.
      * 
@@ -209,21 +209,30 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
      * @param isFreeStandingURI if true then the link is a free standing URI directly in the text
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
-    private void beginInternalLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters) 
+    private void beginInternalLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
         Map<String, String> spanAttributes = new LinkedHashMap<String, String>();
         Map<String, String> aAttributes = new LinkedHashMap<String, String>();
 
         // Add all parameters to the A attributes
         aAttributes.putAll(parameters);
-        
-        if (StringUtils.isEmpty(link.getReference()) && link.getAnchor() != null) {            
+
+        if (StringUtils.isEmpty(link.getReference())) {
             spanAttributes.put(CLASS, WIKILINK);
-            aAttributes.put(HREF, "#" + link.getAnchor());
-        } else if (StringUtils.isEmpty(link.getReference()) 
-            || this.wikiModel.isDocumentAvailable(link.getReference()))
-        {
-            spanAttributes.put(CLASS, WIKILINK);                
+
+            StringBuilder buffer = new StringBuilder();
+            if (link.getQueryString() != null) {
+                buffer.append('?');
+                buffer.append(link.getQueryString());
+            }
+            buffer.append('#');
+            if (link.getAnchor() != null) {
+                buffer.append(link.getAnchor());
+            }
+
+            aAttributes.put(HREF, buffer.toString());
+        } else if (this.wikiModel.isDocumentAvailable(link.getReference())) {
+            spanAttributes.put(CLASS, WIKILINK);
             aAttributes.put(HREF, this.wikiModel.getDocumentViewURL(link.getReference(), link.getAnchor(),
                 link.getQueryString()));
         } else {
@@ -232,7 +241,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
             aAttributes.put(HREF, this.wikiModel.getDocumentEditURL(link.getReference(), link.getAnchor(),
                 link.getQueryString()));
         }
-        
+
         getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
         getXHTMLWikiPrinter().printXMLStartElement(ANCHOR, aAttributes);
     }

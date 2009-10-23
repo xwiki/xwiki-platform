@@ -652,8 +652,6 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         XWikiDocument baseDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
         this.xwikiContext.setDoc(baseDocument);
-        baseDocument.setAuthor(this.xwikiContext.getUser());
-        baseDocument.setContentAuthor(this.xwikiContext.getUser());
 
         VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
@@ -664,6 +662,9 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
              * If content is not provided, then the existing content of the page is used
              */
             content = doc.getContent();
+        } else {
+            baseDocument.setAuthor(this.xwikiContext.getUser());
+            baseDocument.setContentAuthor(this.xwikiContext.getUser());
         }
 
         return baseDocument.getRenderedContent(content, baseDocument.getSyntaxId(), xwikiContext);

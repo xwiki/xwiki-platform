@@ -295,10 +295,10 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   $result
 #end
 
-#set($previousEvent = $util.getNull())
-#set($previousDoc = $util.getNull())
+#set($previousEvent = "")
+#set($previousDoc = "")
 #foreach ($event in $events)
-  #set($firstEntry = ($previousEvent == $util.getNull()))
+  #set($firstEntry = ($previousEvent == ""))
   #set($prefixedFullName = $event.getPrefixedFullName())
   #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
   #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
@@ -387,10 +387,10 @@ $msg.get("watchlist.notification.email.singleUpdate.intro")
 $msg.get("watchlist.notification.email.multipleUpdates.intro")
 #end
 
-#set($previousEvent = $util.getNull())
-#set($previousDoc = $util.getNull())
+#set($previousEvent = "")
+#set($previousDoc = "")
 #foreach ($event in $events)
-#set($firstEntry = ($previousEvent == $util.getNull()))
+#set($firstEntry = ($previousEvent == ""))
 #set($prefixedFullName = $event.getPrefixedFullName())
 #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
 #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))

@@ -31,12 +31,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
-import com.xpn.xwiki.gwt.api.client.dialog.MessageDialog;
-import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
@@ -113,7 +111,8 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
 
         timer = new Timer();
         timer.addTimerListener(this);
-        timer.scheduleRepeating(Wysiwyg.getInstance().getParamAsInt("sync_delay", DEFAULT_SYNC_DELAY));
+        timer.scheduleRepeating(Integer.parseInt(getConfig().getParameter("sync_delay",
+            String.valueOf(DEFAULT_SYNC_DELAY))));
     }
 
     /**
@@ -442,12 +441,8 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
     public void showDialog(String title, String message, AsyncCallback cb)
     {
         try {
-            MessageDialog messageDialog = new MessageDialog(Wysiwyg.getInstance(), title, Dialog.BUTTON_CANCEL);
-            if (cb != null) {
-                messageDialog.setAsyncCallback(cb);
-            }
-            messageDialog.setMessage(message, new String[0]);
-            messageDialog.show();
+            Window.alert(title + "\n\n" + message);
+            cb.onSuccess(null);
         } catch (Throwable e) {
             debugMessage("Error displaying failed " + e.getMessage());
             cb.onFailure(e);
@@ -463,12 +458,10 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
             XWikiGWTException exp = ((XWikiGWTException) caught);
             if (exp.getCode() == 9002) {
                 // This is a login error
-                showDialog(Wysiwyg.getInstance().getTranslation("appname"), Wysiwyg.getInstance().getTranslation(
-                    "login_first"), cb);
+                showDialog("Synchronize", "You are not logged in.", cb);
             } else if (exp.getCode() == 9001) {
                 // This is a right error
-                showDialog(Wysiwyg.getInstance().getTranslation("appname"), Wysiwyg.getInstance().getTranslation(
-                    "missing_rights"), cb);
+                showDialog("Synchronize", "You are not allowed to perform this action.", cb);
             } else {
                 showError("" + exp.getCode(), exp.getFullMessage(), cb);
             }
@@ -489,11 +482,9 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
 
     public void showError(String code, String text, AsyncCallback< ? > cb)
     {
-        String[] args = new String[1];
-        args[0] = code;
         debugMessage("Error ready to display");
-        String message = Wysiwyg.getInstance().getTranslation("errorwithcode", args) + "\r\n\r\n" + text;
+        String message = "An error occured. Its code is " + code + ".\r\n\r\n" + text;
         debugMessage("Error displaying: " + message);
-        showDialog(Wysiwyg.getInstance().getTranslation("appname"), message, cb);
+        showDialog("Synchronize", message, cb);
     }
 }

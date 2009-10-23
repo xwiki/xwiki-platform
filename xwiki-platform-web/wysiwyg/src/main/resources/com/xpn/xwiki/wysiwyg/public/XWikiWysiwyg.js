@@ -11,13 +11,6 @@
 var Wysiwyg =
 {
     /**
-     * This is the entry pointy for XWiki GWT services.
-     *
-     * @see web.xml
-     */
-    xwikiservice: '${request.contextPath}/XWikiService',
-
-    /**
      * This is the entry pointy for the new WYSIWYG's GWT services.
      *
      * @see web.xml

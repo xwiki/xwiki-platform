@@ -1,20 +1,20 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-{{testwikimacro param1="val1" param2="val2"/}}
+{{mockwikimacro1 param1="val1" param2="val2"/}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
 beginDocument
-beginMacroMarkerStandalone [testwikimacro] [param1=val1|param2=val2]
+beginMacroMarkerStandalone [mockwikimacro1] [param1=val1|param2=val2]
 beginParagraph
 onWord [This]
 onSpace
 onWord [is]
 onSpace
 beginFormat [BOLD]
-onWord [testwikimacro]
+onWord [mockwikimacro1]
 endFormat [BOLD]
 endParagraph
-endMacroMarkerStandalone [testwikimacro] [param1=val1|param2=val2]
+endMacroMarkerStandalone [mockwikimacro1] [param1=val1|param2=val2]
 endDocument

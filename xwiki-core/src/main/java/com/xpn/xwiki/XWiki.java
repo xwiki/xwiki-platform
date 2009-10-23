@@ -1980,8 +1980,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (baseskin.equals("")) {
                 // Let's get the base skin from the skin itself
                 String skin = getSkin(context);
-                XWikiDocument doc = getDocument(skin, context);
-                baseskin = doc.getStringValue("XWiki.XWikiSkins", "baseskin");
+                baseskin = getBaseSkin(skin, context);
             }
             if (baseskin.equals("")) {
                 baseskin = getDefaultBaseSkin(context);
@@ -1994,6 +1993,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return baseskin;
     }
 
+    /**
+     * @param skin the full name of the skin document for which to return the base skin. For example :
+     *            <tt>XWiki.DefaultSkin</tt>
+     * @param context the XWiki context
+     * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty
+     *         string.
+     * @since 2.0.2
+     * @since 2.1M1
+     */
+    public String getBaseSkin(String skin, XWikiContext context)
+    {
+        if (context.getWiki().exists(skin, context)) {
+            try {
+                return getDocument(skin, context).getStringValue("XWiki.XWikiSkins", "baseskin");
+            } catch (XWikiException e) {
+                // Do nothing and let return the empty string.
+            }
+        }
+        return "";
+    }
+    
     public String getWebCopyright(XWikiContext context)
     {
         String defaultValue = "Copyright 2004-" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";

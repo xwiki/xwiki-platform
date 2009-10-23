@@ -19,27 +19,17 @@
  */
 package com.xpn.xwiki.wysiwyg.client;
 
-import java.util.MissingResourceException;
-
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.i18n.client.Dictionary;
-import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManagerApi;
 
 /**
- * The class responsible for loading the WYSIWYG editors. It can be also viewed as the application context.
+ * Publishes the JavaScript APIs to be used for creating and managing WYSIWYG editor instances.
  * 
  * @version $Id$
  */
-public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
+public class Wysiwyg implements EntryPoint
 {
-    /**
-     * A static reference to this GWT module.
-     */
-    private static Wysiwyg instance;
-
     /**
      * {@inheritDoc}
      * 
@@ -47,42 +37,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
      */
     public void onModuleLoad()
     {
-        // This method should be called only once.
-        instance = this;
-
-        setName("Wysiwyg");
-
-        // Publish the JavaScript API.
         CommandManagerApi.publish();
         WysiwygEditorApi.publish();
-    }
-
-    /**
-     * @return a reference to this GWT module
-     */
-    public static Wysiwyg getInstance()
-    {
-        return instance;
-    }
-
-    /**
-     * {@inheritDoc}<br/>
-     * NOTE: We overwrite this method in order to be able to control the URL of the XWikiService.
-     * 
-     * @see XWikiGWTDefaultApp#getParam(String, String)
-     */
-    public String getParam(String key, String defaultValue)
-    {
-        // First look for meta gwt:property.
-        String value = getProperty(key);
-        if (!StringUtils.isEmpty(value)) {
-            return value;
-        }
-        // Then look in the global configuration object.
-        try {
-            return Dictionary.getDictionary(getName()).get(key);
-        } catch (MissingResourceException e) {
-            return defaultValue;
-        }
     }
 }

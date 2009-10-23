@@ -136,7 +136,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                 }
             });
         this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
-
+        this.mockXWikiStore.stubs().method("exists").will(returnValue(true));
+        
         this.mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
             this.xwiki, getContext()});

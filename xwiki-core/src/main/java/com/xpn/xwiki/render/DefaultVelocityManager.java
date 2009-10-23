@@ -131,25 +131,32 @@ public class DefaultVelocityManager implements VelocityManager
             int pos = skinMacros.indexOf("skins/");
             if (pos > -1) {
                 cacheKey = skinMacros.substring(pos);
-            } else {
-                // If the macros.vm file is stored in a wiki page (in a macros.vm property in
-                // a XWikiSkins object) then we use the parent skin's macros.vm since we
-                // currently don't support having global velocimacros defined in wiki pages.
-                String baseSkin = context.getWiki().getBaseSkin(context);
-                // Avoid plain recursive calls
-                if (StringUtils.equals(baseSkin, skin)) {
-                    baseSkin = context.getWiki().getDefaultBaseSkin(context);
-                }
-                if (!StringUtils.equals(baseSkin, skin)) {
-                    try {
-                        cacheKey = getVelocityEngineCacheKey(baseSkin, context);
-                    } catch (StackOverflowError ex) {
-                        // Circular dependency, just return the default key
-                    }
+            }
+        }
+        // If no macros.vm file has been found for the passed skin, we can try to get a baseskin -
+        // this only if the skin is a wiki page skin.
+        // We first need to make sure the skin is actually a wiki page skin since otherwise
+        // the notion of baseskin is meaningless.
+        // We also need to ensure the presence of a dot in the skin name,
+        // otherwise XWiki#exists will assume the context's space is the skin's space
+        // (as in "XWiki.albatross" if the context space is XWiki) which can lead to misbehavior.
+        else if (skin.indexOf(".") > 0 && context.getWiki().exists(skin, context)) {
+            // If the macros.vm file is stored in a wiki page (in a macros.vm property in
+            // a XWikiSkins object) then we use the parent skin's macros.vm since we
+            // currently don't support having global velocimacros defined in wiki pages.
+            String baseSkin = context.getWiki().getBaseSkin(skin, context);
+            // Avoid plain recursive calls
+            if (StringUtils.equals(baseSkin, skin)) {
+                baseSkin = context.getWiki().getDefaultBaseSkin(context);
+            }
+            if (!StringUtils.equals(baseSkin, skin)) {
+                try {
+                    cacheKey = getVelocityEngineCacheKey(baseSkin, context);
+                } catch (StackOverflowError ex) {
+                    // Circular dependency, just return the default key
                 }
             }
         }
-
         return cacheKey;
     }
 

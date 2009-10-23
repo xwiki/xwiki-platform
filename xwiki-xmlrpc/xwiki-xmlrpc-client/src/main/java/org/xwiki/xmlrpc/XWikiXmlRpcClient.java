@@ -91,10 +91,10 @@ public class XWikiXmlRpcClient
     }
 
     /**
-     * Login.
+     * Login with the provided user. If the method is not called anonymous user is used.
      * 
-     * @param username
-     * @param password
+     * @param username the user id
+     * @param password the user password
      * @throws XmlRpcException If an invalid username/password was specified or communication problem.
      */
     public void login(String username, String password) throws XmlRpcException

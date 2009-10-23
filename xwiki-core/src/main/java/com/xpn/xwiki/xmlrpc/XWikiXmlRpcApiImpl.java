@@ -652,8 +652,10 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
         XWikiDocument baseDocument = this.xwiki.getDocument(extendedId.getBasePageId(), this.xwikiContext);
         this.xwikiContext.setDoc(baseDocument);
+        baseDocument.setAuthor(this.xwikiContext.getUser());
+        baseDocument.setContentAuthor(this.xwikiContext.getUser());
 
-        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
+        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
 
         this.xwiki.prepareDocuments(this.xwikiContext.getRequest(), this.xwikiContext, vcontext);

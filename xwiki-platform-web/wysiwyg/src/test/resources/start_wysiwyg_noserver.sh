@@ -15,6 +15,7 @@ $APP_DIR/WEB-INF/lib/xwiki-web-wysiwyg-$XE_VERSION.jar:\
 $M2_REPO/com/xpn/xwiki/platform/xwiki-web-wysiwyg/$XE_VERSION/xwiki-web-wysiwyg-$XE_VERSION-sources.jar:\
 $M2_REPO/com/xpn/xwiki/platform/xwiki-web-gwt/$XE_VERSION/xwiki-web-gwt-$XE_VERSION-sources.jar:\
 $M2_REPO/org/xwiki/platform/xwiki-web-gwt-dom/$XE_VERSION/xwiki-web-gwt-dom-$XE_VERSION.jar:\
+$M2_REPO/org/xwiki/platform/xwiki-core-component-api/$XE_VERSION/xwiki-core-component-api-$XE_VERSION.jar:\
 $M2_REPO/com/google/gwt/gwt-incubator/july-14-2009/gwt-incubator-july-14-2009.jar:\
 $M2_REPO/com/smartgwt/smartgwt/1.2/smartgwt-1.2.jar:\
 $M2_REPO/com/google/gwt/gwt-dev/$GWT_VERSION/gwt-dev-$GWT_VERSION-linux.jar:\

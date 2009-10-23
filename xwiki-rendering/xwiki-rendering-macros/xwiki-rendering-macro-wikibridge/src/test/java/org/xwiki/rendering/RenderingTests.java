@@ -20,6 +20,9 @@
 
 package org.xwiki.rendering;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 
@@ -28,6 +31,13 @@ import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
+import org.xwiki.rendering.internal.macro.wikibridge.MockWikiMacro;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -50,6 +60,7 @@ public class RenderingTests extends TestCase
         RenderingTestSuite suite = new RenderingTestSuite("Test Wiki Macro Bridge");
         
         suite.addTestsFromResource("wikimacro1", true);
+        suite.addTestsFromResource("wikimacro2", true);
 
         ComponentManagerTestSetup testSetup = new ComponentManagerTestSetup(suite);
         setUpMocks(testSetup.getComponentManager());
@@ -67,9 +78,35 @@ public class RenderingTests extends TestCase
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
+        
+        // Register mock wiki macros.
+        WikiMacroManager wikiMacroManager = componentManager.lookup(WikiMacroManager.class);
+        
+        // Mock wiki macro - 1.
+        WikiMacroParameterDescriptor param1 = new WikiMacroParameterDescriptor("param1", "This is param1", true);
+        WikiMacroParameterDescriptor param2 = new WikiMacroParameterDescriptor("param2", "This is param2", true);
+        List<WikiMacroParameterDescriptor> params = new ArrayList<WikiMacroParameterDescriptor>();
+        params.add(param1);
+        params.add(param2);
+        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Mock Wiki Macro - 1", "Description", "Test",
+            new DefaultContentDescriptor(false), params);
+        WikiMacro wikiMacro = new MockWikiMacro(new DefaultWikiMacro("xwiki:Main.MockWikiMacro1", "mockwikimacro1",
+            true, descriptor, "This is **mockwikimacro1**", "xwiki/2.0", componentManager), componentManager);                     
+        wikiMacroManager.registerWikiMacro("xwiki:Main.MockWikiMacro1", wikiMacro);
+        
+        // Mock wiki macro - 2.
+        params = new ArrayList<WikiMacroParameterDescriptor>();
+        descriptor = new WikiMacroDescriptor("Mock Wiki Macro - 2", "Description", "Test", 
+            new DefaultContentDescriptor(false), params);
+        wikiMacro = new MockWikiMacro(new DefaultWikiMacro("xwiki:Main.MockWikiMacro2", "mockwikimacro2",
+            true, descriptor, "{{mockwikimacro1 param1=\"p1\" param2=\"p2\"/}}", "xwiki/2.0", componentManager),
+            componentManager);
+        wikiMacroManager.registerWikiMacro("xwiki:Main.MockWikiMacro2", wikiMacro);
+        
 
         context.checking(new Expectations() {{
-            oneOf(mockDocumentAccessBridge).getDocument("xwiki:Main.TestWikiMacro"); will(returnValue(null));
+            allowing(mockDocumentAccessBridge).getDocument("xwiki:Main.MockWikiMacro1"); will(returnValue(null));
+            allowing(mockDocumentAccessBridge).getDocument("xwiki:Main.MockWikiMacro2"); will(returnValue(null));
         }});
     }    
 }

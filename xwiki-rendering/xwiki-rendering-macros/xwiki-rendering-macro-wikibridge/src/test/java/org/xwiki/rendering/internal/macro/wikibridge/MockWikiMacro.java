@@ -20,72 +20,48 @@
 
 package org.xwiki.rendering.internal.macro.wikibridge;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
- * A wrapper macro used for testing a {@link DefaultWikiMacro} instance.
+ * A wrapper macro used for testing wiki macros.
  * 
  * @version $Id$
  * @since 2.0M2
  */
-@Component("testwikimacro")
-public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
+public class MockWikiMacro implements WikiMacro
 {
     /**
-     * The internal {@link DefaultWikiMacro} instance.
+     * The internal wiki macro instance.
      */
-    private DefaultWikiMacro wikiMacro;
+    private WikiMacro wikiMacro;
 
     /**
      * The {@link ComponentManager} component.
      */
-    @Requirement
     private ComponentManager componentManager;
-
+    
     /**
-     * The {@link Execution} component.
+     * Creates a new mock wiki macro encapsulating the given wiki macro instance. 
+     * 
+     * @param wikiMacro encapsulated wiki macro instance.
+     * @param componentManager component manager.
      */
-    @Requirement
-    private Execution execution;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void initialize() throws InitializationException
+    public MockWikiMacro(WikiMacro wikiMacro, ComponentManager componentManager)
     {
-        // Require two parameters, one mandatory and one optional.
-        WikiMacroParameterDescriptor param1 = new WikiMacroParameterDescriptor("param1", "This is param1", true);
-        WikiMacroParameterDescriptor param2 = new WikiMacroParameterDescriptor("param2", "This is param2", true);
-        List<WikiMacroParameterDescriptor> params = new ArrayList<WikiMacroParameterDescriptor>();
-        params.add(param1);
-        params.add(param2);
-
-        // Initialize the internal WikiMacro instance.
-        WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Test Wiki Macro", "Description", "Test",
-            new DefaultContentDescriptor(false), params);
-        this.wikiMacro = new DefaultWikiMacro("xwiki:Main.TestWikiMacro", "testwikimacro", true, descriptor,
-            "This is **testwikimacro**", "xwiki/2.0", componentManager);
-
-        // Set a dummy XWikiContext.
-        execution.getContext().setProperty("xwikicontext", new HashMap<String, Object>());
+        this.wikiMacro = wikiMacro;
+        this.componentManager = componentManager;
     }
 
     /**
@@ -94,7 +70,23 @@ public class MockWikiMacro implements Macro<WikiMacroParameters>, Initializable
     public List<Block> execute(WikiMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
+        // Use a dummy XWikiContext.
+        try {
+            Execution execution = componentManager.lookup(Execution.class);
+            execution.getContext().setProperty("xwikicontext", new HashMap<String, Object>());
+        } catch (ComponentLookupException ex) {
+            throw new MacroExecutionException(ex.getMessage(), ex);
+        }
+        
         return this.wikiMacro.execute(parameters, content, context);
+    }
+
+    /**
+     * {@inheritDoc}    
+     */
+    public String getId()
+    {
+        return this.wikiMacro.getId();
     }
 
     /**

@@ -23,8 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -142,22 +140,7 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
                     ec.setWakeupInterval(DEFAULT_WAKEUPINTERVAL, TimeUnit.SECONDS);
                 }
 
-                List<EvictionRegionConfig> ercList = ec.getEvictionRegionConfigs();
-
-                EvictionRegionConfig erc = null;
-                if (ercList != null && ercList.size() > 0) {
-                    // Overwrite the default eviction configuration
-                    erc = ercList.get(0);
-                    erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
-                    setLRUConfiguration(erc, eec);
-                } else {
-                    // Set a new eviction configuration
-                    erc = new EvictionRegionConfig();
-                    erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
-                    setLRUConfiguration(erc, eec);
-
-                    ec.setEvictionRegionConfigs(Collections.singletonList(erc));
-                }
+                setLRUConfiguration(ec.getDefaultEvictionRegionConfig(), eec);
             }
         }
 

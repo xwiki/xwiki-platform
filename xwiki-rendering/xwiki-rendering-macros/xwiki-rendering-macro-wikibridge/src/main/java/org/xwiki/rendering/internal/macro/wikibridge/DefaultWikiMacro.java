@@ -31,6 +31,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -181,6 +182,17 @@ public class DefaultWikiMacro implements WikiMacro
             throw new MacroExecutionException("Could not find a parser for macro content", ex);
         } catch (ParseException ex) {
             throw new MacroExecutionException("Error while parsing macro content", ex);
+        }
+        
+        // If in inline mode, check whether wiki macro code segment starts with a nested macro block.
+        // If this is the case, we need to force this nested macro to be an inline macro.
+        if (context.isInline()) {
+            List<Block> children = xdom.getChildren();
+            if (children.size() > 0 && children.get(0) instanceof MacroBlock) {
+               MacroBlock old = (MacroBlock) children.get(0);
+               MacroBlock replacement = new MacroBlock(old.getId(), old.getParameters(), old.getContent(), true);
+               xdom.replaceChild(replacement, old);
+            }
         }
 
         // Prepare macro execution environment.

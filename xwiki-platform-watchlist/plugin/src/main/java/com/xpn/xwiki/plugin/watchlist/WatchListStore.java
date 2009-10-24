@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -175,22 +176,18 @@ public class WatchListStore implements EventListener
         // Check that the interval property contains all the available jobs
         StaticListClass intervalClass = (StaticListClass) bclass.get(WATCHLIST_CLASS_INTERVAL_PROP);
         List<String> intervalValues = intervalClass.getList(context);
-        List<String> newInterval = new ArrayList<String>();
+        List<String> newInterval = ListUtils.intersection(jobDocumentNames, intervalValues);
         boolean intervalNeedsUpdate = false;
 
         // Look for missing jobs, build a complete list
-        for (String jobName : jobDocumentNames) {
-            if (!newInterval.contains(jobName)) {
-                newInterval.add(jobName);
-                intervalNeedsUpdate = true;
-            }
+        for (String jobName : (List<String>) ListUtils.subtract(jobDocumentNames, intervalValues)) {
+            newInterval.add(jobName);
+            intervalNeedsUpdate = true;
         }
-        
+
         // Look for outdated jobs
-        for (String jobName : intervalValues) {
-            if (!newInterval.contains(jobName)) {
-                intervalNeedsUpdate = true;
-            }
+        if (ListUtils.subtract(intervalValues, jobDocumentNames).size() > 0) {
+            intervalNeedsUpdate = true;
         }
 
         // Save the complete list in the interval prop

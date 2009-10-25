@@ -3794,6 +3794,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         if (action.equals("skin") && doc.getSpace().equals("skins")) {
+            // We still need to call checkAuth to set the proper user.
+            XWikiUser user = checkAuth(context);
+            if (user != null) {
+                context.setUser(user.getUser());
+            }
             return true;
         }
         return getRightService().checkAccess(action, doc, context);

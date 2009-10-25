@@ -66,12 +66,15 @@ public class ImportAction extends XWikiAction
 
             if ("getPackageInfos".equals(action)) {
                 // List the documents present in the selected archive
+                String encoding = context.getWiki().getEncoding();
                 response.setContentType("text/xml");
+                response.setCharacterEncoding(encoding);
                 XWikiAttachment packFile = doc.getAttachment(name);
                 importer.Import(packFile.getContent(context));
                 String xml = importer.toXml();
-                response.setContentLength(xml.getBytes().length);
-                response.getWriter().write(xml);
+                byte[] result = xml.getBytes(encoding);
+                response.setContentLength(result.length);
+                response.getOutputStream().write(result);
                 return null;
             } else if ("import".equals(action)) {
                 // Do the actual import

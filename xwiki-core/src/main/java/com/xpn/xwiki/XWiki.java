@@ -778,8 +778,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Ensure that mandatory classes (ie classes XWiki needs to work properly) exist and create
-     * them if they don't exist.
+     * Ensure that mandatory classes (ie classes XWiki needs to work properly) exist and create them if they don't
+     * exist.
      */
     private void initializeMandatoryClasses(XWikiContext context) throws XWikiException
     {
@@ -1997,8 +1997,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * @param skin the full name of the skin document for which to return the base skin. For example :
      *            <tt>XWiki.DefaultSkin</tt>
      * @param context the XWiki context
-     * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty
-     *         string.
+     * @return if found, the name of the base skin the asked skin inherits from. If not found, returns an empty string.
      * @since 2.0.2
      * @since 2.1M1
      */
@@ -2013,7 +2012,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
         return "";
     }
-    
+
     public String getWebCopyright(XWikiContext context)
     {
         String defaultValue = "Copyright 2004-" + Calendar.getInstance().get(java.util.Calendar.YEAR) + " XWiki";
@@ -2859,7 +2858,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
-        needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");        
+        needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -2891,8 +2890,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName("XWiki.GlobalRedirect");
         needsUpdate |= bclass.addTextField("pattern", "Pattern", 30);
-        needsUpdate |= bclass.addTextField("destination", "Destination", 30);        
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Global Redirect Class");        
+        needsUpdate |= bclass.addTextField("destination", "Destination", 30);
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Global Redirect Class");
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3035,8 +3034,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             ((BooleanClass) bclass.get("showRightPanels")).setDisplayType("yesno");
             needsUpdate = true;
         }
-        
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");        
+
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Preferences");
 
         String menu = doc.getStringValue("XWiki.XWikiPreferences", "menu");
         if (menu.indexOf("../..") != -1) {
@@ -3158,7 +3157,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             afield.setDefaultValue(1);
             needsUpdate = true;
         }
-        
+
         String title;
         if (pagename.equals("XWikiGlobalRights")) {
             title = "XWiki Global Rights Class";
@@ -3166,7 +3165,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             title = "XWiki Rights Class";
         }
 
-        needsUpdate |= setClassDocumentFields(doc, title);        
+        needsUpdate |= setClassDocumentFields(doc, title);
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -3202,7 +3201,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addNumberField("replyto", "Reply To", 5, "integer");
         needsUpdate |= bclass.addDateField("date", "Date");
         needsUpdate |= bclass.addTextAreaField("comment", "Comment", 40, 5);
-        needsUpdate |= setClassDocumentFields(doc, "XWiki Comment Class");        
+        needsUpdate |= setClassDocumentFields(doc, "XWiki Comment Class");
 
         if (needsUpdate) {
             saveDocument(doc, context);
@@ -4055,9 +4054,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return copyDocument(docname, targetdocname, null, null, null, reset, context);
     }
-    
-    public boolean copyDocument(String docname, String targetdocname, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
-        throws XWikiException
+
+    public boolean copyDocument(String docname, String targetdocname, boolean reset, boolean force,
+        boolean resetCreationData, XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, targetdocname, null, null, null, reset, force, resetCreationData, context);
     }
@@ -4717,7 +4716,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         int active = 1;
 
         // These users are necessarly active
-        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME) 
+        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)
             || (user.equals(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
             return active;
         }
@@ -5227,8 +5226,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         return "org.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties().get(
             "dialect"))
-            || "net.sf.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties().get(
-                "dialect"));
+            || "net.sf.hibernate.dialect.MySQLDialect".equals(getHibernateStore().getConfiguration().getProperties()
+                .get("dialect"));
     }
 
     public String getFullNameSQL()
@@ -6854,7 +6853,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 doc.setSyntaxId(XWikiDocument.XWIKI10_SYNTAXID);
             }
         }
-        
+
         return needsUpdate;
     }
 
@@ -6886,11 +6885,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         return syntaxId;
     }
-    
+
     /**
-     * @return true if title handling should be using the compatibility mode or not. When the compatibility
-     *         mode is active, if the document's content first header (level 1 or level 2) matches the document's 
-     *         title the first header is stripped.
+     * @return true if title handling should be using the compatibility mode or not. When the compatibility mode is
+     *         active, if the document's content first header (level 1 or level 2) matches the document's title the
+     *         first header is stripped.
      */
     public boolean isTitleInCompatibilityMode()
     {

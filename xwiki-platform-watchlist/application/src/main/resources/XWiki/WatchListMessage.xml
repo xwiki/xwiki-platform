@@ -194,6 +194,15 @@
 <comment></comment>
 <content>R0lGODlhEAAQAOZLAMDAwL29vdra2qOjo8LCwsfHx6KiosHBwdbW1svLy83NzbGxsfPz86ysrOPj4+Tk5Jqamuvr6/z8/LW1terq6sPDw+7u7t3d3fv7+9jY2N7e3uDg4PHx8ejo6MTExM7Ozufn56GhoaampvX19dfX1/b29r+/v+np6dXV1cnJyezs7LCwsMXFxdvb262trff399LS0vT09PDw8LOzs6+vr7i4uPj4+M/Pz5iYmKCgoKioqPLy8p+fn7Kysp2dnZ6entPT0+Hh4b6+vq6urqurq9/f3/39/dHR0bu7u8zMzP///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAEsALAAAAAAQABAAAAfRgEuCgkVIBgZIRYOLgjZESpBKRCWMRQEDBgsIRhJACwYDAYpLj5AbDUdHRBuRREtJQyhGRgUTAwMTBRIYMEMmLhkKH0cNkUqoSQdCPisMJxcaBAKzAhUkSEg3OTQMHBZBBQmpSQtIAAAfPEMMMioUDwIZHkhCBBUACT86IzsgD0UtEAAgQDCAkBQ4DDrgAOKCAARCDhxAkgCAiCFGBAw50CGCBgTYEhQgEuIIBkEvkgxgEaFDEgUzIHiIwWiJBSEQFAQIUYNCzUUOegwZ9bMoo0AAOw==</content>
 </attachment>
+<attachment>
+<filename>arrowup.gif</filename>
+<filesize>176</filesize>
+<author>XWiki.Admin</author>
+<date>1256570420000</date>
+<version>1.1</version>
+<comment></comment>
+<content>R0lGODlhEAAQAMQaAKmpqff392JiYqWlpbKysnFxcYaGhpmZmX9/f46Ojnp6evHx8aKiovT09KGhoa+vr5eXl4SEhGlpaaurq/j4+IKCgu3t7bGxsaampqioqP///wAAAAAAAAAAAAAAAAAAACH5BAEAABoALAAAAAAQABAAAAUtoCaOZGmeaKqubLtSRMMGwAQtaoBl14FYKcfgAWAYKqlERFGQCASuqHRKLYUAADs=</content>
+</attachment>
 <object>
 <class>
 <name>XWiki.Mail</name>
@@ -244,16 +253,8 @@
 <className>XWiki.Mail</className>
 <guid>6e7ba94a-fc9c-45ad-8758-9b9a04ce92c1</guid>
 <property>
-<html>$msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
-
-#if($modifiedDocuments.size() == 1)
-$msg.get("watchlist.notification.email.singleUpdate.intro")
-#else
-$msg.get("watchlist.notification.email.multipleUpdates.intro")
-#end
-
-#set($lightGray = "#CCC")
-#set($veryLightGray = "#FDFDFD")
+<html>#set($lightGray = "#CCC")
+#set($veryLightGray = "#FBFBFB")
 #set($darkGray = "#333")
 #set($commonHeadingStyle = "margin:0;")
 #set($h1Style = "$commonHeadingStyle")
@@ -270,6 +271,11 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
 #set($eventStyle = "padding-left:21px;")
 #set($diffStyle = "padding:5px;margin:5px;background-color:$veryLightGray;border-left:solid 4px $lightGray;")
 #set($propDiffStyle = "margin-right:2px;padding:2px;")
+#set($containerStyle = "width:800px;font-family: Arial, Verdana;")
+#set($leftColumnStyle = "float:left;width:600px;font-size:80%;")
+#set($rightColumnStyle = "float:right;width:200px;border-left:solid 1px $darkgray;")
+#set($rightColumnUlStyle = "margin-left:1em;padding-left:0;font-size:90%;list-style-type:empty-circle;")
+#set($rightColumnAStyle = "color:$darkGray;")
 
 #macro(displayhtmldiff $html)
   #set($result = $html.replaceAll('\&lt;div class="diff"\&gt;\&lt;/div\&gt;', "").trim())
@@ -295,6 +301,17 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   $result
 #end
 
+&lt;div style="$containerStyle"&gt;
+$msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
+
+#if($modifiedDocuments.size() == 1)
+$msg.get("watchlist.notification.email.singleUpdate.intro")
+#else
+$msg.get("watchlist.notification.email.multipleUpdates.intro")
+#end
+
+&lt;div style="clear:both;heigth:0;"&gt;&lt;/div&gt;
+&lt;div style="$leftColumnStyle"&gt;
 #set($previousEvent = "")
 #set($previousDoc = "")
 #foreach ($event in $events)
@@ -306,18 +323,18 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   #if ($newWiki)
     #if (!$firstEntry) &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; #end
     &lt;div class="wiki" style="$wikiDivStyle"&gt;
-    &lt;h1 style="$h1Style"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt; $event.getWiki()&lt;/h1&gt;
+    &lt;h1 style="$h1Style" id="$event.getWiki()"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt; $event.getWiki()&lt;/h1&gt;
   #end
   #if ($newSpace)
     #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/div&gt;&lt;/div&gt; #end
     &lt;div class="space" style="$spaceDivStyle"&gt;
-    &lt;h2 style="$h2Style"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt; $event.getSpace()&lt;/h2&gt;
+    &lt;h2 style="$h2Style" id="${event.getWiki()}:$event.getSpace()"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt; $event.getSpace()&lt;/h2&gt;
   #end
   #if($newDocument)
     #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
     &lt;div class="document" style="$documentDivStyle"&gt;
     #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a href="$event.getUrl()"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/h3&gt;
+    &lt;h3 id="$prefixedFullName" style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a href="$event.getUrl()"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"/&gt;&lt;img src="cid:arrowup.gif" style="border:0;" /&gt;&lt;/a&gt;&lt;/h3&gt;
     &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
   &lt;div style="$eventStyle"&gt;
@@ -345,6 +362,37 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   #set($previousDoc = $currentDoc)
 #end
 &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id="nav" style="$rightColumnStyle"&gt;
+#set($previousEvent = "")
+#set($previousDoc = "")
+&lt;ul style="$rightColumnUlStyle"&gt;
+#foreach ($event in $events)
+  #set($firstEntry = ($previousEvent == ""))
+  #set($prefixedFullName = $event.getPrefixedFullName())
+  #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
+  #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
+  #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
+  #if ($newWiki)
+    #if (!$firstEntry) &lt;/ul&gt;&lt;/li&gt; #end
+    &lt;li&gt;&lt;a href="#$event.getWiki()" style="$rightColumnAStyle"&gt;$event.getWiki()&lt;/a&gt;
+    &lt;ul style="$rightColumnUlStyle"&gt;
+  #end
+  #if ($newSpace)
+    #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/ul&gt;&lt;/li&gt; #end
+    &lt;li&gt;&lt;a href="#${event.getWiki()}:$event.getSpace()" style="$rightColumnAStyle"&gt;$event.getSpace()&lt;/a&gt;
+    &lt;ul style="$rightColumnUlStyle"&gt;
+  #end
+  #if($newDocument)
+    #set($currentDoc = $xwiki.getDocument($prefixedFullName))
+    &lt;li&gt;&lt;a href="#$prefixedFullName" style="$rightColumnAStyle"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/li&gt;
+  #end
+  #set($previousEvent = $event)
+  #set($previousDoc = $currentDoc)
+#end
+&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
 &lt;!--
 We want to be able to use attached images in the HTML part of the email but we don't want them to be listed as attachments. We use a little trick here to make the mailsender plugin consider that we use all the attached images in this mail even if we don't (some images are used very rarely).
 
@@ -367,6 +415,7 @@ src='cid:staticlist.png'
 src='cid:levels.png'
 src='cid:password.png'
 src='cid:object.gif'
+src='cid:arrowup.gif'
 --&gt;</html>
 </property>
 <property>

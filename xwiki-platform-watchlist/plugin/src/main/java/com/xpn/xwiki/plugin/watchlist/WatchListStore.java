@@ -363,7 +363,15 @@ public class WatchListStore implements EventListener
         if (subForJob != null && subForJob.contains(user)) {
             subForJob.remove(user);
         }
-    }    
+    }
+    
+    /**
+     * @return Names of documents which contain a watchlist job object. 
+     */
+    public List<String> getJobDocumentNames()
+    {
+        return jobDocumentNames;
+    }
 
     /**
      * Get watched elements for the given element type and user.

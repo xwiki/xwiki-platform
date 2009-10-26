@@ -77,7 +77,8 @@ public class WatchListEventMatcher
     public WatchListEventMatcher(Date start, XWikiContext context)
     {
         ActivityStream actStream = 
-            ((ActivityStreamPlugin) context.getWiki().getPlugin("activitystream", context)).getActivityStream();
+            ((ActivityStreamPlugin) 
+                context.getWiki().getPlugin(ActivityStreamPlugin.PLUGIN_NAME, context)).getActivityStream();
         List<Object> parameters = new ArrayList<Object>();
         List<ActivityEvent> rawEvents;
 
@@ -131,15 +132,20 @@ public class WatchListEventMatcher
         List<String> users, String userName, XWikiContext context)
     {
         List<WatchListEvent> matchingEvents = new ArrayList<WatchListEvent>();        
-               
+        WatchListPlugin plugin = (WatchListPlugin) context.getWiki().getPlugin(WatchListPlugin.ID, context);
+        List<String> jobDocumentNames = plugin.getStore().getJobDocumentNames();
         
         for (WatchListEvent event : events) {
             if (wikis.contains(event.getWiki()) || spaces.contains(event.getPrefixedSpace())
                 || documents.contains(event.getPrefixedFullName()) 
                 || ListUtils.intersection(users, event.getAuthors()).size() > 0) {
                 try {
-                    if (context.getWiki().getRightService().hasAccessLevel("view", userName,
-                        event.getPrefixedFullName(), context)) {
+                    // We exclude watchlist jobs from notifications since they are modified each time they are fired,
+                    // producing useless noise. We also ensure that users have the right to view documents we send
+                    // notifications for.
+                    if (!jobDocumentNames.contains(event.getFullName()) 
+                        && context.getWiki().getRightService().hasAccessLevel("view", userName, 
+                            event.getPrefixedFullName(), context)) {
                         matchingEvents.add(event);
                     }
                 } catch (XWikiException e) {

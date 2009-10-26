@@ -21,12 +21,13 @@
 
 package com.xpn.xwiki.plugin.ldap;
 
+import java.io.UnsupportedEncodingException;
+import java.security.Security;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,8 +42,6 @@ import com.novell.ldap.LDAPSearchConstraints;
 import com.novell.ldap.LDAPSearchResults;
 import com.novell.ldap.LDAPSocketFactory;
 import com.xpn.xwiki.XWikiContext;
-
-import java.security.Security;
 
 /**
  * LDAP communication tool.
@@ -123,8 +122,6 @@ public class XWikiLDAPConnection
     public boolean open(String ldapHost, int ldapPort, String loginDN, String password, String pathToKeys, boolean ssl,
         XWikiContext context) throws XWikiLDAPException
     {
-        boolean succeed = false;
-
         int port = ldapPort;
 
         if (port <= 0) {
@@ -159,18 +156,23 @@ public class XWikiLDAPConnection
                 this.connection = new LDAPConnection();
             }
 
+            // connect
             connect(ldapHost, port);
 
-            bind(loginDN, password);
+            // set referral following
+            LDAPSearchConstraints constraints = this.connection.getSearchConstraints();
+            constraints.setReferralFollowing(true);
+            this.connection.setConstraints(constraints);
 
-            succeed = true;
+            // bind
+            bind(loginDN, password);
         } catch (UnsupportedEncodingException e) {
             throw new XWikiLDAPException("LDAP bind failed with UnsupportedEncodingException.", e);
         } catch (LDAPException e) {
             throw new XWikiLDAPException("LDAP bind failed with LDAPException.", e);
         }
 
-        return succeed;
+        return true;
     }
 
     /**
@@ -288,9 +290,8 @@ public class XWikiLDAPConnection
             cons.setTimeLimit(1000);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(
-                    MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]", baseDN,
-                        query, attr != null ? Arrays.asList(attr) : null, ldapScope));
+                LOG.debug(MessageFormat.format("LDAP search: baseDN=[{0}] query=[{1}] attr=[{2}] ldapScope=[{3}]",
+                    baseDN, query, attr != null ? Arrays.asList(attr) : null, ldapScope));
             }
 
             // filter return all attributes return attrs and values time out value

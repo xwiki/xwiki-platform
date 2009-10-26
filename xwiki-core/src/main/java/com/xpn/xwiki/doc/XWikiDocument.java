@@ -175,10 +175,19 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String format;
 
+    /**
+     * First author of the document.
+     */
     private String creator;
 
+    /**
+     * Author is changed when any part of the document changes (content, objects, etc).
+     */
     private String author;
 
+    /**
+     * Content author is only changed when the document content changes.
+     */
     private String contentAuthor;
 
     private String customClass;

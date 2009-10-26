@@ -181,12 +181,15 @@ public class XWikiDocument implements DocumentModelBridge
     private String creator;
 
     /**
-     * Author is changed when any part of the document changes (content, objects, etc).
+     * The Author is changed when any part of the document changes (content, objects, attachments).
      */
     private String author;
 
     /**
-     * Content author is only changed when the document content changes.
+     * The last user that has changed the document's content (ie not object, attachments). The Content author is only 
+     * changed when the document content changes. Note that Content Author is used to check programming rights on a 
+     * document and this is the reason we need to know the last author who's modified the content since programming
+     * rights depend on this.
      */
     private String contentAuthor;
 

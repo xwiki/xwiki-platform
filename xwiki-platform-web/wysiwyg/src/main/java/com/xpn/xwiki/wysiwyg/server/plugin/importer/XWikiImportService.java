@@ -25,7 +25,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.AttachmentName;
+import org.xwiki.bridge.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
@@ -36,7 +37,6 @@ import org.xwiki.xml.html.HTMLUtils;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportService;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 
 /**
  * XWiki specific implementation of {@link ImportService}.
@@ -57,10 +57,17 @@ public class XWikiImportService implements ImportService
     private OfficeImporter officeImporter;
 
     /**
-     * The component used to serialize {@link DocumentName} instances.
+     * The component used to serialize {@link org.xwiki.bridge.DocumentName} instances. This component is needed only
+     * because OfficeImporter component uses String instead of {@link org.xwiki.bridge.DocumentName}.
      */
     @Requirement
     private DocumentNameSerializer documentNameSerializer;
+
+    /**
+     * The component used to parse attachment references.
+     */
+    @Requirement
+    private AttachmentNameFactory attachmentNameFactory;
 
     /**
      * The component manager. We need it because we have to access some components dynamically.
@@ -96,12 +103,11 @@ public class XWikiImportService implements ImportService
     public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams)
     {
         try {
-            ResourceName resourceName = new ResourceName();
-            resourceName.fromString(attachment.getReference(), true);
-            DocumentName documentName =
-                new DocumentName(resourceName.getWiki(), resourceName.getSpace(), resourceName.getPage());
-            return officeImporter.importAttachment(documentNameSerializer.serialize(documentName), resourceName
-                .getFile(), cleaningParams);
+            AttachmentName attachmentName = attachmentNameFactory.createAttachmentName(attachment.getReference());
+            // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
+            // DocumentNameSerializer.
+            return officeImporter.importAttachment(documentNameSerializer.serialize(attachmentName.getDocumentName()),
+                attachmentName.getFileName(), cleaningParams);
         } catch (Exception e) {
             LOG.error("Exception while importing office document.", e);
             throw new RuntimeException(e.getLocalizedMessage());

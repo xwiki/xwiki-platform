@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.sync;
+package com.xpn.xwiki.wysiwyg.server.plugin.sync;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,9 +25,10 @@ import java.util.Map;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncTools;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncTools;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.sync;
+package com.xpn.xwiki.wysiwyg.client.plugin.sync;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;

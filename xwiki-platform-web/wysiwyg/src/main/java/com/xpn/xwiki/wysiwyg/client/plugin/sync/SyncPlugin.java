@@ -44,8 +44,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncTools;
 import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.Console;
 import com.xpn.xwiki.wysiwyg.client.util.Timer;

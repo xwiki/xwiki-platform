@@ -721,13 +721,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public String getDisplayTitle(XWikiContext context)
     {
-        try {
-            return getRenderedTitle(Syntax.XHTML_1_0, context);
-        } catch (XWikiException e) {
-            LOG.error("Failed to render document title content", e);
-
-            return getName();
-        }
+        return getRenderedTitle(Syntax.XHTML_1_0, context);
     }
 
     /**
@@ -815,27 +809,34 @@ public class XWikiDocument implements DocumentModelBridge
      * @param outputSyntax the syntax to render to. This is not taken into account for xwiki/1.0 syntax.
      * @param context the XWiki context
      * @return the rendered version of the title
-     * @throws XWikiException failed to render title content
      */
-    public String getRenderedTitle(Syntax outputSyntax, XWikiContext context) throws XWikiException
+    public String getRenderedTitle(Syntax outputSyntax, XWikiContext context)
     {
         // 1) Check if the user has provided a title
         String title = getTitle();
 
-        if (!StringUtils.isEmpty(title)) {
-            title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
+        try {
+            if (!StringUtils.isEmpty(title)) {
+                title = context.getWiki().getRenderingEngine().interpretText(title, this, context);
 
-            if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
-                XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), title);
-                this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
-                title = renderXDOM(xdom, outputSyntax);
+                if (!outputSyntax.equals(Syntax.HTML_4_01) && !outputSyntax.equals(Syntax.XHTML_1_0)) {
+                    XDOM xdom = parseContent(Syntax.HTML_4_01.toIdString(), title);
+                    this.parserUtils.removeTopLevelParagraph(xdom.getChildren());
+                    title = renderXDOM(xdom, outputSyntax);
+                }
+
+                return title;
             }
-
-            return title;
+        } catch (Exception e) {
+            LOG.warn("Failed to inerpret title of document [" + this + "]", e);
         }
 
-        // 2) If not, then try to extract the title from the first document section title
-        title = getRenderedContentTitle(outputSyntax, context);
+        try {
+            // 2) If not, then try to extract the title from the first document section title
+            title = getRenderedContentTitle(outputSyntax, context);
+        } catch (Exception e) {
+            LOG.warn("Failed to extract title from content of document [" + this + "]", e);
+        }
 
         // 3) No title has been found, return the page name as the title
         if (StringUtils.isEmpty(title)) {

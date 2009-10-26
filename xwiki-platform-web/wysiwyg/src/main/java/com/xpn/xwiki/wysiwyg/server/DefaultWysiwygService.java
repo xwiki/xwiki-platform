@@ -45,11 +45,11 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
-import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.DefaultSyncEngine;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 
 /**
  * The default implementation for {@link WysiwygService}.

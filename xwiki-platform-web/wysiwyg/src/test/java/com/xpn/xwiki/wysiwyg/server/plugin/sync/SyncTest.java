@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.sync;
+package com.xpn.xwiki.wysiwyg.server.plugin.sync;
 
 import org.jmock.cglib.MockObjectTestCase;
 
@@ -27,8 +27,11 @@ import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.PatchFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
+import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.DefaultSyncEngine;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncException;
 
 public class SyncTest extends MockObjectTestCase
 {

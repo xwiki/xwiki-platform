@@ -271,11 +271,11 @@
 #set($eventStyle = "padding-left:21px;")
 #set($diffStyle = "padding:5px;margin:5px;background-color:$veryLightGray;border-left:solid 4px $lightGray;")
 #set($propDiffStyle = "margin-right:2px;padding:2px;")
-#set($containerStyle = "width:800px;font-family: Arial, Verdana;")
-#set($leftColumnStyle = "float:left;width:600px;font-size:80%;")
-#set($rightColumnStyle = "float:right;width:200px;border-left:solid 1px $darkgray;")
-#set($rightColumnUlStyle = "margin-left:1em;padding-left:0;font-size:90%;list-style-type:empty-circle;")
+#set($containerStyle = "font-family: Arial, Verdana;font-size:95%")
+#set($rightColumnStyle = "float:right;border:solid 1px ${darkGray};background:white;margin-left:2em;margin-bottom:2em;padding-right:0.5em;")
+#set($rightColumnUlStyle = "margin-left:1em;padding-left:0;")
 #set($rightColumnAStyle = "color:$darkGray;")
+#set($rightColumnTitleStyle = "margin:0.5em;")
 
 #macro(displayhtmldiff $html)
   #set($result = $html.replaceAll('\&lt;div class="diff"\&gt;\&lt;/div\&gt;', "").trim())
@@ -302,6 +302,40 @@
 #end
 
 &lt;div style="$containerStyle"&gt;
+&lt;div style="$rightColumnStyle"&gt;
+&lt;h2 style="$rightColumnTitleStyle"&gt;$msg.get("Contents")&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+#set($firstEntry = true)
+#set($previousEvent = "")
+#set($previousDoc = "")
+&lt;ul style="$rightColumnUlStyle"&gt;
+#foreach ($event in $events)
+  #set($prefixedFullName = $event.getPrefixedFullName())
+  #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
+  #if ($newWiki)
+    #if (!$firstEntry) &lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt; #else #set($firstEntry = false) #end
+    #set($previousEvent = "")
+    &lt;li&gt;&lt;a href="#$event.getWiki()" style="$rightColumnAStyle"&gt;$event.getWiki()&lt;/a&gt;
+    &lt;ul style="$rightColumnUlStyle"&gt;
+  #end
+  #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
+  #if ($newSpace)
+    #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/ul&gt;&lt;/li&gt; #end
+    #set($previousEvent = "")
+    &lt;li&gt;&lt;a href="#${event.getWiki()}:$event.getSpace()" style="$rightColumnAStyle"&gt;$event.getSpace()&lt;/a&gt;
+    &lt;ul style="$rightColumnUlStyle"&gt;
+  #end
+  #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
+  #if($newDocument)
+    #set($currentDoc = $xwiki.getDocument($prefixedFullName))
+    &lt;li&gt;&lt;a href="#$prefixedFullName" style="$rightColumnAStyle"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/li&gt;
+  #end
+  #set($previousEvent = $event)
+  #set($previousDoc = $currentDoc)
+#end
+&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+
 $msg.get("watchlist.notification.email.greeting", [$first_name])&lt;br&gt;&lt;br&gt;
 
 #if($modifiedDocuments.size() == 1)
@@ -310,31 +344,31 @@ $msg.get("watchlist.notification.email.singleUpdate.intro")
 $msg.get("watchlist.notification.email.multipleUpdates.intro")
 #end
 
-&lt;div style="clear:both;heigth:0;"&gt;&lt;/div&gt;
-&lt;div style="$leftColumnStyle"&gt;
+#set($firstEntry = true)
 #set($previousEvent = "")
 #set($previousDoc = "")
 #foreach ($event in $events)
-  #set($firstEntry = ($previousEvent == ""))
   #set($prefixedFullName = $event.getPrefixedFullName())
-  #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
-  #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
-  #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
+  #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))  
   #if ($newWiki)
-    #if (!$firstEntry) &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; #end
+    #if (!$firstEntry) &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; #else #set($firstEntry = false) #end
+    #set($previousEvent = "")
     &lt;div class="wiki" style="$wikiDivStyle"&gt;
     &lt;h1 style="$h1Style"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$event.getWiki()"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getWiki()&lt;/h1&gt;
   #end
+  #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
   #if ($newSpace)
     #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/div&gt;&lt;/div&gt; #end
+    #set($previousEvent = "")
     &lt;div class="space" style="$spaceDivStyle"&gt;
     &lt;h2 style="$h2Style"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="${event.getWiki()}:$event.getSpace()"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getSpace()&lt;/h2&gt;
   #end
+  #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
   #if($newDocument)
     #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
     &lt;div class="document" style="$documentDivStyle"&gt;
     #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$prefixedFullName" href="$event.getUrl()"&gt;&lt;span&gt;$currentDoc.getDisplayTitle()&lt;/span&gt;&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"&gt;&lt;img src="cid:arrowup.gif" style="border:0;" /&gt;&lt;/a&gt;&lt;/h3&gt;
+    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$prefixedFullName" href="$event.getUrl()"&gt;&lt;span&gt;$currentDoc.getDisplayTitle()&lt;/span&gt;&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"&gt;&lt;img src="cid:arrowup.gif" style="border:0;" width="16px" height="16px"/&gt;&lt;/a&gt;&lt;/h3&gt;
     &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
   &lt;div style="$eventStyle"&gt;
@@ -362,37 +396,6 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   #set($previousDoc = $currentDoc)
 #end
 &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;div style="$rightColumnStyle"&gt;
-&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;
-#set($previousEvent = "")
-#set($previousDoc = "")
-&lt;ul style="$rightColumnUlStyle"&gt;
-#foreach ($event in $events)
-  #set($firstEntry = ($previousEvent == ""))
-  #set($prefixedFullName = $event.getPrefixedFullName())
-  #set($newWiki = ($event.getWiki() != $previousEvent.getWiki()))
-  #set($newSpace = ($event.getSpace() != $previousEvent.getSpace()))
-  #set($newDocument = $prefixedFullName != $previousDoc.getPrefixedFullName())
-  #if ($newWiki)
-    #if (!$firstEntry) &lt;/ul&gt;&lt;/li&gt; #end
-    &lt;li&gt;&lt;a href="#$event.getWiki()" style="$rightColumnAStyle"&gt;$event.getWiki()&lt;/a&gt;
-    &lt;ul style="$rightColumnUlStyle"&gt;
-  #end
-  #if ($newSpace)
-    #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/ul&gt;&lt;/li&gt; #end
-    &lt;li&gt;&lt;a href="#${event.getWiki()}:$event.getSpace()" style="$rightColumnAStyle"&gt;$event.getSpace()&lt;/a&gt;
-    &lt;ul style="$rightColumnUlStyle"&gt;
-  #end
-  #if($newDocument)
-    #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;li&gt;&lt;a href="#$prefixedFullName" style="$rightColumnAStyle"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt;&lt;/li&gt;
-  #end
-  #set($previousEvent = $event)
-  #set($previousDoc = $currentDoc)
-#end
-&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;
-&lt;/div&gt;
 &lt;/div&gt;
 &lt;!--
 We want to be able to use attached images in the HTML part of the email but we don't want them to be listed as attachments. We use a little trick here to make the mailsender plugin consider that we use all the attached images in this mail even if we don't (some images are used very rarely).

@@ -222,7 +222,7 @@ public class ObservationManagerTest
     }
     
     /**
-     * Verify that we can register a listener with too even of the same type but with different matching and it will receive both events.
+     * Verify that we can register a listener with two events of the same type but with not matching the same thing and it will receive both events.
      */
     @Test
     public void testRegisterListenerForTwoEventsOfSameType()

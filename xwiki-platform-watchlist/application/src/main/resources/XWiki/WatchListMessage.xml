@@ -303,7 +303,7 @@
 
 &lt;div style="$containerStyle"&gt;
 &lt;div style="$rightColumnStyle"&gt;
-&lt;h2 style="$rightColumnTitleStyle"&gt;$msg.get("Contents")&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
+&lt;h2 style="$rightColumnTitleStyle"&gt;$msg.get("watchlist.notification.email.contents")&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;&lt;/h2&gt;
 #set($firstEntry = true)
 #set($previousEvent = "")
 #set($previousDoc = "")

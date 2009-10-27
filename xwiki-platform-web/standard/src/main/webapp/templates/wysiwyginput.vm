@@ -1,3 +1,5 @@
+## Make sure the XWiki velocity variables are defined when the edited content is rendered.
+#template("xwikivars.vm")
 ## The XML declaration is commented out to avoid quirks mode in IE6.
 ##<?xml version="1.0" encoding="$xwiki.encoding" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"

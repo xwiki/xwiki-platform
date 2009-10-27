@@ -323,18 +323,18 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
   #if ($newWiki)
     #if (!$firstEntry) &lt;/div&gt;&lt;/div&gt;&lt;/div&gt; #end
     &lt;div class="wiki" style="$wikiDivStyle"&gt;
-    &lt;h1 style="$h1Style" id="$event.getWiki()"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt; $event.getWiki()&lt;/h1&gt;
+    &lt;h1 style="$h1Style"&gt;&lt;img src="cid:wiki.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$event.getWiki()"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getWiki()&lt;/h1&gt;
   #end
   #if ($newSpace)
     #if (!$firstEntry &amp;&amp; !$newWiki) &lt;/div&gt;&lt;/div&gt; #end
     &lt;div class="space" style="$spaceDivStyle"&gt;
-    &lt;h2 style="$h2Style" id="${event.getWiki()}:$event.getSpace()"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt; $event.getSpace()&lt;/h2&gt;
+    &lt;h2 style="$h2Style"&gt;&lt;img src="cid:space.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="${event.getWiki()}:$event.getSpace()"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;$event.getSpace()&lt;/h2&gt;
   #end
   #if($newDocument)
     #if (!$firstEntry &amp;&amp; !$newWiki &amp;&amp; !$newSpace) &lt;/div&gt; #end
     &lt;div class="document" style="$documentDivStyle"&gt;
     #set($currentDoc = $xwiki.getDocument($prefixedFullName))
-    &lt;h3 id="$prefixedFullName" style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a href="$event.getUrl()"&gt;$currentDoc.getDisplayTitle()&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"/&gt;&lt;img src="cid:arrowup.gif" style="border:0;" /&gt;&lt;/a&gt;&lt;/h3&gt;
+    &lt;h3 style="$h3Style"&gt;&lt;img src="cid:document.gif" style="$iconStyle" ${iconAttrs} /&gt;&lt;a name="$prefixedFullName" href="$event.getUrl()"&gt;&lt;span&gt;$currentDoc.getDisplayTitle()&lt;/span&gt;&lt;/a&gt; &lt;a href="#nav" style="text-decoration:none;padding-top:8px;"&gt;&lt;img src="cid:arrowup.gif" style="border:0;" /&gt;&lt;/a&gt;&lt;/h3&gt;
     &lt;span style="$h3BaselineStyle"&gt;$event.getFullName()&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;
   #end
   &lt;div style="$eventStyle"&gt;
@@ -363,7 +363,8 @@ $msg.get("watchlist.notification.email.multipleUpdates.intro")
 #end
 &lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;div id="nav" style="$rightColumnStyle"&gt;
+&lt;div style="$rightColumnStyle"&gt;
+&lt;a name="nav"&gt;&lt;span&gt;&amp;nbsp;&lt;/span&gt;&lt;/a&gt;
 #set($previousEvent = "")
 #set($previousDoc = "")
 &lt;ul style="$rightColumnUlStyle"&gt;

@@ -80,7 +80,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
         /**
          * Events of a given type associated with a given listener.
          */
-        private List<Event> events;
+        private List<Event> events = new ArrayList<Event>();
 
         /**
          * Listener associated with the events.
@@ -94,9 +94,7 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
          */
         RegisteredListener(EventListener listener, Event event)
         {
-            List<Event> list = new ArrayList<Event>();
-            list.add(event);
-            this.events = list;
+            addEvent(event);
 
             this.listener = listener;
         }
@@ -143,16 +141,16 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
      */
     public void addListener(EventListener eventListener)
     {
+        // Register the listener by name. If already registered, override it.
+        EventListener previousListener = this.listenersByName.put(eventListener.getName(), eventListener);
+
         // If the passed event listener name is already registered, log a warning
-        if (this.listenersByName.containsKey(eventListener.getName())) {
+        if (previousListener != null) {
             getLogger().warn("The [" + eventListener.getClass().getName() + "] listener has overwritten a previously "
-                + "registered listener [" + this.listenersByName.get(eventListener.getName()).getClass().getName()
+                + "registered listener [" + previousListener.getClass().getName()
                 + "] since they both are registered under the same id [" + eventListener.getName() + "]."
                 + " In the future consider removing a Listener first if you really want to register it again.");
         }
-
-        // Register the listener by name. If already registered, override it.
-        this.listenersByName.put(eventListener.getName(), eventListener);
 
         // For each event defined for this listener, add it to the Event Map.
         for (Event event : eventListener.getEvents()) {
@@ -162,8 +160,17 @@ public class DefaultObservationManager extends AbstractLogEnabled implements Obs
                 // No listener registered for this event yet. Create a map to store listeners for this event.
                 eventListeners = new ConcurrentHashMap<String, RegisteredListener>();
                 this.listenersByEvent.put(event.getClass(), eventListeners);
+                // There is no RegisteredListener yet, create one
+                eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event));
+            } else {
+                // Add an event to existing RegisteredListener object
+                RegisteredListener registeredListener = eventListeners.get(eventListener.getName());
+                if (registeredListener == null) {
+                    eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event)); 
+                } else {
+                    registeredListener.addEvent(event);
+                }
             }
-            eventListeners.put(eventListener.getName(), new RegisteredListener(eventListener, event));
         }
     }
 

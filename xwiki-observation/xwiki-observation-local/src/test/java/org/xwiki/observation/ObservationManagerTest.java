@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.phase.LogEnabled;
+import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.AllEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -218,5 +219,28 @@ public class ObservationManagerTest
         this.manager.removeListener("mylistener");
         // Next line will not log any warning
         this.manager.addListener(listener);
+    }
+    
+    /**
+     * Verify that we can register a listener with too even of the same type but with different matching and it will receive both events.
+     */
+    @Test
+    public void testRegisterListenerForTwoEventsOfSameType()
+    {
+        final EventListener listener = this.context.mock(EventListener.class);
+        final Event eventMatcher1 = new ActionExecutionEvent("action1");
+        final Event eventMatcher2 = new ActionExecutionEvent("action2");
+        
+        this.context.checking(new Expectations() {{
+            allowing(listener).getName(); will(returnValue("mylistener"));
+            allowing(listener).getEvents(); will(returnValue(Arrays.asList(eventMatcher1, eventMatcher2)));
+
+            oneOf(listener).onEvent(with(eventMatcher1), with(any(Object.class)), with(any(Object.class)));
+            oneOf(listener).onEvent(with(eventMatcher2), with(any(Object.class)), with(any(Object.class)));
+        }});
+
+        this.manager.addListener(listener);
+        this.manager.notify(eventMatcher1, "some source", "some data");
+        this.manager.notify(eventMatcher2, "some source", "some data");
     }
 }

@@ -78,6 +78,16 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     private static final String PREINITIAL_DOCUMENT_VERSION = "1.0";
     
     /**
+     * Value to display in diffs for hidden properties (email, password, etc).
+     */
+    private static final String HIDDEN_PROPERTIES_OBFUSCATED_VALUE = "******************";
+    
+    /**
+     * Name of email property.
+     */
+    private static final String EMAIL_PROPERTY_NAME = "email";
+    
+    /**
      * Event hashcode.
      */
     private final int hashCode;
@@ -437,9 +447,10 @@ public class WatchListEvent implements Comparable<WatchListEvent>
             diff.getDifferencesAsHTML(objectDiff.getPrevValue().toString(), objectDiff.getNewValue().toString(), 
                 false);
         
-        if (objectDiff.getPropType().equals(StringUtils.substringAfterLast(PasswordClass.class.getName(), ".")) 
-            && !StringUtils.isBlank(propDiff)) {
-            propDiff = "******************";
+        // We hide PasswordClass properties and properties named "email" from notifications for security reasons.
+        if ((objectDiff.getPropType().equals(StringUtils.substringAfterLast(PasswordClass.class.getName(), ".")) 
+            || objectDiff.getPropName().equals(EMAIL_PROPERTY_NAME)) && !StringUtils.isBlank(propDiff)) {
+            propDiff = HIDDEN_PROPERTIES_OBFUSCATED_VALUE;
         }
          
         return propDiff;

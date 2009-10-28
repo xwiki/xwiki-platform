@@ -376,8 +376,12 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                         currentVersion = allVersions.get(allVersions.size() - 1);
                     }
                 }
+                
+                if (currentVersion.equals(INITIAL_DOCUMENT_VERSION)) {
+                    previousVersion = PREINITIAL_DOCUMENT_VERSION;
+                }
 
-                if (!StringUtils.isBlank(currentVersion)) {
+                if (!StringUtils.isBlank(currentVersion) && StringUtils.isBlank(previousVersion)) {
                     XWikiDocument doc = context.getWiki().getDocument(prefixedFullName, context);
                     XWikiDocument docRev = context.getWiki().getDocument(doc, currentVersion, context);
                     doc.loadArchive(context);
@@ -385,10 +389,6 @@ public class WatchListEvent implements Comparable<WatchListEvent>
                     if (version != null) {
                         previousVersion = version.toString();
                     }
-                }
-                
-                if (currentVersion.equals(INITIAL_DOCUMENT_VERSION)) {
-                    previousVersion = PREINITIAL_DOCUMENT_VERSION;
                 }
             } catch (XWikiException e) {
                 // Catch the exception to be sure we won't send emails containing stacktraces to users.

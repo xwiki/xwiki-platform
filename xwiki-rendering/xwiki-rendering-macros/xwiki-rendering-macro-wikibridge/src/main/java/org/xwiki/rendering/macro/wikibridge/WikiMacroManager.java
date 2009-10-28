@@ -24,6 +24,8 @@ import org.xwiki.component.annotation.ComponentRole;
 /**
  * Component interface responsible for managing wiki macro instances.
  * 
+ * TODO: Need to change all the string based document names to DocumentName. 
+ * 
  * @version $Id$
  * @since 2.0M2
  */

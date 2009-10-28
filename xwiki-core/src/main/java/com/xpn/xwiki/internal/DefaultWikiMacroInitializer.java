@@ -86,17 +86,17 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     /**
      * {@inheritDoc}
      */
-    public void init()
-    {
-        // Install or Upgrade wiki macro class definitions.
-        try {
-            installOrUpgradeWikiMacroClasses();
-        } catch (XWikiException ex) {
-            getLogger().error("Error while installing / upgrading wiki macro class definitions.", ex);
-            return;
-        }
-
+    public void registerExistingWikiMacros() throws Exception
+    {                
         XWikiContext xcontext = getContext();
+        
+        // Check whether xwiki classes required for defining wiki macros are present.
+        XWikiDocument wikiMacroClass = xcontext.getWiki().getDocument(WIKI_MACRO_CLASS, xcontext);
+        XWikiDocument wikiMacroParameterClass = xcontext.getWiki().getDocument(WIKI_MACRO_PARAMETER_CLASS, xcontext);
+        if (wikiMacroClass.isNew() || wikiMacroParameterClass.isNew()) {
+            String message = "Unable to locate [%s] & [%s] classes required for defining wiki macros.";
+            throw new Exception(String.format(message, WIKI_MACRO_CLASS, WIKI_MACRO_PARAMETER_CLASS));
+        }
 
         // Only consider the main wiki.
         xcontext.setDatabase(MAIN_WIKI);
@@ -109,8 +109,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         try {
             wikiMacroDocs = xcontext.getWiki().getStore().search(sql, 0, 0, Arrays.asList(WIKI_MACRO_CLASS), xcontext);
         } catch (XWikiException ex) {
-            getLogger().error("Error while searching for macro documents", ex);
-            return;
+            throw new Exception("Error while searching for macro documents", ex);
         }
 
         // Build macros.
@@ -164,11 +163,9 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     }
 
     /**
-     * Installs or upgrades XWiki.WikiMacroClass & XWiki.WikiMacroParameterClass.
-     * 
-     * @throws XWikiException if an error occurs while accessing wiki macro class definitions.
+     * {@inheritDoc}
      */
-    private void installOrUpgradeWikiMacroClasses() throws XWikiException
+    public void installOrUpgradeWikiMacroClasses() throws Exception
     {
         XWikiContext xcontext = getContext();
 
@@ -192,7 +189,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);
         
         if (needsUpdate) {
-           xcontext.getWiki().saveDocument(doc, xcontext); 
+           update(doc);
         }
         
         // Install or Upgrade XWiki.WikiMacroParameterClass
@@ -208,7 +205,24 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         needsUpdate |= bclass.addBooleanField(PARAMETER_MANDATORY_PROPERTY, "Parameter mandatory", "yesno");
         
         if (needsUpdate) {
-            xcontext.getWiki().saveDocument(doc, xcontext); 
+        	update(doc);
         }
+    }
+
+    /**
+     * Utility method for updating a wiki macro class definition document.
+     * 
+     * @param doc xwiki document containing the wiki macro class.
+     * @throws XWikiException if an error occurs while saving the document.
+     */
+    private void update(XWikiDocument doc) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+
+        if (doc.isNew()) {
+            doc.setParent("XWiki.WebHome");
+        }
+        
+        xcontext.getWiki().saveDocument(doc, xcontext);
     }
 }

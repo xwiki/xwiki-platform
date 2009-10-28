@@ -774,7 +774,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
         // Initialize all wiki macros
-        initWikiMacros();
+        registerWikiMacros();
     }
 
     /**
@@ -792,6 +792,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         getSkinClass(context);
         getGlobalRightsClass(context);
         getSheetClass(context);
+        
+        try {
+            WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
+            wikiMacroInitializer.installOrUpgradeWikiMacroClasses();
+        } catch (Exception ex) {
+            LOG.error("Error while installing / upgrading xwiki classes required for wiki macros.", ex);
+        }
 
         if (context.getDatabase().equals(context.getMainXWiki())
             && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
@@ -799,15 +806,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
-    protected void initWikiMacros()
+    protected void registerWikiMacros()
     {
-        // Initialize all wiki macros
         // TODO: Use a component-based init mechanism instead. Note that we need the DB access to be available.
         try {
             WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
-            wikiMacroInitializer.init();
-        } catch (ComponentLookupException e) {
-            LOG.error("Error while initializing wiki macros", e);
+            wikiMacroInitializer.registerExistingWikiMacros();
+        } catch (Exception ex) {
+            LOG.error("Error while registering wiki macros.", ex);
         }
     }
 

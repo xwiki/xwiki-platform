@@ -82,7 +82,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractBridgedXWikiCompone
                 return defaultValue;
             }
 
-            protected void initWikiMacros()
+            protected void registerWikiMacros()
             {
 
             }

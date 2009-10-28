@@ -272,10 +272,10 @@
 #set($diffStyle = "padding:5px;margin:5px;background-color:$veryLightGray;border-left:solid 4px $lightGray;")
 #set($propDiffStyle = "margin-right:2px;padding:2px;")
 #set($containerStyle = "font-family: Arial, Verdana;font-size:95%")
-#set($rightColumnStyle = "float:right;border:solid 1px ${darkGray};background:white;margin-left:2em;margin-bottom:2em;padding-right:0.5em;")
+#set($rightColumnStyle = "float:right;border:solid 1px ${darkGray};background:white;margin-left:2em;margin-bottom:2em;padding:1em;")
 #set($rightColumnUlStyle = "margin-left:1em;padding-left:0;")
 #set($rightColumnAStyle = "color:$darkGray;")
-#set($rightColumnTitleStyle = "margin:0.5em;")
+#set($rightColumnTitleStyle = "margin:0;")
 
 #macro(displayhtmldiff $html)
   #set($result = $html.replaceAll('\&lt;div class="diff"\&gt;\&lt;/div\&gt;', "").trim())

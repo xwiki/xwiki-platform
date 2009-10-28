@@ -99,4 +99,9 @@ public interface DocumentModelBridge
      * @return the document's title or null if not set
      */
     String getTitle();
+
+    /**
+     * @return a string identifying the current version of this document
+     */
+    String getVersion();
 }

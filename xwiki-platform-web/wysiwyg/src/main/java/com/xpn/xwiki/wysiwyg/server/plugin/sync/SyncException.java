@@ -19,95 +19,54 @@
  */
 package com.xpn.xwiki.wysiwyg.server.plugin.sync;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletException;
-
-import org.apache.velocity.exception.MethodInvocationException;
-import org.hibernate.JDBCException;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-public class SyncException extends Exception implements IsSerializable
+/**
+ * A synchronization exception.
+ * 
+ * @version $Id$
+ */
+public class SyncException extends Exception
 {
-    private String message;
+    /**
+     * Field required by all {@link java.io.Serializable} classes.
+     */
+    private static final long serialVersionUID = 4456364417718269072L;
 
-    private Exception exception;
-
+    /**
+     * Creates a new synchronization exception.
+     */
     public SyncException()
     {
         super();
     }
 
-    public SyncException(String message, Exception e)
+    /**
+     * Creates a new synchronization exception with the specified message.
+     * 
+     * @param message the exception message
+     */
+    public SyncException(String message)
     {
-        super();
-        this.setMessage(message);
-        this.setException(e);
+        super(message);
     }
 
-    public String getMessage()
+    /**
+     * Creates a new synchronization exception with the specified cause.
+     * 
+     * @param cause the exception cause
+     */
+    public SyncException(Throwable cause)
     {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append(message);
-        if (exception != null) {
-            buffer.append("\nWrapped Exception: ");
-            buffer.append(exception.getMessage());
-        }
-        return buffer.toString();
+        super(cause);
     }
 
-    public void setMessage(String message)
+    /**
+     * Creates a new synchronization exception with the given message and the specified cause.
+     * 
+     * @param message the exception message
+     * @param cause the exception cause
+     */
+    public SyncException(String message, Throwable cause)
     {
-        this.message = message;
-    }
-
-    public Exception getException()
-    {
-        return exception;
-    }
-
-    public void setException(Exception e)
-    {
-        this.exception = e;
-    }
-
-    public void printStackTrace(PrintWriter s)
-    {
-        super.printStackTrace(s);
-        if (exception != null) {
-            s.write("\n\nWrapped Exception:\n\n");
-            if (exception.getCause() != null)
-                exception.getCause().printStackTrace(s);
-            else if (exception instanceof org.hibernate.JDBCException) {
-                (((JDBCException) exception).getSQLException()).printStackTrace(s);
-            } else if (exception instanceof MethodInvocationException) {
-                (((MethodInvocationException) exception).getWrappedThrowable()).printStackTrace(s);
-            } else if (exception instanceof ServletException) {
-                (((ServletException) exception).getRootCause()).printStackTrace(s);
-            } else {
-                exception.printStackTrace(s);
-            }
-        }
-    }
-
-    public void printStackTrace(PrintStream s)
-    {
-        super.printStackTrace(s);
-        if (exception != null) {
-            s.print("\n\nWrapped Exception:\n\n");
-            if (exception.getCause() != null)
-                exception.getCause().printStackTrace(s);
-            else if (exception instanceof org.hibernate.JDBCException) {
-                (((JDBCException) exception).getSQLException()).printStackTrace(s);
-            } else if (exception instanceof MethodInvocationException) {
-                (((MethodInvocationException) exception).getWrappedThrowable()).printStackTrace(s);
-            } else if (exception instanceof ServletException) {
-                (((ServletException) exception).getRootCause()).printStackTrace(s);
-            } else {
-                exception.printStackTrace(s);
-            }
-        }
+        super(message, cause);
     }
 }

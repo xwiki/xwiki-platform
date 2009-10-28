@@ -107,6 +107,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-container-api</artifactId>
+      <version>${platform.core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <scope>provided</scope>
@@ -198,9 +204,10 @@
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfig.java,
             com/xpn/xwiki/wysiwyg/client/plugin/link/LinkConfigTest.java,
             com/xpn/xwiki/wysiwyg/client/plugin/image/ImageConfig.java,
-            com/xpn/xwiki/wysiwyg/client/plugin/sync/**/*,
-            com/xpn/xwiki/wysiwyg/server/plugin/sync/**/*,
-            com/xpn/xwiki/wysiwyg/server/DefaultWysiwygService.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
+            com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncTools.java,
+            com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
+            com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java,
             com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java</excludes>
         </configuration>
       </plugin>

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.sync;
 
+import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
@@ -33,6 +34,11 @@ public final class SyncPluginFactory extends AbstractPluginFactory
      * The singleton factory instance.
      */
     private static SyncPluginFactory instance;
+
+    /**
+     * The service used to synchronize the content of multiple editors.
+     */
+    private final SyncServiceAsync syncService = GWT.create(SyncService.class);
 
     /**
      * Default constructor.
@@ -60,6 +66,6 @@ public final class SyncPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return new SyncPlugin();
+        return new SyncPlugin(syncService);
     }
 }

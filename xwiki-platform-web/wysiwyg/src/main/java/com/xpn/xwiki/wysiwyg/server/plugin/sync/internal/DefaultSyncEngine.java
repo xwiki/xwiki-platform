@@ -17,10 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.plugin.sync;
+package com.xpn.xwiki.wysiwyg.server.plugin.sync.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -28,64 +31,75 @@ import com.xpn.xwiki.wysiwyg.client.diff.ToString;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncTools;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+/**
+ * Default implementation of {@link SyncEngine}.
+ * 
+ * @version $Id$
+ */
 public class DefaultSyncEngine implements SyncEngine
 {
-
     /**
-       * Default XWiki logger to report errors correctly.
-       */
+     * Default XWiki logger to report errors correctly.
+     */
     private static final Log LOG = LogFactory.getLog(DefaultSyncEngine.class);
 
+    /**
+     * The map of synchronization statuses.
+     */
     private Map<String, SyncStatus> syncMap = new HashMap<String, SyncStatus>();
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SyncEngine#getSyncStatus(String)
+     */
     public SyncStatus getSyncStatus(String key)
     {
         return syncMap.get(key);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SyncEngine#setSyncStatus(String, SyncStatus)
+     */
     public void setSyncStatus(String key, SyncStatus syncStatus)
     {
         syncMap.put(key, syncStatus);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SyncEngine#sync(SyncStatus, Revision, int)
+     */
     public SyncResult sync(SyncStatus syncStatus, Revision revision, int version) throws SyncException
     {
         try {
             SyncResult result = new SyncResult();
             String originalContent = syncStatus.getVersion(version);
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Current server version is: " + syncStatus.getCurrentVersionNumber());
-                LOG.debug("Client version is: " + version);
-            }
+            LOG.debug("Current server version is: " + syncStatus.getCurrentVersionNumber());
+            LOG.debug("Client version is: " + version);
 
             if (version == syncStatus.getCurrentVersionNumber()) {
                 // this is simple just apply the patch if there is a patch
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Nothing to apply from the server");
-                }
+                LOG.debug("Nothing to apply from the server");
 
                 if (revision == null) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Nothing to apply from the client");
-                    }
+                    LOG.debug("Nothing to apply from the client");
                     return null;
                 }
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Applying patch from the client: " + revision);
-                    LOG.debug("Original content: " + originalContent);
-                }
+                LOG.debug("Applying patch from the client: " + revision);
+                LOG.debug("Original content: " + originalContent);
 
                 String newContent = ToString.arrayToString(revision.patch(ToString.stringToArray(originalContent)));
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("New content: " + newContent);
-                }
+                LOG.debug("New content: " + newContent);
                 syncStatus.addVersion(newContent);
                 result.setVersion(syncStatus.getCurrentVersionNumber());
                 result.setRevision(null);
@@ -94,14 +108,12 @@ public class DefaultSyncEngine implements SyncEngine
             } else {
                 String lastContent = syncStatus.getCurrentVersion();
                 Revision rev;
-                if (lastContent.equals(originalContent))
+                if (lastContent.equals(originalContent)) {
                     rev = null;
-                else {
+                } else {
                     rev = Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(lastContent));
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Content on client is based on this content: " + originalContent);
-                        LOG.debug("Clients needs to update it's content with rev: " + rev);
-                    }
+                    LOG.debug("Content on client is based on this content: " + originalContent);
+                    LOG.debug("Clients needs to update it's content with rev: " + rev);
                 }
 
                 if (revision == null) {
@@ -110,30 +122,22 @@ public class DefaultSyncEngine implements SyncEngine
                     result.setStatus(true);
                     return result;
                 } else {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Original revision is: " + revision);
-                        LOG.debug("Other revision is: " + rev);
-                    }
+                    LOG.debug("Original revision is: " + revision);
+                    LOG.debug("Other revision is: " + rev);
                     if (rev != null) {
                         revision = SyncTools.relocateRevision(revision, rev);
                     }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Relocated revision is: " + revision);
-                        LOG.debug("Content being patched: " + lastContent);
-                    }
+                    LOG.debug("Relocated revision is: " + revision);
+                    LOG.debug("Content being patched: " + lastContent);
 
                     String newContent = ToString.arrayToString(revision.patch(ToString.stringToArray(lastContent)));
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("New content: " + newContent);
-                    }
+                    LOG.debug("New content is: " + newContent);
 
                     // Calculate the new revision to send back
                     Revision newRevision =
                         Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(newContent));
 
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("New revision to apply on the client: " + newRevision);                     
-                    }
+                    LOG.debug("New revision to apply on the client: " + newRevision);
 
                     syncStatus.addVersion(newContent);
                     result.setVersion(syncStatus.getCurrentVersionNumber());
@@ -143,11 +147,8 @@ public class DefaultSyncEngine implements SyncEngine
                 }
             }
         } catch (Exception e) {
-            if (LOG.isErrorEnabled())
-                LOG.error("Exception while processing sync", e);
+            LOG.error("Exception while processing sync", e);
             throw new SyncException("Sync Failed", e);
-
         }
-
     }
 }

@@ -29,9 +29,9 @@ import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
-import com.xpn.xwiki.wysiwyg.server.plugin.sync.DefaultSyncEngine;
 import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncException;
+import com.xpn.xwiki.wysiwyg.server.plugin.sync.internal.DefaultSyncEngine;
 
 public class SyncTest extends MockObjectTestCase
 {

@@ -31,7 +31,17 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface WikiMacroInitializer
 {
     /**
-     * Initializes this {@link WikiMacroInitializer}'s macros and registers them against the ComponentManager.
+     * Installs or upgrades xwiki classes required for defining wiki macros.
+     * 
+     * @throws Exception if an error occurs while installing / upgrading classes.
      */
-    void init();
+    void installOrUpgradeWikiMacroClasses() throws Exception;
+
+    /**
+     * Searches for all the wiki macro definitions on the system and registers them against the macro manager.
+     * 
+     * @throws Exception if xwiki classes required for defining wiki macros are missing or if an error occurs while
+     *             searching for existing wiki macros.
+     */
+    void registerExistingWikiMacros() throws Exception;
 }

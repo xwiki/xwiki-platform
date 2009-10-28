@@ -76,7 +76,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.document = new XWikiDocument("MilkyWay", "Fidis");
         this.xwiki = new XWiki(new XWikiConfig(), getContext())
         {
-            protected void initWikiMacros()
+            protected void registerWikiMacros()
             {
             }
 

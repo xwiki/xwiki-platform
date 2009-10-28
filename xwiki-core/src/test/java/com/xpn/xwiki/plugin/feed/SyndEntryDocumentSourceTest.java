@@ -112,7 +112,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         final XWikiContext context = getContext();
         final XWiki xwiki = new XWiki(new XWikiConfig(), context)
         {
-            protected void initWikiMacros()
+            protected void registerWikiMacros()
             {
             }
 

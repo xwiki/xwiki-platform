@@ -93,7 +93,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
                 return defaultValue;
             }
 
-            protected void initWikiMacros()
+            protected void registerWikiMacros()
             {
 
             }

@@ -10,9 +10,21 @@
     <filter-name>ConversionFilter</filter-name>
     <filter-class>com.xpn.xwiki.wysiwyg.server.filter.ConversionFilter</filter-class>
   </filter>
+  
+  <!-- This filter is used to initialize the XWiki context before processing a request. -->
+  <filter>
+    <filter-name>XWikiContextInitializationFilter</filter-name>
+    <filter-class>com.xpn.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
+  </filter>
+
   <filter-mapping>
     <filter-name>ConversionFilter</filter-name>
     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>XWikiContextInitializationFilter</filter-name>
+    <servlet-name>gwtrpc</servlet-name>
   </filter-mapping>
 
   <!--

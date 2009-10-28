@@ -23,9 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
@@ -36,18 +34,6 @@ import com.xpn.xwiki.wysiwyg.client.util.Attachment;
  */
 public interface WysiwygServiceAsync
 {
-    /**
-     * Synchronizes this editor with others that edit the same page.
-     * 
-     * @param syncedRevision The changes to this editor's content, since the last update.
-     * @param pageName The page being edited.
-     * @param version The version affected by syncedRevision.
-     * @param syncReset resets the sync server for this page.
-     * @param async The callback to be used for notifying the caller after receiving the response from the server.
-     */
-    void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset,
-        AsyncCallback<SyncResult> async);
-
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).
      * 

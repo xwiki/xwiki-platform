@@ -22,18 +22,45 @@ package com.xpn.xwiki.wysiwyg.client.plugin.sync;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The synchronization status.
+ * 
+ * @version $Id$
+ */
 public class SyncStatus
 {
-    protected int currentVersionNumber = 0;
+    /**
+     * The current version number.
+     */
+    protected int currentVersionNumber;
 
+    /**
+     * The list of versions.
+     */
     protected List<String> versions = new ArrayList<String>();
 
+    /**
+     * The name of the edited page.
+     */
     protected String pageName;
 
+    /**
+     * The current version identifier of the edited page.
+     */
     private String lastXWikiVersion;
 
+    /**
+     * The current content of the edited page.
+     */
     private String lastXWikiContent;
 
+    /**
+     * Creates a new synchronization status.
+     * 
+     * @param pageName the name of the edited page
+     * @param version the version of the edited page
+     * @param content the content of the edited page
+     */
     public SyncStatus(String pageName, String version, String content)
     {
         this.pageName = pageName;
@@ -43,43 +70,75 @@ public class SyncStatus
         this.lastXWikiContent = content;
     }
 
+    /**
+     * @return {@link #versions}
+     */
     public List<String> getVersions()
     {
         return versions;
     }
 
+    /**
+     * @return {@link #currentVersionNumber}
+     */
     public int getCurrentVersionNumber()
     {
         return currentVersionNumber;
     }
 
+    /**
+     * @param version version index
+     * @return the content in the specified version
+     */
     public String getVersion(int version)
     {
         return (String) versions.get(version);
     }
 
+    /**
+     * Adds a new version.
+     * 
+     * @param newContent the content for the new version
+     */
     public void addVersion(String newContent)
     {
         versions.add(newContent);
         currentVersionNumber++;
     }
 
+    /**
+     * @return the content for the current version
+     */
     public String getCurrentVersion()
     {
         return getVersion(getCurrentVersionNumber());
     }
 
-    public String getLastXWikiVersion() {
+    /**
+     * @return {@link #lastXWikiVersion}
+     */
+    public String getLastXWikiVersion()
+    {
         return lastXWikiVersion;
     }
 
-    public String getLastXWikiContent() {
+    /**
+     * @return {@link #lastXWikiContent}
+     */
+    public String getLastXWikiContent()
+    {
         return lastXWikiContent;
     }
-    
-    public void setLastXWikiContent(String version, String content) {
+
+    /**
+     * Updates the state of the edited page.
+     * 
+     * @param version the current version of the edited page
+     * @param content the current content of the edited page
+     */
+    public void setLastXWikiContent(String version, String content)
+    {
         this.lastXWikiVersion = version;
         this.lastXWikiContent = content;
     }
-
 }

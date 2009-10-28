@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.VelocityContext;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
@@ -34,22 +33,14 @@ import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
-import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.server.plugin.sync.DefaultSyncEngine;
-import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
 
 /**
  * The default implementation for {@link WysiwygService}.
@@ -74,73 +65,11 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     private static final String VIEW_ACTION = "view";
 
     /**
-     * The object used to synchronize the content edited by multiple users when the real time feature of the editor is
-     * activated.
-     */
-    private SyncEngine syncEngine;
-
-    /**
-     * Default constructor.
-     */
-    public DefaultWysiwygService()
-    {
-        syncEngine = new DefaultSyncEngine();
-    }
-
-    /**
      * @return The component used to access documents. This is temporary till XWiki model is moved into components.
      */
     private DocumentAccessBridge getDocumentAccessBridge()
     {
         return Utils.getComponent(DocumentAccessBridge.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygService#syncEditorContent(com.xpn.xwiki.wysiwyg.client.diff.Revision, String, int, boolean)
-     */
-    public synchronized SyncResult syncEditorContent(Revision revision, String pageName, int version, boolean syncReset)
-        throws XWikiGWTException
-    {
-        try {
-            XWikiContext context = getXWikiContext();
-            SyncStatus syncStatus = syncEngine.getSyncStatus(pageName);
-            XWikiDocument doc = context.getWiki().getDocument(pageName, context);
-            String docVersion = doc.getVersion();
-            if ((syncStatus == null) || syncReset) {
-                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-                if (vcontext == null) {
-                    vcontext = new VelocityContext();
-                    vcontext.put("context", new Context(context));
-                    vcontext.put("request", context.getRequest());
-                    vcontext.put("response", context.getResponse());
-                    vcontext.put("util", context.getUtil());
-                    vcontext.put("xwiki", new XWiki(context.getWiki(), context));
-                    context.put("vcontext", vcontext);
-                }
-                Document doc2 = doc.newDocument(context);
-                vcontext.put("tdoc", doc2);
-                vcontext.put("doc", doc2);
-
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Initial content wiki syntax: " + doc.getContent());
-                }
-                String html = context.getWiki().parseTemplate("wysiwyginput.vm", context);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Initial content html: " + html);
-                }
-                syncStatus = new SyncStatus(pageName, docVersion, html);
-                syncEngine.setSyncStatus(pageName, syncStatus);
-            } else {
-                // we need to check the version versus the one that was initially loaded
-                // if the version is different then we should handle this
-
-            }
-            return syncEngine.sync(syncStatus, revision, version);
-        } catch (Exception e) {
-            throw getXWikiGWTException(e);
-        }
     }
 
     /**

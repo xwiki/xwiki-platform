@@ -22,42 +22,79 @@ package com.xpn.xwiki.wysiwyg.client.plugin.sync;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 
+/**
+ * The synchronization result.
+ * 
+ * @version $Id$
+ */
 public class SyncResult implements IsSerializable
 {
+    /**
+     * The revision that needs to be applied on the client in order to update its content to the latest version.
+     */
     protected Revision revision;
 
+    /**
+     * The status.
+     */
     protected boolean status;
 
+    /**
+     * The new version.
+     */
     protected int version;
 
+    /**
+     * @return {@link #revision}
+     */
     public Revision getRevision()
     {
         return revision;
     }
 
+    /**
+     * Sets the {@link #revision}.
+     * 
+     * @param revision a revision
+     */
     public void setRevision(Revision revision)
     {
         this.revision = revision;
     }
 
+    /**
+     * @return {@link #status}
+     */
     public boolean isStatus()
     {
         return status;
     }
 
+    /**
+     * Sets the {@link #status}.
+     * 
+     * @param status the status
+     */
     public void setStatus(boolean status)
     {
         this.status = status;
     }
 
+    /**
+     * @return {@link #version}
+     */
     public int getVersion()
     {
         return version;
     }
 
+    /**
+     * Sets the {@link #version}.
+     * 
+     * @param version the version number
+     */
     public void setVersion(int version)
     {
         this.version = version;
     }
-
 }

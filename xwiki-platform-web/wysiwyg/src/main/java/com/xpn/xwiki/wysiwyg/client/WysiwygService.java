@@ -28,9 +28,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
@@ -80,17 +78,6 @@ public interface WysiwygService extends RemoteService
             return instance;
         }
     }
-
-    /**
-     * @param syncedRevision The changes to this editor's content, since the last update.
-     * @param pageName The page being edited.
-     * @param version The version affected by syncedRevision.
-     * @param syncReset resets the sync server for this page.
-     * @return The result of synchronizing this editor with others editing the same page.
-     * @throws XWikiGWTException when the synchronization fails
-     */
-    SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset)
-        throws XWikiGWTException;
 
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).

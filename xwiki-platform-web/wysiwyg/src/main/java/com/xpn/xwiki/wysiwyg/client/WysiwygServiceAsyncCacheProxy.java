@@ -23,9 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
@@ -60,17 +58,6 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     public WysiwygServiceAsyncCacheProxy(WysiwygServiceAsync service)
     {
         this.service = service;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see WysiwygServiceAsync#syncEditorContent(Revision, String, int, boolean, AsyncCallback)
-     */
-    public void syncEditorContent(Revision syncedRevision, String pageName, int version, boolean syncReset,
-        AsyncCallback<SyncResult> async)
-    {
-        service.syncEditorContent(syncedRevision, pageName, version, syncReset, async);
     }
 
     /**

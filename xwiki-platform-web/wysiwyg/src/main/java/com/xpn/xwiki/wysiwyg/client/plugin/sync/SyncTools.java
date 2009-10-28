@@ -27,13 +27,26 @@ import com.xpn.xwiki.wysiwyg.client.diff.Chunk;
 import com.xpn.xwiki.wysiwyg.client.diff.Delta;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 
-public class SyncTools
+/**
+ * Utility methods for content synchronization.
+ * 
+ * @version $Id$
+ */
+public final class SyncTools
 {
     /**
-     * This will relocate the patches on rev2 based on changes in rev1
+     * Default constructor is private because this is a utility class.
+     */
+    private SyncTools()
+    {
+    }
+
+    /**
+     * This will relocate the patches on rev2 based on changes in rev1.
      * 
      * @param rev2
      * @param rev1
+     * @return the computed revision
      */
     public static Revision relocateRevision(Revision rev2, Revision rev1)
     {
@@ -76,6 +89,17 @@ public class SyncTools
         return rev2;
     }
 
+    /**
+     * Updates the given revision.
+     * 
+     * @param rev2
+     * @param position
+     * @param origchar
+     * @param newchar1
+     * @param newchar2
+     * @param nbunreloc
+     * @param shiftList
+     */
     private static void updateRevision(Revision rev2, int position, String origchar, String newchar1, String newchar2,
         int nbunreloc, Map<Chunk, Integer> shiftList)
     {
@@ -105,6 +129,13 @@ public class SyncTools
         }
     }
 
+    /**
+     * Relocates the given revision.
+     * 
+     * @param rev2
+     * @param position
+     * @param deltaSize
+     */
     private static void relocateRevision(Revision rev2, int position, int deltaSize)
     {
         for (int j = 0; j < rev2.size(); j++) {

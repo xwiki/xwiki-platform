@@ -31,11 +31,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PushButton;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -77,6 +75,21 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
     private boolean sendCursor = false;
 
     private boolean maintainCursor = true;
+
+    /**
+     * The service used to synchronize the content of multiple editors.
+     */
+    private final SyncServiceAsync syncService;
+
+    /**
+     * Creates a new synchronization plug-in that uses the given service to synchronize multiple editors.
+     * 
+     * @param syncService the synchronization service
+     */
+    public SyncPlugin(SyncServiceAsync syncService)
+    {
+        this.syncService = syncService;
+    }
 
     /**
      * {@inheritDoc}
@@ -191,8 +204,7 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
             // Commit our revision and, at the same time, checkout the latest revision
             // If we send -1 then we ask the server to reset it's content to the page content
             boolean syncReset = ((version == 0) && (getConfig().getParameter("syncReset", "0").equals("1")));
-            WysiwygService.Singleton.getInstance()
-                .syncEditorContent(syncedRevision, pageName, version, syncReset, this);
+            syncService.syncEditorContent(syncedRevision, pageName, version, syncReset, this);
         } catch (Throwable th) {
             debugMessage("error in onSync ");
             showErrorAndResetSync(th);
@@ -439,13 +451,12 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
     public void showDialog(String title, String message, AsyncCallback cb)
     {
         try {
-            Window.alert(title + "\n\n" + message);
+            Console.getInstance().error(title + "\n\n" + message);
             cb.onSuccess(null);
         } catch (Throwable e) {
             debugMessage("Error displaying failed " + e.getMessage());
             cb.onFailure(e);
         }
-
     }
 
     public void showError(Throwable caught, AsyncCallback< ? > cb)

@@ -21,9 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractBlockExecutable;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractBlockExecutable;
 
 /**
  * Wraps the HTML fragment including the current selection in a specified block level element.

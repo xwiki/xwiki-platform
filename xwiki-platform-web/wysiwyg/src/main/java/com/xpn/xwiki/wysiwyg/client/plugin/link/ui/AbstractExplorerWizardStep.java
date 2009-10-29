@@ -19,6 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
+import org.xwiki.gwt.user.client.ui.VerticalResizePanel;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
+import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,13 +33,8 @@ import com.smartgwt.client.widgets.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.RecordDoubleClickHandler;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
-import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.XWikiExplorer;
 import com.xpn.xwiki.wysiwyg.client.widget.explorer.ds.WikiDataSource;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorWizardStep;
 
 /**

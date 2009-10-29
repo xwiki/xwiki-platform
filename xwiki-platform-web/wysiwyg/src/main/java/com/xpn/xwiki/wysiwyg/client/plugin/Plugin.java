@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin;
 
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 
 /**
  * A plug-in for the WYSIWYG editor.

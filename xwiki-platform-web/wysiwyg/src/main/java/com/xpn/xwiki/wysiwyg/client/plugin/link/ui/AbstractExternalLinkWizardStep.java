@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
+import org.xwiki.gwt.user.client.FocusCommand;
+
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -28,7 +30,6 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
 
 /**
  * Wizard step to collect the data about an external link (e.g. http: or mailto:). Extends the default link

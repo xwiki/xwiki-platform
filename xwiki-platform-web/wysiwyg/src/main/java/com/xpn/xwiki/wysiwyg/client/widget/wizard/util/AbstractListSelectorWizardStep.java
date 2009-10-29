@@ -21,6 +21,15 @@ package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 
 import java.util.List;
 
+import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.ui.ListBox;
+import org.xwiki.gwt.user.client.ui.ListItem;
+import org.xwiki.gwt.user.client.ui.VerticalResizePanel;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
+import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -30,14 +39,6 @@ import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
-import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
-import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
-import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Generic wizard step for selecting from a list of items: it handles list creation and population along with item

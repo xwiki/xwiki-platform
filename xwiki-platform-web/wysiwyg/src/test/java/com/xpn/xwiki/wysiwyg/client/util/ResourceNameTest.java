@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util;
 
+import org.xwiki.gwt.user.client.StringUtils;
+
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
 
 /**

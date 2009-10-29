@@ -22,9 +22,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.exec;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Utility class to perform functions associated to link executables, such as detecting the selected anchor. We have

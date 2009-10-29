@@ -22,6 +22,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.list;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,9 +37,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.exec.ListExecutable;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Plug-in for inserting ordered (numbered) and unordered (bullet) lists. It installs two toggle buttons on the tool bar

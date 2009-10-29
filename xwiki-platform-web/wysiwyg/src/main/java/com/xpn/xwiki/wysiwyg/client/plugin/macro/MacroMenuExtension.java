@@ -22,17 +22,18 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.user.client.DeferredUpdater;
+import org.xwiki.gwt.user.client.RichTextAreaCommand;
+import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ui.MenuBar;
+import org.xwiki.gwt.user.client.ui.MenuItem;
+import org.xwiki.gwt.user.client.ui.MenuListener;
+
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
-import com.xpn.xwiki.wysiwyg.client.util.RichTextAreaCommand;
-import com.xpn.xwiki.wysiwyg.client.util.Updatable;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuListener;
 
 /**
  * Provides a user interface extension to allow users to manipulate macros using the top-level menu of the WYSIWYG

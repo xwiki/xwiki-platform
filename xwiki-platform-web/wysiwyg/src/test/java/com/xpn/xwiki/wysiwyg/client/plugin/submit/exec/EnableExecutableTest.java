@@ -19,15 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit test for {@link EnableExecutable}.
  * 
  * @version $Id$
  */
-public class EnableExecutableTest extends AbstractRichTextAreaTest
+public class EnableExecutableTest extends RichTextAreaTestCase
 {
     /**
      * The command used to enable or disable the rich text area.
@@ -37,7 +38,7 @@ public class EnableExecutableTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {

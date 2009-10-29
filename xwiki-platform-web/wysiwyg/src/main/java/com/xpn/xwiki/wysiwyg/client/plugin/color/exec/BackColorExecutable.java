@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color.exec;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.DefaultExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultExecutable;
 
 /**
  * Changes the background color of the current selection. It executes the built-in command. We created this class solely

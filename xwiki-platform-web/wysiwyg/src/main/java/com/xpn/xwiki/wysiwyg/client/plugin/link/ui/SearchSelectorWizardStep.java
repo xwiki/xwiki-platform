@@ -21,6 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.ListItem;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -35,8 +38,6 @@ import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 
 /**
  * Wizard step to select the wiki page to link to, from the page search results for a keyword.

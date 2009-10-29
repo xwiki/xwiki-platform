@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Unit test for {@link DisablingRule}.

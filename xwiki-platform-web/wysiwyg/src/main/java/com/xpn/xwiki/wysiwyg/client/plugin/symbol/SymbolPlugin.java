@@ -19,6 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.CompositeDialogBox;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -28,10 +33,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Allows the user to insert a special symbol chosen with a symbol picker in place of the current selection.

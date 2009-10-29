@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 /**
  * TableFeature API. 

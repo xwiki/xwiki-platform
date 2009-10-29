@@ -23,13 +23,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.importer.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.wizard.Wizard;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
+
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStepProvider;
 
 /**
  * Import wizard responsible for performing various content import operation into wysiwyg editor.

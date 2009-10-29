@@ -22,14 +22,15 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.ui.LoadingPanel;
+import org.xwiki.gwt.user.client.ui.rta.Reloader;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
-import com.xpn.xwiki.wysiwyg.client.widget.LoadingPanel;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.Reloader;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Refreshes all the macros present on the edited document.

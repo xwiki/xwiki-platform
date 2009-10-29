@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.StringUtils;
+
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
@@ -29,8 +32,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.HasFocus;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.HasValue;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.input.InputFactory;
-import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Displays a macro parameter allowing us to change its value.

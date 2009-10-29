@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -32,8 +34,6 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Customizes the behavior of the editor according to the image constraints, e.g. disables all keys besides backspace

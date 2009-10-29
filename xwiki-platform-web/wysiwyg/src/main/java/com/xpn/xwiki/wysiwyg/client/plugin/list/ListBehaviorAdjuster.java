@@ -26,6 +26,10 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
@@ -37,10 +41,6 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * Handles keyboard actions on valid HTML lists, to ensure that the lists stay valid even after keyboard changes such as

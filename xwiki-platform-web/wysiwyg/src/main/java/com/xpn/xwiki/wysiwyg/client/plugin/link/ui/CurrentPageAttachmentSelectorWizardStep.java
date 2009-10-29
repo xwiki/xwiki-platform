@@ -21,6 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
 import java.util.List;
 
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.ListItem;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
@@ -29,8 +32,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
 
 /**

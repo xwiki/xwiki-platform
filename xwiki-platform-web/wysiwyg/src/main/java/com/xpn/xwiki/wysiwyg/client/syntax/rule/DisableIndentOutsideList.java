@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.rule;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Validation rule for disabling the indent and outdent features when the selection is outside a list item. These two

@@ -24,6 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.DeferredUpdater;
+import org.xwiki.gwt.user.client.RichTextAreaCommand;
+import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ui.MenuBar;
+import org.xwiki.gwt.user.client.ui.MenuItem;
+import org.xwiki.gwt.user.client.ui.MenuListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.user.client.ui.MenuItemSeparator;
 import com.google.gwt.user.client.ui.UIObject;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
@@ -40,13 +48,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertColBefore;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowAfter;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowBefore;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertTable;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
-import com.xpn.xwiki.wysiwyg.client.util.RichTextAreaCommand;
-import com.xpn.xwiki.wysiwyg.client.util.Updatable;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Provides user interface for manipulating tables through the WYSIWYG top-level menu.
@@ -202,7 +203,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.wysiwyg.client.widget.MenuListener#onMenuItemSelected(com.xpn.xwiki.wysiwyg.client.widget.MenuItem)
+     * @see org.xwiki.gwt.user.client.ui.MenuListener#onMenuItemSelected(org.xwiki.gwt.user.client.ui.MenuItem)
      */
     public void onMenuItemSelected(MenuItem menuItem)
     {
@@ -213,7 +214,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.wysiwyg.client.util.Updatable#update()
+     * @see org.xwiki.gwt.user.client.Updatable#update()
      */
     public void update()
     {

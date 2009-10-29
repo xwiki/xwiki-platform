@@ -23,6 +23,10 @@ package com.xpn.xwiki.wysiwyg.client.editor;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Console;
+import org.xwiki.gwt.user.client.ui.rta.Reloader;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -34,9 +38,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverterAsync;
-import com.xpn.xwiki.wysiwyg.client.util.Console;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.Reloader;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * {@link WysiwygEditor} tab-switch handler.

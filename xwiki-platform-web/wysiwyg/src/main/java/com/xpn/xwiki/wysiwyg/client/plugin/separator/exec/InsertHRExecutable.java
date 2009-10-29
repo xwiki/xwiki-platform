@@ -21,11 +21,11 @@ package com.xpn.xwiki.wysiwyg.client.plugin.separator.exec;
 
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Inserts a horizontal rule in place of the current selection. It should be noted that hr, being a block level element,

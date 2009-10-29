@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.util;
 
+import org.xwiki.gwt.user.client.StringUtils;
+
 /**
  * Stores a resource reference: the wiki, space, page and attached file name, if it's the case. It allows parsing from
  * and serializing to a string, in a {@code org.xwiki.bridge.DocumentName} form, i.e. {@code wiki:Space.Page@attachment}

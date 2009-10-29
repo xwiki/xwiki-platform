@@ -20,17 +20,17 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 import com.google.gwt.user.client.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for {@link IndentExecutable}.
  * 
  * @version $Id$
  */
-public class IndentExecutableTest extends AbstractRichTextAreaTest
+public class IndentExecutableTest extends RichTextAreaTestCase
 {
     /**
      * The executable being tested.
@@ -40,7 +40,7 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -52,8 +52,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple list (with no sublists), when a list item should be indented as the sublist of its parent.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a
+     * simple list (with no sublists), when a list item should be indented as the sublist of its parent.
      */
     public void testIndentNoSublist()
     {
@@ -77,8 +77,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a list with an item with a sublist, to test that the first element in a list cannot be indented.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a list
+     * with an item with a sublist, to test that the first element in a list cannot be indented.
      */
     public void testIndentDisabledOnFirstItem()
     {
@@ -92,8 +92,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a list with an item with a sublist, to test that the first element in a list cannot be indented.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a list
+     * with an item with a sublist, to test that the first element in a list cannot be indented.
      */
     private void doTestIndentDisabledOnFirstItem()
     {
@@ -128,8 +128,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is outside a list.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the selection is outside a list.
      */
     public void testIndentDisabledOutsideList()
     {
@@ -156,10 +156,10 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is around both the list items in a list, on the first level. The indent cannot be
-     * made because the rule is that if the selected items are part of the same list, either they should all be indented
-     * or none.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the selection is around both the list items in a list, on the first level. The indent cannot be made
+     * because the rule is that if the selected items are part of the same list, either they should all be indented or
+     * none.
      */
     public void testIndentDisabledWhenEntireListIsSelected()
     {
@@ -195,8 +195,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}, for
-     * the case when the selection is around an entire sublist: the indent button should be disabled because not all the
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the selection is around an entire sublist: the indent button should be disabled because not all the
      * items can be indented. The rule is that if the selected items are part of the same list, either they should all
      * be indented or none.
      */
@@ -226,8 +226,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a list with sublists.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a list
+     * with sublists.
      */
     public void testIndentWithSublist()
     {
@@ -251,8 +251,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a list with sublists, entirely selected upon indenting.
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a list
+     * with sublists, entirely selected upon indenting.
      */
     public void testIndentEntirelySelectedItemWithSublist()
     {
@@ -278,8 +278,8 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple list (with no sublists), under a list item with a sublist, when the indented item should become the last
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a
+     * simple list (with no sublists), under a list item with a sublist, when the indented item should become the last
      * child in its previous sibling's sublist.
      */
     public void testIndentUnderSublist()
@@ -304,7 +304,7 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for
      * indenting an entire fragment of a list as a sublist.
      */
     public void testIndentListFragment()
@@ -330,7 +330,7 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for
      * indenting an entire fragment of a list as a sublist, under an existing second level list. In this case, the
      * indented items should be added as next items in the list.
      */
@@ -358,7 +358,7 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for
      * indenting a fragment of a list as a sublist, with the selection starting containing the whole sublist too. In
      * this case, the indent should only work on the fragment of the first level list, and the result should be the
      * alignment of the newly indented list items with the selected sublist.
@@ -388,7 +388,7 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for
      * indenting a fragment of a sublist together with the first level list under it. In this case, the sublist fragment
      * should be indented correctly relative to its parent, and the first level list under it as the next sibling of the
      * original sublist.
@@ -427,7 +427,7 @@ public class IndentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link IndentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * Unit test for {@link IndentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for
      * indenting a fragment of a sublist with some trailing text after it, together with the first level list under it.
      * In this case, the sublist fragment should be indented correctly relative to its parent, the first level item it
      * makes part of should be indented too (because of the trailing text) and the first level list under it as the next

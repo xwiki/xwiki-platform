@@ -23,6 +23,13 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
+import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
@@ -36,12 +43,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
-import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Wizard step to configure the image parameters.

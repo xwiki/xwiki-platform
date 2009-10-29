@@ -19,14 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.wizard.Wizard;
+import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard.ImportWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
 
 /**
  * Plugin responsible for importing external content into wysiwyg editor.

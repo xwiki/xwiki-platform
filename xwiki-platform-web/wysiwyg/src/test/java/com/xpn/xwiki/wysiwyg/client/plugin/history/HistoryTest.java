@@ -20,25 +20,25 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.history;
 
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.RedoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.plugin.text.exec.BoldExecutable;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Unit tests for any implementation of {@link History}.
  * 
  * @version $Id$
  */
-public class HistoryTest extends AbstractRichTextAreaTest
+public class HistoryTest extends RichTextAreaTestCase
 {
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {

@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client;
 
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManagerApi;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.xpn.xwiki.wysiwyg.client.editor.WysiwygEditorApi;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManagerApi;
 
 /**
  * Publishes the JavaScript APIs to be used for creating and managing WYSIWYG editor instances.

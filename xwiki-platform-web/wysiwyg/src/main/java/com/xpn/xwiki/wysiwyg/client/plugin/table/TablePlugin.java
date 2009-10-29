@@ -22,6 +22,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.table;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.DeleteCol;
@@ -33,8 +36,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowAfter;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertRowBefore;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.feature.InsertTable;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableMenuExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Plug-in allowing to manipulate tables in the WYSIWYG editor.

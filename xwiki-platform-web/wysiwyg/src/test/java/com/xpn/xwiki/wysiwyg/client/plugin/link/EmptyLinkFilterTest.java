@@ -19,17 +19,18 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for the {@link EmptyLinkFilter}, to check client side handling of empty links.
  * 
  * @version $Id$
  */
-public class EmptyLinkFilterTest extends AbstractRichTextAreaTest
+public class EmptyLinkFilterTest extends RichTextAreaTestCase
 {
     /**
      * The submit command used to simulate a submit for the link filter.

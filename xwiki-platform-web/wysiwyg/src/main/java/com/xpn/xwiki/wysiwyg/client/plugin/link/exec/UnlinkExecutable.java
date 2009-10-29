@@ -21,9 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Executable for the unlink command, to remove a link in the wiki document. The command will be enabled whenever a 

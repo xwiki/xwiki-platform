@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.MockCommandManager;
+
 import com.google.gwt.user.client.ui.RootPanel;
 import com.xpn.xwiki.wysiwyg.client.AbstractWysiwygClientTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.MockCommandManager;
 
 /**
  * Unit test for {@link DefaultValidationRule}.

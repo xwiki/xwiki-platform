@@ -26,11 +26,11 @@ import java.util.Stack;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Text;
 import org.xwiki.gwt.dom.client.TextFragment;
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 /**
  * Removes the in-line style from the current selection.

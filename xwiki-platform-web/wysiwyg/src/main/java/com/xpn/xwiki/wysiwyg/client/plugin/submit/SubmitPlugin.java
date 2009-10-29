@@ -22,6 +22,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.submit;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.user.client.Cache;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.HiddenConfig;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.BlurEvent;
@@ -34,14 +42,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatelessUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.EnableExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.ResetExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.exec.SubmitExecutable;
-import com.xpn.xwiki.wysiwyg.client.util.Cache;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.HiddenConfig;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * Binds a {@link RichTextArea} to a form field.

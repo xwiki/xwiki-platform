@@ -20,9 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Resets the content of the rich text area. This executable should be used, instead of setting the content of the rich

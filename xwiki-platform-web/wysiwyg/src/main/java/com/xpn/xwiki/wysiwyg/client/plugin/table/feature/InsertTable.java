@@ -26,22 +26,22 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.wizard.Wizard;
+import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
 import com.google.gwt.dom.client.Node;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.WizardStepMap;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.ui.TableConfigWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Feature allowing to insert a table in the editor. It is disabled when the caret is positioned in a table.

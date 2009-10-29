@@ -24,13 +24,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Default implementation of the {@link PluginManager} interface. We don't plan to provide another implementation.

@@ -20,17 +20,17 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 import com.google.gwt.user.client.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for {@link RemoveFormatExecutable}.
  * 
  * @version $Id$
  */
-public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
+public class RemoveFormatExecutableTest extends RichTextAreaTestCase
 {
     /**
      * The executable being tested.
@@ -40,7 +40,7 @@ public class RemoveFormatExecutableTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {

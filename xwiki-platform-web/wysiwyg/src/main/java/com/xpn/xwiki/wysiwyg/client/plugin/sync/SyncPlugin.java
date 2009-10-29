@@ -23,6 +23,11 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.RangeFactory;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.Console;
+import org.xwiki.gwt.user.client.Timer;
+import org.xwiki.gwt.user.client.TimerListener;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
@@ -42,11 +47,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.Console;
-import com.xpn.xwiki.wysiwyg.client.util.Timer;
-import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerListener, AsyncCallback<SyncResult>
 {

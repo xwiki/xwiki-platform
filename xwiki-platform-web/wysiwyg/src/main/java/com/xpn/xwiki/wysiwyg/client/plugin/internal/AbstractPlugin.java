@@ -22,12 +22,13 @@ package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.HandlerRegistrationCollection;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.HandlerRegistrationCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Abstract implementation of the {@link Plugin} interface. This could serve as a base class for all kind of plug-ins.

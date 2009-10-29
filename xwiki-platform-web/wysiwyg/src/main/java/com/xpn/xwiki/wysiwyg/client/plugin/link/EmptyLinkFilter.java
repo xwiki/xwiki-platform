@@ -22,13 +22,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
+
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * Client side empty link cleaner, to delete all links without content before the content is submitted. This is to

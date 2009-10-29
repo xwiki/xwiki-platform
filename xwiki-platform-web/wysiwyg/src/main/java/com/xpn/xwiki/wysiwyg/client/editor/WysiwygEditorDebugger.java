@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import org.xwiki.gwt.user.client.Timer;
+import org.xwiki.gwt.user.client.TimerListener;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
@@ -28,8 +31,6 @@ import com.xpn.xwiki.wysiwyg.client.cleaner.HTMLCleaner;
 import com.xpn.xwiki.wysiwyg.client.cleaner.HTMLCleanerAsync;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverterAsync;
-import com.xpn.xwiki.wysiwyg.client.util.Timer;
-import com.xpn.xwiki.wysiwyg.client.util.TimerListener;
 
 /**
  * Debugger for the {@link WysiwygEditor}. It displays the current HTML content of the debugged rich text area, the

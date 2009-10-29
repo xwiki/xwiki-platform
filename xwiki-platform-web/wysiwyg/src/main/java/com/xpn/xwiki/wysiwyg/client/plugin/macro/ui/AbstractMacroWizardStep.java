@@ -19,9 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.ui;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractNavigationAwareWizardStep;
+
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 /**
  * An abstract wizard step to serve as a base class for all macro wizard steps.

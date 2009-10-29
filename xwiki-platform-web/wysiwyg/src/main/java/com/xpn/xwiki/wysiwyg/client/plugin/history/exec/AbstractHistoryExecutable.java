@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.history.exec;
 
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Abstract history executable.

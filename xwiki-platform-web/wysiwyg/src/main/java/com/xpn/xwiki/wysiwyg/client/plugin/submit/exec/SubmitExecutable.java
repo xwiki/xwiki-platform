@@ -20,10 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 import com.google.gwt.dom.client.Document;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
 
 /**
  * Stores the value of the rich text area in a HTML form field before submitting it to the server.

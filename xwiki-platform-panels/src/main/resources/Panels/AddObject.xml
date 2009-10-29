@@ -113,19 +113,17 @@
 #set($prevSpace = "")
 #set($optGroupOpen = false)
 #foreach ($classname in $xwiki.classList)
-  #if($!xwiki.hasAccessLevel("edit", $classname))
-    #set($classdoc = $xwiki.getDocument($classname))
-    #if($classdoc.space != $prevSpace)
-      #if($optGroupOpen)
-        &lt;/optgroup&gt;
-      #else
-        #set($optGroupOpen = true)
-      #end
-          &lt;optgroup label="$classdoc.space"&gt;
-      #set($prevSpace = $classdoc.space)
+  #set($classdoc = $xwiki.getDocument($classname))
+  #if($classdoc.space != $prevSpace)
+    #if($optGroupOpen)
+      &lt;/optgroup&gt;
+    #else
+      #set($optGroupOpen = true)
     #end
-    &lt;option value="$classdoc.fullName"&gt;$classdoc.name&lt;/option&gt;
+        &lt;optgroup label="$classdoc.space"&gt;
+    #set($prevSpace = $classdoc.space)
   #end
+  &lt;option value="$classdoc.fullName"&gt;$classdoc.name&lt;/option&gt;
 #end
 #if($optGroupOpen)
         &lt;/optgroup&gt;

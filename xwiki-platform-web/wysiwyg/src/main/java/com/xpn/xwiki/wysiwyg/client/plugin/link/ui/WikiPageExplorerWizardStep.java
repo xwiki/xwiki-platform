@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 
+import org.xwiki.gwt.user.client.StringUtils;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -26,7 +28,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Specialized {@link AbstractExplorerWizardStep} to select a wiki page (existing or new).

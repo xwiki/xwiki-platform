@@ -24,11 +24,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
 import com.xpn.xwiki.wysiwyg.client.syntax.rule.ImageSelectionBehaviourRule;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Base class for syntax-specific validators. It includes by default syntax-independent rules.

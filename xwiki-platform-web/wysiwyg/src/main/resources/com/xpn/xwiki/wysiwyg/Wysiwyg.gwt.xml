@@ -20,101 +20,15 @@
  *
 -->
 <module rename-to="xwe">
-  <inherits name='com.google.gwt.user.User'/>
   <inherits name="com.google.gwt.http.HTTP"/>
-  <inherits name="com.google.gwt.i18n.I18N"/>
-  <inherits name="com.google.gwt.widgetideas.GlassPanel"/>
-  <inherits name="com.smartgwt.SmartGwtNoScript"/>
+  <inherits name='org.xwiki.gwt.user.User'/>
   <inherits name="com.xpn.xwiki.gwt.api.Api"/>
-  <inherits name="org.xwiki.gwt.dom.DOM"/>
+  <inherits name="com.smartgwt.SmartGwtNoScript"/>
 
   <stylesheet src="stylesheets/Wysiwyg.css"/>
   <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg"/>
 
   <extend-property name="locale" values="fr"/>
-
-  <!-- RichTextArea -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplIE6">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
-    <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
-    </any>
-  </replace-with>
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplMozilla">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
-  </replace-with>
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplSafari">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
-    <any>
-      <when-property-is name="user.agent" value="safari"/>
-    </any>
-  </replace-with>
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.RichTextAreaImplOpera">
-    <when-type-is class="com.google.gwt.user.client.ui.impl.RichTextAreaImpl"/>
-    <any>
-      <when-property-is name="user.agent" value="opera"/>
-    </any>
-  </replace-with>
-
-  <!-- BehaviorAdjuster -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
-  </replace-with>
-
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.MozillaBehaviorAdjuster">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
-  </replace-with>
-
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.IEBehaviorAdjuster">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.BehaviorAdjuster"/>
-    <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
-    </any>
-  </replace-with>
-
-  <!-- List behavior adjuster -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
-  </replace-with>
-
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
-    <any>
-      <when-property-is name="user.agent" value="ie6"/>
-      <when-property-is name="user.agent" value="ie8"/>
-    </any>
-  </replace-with>
-
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
-  </replace-with>
-
-  <!-- Console -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.Console">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console"/>
-  </replace-with>
-
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.FirebugConsole">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.util.Console"/>
-    <any>
-      <when-property-is name="user.agent" value="gecko1_8"/>
-      <when-property-is name="user.agent" value="gecko"/>
-    </any>
-  </replace-with>
 
   <!-- BackColorExecutable -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable">
@@ -176,24 +90,24 @@
     </any>
   </replace-with>
 
-  <!-- DOMImpl for widgets -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.util.internal.IEDOMImpl">
-    <when-type-is class="com.google.gwt.user.client.impl.DOMImpl"/>
+  <!-- List behavior adjuster -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
+  </replace-with>
+
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.IEListBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
     <any>
       <when-property-is name="user.agent" value="ie6"/>
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
 
-  <!-- Reloader -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.ReloaderImplMozillaOld">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.widget.rta.internal.ReloaderImpl"/>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.list.internal.MozillaListBehaviorAdjuster">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.list.ListBehaviorAdjuster"/>
     <any>
+      <when-property-is name="user.agent" value="gecko1_8"/>
       <when-property-is name="user.agent" value="gecko"/>
-      <all>
-        <when-property-is name="user.agent" value="gecko1_8"/>
-        <when-property-is name="gecko1_9" value="no"/>
-      </all>
     </any>
   </replace-with>
 </module>

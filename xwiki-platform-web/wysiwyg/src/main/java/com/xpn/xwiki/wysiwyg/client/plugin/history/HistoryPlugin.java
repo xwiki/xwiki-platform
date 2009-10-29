@@ -23,6 +23,14 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.ClickCommand;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ShortcutKey;
+import org.xwiki.gwt.user.client.ShortcutKeyManager;
+import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FocusWidget;
@@ -35,13 +43,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey.ModifierKey;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Plug-in for undoing and redoing the past actions taken on the rich text area. It installs two push buttons on the

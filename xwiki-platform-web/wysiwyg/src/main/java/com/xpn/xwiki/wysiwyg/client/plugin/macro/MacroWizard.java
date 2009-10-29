@@ -24,17 +24,17 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.wizard.Wizard;
+import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStepMap;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.EditMacroWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.SelectMacroWizardStep;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.WizardStepMap;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * A wizard that can be used to cast macro spells on a rich text area.

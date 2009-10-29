@@ -19,15 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
+import org.xwiki.gwt.user.client.DeferredUpdater;
+import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
+
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
-import com.xpn.xwiki.wysiwyg.client.util.Updatable;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * An abstract kind of plug-in that listens to the changes in the state of the editor's text area.

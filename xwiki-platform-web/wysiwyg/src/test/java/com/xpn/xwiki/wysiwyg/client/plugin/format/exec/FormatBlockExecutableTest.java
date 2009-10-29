@@ -23,19 +23,19 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.user.client.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for {@link FormatBlockExecutable}.
  * 
  * @version $Id$
  */
-public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
+public class FormatBlockExecutableTest extends RichTextAreaTestCase
 {
     /**
      * Heading level 1.
@@ -55,7 +55,7 @@ public class FormatBlockExecutableTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {

@@ -28,6 +28,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.DeferredUpdater;
+import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ui.LabeledTextBox;
+import org.xwiki.gwt.user.client.ui.ListBox;
+import org.xwiki.gwt.user.client.ui.ListItem;
+import org.xwiki.gwt.user.client.ui.VerticalResizePanel;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
+import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -47,18 +59,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroCall;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroServiceAsync;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
-import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
-import com.xpn.xwiki.wysiwyg.client.util.Updatable;
-import com.xpn.xwiki.wysiwyg.client.widget.LabeledTextBox;
-import com.xpn.xwiki.wysiwyg.client.widget.ListBox;
-import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
-import com.xpn.xwiki.wysiwyg.client.widget.VerticalResizePanel;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Wizard step for selecting one of the available macros.
@@ -360,7 +360,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getResult()
+     * @see AbstractMacroWizardStep#getResult()
      */
     public Object getResult()
     {
@@ -376,7 +376,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getStepTitle()
+     * @see AbstractMacroWizardStep#getStepTitle()
      */
     public String getStepTitle()
     {
@@ -386,7 +386,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
+     * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
      */
     @SuppressWarnings("unchecked")
     public void init(Object data, AsyncCallback< ? > initCallback)
@@ -437,7 +437,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onCancel()
+     * @see AbstractMacroWizardStep#onCancel()
      */
     public void onCancel()
     {
@@ -447,7 +447,7 @@ public class SelectMacroWizardStep extends AbstractMacroWizardStep implements Do
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
+     * @see AbstractMacroWizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {

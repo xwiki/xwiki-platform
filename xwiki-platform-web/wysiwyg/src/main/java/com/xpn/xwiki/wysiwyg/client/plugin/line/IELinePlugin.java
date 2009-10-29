@@ -22,10 +22,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.line;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Internet Explorer specific implementation of the {@link LinePlugin}.

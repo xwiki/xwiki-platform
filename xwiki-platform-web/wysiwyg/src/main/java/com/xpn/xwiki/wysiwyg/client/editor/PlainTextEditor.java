@@ -21,6 +21,7 @@
 package com.xpn.xwiki.wysiwyg.client.editor;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.Cache;
 
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -30,7 +31,6 @@ import com.google.gwt.user.client.Window.ClosingHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextArea;
-import com.xpn.xwiki.wysiwyg.client.util.Cache;
 
 /**
  * Source editor.

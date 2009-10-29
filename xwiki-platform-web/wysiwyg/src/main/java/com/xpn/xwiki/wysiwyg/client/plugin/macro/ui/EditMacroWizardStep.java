@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.StringUtils;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
@@ -31,8 +34,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDisplayer;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
 
 /**
  * Wizard step for editing macro parameters and content.
@@ -135,7 +136,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getResult()
+     * @see AbstractMacroWizardStep#getResult()
      */
     public Object getResult()
     {
@@ -145,7 +146,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#getStepTitle()
+     * @see AbstractMacroWizardStep#getStepTitle()
      */
     public String getStepTitle()
     {
@@ -157,7 +158,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#init(Object, AsyncCallback)
+     * @see AbstractMacroWizardStep#init(Object, AsyncCallback)
      */
     public void init(Object data, AsyncCallback< ? > cb)
     {
@@ -177,7 +178,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onCancel()
+     * @see AbstractMacroWizardStep#onCancel()
      */
     public void onCancel()
     {
@@ -187,7 +188,7 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractNavigationAwareWizardStep#onSubmit(AsyncCallback)
+     * @see AbstractMacroWizardStep#onSubmit(AsyncCallback)
      */
     public void onSubmit(AsyncCallback<Boolean> async)
     {

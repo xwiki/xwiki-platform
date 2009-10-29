@@ -24,6 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ClickCommand;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ShortcutKey;
+import org.xwiki.gwt.user.client.ShortcutKeyManager;
+import org.xwiki.gwt.user.client.ShortcutKey.ModifierKey;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -35,14 +43,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
 import com.xpn.xwiki.wysiwyg.client.plugin.text.exec.BoldExecutable;
-import com.xpn.xwiki.wysiwyg.client.util.ClickCommand;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKeyManager;
-import com.xpn.xwiki.wysiwyg.client.util.ShortcutKey.ModifierKey;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 /**
  * Plug-in for making text bold, italic, underline or strike through. It installs four toggle buttons on the tool bar

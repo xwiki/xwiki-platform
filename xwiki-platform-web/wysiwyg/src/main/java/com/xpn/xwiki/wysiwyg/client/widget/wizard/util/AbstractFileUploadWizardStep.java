@@ -21,6 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 
 import java.util.EnumSet;
 
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FileUpload;
@@ -35,9 +39,6 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Wizard step to handle the upload of a file to a wiki page: display the file input and upload on finish. <br/>

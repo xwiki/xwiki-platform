@@ -27,14 +27,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.user.client.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for {@link LinePlugin}.
  * 
  * @version $Id$
  */
-public class LinePluginTest extends AbstractRichTextAreaTest
+public class LinePluginTest extends RichTextAreaTestCase
 {
     /**
      * The name of the paragraph HTML element.
@@ -59,7 +59,7 @@ public class LinePluginTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#onLoad(LoadEvent)
+     * @see RichTextAreaTestCase#onLoad(LoadEvent)
      */
     public void onLoad(LoadEvent event)
     {
@@ -72,7 +72,7 @@ public class LinePluginTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtTearDown()
+     * @see RichTextAreaTestCase#gwtTearDown()
      */
     protected void gwtTearDown() throws Exception
     {

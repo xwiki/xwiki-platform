@@ -45,11 +45,6 @@ import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultValidationRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DisablingRuleTest;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidatorTest;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceNameTest;
-import com.xpn.xwiki.wysiwyg.client.util.TimerTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.SelectionPreserverTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutableTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.StyleExecutableTest;
 
 /**
  * All the client tests to be run. We're using a test suite because it decreases the overall testing time. GWTTestCase
@@ -81,10 +76,7 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(XWikiSyntaxValidatorTest.class);
 
         // util
-        suite.addTestSuite(TimerTest.class);
         suite.addTestSuite(ResourceNameTest.class);
-
-        addWidgetTests(suite);
 
         return suite;
     }
@@ -113,18 +105,5 @@ public class WysiwygClientTestSuite extends GWTTestSuite
         suite.addTestSuite(ColorPickerTest.class);
         suite.addTestSuite(EnableExecutableTest.class);
         suite.addTestSuite(LinePluginTest.class);
-    }
-
-    /**
-     * Adds unit tests for the widgets to the given test suite.
-     * 
-     * @param suite the test suite
-     */
-    private static void addWidgetTests(TestSuite suite)
-    {
-        suite.addTestSuite(RichTextAreaTest.class);
-        suite.addTestSuite(InsertHTMLExecutableTest.class);
-        suite.addTestSuite(StyleExecutableTest.class);
-        suite.addTestSuite(SelectionPreserverTest.class);
     }
 }

@@ -21,6 +21,9 @@ package com.xpn.xwiki.wysiwyg.client.plugin.image.ui;
 
 import java.util.List;
 
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.ui.ListItem;
+
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -33,8 +36,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.widget.ListItem;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
 
 /**

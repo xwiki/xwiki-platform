@@ -20,17 +20,17 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 import com.google.gwt.user.client.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for {@link OutdentExecutable}.
  * 
  * @version $Id$
  */
-public class OutdentExecutableTest extends AbstractRichTextAreaTest
+public class OutdentExecutableTest extends RichTextAreaTestCase
 {
     /**
      * The executable being tested.
@@ -40,7 +40,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -52,8 +52,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the selection is outside a list.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the selection is outside a list.
      */
     public void testOutdentDisabledOutsideList()
     {
@@ -67,8 +67,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the selection is outside a list.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the selection is outside a list.
      */
     private void doTestOutdentDisabledOutsideList()
     {
@@ -89,9 +89,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the selection is around all items on a first level list, in which case they are both to be
-     * unindented.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the selection is around all items on a first level list, in which case they are both to be unindented.
      */
     public void testOutdentEntireFirstLevelList()
     {
@@ -116,8 +115,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple sublist list item (with no other sublists), and which is the last item in its sublist.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a
+     * simple sublist list item (with no other sublists), and which is the last item in its sublist.
      */
     public void testOutdentLastItemNoSublist()
     {
@@ -142,8 +141,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a sublist list item with sublists which is the last item in its sublist.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a
+     * sublist list item with sublists which is the last item in its sublist.
      */
     public void testOutdentLastItemWithSublist()
     {
@@ -168,9 +167,9 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple sublist list item (with no other sublists), which is in the middle of its sublist and on outdent it
-     * needs to be split in two sublists.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a
+     * simple sublist list item (with no other sublists), which is in the middle of its sublist and on outdent it needs
+     * to be split in two sublists.
      */
     public void testOutdentSplitNoSublist()
     {
@@ -195,8 +194,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
-     * a simple sublist list item with a sublist, which is in the middle of its sublist and on outdent it needs to be
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for a
+     * simple sublist list item with a sublist, which is in the middle of its sublist and on outdent it needs to be
      * split in two sublists.
      */
     public void testOutdentSplitWithSublist()
@@ -223,9 +222,9 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for a simple sublist list item with a sublist, which is in the middle of its sublist and on outdent it needs to
-     * be split in two sublists, and the item to be outdented is fully selected.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for a
+     * simple sublist list item with a sublist, which is in the middle of its sublist and on outdent it needs to be
+     * split in two sublists, and the item to be outdented is fully selected.
      */
     public void testOutdentSplitWithSublistEntirelySelected()
     {
@@ -261,9 +260,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when the outdented item is in a sublist and content is present in the parent list item after the
-     * sublist.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when the outdented item is in a sublist and content is present in the parent list item after the sublist.
      */
     public void testOutdentSplitWithContentAfter()
     {
@@ -289,8 +287,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is the first item in its list.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} the case
+     * of a first level item, which is the first item in its list.
      */
     public void testOutdentFirstLevelItemAtListTop()
     {
@@ -314,8 +312,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is in the middle of its list and outdent needs to split it in two.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} the case
+     * of a first level item, which is in the middle of its list and outdent needs to split it in two.
      */
     public void testOutdentFirstLevelItemSplitList()
     {
@@ -339,8 +337,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is in the middle of its list and outdent needs to split it in two.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} the case
+     * of a first level item, which is in the middle of its list and outdent needs to split it in two.
      */
     public void testOutdentFirstLevelItemWithSublist()
     {
@@ -364,10 +362,10 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case of a first level item with a sublist and content after, which is in the middle of its list and
-     * outdent needs to split it in two, and wrap the list text in a paragraph, as well as the text after, but leaving
-     * the inner sublist unwrapped.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case of a first level item with a sublist and content after, which is in the middle of its list and outdent needs
+     * to split it in two, and wrap the list text in a paragraph, as well as the text after, but leaving the inner
+     * sublist unwrapped.
      */
     public void testOutdentFirstLevelItemWithSublistAndContentAfter()
     {
@@ -391,8 +389,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} the
-     * case of a first level item, which is the last item in its list.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} the case
+     * of a first level item, which is the last item in its list.
      */
     public void testOutdentFirstLevelItemAtListEnd()
     {
@@ -416,8 +414,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when a whole second level sublist is to be outdented.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when a whole second level sublist is to be outdented.
      */
     public void testOutdentEntireSublist()
     {
@@ -452,8 +450,8 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)},
-     * for the case when a whole second level sublist is to be outdented.
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)}, for the
+     * case when a whole second level sublist is to be outdented.
      */
     public void testOutdentSublistFragmentWithFollowingListFragment()
     {
@@ -490,7 +488,7 @@ public class OutdentExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link OutdentExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)} for
+     * Unit test for {@link OutdentExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} for
      * outdenting a fragment of a sublist with some trailing text after it, together with the first level list under it.
      * In this case, the sublist fragment should be outdented correctly to the first level (and grab the trailing text
      * in itself), the first level item it makes part of should be outdented too (because of the trailing text) and the

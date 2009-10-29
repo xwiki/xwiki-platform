@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Validation rule for text area's commands. Verifies if a specific command can be executed on the current state of the

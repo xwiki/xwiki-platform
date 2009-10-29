@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.editor;
 
+import org.xwiki.gwt.user.client.Config;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.font.FontPluginFactory;
@@ -44,7 +46,6 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
 
 /**
  * Factory for {@link WysiwygEditor}. Holds the responsibility of injecting the {@link PluginFactoryManager} and

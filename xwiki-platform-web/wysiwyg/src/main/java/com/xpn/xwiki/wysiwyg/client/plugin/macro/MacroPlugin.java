@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
@@ -26,9 +30,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.CollapseExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.InsertExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.exec.RefreshExecutable;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * WYSIWYG editor plug-in for inserting macros and for editing macro parameters.

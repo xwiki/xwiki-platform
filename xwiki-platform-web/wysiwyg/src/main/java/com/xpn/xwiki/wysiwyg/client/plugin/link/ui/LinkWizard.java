@@ -22,13 +22,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.wizard.Wizard;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
+
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.Wizard;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStepProvider;
 
 /**
  * The link wizard, used to configure link parameters in a {@link com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig}

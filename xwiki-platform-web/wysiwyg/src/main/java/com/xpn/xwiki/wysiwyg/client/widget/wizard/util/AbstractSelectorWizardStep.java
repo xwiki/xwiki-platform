@@ -21,10 +21,11 @@ package com.xpn.xwiki.wysiwyg.client.widget.wizard.util;
 
 import java.util.EnumSet;
 
+import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.WizardStep;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Abstract {@link WizardStep} to implement basic selector functions (storing edited data on

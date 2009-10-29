@@ -50,12 +50,6 @@
     </dependency>
     <!-- GWT libraries -->
     <dependency>
-      <groupId>com.google.gwt</groupId>
-      <artifactId>gwt-incubator</artifactId>
-      <version>july-14-2009</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>com.smartgwt</groupId>
       <artifactId>smartgwt</artifactId>
       <version>${smartgwt.version}</version>
@@ -77,6 +71,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-dom</artifactId>
+      <version>${pom.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-user</artifactId>
       <version>${pom.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -122,6 +122,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-shared-tests</artifactId>
       <version>${platform.core.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-user</artifactId>
+      <classifier>tests</classifier>
+      <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -19,12 +19,13 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
+import org.xwiki.gwt.user.client.ui.MenuBar;
+import org.xwiki.gwt.user.client.ui.MenuItem;
+
 import com.google.gwt.user.client.Command;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.MenuItemUIExtension;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
 
 /**
  * Provides access to various content importers through the top-level wysiwyg menu.

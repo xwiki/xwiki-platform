@@ -21,10 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
 
 import com.google.gwt.dom.client.Node;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Superclass for all the list executables, such as indent and outdent executables, to handle frequent list operations.

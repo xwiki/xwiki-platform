@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 /**
  * A validation rule states that some of the editor's features (like 'bold', 'indent' etc.) should not be enabled when

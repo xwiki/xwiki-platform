@@ -19,15 +19,16 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.list;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 
 /**
  * Unit tests for the {@link ListBehaviorAdjuster}.
  * 
  * @version $Id$
  */
-public class ListBehaviorAdjusterTest extends AbstractRichTextAreaTest
+public class ListBehaviorAdjusterTest extends RichTextAreaTestCase
 {
     /**
      * The behavior adjuster being tested.
@@ -37,7 +38,7 @@ public class ListBehaviorAdjusterTest extends AbstractRichTextAreaTest
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -51,7 +52,7 @@ public class ListBehaviorAdjusterTest extends AbstractRichTextAreaTest
 
     /**
      * Unit test for
-     * {@link ListBehaviorAdjuster#onCommand(com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager, com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command, String)}
+     * {@link ListBehaviorAdjuster#onCommand(org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager, org.xwiki.gwt.user.client.ui.rta.cmd.Command, String)}
      * , for the case when a list element appears in another list element as the first child, in which case, the list
      * element inside needs to be wrapped in an empty list item.
      */
@@ -74,7 +75,7 @@ public class ListBehaviorAdjusterTest extends AbstractRichTextAreaTest
 
     /**
      * Unit test for
-     * {@link ListBehaviorAdjuster#onCommand(com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager, com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command, String)}
+     * {@link ListBehaviorAdjuster#onCommand(org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager, org.xwiki.gwt.user.client.ui.rta.cmd.Command, String)}
      * , for the case when a list element appears in another list element after another list item, in which case, the
      * list element needs to be appended as a child of its previous list item.
      */

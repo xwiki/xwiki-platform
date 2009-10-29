@@ -19,6 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.ui;
 
+import org.xwiki.gwt.user.client.FocusCommand;
+import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.TextBoxNumberFilter;
+import org.xwiki.gwt.user.client.ui.wizard.AbstractNavigationAwareWizardStep;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListenerCollection;
+import org.xwiki.gwt.user.client.ui.wizard.SourcesNavigationEvents;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
@@ -32,15 +41,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.plugin.macro.ui.AbstractNavigationAwareWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableDescriptor;
-import com.xpn.xwiki.wysiwyg.client.util.FocusCommand;
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
-import com.xpn.xwiki.wysiwyg.client.util.TextBoxNumberFilter;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListenerCollection;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.SourcesNavigationEvents;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 
 /**
  * Wizard step for configuring a table before inserting it.

@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Executable;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 /**
  * Enables or disables the rich text area. When the rich text area is disabled its content is not submitted.

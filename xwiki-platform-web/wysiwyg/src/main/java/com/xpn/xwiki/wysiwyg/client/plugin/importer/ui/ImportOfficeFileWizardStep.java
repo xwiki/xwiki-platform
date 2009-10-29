@@ -23,6 +23,9 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirection;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -32,8 +35,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.wizard.NavigationListener.NavigationDirection;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractFileUploadWizardStep;
 
 /**

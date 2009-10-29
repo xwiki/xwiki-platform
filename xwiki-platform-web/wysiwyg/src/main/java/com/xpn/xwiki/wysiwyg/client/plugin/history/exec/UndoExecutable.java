@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.history.exec;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Loads the previous entry in the history of a rich text area.

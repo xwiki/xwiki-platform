@@ -24,6 +24,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.Cache;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.Console;
+import org.xwiki.gwt.user.client.DeferredUpdater;
+import org.xwiki.gwt.user.client.HandlerRegistrationCollection;
+import org.xwiki.gwt.user.client.Updatable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 
 import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.event.dom.client.KeyUpEvent;
@@ -47,15 +56,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.separator.ToolBarSeparator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
-import com.xpn.xwiki.wysiwyg.client.util.Cache;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.Console;
-import com.xpn.xwiki.wysiwyg.client.util.DeferredUpdater;
-import com.xpn.xwiki.wysiwyg.client.util.HandlerRegistrationCollection;
-import com.xpn.xwiki.wysiwyg.client.util.Updatable;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandListener;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManager;
 
 /**
  * The controller part of the WYSIWYG editor.

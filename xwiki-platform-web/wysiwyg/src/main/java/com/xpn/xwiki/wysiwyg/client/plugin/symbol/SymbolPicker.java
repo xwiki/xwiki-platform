@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.symbol;
 
+import org.xwiki.gwt.user.client.ui.CompositeDialogBox;
+
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
-import com.xpn.xwiki.wysiwyg.client.widget.CompositeDialogBox;
 
 /**
  * A popup panel which allows you to pick a symbol from a symbol palette by clicking on that symbol.

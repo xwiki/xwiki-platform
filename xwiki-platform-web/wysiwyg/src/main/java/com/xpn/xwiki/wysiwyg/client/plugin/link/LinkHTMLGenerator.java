@@ -21,7 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
 import java.util.Map;
 
-import com.xpn.xwiki.wysiwyg.client.util.StringUtils;
+import org.xwiki.gwt.user.client.StringUtils;
+
 
 /**
  * Generates html link blocks for all types of links.

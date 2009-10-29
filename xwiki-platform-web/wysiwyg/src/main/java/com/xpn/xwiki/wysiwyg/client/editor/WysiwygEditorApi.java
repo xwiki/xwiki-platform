@@ -20,6 +20,12 @@
 package com.xpn.xwiki.wysiwyg.client.editor;
 
 import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.NativeAsyncCallback;
+import org.xwiki.gwt.user.client.internal.DefaultConfig;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManagerApi;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -31,12 +37,6 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverterAsync;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.util.NativeAsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.util.internal.DefaultConfig;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.CommandManagerApi;
 
 /**
  * This class exposes a {@link WysiwygEditor} to the native JavaScript code.

@@ -23,6 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.BlockStyleExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleExecutable;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -33,11 +38,6 @@ import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.BlockStyleExecutable;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleExecutable;
 
 /**
  * Plug-in for justifying text. It can be used to align text to the left, to the right, in center or to make it expand

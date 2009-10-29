@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroSelector;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.InsertHTMLExecutable;
 
 /**
  * Inserts a new macro in the edited document or replaces an existing one.

@@ -30,10 +30,10 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.InnerHTMLListener;
 import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.dom.client.Style.Display;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
 import com.google.gwt.dom.client.NodeList;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Hides macro meta data and displays macro output in a read only text box.

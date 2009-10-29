@@ -21,8 +21,8 @@ package com.xpn.xwiki.wysiwyg.client.plugin.text.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleInlineStyleExecutable;
 
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 /**
  * If there is no selection, the insertion point will set bold for subsequently typed characters. If there is a

@@ -22,6 +22,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.format;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Config;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -36,9 +40,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.FormatBlockExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.exec.RemoveFormatExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractStatefulPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
-import com.xpn.xwiki.wysiwyg.client.util.Config;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * {@link RichTextArea} plug-in for formatting text. It can be used to format text as heading 1 to 5. It installs a

@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroSelector;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * Collapses or expands the selected macros or all the macros present in the edited document if no macros are selected.

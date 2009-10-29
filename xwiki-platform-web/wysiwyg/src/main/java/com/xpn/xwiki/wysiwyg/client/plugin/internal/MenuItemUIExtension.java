@@ -1,7 +1,8 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
+import org.xwiki.gwt.user.client.ui.MenuItem;
+
 import com.google.gwt.user.client.ui.UIObject;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuItem;
 
 /**
  * Concrete implementation of the {@link AbstractUIExtension}. Each feature must have associated a menu item.

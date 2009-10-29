@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableFeature;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.internal.AbstractExecutable;
 
 /**
  * This class partly implements the Executable and TableFeature interfaces. Table features must extend this class.

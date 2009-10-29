@@ -20,6 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.editor;
 
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ui.LoadingPanel;
+import org.xwiki.gwt.user.client.ui.MenuBar;
+import org.xwiki.gwt.user.client.ui.ToolBar;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
@@ -27,10 +31,6 @@ import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.xpn.xwiki.wysiwyg.client.widget.LoadingPanel;
-import com.xpn.xwiki.wysiwyg.client.widget.MenuBar;
-import com.xpn.xwiki.wysiwyg.client.widget.ToolBar;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * The user interface of the WYSIWYG editor.

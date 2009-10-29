@@ -21,23 +21,23 @@ package com.xpn.xwiki.wysiwyg.client.plugin.separator.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
+import com.xpn.xwiki.wysiwyg.client.RichTextAreaTestCase;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.exec.UndoExecutable;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.internal.DefaultHistory;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.AbstractRichTextAreaTest;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.cmd.Command;
 
 /**
  * Unit test for {@link InsertHRExecutable}.
  * 
  * @version $Id$
  */
-public class InsertHRExecutableTest extends AbstractRichTextAreaTest
+public class InsertHRExecutableTest extends RichTextAreaTestCase
 {
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractRichTextAreaTest#gwtSetUp()
+     * @see RichTextAreaTestCase#gwtSetUp()
      */
     protected void gwtSetUp() throws Exception
     {
@@ -48,8 +48,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when there is no text selected.
+     * Unit test for {@link InsertHRExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} when
+     * there is no text selected.
      */
     public void testInsertAtCaret()
     {
@@ -72,8 +72,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when there is text selected.
+     * Unit test for {@link InsertHRExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} when
+     * there is text selected.
      */
     public void testReplaceSelection()
     {
@@ -87,8 +87,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when there is text selected.
+     * Unit test for {@link InsertHRExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} when
+     * there is text selected.
      */
     private void doTestReplaceSelection()
     {
@@ -110,8 +110,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when the rich text area is empty.
+     * Unit test for {@link InsertHRExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} when the
+     * rich text area is empty.
      */
     public void testEmptyDocument()
     {
@@ -128,8 +128,8 @@ public class InsertHRExecutableTest extends AbstractRichTextAreaTest
     }
 
     /**
-     * Unit test for {@link InsertHRExecutable#execute(com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea, String)}
-     * when the selection wraps an element's inner text.
+     * Unit test for {@link InsertHRExecutable#execute(org.xwiki.gwt.user.client.ui.rta.RichTextArea, String)} when the
+     * selection wraps an element's inner text.
      */
     public void testReplaceElementText()
     {

@@ -19,8 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
+
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.widget.rta.RichTextArea;
 
 /**
  * Utility rule for disabling some of the editor's features.

@@ -274,7 +274,7 @@ $msg.get('xe.scheduler.welcome')
 &lt;input type="hidden" name="name" value=""/&gt;
 &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
 &lt;input type="text" name="title" value="$msg.get('xe.scheduler.jobs.pagename')" size="30"/&gt;
-&lt;input type="button" value="$msg.get('xe.scheduler.jobs.add')" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;
+&lt;span class="buttonwrapper"&gt;&lt;input type="button" class="button" value="$msg.get('xe.scheduler.jobs.add')" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;&lt;/span&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

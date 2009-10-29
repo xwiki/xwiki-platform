@@ -365,7 +365,7 @@ public class WatchListEvent implements Comparable<WatchListEvent>
     {
         if (previousVersion == null) {
             String currentVersion = "";
-            previousVersion = INITIAL_DOCUMENT_VERSION;
+            previousVersion = "";
 
             try {
                 if (!isComposite()) {

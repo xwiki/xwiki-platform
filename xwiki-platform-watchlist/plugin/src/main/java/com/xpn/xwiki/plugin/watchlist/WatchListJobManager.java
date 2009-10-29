@@ -31,6 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Manager for WatchList jobs.
@@ -237,7 +238,7 @@ public class WatchListJobManager
                 job.setStringValue("jobName", name);
                 job.setStringValue("jobClass", WatchListJob.class.getName());
                 job.setStringValue("cron", cron);
-                job.setStringValue("contextUser", "XWiki.Admin");
+                job.setStringValue("contextUser", XWikiRightService.SUPERADMIN_USER_FULLNAME);
                 job.setStringValue("contextLang", "en");
                 job.setStringValue("contextDatabase", "xwiki");
             }

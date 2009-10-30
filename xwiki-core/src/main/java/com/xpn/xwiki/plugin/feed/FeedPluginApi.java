@@ -764,6 +764,22 @@ public class FeedPluginApi extends Api
      */
     public SyndFeed getBlogFeed(String query, int count, int start, Map<String, Object> metadata)
     {
+        return getBlogFeed(query, count, start, null, metadata);
+    }
+
+    /**
+     * Instantiates the default article feed.
+     *
+     * @param query the HQL query used for retrieving the articles
+     * @param count the maximum number of articles to retrieve
+     * @param start the start index
+     * @param blogPostClassName The name of the Blog Class the data are retrieved from. If null the Default Blog Application is used.
+     * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
+     * @return a new feed
+     * @see #getArticleFeed(String, int, int, Map)
+     */
+    public SyndFeed getBlogFeed(String query, int count, int start, String blogPostClassName, Map<String, Object> metadata)
+    {
         if (query == null) {
             XWikiRequest request = getXWikiContext().getRequest();
             String category = request.getParameter("category");
@@ -777,7 +793,17 @@ public class FeedPluginApi extends Api
             }
         }
         Map<String, Object> params = Collections.emptyMap();
-        SyndFeed blogFeed =  getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), params, fillBlogFeedMetadata(metadata));
+        Map<String, Object> blogMappings = null;
+        if( blogPostClassName == null ) {
+            blogMappings = BLOG_FIELDS_MAPPING;
+        } else {
+            blogMappings = new HashMap<String, Object>();
+            blogMappings.put(SyndEntryDocumentSource.FIELD_TITLE, blogPostClassName + "_title");
+            blogMappings.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, blogPostClassName + "_content");
+            blogMappings.put(SyndEntryDocumentSource.FIELD_CATEGORIES, blogPostClassName + "_category");
+            blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
+        }
+        SyndFeed blogFeed =  getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), blogMappings), params, fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }
@@ -902,5 +928,16 @@ public class FeedPluginApi extends Api
     public String getBlogFeedOutput(String query, int count, int start, Map<String, Object> metadata, String type)
     {
         return getFeedOutput(getBlogFeed(query, count, start, metadata), type);
+    }
+
+    /**
+     * @see #getBlogFeed(String, int, int, Map)
+     * @see #getFeedOutput(SyndFeed, String)
+     */
+    public String getBlogFeedOutput(String query, int count, int start, String blogPostClassName, Map<String, Object> metadata, String type)
+    {
+        SyndFeed feed = getBlogFeed(query, count, start, blogPostClassName, metadata);
+        String ret = getFeedOutput( feed, type );
+        return ret;
     }
 }

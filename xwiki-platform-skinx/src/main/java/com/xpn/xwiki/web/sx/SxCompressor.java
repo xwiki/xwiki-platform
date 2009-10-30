@@ -28,5 +28,11 @@ package com.xpn.xwiki.web.sx;
  */
 public interface SxCompressor
 {
+    /**
+     * Compresses the given script, making it smaller and less readable, but with the same behavior.
+     *
+     * @param source The uncompressed script
+     * @return A compressed version of the input source
+     */
     String compress(String source);
 }

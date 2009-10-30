@@ -37,20 +37,32 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public class SxDocumentSource implements SxSource
 {
-    private XWikiDocument document;
+    /** The name of the property in the script extension object which contains the script content. */
+    private static final String CONTENT_PROPERTY_NAME = "code";
 
-    private XWikiContext context;
+    /** The name of the property in the script extension object which tells us if the content should be parsed. */
+    private static final String PARSE_CONTENT_PROPERTY_NAME = "parse";
 
-    private Extension extension;
+    /** The name of the property in the script extension object which contains the cache policy. */
+    private static final String CACHE_POLICY_PROPERTY_NAME = "cache";
 
     /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(SxDocumentSource.class);
 
+    /** The document containing the extension. */
+    private XWikiDocument document;
+
+    /** The current XWikiContext. */
+    private XWikiContext context;
+
+    /** The type of Extension for getting the right kind of object from the document. */
+    private Extension extension;
+
     /**
-     * Constructor for this source.
+     * Constructor for this extension source.
      * 
-     * @param context
-     * @param type
+     * @param context The XWikiContext
+     * @param extension The Extension type
      */
     public SxDocumentSource(XWikiContext context, Extension extension)
     {
@@ -76,13 +88,15 @@ public class SxDocumentSource implements SxSource
                 try {
                     CachePolicy cache =
                         CachePolicy.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
-                            .getStringValue("cache"), "LONG")));
+                            .getStringValue(CACHE_POLICY_PROPERTY_NAME), "LONG")));
                     if (cache.compareTo(finalCache) > 0) {
                         finalCache = cache;
                     }
                 } catch (Exception ex) {
-                    LOG.warn(String.format("SX object [%s#%s] has an invalid cache policy: [%s]", this.document
-                        .getFullName(), sxObj.getStringValue("name"), sxObj.getStringValue("cache")));
+                    LOG.warn(String.format("SX object [%s#%s] has an invalid cache policy: [%s]",
+                                           this.document.getFullName(),
+                                           sxObj.getStringValue("name"),
+                                           sxObj.getStringValue(CACHE_POLICY_PROPERTY_NAME)));
                 }
             }
         }
@@ -103,8 +117,8 @@ public class SxDocumentSource implements SxSource
                 if (sxObj == null) {
                     continue;
                 }
-                String sxContent = sxObj.getLargeStringValue("code");
-                int parse = sxObj.getIntValue("parse");
+                String sxContent = sxObj.getLargeStringValue(CONTENT_PROPERTY_NAME);
+                int parse = sxObj.getIntValue(PARSE_CONTENT_PROPERTY_NAME);
                 if (parse == 1) {
                     sxContent =
                         this.context.getWiki().getRenderingEngine().interpretText(sxContent, this.document,

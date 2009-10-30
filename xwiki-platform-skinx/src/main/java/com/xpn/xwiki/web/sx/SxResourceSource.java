@@ -26,7 +26,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 
 /**
- * JAR resource source for Skin Extensions
+ * JAR resource source for Skin Extensions.
  * 
  * @version $Id$
  * @since 1.7M2

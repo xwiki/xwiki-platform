@@ -29,11 +29,31 @@ package com.xpn.xwiki.web.sx;
 public interface SxSource
 {
     /**
-     * Cache policies available for extensions
+     * Cache policies available for extensions.
      */
     public enum CachePolicy
     {
-        LONG, SHORT, DEFAULT, FORBID
+        /** 
+         * Cache for a long time.
+         * @see AbstractSxAction#LONG_CACHE_DURATION 
+         */
+        LONG,
+
+        /** 
+         * Cache for a short time.
+         * @see AbstractSxAction#SHORT_CACHE_DURATION
+         */
+        SHORT,
+
+        /** 
+         * Cache for the proxy/browser's default time, It will be held in the 
+         * server cache an amount of time specified in AbstractSxAction.
+         * @see AbstractSxAction.DEFAULT_CACHE_DURATION 
+         */
+        DEFAULT,
+
+        /** Do not cache at all in server cache or in proxy/browser. */
+        FORBID
     }
 
     /**

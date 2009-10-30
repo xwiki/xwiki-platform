@@ -70,45 +70,71 @@ public class JsExtension implements Extension
      */
     public SxCompressor getCompressor()
     {
-        return new SxCompressor()
+        return new JsCompressor();
+    }
+
+    /** The JavaScript compressor which is returned by getCompressor. Currently implemented using YUI Compressor. */
+    private class JsCompressor implements SxCompressor
+    {
+        /**
+         * {@inheritDoc}
+         * 
+         * @see SxCompressor#compress()
+         */
+        public String compress(String source)
         {
-            public String compress(String source)
-            {
-                try {
-                    ErrorReporter reporter = new ErrorReporter()
-                    {
-                        public void error(String message, String filename, int lineNumber, String context, int column)
-                        {
-                            LOG.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
-                                message, context, lineNumber, column));
-                        }
-
-                        public EvaluatorException runtimeError(String message, String filename, int lineNumber,
-                            String context, int column)
-                        {
-                            LOG.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
-                            return null;
-                        }
-
-                        public void warning(String message, String filename, int lineNumber, String context, int column)
-                        {
-                            LOG.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
-                                message, context, lineNumber, column));
-                        }
-                    };
-                    JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(source), reporter);
-                    StringWriter out = new StringWriter();
-                    compressor.compress(out, -1, true, false, false, false);
-                    return out.toString();
-                } catch (IOException ex) {
-                    LOG.info("Failed to write the compressed output: " + ex.getMessage());
-                } catch (EvaluatorException ex) {
-                    LOG.info("Failed to parse the JS extension: " + ex.getMessage());
-                } catch (Exception ex) {
-                    LOG.warn("Failed to compress JS extension: " + ex.getMessage());
-                }
-                return source;
+            try {
+                ErrorReporter reporter = (ErrorReporter) this.new CustomErrorReporter();
+                JavaScriptCompressor compressor = new JavaScriptCompressor(new StringReader(source), reporter);
+                StringWriter out = new StringWriter();
+                compressor.compress(out, -1, true, false, false, false);
+                return out.toString();
+            } catch (IOException ex) {
+                LOG.info("Failed to write the compressed output: " + ex.getMessage());
+            } catch (EvaluatorException ex) {
+                LOG.info("Failed to parse the JS extension: " + ex.getMessage());
+            } catch (Exception ex) {
+                LOG.warn("Failed to compress JS extension: " + ex.getMessage());
             }
-        };
+            return source;
+        }
+
+        /** A Javascript error reporter which logs errors with log4j. */
+        private class CustomErrorReporter implements ErrorReporter
+        {
+            /**
+             * {@inheritDoc}
+             * 
+             * @see ErrorReporter#error(String, String, int, String, int)
+             */
+            public void error(String message, String filename, int lineNumber, String context, int column)
+            {
+                LOG.warn(MessageFormat.format("Error at line {2}, column {3}: {0}. Caused by: [{1}]",
+                    message, context, lineNumber, column));
+            }
+
+            /**
+             * {@inheritDoc}
+             * 
+             * @see ErrorReporter#runtimeError(String, String, int, String, int)
+             */
+            public EvaluatorException runtimeError(String message, String filename, int lineNumber,
+                String context, int column)
+            {
+                LOG.error(MessageFormat.format("Runtime error minimizing JSX object: {0}", message));
+                return null;
+            }
+
+            /**
+             * {@inheritDoc}
+             * 
+             * @see ErrorReporter#warning(String, String, int, String, int)
+             */
+            public void warning(String message, String filename, int lineNumber, String context, int column)
+            {
+                LOG.info(MessageFormat.format("Warning at line {2}, column {3}: {0}. Caused by: [{1}]",
+                    message, context, lineNumber, column));
+            }
+        }
     }
 }

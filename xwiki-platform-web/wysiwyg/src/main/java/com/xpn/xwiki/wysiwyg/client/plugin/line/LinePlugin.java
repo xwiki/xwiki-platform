@@ -28,6 +28,7 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
@@ -597,27 +598,10 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
 
         // Split the container after the found BR.
         if (domUtils.isFlowContainer(container)) {
-            Node child = domUtils.getChild(container, br);
-            if (child != br) {
-                start = domUtils.splitNode(container, br.getParentNode(), domUtils.getNodeIndex(br));
-            } else {
-                start = paragraph;
-            }
-            // Insert the created paragraph before the split.
-            domUtils.insertAfter(paragraph, child);
-            // Move all the in-line nodes after the split in the created paragraph.
-            child = paragraph.getNextSibling();
-            while (child != null && domUtils.isInline(child)) {
-                paragraph.appendChild(child);
-                child = paragraph.getNextSibling();
-            }
+            start = splitContentAndWrap(container, br, paragraph);
         } else {
-            start = domUtils.splitNode(container.getParentNode(), br.getParentNode(), domUtils.getNodeIndex(br));
-            if (start == container.getNextSibling()) {
-                start = paragraph;
-            }
-            paragraph.appendChild(Element.as(container.getNextSibling()).extractContents());
-            container.getParentNode().replaceChild(paragraph, container.getNextSibling());
+            start = splitAndReplace(container, br, paragraph);
+            copyLineStyle(Element.as(container), Element.as(paragraph));
         }
         br.getParentNode().removeChild(br);
 
@@ -722,5 +706,70 @@ public class LinePlugin extends AbstractPlugin implements KeyDownHandler, KeyUpH
         markInitialLineBreaks();
         replaceEmptyLinesWithParagraphs();
         Element.as(getTextArea().getDocument().getBody()).ensureEditable();
+    }
+
+    /**
+     * Splits the given container in two parts, before the specified child and after, and replaces the container of the
+     * second part (to the right of the child node) with the given replacement.
+     * 
+     * @param container the root of the subtree to be split
+     * @param child the descendant that marks the split point
+     * @param replacement the new container for the second part obtained from the split
+     * @return the node resulted from splitting the child, or the replacement if the container is split at the end
+     */
+    private Node splitAndReplace(Node container, Node child, Node replacement)
+    {
+        Node start = domUtils.splitNode(container.getParentNode(), child.getParentNode(), domUtils.getNodeIndex(child));
+        if (start == container.getNextSibling()) {
+            start = replacement;
+        }
+        replacement.appendChild(Element.as(container.getNextSibling()).extractContents());
+        container.getParentNode().replaceChild(replacement, container.getNextSibling());
+        return start;
+    }
+
+    /**
+     * Splits the content of the given container in two parts, before the specified descendant and after, and wraps the
+     * in-line nodes to the right of the split with the given wrapper.
+     * <p>
+     * NOTE: The container itself is not split, only its content is.
+     * 
+     * @param container the root of the subtree to be split; the root itself is not split
+     * @param descendant the descendant that marks the split point
+     * @param wrapper the new container for the in-line nodes that are positioned to the right of the split point
+     * @return the node resulted from splitting the descendant, or the wrapper if the descendant is a direct child of
+     *         the container (in which case the split doesn't take place)
+     */
+    private Node splitContentAndWrap(Node container, Node descendant, Node wrapper)
+    {
+        Node start = wrapper;
+        Node child = domUtils.getChild(container, descendant);
+        // If the descendant is a direct child of the container then we don't have to split.
+        if (child != descendant) {
+            start = domUtils.splitNode(container, descendant.getParentNode(), domUtils.getNodeIndex(descendant));
+        }
+        // Insert the wrapper after the split.
+        domUtils.insertAfter(wrapper, child);
+        // Move all the following in-line nodes inside the wrapper.
+        child = wrapper.getNextSibling();
+        while (child != null && domUtils.isInline(child)) {
+            wrapper.appendChild(child);
+            child = wrapper.getNextSibling();
+        }
+        return start;
+    }
+
+    /**
+     * Copy some of the CSS styles from the source line to the destination line. Call this method to ensure the
+     * important line styles are preserved on the new line after splitting a line.
+     * 
+     * @param sourceLine the line from where to copy the styles
+     * @param destinationLine the line whose style will be changed
+     * @see #splitLine(Node, Range)
+     */
+    protected void copyLineStyle(Element sourceLine, Element destinationLine)
+    {
+        destinationLine.getStyle().setProperty(Style.TEXT_ALIGN.getJSName(),
+            sourceLine.getStyle().getProperty(Style.TEXT_ALIGN.getJSName()));
     }
 }

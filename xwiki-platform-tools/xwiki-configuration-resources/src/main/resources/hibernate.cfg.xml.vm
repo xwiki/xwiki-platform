@@ -28,6 +28,8 @@
     <property name="dbcp.ps.maxActive">20</property>
     <property name="dbcp.ps.maxWait">120000</property>
     <property name="dbcp.ps.maxIdle">20</property>
+    <!-- Without it, some queries fail in MS SQL. XWiki doesn't need scrollable result sets, anyway. -->
+    <property name="jdbc.use_scrollable_resultset">false</property>
 
     <!-- Configuration for the default database.
          Comment out this section and uncomment other sections below if you want to use another database.

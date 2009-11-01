@@ -89,10 +89,10 @@
           &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('watchlist.staytuned.email.frequency.save')" class="button"/&gt;&lt;/span&gt;
           &lt;/fieldset&gt;
         &lt;/form&gt;
-        &lt;/div&gt;        
+        &lt;/div&gt;
         &lt;div style="width:48%;float:right;"&gt;
         &lt;h2&gt;$msg.get("watchlist.staytuned.rss")&lt;/h2&gt;
-        &lt;a rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
+        &lt;a rel="_blank" href="$xwiki.getURL("XWiki.WatchListRss", "view", "xpage=plain&amp;amp;outputSyntax=plain")" style="padding-left:16px;background:url('$xwiki.getSkinFile('icons/black-rss-mini2.png')') left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
         &lt;br/&gt;
         &lt;/div&gt;
         &lt;div style="clear:both;"&gt;&lt;/div&gt;

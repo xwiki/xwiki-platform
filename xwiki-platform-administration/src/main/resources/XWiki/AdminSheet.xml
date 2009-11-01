@@ -727,7 +727,7 @@ p.legend {
                #set($url = $xwiki.getURL($currentDoc, 'admin', $query))
              #end
             #end
-            &lt;li class="${name}"&gt;&lt;a href="$url" #if("$!aiconurl" != '')style="background:url($aiconurl) no-repeat;"#end&gt;&lt;span&gt;#if("$!atitle" != '')$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+            &lt;li class="${name}"&gt;&lt;a href="$url" #if("$!aiconurl" != '')style="background:url('$aiconurl') no-repeat;"#end&gt;&lt;span&gt;#if("$!atitle" != '')$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
           #end
         #end
        &lt;/ul&gt;

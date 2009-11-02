@@ -188,4 +188,26 @@ public class EmptyLinkFilterTest extends RichTextAreaTestCase
             }
         });
     }
+
+    /**
+     * @see XWIKI-4541: Links are removed when a macro is collapsed and the editor looses focus.
+     */
+    public void testHiddenAnchorsAreNotFiltered()
+    {
+        deferTest(new com.google.gwt.user.client.Command()
+        {
+            public void execute()
+            {
+                // Link is hidden.
+                rta.setHTML("1<a style=\"display:none;\" href=\"http://www.xwiki.org\">2</a>3");
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+                assertEquals(1, getBody().getElementsByTagName(ANCHOR_TAG).getLength());
+
+                // Link container is hidden.
+                rta.setHTML("1<span style=\"display:none;\">2<a href=\"http://www.xwiki.org\">3</a>4</span>5");
+                linkFilter.onBeforeCommand(rta.getCommandManager(), SUBMIT_COMMAND, null);
+                assertEquals(1, getBody().getElementsByTagName(ANCHOR_TAG).getLength());
+            }
+        });
+    }
 }

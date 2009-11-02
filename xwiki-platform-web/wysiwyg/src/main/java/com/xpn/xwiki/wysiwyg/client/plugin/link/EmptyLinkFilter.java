@@ -22,12 +22,14 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xwiki.gwt.dom.client.Style;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandListener;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 
+import com.google.gwt.dom.client.AnchorElement;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NodeList;
 
@@ -39,6 +41,11 @@ import com.google.gwt.dom.client.NodeList;
  */
 public class EmptyLinkFilter implements CommandListener
 {
+    /**
+     * The submit rich text area command.
+     */
+    private static final Command SUBMIT = new Command("submit");
+
     /**
      * The rich text area for which this command listener cleans the empty listener.
      */
@@ -56,31 +63,70 @@ public class EmptyLinkFilter implements CommandListener
 
     /**
      * {@inheritDoc}
+     * 
+     * @see CommandListener#onBeforeCommand(CommandManager, Command, String)
      */
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
-        // store the empty anchors in a separate list, to remove at the end since NodeList is an iterator, actually
-        List<Element> emptyAnchors = new ArrayList<Element>();
-        if (command.equals(new Command("submit"))) {
-            NodeList<Element> anchorsList = rta.getDocument().getElementsByTagName("a");
-            for (int i = 0; i < anchorsList.getLength(); i++) {
-                Element anchor = anchorsList.getItem(i);
-                // check if it has a href (not to remove named anchors by mistake) and it's void
-                if (!StringUtils.isEmpty(anchor.getAttribute("href")) && anchor.getOffsetWidth() == 0) {
-                    // should be removed
-                    emptyAnchors.add(anchor);
-                }
+        if (SUBMIT.equals(command)) {
+            for (Element anchor : getEmptyAnchors()) {
+                anchor.getParentNode().removeChild(anchor);
             }
-        }
-        // now actually remove them from the DOM
-        for (Element anchor : emptyAnchors) {
-            anchor.getParentElement().removeChild(anchor);
         }
         return false;
     }
 
     /**
+     * @return the list of empty anchors
+     * @see #isEmpty(Element)
+     */
+    private List<Element> getEmptyAnchors()
+    {
+        List<Element> emptyAnchors = new ArrayList<Element>();
+        NodeList<Element> anchorsList = rta.getDocument().getElementsByTagName("a");
+        for (int i = 0; i < anchorsList.getLength(); i++) {
+            Element anchor = anchorsList.getItem(i);
+            if (isEmpty(AnchorElement.as(anchor))) {
+                emptyAnchors.add(anchor);
+            }
+        }
+        return emptyAnchors;
+    }
+
+    /**
+     * @param anchor an anchor element
+     * @return {@code true} if the given anchor has a reference and is not visible although its parent is, {@code false}
+     *         otherwise
+     */
+    private boolean isEmpty(AnchorElement anchor)
+    {
+        return !StringUtils.isEmpty(anchor.getHref()) && anchor.getOffsetWidth() == 0 && anchor.getOffsetHeight() == 0
+            && isDisplayed(anchor);
+    }
+
+    /**
+     * We have to iterate all the ancestor elements and check if each is displayed because the {@link Style#DISPLAY} CSS
+     * property is not inherited.
+     * 
+     * @param element a DOM element
+     * @return {@code true} if the given element is displayed, {@code false} otherwise
+     */
+    private boolean isDisplayed(Element element)
+    {
+        Element ancestor = element;
+        while (ancestor != null) {
+            if (Style.Display.NONE.equals(ancestor.getStyle().getProperty(Style.DISPLAY))) {
+                return false;
+            }
+            ancestor = ancestor.getParentElement();
+        }
+        return true;
+    }
+
+    /**
      * {@inheritDoc}
+     * 
+     * @see CommandListener#onCommand(CommandManager, Command, String)
      */
     public void onCommand(CommandManager sender, Command command, String param)
     {

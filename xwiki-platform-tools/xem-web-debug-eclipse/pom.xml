@@ -95,6 +95,12 @@
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt-user</artifactId>
+      <version>${pom.version}</version>
+      <scope>provided</scope>
+    </dependency>
     
     <!-- GWT core dependencies -->
     <dependency>

@@ -22,14 +22,14 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform.toolsoupId>
+    <groupId>org.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>16</version>
+    <version>20</version>
   </parent>
-  <groupId>org.org.xwiki.platform.toolsd>
   <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
   <packaging>pom</packaging>
   <name>Maven XWiki Backup Plugin Basic Import/Export Sample</name>
@@ -37,6 +37,7 @@
   <version>1.0-SNAPSHOT</version>
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-remote-resources-plugin</artifactId>
@@ -48,7 +49,7 @@
             </goals>
             <configuration>
               <resourceBundles>
-                <resourceBundle>org.xwikorg.xwiki.platform.toolsguration-resources:1.10</resourceBundle>
+                <resourceBundle>org.xwiki.platform.tools:xwiki-configuration-resources:1.34</resourceBundle>
               </resourceBundles>
               <properties>
                 <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
@@ -57,9 +58,11 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
-        <groupId>org.xwiki.plorg.xwiki.platform.tools   <artifactId>xwiki-packager-plugin</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <groupId>org.xwiki.platform.tools</groupId>
+        <artifactId>xwiki-packager-plugin</artifactId>
+        <version>1.15-SNAPSHOT</version>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
         </configuration>
@@ -69,8 +72,11 @@
             <artifactId>hsqldb</artifactId>
             <version>1.8.0.7</version>
           </dependency>
-          <!-- We need the Servlet API dep since it's used by the Packager and since it has
-               a provided scope in XWiki core it's not inherited as part of transitive deps -->
+          <!--
+            We need the Servlet API dep since it's used by the Packager
+            and since it has a provided scope in XWiki core it's not
+            inherited as part of transitive deps
+          -->
           <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>

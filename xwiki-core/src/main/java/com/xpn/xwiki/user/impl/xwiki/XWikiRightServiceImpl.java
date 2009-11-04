@@ -490,8 +490,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
             } catch (XWikiRightNotFoundException e) {
             } catch (Exception e) {
-                // This should not happen
-                e.printStackTrace();
+                LOG.error("Failed to chech right [" + accessLevel + "] for group [" + group + "] on document ["
+                    + doc.getPrefixedFullName() + "]", e);
             }
         }
 
@@ -561,6 +561,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             if (wikiOwner != null) {
                 if (wikiOwner.equals(name)) {
                     logAllow(name, resourceKey, accessLevel, "admin level from wiki ownership");
+
                     return true;
                 }
             }

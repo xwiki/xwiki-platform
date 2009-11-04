@@ -23,7 +23,9 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,19 +54,30 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
     private static final Log log = LogFactory.getLog(XWikiAuthServiceImpl.class);
 
-    protected XWikiAuthenticator authenticator;
+    /**
+     * Each wiki has its own authenticator.
+     */
+    protected Map<String, XWikiAuthenticator> authenticators = new HashMap<String, XWikiAuthenticator>();
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
-        if (this.authenticator != null) {
-            return this.authenticator;
+        String wikiName = context.getDatabase();
+
+        if (wikiName != null) {
+            wikiName = wikiName.toLowerCase();
+        }
+
+        XWikiAuthenticator authenticator = this.authenticators.get(wikiName);
+
+        if (authenticator != null) {
+            return authenticator;
         }
 
         try {
             XWiki xwiki = context.getWiki();
 
             if ("basic".equals(xwiki.Param("xwiki.authentication"))) {
-                this.authenticator = new MyBasicAuthenticator();
+                authenticator = new MyBasicAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
                 sconfig.setAuthMethod("BASIC");
                 if (xwiki.Param("xwiki.authentication.realmname") != null) {
@@ -72,9 +85,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 } else {
                     sconfig.setRealmName("XWiki");
                 }
-                this.authenticator.init(null, sconfig);
+                authenticator.init(null, sconfig);
             } else {
-                this.authenticator = new MyFormAuthenticator();
+                authenticator = new MyFormAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
 
                 sconfig.setAuthMethod("FORM");
@@ -164,13 +177,15 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 fconfig.setInitParameter(FormAuthenticator.LOGIN_SUBMIT_PATTERN_KEY, xwiki.Param(
                     "xwiki.authentication.loginsubmitpage", "/loginsubmit/XWiki/XWikiLogin"));
 
-                this.authenticator.init(fconfig, sconfig);
+                authenticator.init(fconfig, sconfig);
             }
 
-            return this.authenticator;
+            this.authenticators.put(wikiName, authenticator);
+
+            return authenticator;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
-                "Cannot initialize authentication system", e);
+                "Cannot initialize authentication system for wiki [" + wikiName + "]", e);
         }
     }
 

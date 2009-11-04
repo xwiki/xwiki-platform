@@ -39,9 +39,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.SavedRequestRestorerFilter;
 
-public class MyFormAuthenticator extends FormAuthenticator implements Authenticator, XWikiAuthenticator
+public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
-    private static final Log log = LogFactory.getLog(MyFormAuthenticator.class);
+    private static final Log LOG = LogFactory.getLog(MyFormAuthenticator.class);
 
     /**
      * Show the login page.
@@ -80,9 +80,16 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         // Redirect to login page
         response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
             + SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId));
+
         return;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.securityfilter.authenticator.FormAuthenticator#processLogin(org.securityfilter.filter.SecurityRequestWrapper,
+     *      javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
@@ -133,8 +140,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("User " + principal.getName() + " has been authentified from cookie");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
                     request.setUserPrincipal(principal);
                 } else {
@@ -174,8 +181,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         Principal principal = authenticate(username, password, context);
         if (principal != null) {
             // login successful
-            if (log.isInfoEnabled()) {
-                log.info("User " + principal.getName() + " has been logged-in");
+            if (LOG.isInfoEnabled()) {
+                LOG.info("User " + principal.getName() + " has been logged-in");
             }
 
             // invalidate old session if the user was already authenticated, and they logged in as a different user
@@ -205,8 +212,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         } else {
             // login failed
             // set response status and forward to error page
-            if (log.isInfoEnabled()) {
-                log.info("User " + username + " login has failed");
+            if (LOG.isInfoEnabled()) {
+                LOG.info("User " + username + " login has failed");
             }
 
             String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");

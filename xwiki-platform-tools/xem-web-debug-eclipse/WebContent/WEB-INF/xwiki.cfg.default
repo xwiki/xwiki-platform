@@ -256,7 +256,11 @@ xwiki.authentication.cookiedomains=
 
 #-# This allows logout to happen for any page going through the /logout/ action, regardless of the document or the servlet.
 #-# Comment-out if you want to enable logout only for /bin/logout/XWiki/XWikiLogout
-xwiki.authentication.logoutpage=(/[^/]+/|/)logout/*
+#-# Currently accepted patterns:
+#-# - /StrutsServletName/logout/ (this is usually /bin/logout/ and is the default setup)
+#-# - /logout/ (this works with the short URLs configuration)
+#-# - /wiki/SomeWikiName/logout/ (this works with path-based virtual wikis)
+xwiki.authentication.logoutpage=(/|/[^/]+/|/wiki/[^/]+/)logout/*
 
 #-# The group management class.
 # xwiki.authentication.groupclass=com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl
@@ -590,4 +594,3 @@ xwiki.plugin.captcha=0
 #-# XWiki work directory
 # xwiki.work.dir=/usr/local/xwiki
 
-xwiki.work.dir=work

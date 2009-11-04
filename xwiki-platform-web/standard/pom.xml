@@ -167,19 +167,19 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <groupId>org.xwiki.platform.skins</groupId>
                   <artifactId>xwiki-skin-albatross</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <groupId>org.xwiki.platform.skins</groupId>
                   <artifactId>xwiki-skin-toucan</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <groupId>org.xwiki.platform.skins</groupId>
                   <artifactId>xwiki-skin-colibri</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>

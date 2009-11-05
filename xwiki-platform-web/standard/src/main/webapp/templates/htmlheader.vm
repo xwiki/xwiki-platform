@@ -1,5 +1,7 @@
-### In non-Servlet mode (in Portlet mode for example) we don't display the <HTML>, <HEAD> and <BODY>
-### elements.
+## -------------------------------------------------------------------------------------------------------------------
+## In non-Servlet mode (in Portlet mode for example) we don't display the <HTML>, <HEAD> and <BODY>
+## elements.
+## -------------------------------------------------------------------------------------------------------------------
 #if($context.getMode()==0)
 <?xml version="1.0" encoding="$xwiki.encoding" ?>
 ## TODO this should be more specific
@@ -9,6 +11,14 @@
 #end
 <html xmlns="http://www.w3.org/1999/xhtml" lang="$context.language" xml:lang="$context.language">
   <head>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Ensure that the Content-Type meta directive is the first one in the header.
+    ## See http://www.w3.org/International/tutorials/tutorial-char-enc/
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Compute the title.
+    ## ---------------------------------------------------------------------------------------------------------------
     <title>
     #if(!$title)
       #set( $title = $!xwiki.getWebPreference('title'))
@@ -21,26 +31,41 @@
       $xwiki.getXMLEncoded($title)
     #end
     </title>
-    <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Disable the toolbar that comes up when you mouse over an image in MSIE
+    ## TODO: Shouldn't this be moved to the Admin Presentation preferences instead (user-defined META), since
+    ## it's possible to imagine that the user might want it?  
+    ## ---------------------------------------------------------------------------------------------------------------
     <meta http-equiv="imagetoolbar" content="no"/>
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Universal edit button. See http://universaleditbutton.org
+    ## ---------------------------------------------------------------------------------------------------------------
     #if($context.action=="view")
-      ## Universal edit button http://universaleditbutton.org
       <link rel="alternate" type="application/x-wiki" title="Edit" href="$doc.getURL("edit")" />
     #end
-    ## Store the space name, page name, wiki name and full document name (for convenience since it can be reconstructed
-    ## from the individual wiki/space/page names), so that it can be accessed from Javascript code.
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Store the space name, page name, wiki name and full document name (for convenience since it can be 
+    ## reconstructed from the individual wiki/space/page names), so that it can be accessed from Javascript code.
     ## For example, to pass it to the server side using an Ajax query.
     ## Usage example: var name = $$("meta[name='page']")[0].content;
+    ## ---------------------------------------------------------------------------------------------------------------
     <meta name="document" content="$xwiki.getXMLEncoded($doc.fullName)"/>
     <meta name="space" content="$xwiki.getXMLEncoded($doc.space)"/>
     <meta name="page" content="$xwiki.getXMLEncoded($doc.name)"/>
     #if($xwiki.isVirtualMode())
       <meta name="wiki" content="$xwiki.getXMLEncoded($doc.wiki)"/>
     #end
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Localize GWT applications.
+    ## ---------------------------------------------------------------------------------------------------------------
     <meta name="gwt:property" content="locale=$!{context.language}" />
+    ## ---------------------------------------------------------------------------------------------------------------
+    ## Add user-defined Meta directives
+    ## ---------------------------------------------------------------------------------------------------------------
     $xwiki.parseContent($!xwiki.getWebPreference("meta"))
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Hook for inserting Link extensions. This will be replaced with the pulled link references.
+    ## ---------------------------------------------------------------------------------------------------------------
     <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
     #template("stylesheets.vm")
     #template("analytics.vm")
@@ -59,9 +84,10 @@
 #else
   #template("stylesheets2.vm")
   #template("javascript.vm")
-  <!-- This is a hack for Exo which needs this for the XWiki portlet to fit in the Portlet window
-       properly. In the future Exo should modifies its behavior so that this is not necessary and
-       this will need to be removed -->
+  ## ---------------------------------------------------------------------------------------------------------------
+  ## This is a hack for Exo which needs this for the XWiki portlet to fit in the Portlet window properly. In the 
+  ## future Exo should modifies its behavior so that this is not necessary and this will need to be removed
+  ## ---------------------------------------------------------------------------------------------------------------
   <div class="UIApplication" style="overflow: auto">
 #end
 ## These elements will be closed in the footer vm file

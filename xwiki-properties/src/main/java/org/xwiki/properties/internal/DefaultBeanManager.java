@@ -111,12 +111,12 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
         }
 
         for (PropertyDescriptor propertyDescriptor : beanDescriptor.getProperties()) {
-            String propetyName = propertyDescriptor.getName();
-            Object value = values.get(propetyName);
+            String propetyId = propertyDescriptor.getId();
+            Object value = values.get(propetyId);
 
             if (value == null) {
-                propetyName = propertyDescriptor.getName().toLowerCase();
-                value = values.get(lowerKeyMap.get(propetyName));
+                propetyId = propetyId.toLowerCase();
+                value = values.get(lowerKeyMap.get(propetyId));
             }
 
             if (value != null) {
@@ -130,13 +130,13 @@ public class DefaultBeanManager extends AbstractLogEnabled implements BeanManage
                         propertyDescriptor.getFied().set(bean, convertedValue);
                     }
                 } catch (Exception e) {
-                    throw new PropertyException("Failed to populate property " + propertyDescriptor.getName(), e);
+                    throw new PropertyException("Failed to populate property " + propetyId, e);
                 }
 
                 // "Tick" already populated properties
-                values.remove(propetyName);
+                values.remove(propetyId);
             } else if (propertyDescriptor.isMandatory()) {
-                throw new PropertyMandatoryException(propertyDescriptor.getName());
+                throw new PropertyMandatoryException(propetyId);
             }
         }
     }

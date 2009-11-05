@@ -47,11 +47,21 @@ public class DefaultParameterDescriptor implements ParameterDescriptor
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getId()
+     */
+    public String getId()
+    {
+        return this.propertyDescriptor.getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getName()
      */
     public String getName()
     {
-        return propertyDescriptor.getName();
+        return this.propertyDescriptor.getName();
     }
 
     /**

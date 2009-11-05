@@ -35,7 +35,7 @@ import org.xwiki.properties.PropertyDescriptor;
 public abstract class AbstractMacroDescriptor implements MacroDescriptor
 {
     /**
-     * @see #getName() 
+     * @see #getName()
      */
     private String name;
 
@@ -53,7 +53,7 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
      * The description of the parameters bean.
      */
     private BeanDescriptor parametersBeanDescriptor;
-        
+
     /**
      * Default macro category.
      */
@@ -94,14 +94,14 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     {
         for (PropertyDescriptor propertyDescriptor : parametersBeanDescriptor.getProperties()) {
             DefaultParameterDescriptor desc = new DefaultParameterDescriptor(propertyDescriptor);
-            this.parameterDescriptorMap.put(desc.getName().toLowerCase(), desc);
+            this.parameterDescriptorMap.put(desc.getId().toLowerCase(), desc);
         }
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @see MacroDescriptor#getName() 
+     * 
+     * @see MacroDescriptor#getName()
      * @since 2.0M3
      */
     public String getName()
@@ -156,8 +156,8 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
     public String getDefaultCategory()
     {
         return this.defaultCategory;
-    }        
-    
+    }
+
     /**
      * @param defaultCategory default category under which this macro should be listed.
      * @see MacroDescriptor#getDefaultCategory()

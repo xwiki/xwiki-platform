@@ -17,46 +17,25 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.descriptor;
+package org.xwiki.properties.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Define a macro parameter.
+ * Use this annotation to add a display name to a property bean method.
  * 
  * @version $Id$
- * @since 1.7M2
+ * @since 2.1M1
  */
-public interface ParameterDescriptor
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD, ElementType.FIELD })
+public @interface PropertyName
 {
     /**
-     * @return the identifier of the parameter.
-     * @since 2.1M1
+     * The description.
      */
-    String getId();
-
-    /**
-     * @return the display name of the parameter.
-     * @since 2.1M1
-     */
-    String getName();
-
-    /**
-     * @return the description of the parameter.
-     */
-    String getDescription();
-
-    /**
-     * @return the type of the parameter.
-     */
-    Class< ? > getType();
-
-    /**
-     * @return the default value of the parameter.
-     */
-    Object getDefaultValue();
-
-    /**
-     * @return indicate if the parameter is mandatory.
-     * @since 1.7
-     */
-    boolean isMandatory();
+    String value();
 }

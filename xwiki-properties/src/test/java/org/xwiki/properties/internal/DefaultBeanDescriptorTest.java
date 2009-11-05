@@ -25,6 +25,7 @@ import org.xwiki.properties.PropertyDescriptor;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyName;
 
 /**
  * Validate {@link DefaultBeanDescriptor}.
@@ -47,6 +48,7 @@ public class DefaultBeanDescriptorTest extends TestCase
 
         private String hiddenProperty;
 
+        @PropertyName("Public Field")
         @PropertyDescription("a public field")
         public String publicField;
 
@@ -134,6 +136,7 @@ public class DefaultBeanDescriptorTest extends TestCase
         PropertyDescriptor lowerPropertyDescriptor = this.beanDescriptor.getProperty("lowerprop");
 
         assertNotNull(lowerPropertyDescriptor);
+        assertEquals("lowerprop", lowerPropertyDescriptor.getId());
         assertEquals("lowerprop", lowerPropertyDescriptor.getName());
         assertEquals("lowerprop", lowerPropertyDescriptor.getDescription());
         assertSame(String.class, lowerPropertyDescriptor.getPropertyClass());
@@ -153,6 +156,7 @@ public class DefaultBeanDescriptorTest extends TestCase
         PropertyDescriptor upperPropertyDescriptor = this.beanDescriptor.getProperty("upperProp");
 
         assertNotNull(upperPropertyDescriptor);
+        assertEquals("upperProp", upperPropertyDescriptor.getId());
         assertEquals("upperProp", upperPropertyDescriptor.getName());
         assertEquals("upperProp", upperPropertyDescriptor.getDescription());
         assertSame(String.class, upperPropertyDescriptor.getPropertyClass());
@@ -167,7 +171,8 @@ public class DefaultBeanDescriptorTest extends TestCase
         PropertyDescriptor publicFieldPropertyDescriptor = this.beanDescriptor.getProperty("publicField");
 
         assertNotNull(publicFieldPropertyDescriptor);
-        assertEquals("publicField", publicFieldPropertyDescriptor.getName());
+        assertEquals("publicField", publicFieldPropertyDescriptor.getId());
+        assertEquals("Public Field", publicFieldPropertyDescriptor.getName());
         assertEquals("a public field", publicFieldPropertyDescriptor.getDescription());
         assertSame(String.class, publicFieldPropertyDescriptor.getPropertyClass());
         assertEquals(false, publicFieldPropertyDescriptor.isMandatory());
@@ -181,7 +186,7 @@ public class DefaultBeanDescriptorTest extends TestCase
         PropertyDescriptor prop1Descriptor = this.beanDescriptor.getProperty("prop1");
 
         assertNotNull(prop1Descriptor);
-        assertEquals("prop1", prop1Descriptor.getName());
+        assertEquals("prop1", prop1Descriptor.getId());
         assertEquals("prop1 description", prop1Descriptor.getDescription());
         assertSame(String.class, prop1Descriptor.getPropertyClass());
         assertEquals(false, prop1Descriptor.isMandatory());
@@ -195,7 +200,7 @@ public class DefaultBeanDescriptorTest extends TestCase
         PropertyDescriptor prop2Descriptor = this.beanDescriptor.getProperty("prop2");
 
         assertNotNull(prop2Descriptor);
-        assertEquals("prop2", prop2Descriptor.getName());
+        assertEquals("prop2", prop2Descriptor.getId());
         assertEquals("prop2 description", prop2Descriptor.getDescription());
         assertSame(int.class, prop2Descriptor.getPropertyClass());
         assertEquals(true, prop2Descriptor.isMandatory());
@@ -209,7 +214,7 @@ public class DefaultBeanDescriptorTest extends TestCase
         PropertyDescriptor prop3Descriptor = this.beanDescriptor.getProperty("prop3");
 
         assertNotNull(prop3Descriptor);
-        assertEquals("prop3", prop3Descriptor.getName());
+        assertEquals("prop3", prop3Descriptor.getId());
         assertEquals("prop3 description", prop3Descriptor.getDescription());
         assertSame(boolean.class, prop3Descriptor.getPropertyClass());
         assertEquals(true, prop3Descriptor.isMandatory());

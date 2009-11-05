@@ -122,8 +122,8 @@ public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
         super.setUp();
         BeanManager propertiesManager = getComponentManager().lookup(BeanManager.class);
         macroDescriptor =
-            new DefaultMacroDescriptor("Name", "Description", new DefaultContentDescriptor(), propertiesManager
-                .getBeanDescriptor(ParametersTests.class));
+            new DefaultMacroDescriptor("Name", "Description", new DefaultContentDescriptor(),
+                propertiesManager.getBeanDescriptor(ParametersTests.class));
     }
 
     public void testParameterDescriptor()
@@ -135,7 +135,7 @@ public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
         ParameterDescriptor lowerParamDescriptor = map.get("lowerparam");
 
         assertNotNull(lowerParamDescriptor);
-        assertEquals("lowerparam", lowerParamDescriptor.getName());
+        assertEquals("lowerparam", lowerParamDescriptor.getId());
         assertEquals("lowerparam", lowerParamDescriptor.getDescription());
         assertSame(String.class, lowerParamDescriptor.getType());
         assertEquals(null, lowerParamDescriptor.getDefaultValue());
@@ -153,7 +153,7 @@ public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
         ParameterDescriptor upperParamDescriptor = map.get("upperParam".toLowerCase());
 
         assertNotNull(upperParamDescriptor);
-        assertEquals("upperParam", upperParamDescriptor.getName());
+        assertEquals("upperParam", upperParamDescriptor.getId());
         assertEquals("upperParam", upperParamDescriptor.getDescription());
         assertSame(String.class, upperParamDescriptor.getType());
         assertEquals(false, upperParamDescriptor.isMandatory());
@@ -166,7 +166,7 @@ public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
         ParameterDescriptor param1Descriptor = map.get("param1".toLowerCase());
 
         assertNotNull(param1Descriptor);
-        assertEquals("param1", param1Descriptor.getName());
+        assertEquals("param1", param1Descriptor.getId());
         assertEquals("param1 description", param1Descriptor.getDescription());
         assertSame(String.class, param1Descriptor.getType());
         assertEquals(false, param1Descriptor.isMandatory());
@@ -179,7 +179,7 @@ public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
         ParameterDescriptor param2Descriptor = map.get("param2".toLowerCase());
 
         assertNotNull(param2Descriptor);
-        assertEquals("param2", param2Descriptor.getName());
+        assertEquals("param2", param2Descriptor.getId());
         assertEquals("param2 description", param2Descriptor.getDescription());
         assertSame(int.class, param2Descriptor.getType());
         assertEquals(true, param2Descriptor.isMandatory());
@@ -192,7 +192,7 @@ public class DefaultMacroDescriptorTest extends AbstractXWikiComponentTestCase
         ParameterDescriptor param3Descriptor = map.get("param3".toLowerCase());
 
         assertNotNull(param3Descriptor);
-        assertEquals("param3", param3Descriptor.getName());
+        assertEquals("param3", param3Descriptor.getId());
         assertEquals("param3 description", param3Descriptor.getDescription());
         assertSame(boolean.class, param3Descriptor.getType());
         assertEquals(true, param3Descriptor.isMandatory());

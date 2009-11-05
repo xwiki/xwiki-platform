@@ -30,7 +30,16 @@ import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 public class WikiMacroParameterDescriptor implements ParameterDescriptor
 {
     /**
-     * Name of the parameter.
+     * Identifier of the parameter.
+     * 
+     * @since 2.1M1
+     */
+    private String id;
+
+    /**
+     * Display name of the parameter.
+     * 
+     * @since 2.1M1
      */
     private String name;
 
@@ -47,13 +56,13 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     /**
      * Creates a new {@link WikiMacroParameterDescriptor} instance.
      * 
-     * @param name parameter name.
+     * @param id parameter identifier.
      * @param description parameter description.
      * @param mandatory if the parameter is mandatory.
      */
-    public WikiMacroParameterDescriptor(String name, String description, boolean mandatory)
+    public WikiMacroParameterDescriptor(String id, String description, boolean mandatory)
     {
-        this.name = name;
+        this.id = id;
         this.description = description;
         this.mandatory = mandatory;
     }
@@ -61,18 +70,28 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     /**
      * {@inheritDoc}
      */
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.ParameterDescriptor#getName()
+     */
     public String getName()
     {
         return this.name;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public String getDescription()
     {
         return this.description;
-    }    
+    }
 
     /**
      * {@inheritDoc}
@@ -81,7 +100,7 @@ public class WikiMacroParameterDescriptor implements ParameterDescriptor
     {
         return String.class;
     }
-    
+
     /**
      * {@inheritDoc}
      */

@@ -31,7 +31,14 @@ import java.lang.reflect.Method;
 public interface PropertyDescriptor
 {
     /**
-     * @return the name of the property.
+     * @return the identifier of the property.
+     * @since 2.1M1
+     */
+    String getId();
+
+    /**
+     * @return the display name of the property.
+     * @since 2.1M1
      */
     String getName();
 

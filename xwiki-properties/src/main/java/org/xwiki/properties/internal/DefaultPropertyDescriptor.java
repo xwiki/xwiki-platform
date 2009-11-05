@@ -33,7 +33,14 @@ import org.xwiki.properties.PropertyDescriptor;
 public class DefaultPropertyDescriptor implements PropertyDescriptor
 {
     /**
+     * @see #getId()
+     * @since 2.1M1
+     */
+    private String id;
+
+    /**
      * @see #getName()
+     * @since 2.1M1
      */
     private String name;
 
@@ -75,6 +82,26 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.properties.PropertyDescriptor#getId()
+     */
+    public String getId()
+    {
+        return this.id;
+    }
+
+    /**
+     * @param id the identifier of the property.
+     * @see #getId()
+     * @since 2.1M1
+     */
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.properties.PropertyDescriptor#getName()
      */
     public String getName()
@@ -83,8 +110,9 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
     }
 
     /**
-     * @param name the name of the property.
+     * @param name the display name of the property.
      * @see #getName()
+     * @since 2.1M1
      */
     public void setName(String name)
     {
@@ -169,7 +197,6 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
 
     /**
      * @see org.xwiki.properties.PropertyDescriptor#getFied().
-     * 
      * @param field the {@link Field}.
      */
     public void setField(Field field)
@@ -189,7 +216,6 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
 
     /**
      * @see org.xwiki.properties.PropertyDescriptor#getReadMethod().
-     * 
      * @param readMethod the read {@link Method}.
      */
     public void setReadMethod(Method readMethod)
@@ -209,7 +235,6 @@ public class DefaultPropertyDescriptor implements PropertyDescriptor
 
     /**
      * @see org.xwiki.properties.PropertyDescriptor#getWriteMethod().
-     * 
      * @param writeMethod the write {@link Method}.
      */
     public void setWriteMethod(Method writeMethod)

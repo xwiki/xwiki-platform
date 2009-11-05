@@ -35,6 +35,7 @@ import org.xwiki.properties.PropertyDescriptor;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyMandatory;
+import org.xwiki.properties.annotation.PropertyName;
 
 /**
  * Default implementation for BeanDescriptor.
@@ -113,7 +114,7 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
     protected void extractPropertyDescriptor(java.beans.PropertyDescriptor propertyDescriptor, Object defaultInstance)
     {
         DefaultPropertyDescriptor desc = new DefaultPropertyDescriptor();
-        desc.setName(propertyDescriptor.getName());
+        desc.setId(propertyDescriptor.getName());
         desc.setPropertyClass(propertyDescriptor.getPropertyType());
 
         Method writeMethod = propertyDescriptor.getWriteMethod();
@@ -126,15 +127,20 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
 
             if (parameterHidden == null) {
                 // get parameter description
-                PropertyDescription parameterDescription =
-                    extractPropertyAnnotation(writeMethod, readMethod, PropertyDescription.class);
+                PropertyName parameterName = extractPropertyAnnotation(writeMethod, readMethod, PropertyName.class);
 
-                desc.setDescription(parameterDescription != null ? parameterDescription.value() : propertyDescriptor
-                    .getShortDescription());
+                desc.setName(parameterName != null ? parameterName.value() : propertyDescriptor.getName());
+
+                // get parameter description
+                PropertyDescription parameterDescription =
+                        extractPropertyAnnotation(writeMethod, readMethod, PropertyDescription.class);
+
+                desc.setDescription(parameterDescription != null ? parameterDescription.value()
+                    : propertyDescriptor.getShortDescription());
 
                 // is parameter mandatory
                 PropertyMandatory parameterMandatory =
-                    extractPropertyAnnotation(writeMethod, readMethod, PropertyMandatory.class);
+                        extractPropertyAnnotation(writeMethod, readMethod, PropertyMandatory.class);
 
                 desc.setMandatory(parameterMandatory != null);
 
@@ -153,7 +159,7 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
 
                 desc.setReadMethod(readMethod);
 
-                this.parameterDescriptorMap.put(desc.getName(), desc);
+                this.parameterDescriptorMap.put(desc.getId(), desc);
             }
         }
     }
@@ -167,13 +173,18 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
     protected void extractPropertyDescriptor(Field field, Object defaultInstance)
     {
         DefaultPropertyDescriptor desc = new DefaultPropertyDescriptor();
-        desc.setName(field.getName());
+        desc.setId(field.getName());
         desc.setPropertyClass(field.getType());
 
         // is parameter hidden
         PropertyHidden parameterHidden = field.getAnnotation(PropertyHidden.class);
 
         if (parameterHidden == null) {
+            // get parameter name
+            PropertyName parameterName = field.getAnnotation(PropertyName.class);
+
+            desc.setName(parameterName != null ? parameterName.value() : field.getName());
+
             // get parameter description
             PropertyDescription parameterDescription = field.getAnnotation(PropertyDescription.class);
 
@@ -190,14 +201,14 @@ public class DefaultBeanDescriptor extends AbstractLogEnabled implements BeanDes
                     desc.setDefaultValue(field.get(defaultInstance));
                 } catch (Exception e) {
                     getLogger().error(
-                        MessageFormat.format("Failed to get default prperty value from field {0} in class {1}", field
-                            .getName(), this.beanClass), e);
+                        MessageFormat.format("Failed to get default prperty value from field {0} in class {1}",
+                            field.getName(), this.beanClass), e);
                 }
             }
 
             desc.setField(field);
 
-            this.parameterDescriptorMap.put(desc.getName(), desc);
+            this.parameterDescriptorMap.put(desc.getId(), desc);
         }
     }
 

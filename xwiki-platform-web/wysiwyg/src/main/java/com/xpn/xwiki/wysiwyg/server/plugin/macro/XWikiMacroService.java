@@ -88,7 +88,7 @@ public class XWikiMacroService implements MacroService
                 contentDescriptor = new ParameterDescriptor();
                 contentDescriptor.setId("content");
                 // TODO: internationalize content display name
-                contentDescriptor.setName("content");
+                contentDescriptor.setName("Content");
                 contentDescriptor.setDescription(descriptor.getContentDescriptor().getDescription());
                 // Just a hack to distinguish between regular strings and large strings.
                 contentDescriptor.setType(StringBuffer.class.getName());

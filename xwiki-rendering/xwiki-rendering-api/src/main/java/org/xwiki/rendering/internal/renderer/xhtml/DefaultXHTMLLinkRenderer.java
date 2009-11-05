@@ -157,7 +157,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
      */
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        if (link.isExternalLink()) {
+        if (this.wikiModel == null || link.isExternalLink()) {
             beginExternalLink(link, isFreeStandingURI, parameters);
         } else {
             beginInternalLink(link, isFreeStandingURI, parameters);
@@ -188,7 +188,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
         if (link.getType() == LinkType.INTERWIKI) {
             // TODO: Resolve the Interwiki link
         } else {
-            if ((link.getType() == LinkType.URI) && link.getReference().startsWith(ATTACH)) {
+            if (this.wikiModel != null && link.getType() == LinkType.URI && link.getReference().startsWith(ATTACH)) {
                 // use the default attachment syntax parser to extract document name and attachment name
                 Attachment attachment = this.attachmentParser.parse(link.getReference().substring(ATTACH.length()));
                 aAttributes.put(HREF, this.wikiModel.getAttachmentURL(attachment.getDocumentName(),

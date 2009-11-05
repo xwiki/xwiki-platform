@@ -71,7 +71,7 @@ public class ParameterDisplayer
 
         Panel label = new FlowPanel();
         label.setStylePrimaryName("xMacroParameterLabel");
-        label.add(new InlineLabel(descriptor.getName()));
+        label.add(new InlineLabel(descriptor.getId()));
         if (descriptor.isMandatory()) {
             InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
             mandatoryLabel.addStyleName("xMandatory");
@@ -84,7 +84,7 @@ public class ParameterDisplayer
         input = InputFactory.createInput(descriptor.getType());
         // Specify an id for debugging and testing.
         if (StringUtils.isEmpty(input.getElement().getId())) {
-            input.getElement().setId("pd-" + descriptor.getName() + "-input");
+            input.getElement().setId("pd-" + descriptor.getId() + "-input");
         }
 
         validationMessage = new Label();

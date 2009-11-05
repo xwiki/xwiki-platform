@@ -29,9 +29,10 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class ParameterDescriptor implements IsSerializable
 {
     /**
-     * @see #getName()
+     * @see #getId()
+     * @since 2.1M1
      */
-    private String name;
+    private String id;
 
     /**
      * @see #getDescription()
@@ -54,21 +55,23 @@ public class ParameterDescriptor implements IsSerializable
     private boolean mandatory;
 
     /**
-     * @return the parameter name
+     * @return the identifier of this parameter
+     * @since 2.1M1
      */
-    public String getName()
+    public String getId()
     {
-        return name;
+        return id;
     }
 
     /**
-     * Sets the name of this parameter.
+     * Sets the identifier of this parameter.
      * 
-     * @param name the name of the parameter
+     * @param id the identifier of the parameter
+     * @since 2.1M1
      */
-    public void setName(String name)
+    public void setId(String id)
     {
-        this.name = name;
+        this.id = id;
     }
 
     /**

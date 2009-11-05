@@ -230,9 +230,9 @@ public class EditMacroWizardStep extends AbstractMacroWizardStep
             String value = displayer.getValue();
             ParameterDescriptor descriptor = displayer.getDescriptor();
             if (StringUtils.isEmpty(value) || value.equalsIgnoreCase(descriptor.getDefaultValue())) {
-                macroCall.removeArgument(descriptor.getName());
+                macroCall.removeArgument(descriptor.getId());
             } else {
-                macroCall.setArgument(descriptor.getName(), value);
+                macroCall.setArgument(descriptor.getId(), value);
             }
         }
         if (contentDisplayer != null) {

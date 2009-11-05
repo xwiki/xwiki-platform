@@ -86,7 +86,7 @@ public class XWikiMacroService implements MacroService
             ParameterDescriptor contentDescriptor = null;
             if (descriptor.getContentDescriptor() != null) {
                 contentDescriptor = new ParameterDescriptor();
-                contentDescriptor.setName("content");
+                contentDescriptor.setId("content");
                 contentDescriptor.setDescription(descriptor.getContentDescriptor().getDescription());
                 // Just a hack to distinguish between regular strings and large strings.
                 contentDescriptor.setType(StringBuffer.class.getName());
@@ -124,7 +124,7 @@ public class XWikiMacroService implements MacroService
         org.xwiki.rendering.macro.descriptor.ParameterDescriptor descriptor)
     {
         ParameterDescriptor result = new ParameterDescriptor();
-        result.setName(descriptor.getName());
+        result.setId(descriptor.getId());
         result.setDescription(descriptor.getDescription());
         result.setType(getMacroParameterType(descriptor.getType()));
         Object defaultValue = descriptor.getDefaultValue();

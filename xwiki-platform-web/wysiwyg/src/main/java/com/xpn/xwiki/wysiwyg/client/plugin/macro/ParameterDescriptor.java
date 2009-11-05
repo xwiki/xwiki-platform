@@ -35,6 +35,12 @@ public class ParameterDescriptor implements IsSerializable
     private String id;
 
     /**
+     * @see #getName()
+     * @since 2.1M1
+     */
+    private String name;
+
+    /**
      * @see #getDescription()
      */
     private String description;
@@ -72,6 +78,26 @@ public class ParameterDescriptor implements IsSerializable
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    /**
+     * @return the display name of this parameter
+     * @since 2.1M1
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Sets the display name of this parameter.
+     * 
+     * @param id the display name of the parameter
+     * @since 2.1M1
+     */
+    public void setName(String name)
+    {
+        this.name = name;
     }
 
     /**

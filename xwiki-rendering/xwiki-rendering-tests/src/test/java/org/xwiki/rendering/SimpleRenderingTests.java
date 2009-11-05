@@ -210,6 +210,9 @@ public class SimpleRenderingTests extends TestCase
         suite.addTestsFromResource("misc/misc7", false);
         suite.addTestsFromResource("encoding/encoding1", false);
 
+        // Links without WikiModel
+        suite.addTestsFromResource("link/links24", false);
+
         return new ComponentManagerTestSetup(suite);
     }
 }

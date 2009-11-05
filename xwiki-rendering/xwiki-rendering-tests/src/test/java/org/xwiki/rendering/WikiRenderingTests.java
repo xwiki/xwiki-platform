@@ -75,8 +75,6 @@ public class WikiRenderingTests extends TestCase
         suite.addTestsFromResource("image/image3", false);
         suite.addTestsFromResource("image/image4", false);
         suite.addTestsFromResource("image/image5", false);
-        
-        suite.addTestsFromResource("link/links18", false);
 
         List<ComponentDescriptor< ? >> mocks = new ArrayList<ComponentDescriptor< ? >>();
         mocks.add(MockWikiModel.getComponentDescriptor());

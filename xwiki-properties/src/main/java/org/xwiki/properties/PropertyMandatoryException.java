@@ -28,6 +28,11 @@ package org.xwiki.properties;
 public class PropertyMandatoryException extends PropertyException
 {
     /**
+     * Class ID for serialization.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * @param propertyName the name of the mandatory property
      */
     public PropertyMandatoryException(String propertyName)

@@ -28,6 +28,11 @@ package org.xwiki.properties;
 public class PropertyException extends Exception
 {
     /**
+     * Class ID for serialization.
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
      * {@inheritDoc}
      * 
      * @see Exception#Exception(String)

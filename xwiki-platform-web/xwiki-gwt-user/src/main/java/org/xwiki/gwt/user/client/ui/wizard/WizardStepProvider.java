@@ -24,7 +24,7 @@ package org.xwiki.gwt.user.client.ui.wizard;
  * {@link Wizard} to determine the next {@link WizardStep} based on the name returned by the current dialog's
  * {@link WizardStep#getNextStep()}.
  * 
- * @version $Id: WizardStepProvider.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface WizardStepProvider
 {

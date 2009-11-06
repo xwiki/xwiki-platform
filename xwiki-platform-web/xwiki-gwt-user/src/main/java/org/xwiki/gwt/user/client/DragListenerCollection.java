@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * A collection of drag listeners.
  * 
- * @version $Id: DragListenerCollection.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class DragListenerCollection extends ArrayList<DragListener>
 {

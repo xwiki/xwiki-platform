@@ -28,7 +28,7 @@ import com.google.gwt.user.client.Command;
 /**
  * Unit tests for {@link InsertHTMLExecutable}.
  * 
- * @version $Id: InsertHTMLExecutableTest.java 24533 2009-10-16 14:42:07Z mflorea $
+ * @version $Id$
  */
 public class InsertHTMLExecutableTest extends RichTextAreaTestCase
 {

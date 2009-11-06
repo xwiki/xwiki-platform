@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * A collection of {@link CommandListener}. It provides an easy way of notifying all the listeners when a
  * {@link Command} is executed.
  * 
- * @version $Id: CommandListenerCollection.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class CommandListenerCollection extends ArrayList<CommandListener>
 {

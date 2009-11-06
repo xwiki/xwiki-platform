@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.Node;
 
 /**
  * @see http://getfirebug.com/console.html
- * @version $Id: FirebugConsole.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class FirebugConsole extends Console
 {

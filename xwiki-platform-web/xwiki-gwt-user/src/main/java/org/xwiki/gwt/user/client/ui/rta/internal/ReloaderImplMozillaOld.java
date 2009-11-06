@@ -27,7 +27,7 @@ import com.google.gwt.event.dom.client.LoadHandler;
 /**
  * Custom {org.xwiki.gwt.user.client.ui.rta.Reloader} implementation for Firefox 2 and prior.
  * 
- * @version $Id: ReloaderImplMozillaOld.java 24177 2009-10-01 20:10:55Z mflorea $
+ * @version $Id$
  */
 public class ReloaderImplMozillaOld extends ReloaderImpl
 {

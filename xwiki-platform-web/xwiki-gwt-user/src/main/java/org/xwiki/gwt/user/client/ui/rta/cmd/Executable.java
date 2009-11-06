@@ -24,7 +24,7 @@ import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 /**
  * The code associated with a {@link Command}.
  * 
- * @version $Id: Executable.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface Executable
 {

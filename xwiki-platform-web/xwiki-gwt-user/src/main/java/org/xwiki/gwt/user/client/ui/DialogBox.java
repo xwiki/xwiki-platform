@@ -43,7 +43,7 @@ import com.google.gwt.widgetideas.client.GlassPanel;
 /**
  * Generic dialog box with optimized dragging.
  * 
- * @version $Id: DialogBox.java 22496 2009-08-11 09:03:07Z mflorea $
+ * @version $Id$
  */
 public class DialogBox extends PopupPanel implements DragListener, ClickHandler
 {

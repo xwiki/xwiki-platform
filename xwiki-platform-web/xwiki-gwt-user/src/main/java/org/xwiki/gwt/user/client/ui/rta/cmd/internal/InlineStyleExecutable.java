@@ -36,7 +36,7 @@ import com.google.gwt.dom.client.Node;
 /**
  * Applies in-line style to the current selection.
  * 
- * @version $Id: InlineStyleExecutable.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class InlineStyleExecutable extends AbstractExecutable
 {

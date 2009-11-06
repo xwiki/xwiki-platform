@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client.ui;
 /**
  * Interface to register and unregister {@link MenuListener}s.
  * 
- * @version $Id: SourcesMenuEvents.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface SourcesMenuEvents
 {

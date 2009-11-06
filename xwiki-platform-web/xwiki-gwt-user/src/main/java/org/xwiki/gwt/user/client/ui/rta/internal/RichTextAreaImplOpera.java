@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.IFrameElement;
 /**
  * Opera-specific implementation of rich-text editing.
  * 
- * @version $Id: RichTextAreaImplOpera.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class RichTextAreaImplOpera extends com.google.gwt.user.client.ui.impl.RichTextAreaImplOpera
 {

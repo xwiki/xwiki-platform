@@ -25,7 +25,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 /**
  * An executable that only notifies the command listeners that they should update their states.
  * 
- * @version $Id: UpdateExecutable.java 19307 2009-05-04 04:32:45Z mflorea $
+ * @version $Id$
  */
 public class UpdateExecutable implements Executable
 {

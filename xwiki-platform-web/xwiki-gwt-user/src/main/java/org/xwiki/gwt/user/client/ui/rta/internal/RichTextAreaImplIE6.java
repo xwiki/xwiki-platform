@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.IFrameElement;
 /**
  * IE6-specific implementation of rich-text editing.
  * 
- * @version $Id: RichTextAreaImplIE6.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class RichTextAreaImplIE6 extends com.google.gwt.user.client.ui.impl.RichTextAreaImplIE6
 {

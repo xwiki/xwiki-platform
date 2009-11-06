@@ -26,7 +26,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 /**
  * A collection of {@link HandlerRegistration} instances.
  * 
- * @version $Id: HandlerRegistrationCollection.java 22775 2009-08-18 08:17:17Z mflorea $
+ * @version $Id$
  */
 public class HandlerRegistrationCollection extends ArrayList<HandlerRegistration>
 {

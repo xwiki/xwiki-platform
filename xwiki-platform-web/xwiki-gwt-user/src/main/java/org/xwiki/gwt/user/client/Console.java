@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.Node;
  * Each browser has its own console API. You should extend this class and overwrite the needed methods by using that
  * API.
  * 
- * @version $Id: Console.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class Console
 {

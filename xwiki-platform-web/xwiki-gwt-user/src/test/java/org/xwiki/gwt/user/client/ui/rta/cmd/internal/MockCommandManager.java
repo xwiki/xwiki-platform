@@ -27,7 +27,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 /**
  * Mock command manager to be used on unit tests.
  * 
- * @version $Id: MockCommandManager.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class MockCommandManager extends AbstractCommandManager
 {

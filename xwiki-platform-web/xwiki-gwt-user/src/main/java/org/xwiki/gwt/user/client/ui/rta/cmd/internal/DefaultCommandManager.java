@@ -30,7 +30,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 /**
  * Default command manager.
  * 
- * @version $Id: DefaultCommandManager.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class DefaultCommandManager extends AbstractCommandManager
 {

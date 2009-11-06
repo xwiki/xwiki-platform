@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * An abstract wizard step that is a widget composite.
  * 
- * @version $Id: AbstractCompositeWizardStep.java 24578 2009-10-20 11:55:15Z mflorea $
+ * @version $Id$
  */
 public abstract class AbstractCompositeWizardStep extends Composite implements WizardStep
 {

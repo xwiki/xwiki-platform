@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Defines the behaviour of a wizard step.
  * 
- * @version $Id: WizardStep.java 22859 2009-08-23 22:29:33Z lucaa $
+ * @version $Id$
  */
 public interface WizardStep
 {

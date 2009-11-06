@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Panel;
 /**
  * Wizard dialog class, used to display the current wizard step.
  * 
- * @version $Id: WizardDialog.java 24601 2009-10-21 09:17:11Z mflorea $
+ * @version $Id$
  */
 public class WizardDialog extends ComplexDialogBox implements SourcesNavigationEvents
 {

@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client;
 /**
  * Interface to an object that can be updated.
  * 
- * @version $Id: Updatable.java 21733 2009-06-30 15:10:18Z mflorea $
+ * @version $Id$
  */
 public interface Updatable
 {

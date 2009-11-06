@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client.ui;
 /**
  * Interface that must be implemented in order to be notified of menu events.
  * 
- * @version $Id: MenuListener.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface MenuListener
 {

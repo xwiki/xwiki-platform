@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.IFrameElement;
 /**
  * Safari-specific implementation of rich-text editing.
  * 
- * @version $Id: RichTextAreaImplSafari.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari
 {

@@ -28,7 +28,7 @@ import com.google.gwt.event.dom.client.HasClickHandlers;
 /**
  * A command that simulates a click when executed. Click commands can be associated with shortcut keys.
  * 
- * @version $Id: ClickCommand.java 24601 2009-10-21 09:17:11Z mflorea $
+ * @version $Id$
  */
 public final class ClickCommand implements com.google.gwt.user.client.Command
 {

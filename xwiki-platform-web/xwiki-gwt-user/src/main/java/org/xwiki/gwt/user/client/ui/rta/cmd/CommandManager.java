@@ -25,7 +25,7 @@ package org.xwiki.gwt.user.client.ui.rta.cmd;
  * notified about these changes. A group of changes to the edited document, with a well defined purpose, should be
  * grouped in a command.
  * 
- * @version $Id: CommandManager.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface CommandManager extends SourcesCommandEvents
 {

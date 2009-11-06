@@ -25,7 +25,7 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.user.client.ui.TextBox;
 
 /**
- * @version $Id: TextBoxNumberFilter.java 23106 2009-08-28 08:18:07Z mflorea $
+ * @version $Id$
  */
 public class TextBoxNumberFilter implements KeyPressHandler
 {

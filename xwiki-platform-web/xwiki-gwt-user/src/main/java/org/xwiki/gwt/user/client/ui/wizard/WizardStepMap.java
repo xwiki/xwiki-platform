@@ -26,7 +26,7 @@ import java.util.HashMap;
 /**
  * A generic wizard step provider implemented as a map of wizard steps. The key into the map is the step name.
  * 
- * @version $Id: WizardStepMap.java 22876 2009-08-24 14:54:49Z mflorea $
+ * @version $Id$
  */
 public class WizardStepMap extends HashMap<String, WizardStep> implements WizardStepProvider
 {

@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Unit tests for {@link Timer}.
  * 
- * @version $Id: TimerTest.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class TimerTest extends UserTestCase
 {

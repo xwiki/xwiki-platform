@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client.ui.wizard;
 /**
  * Wizard navigation events source, to accept listeners for the navigation events.
  * 
- * @version $Id: SourcesNavigationEvents.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface SourcesNavigationEvents
 {

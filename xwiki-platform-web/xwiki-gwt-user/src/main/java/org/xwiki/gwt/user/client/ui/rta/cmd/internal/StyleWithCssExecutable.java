@@ -31,7 +31,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
  * {@link Command#STYLE_WITH_CSS} and {@link StyleWithCssExecutable#USE_CSS}. Since some browsers support the first
  * while other support the second, we execute both commands.
  * 
- * @version $Id: StyleWithCssExecutable.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class StyleWithCssExecutable implements Executable
 {

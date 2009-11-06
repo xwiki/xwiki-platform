@@ -41,7 +41,7 @@ import com.google.gwt.user.client.DeferredCommand;
 /**
  * Associates {@link Command}s to shortcut keys.<br/>
  * 
- * @version $Id: ShortcutKeyManager.java 24142 2009-09-30 09:25:30Z mflorea $
+ * @version $Id$
  */
 public class ShortcutKeyManager extends HashMap<ShortcutKey, Command> implements KeyDownHandler, KeyPressHandler,
     KeyUpHandler

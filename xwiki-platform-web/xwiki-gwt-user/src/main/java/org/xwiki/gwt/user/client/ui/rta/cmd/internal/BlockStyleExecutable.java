@@ -27,7 +27,7 @@ import com.google.gwt.dom.client.Node;
 /**
  * Looks for the nearest block-level elements from the current selection and applies a specific style to them.
  * 
- * @version $Id: BlockStyleExecutable.java 18818 2009-04-19 15:54:32Z mflorea $
+ * @version $Id$
  */
 public class BlockStyleExecutable extends AbstractBlockExecutable
 {

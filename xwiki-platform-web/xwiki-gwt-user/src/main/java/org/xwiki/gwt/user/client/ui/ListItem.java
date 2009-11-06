@@ -25,7 +25,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * An item in a list box. It can contain other widgets not just plain text and also can have data attached to it.
  * 
  * @param <T> the data type that can be attached to list items
- * @version $Id: ListItem.java 22636 2009-08-13 08:04:17Z mflorea $
+ * @version $Id$
  */
 public class ListItem<T> extends FlowPanel
 {

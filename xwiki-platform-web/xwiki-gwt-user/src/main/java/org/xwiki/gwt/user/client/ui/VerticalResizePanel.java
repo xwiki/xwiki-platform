@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
  * container are modified (their content, their size, or visibility), children are added or removed or when the size of
  * this widget is changed.
  * 
- * @version $Id: VerticalResizePanel.java 23084 2009-08-27 16:50:59Z lucaa $
+ * @version $Id$
  */
 public class VerticalResizePanel extends FlowPanel
 {

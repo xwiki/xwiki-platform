@@ -49,7 +49,7 @@ import com.google.gwt.user.client.ui.Focusable;
  * Displays a list of items allowing us to select one using the mouse or the keyboard.
  * 
  * @param <T> the data type that can be attached to list items
- * @version $Id: ListBox.java 23554 2009-09-15 20:17:54Z lucaa $
+ * @version $Id$
  */
 public class ListBox<T> extends Composite implements HasSelectionHandlers<ListItem<T>>, HasDoubleClickHandlers,
     HasAllKeyHandlers, ClickHandler, KeyDownHandler, KeyPressHandler, KeyUpHandler, Focusable

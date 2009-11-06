@@ -24,7 +24,7 @@ import org.xwiki.gwt.dom.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * @version $Id: NativeAsyncCallback.java 24601 2009-10-21 09:17:11Z mflorea $
+ * @version $Id$
  * @param <T> The type of the return value that was declared in the synchronous version of the method. If the return
  *            type is a primitive, use the boxed version of that primitive (for example, an {@code int} return type
  *            becomes an {@link Integer} type argument, and a {@code void} return type becomes a {@link Void} type

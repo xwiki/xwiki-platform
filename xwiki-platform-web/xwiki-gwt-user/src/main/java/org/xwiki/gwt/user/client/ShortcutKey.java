@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Represents a combination of a keyboard key and one or more modifier keys, that could trigger a specific action.
  * 
- * @version $Id: ShortcutKey.java 21975 2009-07-16 16:22:10Z mflorea $
+ * @version $Id$
  */
 public class ShortcutKey
 {

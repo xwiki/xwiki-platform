@@ -39,7 +39,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
  * The built-in WYSIWYG editor provided by all modern browsers may react differently to user input (like typing) on
  * different browsers. This class serves as a base class for browser specific behavior adjustment.
  * 
- * @version $Id: BehaviorAdjuster.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class BehaviorAdjuster
 {

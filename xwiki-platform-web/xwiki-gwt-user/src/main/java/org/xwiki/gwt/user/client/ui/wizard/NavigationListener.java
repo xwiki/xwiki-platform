@@ -22,14 +22,14 @@ package org.xwiki.gwt.user.client.ui.wizard;
 /**
  * Navigation events listener.
  * 
- * @version $Id: NavigationListener.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface NavigationListener
 {
     /**
      * The navigation directions defined by this wizard.
      * 
-     * @version $Id: NavigationListener.java 20040 2009-05-16 12:06:29Z sdumitriu $
+     * @version $Id$
      */
     public static enum NavigationDirection
     {

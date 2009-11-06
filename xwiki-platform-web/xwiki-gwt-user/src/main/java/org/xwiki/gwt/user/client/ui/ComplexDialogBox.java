@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Label;
  * forth). The body contains the widgets for acquiring user data. The footer usually contains buttons for closing the
  * dialog or ending the wizard.
  * 
- * @version $Id: ComplexDialogBox.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class ComplexDialogBox extends CompositeDialogBox
 {

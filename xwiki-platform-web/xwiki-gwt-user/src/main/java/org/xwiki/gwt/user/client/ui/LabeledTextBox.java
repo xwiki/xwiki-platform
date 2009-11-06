@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.TextBox;
 /**
  * A labeled text box. The label is displayed inside the text box whenever the text box is empty and not focused.
  * 
- * @version $Id: LabeledTextBox.java 22938 2009-08-26 12:27:38Z mflorea $
+ * @version $Id$
  */
 public class LabeledTextBox extends TextBox implements FocusHandler, BlurHandler
 {

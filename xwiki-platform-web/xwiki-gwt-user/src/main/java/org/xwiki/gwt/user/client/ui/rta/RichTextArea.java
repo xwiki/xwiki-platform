@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.impl.RichTextAreaImpl;
 /**
  * Extends the rich text area provided by GWT to add support for advanced editing.
  * 
- * @version $Id: RichTextArea.java 24601 2009-10-21 09:17:11Z mflorea $
+ * @version $Id$
  */
 public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea implements HasDoubleClickHandlers,
     HasLoadHandlers, LoadHandler

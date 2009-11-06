@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.Image;
 /**
  * Wizard to handle the loading and navigation in a list of chained dialogs.
  * 
- * @version $Id: Wizard.java 22859 2009-08-23 22:29:33Z lucaa $
+ * @version $Id$
  */
 public class Wizard implements NavigationListener, CloseHandler<CompositeDialogBox>
 {

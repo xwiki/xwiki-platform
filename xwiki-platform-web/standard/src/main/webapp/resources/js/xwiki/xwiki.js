@@ -328,7 +328,7 @@ Object.extend(XWiki, {
     // apply this transformation only in the view mode, to not apply transformation on the content in edit mode to 
     // avoid having it saved by the wysiwyg afterwards. Actually it should be anything different from edit or inline, 
     // but like this is consistent with the next function, for section editing.
-    if (XWiki.contextaction == "view") {
+    if (XWiki.contextaction == "view" || XWiki.contextaction == "preview") {
       if (typeof content == "undefined") {
         content = document.body;
       }

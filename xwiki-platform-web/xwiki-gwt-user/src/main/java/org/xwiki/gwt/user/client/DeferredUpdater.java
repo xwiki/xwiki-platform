@@ -25,7 +25,7 @@ import com.google.gwt.user.client.DeferredCommand;
 /**
  * Schedules updates for an {@link Updatable} object and ensures that only the most recent update is actually executed.
  * 
- * @version $Id: DeferredUpdater.java 21733 2009-06-30 15:10:18Z mflorea $
+ * @version $Id$
  */
 public class DeferredUpdater
 {

@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
  * The base class for any custom dialog box. It prevents unwanted modifications of the content from outside. It wraps
  * {@link DialogBox} object that you can customize and which is not accessible outside.
  * 
- * @version $Id: CompositeDialogBox.java 23084 2009-08-27 16:50:59Z lucaa $
+ * @version $Id$
  */
 public class CompositeDialogBox extends Composite implements HasCloseHandlers<CompositeDialogBox>,
     CloseHandler<PopupPanel>

@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * A collection of {@link MenuListener}s. It provides an easy way of notifying all the listeners when a menu event is
  * triggered.
  * 
- * @version $Id: MenuListenerCollection.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class MenuListenerCollection extends ArrayList<MenuListener>
 {

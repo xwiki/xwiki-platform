@@ -33,7 +33,7 @@ import com.google.gwt.user.client.ui.TextBox;
 /**
  * Unit tests for {@link RichTextArea}.
  * 
- * @version $Id: RichTextAreaTest.java 24559 2009-10-19 08:16:41Z mflorea $
+ * @version $Id$
  */
 public class RichTextAreaTest extends RichTextAreaTestCase
 {

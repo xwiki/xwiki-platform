@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client;
 /**
  * An object that can be selected.
  * 
- * @version $Id: Selectable.java 24117 2009-09-29 09:36:52Z mflorea $
+ * @version $Id$
  */
 public interface Selectable
 {

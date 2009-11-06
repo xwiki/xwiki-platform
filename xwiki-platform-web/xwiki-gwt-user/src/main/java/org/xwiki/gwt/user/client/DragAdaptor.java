@@ -34,7 +34,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Adapts mouse events to drag events.
  * 
- * @version $Id: DragAdaptor.java 21975 2009-07-16 16:22:10Z mflorea $
+ * @version $Id$
  */
 public class DragAdaptor implements SourcesDragEvents, MouseDownHandler, MouseMoveHandler, MouseUpHandler
 {

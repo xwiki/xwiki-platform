@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 /**
  * An abstract wizard step that is aware of the wizard navigation.
  * 
- * @version $Id: AbstractNavigationAwareWizardStep.java 24578 2009-10-20 11:55:15Z mflorea $
+ * @version $Id$
  */
 public abstract class AbstractNavigationAwareWizardStep extends AbstractCompositeWizardStep
 {

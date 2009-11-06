@@ -23,7 +23,7 @@ package org.xwiki.gwt.user.client;
  * Extends {@link com.google.gwt.user.client.Timer} by allowing timer listeners to be registered and notified whenever
  * the run method is being called.
  * 
- * @version $Id: Timer.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class Timer extends com.google.gwt.user.client.Timer implements SourcesTimerEvents
 {

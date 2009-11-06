@@ -32,7 +32,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 /**
  * An abstract command manager that knows only how to register commands and listeners.
  * 
- * @version $Id: AbstractCommandManager.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public abstract class AbstractCommandManager implements CommandManager
 {

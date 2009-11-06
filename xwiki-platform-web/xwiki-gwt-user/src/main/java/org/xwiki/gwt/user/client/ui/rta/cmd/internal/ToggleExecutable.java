@@ -25,7 +25,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 /**
  * Toggles an executable. Alternates the calls to the underlying executable using two parameter values.
  * 
- * @version $Id: ToggleExecutable.java 18818 2009-04-19 15:54:32Z mflorea $
+ * @version $Id$
  */
 public class ToggleExecutable extends AbstractExecutable
 {

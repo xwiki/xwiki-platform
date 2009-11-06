@@ -36,7 +36,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
  * we have to know how the DOM tree will be after executing the command.</li>
  * </ul>
  * 
- * @version $Id: InsertHTMLExecutable.java 24073 2009-09-26 19:18:38Z mflorea $
+ * @version $Id$
  */
 public class InsertHTMLExecutable extends AbstractExecutable
 {

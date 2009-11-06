@@ -29,7 +29,7 @@ import com.google.gwt.dom.client.Node;
 /**
  * Unit tests for {@link SelectionPreserver}.
  * 
- * @version $Id: SelectionPreserverTest.java 24533 2009-10-16 14:42:07Z mflorea $
+ * @version $Id$
  */
 public class SelectionPreserverTest extends RichTextAreaTestCase
 {

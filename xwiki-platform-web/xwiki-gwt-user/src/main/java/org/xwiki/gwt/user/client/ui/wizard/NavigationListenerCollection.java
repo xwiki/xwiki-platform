@@ -28,7 +28,7 @@ import org.xwiki.gwt.user.client.ui.wizard.NavigationListener.NavigationDirectio
  * A collection of {@link NavigationListener} to be used by {@link SourcesNavigationEvents} to manage the list of
  * listeners.
  * 
- * @version $Id: NavigationListenerCollection.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class NavigationListenerCollection extends ArrayList<NavigationListener>
 {

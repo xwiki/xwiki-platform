@@ -29,7 +29,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Notifies {@link Selectable} tabs within a {@link TabPanel} when they are selected.
  * 
- * @version $Id: TabPanelSelector.java 24117 2009-09-29 09:36:52Z mflorea $
+ * @version $Id$
  */
 public class TabPanelSelector implements BeforeSelectionHandler<Integer>, SelectionHandler<Integer>
 {

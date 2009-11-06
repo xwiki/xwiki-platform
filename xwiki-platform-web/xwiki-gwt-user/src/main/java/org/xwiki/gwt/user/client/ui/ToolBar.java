@@ -30,7 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Generic tool bar panel accepting any kind of widget.
  * 
- * @version $Id: ToolBar.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class ToolBar extends Composite implements HasWidgets, IndexedPanel
 {

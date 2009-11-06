@@ -24,7 +24,7 @@ import org.xwiki.gwt.dom.client.JavaScriptObject;
 /**
  * This class exposes a {@link CommandManager} to the native JavaScript code.
  * 
- * @version $Id: CommandManagerApi.java 24657 2009-10-22 16:32:57Z mflorea $
+ * @version $Id$
  */
 public final class CommandManagerApi extends JavaScriptObject
 {

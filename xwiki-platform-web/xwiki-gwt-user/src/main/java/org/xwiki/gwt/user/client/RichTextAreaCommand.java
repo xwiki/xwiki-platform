@@ -25,7 +25,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 /**
  * Executes a specific command on a rich text area.
  * 
- * @version $Id: RichTextAreaCommand.java 19608 2009-05-11 12:11:57Z mflorea $
+ * @version $Id$
  */
 public class RichTextAreaCommand implements com.google.gwt.user.client.Command
 {

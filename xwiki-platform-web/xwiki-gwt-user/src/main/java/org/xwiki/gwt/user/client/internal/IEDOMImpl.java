@@ -30,7 +30,7 @@ import com.google.gwt.user.client.impl.DOMImplTrident;
  * NOTE: In the current GWT version (1.7.0) there are two empty classes, DOMImplIE6 and DOMImplIE8, which extend
  * {@link DOMImplTrident}. We tried to extend them but unfortunately DOMImplIE6 has package-only access level..
  * 
- * @version $Id: IEDOMImpl.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class IEDOMImpl extends DOMImplTrident
 {

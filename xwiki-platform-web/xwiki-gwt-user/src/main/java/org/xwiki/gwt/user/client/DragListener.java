@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Interface for listening to drag events.
  * 
- * @version $Id: DragListener.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface DragListener
 {

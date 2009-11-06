@@ -33,7 +33,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 /**
  * Standard {org.xwiki.gwt.user.client.ui.rta.Reloader} implementation.
  * 
- * @version $Id: ReloaderImpl.java 24177 2009-10-01 20:10:55Z mflorea $
+ * @version $Id$
  */
 public class ReloaderImpl
 {

@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client;
 /**
  * An interface for registering timer listeners.
  * 
- * @version $Id: SourcesTimerEvents.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface SourcesTimerEvents
 {

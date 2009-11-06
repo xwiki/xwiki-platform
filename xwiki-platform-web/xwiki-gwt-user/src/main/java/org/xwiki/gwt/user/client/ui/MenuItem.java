@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.AbstractImagePrototype.ImagePrototypeElemen
  * <li>Allows us to disable and re-enable it.</li>
  * </ul>
  * 
- * @version $Id: MenuItem.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class MenuItem extends com.google.gwt.user.client.ui.MenuItem implements SourcesMenuEvents
 {

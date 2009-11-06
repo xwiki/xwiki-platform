@@ -29,7 +29,7 @@ import com.google.gwt.event.dom.client.LoadHandler;
 /**
  * Reloads a rich text area.
  * 
- * @version $Id: Reloader.java 24177 2009-10-01 20:10:55Z mflorea $
+ * @version $Id$
  */
 public class Reloader
 {

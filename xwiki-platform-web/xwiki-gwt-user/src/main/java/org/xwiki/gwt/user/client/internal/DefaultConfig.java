@@ -33,7 +33,7 @@ import com.google.gwt.i18n.client.Dictionary;
  * The default implementation of {@link Config} interface. This implementation wraps a {@link Dictionary} instance build
  * from a JavaScript object in the host HTML page.
  * 
- * @version $Id: DefaultConfig.java 20716 2009-06-02 16:15:02Z mflorea $
+ * @version $Id$
  */
 public final class DefaultConfig implements Config
 {

@@ -22,7 +22,7 @@ package org.xwiki.gwt.user.client.ui.rta.cmd;
 /**
  * Interface that must be implemented in order to be notified of executed commands.
  * 
- * @version $Id: CommandListener.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface CommandListener
 {

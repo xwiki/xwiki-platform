@@ -35,7 +35,7 @@ import com.google.gwt.json.client.JSONString;
  * {@code input} and {@code textarea} as long as they are generated on the server and not on the client using
  * JavaScript. This class uses the value of such an element to save string properties.
  * 
- * @version $Id: Cache.java 23255 2009-09-03 10:16:02Z mflorea $
+ * @version $Id$
  */
 public class Cache implements Updatable
 {

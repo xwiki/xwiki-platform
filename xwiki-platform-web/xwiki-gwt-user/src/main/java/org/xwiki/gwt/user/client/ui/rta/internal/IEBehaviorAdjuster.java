@@ -28,7 +28,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 /**
  * Adjusts the behavior of the rich text area in Internet Explorer browsers.
  * 
- * @version $Id: IEBehaviorAdjuster.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class IEBehaviorAdjuster extends BehaviorAdjuster
 {

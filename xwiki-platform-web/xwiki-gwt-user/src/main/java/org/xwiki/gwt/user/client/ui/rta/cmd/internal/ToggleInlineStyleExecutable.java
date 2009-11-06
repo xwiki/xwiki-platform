@@ -35,7 +35,7 @@ import com.google.gwt.dom.client.Node;
 /**
  * Toggles a style property on the current selection.
  * 
- * @version $Id: ToggleInlineStyleExecutable.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class ToggleInlineStyleExecutable extends InlineStyleExecutable
 {

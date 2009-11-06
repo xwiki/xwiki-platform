@@ -24,7 +24,7 @@ package org.xwiki.gwt.user.client.ui.rta.cmd;
  * identifier. The code associated with the user action should be found in {@link Executable}. Commands should be
  * registered with the {@link CommandManager}.
  * 
- * @version $Id: Command.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class Command
 {

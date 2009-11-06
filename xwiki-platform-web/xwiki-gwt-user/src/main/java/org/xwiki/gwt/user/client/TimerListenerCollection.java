@@ -24,7 +24,7 @@ import java.util.ArrayList;
 /**
  * A collection of timer listeners.
  * 
- * @version $Id: TimerListenerCollection.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class TimerListenerCollection extends ArrayList<TimerListener>
 {

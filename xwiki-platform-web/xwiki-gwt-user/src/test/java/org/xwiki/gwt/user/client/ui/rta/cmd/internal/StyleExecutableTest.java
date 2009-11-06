@@ -30,7 +30,7 @@ import com.google.gwt.user.client.Command;
 /**
  * Unit tests for {@link InlineStyleExecutable}.
  * 
- * @version $Id: StyleExecutableTest.java 24533 2009-10-16 14:42:07Z mflorea $
+ * @version $Id$
  */
 public class StyleExecutableTest extends RichTextAreaTestCase
 {

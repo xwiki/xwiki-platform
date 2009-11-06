@@ -23,7 +23,7 @@ package org.xwiki.gwt.user.client.ui.wizard;
  * Interface to specify wizard event, such as the wizard completion or cancel, to let obsevers know when a wizard is
  * done.
  * 
- * @version $Id: WizardListener.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface WizardListener
 {

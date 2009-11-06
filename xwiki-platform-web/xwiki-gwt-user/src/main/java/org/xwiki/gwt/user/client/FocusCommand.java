@@ -28,7 +28,7 @@ import com.google.gwt.user.client.ui.Focusable;
  * http://code.google.com/p/google-web-toolkit/issues/detail?id=1849 and the applied workarounds in existing code (e.g.
  * GlassPanel).
  * 
- * @version $Id: FocusCommand.java 23554 2009-09-15 20:17:54Z lucaa $
+ * @version $Id$
  */
 public class FocusCommand implements Command
 {

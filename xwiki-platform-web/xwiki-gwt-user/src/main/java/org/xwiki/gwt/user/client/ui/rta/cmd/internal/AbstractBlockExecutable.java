@@ -39,7 +39,7 @@ import com.google.gwt.dom.client.Node;
  * important because the selection markers have to be included in the inserted block and not wrap it</li>
  * </ul>
  * 
- * @version $Id: AbstractBlockExecutable.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public abstract class AbstractBlockExecutable extends AbstractExecutable
 {

@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.UIObject;
 /**
  * Improves the default menu bar widget provided by GWT.
  * 
- * @version $Id: MenuBar.java 24665 2009-10-23 09:42:51Z mflorea $
+ * @version $Id$
  */
 public class MenuBar extends com.google.gwt.user.client.ui.MenuBar
 {

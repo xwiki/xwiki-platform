@@ -27,7 +27,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 /**
  * Base class for all {@link Executable}s that manipulate a DOM document using the selection and range APIs.
  * 
- * @version $Id: AbstractExecutable.java 20788 2009-06-04 09:36:45Z mflorea $
+ * @version $Id$
  */
 public abstract class AbstractExecutable implements Executable
 {

@@ -40,7 +40,7 @@ import com.google.gwt.dom.client.Node;
  * The selection preserver can be also used to restore the selection after executing commands like insert HTML. In this
  * particular case the restored selection will contain the HTML that replaced the previous selection.
  * 
- * @version $Id: SelectionPreserver.java 24341 2009-10-09 14:33:34Z mflorea $
+ * @version $Id$
  */
 public class SelectionPreserver
 {

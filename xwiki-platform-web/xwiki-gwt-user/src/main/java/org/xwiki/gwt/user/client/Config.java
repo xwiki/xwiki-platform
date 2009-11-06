@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Interface for retrieving the configuration parameters of the WYSIWYG editor.
  * 
- * @version $Id: Config.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public interface Config
 {

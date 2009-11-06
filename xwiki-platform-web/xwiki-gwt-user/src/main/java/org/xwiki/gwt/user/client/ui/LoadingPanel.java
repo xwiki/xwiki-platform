@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * Used to indicate that a specified widget is loading.
  * 
- * @version $Id: LoadingPanel.java 23255 2009-09-03 10:16:02Z mflorea $
+ * @version $Id$
  */
 public class LoadingPanel extends FocusPanel
 {

@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.Hidden;
  * Parameters are local with respect to a {@link HiddenConfig}. Their names are prefixed by the {@link #nameSpace}. For
  * each parameter set on a {@link HiddenConfig} there will be a request parameter with the same name and the same value.
  * 
- * @version $Id: HiddenConfig.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class HiddenConfig extends Composite implements Config
 {

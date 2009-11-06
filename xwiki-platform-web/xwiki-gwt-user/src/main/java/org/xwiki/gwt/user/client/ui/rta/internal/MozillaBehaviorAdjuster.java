@@ -33,7 +33,7 @@ import com.google.gwt.dom.client.Node;
 /**
  * Adjusts the behavior of the rich text area in Mozilla based browsers, like Firefox.
  * 
- * @version $Id: MozillaBehaviorAdjuster.java 24072 2009-09-26 19:16:29Z mflorea $
+ * @version $Id$
  */
 public class MozillaBehaviorAdjuster extends BehaviorAdjuster
 {

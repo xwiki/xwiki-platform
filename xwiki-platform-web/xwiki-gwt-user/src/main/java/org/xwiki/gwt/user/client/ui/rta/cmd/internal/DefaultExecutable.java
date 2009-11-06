@@ -27,7 +27,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 /**
  * Executes a predefined command on a specific document.
  * 
- * @version $Id: DefaultExecutable.java 20040 2009-05-16 12:06:29Z sdumitriu $
+ * @version $Id$
  */
 public class DefaultExecutable implements Executable
 {

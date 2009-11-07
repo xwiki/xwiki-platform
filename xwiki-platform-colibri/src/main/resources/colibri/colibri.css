@@ -1627,6 +1627,10 @@ ul.xwikitabbar {
     padding: 0;
 }
 
+#globallinks form {
+  margin: 0;
+  padding: 0;
+}
 #globalsearch {
     margin: 0 0 0 10px;
 }

@@ -141,7 +141,7 @@
 * [$msg.get("xe.panels.quicklinks.blog")&gt;Blog.WebHome]
 * [$msg.get("xe.panels.quicklinks.sandbox")&gt;Sandbox.WebHome]
 #if ($xwiki.hasAdminRights())
-&lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
 #end
 #panelfooter()</content>
 </property>

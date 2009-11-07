@@ -92,7 +92,7 @@ public class ParameterDescriptor implements IsSerializable
     /**
      * Sets the display name of this parameter.
      * 
-     * @param id the display name of the parameter
+     * @param name the display name of the parameter
      * @since 2.1M1
      */
     public void setName(String name)

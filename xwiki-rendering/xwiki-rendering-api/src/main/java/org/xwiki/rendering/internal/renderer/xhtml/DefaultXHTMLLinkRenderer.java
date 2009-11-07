@@ -187,6 +187,8 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
         // href attribute
         if (link.getType() == LinkType.INTERWIKI) {
             // TODO: Resolve the Interwiki link
+        } else if (StringUtils.isEmpty(link.getReference())) {
+            renderAutoLink(link, spanAttributes, aAttributes);
         } else {
             if (this.wikiModel != null && link.getType() == LinkType.URI && link.getReference().startsWith(ATTACH)) {
                 // use the default attachment syntax parser to extract document name and attachment name
@@ -218,19 +220,7 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
         aAttributes.putAll(parameters);
 
         if (StringUtils.isEmpty(link.getReference())) {
-            spanAttributes.put(CLASS, WIKILINK);
-
-            StringBuilder buffer = new StringBuilder();
-            if (link.getQueryString() != null) {
-                buffer.append('?');
-                buffer.append(link.getQueryString());
-            }
-            buffer.append('#');
-            if (link.getAnchor() != null) {
-                buffer.append(link.getAnchor());
-            }
-
-            aAttributes.put(HREF, buffer.toString());
+            renderAutoLink(link, spanAttributes, aAttributes);
         } else if (this.wikiModel.isDocumentAvailable(link.getReference())) {
             spanAttributes.put(CLASS, WIKILINK);
             aAttributes.put(HREF, this.wikiModel.getDocumentViewURL(link.getReference(), link.getAnchor(),
@@ -244,6 +234,28 @@ public class DefaultXHTMLLinkRenderer implements XHTMLLinkRenderer, Initializabl
 
         getXHTMLWikiPrinter().printXMLStartElement(SPAN, spanAttributes);
         getXHTMLWikiPrinter().printXMLStartElement(ANCHOR, aAttributes);
+    }
+
+    /**
+     * @param link the link definition (the reference)
+     * @param spanAttributes the span element where to put the class
+     * @param aAttributes the anchor element where to put the reference
+     */
+    private void renderAutoLink(Link link, Map<String, String> spanAttributes, Map<String, String> aAttributes)
+    {
+        spanAttributes.put(CLASS, WIKILINK);
+
+        StringBuilder buffer = new StringBuilder();
+        if (link.getQueryString() != null) {
+            buffer.append('?');
+            buffer.append(link.getQueryString());
+        }
+        buffer.append('#');
+        if (link.getAnchor() != null) {
+            buffer.append(link.getAnchor());
+        }
+
+        aAttributes.put(HREF, buffer.toString());
     }
 
     /**

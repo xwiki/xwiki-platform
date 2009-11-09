@@ -46,6 +46,7 @@ public interface XWikiGroupService
     /**
      * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
      */
+    @Deprecated
     public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
 
     public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
@@ -66,11 +67,13 @@ public interface XWikiGroupService
     /**
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
      */
+    @Deprecated
     public List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
      */
+    @Deprecated
     public List<String> listAllGroups(XWikiContext context) throws XWikiException;
 
     /**

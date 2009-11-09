@@ -29,10 +29,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.jfree.util.Log;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
-import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.observation.EventListener;
@@ -126,6 +125,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     protected Cache<List<String>> groupCache;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#init(com.xpn.xwiki.XWiki, com.xpn.xwiki.XWikiContext)
+     */
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException
     {
         initCache(context);
@@ -133,6 +137,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         Utils.getComponent(ObservationManager.class).addListener(this);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#initCache(com.xpn.xwiki.XWikiContext)
+     */
     public synchronized void initCache(XWikiContext context) throws XWikiException
     {
         int iCapacity = 100;
@@ -146,9 +155,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         initCache(iCapacity, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#initCache(int, com.xpn.xwiki.XWikiContext)
+     */
     public synchronized void initCache(int iCapacity, XWikiContext context) throws XWikiException
     {
-        CacheFactory cacheFactory = context.getWiki().getCacheFactory();
         try {
             CacheConfiguration configuration = new CacheConfiguration();
             configuration.setConfigurationId("xwiki.groupservice.usergroups");
@@ -156,13 +169,18 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             lru.setMaxEntries(iCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
 
-            this.groupCache = cacheFactory.newCache(configuration);
+            this.groupCache = Utils.getComponent(CacheManager.class).createNewCache(configuration);
         } catch (CacheException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
                 "Failed to initialize cache", e);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#flushCache()
+     */
     public void flushCache()
     {
         if (this.groupCache != null) {
@@ -170,6 +188,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#listGroupsForUser(java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
     public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException
     {
         List<String> list = null;
@@ -205,8 +228,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         }
     }
 
-    /*
+    /**
+     * {@inheritDoc}
+     * <p>
      * Adding the user to the group cache
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#addUserToGroup(java.lang.String, java.lang.String,
+     *      java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public void addUserToGroup(String username, String database, String group, XWikiContext context)
         throws XWikiException
@@ -338,7 +366,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     /**
-     * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#listMemberForGroup(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Deprecated
     public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
@@ -379,7 +409,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     /**
-     * @deprecated Use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#listAllGroups(com.xpn.xwiki.XWikiContext)
      */
     @Deprecated
     public List<String> listAllGroups(XWikiContext context) throws XWikiException
@@ -712,7 +744,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         // Add order by clause
         if (orderAsc != null) {
-            queryString.append(" ORDER BY field.value ").append(orderAsc == null || orderAsc ? "asc" : "desc");
+            queryString.append(" ORDER BY field.value ").append(orderAsc ? "asc" : "desc");
         }
 
         return queryString.toString();

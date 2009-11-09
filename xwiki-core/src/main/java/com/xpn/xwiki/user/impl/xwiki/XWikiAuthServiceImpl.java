@@ -23,9 +23,9 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +62,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Each wiki has its own authenticator.
      */
-    protected Map<String, XWikiAuthenticator> authenticators = new HashMap<String, XWikiAuthenticator>();
+    protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<String, XWikiAuthenticator>();
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {

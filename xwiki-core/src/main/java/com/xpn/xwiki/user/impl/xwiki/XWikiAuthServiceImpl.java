@@ -23,9 +23,9 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.io.IOException;
 import java.net.URL;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,14 +50,19 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 
+/**
+ * Default implementation of {@link XWikiAuthService}.
+ * 
+ * @version $Id$
+ */
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
-    private static final Log log = LogFactory.getLog(XWikiAuthServiceImpl.class);
+    private static final Log LOG = LogFactory.getLog(XWikiAuthServiceImpl.class);
 
     /**
      * Each wiki has its own authenticator.
      */
-    protected Map<String, XWikiAuthenticator> authenticators = new HashMap<String, XWikiAuthenticator>();
+    protected Map<String, XWikiAuthenticator> authenticators = new ConcurrentHashMap<String, XWikiAuthenticator>();
 
     protected XWikiAuthenticator getAuthenticator(XWikiContext context) throws XWikiException
     {
@@ -270,25 +275,27 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
             // Process logout (this only works with Forms)
             if (auth.processLogout(wrappedRequest, response, xwiki.getUrlPatternMatcher())) {
-                if (log.isInfoEnabled()) {
-                    log.info("User " + context.getUser() + " has been logged-out");
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("User " + context.getUser() + " has been logged-out");
                 }
                 wrappedRequest.setUserPrincipal(null);
                 return null;
             }
 
-            if (log.isInfoEnabled()) {
+            if (LOG.isInfoEnabled()) {
                 if (user != null) {
-                    log.info("User " + user.getName() + " is authentified");
+                    LOG.info("User " + user.getName() + " is authentified");
                 }
             }
 
             if (user == null) {
                 return null;
             }
+
             return new XWikiUser(user.getName());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to authenticate", e);
+
             return null;
         }
     }
@@ -324,18 +331,20 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             Principal user = wrappedRequest.getUserPrincipal();
-            if (log.isInfoEnabled()) {
+            if (LOG.isInfoEnabled()) {
                 if (user != null) {
-                    log.info("User " + user.getName() + " is authentified");
+                    LOG.info("User " + user.getName() + " is authentified");
                 }
             }
 
             if (user == null) {
                 return null;
             }
+
             return new XWikiUser(user.getName());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to authenticate", e);
+
             return null;
         }
     }
@@ -348,8 +357,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                     context.getResponse().getHttpServletResponse(), context);
             }
         } catch (IOException e) {
-            // If this fails we continue
-            e.printStackTrace();
+            LOG.error("Unknown failure when calling showLogin", e);
         }
     }
 
@@ -466,7 +474,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
         } else {
-            context.put("message", "loginfailed");
+            LOG.error("XWikiContext is null");
+
             return null;
         }
     }
@@ -486,11 +495,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
             Object[][] whereParameters = new Object[][] { {"doc.space", "XWiki"}, {"doc.name", username}};
 
-            List list = context.getWiki().search(sql, whereParameters, context);
+            List<String> list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {
                 user = null;
             } else {
-                user = (String) list.get(0);
+                user = list.get(0);
             }
         }
 
@@ -506,23 +515,24 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             if (doc.getObject("XWiki.XWikiUsers") != null) {
                 String passwd = doc.getStringValue("XWiki.XWikiUsers", "password");
                 password =
-                    ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context).getField("password"))
-                        .getEquivalentPassword(passwd, password);
+                    ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context).getField("password")).getEquivalentPassword(
+                        passwd, password);
 
                 result = (password.equals(passwd));
             }
 
-            if (log.isDebugEnabled()) {
+            if (LOG.isDebugEnabled()) {
                 if (result) {
-                    log.debug("Password check for user " + username + " successful");
+                    LOG.debug("Password check for user " + username + " successful");
                 } else {
-                    log.debug("Password check for user " + username + " failed");
+                    LOG.debug("Password check for user " + username + " failed");
                 }
             }
 
             return result;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.error("Failed to check password", e);
+
             return false;
         }
     }
@@ -534,53 +544,61 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             param = context.getWiki().getXWikiPreference(name, context);
         } catch (Exception e) {
         }
+
         if (param == null || "".equals(param)) {
             try {
                 param = context.getWiki().Param("xwiki.authentication." + StringUtils.replace(name, "auth_", ""));
             } catch (Exception e) {
             }
         }
+
         if (param == null) {
             param = "";
         }
+
         return param;
     }
 
     protected void createUser(String user, XWikiContext context) throws XWikiException
     {
         String createuser = getParam("auth_createuser", context);
-        if (log.isDebugEnabled()) {
-            log.debug("Create user param is " + createuser);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Create user param is " + createuser);
         }
+
         if (createuser != null) {
             String wikiname = context.getWiki().clearName(user, true, true, context);
             XWikiDocument userdoc = context.getWiki().getDocument("XWiki." + wikiname, context);
             if (userdoc.isNew()) {
-                if (log.isDebugEnabled()) {
-                    log.debug("User page does not exist for user " + user);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("User page does not exist for user " + user);
                 }
+
                 if ("ldap".equals(createuser)) {
                     // Let's create the user from ldap
                     LDAPPlugin ldapplugin = (LDAPPlugin) context.getWiki().getPlugin("ldap", context);
                     if (ldapplugin != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Creating user from ldap for user " + user);
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Creating user from ldap for user " + user);
                         }
+
                         ldapplugin.createUserFromLDAP(wikiname, user, null, null, context);
                     } else {
-                        if (log.isErrorEnabled()) {
-                            log.error("Impossible to create user from LDAP because LDAP plugin is not activated");
+                        if (LOG.isErrorEnabled()) {
+                            LOG.error("Impossible to create user from LDAP because LDAP plugin is not activated");
                         }
                     }
                 } else if ("empty".equals(createuser)) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Creating emptry user for user " + user);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Creating emptry user for user " + user);
                     }
+
                     context.getWiki().createEmptyUser(wikiname, "edit", context);
                 }
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("User page already exists for user " + user);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("User page already exists for user " + user);
                 }
             }
         }
@@ -602,9 +620,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (contextPath.endsWith("/") && !contextPath.startsWith("/")) {
             contextPath = "/" + StringUtils.chop(contextPath);
         }
+
         // URLFactory.getURL applies Util.escapeURL, which might convert the contextPath into an %NN escaped string.
         // Apply the same escape method to compensate this.
         contextPath = Util.escapeURL(contextPath);
+
         return StringUtils.removeStart(context.getURLFactory().getURL(url, context), contextPath);
     }
 }

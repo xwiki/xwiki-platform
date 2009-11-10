@@ -21,7 +21,7 @@
       <img src="$!logourl" alt="XWiki" width="200" height="70"/>
 #else
 #set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
-      <img src="$!logourl" alt="XWiki"/>
+      <img src="$!logourl" alt="Wiki Logo"/>
 #end
     </a>
   </div>

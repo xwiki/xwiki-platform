@@ -998,7 +998,7 @@ $fn
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="panel $expanded $specialClassAttribute">
-<h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
+<div class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</div>
 <div class="xwikipanelcontents">
 #end
 

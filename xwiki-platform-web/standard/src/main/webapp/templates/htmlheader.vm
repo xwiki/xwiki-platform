@@ -21,13 +21,13 @@
     ## ---------------------------------------------------------------------------------------------------------------
     #if(!$title)
       #set($title = $!xwiki.getWebPreference('title'))
-      #if($title != "")
+      #if($title != '')
         #set($title = "$xwiki.getXMLEncoded($xwiki.parseContent($title))")
       #else
         #set($title = "XWiki - $xwiki.getXMLEncoded($!doc.space) - $xwiki.getXMLEncoded($!tdoc.displayTitle)")
       #end
     #else
-      #set($title = "$xwiki.getXMLEncoded($title)")
+      #set($title = $xwiki.getXMLEncoded($title))
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------

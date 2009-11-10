@@ -160,11 +160,13 @@ public class XWikiStatsServiceImpl implements XWikiStatsService, EventListener
         XWikiDocument document = (XWikiDocument) source;
         XWikiContext context = (XWikiContext) data;
 
-        // 1) If the server is in read-only mode, forget about the statistics
-        // 2) Unless this is a "view", "save" or "download" action, we are not interested
-        if (context.getWiki().isReadOnly() || StatsUtil.findCookie(context)) {
+        // If the server is in read-only mode, forget about the statistics
+        if (context.getWiki().isReadOnly()) {
             return;
         }
+
+        // Initialize cookie and put it in the context
+        StatsUtil.findCookie(context);
 
         String action = actionEvent.getActionName();
 

@@ -1719,7 +1719,7 @@ div.xwikipanelcontents ul.minus {
     padding: 0;
 }
 
-h5.xwikipaneltitle {
+div.xwikipaneltitle {
     margin: 0;
     font-size: 1.1em;
     letter-spacing: -1px;
@@ -1729,11 +1729,11 @@ h5.xwikipaneltitle {
     cursor: pointer;
 }
 
-#globalsearch h5.xwikipaneltitle.hidden {
+#globalsearch div.xwikipaneltitle.hidden {
     display: none;
 }
 
-h5.xwikipaneltitle.hidden {
+div.xwikipaneltitle.hidden {
     display: block;
     height: 10px;
     line-height: 200px;
@@ -1769,21 +1769,21 @@ span.panelitem {
 }
 
 /*  edit panels */
-#editPanels .expanded h5.xwikipaneltitle {
+#editPanels .expandeddiv.xwikipaneltitle {
     height: auto;
     font-size: 1em;
     text-align: center;
     letter-spacing: -1px;
 }
 
-#editPanels .editmodes h5 {
+#editPanels .editmodes div {
     height: auto;
     font-size: 1em;
     text-align: center;
     letter-spacing: -1px;
 }
 
-#editPanels .collapsed h5.xwikipaneltitle {
+#editPanels .collapsed div.xwikipaneltitle {
     text-align: center;
     letter-spacing: -1px;
 }
@@ -1814,7 +1814,7 @@ span.panelitem {
     font-size: 1em;
 }
 
-.collapsed h5.xwikipaneltitle {
+.collapseddiv.xwikipaneltitle {
     background-position: top right;
 }
 
@@ -1843,7 +1843,7 @@ span.panelitem {
     text-align: left;
 }
 
-#editPanels .SyntaxHelp h5.xwikipaneltitle {
+#editPanels .SyntaxHelp div.xwikipaneltitle {
     display: none;
 }
 
@@ -1855,7 +1855,7 @@ span.panelitem {
     padding: 5px 25px 5px 10px;
 }
 
-#xwikihelpsyntax div.panel.expanded h5.xwikipaneltitle.hidden {
+#xwikihelpsyntax div.panel.expandeddiv.xwikipaneltitle.hidden {
     display: none;
 }
 
@@ -3508,7 +3508,7 @@ body.hideleft #xwikimaincontainerinner {
 }
 
 /* Overridden with .panel for IE6 */
-.panel h5.xwikipaneltitle {
+.paneldiv.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;
@@ -3517,7 +3517,7 @@ body.hideleft #xwikimaincontainerinner {
 }
 
 /* Overridden with .div for IE6 */
-div.collapsed h5.xwikipaneltitle {
+div.collapsed div.xwikipaneltitle {
   background-color: $theme.panelCollapsedBackgroundColor;
   border: none;
   color: $theme.panelCollapsedTextColor;
@@ -3988,14 +3988,14 @@ body#body.editbody #xwikimaincontainerinner {
 
 /** Edit Panels **/
 
-#editPanels .expanded h5.xwikipaneltitle {
+#editPanels .expandeddiv.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;
   text-align: left;
 }
 
-#editPanels .collapsed h5.xwikipaneltitle {
+#editPanels .collapsed div.xwikipaneltitle {
   background-color: $theme.panelCollapsedBackgroundColor;
   border: none;
   color: $theme.panelCollapsedTextColor;
@@ -4312,9 +4312,9 @@ table.xRichTextEditorTabPanel td {
 /* Added .xwikipanelcontents dt label, .xwikipanelcontents label, .accordionTabTitleBar h6  */
 /* This are all the elements that are made uppercase in the new skin - maybe we could do a new class for them */
 .xwikitabbar li.active a, .xwikitabbar li a,
-h5.xwikipaneltitle,
-#editPanels .expanded h5.xwikipaneltitle ,
-#editPanels .collapsed h5.xwikipaneltitle,
+div.xwikipaneltitle,
+#editPanels .expanded div.xwikipaneltitle ,
+#editPanels .collapsed div.xwikipaneltitle,
 table.xwikidatatable th,
 #actionmenu a,
 #informationcontent dt,
@@ -4363,7 +4363,7 @@ table.xwikidatatable th,
   font-size: 1em;
 }
 
-#editPanels .expanded h5.xwikipaneltitle {
+#editPanels .expanded div.xwikipaneltitle {
   letter-spacing: 0;
 }
 

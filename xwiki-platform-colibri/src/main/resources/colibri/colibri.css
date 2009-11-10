@@ -1769,7 +1769,7 @@ span.panelitem {
 }
 
 /*  edit panels */
-#editPanels .expandeddiv.xwikipaneltitle {
+#editPanels .expanded div.xwikipaneltitle {
     height: auto;
     font-size: 1em;
     text-align: center;
@@ -1814,7 +1814,7 @@ span.panelitem {
     font-size: 1em;
 }
 
-.collapseddiv.xwikipaneltitle {
+.collapsed div.xwikipaneltitle {
     background-position: top right;
 }
 
@@ -1855,7 +1855,7 @@ span.panelitem {
     padding: 5px 25px 5px 10px;
 }
 
-#xwikihelpsyntax div.panel.expandeddiv.xwikipaneltitle.hidden {
+#xwikihelpsyntax div.panel.expanded div.xwikipaneltitle.hidden {
     display: none;
 }
 
@@ -3508,7 +3508,7 @@ body.hideleft #xwikimaincontainerinner {
 }
 
 /* Overridden with .panel for IE6 */
-.paneldiv.xwikipaneltitle {
+.panel div.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;
@@ -3988,7 +3988,7 @@ body#body.editbody #xwikimaincontainerinner {
 
 /** Edit Panels **/
 
-#editPanels .expandeddiv.xwikipaneltitle {
+#editPanels .expanded div.xwikipaneltitle {
   background-color: $theme.panelHeaderBackgroundColor;
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.panelHeaderTextColor;

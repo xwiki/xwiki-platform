@@ -28,9 +28,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.securityfilter.authenticator.BasicAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.securityfilter.realm.SimplePrincipal;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -65,6 +67,12 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
         if (principal != null) {
             // login successful
             request.getSession().removeAttribute(LOGIN_ATTEMPTS);
+
+            // make sure the Principal contains wiki name information
+            if (!StringUtils.contains(principal.getName(), ':')) {
+                principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+            }
+
             request.setUserPrincipal(principal);
             return false;
         } else {
@@ -95,10 +103,18 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
             if (principal != null) {
                 // login successful
                 request.getSession().removeAttribute(LOGIN_ATTEMPTS);
+
+                // make sure the Principal contains wiki name information
+                if (!StringUtils.contains(principal.getName(), ':')) {
+                    principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+                }
+
                 request.setUserPrincipal(principal);
+
                 return principal;
             }
         }
+
         return null;
     }
 

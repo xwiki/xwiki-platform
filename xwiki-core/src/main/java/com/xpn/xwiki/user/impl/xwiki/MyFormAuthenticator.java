@@ -34,6 +34,7 @@ import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
+import org.securityfilter.realm.SimplePrincipal;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -130,11 +131,14 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         // persistent logins are enabled, and the persistent login info is present in this request
         if (this.persistentLoginManager != null) {
             String username =
-                convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
+                    convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
             String password = this.persistentLoginManager.getRememberedPassword(request, response);
 
             Principal principal = request.getUserPrincipal();
 
+            // 1) if user is not already authenticated, authenticate
+            // 2) if authenticated user for this session does not have the same name, authenticate
+            // 3) if xwiki.authentication.always is set to 1 in xwiki.cfg file, authenticate
             if (principal == null || !StringUtils.endsWith(principal.getName(), "XWiki." + username)
                 || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
                 principal = authenticate(username, password, context);
@@ -143,6 +147,12 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
+
+                    // make sure the Principal contains wiki name information
+                    if (!StringUtils.contains(principal.getName(), ':')) {
+                        principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+                    }
+
                     request.setUserPrincipal(principal);
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
@@ -202,6 +212,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
                 }
             }
 
+            // make sure the Principal contains wiki name information
+            if (!StringUtils.contains(principal.getName(), ':')) {
+                principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+            }
+
             request.setUserPrincipal(principal);
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
@@ -227,6 +242,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             }
             response.setStatus(rCode); // TODO: Does this work? (200 in case of error)
         }
+
         return true;
     }
 

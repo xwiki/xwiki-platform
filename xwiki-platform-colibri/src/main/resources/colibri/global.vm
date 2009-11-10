@@ -21,7 +21,7 @@
 #else
   #set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
 #end
-    <img src="$!logourl" alt="XWiki"/>
+    <img src="$!logourl" alt="Wiki Logo"/>
     </a>
   </div> ## companylogo
   </div> ## company

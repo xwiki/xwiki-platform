@@ -24,7 +24,9 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -35,6 +37,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.bridge.DocumentNameSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -58,9 +61,19 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static final Log LOG = LogFactory.getLog(XWikiRightServiceImpl.class);
 
     private static final List<String> ALLLEVELS =
-        Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete", "register", "programming");
+            Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete", "register", "programming");
 
     private static Map<String, String> actionMap;
+
+    /**
+     * Used to convert a string into a proper Document Name.
+     */
+    private DocumentNameFactory documentNameFactory = Utils.getComponent(DocumentNameFactory.class);
+
+    /**
+     * Used to convert a proper Document Name to string.
+     */
+    private DocumentNameSerializer documentNameSerializer = Utils.getComponent(DocumentNameSerializer.class);
 
     protected void logAllow(String username, String page, String action, String info)
     {
@@ -258,7 +271,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth =
-                context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                    context.getWiki().getXWikiPreference("authenticate_" + right, "", context).toLowerCase().equals(
+                        "yes");
         } catch (Exception e) {
         }
 
@@ -269,7 +283,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             needsAuth |=
-                context.getWiki().getWebPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
+                    context.getWiki().getWebPreference("authenticate_" + right, "", context).toLowerCase().equals("yes");
         } catch (Exception e) {
         }
 
@@ -304,12 +318,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
         String fieldName = user ? "users" : "groups";
         boolean found = false;
 
-        // Get the userdb and the shortname
-        String userdatabase = null;
+        // Here entity is either a user or a group
+        DocumentName entityDocumentName = this.documentNameFactory.createDocumentName(name);
+        String prefixedFullName = this.documentNameSerializer.serialize(entityDocumentName);
         String shortname = name;
         int i0 = name.indexOf(":");
         if (i0 != -1) {
-            userdatabase = name.substring(0, i0);
             shortname = name.substring(i0 + 1);
         }
 
@@ -375,7 +389,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         // In the case where the document database and the user database is the same
                         // then we allow the usage of the short name, otherwise the fully qualified
                         // name is requested
-                        if (context.getDatabase().equals(userdatabase)) {
+                        if (context.getDatabase().equals(entityDocumentName.getWiki())) {
                             if (ArrayUtils.contains(userarray, shortname)) {
                                 if (LOG.isDebugEnabled()) {
                                     LOG.debug("Found matching right in " + users + " for " + shortname);
@@ -427,50 +441,61 @@ public class XWikiRightServiceImpl implements XWikiRightService
             context.put("grouplist", grouplistcache);
         }
 
-        Collection<String> grouplist = new ArrayList<String>();
+        Collection<String> grouplist = new HashSet<String>();
         XWikiGroupService groupService = context.getWiki().getGroupService(context);
-        String key = context.getDatabase() + ":" + name;
-        Collection<String> grouplist1 = grouplistcache.get(key);
 
-        if (grouplist1 == null) {
-            grouplist1 = new ArrayList<String>();
-            try {
-                Collection<String> glist = groupService.listGroupsForUser(name, context);
+        // FIXME: it looks like this code was supposed to get entity groups in current wikis but listGroupsForUser
+        // always return groups from entity wiki, maybe listGroupsForUser changed at some point
+        {
+            // the key is for the entity <code>prefixedFullName</code> in current wiki
+            String key = context.getDatabase() + ":" + prefixedFullName;
 
-                for (String groupName : glist) {
-                    grouplist1.add(context.getDatabase() + ":" + groupName);
+            Collection<String> tmpGroupList = grouplistcache.get(key);
+            if (tmpGroupList == null) {
+                try {
+                    Collection<String> glist = groupService.listGroupsForUser(name, context);
+
+                    tmpGroupList = new ArrayList<String>(glist.size());
+                    for (String groupName : glist) {
+                        tmpGroupList.add(entityDocumentName.getWiki() + ":" + groupName);
+                    }
+                } catch (Exception e) {
+                    LOG.error("Failed to get groups for user or group [" + name + "]", e);
+
+                    tmpGroupList = Collections.emptyList();
                 }
-            } catch (Exception e) {
 
+                grouplistcache.put(key, tmpGroupList);
             }
 
-            grouplistcache.put(key, grouplist1);
+            grouplist.addAll(tmpGroupList);
         }
 
-        grouplist.addAll(grouplist1);
-
-        if (context.getWiki().isVirtualMode()) {
+        // Get entity groups in entity wiki
+        if (context.getWiki().isVirtualMode() &&
+                !context.getDatabase().equalsIgnoreCase(entityDocumentName.getWiki()))
+        {
             String database = context.getDatabase();
             try {
-                // Utils.getName set context's database to name's wiki name (what is before ":")
-                shortname = Util.getName(name, context);
+                context.setDatabase(entityDocumentName.getWiki());
 
-                if (!database.equals(context.getDatabase())) {
-                    String key2 = context.getDatabase() + ":" + name;
-                    Collection<String> grouplist2 = grouplistcache.get(key2);
+                // the key is for the entity <code>prefixedFullName</code> in entity wiki
+                String key = context.getDatabase() + ":" + prefixedFullName;
+                Collection<String> tmpGroupList = grouplistcache.get(key);
 
-                    if (grouplist2 == null) {
-                        Collection<String> glist = groupService.listGroupsForUser(shortname, context);
-                        grouplist2 = new ArrayList<String>();
-                        for (String groupName : glist) {
-                            grouplist2.add(context.getDatabase() + ":" + groupName);
-                        }
-                        grouplistcache.put(key2, grouplist2);
+                if (tmpGroupList == null) {
+                    Collection<String> glist = groupService.listGroupsForUser(shortname, context);
+
+                    tmpGroupList = new ArrayList<String>(glist.size());
+                    for (String groupName : glist) {
+                        tmpGroupList.add(context.getDatabase() + ":" + groupName);
                     }
-
-                    grouplist.addAll(grouplist2);
+                    grouplistcache.put(key, tmpGroupList);
                 }
+
+                grouplist.addAll(tmpGroupList);
             } catch (Exception e) {
+                LOG.error("Failed to get groups for user or group [" + name + "]", e);
             } finally {
                 context.setDatabase(database);
             }
@@ -598,7 +623,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             int maxRecursiveSpaceChecks = context.getWiki().getMaxRecursiveSpaceChecks(context);
             boolean isSuperUser =
-                isSuperUser(accessLevel, name, resourceKey, user, xwikidoc, maxRecursiveSpaceChecks, context);
+                    isSuperUser(accessLevel, name, resourceKey, user, xwikidoc, maxRecursiveSpaceChecks, context);
             if (isSuperUser) {
                 logAllow(name, resourceKey, accessLevel, "admin level");
 
@@ -611,7 +636,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 resourceKey = Util.getName(resourceKey, context);
                 try {
                     currentdoc =
-                        (currentdoc == null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;
+                            (currentdoc == null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;
                     deny = checkRight(name, currentdoc, accessLevel, user, false, false, context);
                     deny_found = true;
                     if (deny) {
@@ -937,7 +962,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
         if (!hasAdmin) {
             try {
                 hasAdmin =
-                    hasAccessLevel("admin", context.getUser(), context.getDoc().getSpace() + ".WebPreferences", context);
+                        hasAccessLevel("admin", context.getUser(), context.getDoc().getSpace() + ".WebPreferences",
+                            context);
             } catch (Exception e) {
                 e.printStackTrace();
             }

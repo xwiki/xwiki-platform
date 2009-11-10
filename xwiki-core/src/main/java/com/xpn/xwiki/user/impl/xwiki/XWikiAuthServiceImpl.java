@@ -39,6 +39,9 @@ import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.bridge.DocumentNameSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -49,6 +52,7 @@ import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Default implementation of {@link XWikiAuthService}.
@@ -58,6 +62,17 @@ import com.xpn.xwiki.util.Util;
 public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
     private static final Log LOG = LogFactory.getLog(XWikiAuthServiceImpl.class);
+
+    /**
+     * Used to convert a string into a proper Document Name.
+     */
+    private DocumentNameFactory documentNameFactory = Utils.getComponent(DocumentNameFactory.class);
+
+    /**
+     * Used to convert a proper Document Name to string.
+     */
+    private DocumentNameSerializer compactDocumentNameSerializer =
+            Utils.getComponent(DocumentNameSerializer.class, "compact");
 
     /**
      * Each wiki has its own authenticator.
@@ -221,15 +236,16 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             // TODO : This code need to be moved elsewhere (appropriately).
-            Principal user = wrappedRequest.getUserPrincipal();
-            if (context.getAction().equals("logout") && user != null) {
+            String userName = getContextUserName(wrappedRequest.getUserPrincipal(), context);
+
+            if (context.getAction().equals("logout") && userName != null) {
                 // Release all active locks on current wiki.
                 try {
                     xwiki.getHibernateStore().beginTransaction(context);
                     Session session = xwiki.getHibernateStore().getSession(context);
                     String sql = "delete from XWikiLock as lock where lock.userName=:userName";
                     Query query = session.createQuery(sql);
-                    query.setString("userName", user.getName());
+                    query.setString("userName", userName);
                     query.executeUpdate();
                 } catch (Exception e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -245,7 +261,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 // If we're in a non-main wiki & the user is global,
                 // switch to the global wiki and delete locks held there.
                 if (xwiki.isVirtualMode() && !context.getMainXWiki().equals(context.getDatabase())
-                    && user.getName().startsWith(context.getMainXWiki() + ":")) {
+                    && userName.startsWith(context.getMainXWiki() + ":")) {
                     String cdb = context.getDatabase();
                     // switch to main wiki.
                     context.setDatabase(context.getMainXWiki());
@@ -254,7 +270,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                         Session session = xwiki.getHibernateStore().getSession(context);
                         String sql = "delete from XWikiLock as lock where lock.userName=:userName";
                         Query query = session.createQuery(sql);
-                        String localName = user.getName().substring(user.getName().indexOf(":") + 1);
+                        String localName = userName.substring(userName.indexOf(":") + 1);
                         query.setString("userName", localName);
                         query.executeUpdate();
                     } catch (Exception e) {
@@ -283,16 +299,16 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
 
             if (LOG.isInfoEnabled()) {
-                if (user != null) {
-                    LOG.info("User " + user.getName() + " is authentified");
+                if (userName != null) {
+                    LOG.info("User " + userName + " is authentified");
                 }
             }
 
-            if (user == null) {
+            if (userName == null) {
                 return null;
             }
 
-            return new XWikiUser(user.getName());
+            return new XWikiUser(userName);
         } catch (Exception e) {
             LOG.error("Failed to authenticate", e);
 
@@ -330,23 +346,37 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
             }
 
-            Principal user = wrappedRequest.getUserPrincipal();
+            Principal principal = wrappedRequest.getUserPrincipal();
             if (LOG.isInfoEnabled()) {
-                if (user != null) {
-                    LOG.info("User " + user.getName() + " is authentified");
+                if (principal != null) {
+                    LOG.info("User " + principal.getName() + " is authentified");
                 }
             }
 
-            if (user == null) {
+            if (principal == null) {
                 return null;
             }
 
-            return new XWikiUser(user.getName());
+            return new XWikiUser(getContextUserName(principal, context));
         } catch (Exception e) {
             LOG.error("Failed to authenticate", e);
 
             return null;
         }
+    }
+
+    private String getContextUserName(Principal principal, XWikiContext context)
+    {
+        String contextUserName;
+
+        if (principal != null) {
+            DocumentName userDocumentName = this.documentNameFactory.createDocumentName(principal.getName());
+            contextUserName = this.compactDocumentNameSerializer.serialize(userDocumentName);
+        } else {
+            contextUserName = null;
+        }
+
+        return contextUserName;
     }
 
     public void showLogin(XWikiContext context) throws XWikiException
@@ -515,8 +545,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             if (doc.getObject("XWiki.XWikiUsers") != null) {
                 String passwd = doc.getStringValue("XWiki.XWikiUsers", "password");
                 password =
-                    ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context).getField("password")).getEquivalentPassword(
-                        passwd, password);
+                        ((PasswordClass) context.getWiki().getClass("XWiki.XWikiUsers", context).getField("password")).getEquivalentPassword(
+                            passwd, password);
 
                 result = (password.equals(passwd));
             }

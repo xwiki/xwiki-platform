@@ -34,14 +34,15 @@ import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
+import org.securityfilter.realm.SimplePrincipal;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.SavedRequestRestorerFilter;
 
-public class MyFormAuthenticator extends FormAuthenticator implements Authenticator, XWikiAuthenticator
+public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthenticator
 {
-    private static final Log log = LogFactory.getLog(MyFormAuthenticator.class);
+    private static final Log LOG = LogFactory.getLog(MyFormAuthenticator.class);
 
     /**
      * Show the login page.
@@ -80,9 +81,16 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         // Redirect to login page
         response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
             + SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId));
+
         return;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.securityfilter.authenticator.FormAuthenticator#processLogin(org.securityfilter.filter.SecurityRequestWrapper,
+     *      javax.servlet.http.HttpServletResponse)
+     */
     @Override
     public boolean processLogin(SecurityRequestWrapper request, HttpServletResponse response) throws Exception
     {
@@ -123,19 +131,28 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         // persistent logins are enabled, and the persistent login info is present in this request
         if (this.persistentLoginManager != null) {
             String username =
-                convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
+                    convertUsername(this.persistentLoginManager.getRememberedUsername(request, response), context);
             String password = this.persistentLoginManager.getRememberedPassword(request, response);
 
             Principal principal = request.getUserPrincipal();
 
+            // 1) if user is not already authenticated, authenticate
+            // 2) if authenticated user for this session does not have the same name, authenticate
+            // 3) if xwiki.authentication.always is set to 1 in xwiki.cfg file, authenticate
             if (principal == null || !StringUtils.endsWith(principal.getName(), "XWiki." + username)
                 || context.getWiki().ParamAsLong("xwiki.authentication.always", 0) == 1) {
                 principal = authenticate(username, password, context);
 
                 if (principal != null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("User " + principal.getName() + " has been authentified from cookie");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("User " + principal.getName() + " has been authentified from cookie");
                     }
+
+                    // make sure the Principal contains wiki name information
+                    if (!StringUtils.contains(principal.getName(), ':')) {
+                        principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+                    }
+
                     request.setUserPrincipal(principal);
                 } else {
                     // Failed to authenticate, better cleanup the user stored in the session
@@ -174,8 +191,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         Principal principal = authenticate(username, password, context);
         if (principal != null) {
             // login successful
-            if (log.isInfoEnabled()) {
-                log.info("User " + principal.getName() + " has been logged-in");
+            if (LOG.isInfoEnabled()) {
+                LOG.info("User " + principal.getName() + " has been logged-in");
             }
 
             // invalidate old session if the user was already authenticated, and they logged in as a different user
@@ -195,6 +212,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
                 }
             }
 
+            // make sure the Principal contains wiki name information
+            if (!StringUtils.contains(principal.getName(), ':')) {
+                principal = new SimplePrincipal(context.getDatabase() + ":" + principal.getName());
+            }
+
             request.setUserPrincipal(principal);
             Boolean bAjax = (Boolean) context.get("ajax");
             if ((bAjax == null) || (!bAjax.booleanValue())) {
@@ -205,8 +227,8 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         } else {
             // login failed
             // set response status and forward to error page
-            if (log.isInfoEnabled()) {
-                log.info("User " + username + " login has failed");
+            if (LOG.isInfoEnabled()) {
+                LOG.info("User " + username + " login has failed");
             }
 
             String returnCode = context.getWiki().Param("xwiki.authentication.unauthorized_code");
@@ -220,6 +242,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
             }
             response.setStatus(rCode); // TODO: Does this work? (200 in case of error)
         }
+
         return true;
     }
 

@@ -19,18 +19,17 @@
     ## ---------------------------------------------------------------------------------------------------------------
     ## Compute the title.
     ## ---------------------------------------------------------------------------------------------------------------
-    <title>
     #if(!$title)
-      #set( $title = $!xwiki.getWebPreference('title'))
-      #if ( $title != "")
-        $xwiki.getXMLEncoded($xwiki.parseContent($title))
+      #set($title = $!xwiki.getWebPreference('title'))
+      #if($title != "")
+        #set($title = "$xwiki.getXMLEncoded($xwiki.parseContent($title))")
       #else
-        XWiki - $xwiki.getXMLEncoded($!doc.space) - $xwiki.getXMLEncoded($!tdoc.displayTitle)
+        #set($title = "XWiki - $xwiki.getXMLEncoded($!doc.space) - $xwiki.getXMLEncoded($!tdoc.displayTitle)")
       #end
     #else
-      $xwiki.getXMLEncoded($title)
+      #set($title = "$xwiki.getXMLEncoded($title)")
     #end
-    </title>
+    <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
     ## Disable the toolbar that comes up when you mouse over an image in MSIE
     ## TODO: Shouldn't this be moved to the Admin Presentation preferences instead (user-defined META), since

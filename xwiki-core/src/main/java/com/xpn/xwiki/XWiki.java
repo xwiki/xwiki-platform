@@ -62,9 +62,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -4774,6 +4776,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 String path;
 
                 String uri = request.getRequestURI();
+                try {
+                    uri = URIUtil.decode(uri);
+                } catch (URIException e) {
+                    LOG.warn("Invalid URI: " + uri);
+                }
                 String contextPath = request.getContextPath();
                 String servletPath = request.getServletPath();
 

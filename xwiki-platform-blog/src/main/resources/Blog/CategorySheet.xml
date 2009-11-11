@@ -37,9 +37,9 @@ $xwiki.jsx.use("Blog.ManageCategories")##
   1 Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title="RSS"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.gif')" alt="(RSS)" title="RSS"/&gt;&lt;/a&gt;
   #if($context.action != 'inline')
     #getCategoriesHierarchy($doc.space $tree)
-    #if ("$!{tree.get(${doc.fullName})}" != "")
+    #if("$!{tree.get(${doc.fullName})}" != '')
       &lt;div class="blog-categories-list subcategories"&gt;
-        &lt;div style="margin: 0 0 0 16px; border-bottom: 1px dotted #ddd"&gt;
+        &lt;div&gt;
           *Subcategories*
         &lt;/div&gt;
         &lt;div&gt;

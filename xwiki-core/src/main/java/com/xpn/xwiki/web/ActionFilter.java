@@ -33,6 +33,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -145,7 +147,13 @@ public class ActionFilter implements Filter
         // Extract the document name from the requested path. We don't use getPathInfo() since it is decoded
         // by the container, thus it will not work when XWiki uses a non-UTF-8 encoding.
         // First step, remove the context path, if any.
-        String document = StringUtils.substringAfter(request.getRequestURI(), request.getContextPath());
+        String path = request.getRequestURI();
+        try {
+            path = URIUtil.decode(request.getRequestURI());
+        } catch (URIException e) {
+            LOG.warn("Invalid URI: " + path);
+        }
+        String document = StringUtils.substringAfter(path, request.getContextPath());
 
         // Second step, remove the servlet path, if any.
         document = StringUtils.substringAfter(document, request.getServletPath());

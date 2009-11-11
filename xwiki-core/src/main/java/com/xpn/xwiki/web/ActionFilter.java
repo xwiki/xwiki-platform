@@ -149,7 +149,7 @@ public class ActionFilter implements Filter
         // First step, remove the context path, if any.
         String path = request.getRequestURI();
         try {
-            path = URIUtil.decode(request.getRequestURI());
+            path = URIUtil.decode(path);
         } catch (URIException e) {
             LOG.warn("Invalid URI: " + path);
         }

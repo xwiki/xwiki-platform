@@ -135,3 +135,12 @@ body.main {
   font-style: italic;
   padding-left: 20px;
 }
+
+.main .xEmbeddedObject {
+  background-image: url(../images/embed.gif);
+  background-position: center center;
+  background-repeat: no-repeat;
+  border: 1px solid #CCC;
+  height: 20px;
+  width: 40px;
+}

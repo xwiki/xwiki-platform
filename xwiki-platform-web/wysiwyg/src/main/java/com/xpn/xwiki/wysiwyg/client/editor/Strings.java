@@ -403,4 +403,6 @@ public interface Strings extends Constants
     String importOfficePasteInfoLabel();
 
     String importOfficePasteHelpLabel();
+
+    String embeddedObject();
 }

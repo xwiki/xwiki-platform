@@ -45,6 +45,11 @@ public class RefreshExecutable extends AbstractExecutable
     private static final Command SUBMIT = new Command("submit");
 
     /**
+     * The command used to notify all the rich text area listeners when its content has been reset.
+     */
+    private static final Command RESET = new Command("reset");
+
+    /**
      * Used to prevent typing in the rich text area while waiting for the updated content from the server.
      */
     private final LoadingPanel waiting = new LoadingPanel();
@@ -89,7 +94,7 @@ public class RefreshExecutable extends AbstractExecutable
             public void onLoad(LoadEvent event)
             {
                 // Reset the content of the rich text area.
-                rta.getCommandManager().execute(new Command("reset"));
+                rta.getCommandManager().execute(RESET);
                 // Store the initial value of the rich text area in case it is submitted without gaining focus.
                 rta.getCommandManager().execute(SUBMIT, true);
                 // Try to focus the rich text area.

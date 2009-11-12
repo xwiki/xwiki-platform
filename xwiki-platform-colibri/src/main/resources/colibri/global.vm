@@ -28,7 +28,7 @@
   <div id="globallinks">
     <form action="$xwiki.getURL('Main.WebSearch')">
       <div id="globalsearch">
-        <label><input id="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" class="withTip"/></label><input class="button" type="image" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"/>
+        <label class="accessibility" for="globalsearchinput">$msg.get('panels.search.inputLabel')</label><input id="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" class="withTip"/><input class="button" type="image" value="$msg.get('panels.search.submit')" alt="$msg.get('panels.search.submit')" src="$xwiki.getSkinFile('icons/xwiki/search.png')"/>
       </div>
     </form>
 #if($xwiki.isMultiLingual())

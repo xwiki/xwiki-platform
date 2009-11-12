@@ -23,6 +23,7 @@ import org.xwiki.gwt.user.client.Config;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPluginFactory;
+import com.xpn.xwiki.wysiwyg.client.plugin.embed.EmbedPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.font.FontPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.FormatPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.history.HistoryPluginFactory;
@@ -102,6 +103,7 @@ public final class WysiwygEditorFactory
         pfm.addPluginFactory(ImagePluginFactory.getInstance());
         pfm.addPluginFactory(ImportPluginFactory.getInstance());
         pfm.addPluginFactory(MacroPluginFactory.getInstance());
+        pfm.addPluginFactory(EmbedPluginFactory.getInstance());
         // add additional PluginFactory for other plug-ins
     }
 

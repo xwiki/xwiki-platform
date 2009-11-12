@@ -87,12 +87,17 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     /**
      * The command used to store the value of the rich text area before submitting the including form.
      */
-    protected static final Command SUBMIT = new Command("submit");
+    private static final Command SUBMIT = new Command("submit");
 
     /**
      * The command used to enable or disable the rich text area.
      */
-    protected static final Command ENABLE = new Command("enable");
+    private static final Command ENABLE = new Command("enable");
+
+    /**
+     * The command used to notify all the rich text area listeners when its content has been reset.
+     */
+    private static final Command RESET = new Command("reset");
 
     /**
      * The underlying WYSIWYG editor instance.
@@ -174,14 +179,14 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
             {
                 // Disable the plain text area.
                 editor.getPlainTextEditor().getTextArea().setEnabled(false);
+                // Reset the content of the rich text area.
+                editor.getRichTextEditor().getTextArea().getCommandManager().execute(RESET);
+                // Store the initial value of the rich text area in case it is submitted without gaining focus.
+                editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
                 // Enable the rich text area in order to be able to submit its content.
                 editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
                 // Focus the rich text area.
                 editor.getRichTextEditor().getTextArea().setFocus(true);
-                // Reset the content of the rich text area.
-                editor.getRichTextEditor().getTextArea().getCommandManager().execute(new Command("reset"));
-                // Store the initial value of the rich text area in case it is submitted without gaining focus.
-                editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
             }
         });
     }

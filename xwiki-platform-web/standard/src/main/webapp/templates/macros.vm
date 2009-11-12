@@ -2211,7 +2211,7 @@ var $jsVarName = {
   displayTabs: true,
   defaultEditor: "wysiwyg",
 #end
-  plugins: '$xwiki.getXWikiPreference("wysiwyg.plugins", "submit line separator text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")',
+  plugins: '$xwiki.getXWikiPreference("wysiwyg.plugins", "submit line separator embed text valign list indent history format symbol link image table macro import#if($full && $request.sync) sync#end")',
   menu: '$xwiki.getXWikiPreference("wysiwyg.menu", "link image table macro import")',
   toolbar: '$xwiki.getXWikiPreference("wysiwyg.toolbar", "bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol")',
   wiki: '$!{editedDocument.wiki.replace("'", "\'")}',

@@ -998,7 +998,7 @@ $fn
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="panel $expanded $specialClassAttribute">
-<div class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</div>
+<h1 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h1>
 <div class="xwikipanelcontents">
 #end
 
@@ -1010,7 +1010,7 @@ $fn
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="panel expanded $specialClassAttribute">
-<div class="xwikipaneltitle hidden" onclick="togglePanelVisibility(this.parentNode);">$title</div>
+<h1 class="xwikipaneltitle hidden" onclick="togglePanelVisibility(this.parentNode);">$title</h1>
 <div class="xwikipanelcontents">
 #end
 
@@ -1025,7 +1025,7 @@ $fn
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="large panel $expanded $specialClassAttribute">
-<div class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</div>
+<h1 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h1>
 <div class="xwikipanelcontents">
 #end
 

@@ -31,6 +31,10 @@
     #end
     <title>$title</title>
     ## ---------------------------------------------------------------------------------------------------------------
+    ## Define the default scripting language that is used for intrinsic events (e.g. onmouseover attributes).
+    ## ---------------------------------------------------------------------------------------------------------------
+    <meta http-equiv="Content-Script-Type" content="text/javascript" />
+    ## ---------------------------------------------------------------------------------------------------------------
     ## Disable the toolbar that comes up when you mouse over an image in MSIE
     ## TODO: Shouldn't this be moved to the Admin Presentation preferences instead (user-defined META), since
     ## it's possible to imagine that the user might want it?  

@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.renderer.wikimodel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import org.wikimodel.wem.IWemConstants;
 import org.wikimodel.wem.IWemListener;
@@ -46,9 +47,33 @@ public class WikiModelGeneratorListener implements Listener
 {
     private IWemListener wikimodelListener;
 
+    private int docLevel = 1;
+
+    private Stack<Context> context = new Stack<Context>();
+
+    private class Context
+    {
+        int headerLevel;
+    }
+
     public WikiModelGeneratorListener(IWemListener wikimodelListener)
     {
         this.wikimodelListener = wikimodelListener;
+    }
+
+    private Context getContext()
+    {
+        return this.context.peek();
+    }
+
+    private Context pushContext()
+    {
+        return this.context.push(new Context());
+    }
+
+    private Context popContext()
+    {
+        return this.context.pop();
     }
 
     /**
@@ -58,7 +83,11 @@ public class WikiModelGeneratorListener implements Listener
      */
     public void beginDocument(Map<String, String> parameters)
     {
+        pushContext();
+
         this.wikimodelListener.beginDocument(createWikiParameters(parameters));
+        this.wikimodelListener.beginSection(this.docLevel++, getContext().headerLevel++,
+            createWikiParameters(parameters));
     }
 
     /**
@@ -68,7 +97,10 @@ public class WikiModelGeneratorListener implements Listener
      */
     public void endDocument(Map<String, String> parameters)
     {
+        this.wikimodelListener.endSection(this.docLevel--, getContext().headerLevel, createWikiParameters(parameters));
         this.wikimodelListener.endDocument(createWikiParameters(parameters));
+
+        popContext();
     }
 
     /**
@@ -104,16 +136,16 @@ public class WikiModelGeneratorListener implements Listener
                     createWikiParameters(parameters).toList()));
                 break;
             case ITALIC:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM, createWikiParameters(parameters)
-                    .toList()));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM,
+                    createWikiParameters(parameters).toList()));
                 break;
             case STRIKEDOUT:
                 this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRIKE,
                     createWikiParameters(parameters).toList()));
                 break;
             case UNDERLINED:
-                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.INS, createWikiParameters(parameters)
-                    .toList()));
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.INS,
+                    createWikiParameters(parameters).toList()));
                 break;
             case NONE:
                 this.wikimodelListener.beginFormat(new WikiFormat(createWikiParameters(parameters).toList()));
@@ -130,20 +162,20 @@ public class WikiModelGeneratorListener implements Listener
     {
         switch (format) {
             case BOLD:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG, createWikiParameters(parameters)
-                    .toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG,
+                    createWikiParameters(parameters).toList()));
                 break;
             case ITALIC:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM, createWikiParameters(parameters)
-                    .toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM,
+                    createWikiParameters(parameters).toList()));
                 break;
             case STRIKEDOUT:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE, createWikiParameters(parameters)
-                    .toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE,
+                    createWikiParameters(parameters).toList()));
                 break;
             case UNDERLINED:
-                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.INS, createWikiParameters(parameters)
-                    .toList()));
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.INS,
+                    createWikiParameters(parameters).toList()));
                 break;
             case NONE:
                 this.wikimodelListener.endFormat(new WikiFormat(createWikiParameters(parameters).toList()));
@@ -174,7 +206,7 @@ public class WikiModelGeneratorListener implements Listener
 
     public void beginSection(Map<String, String> parameters)
     {
-        // Don't do anything since there's no notion of Section in WikiModel
+        this.wikimodelListener.beginSection(this.docLevel, getContext().headerLevel++, createWikiParameters(parameters));
     }
 
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -205,7 +237,7 @@ public class WikiModelGeneratorListener implements Listener
 
     public void endSection(Map<String, String> parameters)
     {
-        // Don't do anything since there's no notion of Section in WikiModel
+        this.wikimodelListener.beginSection(this.docLevel, getContext().headerLevel--, createWikiParameters(parameters));
     }
 
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
@@ -227,8 +259,11 @@ public class WikiModelGeneratorListener implements Listener
 
     public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
-        // Don't do anything since macros have already been transformed so this method
-        // should not be called.
+        if (isInline) {
+            this.wikimodelListener.onMacroInline(id, createWikiParameters(parameters), content);
+        } else {
+            this.wikimodelListener.onMacroBlock(id, createWikiParameters(parameters), content);
+        }
     }
 
     public void onNewLine()

@@ -2271,7 +2271,8 @@ Your account on $wikiname has been successfully activated. You can now login at 
 &lt;a href="$xwiki.getURL("XWiki.RegisterNewUser","view")"&gt;Register&lt;/a&gt;&lt;span&gt; | &lt;/span&gt;
 </menu></property><property><meta>&lt;meta name="revisit-after" content="7 days" /&gt;
 &lt;meta name="description" content="$xwiki.getXMLEncoded($!doc.getRenderedTitle("plain/1.0"))" /&gt;
-&lt;meta name="keywords" content="wiki $xwiki.getXMLEncoded($!doc.getTags().replaceAll('[|,]', ' '))" /&gt;
+#set($keywords = "wiki,$!doc.getTags()")
+&lt;meta name="keywords" content="$xwiki.getXMLEncoded($keywords.replaceAll('[|,]', ' ').trim())" /&gt;
 &lt;meta name="distribution" content="GLOBAL" /&gt;
 &lt;meta name="rating" content="General" /&gt;
 &lt;meta name="author" content="$xwiki.getXMLEncoded($!xwiki.getLocalUserName($doc.getAuthor(), false))" /&gt;

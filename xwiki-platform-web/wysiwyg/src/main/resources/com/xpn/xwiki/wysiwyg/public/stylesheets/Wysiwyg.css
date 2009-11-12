@@ -1,17 +1,3 @@
-@import url('dialog.css');
-@import url('tab.css');
-@import url('menu.css');
-@import url('toolbar.css');
-@import url('widget.css');
-
-@import url('color.css');
-@import url('image.css');
-@import url('importer.css');
-@import url('link.css');
-@import url('macro.css');
-@import url('symbol.css');
-@import url('table.css');
-
 table.xRichTextEditorTabPanel {
   font-style: normal;
   width: 100%;

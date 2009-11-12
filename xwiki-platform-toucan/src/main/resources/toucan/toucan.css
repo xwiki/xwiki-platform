@@ -1977,7 +1977,7 @@ div.xwikipanelcontents ul.minus {
     padding: 0;
 }
 
-h5.xwikipaneltitle {
+h1.xwikipaneltitle {
     margin: 0;
     font-size: 1.1em;
     letter-spacing: -1px;
@@ -1992,18 +1992,18 @@ h5.xwikipaneltitle {
     cursor: pointer;
 }
 
-#globalsearch h5.xwikipaneltitle.hidden {
+#globalsearch h1.xwikipaneltitle.hidden {
     display: none;
 }
 
-h5.xwikipaneltitle.hidden {
+h1.xwikipaneltitle.hidden {
     display: block;
     height: 10px;
     line-height: 200px;
     overflow: hidden;
 }
 
-.collapsed h5.xwikipaneltitle {
+.collapsed h1.xwikipaneltitle {
     height: 38px;
     background-image: url( images/panel-v.png );
     background-position: top left;
@@ -2060,7 +2060,7 @@ span.panelitem {
 }
 
 /*  edit panels */
-#editPanels .expanded h5.xwikipaneltitle {
+#editPanels .expanded h1.xwikipaneltitle {
     background-image: url( images/panel-e.png );
     background-position: right -200px;
     color: #333;
@@ -2072,7 +2072,7 @@ span.panelitem {
     padding: 5px 25px 5px 10px;
 }
 
-#editPanels .editmodes h5 {
+#editPanels .editmodes h1 {
     background-image: url( images/panel-m.png );
     background-position: top right;
     color: #333;
@@ -2084,7 +2084,7 @@ span.panelitem {
     padding: 5px 25px 5px 10px;
 }
 
-#editPanels .collapsed h5.xwikipaneltitle {
+#editPanels .collapsed h1.xwikipaneltitle {
     background-image: url( images/panel-e.png );
     background-position: right top;
     color: #333;
@@ -2126,7 +2126,7 @@ span.panelitem {
     font-size: 1em;
 }
 
-.collapsed h5.xwikipaneltitle {
+.collapsed h1.xwikipaneltitle {
     background-position: top right;
 }
 
@@ -2169,7 +2169,7 @@ span.panelitem {
     color: #000;
 }
 
-#editPanels .SyntaxHelp h5.xwikipaneltitle {
+#editPanels .SyntaxHelp h1.xwikipaneltitle {
     display: none;
 }
 
@@ -2184,7 +2184,7 @@ span.panelitem {
     padding: 5px 25px 5px 10px;
 }
 
-#xwikihelpsyntax div.panel.expanded h5.xwikipaneltitle.hidden {
+#xwikihelpsyntax div.panel.expanded h1.xwikipaneltitle.hidden {
     display: none;
 }
 
@@ -3532,7 +3532,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
     background: #dcdce1 url( "icons/black-more-cont.png" ) no-repeat 100% 50%;
 }
 
-#xwikicontent .panellayoutcol .expanded h5.xwikipaneltitle:hover, #xwikicontent .panellayoutcol .collapsed h5.xwikipaneltitle:hover {
+#xwikicontent .panellayoutcol .expanded h1.xwikipaneltitle:hover, #xwikicontent .panellayoutcol .collapsed h1.xwikipaneltitle:hover {
     color: #fff;
 }
 
@@ -3558,8 +3558,8 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
     margin-bottom: 1em
 }
 
-* html h5.xwikipaneltitle,
-    * html .collapsed h5.xwikipaneltitle,
+* html h1.xwikipaneltitle,
+    * html .collapsed h1.xwikipaneltitle,
     * html .xwikipanelcontents {
     background-image: url( images/panel-v.gif );
 }
@@ -3572,7 +3572,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
     background-image: url( images/panel-e.gif );
 }
 
-#editPanels .expanded h5.xwikipaneltitle {
+#editPanels .expanded h1.xwikipaneltitle {
     background-image: url( images/panel-e.gif );
 }
 
@@ -3584,7 +3584,7 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
     background-image: none;
 }
 
-* html #editPanels .EditModes h5,
+* html #editPanels .EditModes h1,
     * html #editPanels .EditModes .xwikipanelcontents {
     background-image: url( images/panel-m.gif );
 }

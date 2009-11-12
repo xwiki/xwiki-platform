@@ -20,21 +20,21 @@
 package org.xwiki.rendering.internal.parser;
 
 import org.wikimodel.wem.IWikiParser;
-import org.wikimodel.wem.xwiki.XWikiParser;
+import org.wikimodel.wem.xwiki.xwiki20.XWikiParser;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
 
 /**
  * @version $Id$
- * @since 1.5M2
+ * @since 2.1M1
  */
 @Component("xwiki/2.0")
-public class WikiModelXWikiParser extends AbstractWikiModelParser
+public class WikiModelXWiki20Parser extends AbstractWikiModelParser
 {
     /**
      * @see #getLinkParser()
@@ -71,6 +71,7 @@ public class WikiModelXWikiParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractWikiModelParser#getImageParser()
      */
     @Override
@@ -81,6 +82,7 @@ public class WikiModelXWikiParser extends AbstractWikiModelParser
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractWikiModelParser#getLinkParser()
      */
     @Override

@@ -1,4 +1,4 @@
-org.xwiki.rendering.internal.parser.WikiModelXWikiParser
+org.xwiki.rendering.internal.parser.WikiModelXWiki20Parser
 org.xwiki.rendering.internal.parser.WikiModelMediaWikiParser
 org.xwiki.rendering.internal.parser.WikiModelCreoleParser
 org.xwiki.rendering.internal.parser.WikiModelJspWikiParser

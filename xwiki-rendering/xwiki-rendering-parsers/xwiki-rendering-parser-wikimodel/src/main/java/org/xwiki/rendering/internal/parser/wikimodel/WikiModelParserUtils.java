@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
-import org.xwiki.rendering.internal.parser.WikiModelXWikiParser;
+import org.xwiki.rendering.internal.parser.WikiModelXWiki20Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.util.ParserUtils;
@@ -29,7 +29,7 @@ public class WikiModelParserUtils extends ParserUtils
         // generate an inline macro and not a standalone one. To force this we're explicitely adding
         // a paragraph and a word as the first content of the string to be parsed and we're removing it
         // afterwards.
-        if (WikiModelXWikiParser.class.isAssignableFrom(parser.getClass())) {
+        if (WikiModelXWiki20Parser.class.isAssignableFrom(parser.getClass())) {
             result = parser.parse(new StringReader("xwikimarker " + content)).getChildren();
         } else if (WikiModelXHTMLParser.class.isAssignableFrom(parser.getClass())) {
             // If the content is already inside a paragraph then simply add the "xwikimarker" prefix since
@@ -51,7 +51,7 @@ public class WikiModelParserUtils extends ParserUtils
         removeTopLevelParagraph(result);
 
         // Remove our marker which is always the first 2 blocks (onWord("xwikimarker") + onSpace)
-        if (WikiModelXWikiParser.class.isAssignableFrom(parser.getClass())
+        if (WikiModelXWiki20Parser.class.isAssignableFrom(parser.getClass())
             || (WikiModelXHTMLParser.class.isAssignableFrom(parser.getClass()))) {
             result.remove(0);
             result.remove(0);

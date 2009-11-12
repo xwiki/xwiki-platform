@@ -98,8 +98,6 @@ public class XDOMGeneratorListener implements IWemListener
 
     private ImageParser imageParser;
 
-    private Stack<Integer> currentSectionLevel = new Stack<Integer>();
-
     private int documentLevel = 0;
 
     private IdGenerator idGenerator = new IdGenerator();
@@ -111,10 +109,11 @@ public class XDOMGeneratorListener implements IWemListener
 
     private static class MarkerBlock extends AbstractBlock
     {
-    	/**
-    	 * {@inheritDoc}
-    	 * @see AbstractBlock#traverse(Listener)
-    	 */
+        /**
+         * {@inheritDoc}
+         * 
+         * @see AbstractBlock#traverse(Listener)
+         */
         public void traverse(Listener listener)
         {
             // Nothing to do since this block is only used as a marker.
@@ -185,7 +184,6 @@ public class XDOMGeneratorListener implements IWemListener
         if (this.documentLevel > 0) {
             this.stack.push(this.marker);
         }
-        this.currentSectionLevel.push(0);
 
         ++this.documentLevel;
     }
@@ -201,35 +199,43 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * {@inheritDoc}
      * 
+     * @see org.wikimodel.wem.IWemListener#beginSection(int, int, WikiParameters)
+     */
+    public void beginSection(int docLevel, int headerLevel, WikiParameters params)
+    {
+        if (headerLevel > 0) {
+            this.stack.push(this.marker);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.wikimodel.wem.IWemListener#beginSectionContent(int, int, WikiParameters)
+     */
+    public void beginSectionContent(int docLevel, int headerLevel, WikiParameters params)
+    {
+        // TODO add support for it
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.wikimodel.wem.IWemListener#beginHeader(int, WikiParameters)
      */
     public void beginHeader(int level, WikiParameters params)
     {
-        int sectionLevel = this.currentSectionLevel.peek();
-
-        // Close sections
-        for (; sectionLevel >= level; --sectionLevel) {
-            this.stack.push(new SectionBlock(generateListFromStack()));
-        }
-
-        // Open sections
-        for (; sectionLevel < level; ++sectionLevel) {
-            this.stack.push(this.marker);
-        }
-
-        this.currentSectionLevel.set(this.currentSectionLevel.size() - 1, sectionLevel);
-
-        // Push header
         this.stack.push(this.marker);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#beginInfoBlock(String, WikiParameters)
      */
     public void beginInfoBlock(String infoType, WikiParameters params)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -264,20 +270,22 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#beginPropertyBlock(String, boolean)
      */
     public void beginPropertyBlock(String propertyUri, boolean doc)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#beginPropertyInline(String)
      */
     public void beginPropertyInline(String str)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -373,14 +381,8 @@ public class XDOMGeneratorListener implements IWemListener
     public void endDocument(WikiParameters params)
     {
         // Close sections
-        int sectionLevel = this.currentSectionLevel.peek();
-        for (; sectionLevel > 0; --sectionLevel) {
-            this.stack.push(new SectionBlock(generateListFromStack()));
-        }
-
         --this.documentLevel;
 
-        this.currentSectionLevel.pop();
         if (this.documentLevel > 0) {
             this.stack.push(new GroupBlock(generateListFromStack(), convertParameters(params)));
         }
@@ -498,11 +500,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#endInfoBlock(String, WikiParameters)
      */
     public void endInfoBlock(String infoType, WikiParameters params)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -544,20 +547,22 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#endPropertyBlock(String, boolean)
      */
     public void endPropertyBlock(String propertyUri, boolean doc)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#endPropertyInline(String)
      */
     public void endPropertyInline(String inlineProperty)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -646,20 +651,22 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#onExtensionBlock(String, WikiParameters)
      */
     public void onExtensionBlock(String extensionName, WikiParameters params)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#onExtensionInline(String, WikiParameters)
      */
     public void onExtensionInline(String extensionName, WikiParameters params)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -810,11 +817,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
+     * 
      * @see IWemListener#onTableCaption(String)
      */
     public void onTableCaption(String str)
     {
-    	// Not used by XWiki Syntax 2.0
+        // Not used by XWiki Syntax 2.0
     }
 
     /**
@@ -953,31 +961,13 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * {@inheritDoc}
      * 
-     * @see org.wikimodel.wem.IWemListener#beginSection(int, int, WikiParameters)
-     */
-    public void beginSection(int docLevel, int headerLevel, WikiParameters params)
-    {
-        // TODO add support for it
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.wikimodel.wem.IWemListener#beginSectionContent(int, int, WikiParameters)
-     */
-    public void beginSectionContent(int docLevel, int headerLevel, WikiParameters params)
-    {
-        // TODO add support for it
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.wikimodel.wem.IWemListener#endSection(int, int, WikiParameters)
      */
     public void endSection(int docLevel, int headerLevel, WikiParameters params)
     {
-        // TODO add support for it
+        if (headerLevel > 0) {
+            this.stack.push(new SectionBlock(generateListFromStack()));
+        }
     }
 
     /**

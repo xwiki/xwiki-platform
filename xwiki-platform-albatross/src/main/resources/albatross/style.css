@@ -163,7 +163,7 @@ div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutconta
 		;
 }
 
-#xwikicontent .panellayoutcol .expanded h5.xwikipaneltitle:hover,#xwikicontent .panellayoutcol .collapsed h5.xwikipaneltitle:hover
+#xwikicontent .panellayoutcol .expanded h1.xwikipaneltitle:hover,#xwikicontent .panellayoutcol .collapsed h1.xwikipaneltitle:hover
 	{
 	color: #fff;
 }

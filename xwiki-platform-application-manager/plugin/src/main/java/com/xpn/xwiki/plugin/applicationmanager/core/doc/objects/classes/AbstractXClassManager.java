@@ -35,6 +35,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Abstract implementation of XClassManager.
@@ -406,6 +407,8 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
                 doc.setSpace(getClassSpace());
                 doc.setName(getClassName());
                 doc.setParent(DEFAULT_XWIKICLASS_PARENT);
+                doc.setCreator(XWikiRightService.SUPERADMIN_USER);
+                doc.setAuthor(doc.getCreator());
                 needsUpdate = true;
             }
 

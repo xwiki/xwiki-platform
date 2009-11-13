@@ -3,6 +3,8 @@
 .# Verify behavior when a macro fails to execute
 .#-------------------------------------------------------------------------------------
 Execution {{testfailingmacro/}} error
+
+{{testfailingmacro/}}
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
@@ -21,20 +23,30 @@ endMacroMarkerInline [testfailingmacro] []
 onSpace
 onWord [error]
 endParagraph
+beginMacroMarkerStandalone [testfailingmacro] []
+beginGroup [[class]=[xwikirenderingerror]]
+onWord [Failed to execute macro: testfailingmacro]
+endGroup [[class]=[xwikirenderingerror]]
+beginGroup [[class]=[xwikirenderingerrordescription hidden]]
+onVerbatim [stack trace here] [false]
+endGroup [[class]=[xwikirenderingerrordescription hidden]]
+endMacroMarkerStandalone [testfailingmacro] []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>Execution <span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span> error</p>
+<p>Execution <span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span> error</p><div class="xwikirenderingerror">Failed to execute macro: testfailingmacro</div><div class="xwikirenderingerrordescription hidden"><pre>stack trace here</pre></div>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p>
+<p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p><!--startmacro:testfailingmacro|-|--><div class="xwikirenderingerror">Failed to execute macro: testfailingmacro</div><div class="xwikirenderingerrordescription hidden"><pre>stack trace here</pre></div><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
 Execution {{testfailingmacro/}} error
+
+{{testfailingmacro/}}
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p>
+<p>Execution <!--startmacro:testfailingmacro|-|--><span class="xwikirenderingerror">Failed to execute macro: testfailingmacro</span><span class="xwikirenderingerrordescription hidden"><tt class="wikimodel-verbatim">stack trace here</tt></span><!--stopmacro--> error</p><!--startmacro:testfailingmacro|-|--><div class="xwikirenderingerror">Failed to execute macro: testfailingmacro</div><div class="xwikirenderingerrordescription hidden"><pre>stack trace here</pre></div><!--stopmacro-->

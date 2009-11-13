@@ -46,6 +46,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macrocode7", true);
         suite.addTestsFromResource("macrocode8", true);
         suite.addTestsFromResource("macrocode9", true);
+        suite.addTestsFromResource("macrocode10", true);
 
         return new ComponentManagerTestSetup(suite);
     }

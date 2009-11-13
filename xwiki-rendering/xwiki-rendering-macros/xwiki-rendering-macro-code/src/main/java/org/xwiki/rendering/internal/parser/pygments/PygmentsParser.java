@@ -78,17 +78,25 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
     private static final String PY_CODE_VARNAME = "code";
 
     /**
+     * Try part of the lexer initialization.
+     */
+    private static final String PY_LEXER_TRY = PY_LEXER_VARNAME + " = None\ntry:\n" + "  " + PY_LEXER_VARNAME;
+
+    /**
+     * Catch part of the lexer initialization.
+     */
+    private static final String PY_LEXER_CATCH = "\nexcept ClassNotFound:\n  pass";
+
+    /**
      * Python code to create the lexer.
      */
     private static final String PY_LEXER_CREATE =
-        PY_LEXER_VARNAME + " = pygments.lexers.get_lexer_by_name(\"{0}\", stripall=True)";
+            PY_LEXER_TRY + " = pygments.lexers.get_lexer_by_name(\"{0}\", stripall=True)" + PY_LEXER_CATCH;
 
     /**
      * Python code to find the lexer from source.
      */
-    private static final String PY_LEXER_FIND =
-        PY_LEXER_VARNAME + " = None\n" + "try:\n" + "  " + PY_LEXER_VARNAME + " = guess_lexer(code, stripall=True)\n"
-            + "except ClassNotFound:\n" + "  pass";
+    private static final String PY_LEXER_FIND = PY_LEXER_TRY + " = guess_lexer(code, stripall=True)" + PY_LEXER_CATCH;
 
     /**
      * The syntax identifier.
@@ -119,11 +127,8 @@ public class PygmentsParser extends AbstractHighlightParser implements Initializ
         this.pythonInterpreter = new PythonInterpreter();
 
         // imports Pygments
-        this.pythonInterpreter.exec("import pygments");
-
-        this.pythonInterpreter.exec("from pygments.lexers import guess_lexer");
-        this.pythonInterpreter.exec("from pygments.util import ClassNotFound");
-        this.pythonInterpreter.exec("from pygments.formatters.xdom import XDOMFormatter");
+        this.pythonInterpreter.exec("import pygments" + "\nfrom pygments.lexers import guess_lexer"
+            + "\nfrom pygments.util import ClassNotFound" + "\nfrom pygments.formatters.xdom import XDOMFormatter");
     }
 
     /**

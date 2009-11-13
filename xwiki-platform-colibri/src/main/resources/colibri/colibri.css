@@ -4407,11 +4407,4 @@ fieldset.xwikimessage legend, div.xwikimessage h3 {
   color: $theme.titleColor;
   background: $theme.backgroundSecondaryColor; /* For Opera */
 }
-
-/* Style used to improve Accessibility but for elements that shouldn't be displayed visually.
-   For example for the label of an input field when in a compact form where the input label is
-   displayed inside the text field. */
-.accessibility {
-  display: none
-}  
  

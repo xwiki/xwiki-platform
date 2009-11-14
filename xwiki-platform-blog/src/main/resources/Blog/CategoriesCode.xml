@@ -292,7 +292,7 @@
  *###
 #macro(displaySimpleCategory $name $level)
   #getEntriesForCategory($name $discard $totalEntries)
-  #foreach($i in [1..$level])*#end &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini.png')" alt="RSS"/&gt;&lt;/a&gt; &lt;a href="$xwiki.getURL($name)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemcount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;
+  #foreach($i in [1..$level])*#end &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini.png')" alt="RSS"/&gt;&lt;/a&gt; &lt;a href="$xwiki.getURL($name)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;
 #end
 ##
 ##

@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -96,16 +96,24 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     private CurrentPageImageSelectorWizardStep pageWizardStep;
 
     /**
+     * The service used to access the wiki.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
      * Builds an image explorer with the default selection on the passed resource.
      * 
      * @param editedResource the resource edited by the wizard in which this wizard step appears (the page currently
      *            edited with the wysiwyg)
      * @param displayWikiSelector whether this explorer should show the selector to choose an image from a different
      *            wiki or not
+     * @param wikiService the service used to access the wiki
      */
-    public ImagesExplorerWizardStep(ResourceName editedResource, boolean displayWikiSelector)
+    public ImagesExplorerWizardStep(ResourceName editedResource, boolean displayWikiSelector,
+        WikiServiceAsync wikiService)
     {
         this.editedResource = editedResource;
+        this.wikiService = wikiService;
 
         Label helpLabel = new Label(Strings.INSTANCE.imageSelectImageLocationHelpLabel());
         helpLabel.addStyleName("xHelpLabel");
@@ -115,6 +123,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         this.displayWikiSelector = displayWikiSelector;
         mainPanel.add(getSelectorsPanel(editedResource.getWiki(), editedResource.getSpace()));
         pageWizardStep = new CurrentPageImageSelectorWizardStep(editedResource);
+        pageWizardStep.setWikiService(wikiService);
         mainPanel.add(pageWizardStep.display());
         mainPanel.setExpandingWidget(pageWizardStep.display(), true);
     }
@@ -129,8 +138,11 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
         // create selectors for the page to get images from
         FlowPanel selectorsPanel = new FlowPanel();
         wikiSelector = new WikiSelector();
+        wikiSelector.setWikiService(wikiService);
         spaceSelector = new SpaceSelector(currentWiki);
+        spaceSelector.setWikiService(wikiService);
         pageSelector = new PageSelector(currentWiki, currentSpace);
+        pageSelector.setWikiService(wikiService);
 
         // hide this selector by default, until we get to update it from the server
         wikiSelector.setVisible(false);
@@ -170,7 +182,7 @@ public class ImagesExplorerWizardStep extends AbstractSelectorWizardStep<ImageCo
     public void setSelection(final String wiki, final String space, final String page, final String fileName,
         final boolean forceRefresh, final AsyncCallback< ? > cb)
     {
-        WysiwygService.Singleton.getInstance().isMultiWiki(new AsyncCallback<Boolean>()
+        wikiService.isMultiWiki(new AsyncCallback<Boolean>()
         {
             public void onFailure(Throwable caught)
             {

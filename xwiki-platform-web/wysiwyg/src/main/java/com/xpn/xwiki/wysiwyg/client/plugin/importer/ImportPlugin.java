@@ -25,6 +25,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ui.ImportWizard.ImportWizardStep;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
@@ -52,14 +53,21 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener
     private final ImportServiceAsync importService;
 
     /**
+     * The service used to access the import attachments.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
      * Creates a new import plug-in that used the given import service.
      * 
      * @param importService the component used to clean content pasted from office documents and to import office
      *            documents
+     * @param wikiService the component used to access the import attachments
      */
-    public ImportPlugin(ImportServiceAsync importService)
+    public ImportPlugin(ImportServiceAsync importService, WikiServiceAsync wikiService)
     {
         this.importService = importService;
+        this.wikiService = wikiService;
     }
 
     /**
@@ -122,7 +130,7 @@ public class ImportPlugin extends AbstractPlugin implements WizardListener
     private Wizard getImportWizard()
     {
         if (null == importWizard) {
-            importWizard = new ImportWizard(getConfig(), importService);
+            importWizard = new ImportWizard(getConfig(), importService, wikiService);
             importWizard.addWizardListener(this);
         }
         return importWizard;

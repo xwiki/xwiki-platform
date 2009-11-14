@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import org.xwiki.gwt.user.client.StringUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
@@ -40,6 +40,11 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
      * The resource edited currently (the wiki page for which this wysiwyg is instantiated).
      */
     private ResourceName editedResource;
+
+    /**
+     * The service used to crate page links.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Creates a wiki page selection wizard step with the specified default selection. The selection will be used to
@@ -130,9 +135,8 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
             }
             // build the link url and reference from the parameters.
             // FIXME: move the reference setting logic in a controller, along with the async fetching
-            WysiwygService.Singleton.getInstance().getPageLink(getExplorer().getSelectedWiki(),
-                getExplorer().getSelectedSpace(), getExplorer().getSelectedPage(), null, null,
-                new AsyncCallback<LinkConfig>()
+            wikiService.getPageLink(getExplorer().getSelectedWiki(), getExplorer().getSelectedSpace(),
+                getExplorer().getSelectedPage(), null, null, new AsyncCallback<LinkConfig>()
                 {
                     public void onSuccess(LinkConfig result)
                     {
@@ -169,5 +173,15 @@ public class WikiPageExplorerWizardStep extends AbstractExplorerWizardStep
     protected String getHelpLabelText()
     {
         return Strings.INSTANCE.linkSelectWikipageHelpLabel();
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to create page links
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

@@ -19,6 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.link;
 
+import com.google.gwt.core.client.GWT;
+import com.xpn.xwiki.wysiwyg.client.WikiService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsyncCacheProxy;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
@@ -33,6 +37,12 @@ public final class LinkPluginFactory extends AbstractPluginFactory
      * The singleton factory instance.
      */
     private static LinkPluginFactory instance;
+
+    /**
+     * The service used to access the wiki.
+     */
+    private final WikiServiceAsync wikiService =
+        new WikiServiceAsyncCacheProxy((WikiServiceAsync) GWT.create(WikiService.class));
 
     /**
      * Default constructor.
@@ -60,6 +70,6 @@ public final class LinkPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return new LinkPlugin();
+        return new LinkPlugin(wikiService);
     }
 }

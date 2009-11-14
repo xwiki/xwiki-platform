@@ -40,7 +40,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
@@ -88,6 +88,11 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
      * default buttons in this wizard step, by firing next event whenever enter key is hit in the step form.
      */
     private final NavigationListenerCollection listeners = new NavigationListenerCollection();
+
+    /**
+     * The service used to create a link to a wiki page.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Creates a new wizard step for the passed edited resource.
@@ -203,8 +208,8 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
         } else {
             // call the server to get the page URL and reference
             // FIXME: move the reference setting logic in a controller, along with the async fetching logic
-            WysiwygService.Singleton.getInstance().getPageLink(linkData.getWiki(), linkData.getSpace(), newPageName,
-                null, null, new AsyncCallback<LinkConfig>()
+            wikiService.getPageLink(linkData.getWiki(), linkData.getSpace(), newPageName, null, null,
+                new AsyncCallback<LinkConfig>()
                 {
                     public void onSuccess(LinkConfig result)
                     {
@@ -281,5 +286,15 @@ public class CreateNewPageWizardStep implements WizardStep, KeyPressHandler, Sou
     public NavigationDirection getDefaultDirection()
     {
         return NavigationDirection.NEXT;
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to create links to wiki pages
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

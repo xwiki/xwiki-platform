@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 
 /**
@@ -33,6 +33,11 @@ import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
  */
 public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWizardStep
 {
+    /**
+     * The service used to retrieve the list of recently modified pages.
+     */
+    private WikiServiceAsync wikiService;
+
     /**
      * Builds a page list selector wizard step for the currently edited resource.
      * 
@@ -50,6 +55,16 @@ public class RecentChangesSelectorWizardStep extends AbstractPageListSelectorWiz
     @Override
     protected void fetchData(AsyncCallback<List<Document>> callback)
     {
-        WysiwygService.Singleton.getInstance().getRecentlyModifiedPages(0, 20, callback);
+        wikiService.getRecentlyModifiedPages(0, 20, callback);
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the list of recently modified pages
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

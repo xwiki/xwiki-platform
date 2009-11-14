@@ -21,67 +21,65 @@ package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.xwiki.component.annotation.ComponentRole;
+
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
- * Service interface used on the client. It should have all the methods from {@link WysiwygService} with an additional
- * {@link AsyncCallback} parameter. This is specific to GWT's architecture.
+ * The service interface used on the server.
+ * <p>
+ * NOTE: This component interface should be split in multiple domain specific interfaces. Don't add any more methods!
  * 
  * @version $Id$
  */
-public interface WysiwygServiceAsync
+@ComponentRole
+@RemoteServiceRelativePath("WikiService.gwtrpc")
+public interface WikiService extends RemoteService
 {
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).
      * 
-     * @param async object used for asynchronous communication between server and client
+     * @return true if the current wiki is a multiwiki, and false in the other case
      */
-    void isMultiWiki(AsyncCallback<Boolean> async);
+    Boolean isMultiWiki();
 
     /**
-     * Returns a list containing the names of all wikis.
-     * 
-     * @param async async object used for asynchronous communication between server and client
+     * @return a list containing the names of all wikis.
      */
-    void getVirtualWikiNames(AsyncCallback<List<String>> async);
+    List<String> getVirtualWikiNames();
 
     /**
-     * Returns a list of all spaces names in the specified wiki.
-     * 
      * @param wikiName the name of the wiki to search for spaces. If this is <code>null</code>, the current wiki will be
      *            used.
-     * @param async object used for asynchronous communication between server and client
+     * @return a list of all spaces names in the specified wiki.
      */
-    void getSpaceNames(String wikiName, AsyncCallback<List<String>> async);
+    List<String> getSpaceNames(String wikiName);
 
     /**
-     * Returns the list of the page names from a given space and a given wiki.
-     * 
      * @param wikiName the name of the wiki. Pass <code>null</code> if this should use the current wiki.
      * @param spaceName the name of the space
-     * @param async object used for asynchronous communication between server and client
+     * @return the list of the page names from a given space and a given wiki.
      */
-    void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async);
+    List<String> getPageNames(String wikiName, String spaceName);
 
     /**
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
-     * @param async object used for asynchronous communication between server and client, to return on success the
-     *            recently {@code count} modified pages of the current user, starting from position {@code start}
+     * @return the recently {@code count} modified pages of the current user, starting from position {@code start}
      */
-    void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async);
+    List<Document> getRecentlyModifiedPages(int start, int count);
 
     /**
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param keyword the keyword to search the pages for
-     * @param async object used for asynchronous communication between server and client, to return on success the
-     *            {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
+     * @return the {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
      */
-    void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<Document>> async);
+    List<Document> getMatchingPages(String keyword, int start, int count);
 
     /**
      * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
@@ -94,10 +92,9 @@ public interface WysiwygServiceAsync
      * @param revision the value for the page revision to which to link to. If this is missing, the link is made to the
      *            latest revision, the default view action for the document.
      * @param anchor the name of the anchor type.
-     * @param async object used for asynchronous communication between server and client.
+     * @return the data of the link to the document, containing link url and link reference information.
      */
-    void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
-        AsyncCallback<LinkConfig> async);
+    LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor);
 
     /**
      * Returns attachment information from the passed parameters, testing if the passed attachment exists. Note that the
@@ -109,12 +106,10 @@ public interface WysiwygServiceAsync
      * @param spaceName the name of the space of the page the file is attached to
      * @param pageName the name of the page the file is attached to
      * @param attachmentName the uncleaned name of the attachment, which is to be cleaned on the server
-     * @param async object used for asynchronous communication between server and client, to return, on success, an
-     *            {@link Attachment} containing the reference and the URL of the attachment, or {@code null} in case the
-     *            attachment was not found
+     * @return an {@link Attachment} containing the reference and the URL of the attachment, or {@code null} in case the
+     *         attachment was not found
      */
-    void getAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
-        AsyncCallback<Attachment> async);
+    Attachment getAttachment(String wikiName, String spaceName, String pageName, String attachmentName);
 
     /**
      * Returns all the image attachments from the referred page.
@@ -122,9 +117,9 @@ public interface WysiwygServiceAsync
      * @param wikiName the name of the wiki to get images from
      * @param spaceName the name of the space to get image attachments from
      * @param pageName the name of the page to get image attachments from
-     * @param async object used for asynchronous communication between server and client.
+     * @return list of the image attachments
      */
-    void getImageAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
+    List<Attachment> getImageAttachments(String wikiName, String spaceName, String pageName);
 
     /**
      * Returns all the attachments from the referred page.
@@ -132,7 +127,7 @@ public interface WysiwygServiceAsync
      * @param wikiName the name of the wiki to get attachments from
      * @param spaceName the name of the space to get attachments from
      * @param pageName the name of the page to get attachments from
-     * @param async object used for asynchronous communication between server and client.
+     * @return list of the attachments
      */
-    void getAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
+    List<Attachment> getAttachments(String wikiName, String spaceName, String pageName);
 }

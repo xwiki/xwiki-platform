@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -37,6 +38,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorAggregato
  */
 public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<LinkConfig>
 {
+    /**
+     * The service used to access the wiki.
+     */
+    private WikiServiceAsync wikiService;
+
     /**
      * Builds a page selector step for the currently edited resource.
      * 
@@ -67,13 +73,19 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     protected WizardStep getStepInstance(String name)
     {
         if (name.equals(Strings.INSTANCE.selectorSelectFromRecentPages())) {
-            return new RecentChangesSelectorWizardStep(getEditedResource());
+            RecentChangesSelectorWizardStep step = new RecentChangesSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
         if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            return new WikiPageExplorerWizardStep(getEditedResource());
+            WikiPageExplorerWizardStep step = new WikiPageExplorerWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
         if (name.equals(Strings.INSTANCE.selectorSelectFromSearchPages())) {
-            return new SearchSelectorWizardStep(getEditedResource());
+            SearchSelectorWizardStep step = new SearchSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
         return null;
     }
@@ -94,5 +106,15 @@ public class PageSelectorWizardStep extends AbstractSelectorAggregatorWizardStep
     public String getStepTitle()
     {
         return Strings.INSTANCE.linkSelectWikipageTitle();
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to access the wiki
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

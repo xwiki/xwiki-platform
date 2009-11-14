@@ -27,18 +27,18 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
- * Cache proxy for {@link WysiwygServiceAsync}. This proxy is used to store on the client a set of values from the
+ * Cache proxy for {@link WikiServiceAsync}. This proxy is used to store on the client a set of values from the
  * server that cannot change without server restart, therefore without the reload of the page that holds the reference
- * to the {@link WysiwygService}.
+ * to the {@link WikiService}.
  * 
  * @version $Id$
  */
-public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
+public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
 {
     /**
      * The cached service.
      */
-    private final WysiwygServiceAsync service;
+    private final WikiServiceAsync service;
 
     /**
      * Caches the multiwiki property for this wiki.
@@ -55,7 +55,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
      * 
      * @param service the service to be cached.
      */
-    public WysiwygServiceAsyncCacheProxy(WysiwygServiceAsync service)
+    public WikiServiceAsyncCacheProxy(WikiServiceAsync service)
     {
         this.service = service;
     }
@@ -63,7 +63,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getPageNames(String, String, AsyncCallback)
+     * @see WikiServiceAsync#getPageNames(String, String, AsyncCallback)
      */
     public void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async)
     {
@@ -89,7 +89,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getSpaceNames(String, AsyncCallback)
+     * @see WikiServiceAsync#getSpaceNames(String, AsyncCallback)
      */
     public void getSpaceNames(String wikiName, AsyncCallback<List<String>> async)
     {
@@ -99,7 +99,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getVirtualWikiNames(AsyncCallback)
+     * @see WikiServiceAsync#getVirtualWikiNames(AsyncCallback)
      */
     public void getVirtualWikiNames(final AsyncCallback<List<String>> async)
     {
@@ -125,7 +125,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#isMultiWiki(AsyncCallback)
+     * @see WikiServiceAsync#isMultiWiki(AsyncCallback)
      */
     public void isMultiWiki(final AsyncCallback<Boolean> async)
     {
@@ -151,7 +151,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getPageLink(String, String, String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getPageLink(String, String, String, String, String, AsyncCallback)
      */
     public void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
         AsyncCallback<LinkConfig> async)
@@ -162,7 +162,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getAttachment(String, String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getAttachment(String, String, String, String, AsyncCallback)
      */
     public void getAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
         AsyncCallback<Attachment> async)
@@ -173,7 +173,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getImageAttachments(String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getImageAttachments(String, String, String, AsyncCallback)
      */
     public void getImageAttachments(String wikiName, String spaceName, String pageName,
         AsyncCallback<List<Attachment>> async)
@@ -184,7 +184,7 @@ public class WysiwygServiceAsyncCacheProxy implements WysiwygServiceAsync
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygServiceAsync#getAttachments(String, String, String, AsyncCallback)
+     * @see WikiServiceAsync#getAttachments(String, String, String, AsyncCallback)
      */
     public void getAttachments(String wikiName, String spaceName, String pageName,
         AsyncCallback<List<Attachment>> async)

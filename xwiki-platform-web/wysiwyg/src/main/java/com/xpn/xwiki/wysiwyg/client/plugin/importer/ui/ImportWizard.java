@@ -28,6 +28,7 @@ import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.importer.ImportServiceAsync;
@@ -75,17 +76,24 @@ public class ImportWizard extends Wizard implements WizardStepProvider
     private final ImportServiceAsync importService;
 
     /**
+     * The service used to access the import attachments.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
      * Instantiates the import wizard.
      * 
      * @param config the object used to configure this wizard
      * @param importService the component used to clean content pasted from office documents and to import office
      *            documents
+     * @param wikiService the service used to access the import attachments
      */
-    public ImportWizard(Config config, ImportServiceAsync importService)
+    public ImportWizard(Config config, ImportServiceAsync importService, WikiServiceAsync wikiService)
     {
         super(Strings.INSTANCE.importWizardTitle(), Images.INSTANCE.importWizardIcon().createImage());
         this.config = config;
         this.importService = importService;
+        this.wikiService = wikiService;
         this.setProvider(this);
     }
 
@@ -100,6 +108,7 @@ public class ImportWizard extends Wizard implements WizardStepProvider
             switch (requestedStep) {
                 case OFFICE_FILE:
                     step = new ImportOfficeFileWizardStep(config, importService);
+                    ((ImportOfficeFileWizardStep) step).setWikiService(wikiService);
                     break;
                 case OFFICE_PASTE:
                     step = new ImportOfficePasteWizardStep(importService);

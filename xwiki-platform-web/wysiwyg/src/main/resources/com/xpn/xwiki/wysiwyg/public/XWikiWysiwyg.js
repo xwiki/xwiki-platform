@@ -11,13 +11,6 @@
 var Wysiwyg =
 {
     /**
-     * This is the entry pointy for the new WYSIWYG's GWT services.
-     *
-     * @see web.xml
-     */
-    wysiwygServiceURL: '${request.contextPath}/WysiwygService',
-
-    /**
      * Indicates the state of the WYSIWYG GWT module. Possible values are: 0 (uninitialized), 1 (loading), 2 (loaded).
      */
     readyState: 0,

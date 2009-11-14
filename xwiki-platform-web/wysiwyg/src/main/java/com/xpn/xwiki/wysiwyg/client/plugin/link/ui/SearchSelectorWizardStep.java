@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
 
@@ -66,6 +66,11 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
      * The search text box.
      */
     private TextBox searchBox;
+
+    /**
+     * The service used to search wiki pages.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Builds a search selector wizard step for the passed edited resource.
@@ -126,7 +131,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
     @Override
     protected void fetchData(AsyncCallback<List<Document>> callback)
     {
-        WysiwygService.Singleton.getInstance().getMatchingPages(getKeyword(), 0, 20, callback);
+        wikiService.getMatchingPages(getKeyword(), 0, 20, callback);
     }
 
     /**
@@ -172,5 +177,15 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
         } else {
             super.setActive();
         }
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to search wiki pages
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

@@ -27,6 +27,7 @@ import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -59,18 +60,25 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     /**
      * The resource currently edited by this WYSIWYG, used to determine the context in which link creation takes place.
      */
-    private Config config;
+    private final Config config;
+
+    /**
+     * The service used to access the wiki.
+     */
+    private final WikiServiceAsync wikiService;
 
     /**
      * Builds a {@link LinkWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
      * specific information for this wizard, such as the current page, etc.
      * 
      * @param config the context configuration for this {@link LinkWizard}
+     * @param wikiService the service used to access the wiki
      */
-    public LinkWizard(Config config)
+    public LinkWizard(Config config, WikiServiceAsync wikiService)
     {
         super(Strings.INSTANCE.link(), Images.INSTANCE.link().createImage());
         this.config = config;
+        this.wikiService = wikiService;
         this.setProvider(this);
     }
 
@@ -90,15 +98,18 @@ public class LinkWizard extends Wizard implements WizardStepProvider
                     break;
                 case WIKI_PAGE:
                     step = new PageSelectorWizardStep(getEditedResource());
+                    ((PageSelectorWizardStep) step).setWikiService(wikiService);
                     break;
                 case WIKI_PAGE_CREATOR:
                     step = new CreateNewPageWizardStep(getEditedResource());
+                    ((CreateNewPageWizardStep) step).setWikiService(wikiService);
                     break;
                 case ATTACHMENT:
                     step = dispatchAttachmentSelectorStep();
                     break;
                 case ATTACHMENT_UPLOAD:
                     step = new AttachmentUploadWizardStep(getEditedResource());
+                    ((AttachmentUploadWizardStep) step).setWikiService(wikiService);
                     break;
                 case WIKI_PAGE_CONFIG:
                     step = new LinkConfigWizardStep();
@@ -137,9 +148,14 @@ public class LinkWizard extends Wizard implements WizardStepProvider
     {
         String linkFiles = config.getParameter("linkfiles");
         if ("currentpage".equals(linkFiles)) {
-            return new CurrentPageAttachmentSelectorWizardStep(getEditedResource()); 
+            CurrentPageAttachmentSelectorWizardStep step =
+                new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         } else {
-            return new AttachmentSelectorWizardStep(getEditedResource());
+            AttachmentSelectorWizardStep step = new AttachmentSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
     }
 

@@ -111,8 +111,9 @@ public class XWikiContextInitializationFilter implements Filter
         try {
             // Create the XWiki context.
             context = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);
-            // Initialize the XWiki database. The following method calls context.setWiki(XWiki).
-            XWiki.getXWiki(context);
+            // Initialize the XWiki database. XWiki#getXWiki(XWikiContext) calls XWikiContext.setWiki(XWiki).
+            context.setURLFactory(XWiki.getXWiki(context).getURLFactoryService().createURLFactory(context.getMode(),
+                context));
         } catch (XWikiException e) {
             throw new ServletException("Failed to prepare the XWiki context.", e);
         }

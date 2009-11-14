@@ -20,107 +20,68 @@
 package com.xpn.xwiki.wysiwyg.client;
 
 import java.util.List;
-import java.util.MissingResourceException;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.Dictionary;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
- * The service interface used on the server.
+ * Service interface used on the client. It should have all the methods from {@link WikiService} with an additional
+ * {@link AsyncCallback} parameter. This is specific to GWT's architecture.
  * 
  * @version $Id$
  */
-public interface WysiwygService extends RemoteService
+public interface WikiServiceAsync
 {
-    /**
-     * Utility class for accessing the service stub.
-     */
-    public static final class Singleton
-    {
-        /**
-         * The service stub.
-         */
-        private static WysiwygServiceAsync instance;
-
-        /**
-         * Private constructor because this is a utility class.
-         */
-        private Singleton()
-        {
-        }
-
-        /**
-         * @return The service stub.
-         */
-        public static synchronized WysiwygServiceAsync getInstance()
-        {
-            if (instance == null) {
-                String serviceURL;
-                try {
-                    // Look in the global configuration object.
-                    serviceURL = Dictionary.getDictionary("Wysiwyg").get("wysiwygServiceURL");
-                } catch (MissingResourceException e) {
-                    serviceURL = "/WysiwygService";
-                }
-
-                instance = GWT.create(WysiwygService.class);
-                ((ServiceDefTarget) instance).setServiceEntryPoint(serviceURL);
-
-                // We cache the service calls.
-                instance = new WysiwygServiceAsyncCacheProxy(instance);
-            }
-            return instance;
-        }
-    }
-
     /**
      * Check if the current wiki is part of a multiwiki (i.e. this is a virtual wiki).
      * 
-     * @return true if the current wiki is a multiwiki, and false in the other case
+     * @param async object used for asynchronous communication between server and client
      */
-    Boolean isMultiWiki();
+    void isMultiWiki(AsyncCallback<Boolean> async);
 
     /**
-     * @return a list containing the names of all wikis.
+     * Returns a list containing the names of all wikis.
+     * 
+     * @param async async object used for asynchronous communication between server and client
      */
-    List<String> getVirtualWikiNames();
+    void getVirtualWikiNames(AsyncCallback<List<String>> async);
 
     /**
+     * Returns a list of all spaces names in the specified wiki.
+     * 
      * @param wikiName the name of the wiki to search for spaces. If this is <code>null</code>, the current wiki will be
      *            used.
-     * @return a list of all spaces names in the specified wiki.
+     * @param async object used for asynchronous communication between server and client
      */
-    List<String> getSpaceNames(String wikiName);
+    void getSpaceNames(String wikiName, AsyncCallback<List<String>> async);
 
     /**
+     * Returns the list of the page names from a given space and a given wiki.
+     * 
      * @param wikiName the name of the wiki. Pass <code>null</code> if this should use the current wiki.
      * @param spaceName the name of the space
-     * @return the list of the page names from a given space and a given wiki.
+     * @param async object used for asynchronous communication between server and client
      */
-    List<String> getPageNames(String wikiName, String spaceName);
+    void getPageNames(String wikiName, String spaceName, AsyncCallback<List<String>> async);
 
     /**
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
-     * @return the recently {@code count} modified pages of the current user, starting from position {@code start}
-     * @throws XWikiGWTException if something goes wrong on the server
+     * @param async object used for asynchronous communication between server and client, to return on success the
+     *            recently {@code count} modified pages of the current user, starting from position {@code start}
      */
-    List<Document> getRecentlyModifiedPages(int start, int count) throws XWikiGWTException;
+    void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async);
 
     /**
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param keyword the keyword to search the pages for
-     * @return the {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
-     * @throws XWikiGWTException if something goes wrong on the server
+     * @param async object used for asynchronous communication between server and client, to return on success the
+     *            {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
      */
-    List<Document> getMatchingPages(String keyword, int start, int count) throws XWikiGWTException;
+    void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<Document>> async);
 
     /**
      * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
@@ -133,9 +94,10 @@ public interface WysiwygService extends RemoteService
      * @param revision the value for the page revision to which to link to. If this is missing, the link is made to the
      *            latest revision, the default view action for the document.
      * @param anchor the name of the anchor type.
-     * @return the data of the link to the document, containing link url and link reference information.
+     * @param async object used for asynchronous communication between server and client.
      */
-    LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor);
+    void getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor,
+        AsyncCallback<LinkConfig> async);
 
     /**
      * Returns attachment information from the passed parameters, testing if the passed attachment exists. Note that the
@@ -147,10 +109,12 @@ public interface WysiwygService extends RemoteService
      * @param spaceName the name of the space of the page the file is attached to
      * @param pageName the name of the page the file is attached to
      * @param attachmentName the uncleaned name of the attachment, which is to be cleaned on the server
-     * @return an {@link Attachment} containing the reference and the URL of the attachment, or {@code null} in case the
-     *         attachment was not found
+     * @param async object used for asynchronous communication between server and client, to return, on success, an
+     *            {@link Attachment} containing the reference and the URL of the attachment, or {@code null} in case the
+     *            attachment was not found
      */
-    Attachment getAttachment(String wikiName, String spaceName, String pageName, String attachmentName);
+    void getAttachment(String wikiName, String spaceName, String pageName, String attachmentName,
+        AsyncCallback<Attachment> async);
 
     /**
      * Returns all the image attachments from the referred page.
@@ -158,10 +122,9 @@ public interface WysiwygService extends RemoteService
      * @param wikiName the name of the wiki to get images from
      * @param spaceName the name of the space to get image attachments from
      * @param pageName the name of the page to get image attachments from
-     * @return list of the image attachments
-     * @throws XWikiGWTException if something goes wrong on the server
+     * @param async object used for asynchronous communication between server and client.
      */
-    List<Attachment> getImageAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException;
+    void getImageAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
 
     /**
      * Returns all the attachments from the referred page.
@@ -169,8 +132,7 @@ public interface WysiwygService extends RemoteService
      * @param wikiName the name of the wiki to get attachments from
      * @param spaceName the name of the space to get attachments from
      * @param pageName the name of the page to get attachments from
-     * @return list of the attachments
-     * @throws XWikiGWTException if something goes wrong on the server
+     * @param async object used for asynchronous communication between server and client.
      */
-    List<Attachment> getAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException;
+    void getAttachments(String wikiName, String spaceName, String pageName, AsyncCallback<List<Attachment>> async);
 }

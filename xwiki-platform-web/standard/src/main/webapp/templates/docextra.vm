@@ -79,7 +79,7 @@
           <li id="${extraAnchor}tab">
             #set ($args = "viewer=${extraName}")
             <a id="${extraAnchor}link" href="$doc.getURL('view', $args)">
-              $extraTabText #if($extraNbOfItems >= 0) <span class="itemcount">$msg.get("docextra.extranb", [$extraNbOfItems])</span> #end
+              $extraTabText #if($extraNbOfItems >= 0) <span class="itemCount">$msg.get("docextra.extranb", [$extraNbOfItems])</span> #end
             </a>
           </li>
         #end

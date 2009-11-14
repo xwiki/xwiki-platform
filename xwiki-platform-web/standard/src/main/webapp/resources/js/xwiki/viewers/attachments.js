@@ -71,11 +71,11 @@ XWiki.viewers.Attachments = Class.create({
     }.bind(this));
   },
   updateCount : function() {
-    if ($("Attachmentstab") && $("Attachmentstab").down(".itemcount")) {
-      $("Attachmentstab").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
+    if ($("Attachmentstab") && $("Attachmentstab").down(".itemCount")) {
+      $("Attachmentstab").down(".itemCount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
     }
-    if ($("attachmentsshortcut") && $("attachmentsshortcut").down(".itemcount")) {
-      $("attachmentsshortcut").down(".itemcount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
+    if ($("attachmentsshortcut") && $("attachmentsshortcut").down(".itemCount")) {
+      $("attachmentsshortcut").down(".itemCount").update("$msg.get('docextra.extranb', ['__number__'])".replace("__number__", $("Attachmentspane").select(".attachment").size()));
     }
   },
   /** Enhance the upload form with JS behaviors. */

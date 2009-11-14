@@ -3331,11 +3331,11 @@ body {
   color: $theme.textColor;
 }
 
-.active .itemcount {
+.active .itemCount {
   color: $theme.textSecondaryColor;
 }
 
-.itemcount {
+.itemCount {
   color: $theme.textSecondaryColor;
 }
 

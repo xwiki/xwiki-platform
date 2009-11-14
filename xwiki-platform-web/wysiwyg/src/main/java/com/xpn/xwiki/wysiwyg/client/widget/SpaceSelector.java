@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 
 /**
  * Selector for the spaces in a wiki.
@@ -36,6 +36,11 @@ public class SpaceSelector extends ListBox
      * Current wiki for which to get the spaces. If this is null, then the spaces of the current wiki are retrieved.
      */
     private String wiki;
+
+    /**
+     * The service used to retrieve the list of space names.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Default constructor.
@@ -68,7 +73,7 @@ public class SpaceSelector extends ListBox
     public void refreshList(final String currentSpace, final AsyncCallback<List<String>> cb)
     {
         this.clear();
-        WysiwygService.Singleton.getInstance().getSpaceNames(wiki, new AsyncCallback<List<String>>()
+        wikiService.getSpaceNames(wiki, new AsyncCallback<List<String>>()
         {
             public void onFailure(Throwable caught)
             {
@@ -110,7 +115,7 @@ public class SpaceSelector extends ListBox
         }
         return null;
     }
-    
+
     /**
      * Sets this selector on the specified space.
      * 
@@ -123,7 +128,7 @@ public class SpaceSelector extends ListBox
                 setSelectedIndex(i);
             }
         }
-    }    
+    }
 
     /**
      * @return the wiki for this space selector.
@@ -142,5 +147,15 @@ public class SpaceSelector extends ListBox
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
+    }
+
+    /**
+     * Inject the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the list of space names
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

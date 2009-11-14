@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 
 /**
  * Selector for the pages from a space in a wiki.
@@ -44,6 +44,11 @@ public class PageSelector extends ListBox
      * @see #PageSelector(String, String)
      */
     private String space;
+
+    /**
+     * The service used to retrieve the list of page names.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Builds a page selector from the passed space, for the current wiki.
@@ -79,7 +84,7 @@ public class PageSelector extends ListBox
     public void refreshList(final String currentPage, final AsyncCallback<List<String>> cb)
     {
         this.clear();
-        WysiwygService.Singleton.getInstance().getPageNames(wiki, space, new AsyncCallback<List<String>>()
+        wikiService.getPageNames(wiki, space, new AsyncCallback<List<String>>()
         {
             public void onFailure(Throwable caught)
             {
@@ -170,5 +175,15 @@ public class PageSelector extends ListBox
     public void setSpace(String space)
     {
         this.space = space;
+    }
+
+    /**
+     * Inject the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the list of page names
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

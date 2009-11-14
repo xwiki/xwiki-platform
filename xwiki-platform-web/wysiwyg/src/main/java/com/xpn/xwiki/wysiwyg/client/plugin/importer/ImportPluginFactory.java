@@ -20,6 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.importer;
 
 import com.google.gwt.core.client.GWT;
+import com.xpn.xwiki.wysiwyg.client.WikiService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsyncCacheProxy;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
@@ -39,6 +42,12 @@ public final class ImportPluginFactory extends AbstractPluginFactory
      * The service used to clean content pasted from office document and to import office documents.
      */
     private final ImportServiceAsync importService = GWT.create(ImportService.class);
+
+    /**
+     * The service used to access the import attachments.
+     */
+    private final WikiServiceAsync wikiService =
+        new WikiServiceAsyncCacheProxy((WikiServiceAsync) GWT.create(WikiService.class));
 
     /**
      * Default constructor.
@@ -66,6 +75,6 @@ public final class ImportPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return new ImportPlugin(importService);
+        return new ImportPlugin(importService, wikiService);
     }
 }

@@ -36,7 +36,7 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteEvent;
 import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
@@ -71,6 +71,11 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
      * The error label for the file input.
      */
     private final Label fileErrorLabel = new Label();
+
+    /**
+     * The service used to access the uploaded attachments.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Default constructor.
@@ -251,25 +256,24 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     protected void onSubmitComplete(SubmitCompleteEvent event, final AsyncCallback<Boolean> async)
     {
         // create the link reference
-        WysiwygService.Singleton.getInstance().getAttachment(getWiki(), getSpace(), getPage(), extractFileName(),
-            new AsyncCallback<Attachment>()
+        wikiService.getAttachment(getWiki(), getSpace(), getPage(), extractFileName(), new AsyncCallback<Attachment>()
+        {
+            public void onSuccess(Attachment result)
             {
-                public void onSuccess(Attachment result)
-                {
-                    if (result == null) {
-                        // there was a problem with the attachment, call it a failure
-                        displayError(Strings.INSTANCE.fileUploadSubmitError());
-                        async.onSuccess(false);
-                    } else {
-                        onAttachmentUploaded(result, async);
-                    }
+                if (result == null) {
+                    // there was a problem with the attachment, call it a failure
+                    displayError(Strings.INSTANCE.fileUploadSubmitError());
+                    async.onSuccess(false);
+                } else {
+                    onAttachmentUploaded(result, async);
                 }
+            }
 
-                public void onFailure(Throwable caught)
-                {
-                    async.onFailure(caught);
-                }
-            });
+            public void onFailure(Throwable caught)
+            {
+                async.onFailure(caught);
+            }
+        });
     }
 
     /**
@@ -347,5 +351,15 @@ public abstract class AbstractFileUploadWizardStep implements WizardStep
     {
         fileErrorLabel.setVisible(false);
         fileUploadInput.removeStyleName(FIELD_ERROR_STYLE);
+    }
+
+    /**
+     * Inject the wiki service.
+     * 
+     * @param wikiService the service used to access the uploaded attachments
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

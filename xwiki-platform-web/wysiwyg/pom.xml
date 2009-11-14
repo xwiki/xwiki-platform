@@ -282,7 +282,7 @@
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncTools.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java,
-            com/xpn/xwiki/wysiwyg/server/DefaultWysiwygServiceTest.java
+            com/xpn/xwiki/wysiwyg/server/DefaultWikiServiceTest.java
           </excludes>
         </configuration>
       </plugin>

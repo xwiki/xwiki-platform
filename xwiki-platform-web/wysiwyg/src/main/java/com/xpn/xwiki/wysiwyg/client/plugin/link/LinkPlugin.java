@@ -31,6 +31,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.exec.CreateLinkExecutable;
@@ -62,7 +63,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      * The link metadata extractor, to handle the link metadata.
      */
     private LinkMetaDataExtractor metaDataExtractor;
-    
+
     /**
      * The empty link filter, to prevent the submission of empty links.
      */
@@ -72,6 +73,21 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
      * Map of the original link related executables, which will be replaced with custom executables by this plugin.
      */
     private Map<Command, Executable> originalExecutables;
+
+    /**
+     * The service used to access the wiki.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
+     * Creates a new link plugin that will use the specified wiki service.
+     * 
+     * @param wikiService the service used to access the wiki
+     */
+    public LinkPlugin(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
+    }
 
     /**
      * {@inheritDoc}
@@ -105,7 +121,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
         // do the initial extracting on the loaded document
         metaDataExtractor.onInnerHTMLChange((Element) getTextArea().getDocument().getDocumentElement());
         getTextArea().getDocument().addInnerHTMLListener(metaDataExtractor);
-        
+
         // create an empty link handler and add it to the RTA command manager
         linkFilter = new EmptyLinkFilter(getTextArea());
         getTextArea().getCommandManager().addCommandListener(linkFilter);
@@ -192,7 +208,7 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     private Wizard getLinkWizard()
     {
         if (linkWizard == null) {
-            linkWizard = new LinkWizard(this.getConfig());
+            linkWizard = new LinkWizard(this.getConfig(), wikiService);
             linkWizard.addWizardListener(this);
         }
         return linkWizard;
@@ -269,7 +285,8 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
     }
 
     /**
-     * Helper method to parse an image execution String parameter and fill the passed {@link LinkConfig} from it. 
+     * Helper method to parse an image execution String parameter and fill the passed {@link LinkConfig} from it.
+     * 
      * @param linkConfig the link config to set the label to
      * @param imageParam the image parameter, as returned by the command manager
      */

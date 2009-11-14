@@ -29,35 +29,29 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiService;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
 
 /**
- * The default implementation for {@link WysiwygService}.
+ * The default implementation for {@link WikiService}.
  * 
  * @version $Id$
  */
-public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygService
+public class DefaultWikiService implements WikiService
 {
-    /**
-     * Class version.
-     */
-    private static final long serialVersionUID = 7555724420345951844L;
-
     /**
      * Default XWiki logger to report errors correctly.
      */
-    private static final Log LOG = LogFactory.getLog(DefaultWysiwygService.class);
+    private static final Log LOG = LogFactory.getLog(DefaultWikiService.class);
 
     /**
      * The name of the view action.
@@ -65,17 +59,34 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     private static final String VIEW_ACTION = "view";
 
     /**
-     * @return The component used to access documents. This is temporary till XWiki model is moved into components.
+     * The component used to serialize XWiki document names.
      */
-    private DocumentAccessBridge getDocumentAccessBridge()
+    @Requirement
+    private DocumentNameSerializer documentNameSerializer;
+
+    /**
+     * The component used to access documents. This is temporary till XWiki model is moved into components.
+     */
+    @Requirement
+    private DocumentAccessBridge documentAccessBridge;
+
+    /** Execution context handler, needed for accessing the XWikiContext. */
+    @Requirement
+    private Execution execution;
+
+    /**
+     * @return the XWiki context
+     * @deprecated avoid using this method; try using the document access bridge instead
+     */
+    private XWikiContext getXWikiContext()
     {
-        return Utils.getComponent(DocumentAccessBridge.class);
+        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#isMultiWiki()
+     * @see WikiService#isMultiWiki()
      */
     public Boolean isMultiWiki()
     {
@@ -85,7 +96,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getVirtualWikiNames()
+     * @see WikiService#getVirtualWikiNames()
      */
     public List<String> getVirtualWikiNames()
     {
@@ -106,7 +117,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getSpaceNames(String)
+     * @see WikiService#getSpaceNames(String)
      */
     public List<String> getSpaceNames(String wikiName)
     {
@@ -142,7 +153,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     {
         // get the blacklisted spaces from the session
         List<String> blacklistedSpaces =
-            (ArrayList<String>) getThreadLocalRequest().getSession().getAttribute("blacklistedSpaces");
+            (ArrayList<String>) getXWikiContext().getRequest().getSession().getAttribute("blacklistedSpaces");
         // always return a list, even if blacklisted spaces variable wasn't set
         if (blacklistedSpaces == null) {
             blacklistedSpaces = Collections.emptyList();
@@ -153,7 +164,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getPageNames(String, String)
+     * @see WikiService#getPageNames(String, String)
      */
     public List<String> getPageNames(String wikiName, String spaceName)
     {
@@ -188,7 +199,6 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * {@inheritDoc}
      */
     public List<com.xpn.xwiki.gwt.api.client.Document> getRecentlyModifiedPages(int start, int count)
-        throws XWikiGWTException
     {
         try {
             List<XWikiDocument> docs =
@@ -197,7 +207,8 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                         + getXWikiContext().getUser() + "' order by doc.date desc", count, start, getXWikiContext());
             return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
-            throw getXWikiGWTException(e);
+            LOG.error(e.getLocalizedMessage(), e);
+            throw new RuntimeException("Failed to retrieve the lists of recently modified pages.", e);
         }
     }
 
@@ -205,7 +216,6 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      * {@inheritDoc}
      */
     public List<com.xpn.xwiki.gwt.api.client.Document> getMatchingPages(String keyword, int start, int count)
-        throws XWikiGWTException
     {
         try {
             String quote = "'";
@@ -235,7 +245,8 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                         + escapedKeyword + "%')", count, start, getXWikiContext());
             return prepareDocumentResultsList(docs);
         } catch (XWikiException e) {
-            throw getXWikiGWTException(e);
+            LOG.error(e.getLocalizedMessage(), e);
+            throw new RuntimeException("Failed to search XWiki pages.", e);
         }
     }
 
@@ -265,16 +276,15 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getPageLink(String, String, String, String, String)
+     * @see WikiService#getPageLink(String, String, String, String, String)
      */
     public LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor)
     {
         String queryString = StringUtils.isEmpty(revision) ? null : "rev=" + revision;
         DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
         // get the url to the targeted document from the bridge
-        DocumentNameSerializer serializer = Utils.getComponent(DocumentNameSerializer.class);
-        String pageReference = serializer.serialize(docName);
-        String pageURL = getDocumentAccessBridge().getURL(pageReference, VIEW_ACTION, queryString, anchor);
+        String pageReference = documentNameSerializer.serialize(docName);
+        String pageURL = documentAccessBridge.getURL(pageReference, VIEW_ACTION, queryString, anchor);
 
         // get a document name serializer to return the page reference
         if (queryString != null) {
@@ -295,7 +305,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getAttachment(String, String, String, String)
+     * @see WikiService#getAttachment(String, String, String, String)
      */
     public Attachment getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
     {
@@ -305,8 +315,7 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
         // clean attachment filename to be synchronized with all attachment operations
         String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
         DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-        DocumentNameSerializer serializer = Utils.getComponent(DocumentNameSerializer.class);
-        String docReference = serializer.serialize(docName);
+        String docReference = documentNameSerializer.serialize(docName);
         XWikiDocument doc;
         try {
             doc = context.getWiki().getDocument(docReference, context);
@@ -342,27 +351,13 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
      */
     protected DocumentName prepareDocumentName(String wiki, String space, String page)
     {
-        String newPageName = StringUtils.isEmpty(page) ? page : clearXWikiName(page);
-        String newSpaceName = StringUtils.isEmpty(space) ? space : clearXWikiName(space);
-        String newWikiName = StringUtils.isEmpty(wiki) ? wiki : clearXWikiName(wiki);
-        if (StringUtils.isEmpty(wiki)) {
-            newWikiName = getXWikiContext().getDoc().getWikiName();
-        }
-        if (StringUtils.isEmpty(page)) {
-            newPageName = "WebHome";
-        }
-        // if we have no space, link to the current doc's space
-        if (StringUtils.isEmpty(space)) {
-            if ((StringUtils.isEmpty(page)) && !StringUtils.isEmpty(wiki)) {
-                // if we have no space set and no page but we have a wiki, then create a link to the mainpage of the
-                // wiki
-                newSpaceName = "Main";
-            } else if (StringUtils.isEmpty(wiki)) {
-                // if all are empty, create a link to the current document
-                newSpaceName = getXWikiContext().getDoc().getSpace();
-                newPageName = getXWikiContext().getDoc().getPageName();
-            }
-        }
+        // We default on xwiki:Main.WebHome and not on the current document because the execution context in which this
+        // component is used doesn't have a current document. This component is used to respond to GWT-RPC requests
+        // which don't have the information required to detect the current document (e.g. these informations can't be
+        // extracted from the request URL).
+        String newPageName = StringUtils.isEmpty(page) ? "WebHome" : clearXWikiName(page);
+        String newSpaceName = StringUtils.isEmpty(space) ? "Main" : clearXWikiName(space);
+        String newWikiName = StringUtils.isEmpty(wiki) ? getXWikiContext().getDatabase() : clearXWikiName(wiki);
         return new DocumentName(newWikiName, newSpaceName, newPageName);
     }
 
@@ -397,21 +392,16 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getImageAttachments(String, String, String)
+     * @see WikiService#getImageAttachments(String, String, String)
      */
     public List<Attachment> getImageAttachments(String wikiName, String spaceName, String pageName)
-        throws XWikiGWTException
     {
         List<Attachment> imageAttachments = new ArrayList<Attachment>();
-        try {
-            List<Attachment> allAttachments = getAttachments(wikiName, spaceName, pageName);
-            for (Attachment attachment : allAttachments) {
-                if (attachment.getMimeType().startsWith("image/")) {
-                    imageAttachments.add(attachment);
-                }
+        List<Attachment> allAttachments = getAttachments(wikiName, spaceName, pageName);
+        for (Attachment attachment : allAttachments) {
+            if (attachment.getMimeType().startsWith("image/")) {
+                imageAttachments.add(attachment);
             }
-        } catch (XWikiGWTException e) {
-            throw getXWikiGWTException(e);
         }
         return imageAttachments;
     }
@@ -419,18 +409,16 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#getAttachments(String, String, String)
+     * @see WikiService#getAttachments(String, String, String)
      */
-    public List<Attachment> getAttachments(String wikiName, String spaceName, String pageName) throws XWikiGWTException
+    public List<Attachment> getAttachments(String wikiName, String spaceName, String pageName)
     {
-        XWikiContext context = getXWikiContext();
-        List<Attachment> attachments = new ArrayList<Attachment>();
-        DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-        DocumentNameSerializer serializer = Utils.getComponent(DocumentNameSerializer.class);
-        String docReference = serializer.serialize(docName);
-        XWikiDocument doc;
         try {
-            doc = context.getWiki().getDocument(docReference, context);
+            XWikiContext context = getXWikiContext();
+            List<Attachment> attachments = new ArrayList<Attachment>();
+            DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
+            String docReference = documentNameSerializer.serialize(docName);
+            XWikiDocument doc = context.getWiki().getDocument(docReference, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
                 Attachment currentAttach = new Attachment();
                 currentAttach.setFilename(attach.getFilename());
@@ -439,9 +427,10 @@ public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygSe
                 currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);
             }
+            return attachments;
         } catch (XWikiException e) {
-            throw getXWikiGWTException(e);
+            LOG.error(e.getLocalizedMessage(), e);
+            throw new RuntimeException("Failed to retrieve the list of attachments.", e);
         }
-        return attachments;
     }
 }

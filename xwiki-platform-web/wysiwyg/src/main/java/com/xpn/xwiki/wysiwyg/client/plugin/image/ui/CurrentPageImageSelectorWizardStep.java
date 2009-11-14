@@ -30,7 +30,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.ui.ImageWizard.ImageWizardSteps;
@@ -61,6 +61,11 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
      * list items.
      */
     private final ListItem<Attachment> clearFloatsListItem;
+
+    /**
+     * The service used to retrieve the list of image attachments.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Builds a selector from the images of the specified current page to edit the specified resource.
@@ -114,8 +119,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
-        WysiwygService.Singleton.getInstance().getImageAttachments(currentPage.getWiki(), currentPage.getSpace(),
-            currentPage.getPage(), callback);
+        wikiService.getImageAttachments(currentPage.getWiki(), currentPage.getSpace(), currentPage.getPage(), callback);
     }
 
     /**
@@ -259,5 +263,15 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
             // it's the fake item, select the last item in the list
             getList().setSelectedItem(getList().getItem(getList().getItemCount() - 2));
         }
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the list of image attachments
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

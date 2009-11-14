@@ -23,7 +23,7 @@ import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ListBox;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 
 /**
  * Selector to choose the wiki from the list of wikis in this instance.
@@ -32,6 +32,11 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
  */
 public class WikiSelector extends ListBox
 {
+    /**
+     * The service used to retrieve the list of virtual wiki names.
+     */
+    private WikiServiceAsync wikiService;
+
     /**
      * Builds a wiki selector. Note that this function does not actually fill the list of wikis, you need to explicitly
      * call {@link #refreshList(String, AsyncCallback)} after this constructor.
@@ -50,7 +55,7 @@ public class WikiSelector extends ListBox
     public void refreshList(final String currentWiki, final AsyncCallback<List<String>> cb)
     {
         this.clear();
-        WysiwygService.Singleton.getInstance().getVirtualWikiNames(new AsyncCallback<List<String>>()
+        wikiService.getVirtualWikiNames(new AsyncCallback<List<String>>()
         {
             public void onFailure(Throwable caught)
             {
@@ -91,7 +96,7 @@ public class WikiSelector extends ListBox
         }
         return null;
     }
-    
+
     /**
      * Sets this selector on the specified wiki.
      * 
@@ -104,5 +109,15 @@ public class WikiSelector extends ListBox
                 setSelectedIndex(i);
             }
         }
+    }
+
+    /**
+     * Inject the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the list of virtual wiki names
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.ui;
 import org.xwiki.gwt.user.client.StringUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
@@ -44,6 +44,11 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
      * The currently edited resource (currently edited page).
      */
     private ResourceName editedResource;
+
+    /**
+     * The service used to retrieve the attachments.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Creates an attachment selection wizard step for the specified resource to be edited.
@@ -126,9 +131,9 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
                 async.onSuccess(true);
             } else {
                 // FIXME: move the reference setting logic in a controller, along with the async fetching
-                WysiwygService.Singleton.getInstance().getAttachment(getExplorer().getSelectedWiki(),
-                    getExplorer().getSelectedSpace(), getExplorer().getSelectedPage(),
-                    getExplorer().getSelectedAttachment(), new AsyncCallback<Attachment>()
+                wikiService.getAttachment(getExplorer().getSelectedWiki(), getExplorer().getSelectedSpace(),
+                    getExplorer().getSelectedPage(), getExplorer().getSelectedAttachment(),
+                    new AsyncCallback<Attachment>()
                     {
                         public void onSuccess(Attachment result)
                         {
@@ -171,5 +176,15 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
     protected String getDefaultErrorText()
     {
         return Strings.INSTANCE.linkNoAttachmentSelectedError();
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the attachments
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

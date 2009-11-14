@@ -29,6 +29,7 @@ import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.PushButton;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.image.exec.InsertImageExecutable;
@@ -77,6 +78,21 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
     private ImageWizard imageWizard;
 
     /**
+     * The service used to access the wiki.
+     */
+    private final WikiServiceAsync wikiService;
+
+    /**
+     * Create a new image plugin that used the specified wiki service.
+     * 
+     * @param wikiService the service used to access the wiki
+     */
+    public ImagePlugin(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractPlugin#init(XRichTextArea, Config)
@@ -100,7 +116,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
             menuExtension = new ImageMenuExtension(this);
             getUIExtensionList().add(menuExtension);
 
-            imageWizard = new ImageWizard(getConfig());
+            imageWizard = new ImageWizard(getConfig(), wikiService);
             imageWizard.addWizardListener(this);
         }
 

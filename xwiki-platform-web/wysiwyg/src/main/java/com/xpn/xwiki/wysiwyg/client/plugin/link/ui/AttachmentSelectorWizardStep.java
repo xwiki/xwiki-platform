@@ -25,6 +25,7 @@ import java.util.List;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -37,6 +38,11 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractSelectorAggregato
  */
 public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWizardStep<LinkConfig>
 {
+    /**
+     * The service used to access the attachments.
+     */
+    private WikiServiceAsync wikiService;
+
     /**
      * Builds an attachment selector step for the currently edited resource.
      * 
@@ -75,10 +81,15 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWiza
     protected WizardStep getStepInstance(String name)
     {
         if (name.equals(Strings.INSTANCE.selectorSelectFromCurrentPage())) {
-            return new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
+            CurrentPageAttachmentSelectorWizardStep step =
+                new CurrentPageAttachmentSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
         if (name.equals(Strings.INSTANCE.selectorSelectFromAllPages())) {
-            return new AttachmentExplorerWizardStep(getEditedResource());
+            AttachmentExplorerWizardStep step = new AttachmentExplorerWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
         return null;
     }
@@ -99,5 +110,15 @@ public class AttachmentSelectorWizardStep extends AbstractSelectorAggregatorWiza
     public String getStepTitle()
     {
         return Strings.INSTANCE.linkSelectAttachmentTitle();
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to access the attachments
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

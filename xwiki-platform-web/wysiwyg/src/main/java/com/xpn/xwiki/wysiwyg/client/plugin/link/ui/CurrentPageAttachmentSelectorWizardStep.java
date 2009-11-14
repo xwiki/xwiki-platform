@@ -26,7 +26,7 @@ import org.xwiki.gwt.user.client.ui.ListItem;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.xpn.xwiki.wysiwyg.client.WysiwygService;
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
@@ -45,6 +45,11 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
      * The currently edited resource (the currently edited page).
      */
     private ResourceName editedResource;
+
+    /**
+     * The service used to retrieve the current page attachments.
+     */
+    private WikiServiceAsync wikiService;
 
     /**
      * Builds a selector from the attachments of the specified page.
@@ -81,8 +86,8 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     @Override
     protected void fetchData(AsyncCallback<List<Attachment>> callback)
     {
-        WysiwygService.Singleton.getInstance().getAttachments(editedResource.getWiki(), editedResource.getSpace(),
-            editedResource.getPage(), callback);
+        wikiService.getAttachments(editedResource.getWiki(), editedResource.getSpace(), editedResource.getPage(),
+            callback);
     }
 
     /**
@@ -189,5 +194,15 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
                 getData().setUrl(attachmentURL);
             }
         }
+    }
+
+    /**
+     * Injects the wiki service.
+     * 
+     * @param wikiService the service used to retrieve the current page attachments
+     */
+    public void setWikiService(WikiServiceAsync wikiService)
+    {
+        this.wikiService = wikiService;
     }
 }

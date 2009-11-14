@@ -27,6 +27,7 @@ import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStep;
 import org.xwiki.gwt.user.client.ui.wizard.WizardStepProvider;
 
+import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Images;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
@@ -60,18 +61,25 @@ public class ImageWizard extends Wizard implements WizardStepProvider
      * The resource currently edited by this WYSIWYG, used to determine the context in which image insertion takes
      * place.
      */
-    private Config config;
+    private final Config config;
+
+    /**
+     * The service used to access the image attachments.
+     */
+    private final WikiServiceAsync wikiService;
 
     /**
      * Builds a {@link ImageWizard} from the passed {@link Config}. The configuration is used to get WYSIWYG editor
      * specific information for this wizard, such as the current page, configuration parameters.
      * 
      * @param config the context configuration for this {@link ImageWizard}
+     * @param wikiService the service used to access the image attachments
      */
-    public ImageWizard(Config config)
+    public ImageWizard(Config config, WikiServiceAsync wikiService)
     {
         super(Strings.INSTANCE.imageTooltip(), Images.INSTANCE.image().createImage());
         this.config = config;
+        this.wikiService = wikiService;
         this.setProvider(this);
     }
 
@@ -94,6 +102,7 @@ public class ImageWizard extends Wizard implements WizardStepProvider
                     break;
                 case IMAGE_UPLOAD:
                     step = new ImageUploadWizardStep(getEditedResource());
+                    ((ImageUploadWizardStep) step).setWikiService(wikiService);
                     break;
                 default:
                     // nothing here, leave it null
@@ -126,9 +135,13 @@ public class ImageWizard extends Wizard implements WizardStepProvider
     {
         String insertImages = config.getParameter("insertimages");
         if ("currentpage".equals(insertImages)) {
-            return new CurrentPageImageSelectorWizardStep(getEditedResource());
+            CurrentPageImageSelectorWizardStep step = new CurrentPageImageSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         } else {
-            return new ImageSelectorWizardStep(getEditedResource());
+            ImageSelectorWizardStep step = new ImageSelectorWizardStep(getEditedResource());
+            step.setWikiService(wikiService);
+            return step;
         }
     }
 

@@ -1577,7 +1577,7 @@ $html
               #if($colname != "_actions" || $hasAdmin)
               <th class="xwiki-livetable-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end"  #if("$!colprop.type"=="hidden") style="display: none" #end>
                 #if($isSortable)<a rel="${colname}">#end
-                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-filter-${velocityCount}">#end
+                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
                 $msg.get("${transprefix}${colname}")
                 #if($isFilterable)</label>#end
                 #if($isSortable)</a>#end
@@ -1611,7 +1611,7 @@ $html
                 </select>
                 </td>
               #elseif( ("$!colprop.type"=="text"||"$!colprop.type"=="number") && $isFilterable)
-                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size"!="") size="${colprop.size}" title="$msg.get('xe.livetable.filters.title', [$msg.get("${transprefix}${colname}")])"#end /></td>
+                <td class="xwiki-livetable-display-header-filter"><input id="xwiki-livetable-${divid}-filter-${velocityCount}" name="${colname}" type="text" #if("!$colprop.size"!="") size="${colprop.size}" title="$msg.get('xe.livetable.filters.title', [$msg.get("${transprefix}${colname}")])"#end /></td>
               #elseif("$!colprop.type"=="hidden")
               #elseif($colname != "_actions" || $hasAdmin)
               <td class="xwiki-livetable-display-header-filter"></td>

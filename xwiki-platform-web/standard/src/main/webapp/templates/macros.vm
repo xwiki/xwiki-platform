@@ -1576,7 +1576,7 @@ $html
                 #set($isSortable = false)
               #end
               #if($colname != "_actions" || $hasAdmin)
-              <th class="xwiki-livetable-display-header-text" scope="col" #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end"  #if("$!colprop.type"=="hidden") style="display: none" #end>
+              <th class="xwiki-livetable-display-header-text #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end" #if("$!colprop.type"=="hidden")style="display: none"#end scope="col">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
                 $msg.get("${transprefix}${colname}")

@@ -14,6 +14,9 @@
     #set($viewer = 'content')
   #end
   <div class="main layoutsubsection">
+  <div id="contentmenu" class="actionmenu">
+  #template("contentmenu.vm")
+  </div>
   <div id="mainContentArea">
   #template("hierarchy.vm")
   #if($viewer == 'content')

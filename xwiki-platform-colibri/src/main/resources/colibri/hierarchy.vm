@@ -15,7 +15,6 @@
 #end
 #if($context.getMode()==0) ## Visible only in a page
   <div id="hierarchy">
-    <span class="currentSpace"><a href="$spaceViewUrl">$xwiki.getXMLEncoded(${doc.space})</a>: </span>
-#computeHierarchy($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
+    #computeHierarchy($doc "<a href='${doc.getURL('view')}'>$xwiki.getXMLEncoded($tdoc.getRenderedTitle('plain/1.0'))</a>" 0)
   </div>
 #end

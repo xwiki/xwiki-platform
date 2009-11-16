@@ -320,7 +320,6 @@ span.wikicreatelink a {
 /* ----------------------Content-------------------------*/
 #xwikimaincontainer{
   line-height: 1.2em;
-  padding-top: 20px;
 }
 
 #xwikimaincontainerinner {
@@ -818,96 +817,239 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 /* --------------------------------------------------------------
   * Action Menu elements
 -------------------------------------------------------------- */
-#actionmenu {
-  background-color: $theme.menuBackgroundColor;
-  height: 20px !important;
-  left: 0;
+
+/* Main menu */
+#mainmenu {
   min-width: 970px;
   overflow: visible;
-  position: fixed;
-  right: 0;
-  text-align: center;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
+  z-index: 10000;
 }
 
-#actionmenu a {
+#mainmenu .submenu {
+  z-index: 10000;
+}
+
+/* Content menu */
+#contentmenu {
+  z-index: 9999;
+}
+
+#contentmenu .submenu {
+  z-index: 9999;
+}
+
+/* Edit menu */
+#editmenu {
   color: $theme.menuLinkColor;
-  cursor: pointer;
+  text-align: center;
+}
+
+#editmenu a {
+  display: inline;
+  float: none;
+}
+
+/* General */
+.actionmenu {
+  background-color: $theme.menuBackgroundColor;
+  height: 22px !important;
+  width: 100%;
+  position: relative;
+  left: 0;
+  top: 0;
+}
+
+.actionmenu .submenu {
+  background: $theme.menuBackgroundColor;
   display: block;
-  float: left;
-  font: normal normal 700 .8em/1.8em sans-serif;
-  margin-right: -1px;
-  padding: 0 20px 0 5px;
+  padding: 5px 5px 5px 10px;
+  position: absolute;
   width: auto;
-  white-space: nowrap;
-  text-transform: uppercase;
+}
+
+.leftmenu {
+  position: absolute;
+  left: 0;
+  padding-left: 15px;
 }
 
 .rightmenu {
   position: absolute;
   right: 0;
-}
-
-.leftmenu {
-  left: 15px;
-  position: absolute;
+  padding-right: 10px;
 }
 
 .topmenuentry {
   display: block;
   float: left;
-}
-
-.submenu {
-  background: $theme.menuBackgroundColor;
-  display: block;
-  padding: 5px;
-  position: absolute;
-  width: auto;
-}
-
-.submenu .submenuseparator {
-  display: none;
-}
-
-#actionmenu .submenuitem a, #actionmenu .submenuitem a:link, #actionmenu .submenuitem a:visited, #actionmenu .submenuitem a:active {
-  float: none;
-  height: auto;
-  line-height: 1.2em;
-  padding: 2px 10px 0;
-  text-align: left;
-}
-
-#actionmenu #tmWatched a.tme {
-  background-color: $theme.menuSelectedEntryBackgroundColor;
-  color: $theme.menuSelectedEntryLinkColor;
-}
-
-#actionmenu .editinfo {
-  color: $theme.menuLinkColor;
-  font-size: 1em;
-  height: 22px;
-  letter-spacing: 2px;
-  line-height: 22px;
-}
-
-#actionmenu .editinfo a {
-  display: inline;
-  float: none;
-  font-size: .9em;
-  height: 20px;
-  text-align: center;
+  margin-right: 5px;
 }
 
 .rightmenu .topmenuentry {
   float: right;
 }
 
+.submenu .submenuseparator {
+  display: none;
+}
+
+.actionmenu .hasIcon {
+  padding-left: 20px;
+  background: no-repeat 0px 3px;
+}
+
+.menuarrow {
+  color: $theme.menuLinkColor;
+  font-size: .5em;
+  line-height: 22px;
+  margin-right: 10px;
+}
+
+/* Links */
+.actionmenu a, .actionmenu a:visited {
+  color: $theme.menuLinkColor;
+  cursor: pointer;
+  display: block;
+  float: left;
+  font: normal normal 700 0.8em/1.8em sans-serif;
+  margin-right: -5px;
+  padding: 2px 10px 0 0px;
+  width: auto;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.dropdownnolink a:hover {
+  text-decoration: none;
+}
+
 #actionmenu .rightmenu .submenuitem a {
   text-align: right;
   width: auto;
+}
+
+.submenuitem a {
+  background: no-repeat 0px 0px;
+  height: 16px;
+  line-height: 20px;
+  margin-bottom: 4px;  
+}
+
+.actionmenu .submenuitem a, .actionmenu .submenuitem a:link, .actionmenu .submenuitem a:visited, .actionmenu .submenuitem a:active {
+  float: none;
+  height: auto;
+  line-height: 1.2em;
+  padding: 2px 20px 0;
+  text-align: left;
+}
+
+/* Icons */
+.actionmenu #tmWiki {
+  background-image: url(/xwiki/resources/icons/silk/world.gif);
+}
+
+.actionmenu #tmAdminWiki {
+  background-image: url(/xwiki/resources/icons/silk/wrench.gif);
+}
+
+.actionmenu #tmWatchWiki {
+  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
+}
+
+.actionmenu #tmCreateSpace {
+  background-image: url(/xwiki/resources/icons/silk/folder_add.gif);
+}
+
+.actionmenu #tmSpace {
+  background-image: url(/xwiki/resources/icons/silk/folder.gif);
+}
+
+.actionmenu #tmAdminSpace {
+  background-image: url(/xwiki/resources/icons/silk/wrench.gif);
+}
+
+.actionmenu #tmWatchSpace {
+  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
+}
+
+.actionmenu #tmCreatePage, .actionmenu #tmCreatePageFromOffice {
+  background-image: url(/xwiki/resources/icons/silk/page_white_add.gif);
+}
+
+.actionmenu #tmEdit {
+  background-image: url(/xwiki/resources/icons/silk/page_white_edit.gif);
+}
+
+.actionmenu #tmEditWiki, .actionmenu #tmViewSource {
+  background-image: url(/xwiki/resources/icons/silk/page_white_code.gif);
+}
+
+.actionmenu #tmEditVisual {
+  background-image: url(/xwiki/resources/icons/silk/page_white_edit.gif);
+}
+
+.actionmenu #tmEditForm {
+  background-image: url(/xwiki/resources/icons/silk/application_form.gif);
+}
+
+.actionmenu #tmEditRights {
+  background-image: url(/xwiki/resources/icons/silk/lock.gif);
+}
+
+.actionmenu #tmEditObjects {
+  background-image: url(/xwiki/resources/icons/silk/brick.gif);
+}
+
+.actionmenu #tmEditClass {
+  background-image: url(/xwiki/resources/icons/silk/box.gif);
+}
+
+.actionmenu #tmExportPdf {
+  background-image: url(/xwiki/resources/icons/silk/page_white_acrobat.gif);
+}
+
+.actionmenu #tmExportRtf {
+  background-image: url(/xwiki/resources/icons/silk/page_white_word.gif);
+}
+
+.actionmenu #tmExportHtml {
+  background-image: url(/xwiki/resources/icons/silk/page_white_world.gif);
+}
+
+.actionmenu #tmExportXar {
+  background-image: url(/xwiki/resources/icons/silk/page_white_compressed.gif);
+}
+
+.actionmenu #tmPrintPreview {
+  background-image: url(/xwiki/resources/icons/silk/page_white_magnify.gif);
+}
+
+.actionmenu #tmActionDelete {
+  background-image: url(/xwiki/resources/icons/silk/cross.gif);
+}
+
+.actionmenu #tmActionRename {
+  background-image: url(/xwiki/resources/icons/silk/textfield_rename.gif);
+}
+
+.actionmenu #tmActionCopy {
+  background-image: url(/xwiki/resources/icons/silk/page_white_copy.gif);
+}
+
+.actionmenu #tmUser {
+  background-image: url(/xwiki/resources/icons/silk/user.gif);
+}
+
+.actionmenu #tmWatchWiki, .actionmenu #tmWatchSpace, .actionmenu #tmWatchDocument {
+  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
+}
+
+.actionmenu #tmWatchlistManager {
+  background-image: url(/xwiki/resources/icons/silk/wrench.gif);
+}
+
+#contentmenu .isWatched, #mainmenu .isWatched a {
+  background-image: url(/xwiki/resources/icons/xwiki/star%2Dyellow.png) !important;  
 }
 
 /* @group BUTTONS */

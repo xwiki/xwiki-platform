@@ -574,6 +574,11 @@ padding:1px 3px;
 line-height:1.5em;
 
 }
+
+.menuarrow {
+  display:none;
+}
+
 /*
 ---------------------------------------
 Editors

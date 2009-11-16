@@ -1741,6 +1741,10 @@ html > body #actionmenu {
     background-image: none;
 }
 
+.menuarrow {
+	display:none;
+}
+
 /* @end */
 /*
 ---------------------------------------

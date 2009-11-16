@@ -394,6 +394,82 @@ Object.extend(XWiki, {
           }
       }
   },
+  
+  /**
+   * Watchlist methods.
+   */
+  watchlist : {
+      
+    /**
+     * Update the given menu (menuview or contentmenu). Allows to update the menu icon without page reload.
+     */
+    updateMenu : function(menu) {
+      new Ajax.Updater(
+              menu,
+              window.docviewurl + "?xpage=xpart&vm=" + menu + ".vm",
+              {
+                method: 'get',
+                evalScripts: true
+              });
+    },
+    
+    /**
+     * Add or remove the current document from the current user's watchlist.
+     * 
+     * @param add True to add the document to the user's watchlist, false to remove it.
+     */
+    toggleDocument : function(add) {
+      var action = "removedocument";
+      if (add) {
+        action = "adddocument";
+      }
+      var surl = window.docviewurl + "?xpage=watch&do=" + action;
+      var myAjax = new Ajax.Request(
+        surl,
+        {
+          method: 'get',
+          onComplete: function() { XWiki.watchlist.updateMenu("contentmenu") }
+        });
+    },
+    
+    /**
+     * Add or remove the current space from the current user's watchlist.
+     * 
+     * @param add True to add the space to the user's watchlist, false to remove it.
+     */
+    toggleSpace : function(add) {
+        var action = "removespace";
+        if (add) {
+          action = "addspace";
+        }
+        var surl = window.docviewurl + "?xpage=watch&do=" + action;
+        var myAjax = new Ajax.Request(
+          surl,
+          {
+            method: 'get',
+            onComplete: function() { XWiki.watchlist.updateMenu("menuview") }
+          });
+    },
+    
+    /**
+     * Add or remove the current wiki from the current user's watchlist.
+     * 
+     * @param add True to add the wiki to the user's watchlist, false to remove it.
+     */
+    toggleWiki : function(add) {
+        var action = "removewiki";
+        if (add) {
+          action = "addwiki";
+        }
+        var surl = window.docviewurl + "?xpage=watch&do=" + action;
+        var myAjax = new Ajax.Request(
+          surl,
+          {
+            method: 'get',
+            onComplete: function() { XWiki.watchlist.updateMenu("menuview") }
+          });
+    }
+  },
 
   /**
    * Initialize method for the XWiki object. This is to be called only once upon dom loading.
@@ -486,12 +562,8 @@ function showsubmenu(element){
                 doHide();
             }
         }
-        var coords = Position.positionedOffset(element);
-        if (element.getStyle("float") == "left") {
-            element.lastChild.style.left = (coords[0]  - 10) + "px";
-        } else {
-            element.lastChild.style.left = (coords[0]  - 70) + "px";
-        }
+        var coords = Element.positionedOffset(element);
+        element.lastChild.style.left = (coords[0] - 10) + "px";
         element.lastChild.style.top = (coords[1] + element.offsetHeight) + "px";
         element.lastChild.className = element.lastChild.className.replace("hidden", "visible");
     }

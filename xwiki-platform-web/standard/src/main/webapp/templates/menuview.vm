@@ -54,7 +54,7 @@
 #submenuitem($doc.getURL('edit', "$!languageparams&amp;editor=wysiwyg") $msg.get('core.menu.edit.visual') 'tmEditVisual')
 #submenuitem($doc.getURL('inline', $!languageparams) $msg.get('core.menu.edit.form') 'tmEditForm')
 #submenuseparator()
-#submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.rights') 'tmEditRights')
+#submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.edit.rights') 'tmEditRights')
 #submenuseparator()
 #submenuitem($doc.getURL('edit', 'editor=object') $msg.get('core.menu.edit.object') 'tmEditObjects')
 #if($hasAdmin)
@@ -88,7 +88,7 @@
 #submenuitem($doc.getURL('view', "viewer=history&amp;$!docvariant") $msg.get('core.menu.view.history') 'tmShowHistory')
 #submenuitem($doc.getURL('view', "viewer=information&amp;$!docvariant") $msg.get('core.menu.view.information') 'tmShowInformation')
 #if($isAdvancedUser)
-#submenuitem($doc.getURL('view', "viewer=code&amp;$docvariant") $msg.get('core.menu.view.code') 'tmShowCode')
+#submenuitem($doc.getURL('view', "viewer=code&amp;$docvariant") $msg.get('core.menu.view.source') 'tmShowCode')
 #end
 #xwikitopmenuentryend()
 #if($keyboardShortcutsEnabled)
@@ -108,7 +108,6 @@
 ## Print menu
 ##
 #xwikitopmenuentrystart('javascript:window.print()' $msg.get('core.menu.print') 'tmPrint')
-#submenuitem('javascript:window.print()' $msg.get('core.menu.print') 'tmPrintAction')
 #submenuitem($doc.getURL('view', "xpage=print&amp;$!docvariant") $msg.get('core.menu.preview') 'tmPrintPreview')
 #submenuseparator()
 #submenuitem($doc.getURL('export', "format=pdf&amp;$!docvariant") $msg.get('core.menu.export.pdf') 'tmExportPdf')
@@ -131,7 +130,7 @@
     #end
   #end
   #if($canImport)
-    #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view') $msg.get('core.menu.import') 'tmActionImport')
+    #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view') $msg.get('core.menu.create.pageFromOffice') 'tmActionImport')
   #end
   #xwikitopmenuentryend()
   #if($canDelete && $keyboardShortcutsEnabled)

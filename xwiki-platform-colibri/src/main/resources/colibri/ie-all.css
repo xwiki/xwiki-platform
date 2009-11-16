@@ -1,6 +1,52 @@
+body {
+  behavior: url("$xwiki.getSkinFile('/htc/csshover3.htc')");
+}
+
+* html div {
+  display: inline-block;
+}
+
+#docextrapanes {
+  *display: inline-block;
+}
+
+.minwidth, .minwidthb, .minwidthc, .minwidthd {
+  display: none;
+  height: 0;
+  font: normal 1px / 1px sans-serif;
+}
+
+#globallinks {
+  margin-left: -230px;
+}
+
 fieldset.xwikimessage, div.xwikimessage {
   border-top-width: 0;
 }
-body {
-  behavior: url("$xwiki.getSkinFile('/htc/csshover3.htc')");
+
+.xwikiintracontent legend {
+  margin: -5px 0 5px 0;
+  *margin: 5px 0 10px -7px;
+}
+
+#commentscontent #AddComment .commentcontainer label {
+  display: none;
+}
+
+input.button {
+  *padding: 1px 0;
+  font-weight: bold;
+}
+
+fieldset.xwikimessage {
+  display: inline;
+}
+
+table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
+  width: 160px;
+}
+
+/* Should be in dataeditors.css */
+#body .collapsed .xobject-title h3, #body .collapsed .xclass-title, #body .collapsed .xproperty-title {
+  display: inline;
 }

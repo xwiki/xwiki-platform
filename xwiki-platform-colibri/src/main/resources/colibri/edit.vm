@@ -28,8 +28,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
 #template("xwikivars.vm")
 #template("layoutvars.vm")
 #template("htmlheader.vm")
-#template("header.vm")
 #template("menuedit.vm")
+#template("header.vm")
 #if($editor == 'wiki' || $editor == 'wysiwyg')
   <form id="edit" method="post" action="$doc.getURL('preview')" >
   ## Pass the section number when the form is submitted in order to affect only the specified section.

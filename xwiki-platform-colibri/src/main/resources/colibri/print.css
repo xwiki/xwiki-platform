@@ -11,7 +11,7 @@
 }
 /* Hide unneeded stuff */
 .edit_section,
-#rightPanels, #leftPanels, #actionmenu,
+#rightPanels, #leftPanels, #mainmenu, #contentmenu, #editmenu,
 #globallinks, #footerglobal,
 #commentform, .xwikitabbar li, #Historyshortcut, #Informationshortcut, .separator,
 .commentheader .commenttools a, a.tag-delete , .tag-add a {

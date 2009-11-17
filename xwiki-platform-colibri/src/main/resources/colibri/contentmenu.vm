@@ -24,7 +24,7 @@
     #submenuitem($doc.getURL('edit', "$!languageparams&amp;editor=wysiwyg") $msg.get('core.menu.edit.visual') 'tmEditVisual', '')
     #submenuitem($doc.getURL('inline', $!languageparams) $msg.get('core.menu.edit.form') 'tmEditForm', '')
     #submenuseparator()
-    #submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.rights') 'tmEditRights', '')
+    #submenuitem($doc.getURL('edit', 'editor=rights') $msg.get('core.menu.edit.rights') 'tmEditRights', '')
     #submenuseparator()
     #submenuitem($doc.getURL('edit', 'editor=object') $msg.get('core.menu.edit.object') 'tmEditObjects', '')
     #if($hasAdmin)

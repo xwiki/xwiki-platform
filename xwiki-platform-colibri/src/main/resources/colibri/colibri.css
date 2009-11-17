@@ -919,7 +919,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   text-transform: uppercase;
 }
 
-.dropdownnolink a:hover {
+.dropdownnolink a.tme:hover {
   text-decoration: none;
 }
 

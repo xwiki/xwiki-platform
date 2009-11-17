@@ -100,7 +100,6 @@
 <property>
 <code>ol.tagCloud { 
   text-align: justify; 
-  text-justify: auto;
   /* Overriding of toucan value */ 
   margin: 0;
 }

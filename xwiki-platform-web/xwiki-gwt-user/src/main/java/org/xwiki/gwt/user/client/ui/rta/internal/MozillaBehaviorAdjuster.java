@@ -19,14 +19,10 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
-import org.xwiki.gwt.dom.client.Style;
 
 import com.google.gwt.dom.client.Node;
 
@@ -71,9 +67,6 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
         Document document = getTextArea().getDocument();
         Node paragraph = document.getSelection().getRangeAt(0).getStartContainer().getParentNode();
         paragraph.appendChild(document.createBRElement());
-
-        // We need to refresh the selection in order to make the table resize handlers disappear.
-        refreshSelection();
     }
 
     /**
@@ -156,33 +149,6 @@ public class MozillaBehaviorAdjuster extends BehaviorAdjuster
                 selection.removeAllRanges();
             }
             selection.addRange(range);
-            refreshSelection();
-        }
-    }
-
-    /**
-     * Repaints the edit area in Gecko-based browsers. This method removes ghost resize handlers and other trailing
-     * graphics.
-     */
-    protected void refreshSelection()
-    {
-        // Backup current ranges.
-        List<Range> ranges = new ArrayList<Range>();
-        Document document = getTextArea().getDocument();
-        Selection selection = document.getSelection();
-        for (int i = 0; i < selection.getRangeCount(); i++) {
-            ranges.add(selection.getRangeAt(i));
-        }
-
-        // Refresh selection.
-        document.getBody().getStyle().setProperty(Style.DISPLAY, Style.Display.NONE);
-        document.execCommand("selectall", null);
-        selection.removeAllRanges();
-        document.getBody().getStyle().setProperty(Style.DISPLAY, Style.Display.BLOCK);
-
-        // Restore the ranges.
-        for (int i = 0; i < ranges.size(); i++) {
-            selection.addRange(ranges.get(i));
         }
     }
 }

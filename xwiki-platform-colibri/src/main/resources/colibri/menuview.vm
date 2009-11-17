@@ -39,7 +39,7 @@
   #xwikitopmenuentry($xwiki.getURL('Main.WebHome', 'view') $context.getDatabase() 'tmWiki' 'hasIcon')
 #else
   #xwikitopmenuentrystart($xwiki.getURL('Main.WebHome', 'view') $context.getDatabase() 'tmWiki' 'hasIcon')
-  #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=space&parent=$doc.fullName") $msg.get('core.menu.create.space') 'tmCreateSpace', '')
+  #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=space&amp;parent=$doc.fullName") $msg.get('core.menu.create.space') 'tmCreateSpace', '')
   #set ($isWikiWatched = $xwiki.watchlist.isWikiWatched())
   #if (!$isWikiWatched)
     #submenuitem("javascript:XWiki.watchlist.toggleWiki(true)" $msg.get('core.menu.watchlist.add.wiki', [$xwiki.getXMLEncoded($doc.wiki)]) 'tmWatchWiki', '')
@@ -66,8 +66,8 @@
 #else
   #xwikitopmenuentrystart($xwiki.getURL("${doc.space}.WebHome", 'view') $doc.space 'tmSpace' 'hasIcon')
   #set ($hasAdminSpaceRights = $xwiki.hasAccessLevel('admin', "${doc.space}.XWikiPreferences"))  
-  #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=page&parent=$doc.fullName") $msg.get('core.menu.create.page') 'tmCreatePage', '')
-  #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view', "&parent=$doc.fullName") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
+  #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=page&amp;parent=$doc.fullName") $msg.get('core.menu.create.page') 'tmCreatePage', '')
+  #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view', "&amp;parent=$doc.fullName") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
   #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())
   #if (!$isSpaceWatched)
     #submenuitem("javascript:XWiki.watchlist.toggleSpace(true)" $msg.get('core.menu.watchlist.add.space', [$xwiki.getXMLEncoded($doc.space)]) 'tmWatchSpace', '')

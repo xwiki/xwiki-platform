@@ -24,11 +24,11 @@ import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.SelectionManager;
 
 /**
- * Implements {@link SelectionManager} for Mozilla browsers.
+ * Implements {@link SelectionManager} for Firefox prior to version 3.0.
  * 
  * @version $Id$
  */
-public class MozillaSelectionManager implements SelectionManager
+public class MozillaOldSelectionManager implements SelectionManager
 {
     /**
      * {@inheritDoc}
@@ -37,6 +37,6 @@ public class MozillaSelectionManager implements SelectionManager
      */
     public Selection getSelection(Document document)
     {
-        return new MozillaSelection(NativeSelection.getInstance(document));
+        return new MozillaOldSelection(NativeSelection.getInstance(document));
     }
 }

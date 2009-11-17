@@ -49,6 +49,13 @@
   <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaSelectionManager">
     <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
     <any>
+      <when-property-is name="gecko1_9" value="yes"/>
+    </any>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.dom.client.internal.mozilla.MozillaOldSelectionManager">
+    <when-type-is class="org.xwiki.gwt.dom.client.internal.DefaultSelectionManager"/>
+    <any>
       <when-property-is name="user.agent" value="gecko"/>
       <all>
         <when-property-is name="user.agent" value="gecko1_8"/>

@@ -95,7 +95,7 @@ public class IdGenerator
      */
     public void remove(String id)
     {
-        generatedIds.remove(id);
+        this.generatedIds.remove(id);
     }
 
     /**

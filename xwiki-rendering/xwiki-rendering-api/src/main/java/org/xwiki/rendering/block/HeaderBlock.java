@@ -196,7 +196,7 @@ public class HeaderBlock extends AbstractFatherBlock
     {
         super.setParent(parentBlock);
 
-        if (id == null) {
+        if (this.id == null) {
             generateId();
         }
     }

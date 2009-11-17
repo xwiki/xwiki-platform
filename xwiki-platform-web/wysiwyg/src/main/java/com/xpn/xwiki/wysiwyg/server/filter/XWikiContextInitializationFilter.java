@@ -38,10 +38,8 @@ import org.xwiki.context.Execution;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletResponse;
@@ -103,24 +101,34 @@ public class XWikiContextInitializationFilter implements Filter
      */
     protected void initializeXWikiContext(ServletRequest request, ServletResponse response) throws ServletException
     {
-        XWikiEngineContext xwikiEngine = new XWikiServletContext(filterConfig.getServletContext());
-        XWikiRequest xwikiRequest = new XWikiServletRequest((HttpServletRequest) request);
-        XWikiResponse xwikiResponse = new XWikiServletResponse((HttpServletResponse) response);
-
-        XWikiContext context;
         try {
-            // Create the XWiki context.
-            context = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);
-            // Initialize the XWiki database. XWiki#getXWiki(XWikiContext) calls XWikiContext.setWiki(XWiki).
-            context.setURLFactory(XWiki.getXWiki(context).getURLFactoryService().createURLFactory(context.getMode(),
-                context));
-        } catch (XWikiException e) {
-            throw new ServletException("Failed to prepare the XWiki context.", e);
-        }
+            // Not all request types specify an action (e.g. GWT-RPC) so we default to the empty string.
+            String action = "";
+            XWikiServletContext xwikiEngine = new XWikiServletContext(filterConfig.getServletContext());
+            XWikiServletRequest xwikiRequest = new XWikiServletRequest((HttpServletRequest) request);
+            XWikiServletResponse xwikiResponse = new XWikiServletResponse((HttpServletResponse) response);
 
-        // Initialize the Container component which is the new way of transporting the Context in the new component
-        // architecture.
-        initializeContainerComponent(context);
+            // Create the XWiki context.
+            XWikiContext context = Utils.prepareContext(action, xwikiRequest, xwikiResponse, xwikiEngine);
+
+            // Initialize the Container component which is the new way of transporting the Context in the new component
+            // architecture. Further initialization might require the Container component.
+            initializeContainerComponent(context);
+
+            // Initialize the XWiki database. XWiki#getXWiki(XWikiContext) calls XWikiContext.setWiki(XWiki).
+            XWiki xwiki = XWiki.getXWiki(context);
+
+            // Initialize the URL factory.
+            context.setURLFactory(xwiki.getURLFactoryService().createURLFactory(context.getMode(), context));
+
+            // Initialize the current user.
+            XWikiUser user = context.getWiki().checkAuth(context);
+            if (user != null) {
+                context.setUser(user.getUser());
+            }
+        } catch (XWikiException e) {
+            throw new ServletException("Failed to initialize the XWiki context.", e);
+        }
     }
 
     /**

@@ -822,20 +822,20 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 #mainmenu {
   min-width: 970px;
   overflow: visible;
-  z-index: 10000;
+  z-index: 1000;
 }
 
 #mainmenu .submenu {
-  z-index: 10000;
+  z-index: 1000;
 }
 
 /* Content menu */
 #contentmenu {
-  z-index: 9999;
+  z-index: 999;
 }
 
 #contentmenu .submenu {
-  z-index: 9999;
+  z-index: 999;
 }
 
 /* Edit menu */
@@ -952,10 +952,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url(/xwiki/resources/icons/silk/wrench.gif);
 }
 
-.actionmenu #tmWatchWiki {
-  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
-}
-
 .actionmenu #tmCreateSpace {
   background-image: url(/xwiki/resources/icons/silk/folder_add.gif);
 }
@@ -966,10 +962,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 .actionmenu #tmAdminSpace {
   background-image: url(/xwiki/resources/icons/silk/wrench.gif);
-}
-
-.actionmenu #tmWatchSpace {
-  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
 }
 
 .actionmenu #tmCreatePage, .actionmenu #tmCreatePageFromOffice {
@@ -1040,16 +1032,16 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url(/xwiki/resources/icons/silk/user.gif);
 }
 
-.actionmenu #tmWatchWiki, .actionmenu #tmWatchSpace, .actionmenu #tmWatchDocument {
-  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
-}
-
 .actionmenu #tmWatchlistManager {
   background-image: url(/xwiki/resources/icons/silk/wrench.gif);
 }
 
-#contentmenu .isWatched, #mainmenu .isWatched a {
-  background-image: url(/xwiki/resources/icons/xwiki/star%2Dyellow.png) !important;  
+.actionmenu #tmWatchWiki, .actionmenu #tmWatchSpace, .actionmenu #tmWatchDocument {
+  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
+}
+
+.actionmenu #tmUnwatchWiki, .actionmenu #tmUnwatchSpace, .actionmenu #tmUnwatchDocument {
+  background-image: url(/xwiki/resources/icons/xwiki/star%2Dyellow.png);  
 }
 
 /* @group BUTTONS */

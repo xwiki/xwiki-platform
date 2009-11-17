@@ -125,7 +125,10 @@
  overflow: hidden;
  white-space: nowrap;
 }
-
+#annotationPanel textarea 
+{
+ width: 100%;
+}
 .untruncate
 {
  overflow: inherit;

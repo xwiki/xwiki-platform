@@ -19,16 +19,11 @@
  */
 package org.xwiki.gwt.dom.client.internal.mozilla;
 
-import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
-import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.internal.DefaultSelection;
-import org.xwiki.gwt.dom.client.internal.NativeRangeWrapper;
-
-import com.google.gwt.dom.client.Node;
 
 /**
- * Fixes selection problems found in Firefox versions prior to 3.0.
+ * Fixes selection problems found in Mozilla browsers.
  * 
  * @version $Id$
  */
@@ -46,44 +41,18 @@ public class MozillaSelection extends DefaultSelection
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Removes the ghost resize handlers (visible around images and tables) as well as other trailing graphics.
      * 
-     * @see DefaultSelection#addRange(Range)
+     * @see DefaultSelection#removeAllRanges()
      */
-    public void addRange(Range range)
+    public void removeAllRanges()
     {
-        NativeRangeWrapper wrapper = (NativeRangeWrapper) range;
-        Document doc = (Document) range.getStartContainer().getOwnerDocument();
-        if (wrapper.getNativeRange() == null) {
-            wrapper.setNativeRange(NativeRange.newInstance(doc));
-        } else {
-            // Firefox prior to version 3.0 throws NS_ERROR_ILLEGAL_VALUE if we try to set the start boundary of the
-            // native range after the end boundary, or the other way around. Firefox 3 collapses the native range in
-            // this case. The DefaultRange already implements this behavior so the input range should be valid. We
-            // select all content to avoid the exception in Firefox 2.
-            ((NativeRange) wrapper.getNativeRange()).selectNode(doc.getBody());
+        if (getRangeCount() > 0) {
+            // Select all. Apparently this has the effect of removing ghost resize handlers and other trailing graphics.
+            ((Document) getNativeSelection().getRangeAt(0).getStartContainer().getOwnerDocument()).execCommand(
+                "selectall", null);
         }
-        NativeRange nativeRange = wrapper.getNativeRange().cast();
-        nativeRange
-            .setStart(range.getStartContainer(), adjustOffset(range.getStartContainer(), range.getStartOffset()));
-        nativeRange.setEnd(range.getEndContainer(), adjustOffset(range.getEndContainer(), range.getEndOffset()));
-        getNativeSelection().addRange(nativeRange);
-        DOMUtils.getInstance().scrollIntoView(range);
-    }
-
-    /**
-     * Adjusts the specified offset within the given node to avoid NS_ERROR_DOM_INDEX_SIZE_ERR.
-     * 
-     * @param node A DOM node.
-     * @param offset The offset within the given node.
-     * @return the adjusted value of the specified offset.
-     */
-    protected int adjustOffset(Node node, int offset)
-    {
-        if (node.getNodeType() == DOMUtils.COMMENT_NODE) {
-            // Only 0 is allowed.
-            return 0;
-        } else {
-            return offset;
-        }
+        super.removeAllRanges();
     }
 }

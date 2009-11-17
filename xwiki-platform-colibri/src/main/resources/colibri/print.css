@@ -1,4 +1,4 @@
-/* #template('initColorTheme.vm') */
+/* #template('colorThemeInit.vm') */
 #body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent, #mainContentArea {
   background-image: none !important;
   background-color: #FFF !important;

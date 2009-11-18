@@ -5,9 +5,9 @@
 #if ($xwiki.watchlist && $context.user != 'XWiki.XWikiGuest' && !$doc.isNew() && $xwiki.exists('XWiki.WatchListManager'))
   #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
   #if ($isDocWatched)
-    #xwikitopmenuentry("javascript:XWiki.watchlist.toggleDocument(false)" $msg.get('core.menu.watchlist.remove.page') 'tmWatchDocument' 'hasIcon isWatched')
+    #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=removedocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.page') 'tmUnwatchDocument' 'hasIcon')
   #else
-    #xwikitopmenuentry("javascript:XWiki.watchlist.toggleDocument(true)" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' 'hasIcon')
+    #xwikitopmenuentry("$doc.getURL('view', 'xpage=watch&amp;do=adddocument')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.page') 'tmWatchDocument' 'hasIcon')
   #end
 #end
 </div>

@@ -409,7 +409,7 @@ Object.extend(XWiki, {
               window.docviewurl + "?xpage=xpart&vm=" + menu + ".vm",
               {
                 method: 'get',
-                evalScripts: true
+                onComplete: XWiki.watchlist.initialize
               });
     },
     
@@ -428,14 +428,14 @@ Object.extend(XWiki, {
         surl,
         {
           method: 'get',
-          onComplete: function() { XWiki.watchlist.updateMenu("contentmenu") }
+          onComplete: function() { XWiki.watchlist.updateMenu("contentmenu"); }
         });
     },
     
     /**
      * Add or remove the current space from the current user's watchlist.
      * 
-     * @param add True to add the space to the user's watchlist, false to remove it.
+     * @param add True to add the space to the user's watchlist, false to remove it. 
      */
     toggleSpace : function(add) {
         var action = "removespace";
@@ -447,7 +447,7 @@ Object.extend(XWiki, {
           surl,
           {
             method: 'get',
-            onComplete: function() { XWiki.watchlist.updateMenu("menuview") }
+            onComplete: function() { XWiki.watchlist.updateMenu("menuview"); }
           });
     },
     
@@ -466,8 +466,46 @@ Object.extend(XWiki, {
           surl,
           {
             method: 'get',
-            onComplete: function() { XWiki.watchlist.updateMenu("menuview") }
+            onComplete: function() { XWiki.watchlist.updateMenu("menuview"); }
           });
+    },
+    
+    /**
+     * Buttons mapping for watchlist UI.
+     */
+    buttonMapping : {
+        'tmWatchDocument' : function() { XWiki.watchlist.toggleDocument(true); },
+        'tmUnwatchDocument' : function() { XWiki.watchlist.toggleDocument(false); },
+        'tmWatchSpace' : function() { XWiki.watchlist.toggleSpace(true); },
+        'tmUnwatchSpace' : function() { XWiki.watchlist.toggleSpace(false); },
+        'tmWatchWiki' : function() { XWiki.watchlist.toggleWiki(true); },
+        'tmUnwatchWiki' : function() { XWiki.watchlist.toggleWiki(false); }
+    },
+    
+    /**
+     * Initialize watchlist UI. 
+     */
+    initialize: function() {
+        for (button in XWiki.watchlist.buttonMapping) {
+          if ($(button) != null) {
+            var element = $(button);
+            var self = this;
+            
+            if (element.nodeName != 'A') {
+              element = $(button).firstChild;
+            }            
+            
+            // unregister previously registered handler if any
+            element.stopObserving('click');
+            element.observe('click', function(event) { 
+                var element = event.element();                
+                while (element.id == '') {
+                    element = element.parentNode;
+                }   
+                XWiki.watchlist.buttonMapping[element.id](); Event.stop(event); 
+              });
+          }
+        }
     }
   },
 
@@ -486,7 +524,8 @@ Object.extend(XWiki, {
       this.makeRenderingErrorsExpandable();
       this.fixLinksTargetAttribute();
       this.insertSectionEditLinks();
-
+      this.watchlist.initialize();
+      
       document.fire("xwiki:dom:loaded");
     }
   }

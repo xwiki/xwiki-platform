@@ -12,3 +12,6 @@
 #elseif ($do == 'removewiki')
   $xwiki.watchlist.removeWiki($doc.wiki)
 #end
+#if ("$!request.xredirect" != "")
+  $response.sendRedirect($request.xredirect)
+#end

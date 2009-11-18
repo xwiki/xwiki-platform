@@ -639,17 +639,17 @@ Panels
 ---------------------------------------
 */
 
-#globalsearch {
+.globalsearch {
   text-align: center;
   margin: 0px;
   padding: 0px 0px 30px;
 }
-#globalsearch input{
+.globalsearch input{
   font-size: 0.7em;
   border: 1px solid;
   display: inline !important;
 }
-#globalsearch input.button{
+.globalsearch input.button{
   vertical-align: middle;
   font-size: 1em;
   border: 0px;

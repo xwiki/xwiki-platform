@@ -71,7 +71,7 @@ public class ParameterDisplayer
 
         Panel label = new FlowPanel();
         label.setStylePrimaryName("xMacroParameterLabel");
-        label.add(new InlineLabel(descriptor.getId()));
+        label.add(new InlineLabel(descriptor.getName()));
         if (descriptor.isMandatory()) {
             InlineLabel mandatoryLabel = new InlineLabel(Strings.INSTANCE.mandatory());
             mandatoryLabel.addStyleName("xMandatory");

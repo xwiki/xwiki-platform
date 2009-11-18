@@ -1389,26 +1389,28 @@ div.panellayoutcontainer-5col .panellayoutcol {
 }
 
 div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcontainer-3col, div.panellayoutcontainer-4col, div.panellayoutcontainer-5col {
-  overflow: auto;
   clear: left;
+  overflow: auto;
 }
 
 .panellayoutcol {
-  overflow: auto;
   float: left;
   height: 1%;
+  overflow: auto;
+
 }
 
 .panellayoutcol .panel {
-  width: 90%;
-  margin: 0 0 20px 5%;
   border: 1px solid #ddd;
+  margin: 0 0 20px 5%;
+  width: 90%;
+
 }
 
 #xwikicontent .panel ul {
+  list-style-position: inside;
   margin: 0 5px;
   padding: 0;
-  list-style-position: inside;
 }
 
 #xwikicontent .panellayoutcol .panel .xwikipanelcontents {

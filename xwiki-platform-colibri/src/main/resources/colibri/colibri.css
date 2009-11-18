@@ -279,22 +279,22 @@ span.wikicreatelink a {
   width: 190px;
 }
 
-#globalsearch {
+.globalsearch {
   text-align: right;
 }
 
-#globalsearch input {
+.globalsearch input {
   display: inline;
   vertical-align: middle;
 }
 
-#globalsearchinput {
+.globalsearchinput {
   min-height: 16px;
   padding: 0 18px 0 2px;
   width: 168px;
 }
 
-#globalsearch input.button {
+.globalsearch input.button {
   background-color: transparent;
   border: 0;
   height: 16px;

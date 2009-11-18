@@ -42,9 +42,9 @@
   #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=space&amp;parent=$doc.fullName") $msg.get('core.menu.create.space') 'tmCreateSpace', '')
   #set ($isWikiWatched = $xwiki.watchlist.isWikiWatched())
   #if (!$isWikiWatched)
-    #submenuitem("javascript:XWiki.watchlist.toggleWiki(true)" $msg.get('core.menu.watchlist.add.wiki', [$xwiki.getXMLEncoded($doc.wiki)]) 'tmWatchWiki', '')
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addwiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.wiki', [$xwiki.getXMLEncoded($doc.wiki)]) 'tmWatchWiki', '')
   #else
-    #submenuitem("javascript:XWiki.watchlist.toggleWiki(false)" $msg.get('core.menu.watchlist.remove.wiki') 'tmWatchWiki', 'isWatched')
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removewiki')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.wiki') 'tmUnwatchWiki', '')
   #end
   #set ($hasAdminWikiRights = $xwiki.hasAccessLevel('admin', 'XWiki.XWikiPreferences'))
   #if($hasAdminWikiRights)
@@ -70,9 +70,9 @@
   #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view', "&amp;parent=$doc.fullName") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
   #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())
   #if (!$isSpaceWatched)
-    #submenuitem("javascript:XWiki.watchlist.toggleSpace(true)" $msg.get('core.menu.watchlist.add.space', [$xwiki.getXMLEncoded($doc.space)]) 'tmWatchSpace', '')
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=addspace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.add.space', [$xwiki.getXMLEncoded($doc.space)]) 'tmWatchSpace', '')
   #else
-    #submenuitem("javascript:XWiki.watchlist.toggleSpace(false)" $msg.get('core.menu.watchlist.remove.space') 'tmWatchSpace', 'isWatched')
+    #submenuitem("$doc.getURL('view', 'xpage=watch&amp;do=removespace')&amp;xredirect=$doc.getURL()" $msg.get('core.menu.watchlist.remove.space') 'tmUnwatchSpace', '')
   #end
   #if($hasAdminSpaceRights && $adminapppresent)
     #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences", 'admin'))

@@ -5,12 +5,12 @@ a {position:relative; z-index:1;}
 #companylogo a img {position: relative; float: left;}
 #companylogo {width: 740px;}
 #rightPanels, #editPanels { margin-top: -27px;}
-#globalsearch{margin-bottom: 1em}
+.globalsearch{margin-bottom: 1em}
 
 h5.xwikipaneltitle,
 .collapsed h5.xwikipaneltitle,
 .xwikipanelcontents {background-image: url(images/panel-v.gif);}
-#globalsearch form div {background-image:url(images/search-bg.gif);}
+.globalsearch form div {background-image:url(images/search-bg.gif);}
 
 
 #xwikihelpsyntax {background-image: url(images/panel-e.gif);}

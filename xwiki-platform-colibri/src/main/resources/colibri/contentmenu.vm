@@ -1,3 +1,4 @@
+<strong id="xwikicontentmenutitle" class="hidden">$msg.get('core.menu.content.title')</strong>
 <div class="rightmenu">
 ##
 ## Watch menu

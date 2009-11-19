@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1242173909000</creationDate>
-<date>1242267483000</date>
-<contentUpdateDate>1242267483000</contentUpdateDate>
-<version>60.1</version>
+<date>1258641136000</date>
+<contentUpdateDate>1258641136000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -24,6 +24,7 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <hidden>false</hidden>
 <content>#set($interface = $xwiki.rightsmanager.defaultUi)
+#set($mainwk = $context.isMainWiki())
 ## display the new interface
 #if($interface == "new")
 $xwiki.jsfx.use("js/xwiki/usersandgroups/usersandgroups.js", true)

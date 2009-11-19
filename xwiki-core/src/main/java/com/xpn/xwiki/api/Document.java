@@ -2005,8 +2005,9 @@ public class Document extends Api
     }
 
     /**
-     * Rename the current document and all the backlinks leading to it. See
-     * {@link #renameDocument(String, java.util.List)} for more details.
+     * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
+     * which list the document we are renaming as their parent.
+     * See {@link #renameDocument(String, java.util.List, java.util.List)} for more details.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @throws XWikiException in case of an error
@@ -2037,10 +2038,11 @@ public class Document extends Api
      * <li>[Page]</li>
      * <li>[Page?param=1]</li>
      * <li>[currentwiki:Page]</li>
-     * <li>[CurrentSpace.Page]</li>
+     * <li>[currentwiki:CurrentSpace.Page]</li>
      * </ul>
      * <p>
-     * Note: links without a space are renamed with the space added.
+     * Note: links without a space are renamed with the space added and all documents which have the document being 
+     * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
      * </p>
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
@@ -2054,6 +2056,41 @@ public class Document extends Api
             && this.context.getWiki().checkAccess("edit",
                 this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
             this.doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
+        }
+    }
+    
+    /**
+     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document
+     * as their parent is passed in parameter.
+     * 
+     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
+     * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
+     *        new renamed document.
+     * @param childDocumentNames the list of documents whose parent field will be set to the new document name.
+     * @throws XWikiException in case of an error
+     */
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames) 
+        throws XWikiException
+    {
+        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
+            this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+
+            // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
+            // Let's make sure the user has edit permission on any page given which is not actually a child.
+            // Otherwise it would be embarrassing if a user called: 
+            //   $doc.rename("mynewpage",$doc.getBacklinks(),$xwiki.searchDocuments("true"))
+            int counter = childDocumentNames.size();
+            List<String> actuallyChildren = getChildren();
+            while (counter > 0) {
+                counter--;
+                if (!actuallyChildren.contains(childDocumentNames.get(counter)) 
+                    && !this.context.getWiki().checkAccess("edit", this.context.getWiki().getDocument(
+                        childDocumentNames.get(counter), this.context), this.context)) {
+                    return;
+                }
+            }
+
+            this.doc.rename(newDocumentName, backlinkDocumentNames, childDocumentNames, getXWikiContext());
         }
     }
 

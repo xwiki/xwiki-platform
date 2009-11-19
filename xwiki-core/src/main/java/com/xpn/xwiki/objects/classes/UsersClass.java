@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.button;
@@ -39,7 +40,9 @@ public class UsersClass extends ListClass
     {
         List<String> list;
         try {
-            list = context.getWiki().getGroupService(context).listMemberForGroup(null, context);
+            list =
+                    (List<String>) context.getWiki().getGroupService(context).getAllMatchedUsers(null, false, 0, 0,
+                        null, context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList<String>();
@@ -135,9 +138,17 @@ public class UsersClass extends ListClass
         list.remove(XWikiRightService.GUEST_USER_FULLNAME);
         list.add(0, XWikiRightService.GUEST_USER_FULLNAME);
 
-        // Add options from Set
+        // Sort the user list
+        TreeMap<String, String> map = new TreeMap<String, String>();
         for (String value : list) {
-            String display = getText(value, context);
+            map.put(getText(value, context), value);
+        }
+
+        // Add options from Set
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String display = entry.getKey();
+            String value = entry.getValue();
+
             option option = new option(display, value);
             option.addElement(display);
             if (selectlist.contains(value)) {

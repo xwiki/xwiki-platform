@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.button;
@@ -21,10 +22,10 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class GroupsClass extends ListClass
 {
-
     public GroupsClass(PropertyMetaClass wclass)
     {
         super("groupslist", "Groups List", wclass);
+
         setSize(6);
         setUsesList(true);
     }
@@ -41,8 +42,8 @@ public class GroupsClass extends ListClass
         List<String> list;
         try {
             list =
-                (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0, null,
-                    context);
+                    (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0,
+                        null, context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList<String>();
@@ -144,8 +145,17 @@ public class GroupsClass extends ListClass
                 list.add(value);
             }
         }
+
+        // Sort the group list
+        TreeMap<String, String> map = new TreeMap<String, String>();
         for (String value : list) {
-            String display = getText(value, context);
+            map.put(getText(value, context), value);
+        }
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            String display = entry.getKey();
+            String value = entry.getValue();
+
             option option = new option(display, value);
             option.addElement(display);
             if (selectlist.contains(value)) {

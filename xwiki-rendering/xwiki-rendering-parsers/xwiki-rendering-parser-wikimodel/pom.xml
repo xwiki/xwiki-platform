@@ -52,7 +52,7 @@
         <configuration>
           <includes>
             **/AbstractWikiModelParser.java
-            **/WikiModelXWikiParser.java
+            **/WikiModelXWiki20Parser.java
           </includes>
         </configuration>
       </plugin>

@@ -90,6 +90,15 @@ public class XDOM extends AbstractFatherBlock
     }
 
     /**
+     * @param idGenerator a stateful id generator for the whole document.
+     * @since 2.1M1
+     */
+    public void setIdGenerator(IdGenerator idGenerator)
+    {
+        this.idGenerator = idGenerator;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)

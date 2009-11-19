@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.listener;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.xwiki.rendering.syntax.Syntax;
@@ -49,6 +50,11 @@ import org.xwiki.rendering.syntax.Syntax;
 public interface Listener extends LinkListener, ImageListener
 {
     /**
+     * To use when there is no parameters.
+     */
+    Map<String, String> EMPTY_PARAMETERS = Collections.emptyMap();
+
+    /**
      * Start of the document.
      * 
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
@@ -63,9 +69,8 @@ public interface Listener extends LinkListener, ImageListener
     void endDocument(Map<String, String> parameters);
 
     /**
-     * Start a group of elements. Groups are used to allow using standalone elements in 
-     * list items, table cells, etc. They can also be used to set parameters on a group of 
-     * standalone elements.
+     * Start a group of elements. Groups are used to allow using standalone elements in list items, table cells, etc.
+     * They can also be used to set parameters on a group of standalone elements.
      * 
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      * @since 1.8.3
@@ -406,16 +411,16 @@ public interface Listener extends LinkListener, ImageListener
      * @param parameters a generic list of parameters. Example: style="background-color: blue"
      */
     void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters);
-    
+
     /**
      * Some text to inject directly into the listener output without parsing it. For example a HTML macro could inject
-     * directly some HTML entered by the user into the rendered HTML output. Note that it's not recommended to use
-     * this event in most cases since it can lead to invalid content being generated and in addition most listener 
+     * directly some HTML entered by the user into the rendered HTML output. Note that it's not recommended to use this
+     * event in most cases since it can lead to invalid content being generated and in addition most listener
      * implementations will not understand the injected text and will just ignore it.
-     *  
-     * @param text the text to inject
+     * 
+     * @param rawContent the text to inject
      * @param syntax the syntax in which the text is written. This is useful so that listener implementations can decide
-     *         whether they can handle direct inject for that syntax
+     *            whether they can handle direct inject for that syntax
      */
-    void onRawText(String text, Syntax syntax);
+    void onRawText(String rawContent, Syntax syntax);
 }

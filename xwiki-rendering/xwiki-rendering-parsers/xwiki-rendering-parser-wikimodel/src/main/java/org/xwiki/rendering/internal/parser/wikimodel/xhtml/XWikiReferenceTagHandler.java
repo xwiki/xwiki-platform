@@ -19,12 +19,12 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
+import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.impl.WikiScannerContext;
 import org.wikimodel.wem.xhtml.handler.ReferenceTagHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack.TagContext;
-import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 
 /**
  * Override the default WikiModel Reference handler to handle XWiki references since we store some information in
@@ -48,8 +48,8 @@ public class XWikiReferenceTagHandler extends ReferenceTagHandler
     {
         boolean isInLink = (Boolean) context.getTagStack().getStackParameter("isInLink");
         if (isInLink) {
-            XDOMGeneratorListener listener =
-                (XDOMGeneratorListener) context.getTagStack().getStackParameter("xdomGeneratorListener");
+            IWemListener listener =
+                (IWemListener) context.getTagStack().getStackParameter("linkListener");
             context.getTagStack().pushScannerContext(new WikiScannerContext(listener));
 
             // Ensure we simulate a new document being parsed

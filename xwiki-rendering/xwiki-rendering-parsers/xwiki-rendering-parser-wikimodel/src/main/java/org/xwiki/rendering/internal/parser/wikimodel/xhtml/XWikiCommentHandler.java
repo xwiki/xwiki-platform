@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
-import java.util.Collections;
 import java.util.Stack;
 
 import org.wikimodel.wem.WikiParameter;
@@ -27,13 +26,12 @@ import org.wikimodel.wem.WikiParameters;
 import org.wikimodel.wem.WikiReference;
 import org.wikimodel.wem.xhtml.handler.CommentHandler;
 import org.wikimodel.wem.xhtml.impl.XhtmlHandler.TagStack;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
+import org.xwiki.rendering.internal.parser.wikimodel.XWikiGeneratorListener;
 import org.xwiki.rendering.listener.Image;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -49,7 +47,7 @@ import org.xwiki.xml.XMLUtils;
  */
 public class XWikiCommentHandler extends CommentHandler
 {
-    private Parser parser;
+    private StreamParser parser;
 
     private LinkParser linkParser;
 
@@ -57,7 +55,7 @@ public class XWikiCommentHandler extends CommentHandler
 
     private PrintRendererFactory xwikiSyntaxPrintRendererFactory;
 
-    private BlockRenderer plainTextBlockRenderer;
+    private PrintRendererFactory plainRendererFactory;
 
     /**
      * We're using a stack so that we can have nested comment handling. For example when we have a link to an image we
@@ -66,18 +64,18 @@ public class XWikiCommentHandler extends CommentHandler
     private Stack<String> commentContentStack = new Stack<String>();
 
     /**
-     * @since 2.0M3
+     * @since 2.1RC1
      * @todo Remove the need to pass a Parser when WikiModel implements support for wiki syntax in links. See
      *       http://code.google.com/p/wikimodel/issues/detail?id=87
      */
-    public XWikiCommentHandler(Parser parser, LinkParser linkParser, ImageParser imageParser,
-        PrintRendererFactory xwikiSyntaxPrintRendererFactory, BlockRenderer plainTextBlockRenderer)
+    public XWikiCommentHandler(StreamParser parser, LinkParser linkParser, ImageParser imageParser,
+        PrintRendererFactory xwikiSyntaxPrintRendererFactory, PrintRendererFactory plainRendererFactory)
     {
         this.parser = parser;
         this.linkParser = linkParser;
         this.xwikiSyntaxPrintRendererFactory = xwikiSyntaxPrintRendererFactory;
         this.imageParser = imageParser;
-        this.plainTextBlockRenderer = plainTextBlockRenderer;
+        this.plainRendererFactory = plainRendererFactory;
     }
 
     @Override
@@ -106,18 +104,6 @@ public class XWikiCommentHandler extends CommentHandler
 
     private void handleLinkCommentStart(String content, TagStack stack)
     {
-        stack.pushStackParameter("xdomGeneratorListener", new XDOMGeneratorListener(this.parser, this.linkParser,
-            this.imageParser, this.plainTextBlockRenderer));
-        stack.pushStackParameter("isInLink", true);
-        stack.pushStackParameter("isFreeStandingLink", false);
-        stack.pushStackParameter("linkParameters", WikiParameters.EMPTY);
-
-        this.commentContentStack.push(content.substring("startwikilink:".length()));
-    }
-
-    private void handleLinkCommentStop(String content, TagStack stack)
-    {
-        DefaultWikiPrinter printer = new DefaultWikiPrinter();
         // Since wikimodel does not support wiki syntax in link labels we need to pass the link label "as is" (as it
         // originally appears in the parsed source) and handle it specially in the
         // XDOMGeneratorListener.createLinkBlock(), with the parser passed as the first parameter in the
@@ -131,21 +117,39 @@ public class XWikiCommentHandler extends CommentHandler
         // see WikiModelXHTMLParser#getLinkLabelParser()
         // see http://code.google.com/p/wikimodel/issues/detail?id=87
         // TODO: remove this workaround when wiki syntax in link labels will be supported by wikimodel
-        PrintRenderer renderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
-        XDOMGeneratorListener listener = (XDOMGeneratorListener) stack.popStackParameter("xdomGeneratorListener");
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
 
-        renderer.beginDocument(Collections.<String, String> emptyMap());
-        for (Block block : listener.getXDOM().getChildren()) {
-            block.traverse(renderer);
-        }
-        renderer.endDocument(Collections.<String, String> emptyMap());
+        PrintRenderer linkLabelRenderer = this.xwikiSyntaxPrintRendererFactory.createRenderer(printer);
+        // Make sure to flush whatever the renderer implementation
+        linkLabelRenderer.beginDocument(Listener.EMPTY_PARAMETERS);
+
+        XWikiGeneratorListener xwikiListener =
+                new XWikiGeneratorListener(this.parser, linkLabelRenderer, this.linkParser, this.imageParser,
+                    this.plainRendererFactory, null);
+
+        stack.pushStackParameter("linkListener", xwikiListener);
+
+        stack.pushStackParameter("isInLink", true);
+        stack.pushStackParameter("isFreeStandingLink", false);
+        stack.pushStackParameter("linkParameters", WikiParameters.EMPTY);
+
+        this.commentContentStack.push(content.substring("startwikilink:".length()));
+    }
+
+    private void handleLinkCommentStop(String content, TagStack stack)
+    {
+        XWikiGeneratorListener xwikiListener = (XWikiGeneratorListener) stack.popStackParameter("linkListener");
+        PrintRenderer linkLabelRenderer = (PrintRenderer) xwikiListener.getListener();
+
+        // Make sure to flush whatever the renderer implementation
+        linkLabelRenderer.endDocument(Listener.EMPTY_PARAMETERS);
 
         boolean isFreeStandingLink = (Boolean) stack.getStackParameter("isFreeStandingLink");
         String linkComment = this.commentContentStack.pop();
         if (isFreeStandingLink) {
             stack.getScannerContext().onReference(linkComment);
         } else {
-            String label = printer.toString();
+            String label = linkLabelRenderer.getPrinter().toString();
             String reference = linkComment;
             WikiParameters params = (WikiParameters) stack.getStackParameter("linkParameters");
 

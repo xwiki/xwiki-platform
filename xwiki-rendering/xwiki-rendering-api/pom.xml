@@ -139,7 +139,6 @@
             **/rendering/listener/chaining/ChainingListener.java,
             **/rendering/listener/chaining/StackableChainingListener.java,
             **/rendering/listener/chaining/ListenerChain.java,
-            **/rendering/listener/xml/*.java,
             **/rendering/macro/**/*.java,
             **/rendering/parser/*.java,
             **/rendering/renderer/*.java,
@@ -151,7 +150,7 @@
             **/rendering/util/*.java
           </includes>
           <excludes>
-            **/rendering/internal/parser/XMLBlockConverterHandler.java,
+            **/rendering/internal/parser/XDOMGeneratorListener.java,
           </excludes>
         </configuration>
       </plugin>
@@ -202,6 +201,9 @@
                 <exclude>org/xwiki/rendering/macro/descriptor/AbstractMacroDescriptor</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/DefaultParameterDescriptor</exclude>
                 <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
+                <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener$Event</exclude>
+                <exclude>org/xwiki/rendering/block/HeaderBlock</exclude>
               </excludes>
             </configuration>
           </plugin>

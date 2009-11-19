@@ -19,17 +19,21 @@
  */
 package org.xwiki.rendering.internal.parser.wikimodel;
 
+import java.io.Reader;
+
+import org.wikimodel.wem.IWikiParser;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.XDOMGeneratorListener;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
-import org.wikimodel.wem.IWikiParser;
-
-import java.io.Reader;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * Common code for all WikiModel-based parsers.
@@ -37,13 +41,13 @@ import org.xwiki.rendering.renderer.BlockRenderer;
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
+public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser, StreamParser
 {
     /**
-     * Used by the XDOMGeneratorListener to generate unique header ids.
+     * Used by the XWikiGeneratorListener to generate unique header ids.
      */
     @Requirement("plain/1.0")
-    protected BlockRenderer plainTextBlockRenderer;
+    protected PrintRendererFactory plainRendererFactory;
 
     /**
      * @return the WikiModel parser instance to use to parse input content.
@@ -52,48 +56,84 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     public abstract IWikiParser createWikiModelParser() throws ParseException;
 
     /**
-     * @return the parser to use when parsing links. We need to parse links to transform a link reference passed as
-     *         a raw string by WikiModel into a {@link org.xwiki.rendering.listener.Link} object.
+     * @return the parser to use when parsing links. We need to parse links to transform a link reference passed as a
+     *         raw string by WikiModel into a {@link org.xwiki.rendering.listener.Link} object.
      */
     public abstract LinkParser getLinkParser();
 
     /**
-     * @return the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). 
-     *         We transform a raw image reference into a {@link org.xwiki.rendering.listener.Image} object.
+     * @return the parser to use when parsing image references (eg "Space.Doc@image.png" in XWiki Syntax 2.0). We
+     *         transform a raw image reference into a {@link org.xwiki.rendering.listener.Image} object.
      */
     public abstract ImageParser getImageParser();
-    
+
     /**
-     * @return the syntax parser to use for parsing link labels, since wikimodel does not support wiki syntax 
-     *         in links and they need to be handled in the XDOMGeneratorListener. By default, the link label 
-     *         parser is the same one as the source parser (this), but you should overwrite this method if you
-     *         need to use a special parser.
+     * @return the syntax parser to use for parsing link labels, since wikimodel does not support wiki syntax in links
+     *         and they need to be handled in the {@link XWikiGeneratorListener}. By default, the link label parser is
+     *         the same one as the source parser (this), but you should overwrite this method if you need to use a
+     *         special parser.
      * @see XDOMGeneratorListener
      * @see <a href="http://code.google.com/p/wikimodel/issues/detail?id=87">wikimodel issue 87</a>
-     * TODO: Remove this method when the parser will not need to be passed to the XDOMGeneratorListener anymore.
+     * @since 2.1RC1
      */
-    protected Parser getLinkLabelParser() 
+    // TODO: Remove this method when the parser will not need to be passed to the XDOMGeneratorListener anymore.
+    protected StreamParser getLinkLabelParser()
     {
         return this;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Parser#parse(Reader)
      */
     public XDOM parse(Reader source) throws ParseException
     {
-        IWikiParser parser = createWikiModelParser();
+        IdGenerator idGenerator = new IdGenerator();
 
         // We pass the LinkParser corresponding to the syntax.
-        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.getLinkLabelParser(), getLinkParser(),
-            getImageParser(), this.plainTextBlockRenderer);
+        XDOMGeneratorListener listener = new XDOMGeneratorListener();
 
+        parse(source, listener, idGenerator);
+
+        XDOM xdom = listener.getXDOM();
+        xdom.setIdGenerator(idGenerator);
+
+        return xdom;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.StreamParser#parse(java.io.Reader, org.xwiki.rendering.listener.Listener)
+     */
+    public void parse(Reader source, Listener listener) throws ParseException
+    {
+        IdGenerator idGenerator = new IdGenerator();
+
+        parse(source, listener, idGenerator);
+    }
+
+    /**
+     * @param source the content to parse
+     * @param listener receive event for each element
+     * @param idGenerator unique id tool generator
+     * @throws ParseException if the source cannot be read or an unexpected error happens during the parsing. Parsers
+     *             should be written to not generate any error as much as possible.
+     * @since 2.1RC1
+     */
+    private void parse(Reader source, Listener listener, IdGenerator idGenerator) throws ParseException
+    {
+        // We pass the LinkParser corresponding to the syntax.
+        XWikiGeneratorListener wikimodelListener =
+                new XWikiGeneratorListener(getLinkLabelParser(), listener, getLinkParser(), getImageParser(),
+                    this.plainRendererFactory, idGenerator);
+
+        IWikiParser parser = createWikiModelParser();
         try {
-            parser.parse(source, listener);
+            parser.parse(source, wikimodelListener);
         } catch (Exception e) {
             throw new ParseException("Failed to parse input source", e);
         }
-        return listener.getXDOM();
     }
 }

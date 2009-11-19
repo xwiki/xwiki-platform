@@ -19,37 +19,29 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.block.NewLineBlock;
-import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.rendering.block.SpecialSymbolBlock;
-import org.xwiki.component.annotation.Component;
-
-import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.ArrayList;
+import java.io.Reader;
 import java.util.regex.Pattern;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.syntax.Syntax;
+
 /**
- * Plain Text Parser to convert a text source into a XDOM object.
+ * Plain Text Parser to convert a text source into a events.
  * 
  * @version $Id$
- * @since 2.0M3
+ * @since 2.1M1
  */
 @Component("plain/1.0")
-public class PlainTextParser implements Parser
+public class PlainTextStreamParser implements StreamParser
 {
     /**
-     * The characters which are considered as "special" symbols for {@link SpecialSymbolBlock}.
+     * The characters which are considered as "special" symbols for {@link org.xwiki.rendering.block.SpecialSymbolBlock}
+     * .
      */
     private static final Pattern SPECIALSYMBOL_PATTERN = Pattern.compile("[!\"#$%&'()*+,-./:;<=>?@\\[\\]^_`{|}~]");
 
@@ -61,55 +53,6 @@ public class PlainTextParser implements Parser
     public Syntax getSyntax()
     {
         return Syntax.PLAIN_1_0;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.parser.Parser#parse(java.io.Reader)
-     */
-    public XDOM parse(Reader source) throws ParseException
-    {
-        List<Block> blockList = new ArrayList<Block>();
-        StringBuffer word = new StringBuffer();
-        BufferedReader bufferedSource = new BufferedReader(source);
-        int charAsInt;
-
-        while ((charAsInt = readChar(bufferedSource)) != -1) {
-            char c = (char) charAsInt;
-            if (c == '\n') {
-                if (word.length() > 0) {
-                    blockList.add(new WordBlock(word.toString()));
-                }
-                blockList.add(NewLineBlock.NEW_LINE_BLOCK);
-
-                word.setLength(0);
-            } else if (c == '\r') {
-                // Do nothing, skip it
-            } else if (c == ' ') {
-                if (word.length() > 0) {
-                    blockList.add(new WordBlock(word.toString()));
-                }
-                blockList.add(SpaceBlock.SPACE_BLOCK);
-
-                word.setLength(0);
-            } else if (SPECIALSYMBOL_PATTERN.matcher(String.valueOf(c)).matches()) {
-                if (word.length() > 0) {
-                    blockList.add(new WordBlock(word.toString()));
-                }
-                blockList.add(new SpecialSymbolBlock(c));
-
-                word.setLength(0);
-            } else {
-                word.append(c);
-            }
-        }
-
-        if (word.length() > 0) {
-            blockList.add(new WordBlock(word.toString()));
-        }
-
-        return new XDOM(Collections.<Block> singletonList(new ParagraphBlock(blockList)));
     }
 
     /**
@@ -130,5 +73,55 @@ public class PlainTextParser implements Parser
         }
 
         return c;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.StreamParser#parse(java.io.Reader, org.xwiki.rendering.listener.Listener)
+     */
+    public void parse(Reader source, Listener listener) throws ParseException
+    {
+        StringBuffer word = new StringBuffer();
+        BufferedReader bufferedSource = new BufferedReader(source);
+        int charAsInt;
+
+        listener.beginParagraph(Listener.EMPTY_PARAMETERS);
+
+        while ((charAsInt = readChar(bufferedSource)) != -1) {
+            char c = (char) charAsInt;
+            if (c == '\n') {
+                if (word.length() > 0) {
+                    listener.onWord(word.toString());
+                }
+                listener.onNewLine();
+
+                word.setLength(0);
+            } else if (c == '\r') {
+                // Do nothing, skip it
+            } else if (c == ' ') {
+                if (word.length() > 0) {
+                    listener.onWord(word.toString());
+                }
+                listener.onSpace();
+
+                word.setLength(0);
+            } else if (SPECIALSYMBOL_PATTERN.matcher(String.valueOf(c)).matches()) {
+                if (word.length() > 0) {
+                    listener.onWord(word.toString());
+                }
+                listener.onSpecialSymbol(c);
+
+                word.setLength(0);
+            } else {
+                word.append(c);
+            }
+        }
+
+        if (word.length() > 0) {
+            listener.onWord(word.toString());
+        }
+
+        listener.endParagraph(Listener.EMPTY_PARAMETERS);
     }
 }

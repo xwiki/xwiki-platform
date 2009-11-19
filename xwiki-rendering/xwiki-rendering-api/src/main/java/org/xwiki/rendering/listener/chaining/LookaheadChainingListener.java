@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.listener.chaining;
 
-import java.util.LinkedList;
 import java.util.Map;
 
 import org.xwiki.rendering.listener.Format;
@@ -27,6 +26,8 @@ import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.QueueListener;
+import org.xwiki.rendering.listener.QueueListener.Event;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -38,22 +39,9 @@ import org.xwiki.rendering.syntax.Syntax;
  */
 public class LookaheadChainingListener extends AbstractChainingListener
 {
-    private LinkedList<Event> previousEvents = new LinkedList<Event>();
+    private QueueListener previousEvents = new QueueListener();
 
     private int lookaheadDepth;
-
-    public class Event
-    {
-        public EventType eventType;
-
-        public Object[] eventParameters;
-
-        public Event(EventType eventType, Object[] eventParameters)
-        {
-            this.eventType = eventType;
-            this.eventParameters = eventParameters;
-        }
-    }
 
     public LookaheadChainingListener(ListenerChain listenerChain, int lookaheadDepth)
     {
@@ -68,11 +56,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
 
     public Event getNextEvent(int depth)
     {
-        Event event = null;
-        if (depth > 0 && this.previousEvents.size() > depth - 1) {
-            event = this.previousEvents.get(depth - 1);
-        }
-        return event;
+        return this.previousEvents.getEvent(depth);
     }
 
     /**
@@ -83,7 +67,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginDefinitionDescription()
     {
-        saveEvent(EventType.BEGIN_DEFINITION_DESCRIPTION);
+        this.previousEvents.beginDefinitionDescription();
         firePreviousEvent();
     }
 
@@ -96,7 +80,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginDefinitionList(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_DEFINITION_LIST, parameters);
+        this.previousEvents.beginDefinitionList(parameters);
         firePreviousEvent();
     }
 
@@ -108,7 +92,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginDefinitionTerm()
     {
-        saveEvent(EventType.BEGIN_DEFINITION_TERM);
+        this.previousEvents.beginDefinitionTerm();
         firePreviousEvent();
     }
 
@@ -120,7 +104,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginDocument(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_DOCUMENT, parameters);
+        this.previousEvents.beginDocument(parameters);
         flush();
     }
 
@@ -132,7 +116,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginGroup(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_GROUP, parameters);
+        this.previousEvents.beginGroup(parameters);
         firePreviousEvent();
     }
 
@@ -145,7 +129,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginFormat(Format format, Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_FORMAT, format, parameters);
+        this.previousEvents.beginFormat(format, parameters);
         firePreviousEvent();
     }
 
@@ -158,7 +142,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_HEADER, level, id, parameters);
+        this.previousEvents.beginHeader(level, id, parameters);
         firePreviousEvent();
     }
 
@@ -171,7 +155,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_LINK, link, isFreeStandingURI, parameters);
+        this.previousEvents.beginLink(link, isFreeStandingURI, parameters);
         firePreviousEvent();
     }
 
@@ -184,7 +168,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginList(ListType listType, Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_LIST, listType, parameters);
+        this.previousEvents.beginList(listType, parameters);
         firePreviousEvent();
     }
 
@@ -196,7 +180,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginListItem()
     {
-        saveEvent(EventType.BEGIN_LIST_ITEM);
+        this.previousEvents.beginListItem();
         firePreviousEvent();
     }
 
@@ -209,7 +193,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        saveEvent(EventType.BEGIN_MACRO_MARKER, name, parameters, content, isInline);
+        this.previousEvents.beginMacroMarker(name, parameters, content, isInline);
         firePreviousEvent();
     }
 
@@ -221,7 +205,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginParagraph(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_PARAGRAPH, parameters);
+        this.previousEvents.beginParagraph(parameters);
         firePreviousEvent();
     }
 
@@ -233,7 +217,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginQuotation(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_QUOTATION, parameters);
+        this.previousEvents.beginQuotation(parameters);
         firePreviousEvent();
     }
 
@@ -245,7 +229,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginQuotationLine()
     {
-        saveEvent(EventType.BEGIN_QUOTATION_LINE);
+        this.previousEvents.beginQuotationLine();
         firePreviousEvent();
     }
 
@@ -257,7 +241,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginSection(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_SECTION, parameters);
+        this.previousEvents.beginSection(parameters);
         firePreviousEvent();
     }
 
@@ -269,7 +253,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginTable(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_TABLE, parameters);
+        this.previousEvents.beginTable(parameters);
         firePreviousEvent();
     }
 
@@ -281,7 +265,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginTableCell(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_TABLE_CELL, parameters);
+        this.previousEvents.beginTableCell(parameters);
         firePreviousEvent();
     }
 
@@ -293,7 +277,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginTableHeadCell(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_TABLE_HEAD_CELL, parameters);
+        this.previousEvents.beginTableHeadCell(parameters);
         firePreviousEvent();
     }
 
@@ -305,7 +289,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void beginTableRow(Map<String, String> parameters)
     {
-        saveEvent(EventType.BEGIN_TABLE_ROW, parameters);
+        this.previousEvents.beginTableRow(parameters);
         firePreviousEvent();
     }
 
@@ -317,7 +301,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endDefinitionDescription()
     {
-        saveEvent(EventType.END_DEFINITION_DESCRIPTION);
+        this.previousEvents.endDefinitionDescription();
         firePreviousEvent();
     }
 
@@ -330,7 +314,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endDefinitionList(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_DEFINITION_LIST, parameters);
+        this.previousEvents.endDefinitionList(parameters);
         firePreviousEvent();
     }
 
@@ -342,7 +326,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endDefinitionTerm()
     {
-        saveEvent(EventType.END_DEFINITION_TERM);
+        this.previousEvents.endDefinitionTerm();
         firePreviousEvent();
     }
 
@@ -354,7 +338,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endDocument(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_DOCUMENT, parameters);
+        this.previousEvents.endDocument(parameters);
         flush();
     }
 
@@ -365,7 +349,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
      */
     public void endGroup(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_GROUP, parameters);
+        this.previousEvents.endGroup(parameters);
         firePreviousEvent();
     }
 
@@ -378,7 +362,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endFormat(Format format, Map<String, String> parameters)
     {
-        saveEvent(EventType.END_FORMAT, format, parameters);
+        this.previousEvents.endFormat(format, parameters);
         firePreviousEvent();
     }
 
@@ -391,7 +375,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endHeader(HeaderLevel level, String id, Map<String, String> parameters)
     {
-        saveEvent(EventType.END_HEADER, level, id, parameters);
+        this.previousEvents.endHeader(level, id, parameters);
         firePreviousEvent();
     }
 
@@ -404,7 +388,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        saveEvent(EventType.END_LINK, link, isFreeStandingURI, parameters);
+        this.previousEvents.endLink(link, isFreeStandingURI, parameters);
         firePreviousEvent();
     }
 
@@ -417,7 +401,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endList(ListType listType, Map<String, String> parameters)
     {
-        saveEvent(EventType.END_LIST, listType, parameters);
+        this.previousEvents.endList(listType, parameters);
         firePreviousEvent();
     }
 
@@ -429,7 +413,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endListItem()
     {
-        saveEvent(EventType.END_LIST_ITEM);
+        this.previousEvents.endListItem();
         firePreviousEvent();
     }
 
@@ -442,7 +426,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endMacroMarker(String name, Map<String, String> parameters, String content, boolean isInline)
     {
-        saveEvent(EventType.END_MACRO_MARKER, name, parameters, content, isInline);
+        this.previousEvents.endMacroMarker(name, parameters, content, isInline);
         firePreviousEvent();
     }
 
@@ -454,7 +438,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endParagraph(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_PARAGRAPH, parameters);
+        this.previousEvents.endParagraph(parameters);
         firePreviousEvent();
     }
 
@@ -466,7 +450,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endQuotation(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_QUOTATION, parameters);
+        this.previousEvents.endQuotation(parameters);
         firePreviousEvent();
     }
 
@@ -478,7 +462,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endQuotationLine()
     {
-        saveEvent(EventType.END_QUOTATION_LINE);
+        this.previousEvents.endQuotationLine();
         firePreviousEvent();
     }
 
@@ -490,7 +474,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endSection(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_SECTION, parameters);
+        this.previousEvents.endSection(parameters);
         firePreviousEvent();
     }
 
@@ -502,7 +486,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endTable(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_TABLE, parameters);
+        this.previousEvents.endTable(parameters);
         firePreviousEvent();
     }
 
@@ -514,7 +498,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endTableCell(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_TABLE_CELL, parameters);
+        this.previousEvents.endTableCell(parameters);
         firePreviousEvent();
     }
 
@@ -526,7 +510,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endTableHeadCell(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_TABLE_HEAD_CELL, parameters);
+        this.previousEvents.endTableHeadCell(parameters);
         firePreviousEvent();
     }
 
@@ -538,7 +522,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void endTableRow(Map<String, String> parameters)
     {
-        saveEvent(EventType.END_TABLE_ROW, parameters);
+        this.previousEvents.endTableRow(parameters);
         firePreviousEvent();
     }
 
@@ -550,7 +534,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onRawText(String text, Syntax syntax)
     {
-        saveEvent(EventType.ON_RAW_TEXT, text, syntax);
+        this.previousEvents.onRawText(text, syntax);
         firePreviousEvent();
     }
 
@@ -562,7 +546,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onEmptyLines(int count)
     {
-        saveEvent(EventType.ON_EMPTY_LINES, count);
+        this.previousEvents.onEmptyLines(count);
         firePreviousEvent();
     }
 
@@ -574,7 +558,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onHorizontalLine(Map<String, String> parameters)
     {
-        saveEvent(EventType.ON_HORIZONTAL_LINE, parameters);
+        this.previousEvents.onHorizontalLine(parameters);
         firePreviousEvent();
     }
 
@@ -586,7 +570,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onId(String name)
     {
-        saveEvent(EventType.ON_ID, name);
+        this.previousEvents.onId(name);
         firePreviousEvent();
     }
 
@@ -599,7 +583,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onImage(Image image, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        saveEvent(EventType.ON_IMAGE, image, isFreeStandingURI, parameters);
+        this.previousEvents.onImage(image, isFreeStandingURI, parameters);
         firePreviousEvent();
     }
 
@@ -612,7 +596,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onMacro(String id, Map<String, String> parameters, String content, boolean isInline)
     {
-        saveEvent(EventType.ON_MACRO, id, parameters, content, isInline);
+        this.previousEvents.onMacro(id, parameters, content, isInline);
         firePreviousEvent();
     }
 
@@ -624,7 +608,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onNewLine()
     {
-        saveEvent(EventType.ON_NEW_LINE);
+        this.previousEvents.onNewLine();
         firePreviousEvent();
     }
 
@@ -636,7 +620,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onSpace()
     {
-        saveEvent(EventType.ON_SPACE);
+        this.previousEvents.onSpace();
         firePreviousEvent();
     }
 
@@ -648,7 +632,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onSpecialSymbol(char symbol)
     {
-        saveEvent(EventType.ON_SPECIAL_SYMBOL, symbol);
+        this.previousEvents.onSpecialSymbol(symbol);
         firePreviousEvent();
     }
 
@@ -660,7 +644,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
-        saveEvent(EventType.ON_VERBATIM, protectedString, isInline, parameters);
+        this.previousEvents.onVerbatim(protectedString, isInline, parameters);
         firePreviousEvent();
     }
 
@@ -672,7 +656,7 @@ public class LookaheadChainingListener extends AbstractChainingListener
     @Override
     public void onWord(String word)
     {
-        saveEvent(EventType.ON_WORD, word);
+        this.previousEvents.onWord(word);
         firePreviousEvent();
     }
 
@@ -691,10 +675,5 @@ public class LookaheadChainingListener extends AbstractChainingListener
             Event event = this.previousEvents.remove();
             event.eventType.fireEvent(getListenerChain().getNextListener(getClass()), event.eventParameters);
         }
-    }
-
-    private void saveEvent(EventType eventType, Object... objects)
-    {
-        this.previousEvents.offer(new Event(eventType, objects));
     }
 }

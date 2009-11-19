@@ -22,13 +22,8 @@ package org.xwiki.rendering.block;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.internal.renderer.plain.PlainTextRenderer;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * @version $Id$
@@ -36,11 +31,6 @@ import org.xwiki.rendering.util.IdGenerator;
  */
 public class HeaderBlock extends AbstractFatherBlock
 {
-    /**
-     * Header identifier prefix. This is to make sure the identifier complies with the XHTML specification.
-     */
-    private static final String ID_PREFIX = "H";
-
     /**
      * The level of the header.
      */
@@ -121,84 +111,6 @@ public class HeaderBlock extends AbstractFatherBlock
     public SectionBlock getSection()
     {
         return (SectionBlock) getParent();
-    }
-
-    /**
-     * Force to regenerate id. This method get the root parent {@link XDOM} {@link IdGenerator} to generate unique
-     * identifier.
-     */
-    public void generateId()
-    {
-        Block rootBlock = getRoot();
-        if (rootBlock instanceof XDOM) {
-            XDOM xdom = (XDOM) rootBlock;
-
-            IdGenerator idGenerator = xdom.getIdGenerator();
-            if (this.id != null) {
-                idGenerator.remove(this.id);
-            }
-
-            generateId(idGenerator);
-        } else {
-            generateId(null);
-        }
-    }
-
-    /**
-     * Generate header identifier. If idGenerator is null the id is generated based on "H" prefix and a cleaned (with
-     * only characters matching [a-zA-Z0-9]) plain text title.
-     * 
-     * @param idGenerator the id generator.
-     */
-    private void generateId(IdGenerator idGenerator)
-    {
-        if (idGenerator != null) {
-            this.id = idGenerator.generateUniqueId(ID_PREFIX, getPlainTextTitle());
-        } else {
-            this.id = ID_PREFIX + getPlainTextTitle().replaceAll("[^a-zA-Z0-9]", "");
-        }
-    }
-
-    /**
-     * Generate a plain text title from header children blocks.
-     * 
-     * @return the plain text title.
-     */
-    public String getPlainTextTitle()
-    {
-        // Note: Since we don't have access to components from inside Blocks we initialize a plain text renderer
-        // manually. Also note that we don't set the link label generator since 1) we want to use the reference as is
-        // and the Plain Text Renderer supports when no link label generator is set, and 2) we don't an easy access
-        // to the link label generator component from here since we don't have access to components at all from here.
-        // TODO: Remove the need for this method here since Blocks shouldn't contain logic.
-        WikiPrinter printer = new DefaultWikiPrinter();
-        PlainTextRenderer renderer = new PlainTextRenderer();
-        try {
-            renderer.initialize();
-        } catch (InitializationException e) {
-            // This should not happen
-            throw new RuntimeException("Failed to initialize Plain Text Renderer", e);
-        }
-        renderer.setPrinter(printer);
-        for (Block block : getChildren()) {
-            block.traverse(renderer);
-        }
-        return printer.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.block.AbstractBlock#setParent(org.xwiki.rendering.block.Block)
-     */
-    @Override
-    public void setParent(Block parentBlock)
-    {
-        super.setParent(parentBlock);
-
-        if (this.id == null) {
-            generateId();
-        }
     }
 
     /**

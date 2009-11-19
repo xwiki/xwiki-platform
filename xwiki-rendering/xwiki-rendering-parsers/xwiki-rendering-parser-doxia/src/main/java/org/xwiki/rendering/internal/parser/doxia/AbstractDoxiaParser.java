@@ -22,49 +22,92 @@ package org.xwiki.rendering.internal.parser.doxia;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.XDOMGeneratorListener;
+import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.ImageParser;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.StreamParser;
 
 import java.io.Reader;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser
+public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser, StreamParser
 {
+    /**
+     * Used by the XWikiGeneratorListener to generate unique header ids.
+     */
+    @Requirement("plain/1.0")
+    protected PrintRendererFactory plainRendererFactory;
+
+    @Requirement("plain/1.0")
+    private StreamParser plainParser;
+
     @Requirement
     private LinkParser linkParser;
 
     @Requirement
     protected ImageParser imageParser;
 
-    @Requirement("plain/1.0")
-    private BlockRenderer plainTextBlockRenderer;
-
-    @Requirement("plain/1.0")
-    private Parser plainTextParser;
-    
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
     /**
      * {@inheritDoc}
+     * 
      * @see Parser#parse(Reader)
      */
     public XDOM parse(Reader source) throws ParseException
     {
-        org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
-        XDOMGeneratorSink sink = new XDOMGeneratorSink(this.linkParser, this.plainTextParser, 
-            this.plainTextBlockRenderer);
+        IdGenerator idGenerator = new IdGenerator();
 
+        // We pass the LinkParser corresponding to the syntax.
+        XDOMGeneratorListener listener = new XDOMGeneratorListener();
+
+        parse(source, listener, idGenerator);
+
+        XDOM xdom = listener.getXDOM();
+        xdom.setIdGenerator(idGenerator);
+
+        return xdom;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parser.StreamParser#parse(java.io.Reader, org.xwiki.rendering.listener.Listener)
+     */
+    public void parse(Reader source, Listener listener) throws ParseException
+    {
+        IdGenerator idGenerator = new IdGenerator();
+
+        parse(source, listener, idGenerator);
+    }
+
+    /**
+     * @param source the content to parse
+     * @param listener receive event for each element
+     * @param idGenerator unique id tool generator
+     * @throws ParseException if the source cannot be read or an unexpected error happens during the parsing. Parsers
+     *             should be written to not generate any error as much as possible.
+     */
+    private void parse(Reader source, Listener listener, IdGenerator idGenerator) throws ParseException
+    {
+        // We pass the LinkParser corresponding to the syntax.
+        XWikiGeneratorSink doxiaSink =
+                new XWikiGeneratorSink(listener, this.linkParser, this.plainRendererFactory, idGenerator,
+                    this.plainParser);
+
+        org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
         try {
-            parser.parse(source, sink);
-        } catch (org.apache.maven.doxia.parser.ParseException e) {
+            parser.parse(source, doxiaSink);
+        } catch (Exception e) {
             throw new ParseException("Failed to parse input source", e);
         }
-        return sink.getXDOM();
     }
 }

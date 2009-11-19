@@ -20,102 +20,112 @@
 package org.xwiki.rendering.internal.parser.doxia;
 
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.maven.doxia.logging.Log;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
-import org.xwiki.rendering.block.AbstractBlock;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BulletedListBlock;
-import org.xwiki.rendering.block.DefinitionDescriptionBlock;
-import org.xwiki.rendering.block.DefinitionListBlock;
-import org.xwiki.rendering.block.DefinitionTermBlock;
-import org.xwiki.rendering.block.EmptyLinesBlock;
-import org.xwiki.rendering.block.FormatBlock;
-import org.xwiki.rendering.block.HeaderBlock;
-import org.xwiki.rendering.block.HorizontalLineBlock;
-import org.xwiki.rendering.block.IdBlock;
-import org.xwiki.rendering.block.ImageBlock;
-import org.xwiki.rendering.block.LinkBlock;
-import org.xwiki.rendering.block.ListItemBlock;
-import org.xwiki.rendering.block.NewLineBlock;
-import org.xwiki.rendering.block.NumberedListBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.rendering.block.TableBlock;
-import org.xwiki.rendering.block.TableCellBlock;
-import org.xwiki.rendering.block.TableHeadCellBlock;
-import org.xwiki.rendering.block.TableRowBlock;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.listener.CompositeListener;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.QueueListener;
 import org.xwiki.rendering.listener.URLImage;
+import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.parser.StreamParser;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.util.IdGenerator;
 
 /**
- * Doxia Sink that generates a XWiki {@link XDOM} object containing page Blocks.
+ * Transforms Doxia events into XWiki Rendering events.
  * 
  * @version $Id$
- * @since 1.5M2
+ * @since 2.1RC1
  */
-public class XDOMGeneratorSink implements Sink
+public class XWikiGeneratorSink implements Sink
 {
+    private Stack<Listener> listener = new Stack<Listener>();
+
+    private Stack<Object> parameters = new Stack<Object>();
+
     private LinkParser linkParser;
 
-    /**
-     * Used to render Bocks into plain text for computing unique HTML ids for Headers.
-     */
-    private BlockRenderer plainTextBlockRenderer;
+    private IdGenerator idGenerator;
 
-    /**
-     * Used to parse Doxia raw text into XDOM blocks.
-     */
-    private Parser plainTextParser;
+    private PrintRendererFactory plainRendererFactory;
 
-    private Stack<Block> stack = new Stack<Block>();
+    private StreamParser plainParser;
 
-    private final MarkerBlock defaultMarker = new MarkerBlock();
+    private int lineBreaks = 0;
 
-    private IdGenerator idGenerator = new IdGenerator();
-
-    private static class MarkerBlock extends AbstractBlock
-    {
-        public Object param1;
-
-        public void traverse(Listener listener)
-        {
-        }
-    }
-
-    private MarkerBlock currentMarker;
+    private int inlineDepth = 0;
 
     /**
      * @since 2.0M3
      */
-    public XDOMGeneratorSink(LinkParser linkParser, Parser plainTextParser, BlockRenderer plainTextBlockRenderer)
+    public XWikiGeneratorSink(Listener listener, LinkParser linkParser, PrintRendererFactory plainRendererFactory,
+        IdGenerator idGenerator, StreamParser plainParser)
     {
+        pushListener(listener);
+
         this.linkParser = linkParser;
-        this.plainTextBlockRenderer = plainTextBlockRenderer;
-        this.plainTextParser = plainTextParser;
+        this.idGenerator = idGenerator != null ? idGenerator : new IdGenerator();
+        this.plainRendererFactory = plainRendererFactory;
+        this.plainParser = plainParser;
     }
 
-    public XDOM getXDOM()
+    public Listener getListener()
     {
-        return new XDOM(generateListFromStack(), this.idGenerator);
+        return this.listener.peek();
+    }
+
+    private Listener pushListener(Listener listener)
+    {
+        return this.listener.push(listener);
+    }
+
+    private Listener popListener()
+    {
+        return this.listener.pop();
+    }
+
+    private boolean isInline()
+    {
+        return this.inlineDepth > 0;
+    }
+
+    private void flushEmptyLines()
+    {
+        if (this.lineBreaks > 0) {
+            if (isInline()) {
+                for (int i = 0; i < this.lineBreaks; ++i) {
+                    getListener().onNewLine();
+                }
+            } else {
+                if (this.lineBreaks >= 2) {
+                    getListener().onEmptyLines(lineBreaks - 1);
+                } else {
+                    getListener().onNewLine();
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Sink#flush()
+     */
+    public void flush()
+    {
+        flushEmptyLines();
     }
 
     /**
@@ -135,8 +145,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void anchor(String name, SinkEventAttributes attributes)
     {
-        // Limitation: XWiki doesn't use parameters on this Block.
-        this.stack.push(new IdBlock(name));
+        flushEmptyLines();
+
+        getListener().onId(name);
     }
 
     /**
@@ -227,7 +238,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void bold()
     {
-        this.stack.push(this.defaultMarker);
+        flushEmptyLines();
+
+        getListener().beginFormat(Format.BOLD, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -237,7 +250,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void bold_()
     {
-        this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
+        flushEmptyLines();
+
+        getListener().endFormat(Format.BOLD, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -297,7 +312,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void definedTerm(SinkEventAttributes attributes)
     {
-        this.stack.push(this.defaultMarker);
+        getListener().beginDefinitionTerm();
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -317,8 +334,12 @@ public class XDOMGeneratorSink implements Sink
      */
     public void definedTerm_()
     {
+        flushEmptyLines();
+
         // Limitation: XWiki doesn't use parameters on this Block.
-        this.stack.push(new DefinitionTermBlock(generateListFromStack()));
+        getListener().endDefinitionTerm();
+
+        --this.inlineDepth;
     }
 
     /**
@@ -328,7 +349,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void definition(SinkEventAttributes attributes)
     {
-        this.stack.push(this.defaultMarker);
+        getListener().beginDefinitionDescription();
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -348,8 +371,12 @@ public class XDOMGeneratorSink implements Sink
      */
     public void definition_()
     {
+        flushEmptyLines();
+
         // Limitation: XWiki doesn't use parameters on this Block.
-        this.stack.push(new DefinitionDescriptionBlock(generateListFromStack()));
+        getListener().endDefinitionDescription();
+
+        --this.inlineDepth;
     }
 
     /**
@@ -359,7 +386,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void definitionList(SinkEventAttributes attributes)
     {
-        this.stack.push(this.defaultMarker);
+        flushEmptyLines();
+
+        getListener().beginDefinitionList(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -380,7 +409,7 @@ public class XDOMGeneratorSink implements Sink
     public void definitionList_()
     {
         // TODO: Handle parameters
-        this.stack.push(new DefinitionListBlock(generateListFromStack()));
+        getListener().endDefinitionList(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -480,9 +509,10 @@ public class XDOMGeneratorSink implements Sink
      */
     public void figureGraphics(String source, SinkEventAttributes attributes)
     {
+        flushEmptyLines();
+
         // TODO: Handle image to attachments. For now we only handle URLs.
-        Image image = new URLImage(source);
-        this.stack.push(new ImageBlock(image, false));
+        getListener().onImage(new URLImage(source), false, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -493,16 +523,6 @@ public class XDOMGeneratorSink implements Sink
     public void figureGraphics(String source)
     {
         figureGraphics(source, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Sink#flush()
-     */
-    public void flush()
-    {
-        // Not used.
     }
 
     /**
@@ -542,8 +562,10 @@ public class XDOMGeneratorSink implements Sink
      */
     public void horizontalRule(SinkEventAttributes attributes)
     {
+        flushEmptyLines();
+
         // TODO: Handle parameters
-        this.stack.push(new HorizontalLineBlock());
+        getListener().onHorizontalLine(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -563,7 +585,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void italic()
     {
-        this.stack.push(this.defaultMarker);
+        flushEmptyLines();
+
+        getListener().beginFormat(Format.ITALIC, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -573,7 +597,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void italic_()
     {
-        this.stack.push(new FormatBlock(generateListFromStack(), Format.ITALIC));
+        flushEmptyLines();
+
+        getListener().endFormat(Format.ITALIC, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -583,17 +609,7 @@ public class XDOMGeneratorSink implements Sink
      */
     public void lineBreak(SinkEventAttributes attributes)
     {
-        // If the previous block is an EmptyLineBlock, increase the line count
-        if (this.stack.peek() instanceof EmptyLinesBlock) {
-            EmptyLinesBlock block = (EmptyLinesBlock) this.stack.peek();
-            block.setEmptyLinesCount(block.getEmptyLinesCount() + 1);
-        } else if ((this.stack.peek() instanceof NewLineBlock)
-            && (this.stack.get(this.stack.size() - 1) instanceof NewLineBlock)) {
-            // If the past 2 blocks are already linebreaks, then send an EmptyLinesBlock
-            this.stack.push(new EmptyLinesBlock(1));
-        } else {
-            this.stack.push(NewLineBlock.NEW_LINE_BLOCK);
-        }
+        ++this.lineBreaks;
     }
 
     /**
@@ -613,10 +629,13 @@ public class XDOMGeneratorSink implements Sink
      */
     public void link(String name, SinkEventAttributes attributes)
     {
-        // TODO: Handle parameters
-        MarkerBlock marker = new MarkerBlock();
-        marker.param1 = name;
-        this.stack.push(marker);
+        flushEmptyLines();
+
+        Link link = this.linkParser.parse(name);
+
+        getListener().beginLink(link, false, Listener.EMPTY_PARAMETERS);
+
+        this.parameters.push(link);
     }
 
     /**
@@ -636,14 +655,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void link_()
     {
-        List<Block> children = generateListFromStack();
+        flushEmptyLines();
 
-        // If there's no link parser defined, don't handle links and images...
-        if (this.linkParser != null) {
-            Link link = this.linkParser.parse((String) this.currentMarker.param1);
-            // TODO: Handle freestanding links
-            this.stack.push(new LinkBlock(children, link, false));
-        }
+        getListener().endLink((Link) this.parameters.pop(), false, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -653,8 +667,10 @@ public class XDOMGeneratorSink implements Sink
      */
     public void list(SinkEventAttributes attributes)
     {
+        flushEmptyLines();
+
         // TODO: Handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginList(ListType.BULLETED, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -674,7 +690,7 @@ public class XDOMGeneratorSink implements Sink
      */
     public void list_()
     {
-        this.stack.push(new BulletedListBlock(generateListFromStack()));
+        getListener().endList(ListType.BULLETED, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -685,7 +701,9 @@ public class XDOMGeneratorSink implements Sink
     public void listItem(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginListItem();
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -705,7 +723,11 @@ public class XDOMGeneratorSink implements Sink
      */
     public void listItem_()
     {
-        this.stack.push(new ListItemBlock(generateListFromStack()));
+        flushEmptyLines();
+
+        getListener().endListItem();
+
+        --this.inlineDepth;
     }
 
     /**
@@ -715,7 +737,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void monospaced()
     {
-        this.stack.push(this.defaultMarker);
+        flushEmptyLines();
+
+        getListener().beginFormat(Format.MONOSPACE, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -725,7 +749,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void monospaced_()
     {
-        this.stack.push(new FormatBlock(generateListFromStack(), Format.MONOSPACE));
+        flushEmptyLines();
+
+        getListener().endFormat(Format.MONOSPACE, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -735,8 +761,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void nonBreakingSpace()
     {
-        // In XWiki all spaces are non breakable
-        this.stack.push(SpaceBlock.SPACE_BLOCK);
+        flushEmptyLines();
+
+        getListener().onSpace();
     }
 
     /**
@@ -746,10 +773,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void numberedList(int numbering, SinkEventAttributes sinkEventAttributes)
     {
-        // TODO: Handle parameters
-        MarkerBlock marker = new MarkerBlock();
-        marker.param1 = numbering;
-        this.stack.push(marker);
+        flushEmptyLines();
+
+        getListener().beginList(ListType.NUMBERED, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -769,9 +795,7 @@ public class XDOMGeneratorSink implements Sink
      */
     public void numberedList_()
     {
-        List<Block> children = generateListFromStack();
-        // TODO: Handle numbering types
-        this.stack.push(new NumberedListBlock(children));
+        getListener().endList(ListType.NUMBERED, Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -781,8 +805,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void numberedListItem(SinkEventAttributes attributes)
     {
-        // TODO: handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginListItem();
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -802,7 +827,11 @@ public class XDOMGeneratorSink implements Sink
      */
     public void numberedListItem_()
     {
-        this.stack.push(new ListItemBlock(generateListFromStack()));
+        flushEmptyLines();
+
+        getListener().endListItem();
+
+        --this.inlineDepth;
     }
 
     /**
@@ -822,8 +851,12 @@ public class XDOMGeneratorSink implements Sink
      */
     public void paragraph(SinkEventAttributes attributes)
     {
+        flushEmptyLines();
+
         // TODO: handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginParagraph(Listener.EMPTY_PARAMETERS);
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -843,7 +876,11 @@ public class XDOMGeneratorSink implements Sink
      */
     public void paragraph_()
     {
-        this.stack.push(new ParagraphBlock(generateListFromStack()));
+        flushEmptyLines();
+
+        getListener().endParagraph(Listener.EMPTY_PARAMETERS);
+
+        --this.inlineDepth;
     }
 
     /**
@@ -853,16 +890,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void rawText(String text)
     {
-        // Parse the text using the plain text parser
-        try {
-            System.out.println("text= " + text);
-            for (Block block : this.plainTextParser.parse(new StringReader(text)).getChildren()) {
-                this.stack.push(block);
-            }
-        } catch (ParseException e) {
-            // Shouldn't happen since we use a StringReader which shouldn't generate any IO.
-            throw new RuntimeException("Failed to parse raw text [" + text + "]", e);
-        }
+        flushEmptyLines();
+
+        getListener().onVerbatim(text, isInline(), Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -872,7 +902,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void section(int level, SinkEventAttributes attributes)
     {
-        this.stack.push(this.defaultMarker);
+        flushEmptyLines();
+
+        getListener().beginSection(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -882,7 +914,9 @@ public class XDOMGeneratorSink implements Sink
      */
     public void section_(int level)
     {
-        this.stack.push(new SectionBlock(generateListFromStack()));
+        flushEmptyLines();
+
+        getListener().endSection(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -992,7 +1026,16 @@ public class XDOMGeneratorSink implements Sink
      */
     public void sectionTitle(int level, SinkEventAttributes attributes)
     {
-        this.stack.push(this.defaultMarker);
+        flushEmptyLines();
+
+        CompositeListener composite = new CompositeListener();
+
+        composite.addListener(new QueueListener());
+        composite.addListener(this.plainRendererFactory.createRenderer(new DefaultWikiPrinter()));
+
+        pushListener(composite);
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -1012,14 +1055,23 @@ public class XDOMGeneratorSink implements Sink
      */
     public void sectionTitle_(int level)
     {
-        List<Block> children = generateListFromStack();
-        WikiPrinter printer = new DefaultWikiPrinter();
-        this.plainTextBlockRenderer.render(children, printer);
-        String id = "H" + this.idGenerator.generateUniqueId(printer.toString());
+        flushEmptyLines();
 
-        List<Block> headerTitleBlocks = generateListFromStack();
+        CompositeListener composite = (CompositeListener) getListener();
 
-        this.stack.push(new HeaderBlock(headerTitleBlocks, HeaderLevel.parseInt(level), id));
+        QueueListener queue = (QueueListener) composite.getListener(0);
+        PrintRenderer renderer = (PrintRenderer) composite.getListener(1);
+
+        popListener();
+
+        HeaderLevel headerLevel = HeaderLevel.parseInt(level);
+        String id = this.idGenerator.generateUniqueId("H", renderer.getPrinter().toString());
+
+        getListener().beginHeader(headerLevel, id, Listener.EMPTY_PARAMETERS);
+        queue.consumeEvents(getListener());
+        getListener().endHeader(headerLevel, id, Listener.EMPTY_PARAMETERS);
+
+        --this.inlineDepth;
     }
 
     /**
@@ -1139,8 +1191,10 @@ public class XDOMGeneratorSink implements Sink
      */
     public void table(SinkEventAttributes attributes)
     {
+        flushEmptyLines();
+
         // TODO: Handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginTable(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -1160,7 +1214,7 @@ public class XDOMGeneratorSink implements Sink
      */
     public void table_()
     {
-        this.stack.push(new TableBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
+        getListener().endTable(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -1201,7 +1255,9 @@ public class XDOMGeneratorSink implements Sink
     public void tableCell(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginTableCell(Listener.EMPTY_PARAMETERS);
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -1232,7 +1288,11 @@ public class XDOMGeneratorSink implements Sink
      */
     public void tableCell_()
     {
-        this.stack.push(new TableCellBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
+        flushEmptyLines();
+
+        getListener().endTableCell(Listener.EMPTY_PARAMETERS);
+
+        --this.inlineDepth;
     }
 
     /**
@@ -1243,7 +1303,9 @@ public class XDOMGeneratorSink implements Sink
     public void tableHeaderCell(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginTableHeadCell(Listener.EMPTY_PARAMETERS);
+
+        ++this.inlineDepth;
     }
 
     /**
@@ -1274,7 +1336,11 @@ public class XDOMGeneratorSink implements Sink
      */
     public void tableHeaderCell_()
     {
-        this.stack.push(new TableHeadCellBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
+        flushEmptyLines();
+
+        getListener().endTableHeadCell(Listener.EMPTY_PARAMETERS);
+
+        --this.inlineDepth;
     }
 
     /**
@@ -1285,7 +1351,7 @@ public class XDOMGeneratorSink implements Sink
     public void tableRow(SinkEventAttributes attributes)
     {
         // TODO: Handle parameters
-        this.stack.push(this.defaultMarker);
+        getListener().beginTableRow(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -1305,7 +1371,7 @@ public class XDOMGeneratorSink implements Sink
      */
     public void tableRow_()
     {
-        this.stack.push(new TableRowBlock(generateListFromStack(), Collections.<String, String> emptyMap()));
+        getListener().endTableRow(Listener.EMPTY_PARAMETERS);
     }
 
     /**
@@ -1335,10 +1401,36 @@ public class XDOMGeneratorSink implements Sink
      */
     public void text(String text, SinkEventAttributes attributes)
     {
+        flushEmptyLines();
+
         // TODO Handle parameters
         // Since Doxia doesn't generate events at the word level we need to reparse the
         // text to extract spaces, special symbols and words.
-        rawText(text);
+
+        // TODO: Use an inline parser. See http://jira.xwiki.org/jira/browse/XWIKI-2748
+        WrappingListener inlineFilterListener = new WrappingListener()
+        {
+            @Override
+            public void beginParagraph(Map<String, String> parameters)
+            {
+                // Filter
+            }
+
+            @Override
+            public void endParagraph(Map<String, String> parameters)
+            {
+                // Filter
+            }
+        };
+        inlineFilterListener.setWrappedListener(getListener());
+
+        // Parse the text using the plain text parser
+        try {
+            this.plainParser.parse(new StringReader(text), inlineFilterListener);
+        } catch (ParseException e) {
+            // Shouldn't happen since we use a StringReader which shouldn't generate any IO.
+            throw new RuntimeException("Failed to parse raw text [" + text + "]", e);
+        }
     }
 
     /**
@@ -1419,21 +1511,5 @@ public class XDOMGeneratorSink implements Sink
     public void unknown(String arg0, Object[] arg1, SinkEventAttributes arg2)
     {
         // TODO: Not supported yet by the XDOM.
-    }
-
-    private List<Block> generateListFromStack()
-    {
-        List<Block> blocks = new ArrayList<Block>();
-        while (!this.stack.empty()) {
-            if (!(this.stack.peek() instanceof MarkerBlock)) {
-                blocks.add(this.stack.pop());
-            } else {
-                // Remove marker and save it so that it can be accessed
-                this.currentMarker = (MarkerBlock) this.stack.pop();
-                break;
-            }
-        }
-        Collections.reverse(blocks);
-        return blocks;
     }
 }

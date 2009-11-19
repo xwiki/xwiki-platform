@@ -42,11 +42,13 @@ public class SyntaxType
     public static final SyntaxType ANNOTATED_XHTML = new SyntaxType("annotatedxhtml", "Annotated XHTML");
 
     public static final SyntaxType HTML = new SyntaxType("html", "HTML");
-    
+
     public static final SyntaxType PLAIN = new SyntaxType("plain", "Plain");
-    
+
     public static final SyntaxType EVENT = new SyntaxType("event", "Event");
-    
+
+    public static final SyntaxType XDOM = new SyntaxType("xdom", "XML based xdom");
+
     public static final SyntaxType TEX = new SyntaxType("tex", "TeX");
 
     /**
@@ -55,7 +57,7 @@ public class SyntaxType
     private String name;
 
     /**
-     * @see #getId()  
+     * @see #getId()
      */
     private String id;
 
@@ -69,7 +71,7 @@ public class SyntaxType
         this.name = name;
         this.id = id;
     }
-    
+
     /**
      * @return the technical id of the Syntax type (ex "annotatedxhtml")
      * @since 2.0M3
@@ -90,7 +92,7 @@ public class SyntaxType
 
     /**
      * {@inheritDoc}
-     *
+     * <p>
      * Display a human readable name of the Syntax type.
      * 
      * @see java.lang.Object#toString()
@@ -112,7 +114,7 @@ public class SyntaxType
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Object#hashCode()
      */
     @Override
@@ -128,7 +130,7 @@ public class SyntaxType
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Object#equals(Object)
      */
     @Override
@@ -150,6 +152,7 @@ public class SyntaxType
                 result = (getId() == syntaxType.getId() || (getId() != null && getId().equals(syntaxType.getId())));
             }
         }
+
         return result;
     }
 }

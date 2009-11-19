@@ -19,75 +19,44 @@
  */
 package org.xwiki.rendering.internal.parser;
 
-import org.wikimodel.wem.IWikiParser;
-import org.wikimodel.wem.xwiki.xwiki20.XWikiParser;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser;
-import org.xwiki.rendering.parser.ImageParser;
-import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
+ * Plain Text Parser to convert a text source into a XDOM object.
+ * 
  * @version $Id$
  * @since 2.1M1
  */
-@Component("xwiki/2.0")
-public class WikiModelXWiki20Parser extends AbstractWikiModelParser
+@Component("plain/1.0")
+public class PlainTextBlockParser extends AbstractBlockParser
 {
     /**
-     * @see #getLinkParser()
+     * The stream based parser.
      */
-    @Requirement("xwiki/2.0")
-    private LinkParser linkParser;
-
-    /**
-     * @see #getImageParser()
-     */
-    @Requirement("xwiki/2.0")
-    private ImageParser imageParser;
+    @Requirement("plain/1.0")
+    private StreamParser plainStreamParser;
 
     /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.parser.Parser#getSyntax()
-     * @see org.xwiki.rendering.parser.StreamParser#getSyntax()
      */
     public Syntax getSyntax()
     {
-        return Syntax.XWIKI_2_0;
+        return Syntax.PLAIN_1_0;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.internal.parser.wikimodel.AbstractWikiModelParser#createWikiModelParser()
+     * @see org.xwiki.rendering.internal.parser.AbstractBlockParser#getStreamParser()
      */
     @Override
-    public IWikiParser createWikiModelParser()
+    protected StreamParser getStreamParser()
     {
-        return new XWikiParser();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractWikiModelParser#getImageParser()
-     */
-    @Override
-    public ImageParser getImageParser()
-    {
-        return this.imageParser;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractWikiModelParser#getLinkParser()
-     */
-    @Override
-    public LinkParser getLinkParser()
-    {
-        return this.linkParser;
+        return plainStreamParser;
     }
 }

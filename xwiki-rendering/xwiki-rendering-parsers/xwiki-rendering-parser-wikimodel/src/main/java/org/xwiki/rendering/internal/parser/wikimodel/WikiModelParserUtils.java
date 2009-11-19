@@ -2,12 +2,16 @@ package org.xwiki.rendering.internal.parser.wikimodel;
 
 import java.io.StringReader;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.internal.parser.WikiModelXHTMLParser;
 import org.xwiki.rendering.internal.parser.WikiModelXWiki20Parser;
+import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.WrappingListener;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.util.ParserUtils;
 
 /**
@@ -58,5 +62,62 @@ public class WikiModelParserUtils extends ParserUtils
         }
 
         return result;
+    }
+
+    public void parseInline(StreamParser parser, String content, Listener listener) throws ParseException
+    {
+        WrappingListener inlineFilterListener = new WrappingListener()
+        {
+            private boolean foundWord = false;
+
+            private boolean foundSpace = false;
+
+            @Override
+            public void beginSection(Map<String, String> parameters)
+            {
+                // Filter
+            }
+
+            @Override
+            public void endSection(Map<String, String> parameters)
+            {
+                // Filter
+            }
+
+            @Override
+            public void beginParagraph(Map<String, String> parameters)
+            {
+                // Filter
+            }
+
+            @Override
+            public void endParagraph(Map<String, String> parameters)
+            {
+                // Filter
+            }
+
+            @Override
+            public void onWord(String word)
+            {
+                if (foundWord) {
+                    super.onWord(word);
+                } else {
+                    foundWord = true;
+                }
+            }
+
+            @Override
+            public void onSpace()
+            {
+                if (foundSpace) {
+                    super.onSpace();
+                } else {
+                    foundSpace = true;
+                }
+            }
+        };
+        inlineFilterListener.setWrappedListener(listener);
+
+        parser.parse(new StringReader("wikimarker " + content), inlineFilterListener);
     }
 }

@@ -23,13 +23,13 @@ import java.util.Map;
 
 import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.listener.DocumentImage;
+import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.listener.Image;
 import org.xwiki.rendering.listener.ImageType;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.HeaderLevel;
-import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.URLImage;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -85,7 +85,7 @@ public class DoxiaGeneratorListener implements Listener
     public void onVerbatim(String protectedString, boolean isInline, Map<String, String> parameters)
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     /**
@@ -310,7 +310,7 @@ public class DoxiaGeneratorListener implements Listener
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, boolean, java.util.Map) 
+     * @see org.xwiki.rendering.listener.Listener#onVerbatim(String, boolean, java.util.Map)
      */
     public void onVerbatim(String protectedString, Map<String, String> parameters, boolean isInline)
     {

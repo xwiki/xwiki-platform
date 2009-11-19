@@ -42,9 +42,12 @@
         #template('renameStep1.vm')
       #else
         #set($renamedBLs = $util.arrayList)
+        #set($children = $util.arrayList)
         #foreach($param in $request.parameterNames)
           #if($param.startsWith("backlink_"))
             #set($discard = $renamedBLs.add($param.substring(9)))
+          #elseif($param.startsWith("child_"))
+            #set($discard = $children.add($param.substring(6)))
           #end
         #end
 
@@ -52,7 +55,7 @@
         ## doc points to the new name!
         #set ($oldDocName = $doc.fullName)
 
-        $doc.rename($newFullName, $renamedBLs)
+        $doc.rename($newFullName, $renamedBLs, $children)
 
         #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$oldDocName, $doc.fullName, $xwiki.getURL($doc.fullName)])")
         #xwikimessageboxend()

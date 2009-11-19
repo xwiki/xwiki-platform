@@ -57,6 +57,11 @@ public class XWikiContextInitializationFilter implements Filter
     private FilterConfig filterConfig;
 
     /**
+     * XWiki context mode.
+     */
+    private int mode;
+
+    /**
      * {@inheritDoc}
      * 
      * @see Filter#destroy()
@@ -75,10 +80,15 @@ public class XWikiContextInitializationFilter implements Filter
         ServletException
     {
         try {
-            initializeXWikiContext(request, response);
+            // Only HTTP requests are supported.
+            if (request instanceof HttpServletRequest) {
+                initializeXWikiContext(request, response);
+            }
             chain.doFilter(request, response);
         } finally {
-            cleanupComponents();
+            if (request instanceof HttpServletRequest) {
+                cleanupComponents();
+            }
         }
     }
 
@@ -90,6 +100,12 @@ public class XWikiContextInitializationFilter implements Filter
     public void init(FilterConfig filterConfig) throws ServletException
     {
         this.filterConfig = filterConfig;
+
+        try {
+            mode = Integer.parseInt(filterConfig.getInitParameter("mode"));
+        } catch (Exception e) {
+            mode = -1;
+        }
     }
 
     /**
@@ -110,6 +126,11 @@ public class XWikiContextInitializationFilter implements Filter
 
             // Create the XWiki context.
             XWikiContext context = Utils.prepareContext(action, xwikiRequest, xwikiResponse, xwikiEngine);
+
+            // Overwrite the context mode if the mode filter initialization parameter is specified.
+            if (mode >= 0) {
+                context.setMode(mode);
+            }
 
             // Initialize the Container component which is the new way of transporting the Context in the new component
             // architecture. Further initialization might require the Container component.

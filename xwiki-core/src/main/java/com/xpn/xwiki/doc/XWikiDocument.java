@@ -447,13 +447,13 @@ public class XWikiDocument implements DocumentModelBridge
      * Constructor that specifies the full document identifier: wiki name, space name, document name.
      * 
      * @param wiki The wiki this document belongs to.
-     * @param web The space this document belongs to.
+     * @param space The space this document belongs to.
      * @param name The name of the document.
      */
-    public XWikiDocument(String wiki, String web, String name)
+    public XWikiDocument(String wiki, String space, String name)
     {
         setDatabase(wiki);
-        setSpace(web);
+        setSpace(space);
 
         int i1 = name.indexOf(".");
         if (i1 == -1) {
@@ -4166,8 +4166,9 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Rename the current document and all the backlinks leading to it. See
-     * {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
+     * Rename the current document and all the backlinks leading to it. The parent field in all documents which list
+     * the renamed document as their parent is also renamed.
+     * See {@link #rename(String, java.util.List, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param context the ubiquitous XWiki Context
@@ -4187,9 +4188,11 @@ public class XWikiDocument implements DocumentModelBridge
      * <li>[Page?param=1]</li>
      * <li>[currentwiki:Page]</li>
      * <li>[CurrentSpace.Page]</li>
+     * <li>[currentwiki:CurrentSpace.Page]</li>
      * </ul>
      * <p>
-     * Note: links without a space are renamed with the space added.
+     * Note: links without a space are renamed with the space added and all documents having the renamed document as
+     *       their parent have their parent field set to "currentwiki:CurrentSpace.Page".
      * </p>
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
@@ -4228,43 +4231,57 @@ public class XWikiDocument implements DocumentModelBridge
             return;
         }
 
-        // Step 1: Copy the document and all its translations under a new name
-        context.getWiki().copyDocument(getFullName(), newDocumentName, false, context);
+        // Grab the XWiki object, it gets used a few times.
+        com.xpn.xwiki.XWiki xwiki = context.getWiki();
 
-        // Step 2: For each backlink to rename, parse the backlink document and replace the links
-        // with the new name.
-        // Note: we ignore invalid links here. Invalid links should be shown to the user so
-        // that they fix them but the rename feature ignores them.
+        // Step 1: Copy the document and all its translations under a new name
+        xwiki.copyDocument(getFullName(), newDocumentName, false, context);
+
+        // Step 2: For each child document, update parent.
+        List<String> childDocumentNames = getChildren(context);
+        if(childDocumentNames != null){
+            // Note: We're adding the fully qualified document name (i.e. including the wiki name).
+            String newParent = newDocName.getWiki() + ":" + newDocName.getSpace() + "." + newDocName.getPage();
+    
+            for (String childDocumentName : childDocumentNames) {
+                XWikiDocument childDocument = xwiki.getDocument(childDocumentName, context);
+                childDocument.setParent(newParent);
+                xwiki.saveDocument(childDocument, context.getMessageTool().get("core.comment.renameParent", 
+                    Arrays.asList(new String[] {newDocumentName})), true, context);
+            }
+        }
+
+        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
+        // Note: we ignore invalid links here. Invalid links should be shown to the user so that they fix them but the
+        // rename feature ignores them.
         DocumentParser documentParser = new DocumentParser();
 
         for (String backlinkDocumentName : backlinkDocumentNames) {
-            XWikiDocument backlinkDocument = context.getWiki().getDocument(backlinkDocumentName, context);
+            XWikiDocument backlinkDocument = xwiki.getDocument(backlinkDocumentName, context);
 
             if (backlinkDocument.is10Syntax()) {
                 // Note: Here we cannot do a simple search/replace as there are several ways to point
                 // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
                 // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
                 // to recognize them and do the replace.
-                ReplacementResultCollection result =
-                    documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
-                        getSpace());
+                ReplacementResultCollection result = documentParser.parseLinksAndReplace(
+                    backlinkDocument.getContent(), oldLink, newLink, linkHandler, getSpace());
 
                 backlinkDocument.setContent((String) result.getModifiedContent());
             } else {
                 backlinkDocument.refactorDocumentLinks(oldDocName, newDocName, context);
             }
 
-            context.getWiki().saveDocument(backlinkDocument,
-                context.getMessageTool().get("core.comment.renameLink", Arrays.asList(new String[] {newDocumentName})),
-                true, context);
+            xwiki.saveDocument(backlinkDocument, context.getMessageTool().get("core.comment.renameLink", 
+                Arrays.asList(new String[] {newDocumentName})), true, context);
         }
 
-        // Step 3: Delete the old document
-        context.getWiki().deleteDocument(this, context);
+        // Step 4: Delete the old document
+        xwiki.deleteDocument(this, context);
 
-        // Step 4: The current document needs to point to the renamed document as otherwise it's
-        // pointing to an invalid XWikiDocument object as it's been deleted...
-        clone(context.getWiki().getDocument(newDocumentName, context));
+        // Step 5: The current document needs to point to the renamed document as otherwise it's pointing to an 
+        // invalid XWikiDocument object as it's been deleted...
+        clone(xwiki.getDocument(newDocumentName, context));
     }
 
     private void refactorDocumentLinks(DocumentName oldDocumentName, DocumentName newDocumentName, XWikiContext context)

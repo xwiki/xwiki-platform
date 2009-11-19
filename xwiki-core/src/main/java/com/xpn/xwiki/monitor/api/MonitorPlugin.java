@@ -35,7 +35,7 @@ import java.util.Map;
 public class MonitorPlugin extends XWikiDefaultPlugin {
     private static final Log log = LogFactory.getLog(MonitorPlugin.class);
 
-    private boolean bActive = true;
+    private boolean bActive;
     private long duration = 0;
     private long nbrequests = 0;
     private Map timerSummaries = new HashMap();
@@ -50,7 +50,7 @@ public class MonitorPlugin extends XWikiDefaultPlugin {
     public void init(XWikiContext context) {
         super.init(context);
         reset(context);
-        long iActive = context.getWiki().ParamAsLong("xwiki.monitor", 1);
+        long iActive = context.getWiki().ParamAsLong("xwiki.monitor", 0);
         setActive((iActive>0));
     }
 

@@ -110,15 +110,15 @@
                  </tr>
                  <tr id="usersandgroupstable-filters">
                    <td>$msg.get("rightsmanager.searchfilter") <input name="name" type="text" style="width:65%"/>
-                     #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
-                       #if(!$mainwk) ## display the combobox only in a local wiki
+                     #if(!$context.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
+                     #if(!$mainwk) ## display the combobox only in a local wiki
                        <select name="wiki" style="margin-left:10px;">
                          <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
                          <option value="global">$msg.get("rightsmanager.global")</option>
                          <option value="both">$msg.get("rightsmanager.both")</option>
                        </select>
-                       #else<input type="hidden" name="wiki" value="local"/>#end
-                       #set($colsp = $maxlevel + 1)
+                     #else<input type="hidden" name="wiki" value="local"/>#end
+                     #set($colsp = $maxlevel + 1)
                    </td>
                    <td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
                  </tr>

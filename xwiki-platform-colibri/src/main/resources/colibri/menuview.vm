@@ -1,6 +1,6 @@
 #if($context.getMode()==0)## Visible only in a page
 <div id="mainmenu" class="layoutsubsection actionmenu">
-<strong id="xwikimenutitle" class="hidden">$msg.get('menu')</strong>
+<strong id="xwikimenutitle" class="hidden">$msg.get('core.menu.main.title')</strong>
 <div class="rightmenu">
 ##
 ## User

@@ -499,6 +499,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            <ul>
      *            <li>fieldname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
+     *            <li>asc : a Boolean, if true the order is ascendent</li>
      *            </ul>
      * @param parameterValues the list of values to fill for use with HQL named request.
      * @return the formated HQL named request.
@@ -605,7 +606,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      *            </ul>
      * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
      *            containing {@link XWikiDocument}.
-     * @param nb the maximum number od result to return.
+     * @param nb the maximum number of results to return. Infinite if 0.
      * @param start the index of the first found user or group to return.
      * @param order the field to order from. It is a table of table with :
      *            <ul>

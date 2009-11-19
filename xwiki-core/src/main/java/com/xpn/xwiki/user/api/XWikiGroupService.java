@@ -87,12 +87,13 @@ public interface XWikiGroupService
      *            </ul>
      * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
      *            containing {@link com.xpn.xwiki.doc.XWikiDocument}.
-     * @param nb the maximum number od result to return.
+     * @param nb the maximum number of results to return. Infinite if 0.
      * @param start the index of the first found user to return.
      * @param order the fields to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
+     *            <li>asc : a Boolean, if true the order is ascendent</li>
      *            </ul>
      * @param context the {@link XWikiContext}.
      * @return the list of users.
@@ -114,12 +115,13 @@ public interface XWikiGroupService
      *            .
      * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
      *            containing {@link com.xpn.xwiki.doc.XWikiDocument}.
-     * @param nb the maximum number od result to return.
+     * @param nb the maximum number of result to return. Infinite if 0.
      * @param start the index of the first found group to return.
      * @param order the field to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
+     *            <li>asc : a Boolean, if true the order is ascendent</li>
      *            </ul>
      * @param context the {@link XWikiContext}.
      * @return the list of groups.

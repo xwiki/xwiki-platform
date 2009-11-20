@@ -8,8 +8,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -26,9 +28,14 @@ import com.xpn.xwiki.util.Util;
 public class ExportURLFactory extends XWikiServletURLFactory
 {
     /**
+     * Logging tool.
+     */
+    protected static final Log LOG = LogFactory.getLog(ExportURLFactory.class);
+
+    /**
      * Pages for which to convert URL to local.
      */
-    protected Set exportedPages = new HashSet();
+    protected Set<String> exportedPages = new HashSet<String>();
 
     /**
      * Directory where to export attachment.
@@ -38,7 +45,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * Names of skins needed by rendered page(s).
      */
-    private Set neededSkins = new HashSet();
+    private Set<String> neededSkins = new HashSet<String>();
 
     /**
      * ExportURLFactory constructor.
@@ -50,7 +57,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     /**
      * @return the list skins names used.
      */
-    public Collection getNeededSkins()
+    public Collection<String> getNeededSkins()
     {
         return this.neededSkins;
     }
@@ -62,7 +69,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
      * @param exportDir the directory where to copy exported objects (attachments).
      * @param context the XWiki context.
      */
-    public void init(Collection exportedPages, File exportDir, XWikiContext context)
+    public void init(Collection<String> exportedPages, File exportDir, XWikiContext context)
     {
         super.init(context);
 
@@ -73,9 +80,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         if (exportedPages != null) {
             XWikiDocument doc = new XWikiDocument();
 
-            for (Iterator it = exportedPages.iterator(); it.hasNext();) {
-                String pageName = (String) it.next();
-
+            for (String pageName : exportedPages) {
                 doc.setDatabase(null);
                 doc.setSpace(null);
                 doc.setName(null);
@@ -99,10 +104,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.web.XWikiServletURLFactory#createSkinURL(java.lang.String, java.lang.String,
-     * com.xpn.xwiki.XWikiContext)
+     *      com.xpn.xwiki.XWikiContext)
      */
     @Override
     public URL createSkinURL(String filename, String skin, XWikiContext context)
@@ -121,16 +127,17 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             return new URL(newpath.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to create skin URL", e);
         }
 
         return super.createSkinURL(filename, skin, context);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.web.XWikiServletURLFactory#createSkinURL(java.lang.String, java.lang.String, java.lang.String,
-     * java.lang.String, com.xpn.xwiki.XWikiContext)
+     *      java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context)
@@ -153,16 +160,43 @@ public class ExportURLFactory extends XWikiServletURLFactory
 
             return new URL(newpath.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to create skin URL", e);
         }
 
         return super.createSkinURL(filename, web, name, xwikidb, context);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createResourceURL(java.lang.String, boolean,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public URL createResourceURL(String filename, boolean forceSkinAction, XWikiContext context)
+    {
+        try {
+            StringBuffer newpath = new StringBuffer();
+
+            newpath.append("file://");
+
+            newpath.append("resources");
+
+            addFileName(newpath, filename, false, context);
+
+            return new URL(newpath.toString());
+        } catch (Exception e) {
+            LOG.error("Failed to create skin URL", e);
+        }
+
+        return super.createResourceURL(filename, forceSkinAction, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.web.XWikiServletURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
-     * java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
     public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
@@ -194,7 +228,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
                 return new URL(newpath.toString());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to create page URL", e);
         }
 
         return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
@@ -223,8 +257,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
         File file = new File(tempdir, path);
         if (!file.exists()) {
             XWikiDocument doc =
-                context.getWiki().getDocument(
-                    db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
+                    context.getWiki().getDocument(
+                        db + XWikiDocument.DB_SPACE_SEP + space + XWikiDocument.SPACE_NAME_SEP + name, context);
             XWikiAttachment attachment = doc.getAttachment(filename);
             byte[] data = attachment.getContent(context);
             FileOutputStream fos = new FileOutputStream(file);
@@ -235,10 +269,11 @@ public class ExportURLFactory extends XWikiServletURLFactory
         return new URI("file://" + path.replace(" ", "%20")).toURL();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.web.XWikiServletURLFactory#createAttachmentURL(java.lang.String, java.lang.String,
-     * java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     *      java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
@@ -247,15 +282,17 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             return createAttachmentURL(filename, web, name, xwikidb, context);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to create attachement URL", e);
+
             return super.createAttachmentURL(filename, web, name, action, null, xwikidb, context);
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#createAttachmentRevisionURL(java.lang.String, java.lang.String,
-     * java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb,
@@ -264,13 +301,15 @@ public class ExportURLFactory extends XWikiServletURLFactory
         try {
             return createAttachmentURL(filename, web, name, xwikidb, context);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Failed to create attachement URL", e);
+
             return super.createAttachmentRevisionURL(filename, web, name, revision, xwikidb, context);
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.web.XWikiServletURLFactory#getURL(java.net.URL, com.xpn.xwiki.XWikiContext)
      */
     @Override

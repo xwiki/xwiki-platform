@@ -140,17 +140,16 @@ public class HtmlPackager
     /**
      * Add rendered document to ZIP stream.
      * 
-     * @param pageName the name (used with
-     *            {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page
-     *            to render.
+     * @param pageName the name (used with {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page to
+     *            render.
      * @param zos the ZIP output stream.
      * @param context the XWiki context.
      * @param vcontext the Velocity context.
      * @throws XWikiException error when rendering document.
      * @throws IOException error when rendering document.
      */
-    private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context,
-        VelocityContext vcontext) throws XWikiException, IOException
+    private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context, VelocityContext vcontext)
+        throws XWikiException, IOException
     {
         XWikiDocument doc = context.getWiki().getDocument(pageName, context);
 
@@ -185,17 +184,15 @@ public class HtmlPackager
      * 
      * @param zos the ZIP output stream.
      * @param tempdir the directory where to copy attached files.
-     * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory} used to render the
-     *            documents.
+     * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory} used to render the documents.
      * @param context the XWiki context.
      * @throws XWikiException error when render documents.
      * @throws IOException error when render documents.
      */
-    private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf,
-        XWikiContext context) throws XWikiException, IOException
+    private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf, XWikiContext context)
+        throws XWikiException, IOException
     {
-        ExecutionContextManager ecim =
-            (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
+        ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
         Execution execution = (Execution) Utils.getComponent(Execution.class);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
@@ -217,26 +214,25 @@ public class HtmlPackager
             // the VelocityRequestInitializer class.
             execution.pushContext(ec);
 
-            VelocityManager velocityManager = 
-                (VelocityManager) Utils.getComponent(VelocityManager.class);
+            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
 
             // At this stage we have a clean Velocity Context
             VelocityContext vcontext = velocityManager.getVelocityContext();
-            
+
             urlf.init(this.pages, tempdir, renderContext);
             renderContext.setURLFactory(urlf);
 
-            for (String pageName: this.pages) {
+            for (String pageName : this.pages) {
                 renderDocument(pageName, zos, renderContext, vcontext);
             }
         } catch (ExecutionContextException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, 
-                XWikiException.ERROR_XWIKI_INIT_FAILED, "Failed to initialize Execution Context", e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, XWikiException.ERROR_XWIKI_INIT_FAILED,
+                "Failed to initialize Execution Context", e);
         } finally {
             // We must ensure that the new request we've used is removed so that the current
             // thread can continue to use its original Execution Context.
             execution.popContext();
-            
+
             context.put("vcontext", oldVelocityContext);
         }
     }
@@ -270,12 +266,15 @@ public class HtmlPackager
         renderDocuments(zos, tempdir, urlf, context);
 
         // Add required skins to ZIP file
-        for (Iterator it = urlf.getNeededSkins().iterator(); it.hasNext();) {
-            String skinName = (String) it.next();
+        for (String skinName : (Collection<String>) urlf.getNeededSkins()) {
             addSkinToZip(skinName, zos, context);
         }
 
-        // Add resources files to ZIP file
+        // add "resources" folder
+        File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
+        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR);
+
+        // Add attachements files to ZIP file
         addDirToZip(tempdir, zos, "");
 
         zos.setComment(description);
@@ -327,11 +326,9 @@ public class HtmlPackager
      * @param context the XWiki context.
      * @throws IOException error when adding the skin to package.
      */
-    private static void addSkinToZip(String skinName, ZipOutputStream out, XWikiContext context)
-        throws IOException
+    private static void addSkinToZip(String skinName, ZipOutputStream out, XWikiContext context) throws IOException
     {
-        File file =
-            new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
+        File file = new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
         addDirToZip(file, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR);
     }
 
@@ -343,13 +340,12 @@ public class HtmlPackager
      * @param basePath the path where to put the directory in the package.
      * @throws IOException error when adding the directory to package.
      */
-    private static void addDirToZip(File directory, ZipOutputStream out, String basePath)
-        throws IOException
+    private static void addDirToZip(File directory, ZipOutputStream out, String basePath) throws IOException
     {
-    	if (LOG.isDebugEnabled()) {
-    		LOG.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
-    	}
-    	
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
+        }
+
         if (!directory.isDirectory()) {
             return;
         }
@@ -371,7 +367,7 @@ public class HtmlPackager
 
             FileInputStream in = new FileInputStream(file);
 
-            // Starts a new Zip entry. It automatically closes the previous entry if present. 
+            // Starts a new Zip entry. It automatically closes the previous entry if present.
             out.putNextEntry(new ZipEntry(basePath + file.getName()));
 
             int len;

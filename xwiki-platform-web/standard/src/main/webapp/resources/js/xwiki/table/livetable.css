@@ -15,7 +15,7 @@
 	font-weight: normal;
 }
 .xwiki-livetable-pagination .xwiki-livetable-pagination-content, .xwiki-livetable-pagination .xwiki-livetable-pagination-text {
-	display: in-line;
+	display: inline;
 }
 .xwiki-livetable-pagination span.pagenumber {
 	color: #888;
@@ -23,7 +23,7 @@
 }
 .xwiki-livetable-pagination span.pagenumber:hover {
 	color: #4D4D4D;
-	text-decoration: underlined;
+	text-decoration: underline;
 }
 .xwiki-livetable-pagination span.selected {
 	color: #4D4D4D;
@@ -107,7 +107,7 @@ html>body .xwiki-livetable-display td {
 table.xwiki-livetable table.xwiki-livetable-display thead.xwiki-livetable-display-header{
 	border-bottom: 5px solid #dddddd;
 }
-thead.xwiki-livetable-display-header tr.xwiki-livetable-display-filters:hover , thead.xwiki-livetable-display-header tr.rowHover.{ /* for IE6 tr:hover fix*/
+thead.xwiki-livetable-display-header tr.xwiki-livetable-display-filters:hover , thead.xwiki-livetable-display-header tr.rowHover { /* for IE6 tr:hover fix*/
 	background-color: #fff;
 }
 thead.xwiki-livetable-display-header th.xwiki-livetable-display-header-text {
@@ -137,7 +137,7 @@ thead.xwiki-livetable-display-header th.asc {
 }
 thead.xwiki-livetable-display-header th.selected {
 	color:#4D4D4D;
-	background-color: lemonChiffon;
+	background-color: #FFFFDD;
 }
 thead.xwiki-livetable-display-header  td.xwiki-livetable-display-header-filter{ /* IE6 padding fix */
 	padding: 1px;
@@ -160,11 +160,11 @@ tbody.xwiki-livetable-display-body tr {
 	border-bottom: 1px solid #cccccc;
 }
 tbody.xwiki-livetable-display-body tr:hover , tbody.xwiki-livetable-display-body tr.rowHover{ /* for IE6 tr:hover fix*/
-	background-color: lemonChiffon;
+	background-color: #FFFFDD;
 }
 tbody.xwiki-livetable-display-body tr.rowHover td { /* IE6 tr border-bottom fix*/
-	border-left-color: lemonChiffon;
-	border-right-color: lemonChiffon;
+	border-left-color: #FFFFDD;
+	border-right-color: #FFFFDD;
 }
 tbody.xwiki-livetable-display-body td{
 	color:#4D4D4D;
@@ -179,12 +179,12 @@ tbody.xwiki-livetable-display-body td.linkeditor, tbody.xwiki-livetable-display-
 	cursor:pointer;
 }
 tbody.xwiki-livetable-display-body td:hover.linkeditor{  
-	background:lemonChiffon url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+	background:#FFFFDD url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
 	cursor:pointer;
 }
 tbody.xwiki-livetable-display-body td.linkeditor a.editableCellHover{ /* for IE6 td:hover fix and because IE6 doesn't support multiple class td.linkeditor.editableCellHover*/
 	display: block;
-	background:lemonChiffon url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
+	background:#FFFFDD url("$xwiki.getSkinFile('pencil.gif')") no-repeat scroll right center;
 	cursor:pointer;
 	color:#4D4D4D;
 	padding-right: 16px;
@@ -312,7 +312,7 @@ div.xwiki-livetable-tagcloud ol.tagCloud li.selectable span {
 	color: #4D4D4D;
 }
 div.xwiki-livetable-tagcloud ol.tagCloud li.selected span {
-	background-color: lemonChiffon;
+	background-color: #FFFFDD;
 	border-bottom:1px solid #DDDDDD;
 	border-top:1px solid #DDDDDD;
 }
@@ -356,7 +356,7 @@ div.xwiki-livetable-pagination-content span.pagenumber {
 }
 div.xwiki-livetable-pagination-content span.pagenumber:hover {
 	color: #4D4D4D;
-	text-decoration: underlined;
+	text-decoration: underline;
 }
 div.xwiki-livetable-pagination-content span.selected {
 	color: #4D4D4D;

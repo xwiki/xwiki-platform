@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.internal.parser;
+package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,7 +34,7 @@ import org.xml.sax.XMLReader;
  * comment placeholders (for recognizing links, images, etc).
  * 
  * @version $Id$
- * @since 1.7M3
+ * @since 2.1RC1
  */
 public class XWikiXHTMLWhitespaceXMLFilter extends XHTMLWhitespaceXMLFilter
 {

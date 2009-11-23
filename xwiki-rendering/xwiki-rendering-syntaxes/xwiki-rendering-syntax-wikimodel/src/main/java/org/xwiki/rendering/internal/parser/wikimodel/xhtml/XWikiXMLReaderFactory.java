@@ -1,4 +1,4 @@
-package org.xwiki.rendering.internal.util;
+package org.xwiki.rendering.internal.parser.wikimodel.xhtml;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -8,7 +8,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.rendering.internal.parser.XWikiXHTMLWhitespaceXMLFilter;
 import org.xwiki.xml.EntityResolver;
 import org.xwiki.xml.XMLReaderFactory;
 
@@ -19,11 +18,11 @@ import org.xwiki.xml.XMLReaderFactory;
  * <li>Ignore SAX callbacks when the parser parses the DTD</li>
  * <li>Accumulate onCharacters() calls since SAX parser may normally call this event several times.</li>
  * <li>Remove non-semantic white spaces where needed</li>
- * <li>Resolve DTDs locally to speed DTD loading/validation</li> 
+ * <li>Resolve DTDs locally to speed DTD loading/validation</li>
  * </ul>
  * 
  * @version $Id$
- * @since 1.8.3
+ * @since 2.1RC1
  */
 @Component("xwiki")
 public class XWikiXMLReaderFactory implements XMLReaderFactory
@@ -63,11 +62,10 @@ public class XWikiXMLReaderFactory implements XMLReaderFactory
             whitespaceFilter.setEntityResolver(this.entityResolver);
 
             xmlReader = whitespaceFilter;
-            
         } catch (Exception e) {
             throw new SAXException("Failed to create XML reader", e);
         }
-        
+
         return xmlReader;
     }
 }

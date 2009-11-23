@@ -19,25 +19,26 @@
  */
 package org.xwiki.rendering.internal.renderer.tex;
 
-import org.xwiki.rendering.internal.renderer.*;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.rendering.internal.renderer.AbstractBlockRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 /**
- * Create Plain Text Renderers.
- *
+ * Generates LaTeX syntax from a {@link org.xwiki.rendering.block.XDOM}.
+ * 
  * @version $Id$
- * @since 2.0M3
+ * @since 2.1RC1
  */
 @Component("tex/1.0")
-public class TexRendererFactory extends AbstractPrintRendererFactory
+public class TexBlockRenderer extends AbstractBlockRenderer
 {
-    /**
-     * {@inheritDoc}
-     * @see AbstractPrintRendererFactory#getSyntax()
-     */
-    public Syntax getSyntax()
+    @Requirement("tex/1.0")
+    private PrintRendererFactory texRendererFactory;
+
+    @Override
+    protected PrintRendererFactory getPrintRendererFactory()
     {
-        return Syntax.TEX_1_0;
+        return this.texRendererFactory;
     }
 }

@@ -27,7 +27,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.HashMap;
+import java.io.StringReader;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -45,6 +48,15 @@ import org.xwiki.xmlrpc.model.XWikiObject;
 import org.xwiki.xmlrpc.model.XWikiPage;
 import org.xwiki.xmlrpc.model.XWikiPageHistorySummary;
 import org.xwiki.xmlrpc.model.XWikiPageSummary;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.syntax.SyntaxFactory;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.converter.Converter;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -130,8 +142,11 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         String version = this.xwikiApi.getVersion();
         Integer majorVersion = null;
         Integer minorVersion = null;
-        ServerInfo serverInfo = new ServerInfo();
+        Map serverInfoMap = new HashMap();
+        serverInfoMap.put("DefaultSyntax", xwikiApi.getDefaultDocumentSyntax());
+        serverInfoMap.put("ConfiguredSyntaxes", xwikiApi.getConfiguredSyntaxes());
 
+        ServerInfo serverInfo = new ServerInfo(serverInfoMap);
         if (version != null) {
             serverInfo.setBuildId(version);
             if (version.indexOf('.') != -1) {
@@ -257,8 +272,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             return DomainObjectFactory.createSpace(spaceWebHome).toRawMap();
         } else {
             throw new Exception(String.format(
-                "[Space cannot be created or it already exists and user '%s' has not the right to modify it]", user
-                    .getName()));
+                "[Space cannot be created or it already exists and user '%s' has not the right to modify it]",
+                user.getName()));
         }
     }
 
@@ -435,6 +450,11 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             page.setLanguage("");
         }
 
+        /* If the syntax field is null then set it to the default wiki syntax */
+        if (page.getSyntaxId() == null) {
+            page.setSyntaxId(xwikiApi.getDefaultDocumentSyntax());
+        }
+
         /* Build the extended id from the page id */
         XWikiExtendedId extendedId = new XWikiExtendedId(page.getId());
 
@@ -455,8 +475,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         if (doc != null) {
             if (doc.getLocked()) {
-                throw new Exception(String.format("[Unable to store document. Document locked by '%s']", doc
-                    .getLockingUser()));
+                throw new Exception(String.format("[Unable to store document. Document locked by '%s']",
+                    doc.getLockingUser()));
             }
 
             /*
@@ -556,6 +576,10 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
                     }
                 }
 
+                if (!StringUtils.isEmpty(page.getSyntaxId())) {
+                    doc.setSyntaxId(page.getSyntaxId());
+                }
+
                 doc.setContent(page.getContent());
                 doc.setTitle(page.getTitle());
                 doc.setParent(page.getParentId()); /* Allow reparenting */
@@ -585,8 +609,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         if (doc != null) {
             if (doc.getLocked()) {
-                throw new Exception(String.format("[Unable to remove page. Document '%s' locked by '%s']", doc
-                    .getName(), doc.getLockingUser()));
+                throw new Exception(String.format("[Unable to remove page. Document '%s' locked by '%s']",
+                    doc.getName(), doc.getLockingUser()));
             }
 
             doc.delete();
@@ -770,8 +794,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         /* Ignore the language or version parameters passed with the page id, and use the base page id */
         Document doc = XWikiUtils.getDocument(this.xwikiApi, extendedId.getBasePageId(), true);
         if (doc.getLocked()) {
-            throw new Exception(String.format("[Unable to remove attachment. Document '%s' locked by '%s']", doc
-                .getName(), doc.getLockingUser()));
+            throw new Exception(String.format("[Unable to remove attachment. Document '%s' locked by '%s']",
+                doc.getName(), doc.getLockingUser()));
         }
 
         com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", commentNumericalId);
@@ -812,7 +836,7 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
      * 
      * @param token The authentication token.
      * @param contentId Ignored
-     * @param attachment The Attachment object used to identify the page id, and attachment metadata.
+     * @param attachmentMap The Attachment object used to identify the page id, and attachment metadata.
      * @param attachmentData The actual attachment data.
      * @return An Attachment object describing the newly added attachment.
      * @throws Exception An invalid token is provided or if the page does not exist or the user has not the right to
@@ -904,8 +928,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         Document doc = XWikiUtils.getDocument(this.xwikiApi, extendedId.getBasePageId(), true);
 
         if (doc.getLocked()) {
-            throw new Exception(String.format("Unable to remove attachment. Document '%s' locked by '%s'", doc
-                .getName(), doc.getLockingUser()));
+            throw new Exception(String.format("Unable to remove attachment. Document '%s' locked by '%s'",
+                doc.getName(), doc.getLockingUser()));
         }
 
         com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(fileName);
@@ -920,8 +944,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             XWikiAttachment baseXWikiAttachment = baseXWikiDocument.getAttachment(fileName);
             baseXWikiDocument.deleteAttachment(baseXWikiAttachment, this.xwikiContext);
         } else {
-            throw new Exception(String.format("Attachment '%s' does not exist on page '%s'", fileName, extendedId
-                .getBasePageId()));
+            throw new Exception(String.format("Attachment '%s' does not exist on page '%s'", fileName,
+                extendedId.getBasePageId()));
         }
 
         return true;
@@ -1125,8 +1149,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         Document doc = XWikiUtils.getDocument(this.xwikiApi, extendedId.getBasePageId(), true);
 
         if (doc.getLocked()) {
-            throw new Exception(String.format("[Unable to remove attachment. Document '%s' locked by '%s']", doc
-                .getName(), doc.getLockingUser()));
+            throw new Exception(String.format("[Unable to remove attachment. Document '%s' locked by '%s']",
+                doc.getName(), doc.getLockingUser()));
         }
 
         com.xpn.xwiki.api.Object object = doc.getObject(className, id);
@@ -1134,8 +1158,8 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             doc.removeObject(object);
             doc.save();
         } else {
-            throw new Exception(String.format("[Object %s[%d] on page '%s' does not exist]", className, id, extendedId
-                .getBasePageId()));
+            throw new Exception(String.format("[Object %s[%d] on page '%s' does not exist]", className, id,
+                extendedId.getBasePageId()));
         }
 
         return true;
@@ -1161,15 +1185,15 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
             for (String spaceKey : spaceKeys) {
                 List<String> pageNames = this.xwikiApi.getSpaceDocsName(spaceKey);
                 for (String pageName : pageNames) {
-                    result.add(DomainObjectFactory.createSearchResult(String.format("%s.%s", spaceKey, pageName))
-                        .toMap());
+                    result.add(DomainObjectFactory.createSearchResult(String.format("%s.%s", spaceKey, pageName)).toMap());
                 }
             }
         } else {
             List<String> searchResults =
-                this.xwiki.getStore().searchDocumentsNames(
-                    "where doc.content like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%' or doc.name like '%"
-                        + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%'", this.xwikiContext);
+                    this.xwiki.getStore().searchDocumentsNames(
+                        "where doc.content like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query)
+                            + "%' or doc.name like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%'",
+                        this.xwikiContext);
             int i = 0;
             for (String pageId : searchResults) {
                 if (maxResults > 0 && i < maxResults) {
@@ -1206,15 +1230,14 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
         String order = fromLatest ? "desc" : "asc";
         String query =
-            String
-                .format(
+                String.format(
                     "select doc.fullName, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and rcs.date > :date order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                     order, order, order);
 
-        QueryManager queryManager = (QueryManager) Utils.getComponent(QueryManager.class);
+        QueryManager queryManager = Utils.getComponent(QueryManager.class);
         List<Object> queryResult =
-            queryManager.createQuery(query, Query.XWQL).bindValue("date", date).setLimit(numberOfResults).setOffset(
-                start).execute();
+                queryManager.createQuery(query, Query.XWQL).bindValue("date", date).setLimit(numberOfResults).setOffset(
+                    start).execute();
 
         for (Object o : queryResult) {
             Object[] fields = (Object[]) o;
@@ -1345,5 +1368,82 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         }
 
         return DomainObjectFactory.createXWikiObject(this.xwiki, this.xwikiContext, doc, object).toRawMap();
+    }
+
+    /**
+     * Converts a wiki source from a syntax to another syntax.
+     * 
+     * @param token The authentication token.
+     * @param source The content to be converted.
+     * @param initialSyntaxId The initial syntax of the source.
+     * @param targetSyntaxId The final syntax of the returned content.
+     * @return The converted source.
+     * @throws Exception An invalid token is provided, the syntaxId is not supported, the source is invalid or the
+     *             conversion fails.
+     */
+    public String convert(String token, String source, String initialSyntaxId, String targetSyntaxId) throws Exception
+    {
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
+        try {
+            SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+            Syntax initialSyntax = syntaxFactory.createSyntaxFromIdString(initialSyntaxId);
+            Syntax targetSyntax = syntaxFactory.createSyntaxFromIdString(targetSyntaxId);
+            WikiPrinter printer = new DefaultWikiPrinter();
+            Converter converter = Utils.getComponent(Converter.class);
+            converter.convert(new StringReader(source), initialSyntax, targetSyntax, printer);
+
+            return printer.toString();
+        } catch (Throwable t) {
+            throw new RuntimeException("Exception while performing syntax conversion.", t);
+        }
+    }
+
+    /**
+     * Gets all syntaxes supported by the rendering parsers as an input for a syntax conversion.
+     * 
+     * @param token The authentication token.
+     * @return A list containing all syntaxes supported by rendering parsers.
+     * @throws Exception An invalid token is provided or the syntax lookup fails.
+     */
+    public List<String> getInputSyntaxes(String token) throws Exception
+    {
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
+        List<String> syntaxes = new ArrayList<String>();
+        List<Parser> parsers;
+        ComponentManager componentManager = Utils.getComponentManager();
+        try {
+            parsers = componentManager.lookupList(Parser.class);
+            for (Parser parser : parsers) {
+                syntaxes.add(parser.getSyntax().toIdString());
+            }
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to lookup the list of available parser syntaxes", e);
+        }
+        return syntaxes;
+    }
+
+    /**
+     * Gets all syntaxes supported by the rendering as an output for a syntax conversion.
+     * 
+     * @param token The authentication token.
+     * @return A list containing all syntaxes supported by renderers.
+     * @throws Exception An invalid token is provided or the syntax lookup fails.
+     */
+    public List<String> getOutputSyntaxes(String token) throws Exception
+    {
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
+        List<String> syntaxes = new ArrayList<String>();
+        List<PrintRendererFactory> renderers;
+        ComponentManager componentManager = Utils.getComponentManager();
+        try {
+            // TODO: use BlockRenderer
+            renderers = componentManager.lookupList(PrintRendererFactory.class);
+            for (PrintRendererFactory renderer : renderers) {
+                syntaxes.add(renderer.getSyntax().toIdString());
+            }
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException("Failed to lookup the list of available renderer syntaxes", e);
+        }
+        return syntaxes;
     }
 }

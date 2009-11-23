@@ -29,6 +29,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
+import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
@@ -47,13 +48,13 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
      * New Line character.
      */
     private static final String NL = "\n";
-    
+
     /**
-     * To generate a string representation of a link that we output when no link label generator exist or when
-     * the link is an external link (ie not a document link).
+     * To generate a string representation of a link that we output when no link label generator exist or when the link
+     * is an external link (ie not a document link).
      */
     private BasicLinkRenderer linkRenderer = new BasicLinkRenderer();
-    
+
     private boolean isFirstElementRendered;
 
     /**
@@ -83,6 +84,11 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
         return (BlockStateChainingListener) getListenerChain().getListener(BlockStateChainingListener.class);
     }
 
+    protected EmptyBlockChainingListener getEmptyBlockState()
+    {
+        return (EmptyBlockChainingListener) getListenerChain().getListener(EmptyBlockChainingListener.class);
+    }
+
     // Events
 
     /**
@@ -110,20 +116,18 @@ public class PlainTextChainingRenderer extends AbstractChainingPrintRenderer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.renderer.AbstractChainingPrintRenderer#beginLink(org.xwiki.rendering.listener.Link,
+     * @see org.xwiki.rendering.listener.chaining.AbstractChainingListener#endLink(org.xwiki.rendering.listener.Link,
      *      boolean, java.util.Map)
      */
     @Override
-    public void beginLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
+    public void endLink(Link link, boolean isFreeStandingURI, Map<String, String> parameters)
     {
-        if (link.getType() == LinkType.DOCUMENT) {
-            if (this.linkLabelGenerator != null) {
+        if (getEmptyBlockState().isCurrentContainerBlockEmpty()) {
+            if (link.getType() == LinkType.DOCUMENT && this.linkLabelGenerator != null) {
                 getPrinter().print(this.linkLabelGenerator.generate(link));
             } else {
                 getPrinter().print(this.linkRenderer.renderLinkReference(link));
             }
-        } else {
-            getPrinter().print(this.linkRenderer.renderLinkReference(link));
         }
     }
 

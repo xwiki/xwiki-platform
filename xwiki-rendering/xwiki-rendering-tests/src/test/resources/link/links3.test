@@ -28,3 +28,7 @@ endDocument
 .input|xhtml/1.0
 .#-----------------------------------------------------
 <p><!--startwikilink:Space.UnknownPage--><span class="wikicreatelink"><a href="/xwiki/bin/edit/Space/UnknownPage?parent=xwiki%3ASpace.Page">label</a></span><!--stopwikilink--></p>
+.#-----------------------------------------------------
+.expect|plain/1.0
+.#-----------------------------------------------------
+label

@@ -26,6 +26,7 @@ import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.listener.chaining.BlockStateChainingListener;
+import org.xwiki.rendering.listener.chaining.EmptyBlockChainingListener;
 import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
 import org.xwiki.rendering.renderer.AbstractChainingPrintRenderer;
@@ -47,6 +48,7 @@ public class PlainTextRenderer extends AbstractChainingPrintRenderer implements 
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      * @since 2.0M3
      */
@@ -59,6 +61,7 @@ public class PlainTextRenderer extends AbstractChainingPrintRenderer implements 
         // placed later in the chain.
         chain.addListener(this);
         chain.addListener(new BlockStateChainingListener(chain));
+        chain.addListener(new EmptyBlockChainingListener(chain));
         chain.addListener(new PlainTextChainingRenderer(this.linkLabelGenerator, chain));
     }
 }

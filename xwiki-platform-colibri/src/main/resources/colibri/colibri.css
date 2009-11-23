@@ -945,103 +945,103 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 
 /* Icons */
 .actionmenu #tmWiki {
-  background-image: url(/xwiki/resources/icons/silk/world.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/world.gif'));
 }
 
 .actionmenu #tmAdminWiki {
-  background-image: url(/xwiki/resources/icons/silk/wrench.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
 .actionmenu #tmCreateSpace {
-  background-image: url(/xwiki/resources/icons/silk/folder_add.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/folder_add.gif'));
 }
 
 .actionmenu #tmSpace {
-  background-image: url(/xwiki/resources/icons/silk/folder.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/folder.gif'));
 }
 
 .actionmenu #tmAdminSpace {
-  background-image: url(/xwiki/resources/icons/silk/wrench.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
 .actionmenu #tmCreatePage, .actionmenu #tmCreatePageFromOffice {
-  background-image: url(/xwiki/resources/icons/silk/page_white_add.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_add.gif'));
 }
 
 .actionmenu #tmEdit {
-  background-image: url(/xwiki/resources/icons/silk/page_white_edit.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
 }
 
 .actionmenu #tmEditWiki, .actionmenu #tmViewSource {
-  background-image: url(/xwiki/resources/icons/silk/page_white_code.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_code.gif'));
 }
 
 .actionmenu #tmEditVisual {
-  background-image: url(/xwiki/resources/icons/silk/page_white_edit.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
 }
 
 .actionmenu #tmEditForm {
-  background-image: url(/xwiki/resources/icons/silk/application_form.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
 }
 
 .actionmenu #tmEditRights {
-  background-image: url(/xwiki/resources/icons/silk/lock.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/lock.gif'));
 }
 
 .actionmenu #tmEditObjects {
-  background-image: url(/xwiki/resources/icons/silk/brick.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/brick.gif'));
 }
 
 .actionmenu #tmEditClass {
-  background-image: url(/xwiki/resources/icons/silk/box.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/box.gif'));
 }
 
 .actionmenu #tmExportPdf {
-  background-image: url(/xwiki/resources/icons/silk/page_white_acrobat.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_acrobat.gif'));
 }
 
 .actionmenu #tmExportRtf {
-  background-image: url(/xwiki/resources/icons/silk/page_white_word.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_word.gif'));
 }
 
 .actionmenu #tmExportHtml {
-  background-image: url(/xwiki/resources/icons/silk/page_white_world.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_world.gif'));
 }
 
 .actionmenu #tmExportXar {
-  background-image: url(/xwiki/resources/icons/silk/page_white_compressed.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_compressed.gif'));
 }
 
 .actionmenu #tmPrintPreview {
-  background-image: url(/xwiki/resources/icons/silk/page_white_magnify.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_magnify.gif'));
 }
 
 .actionmenu #tmActionDelete {
-  background-image: url(/xwiki/resources/icons/silk/cross.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
 }
 
 .actionmenu #tmActionRename {
-  background-image: url(/xwiki/resources/icons/silk/textfield_rename.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/textfield_rename.gif'));
 }
 
 .actionmenu #tmActionCopy {
-  background-image: url(/xwiki/resources/icons/silk/page_white_copy.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/page_white_copy.gif'));
 }
 
 .actionmenu #tmUser {
-  background-image: url(/xwiki/resources/icons/silk/user.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/user.gif'));
 }
 
 .actionmenu #tmWatchlistManager {
-  background-image: url(/xwiki/resources/icons/silk/wrench.gif);
+  background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
 .actionmenu #tmWatchWiki, .actionmenu #tmWatchSpace, .actionmenu #tmWatchDocument {
-  background-image: url(/xwiki/resources/icons/xwiki/star%2Dgray.png);
+  background-image: url($xwiki.getSkinFile('icons/xwiki/star-gray.png'));
 }
 
 .actionmenu #tmUnwatchWiki, .actionmenu #tmUnwatchSpace, .actionmenu #tmUnwatchDocument {
-  background-image: url(/xwiki/resources/icons/xwiki/star%2Dyellow.png);  
+  background-image: url($xwiki.getSkinFile('icons/xwiki/star-yellow.png'));  
 }
 
 /* @group BUTTONS */

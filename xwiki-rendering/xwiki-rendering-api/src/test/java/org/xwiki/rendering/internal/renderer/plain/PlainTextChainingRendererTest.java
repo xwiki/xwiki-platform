@@ -25,13 +25,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.listener.chaining.ListenerChain;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link PlainTextChainingRenderer} that cannot easily be performed using the Renderng Test framework.
- *  
+ * 
  * @version $Id$
  * @since 2.1M1
  */
@@ -41,18 +40,20 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
     public void testBeginLinkWhenLinkLabelGeneratorIsNull() throws Exception
     {
         // Use the constructor that sets the Link Label Generator to null
-        PlainTextChainingRenderer renderer = new PlainTextChainingRenderer(new ListenerChain());
-        DefaultWikiPrinter printer = new DefaultWikiPrinter(); 
+        PlainTextRenderer renderer = new PlainTextRenderer();
+        renderer.initialize();
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
-        
+
         Link link = new Link();
         link.setAnchor("anchor");
         link.setQueryString("param=value");
         link.setReference("reference");
         link.setType(LinkType.DOCUMENT);
-        
-        renderer.beginLink(link, false, Collections.<String, String>emptyMap());
-        
+
+        renderer.beginLink(link, false, Collections.<String, String> emptyMap());
+        renderer.endLink(link, false, Collections.<String, String> emptyMap());
+
         Assert.assertEquals("reference#anchor?param=value", printer.toString());
     }
 
@@ -60,18 +61,20 @@ public class PlainTextChainingRendererTest extends AbstractComponentTestCase
     public void testBeginLinkWhenExternalLink() throws Exception
     {
         // Use the constructor that sets the Link Label Generator to null
-        PlainTextChainingRenderer renderer = new PlainTextChainingRenderer(new ListenerChain());
-        DefaultWikiPrinter printer = new DefaultWikiPrinter(); 
+        PlainTextRenderer renderer = new PlainTextRenderer();
+        renderer.initialize();
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
         renderer.setPrinter(printer);
-        
+
         Link link = new Link();
         link.setAnchor("anchor");
         link.setQueryString("param=value");
         link.setReference("reference");
         link.setType(LinkType.URI);
-        
-        renderer.beginLink(link, false, Collections.<String, String>emptyMap());
-        
+
+        renderer.beginLink(link, false, Collections.<String, String> emptyMap());
+        renderer.endLink(link, false, Collections.<String, String> emptyMap());
+
         Assert.assertEquals("reference#anchor?param=value", printer.toString());
     }
 }

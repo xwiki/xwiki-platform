@@ -24,35 +24,51 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <description>Parsers based on Doxia</description>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
+    <artifactId>xwiki-core-rendering-syntaxes</artifactId>
     <version>2.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
-  <name>XWiki Platform - Core - Rendering - Parser - Wiki Model</name>
+  <artifactId>xwiki-core-rendering-syntax-xwiki10</artifactId>
+  <name>XWiki Platform - Core - Rendering - Parser - XWiki 1.0</name>
+  <description>XWiki Platform - Core - Rendering - Parser - XWiki 1.0</description>
   <dependencies>
     <dependency>
-      <groupId>org.wikimodel</groupId>
-      <artifactId>org.wikimodel.wem</artifactId>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-xml</artifactId>
+      <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
       <version>${pom.version}</version>
+      <!-- Only needed at runtime since it's a component implementation -->
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-velocity</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <!-- Testing dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-tests</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
+        <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <includes>
-            **/AbstractWikiModelParser.java
-            **/WikiModelXWiki20Parser.java
+            <include>**/RenderingTests.java</include>
           </includes>
         </configuration>
       </plugin>

@@ -47,7 +47,7 @@
   <modules>
     <module>xwiki-rendering-api</module>
     <module>xwiki-rendering-xwiki</module>
-    <module>xwiki-rendering-parsers</module>
+    <module>xwiki-rendering-syntaxes</module>
     <module>xwiki-rendering-tests</module>
     <module>xwiki-rendering-macros</module>
   </modules>

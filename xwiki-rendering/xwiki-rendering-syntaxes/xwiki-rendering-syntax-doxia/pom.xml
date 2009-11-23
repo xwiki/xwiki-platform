@@ -24,14 +24,14 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <description>Parsers based on Doxia</description>
+  <description>Parsers and renderers based on Doxia</description>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-core-rendering-parsers-parent</artifactId>
+    <artifactId>xwiki-core-rendering-syntaxes</artifactId>
     <version>2.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-rendering-parser-doxia</artifactId>
-  <name>XWiki Platform - Core - Rendering - Parser - Doxia</name>
+  <artifactId>xwiki-core-rendering-syntax-doxia</artifactId>
+  <name>XWiki Platform - Core - Rendering - Bridge - Doxia</name>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>

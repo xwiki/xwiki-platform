@@ -730,21 +730,21 @@
     <!-- XWiki syntax parsers -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-parser-doxia</artifactId>
+      <artifactId>xwiki-core-rendering-syntax-doxia</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-parser-wikimodel</artifactId>
+      <artifactId>xwiki-core-rendering-syntax-wikimodel</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering-parser-xwiki10</artifactId>
+      <artifactId>xwiki-core-rendering-syntax-xwiki10</artifactId>
       <version>${pom.version}</version>
       <!-- Only needed at runtime since it's a component implementation -->
       <scope>runtime</scope>

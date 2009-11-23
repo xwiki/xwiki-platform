@@ -50,7 +50,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
 
 public class Utils
 {
@@ -268,9 +267,7 @@ public class Utils
         context.setDatabase(dbname);
 
         int mode = 0;
-        if (request instanceof XWikiXmlRpcRequest) {
-            mode = XWikiContext.MODE_XMLRPC;
-        } else if (request instanceof XWikiServletRequest) {
+        if (request instanceof XWikiServletRequest) {
             mode = XWikiContext.MODE_SERVLET;
         } else if (request instanceof XWikiPortletRequest) {
             mode = XWikiContext.MODE_PORTLET;

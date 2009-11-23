@@ -57,6 +57,8 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -82,11 +84,18 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
 
     private com.xpn.xwiki.api.XWiki xwikiApi;
 
-    public XWikiXmlRpcApiImpl(XWikiContext xwikiContext, com.xpn.xwiki.XWiki xwiki, com.xpn.xwiki.api.XWiki xwikiApi)
+    public XWikiXmlRpcApiImpl()
     {
-        this.xwikiContext = xwikiContext;
-        this.xwiki = xwiki;
-        this.xwikiApi = xwikiApi;
+        this.xwikiContext = getContext();
+        this.xwiki = this.xwikiContext.getWiki();
+        this.xwikiApi = new com.xpn.xwiki.api.XWiki(this.xwiki, this.xwikiContext);
+    }
+
+    protected XWikiContext getContext()
+    {
+        Execution execution = Utils.getComponent(Execution.class);
+        ExecutionContext executionContex = execution.getContext();
+        return (XWikiContext) executionContex.getProperty("xwikicontext");
     }
 
     /**

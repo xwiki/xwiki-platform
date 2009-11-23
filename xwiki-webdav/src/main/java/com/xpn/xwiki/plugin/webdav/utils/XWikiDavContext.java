@@ -58,7 +58,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import com.xpn.xwiki.xmlrpc.XWikiXmlRpcResponse;
+import com.xpn.xwiki.web.XWikiServletResponse;
 
 /**
  * Holds context information about a webdav request. 
@@ -126,10 +126,10 @@ public class XWikiDavContext
         try {
             XWikiEngineContext xwikiEngine = new XWikiServletContext(servletContext);
             XWikiRequest xwikiRequest = new XWikiServletRequest(request);
-            XWikiResponse xwikiResponse = new XWikiXmlRpcResponse(response);
+            XWikiResponse xwikiResponse = new XWikiServletResponse(response);
 
             xwikiContext = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiEngine);
-            xwikiContext.setMode(XWikiContext.MODE_GWT);
+            xwikiContext.setMode(XWikiContext.MODE_SERVLET);
             xwikiContext.setDatabase("xwiki");
 
             ServletContainerInitializer containerInitializer =

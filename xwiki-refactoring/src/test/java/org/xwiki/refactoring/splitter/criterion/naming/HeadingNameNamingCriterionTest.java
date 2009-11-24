@@ -47,7 +47,7 @@ public class HeadingNameNamingCriterionTest extends AbstractRefactoringTestCase
     {
         XDOM xdom = xwikiParser.parse(new StringReader("=Heading="));
         NamingCriterion namingCriterion = new HeadingNameNamingCriterion("Test.Test", docBridge,
-            getComponentManager().lookup(BlockRenderer.class, Syntax.XWIKI_2_0.toIdString()), false);
+            getComponentManager().lookup(BlockRenderer.class, Syntax.PLAIN_1_0.toIdString()), false);
         Block sectionBlock = xdom.getChildren().get(0);
         // Test normal heading-name naming
         Assert.assertEquals("Test.Heading", namingCriterion.getDocumentName(new XDOM(sectionBlock.getChildren())));

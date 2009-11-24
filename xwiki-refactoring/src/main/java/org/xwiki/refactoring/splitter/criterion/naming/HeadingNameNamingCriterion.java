@@ -43,9 +43,9 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 public class HeadingNameNamingCriterion implements NamingCriterion
 {
     /**
-     * Used to render block to xwiki 2.0 syntax.
+     * Used to render block to plain text.
      */
-    private BlockRenderer xwikiSyntaxRenderer;
+    private BlockRenderer plainSyntaxRenderer;
 
     /**
      * {@link DocumentAccessBridge} used to lookup for existing wiki pages and avoid name clashes.
@@ -83,15 +83,15 @@ public class HeadingNameNamingCriterion implements NamingCriterion
      * 
      * @param baseDocumentName name of the document that is being split.
      * @param docBridge {@link DocumentAccessBridge} used to lookup for documents.
-     * @param xwikiSyntaxRenderer the renderer to convert to xwiki 2.0 syntax
+     * @param plainSyntaxRenderer the renderer to convert to plain text
      * @param prependBasePageName a flag indicating if each generated page name should be prepended with base page name.
      */
     public HeadingNameNamingCriterion(String baseDocumentName, DocumentAccessBridge docBridge,
-        BlockRenderer xwikiSyntaxRenderer, boolean prependBasePageName)
+        BlockRenderer plainSyntaxRenderer, boolean prependBasePageName)
     {
         this.mainPageNameAndNumberingNamingCriterion = new PageIndexNamingCriterion(baseDocumentName, docBridge);
         this.docBridge = docBridge;
-        this.xwikiSyntaxRenderer = xwikiSyntaxRenderer;
+        this.plainSyntaxRenderer = plainSyntaxRenderer;
         this.documentNames = new ArrayList<String>();
         int dot = baseDocumentName.lastIndexOf('.');
         this.spaceName = (dot != -1) ? baseDocumentName.substring(0, dot) : "Main";
@@ -125,7 +125,7 @@ public class HeadingNameNamingCriterion implements NamingCriterion
                 XDOM xdom = new XDOM(clonedHeaderBlock.getChildren());
 
                 WikiPrinter printer = new DefaultWikiPrinter();
-                this.xwikiSyntaxRenderer.render(xdom, printer);
+                this.plainSyntaxRenderer.render(xdom, printer);
 
                 documentName = cleanPageName(printer.toString());
             }

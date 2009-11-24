@@ -66,19 +66,19 @@
          Note: even though the dependency plugin below doesn't need explicit dependencies set
          to work it's a best practice to put them here since they are real dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
+      <groupId>com.xpn.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-albatross</artifactId>
       <version>${platform.skin.albatross.version}</version>
       <type>zip</type>
     </dependency>         
     <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
+      <groupId>com.xpn.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-toucan</artifactId>
       <version>${platform.skin.toucan.version}</version>
       <type>zip</type>
     </dependency>         
     <dependency>
-      <groupId>org.xwiki.platform.skins</groupId>
+      <groupId>com.xpn.xwiki.platform.skins</groupId>
       <artifactId>xwiki-skin-colibri</artifactId>
       <version>${platform.skin.colibri.version}</version>
       <type>zip</type>
@@ -167,19 +167,19 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.xwiki.platform.skins</groupId>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
                   <artifactId>xwiki-skin-albatross</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xwiki.platform.skins</groupId>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
                   <artifactId>xwiki-skin-toucan</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>org.xwiki.platform.skins</groupId>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
                   <artifactId>xwiki-skin-colibri</artifactId>
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>

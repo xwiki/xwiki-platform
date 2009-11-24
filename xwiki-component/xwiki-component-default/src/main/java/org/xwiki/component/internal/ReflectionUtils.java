@@ -75,9 +75,13 @@ public class ReflectionUtils
                             field.setAccessible(isAccessible);
                         }
                     } catch (Exception e) {
-                        // Ignore setting this field
-                        // TODO: Generate a log instead of printing in the console
-                        e.printStackTrace();
+                        // This shouldn't happen but if it does then the Component manager will not function properly
+                        // and we need to abort. It probably means the Java security manager has been configured to
+                        // prevent accessing private fields.
+                        throw new RuntimeException("Failed to set field [" + fieldName + "] in instance of ["
+                            + instanceContainingField.getClass().getName() + "]. The Java Security Manager has "
+                            + "probably been configured to prevent settting private field values. XWiki requires "
+                            + "this ability to work.");
                     }
                     return;
                 }

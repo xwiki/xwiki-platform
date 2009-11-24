@@ -74,6 +74,17 @@
     <filter-class>com.xpn.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
   </filter>
 
+  <!-- This filter is used to initialize the XWiki context before processing a XML-RPC request. -->
+  <filter>
+    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
+    <filter-class>com.xpn.xwiki.wysiwyg.server.filter.XWikiContextInitializationFilter</filter-class>
+    <!-- A parameter used to identify the request as a an XML-RPC call -->
+    <init-param>
+      <param-name>mode</param-name>
+      <param-value>2</param-value>
+    </init-param>
+  </filter>
+
   <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
@@ -117,6 +128,14 @@
     <dispatcher>INCLUDE</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
+    <servlet-name>xmlrpc</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>    
 
   <!-- Initializes XWiki -->
   <listener>

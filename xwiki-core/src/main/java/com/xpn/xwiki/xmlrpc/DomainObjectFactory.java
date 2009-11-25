@@ -58,7 +58,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 public class DomainObjectFactory
 {
     private static final Log LOG = LogFactory.getLog(DomainObjectFactory.class);
-    
+
     /**
      * Create a space summary
      * 
@@ -197,6 +197,7 @@ public class DomainObjectFactory
         result.setModifier(document.getContentAuthor());
         result.setHomePage(document.getName().equals("WebHome"));
         result.setLanguage(document.getLanguage());
+        result.setSyntaxId(document.getSyntaxId());
 
         return result;
     }
@@ -221,6 +222,7 @@ public class DomainObjectFactory
         result.setModifier("");
         result.setHomePage(false);
         result.setLanguage("");
+        result.setSyntaxId("");
 
         return result;
     }
@@ -392,8 +394,8 @@ public class DomainObjectFactory
             if (propertyType != null) {
                 result.setPropertyType(propertyName, propertyType.getClass().getName());
             } else {
-                LOG.warn(String.format("Property %s of object %s:%s has a null type", propertyName, document
-                    .getFullName(), object.getPrettyName()));
+                LOG.warn(String.format("Property %s of object %s:%s has a null type", propertyName,
+                    document.getFullName(), object.getPrettyName()));
             }
 
             if (propertyType instanceof ListClass) {

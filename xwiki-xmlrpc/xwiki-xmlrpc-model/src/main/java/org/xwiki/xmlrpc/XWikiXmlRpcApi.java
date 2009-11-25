@@ -63,6 +63,12 @@ public interface XWikiXmlRpcApi
 
     public String renderContent(String token, String space, String pageId, String content) throws Exception;
 
+    public String convert(String token, String source, String initialSyntaxId, String targetSyntaxId) throws Exception;
+
+    public List<String> getInputSyntaxes(String token) throws Exception;
+
+    public List<String> getOutputSyntaxes(String token) throws Exception;
+
     /* Comments */
     public List/* List<Comment> */getComments(String token, String pageId) throws Exception;
 
@@ -106,5 +112,4 @@ public interface XWikiXmlRpcApi
 
     public List/* List<XWikiPageHistorySummary> */getModifiedPagesHistory(String token, Date date, int numberOfResults,
         int start, boolean fromLatest) throws Exception;
-
 }

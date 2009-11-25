@@ -72,4 +72,14 @@ public class XWikiPage extends Page
     {
         return getList("translations");
     }
+
+    public String getSyntaxId()
+    {
+        return super.getString("syntaxId");
+    }
+
+    public void setSyntaxId(String syntaxId)
+    {
+        super.setString("syntaxId", syntaxId);
+    }
 }

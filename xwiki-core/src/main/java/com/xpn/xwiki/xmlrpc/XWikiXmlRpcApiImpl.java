@@ -1455,4 +1455,47 @@ public class XWikiXmlRpcApiImpl implements XWikiXmlRpcApi
         }
         return syntaxes;
     }
+
+    /**
+     * Renders a text in the context of a wiki page.
+     *
+     * @param token The authentication token.
+     * @param pageId The id of the page.
+     * @param content The context to be rendered.
+     * @param sourceSyntaxId The syntax of the content.
+     * @param targetSyntaxId The target syntax of the rendered content
+     * @return The rendered content.
+     * @throws Exception If a invalid token is provided, an unsupported syntax id is given or the rendering fails.
+     */
+    public String renderPageContent(String token, String pageId, String content, String sourceSyntaxId,
+        String targetSyntaxId) throws Exception
+    {
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
+        LOG.debug(String.format("User %s has called renderPageContent()", user.getName()));
+
+        Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
+
+        return doc.getRenderedContent(content, sourceSyntaxId, targetSyntaxId);
+    }
+
+    /**
+     * Gets the rendered content of an existing document.
+     *
+     * @param token The authentication token.
+     * @param pageId The id of the page.
+     * @param syntaxId The target syntax of the rendered content
+     * @return The rendered content
+     * @throws Exception If a invalid token is provided, an unsupported syntax id is given or the rendering fails.
+     */
+    public String getRenderedContent(String token, String pageId, String syntaxId) throws Exception
+    {
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, this.xwikiContext);
+        LOG.debug(String.format("User %s has called getRenderedContent()", user.getName()));
+
+        Document doc = XWikiUtils.getDocument(this.xwikiApi, pageId, true);
+        SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+        Syntax syntax = syntaxFactory.createSyntaxFromIdString(syntaxId);
+
+        return doc.getRenderedContent(syntax);
+    }
 }

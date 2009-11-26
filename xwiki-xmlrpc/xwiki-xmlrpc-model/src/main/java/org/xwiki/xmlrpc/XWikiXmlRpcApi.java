@@ -63,6 +63,11 @@ public interface XWikiXmlRpcApi
 
     public String renderContent(String token, String space, String pageId, String content) throws Exception;
 
+    public String renderPageContent(String token, String pageId, String content, String sourceSyntaxId,
+        String targetSyntaxId) throws Exception;
+
+    public String getRenderedContent(String token, String pageId, String syntaxId) throws Exception;
+
     public String convert(String token, String source, String initialSyntaxId, String targetSyntaxId) throws Exception;
 
     public List<String> getInputSyntaxes(String token) throws Exception;

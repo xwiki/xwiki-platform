@@ -932,6 +932,85 @@ public class XWikiXmlRpcClient
     }
 
     /**
+     * Converts a wiki source from a syntax to another syntax.
+     *
+     * @param source The content to be converted.
+     * @param initialSyntaxId The initial syntax of the source.
+     * @param targetSyntaxId The final syntax of the returned content.
+     * @return The converted source.
+     * @throws XmlRpcException An invalid token is provided, the syntaxId is not supported, the source is invalid or the
+     * conversion fails.
+     */
+    public String convert( String source, String initialSyntaxId, String targetSyntaxId)
+        throws XmlRpcException
+    {
+        return (String) invokeRpc("convert", this.token, source, initialSyntaxId, targetSyntaxId);
+    }
+
+    /**
+     * Gets all syntaxes supported by the rendering parsers as an input for a syntax conversion.
+     *
+     * @return A list containing all syntaxes supported by rendering parsers.
+     * @throws Exception An invalid token is provided or the syntax lookup fails.
+     */
+    public List<String> getInputSyntaxes() throws XmlRpcException
+    {
+        List<String> result = new ArrayList<String>();
+        Object[] objects = (Object[]) invokeRpc("getInputSyntaxes", this.token);
+        for(Object object:objects)
+        {
+            result.add((String)object);        
+        }
+        return result;           
+    }
+
+    /**
+     * Gets all syntaxes supported by the rendering as an output for a syntax conversion.
+     *
+     * @return A list containing all syntaxes supported by renderers.
+     * @throws XmlRpcException An invalid token is provided or the syntax lookup fails.
+     */
+    public List<String> getOutputSyntaxes() throws XmlRpcException
+    {
+        List<String> result = new ArrayList<String>();
+        Object[] objects = (Object[]) invokeRpc("getOutputSyntaxes", this.token);
+        for(Object object:objects)
+        {
+            result.add((String)object);
+        }
+        return result;
+    }
+
+    /**
+     * Renders a text in the context of a wiki page.
+     *
+     * @param pageId The id of the page.
+     * @param content The contenxt to be rendered.
+     * @param sourceSyntaxId The syntax of the content.
+     * @param targetSyntaxId The target syntax of the rendered content
+     * @return The rendered content.
+     * @throws XmlRpcException If a invalid token is provided, an unsuported syntax id is given or the rendering fails.
+     */
+    public String renderPageContent(String pageId, String content, String sourceSyntaxId,
+        String targetSyntaxId) throws XmlRpcException
+    {
+        return (String) invokeRpc("renderPageContent", this.token, pageId, content, sourceSyntaxId, targetSyntaxId);
+    }
+
+    /**
+     * Gets the rendered content of an existing document.
+     *
+     * @param pageId The id of the page.
+     * @param syntaxId The target syntax of the rendered content
+     * @return The renderded content
+     * @throws Exception If a invalid token is provided, an unsuported syntax id is given or the rendering fails.
+     */
+    public String getRenderedContent(String pageId, String syntaxId) throws XmlRpcException
+    {
+        return (String) invokeRpc("getRenderedContent", this.token, pageId, syntaxId);
+    }
+
+    /**
      * Utility method for invoking remote RPC methods.
      * 
      * @param methodName

@@ -53,10 +53,9 @@ public class XWikiServletContextListener implements ServletContextListener
         this.componentManager = ecm;
 
         // Use a Component Event Manager that stacks Component instance creation events till we tell it to flush them.
-        // The reason is that the Observation Manager used to send the events is a component itself and we need the
-        // Application Context to be set up before we start sending events since there can be Observation Listener
-        // components that require the Application Context (this is the case for example for the Office Importer
-        // Lifecycle Listener).
+        // The reason is that the Observation Manager used to send the events but we need the Application Context to
+        // be set up before we start sending events since there can be Observation Listener components that require
+        // the Application Context (this is the case for example for the Office Importer Lifecycle Listener).
         StackingComponentEventManager eventManager = new StackingComponentEventManager();
         ecm.setComponentEventManager(eventManager);
 

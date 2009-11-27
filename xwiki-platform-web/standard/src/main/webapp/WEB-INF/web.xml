@@ -137,6 +137,14 @@
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>    
 
+  <filter-mapping>
+    <filter-name>XWikiXmlRpcContextInitializationFilter</filter-name>
+    <servlet-name>RestletServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>INCLUDE</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
   <!-- Initializes XWiki -->
   <listener>
     <listener-class>org.xwiki.container.servlet.XWikiServletContextListener</listener-class>

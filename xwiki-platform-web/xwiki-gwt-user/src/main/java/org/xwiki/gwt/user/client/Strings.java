@@ -58,4 +58,13 @@ public interface Strings extends Constants
      * @return the label used on the wizard step finish button
      */
     String wizardFinish();
+
+    /**
+     * NOTE: We added this message because the {@code statusText} response property is not accessible when the status
+     * code is 0 (unknown).
+     * 
+     * @return the status text for an HTTP response with status code 0 (unknown); such a response it usually generated
+     *         when the HTTP request is aborted
+     */
+    String httpStatusTextRequestAborted();
 }

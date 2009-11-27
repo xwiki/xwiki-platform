@@ -71,9 +71,14 @@ public class RichTextAreaImplMozilla extends com.google.gwt.user.client.ui.impl.
             || iframe.contentWindow.document.designMode.toLowerCase() == 'on') return;
 
         iframe.contentWindow.document.designMode = 'on';
-        // It seems that the following line of code fixes the Midas bug which prevents the user to delete any HTML
-        // inserted through DOM API before any printable key has been pressed.
-        iframe.contentWindow.document.execCommand('undo', false, null);
+        try {
+            // It seems that the following line of code fixes the Midas bug which prevents the user to delete any HTML
+            // inserted through DOM API before any printable key has been pressed.
+            iframe.contentWindow.document.execCommand('undo', false, null);
+        } catch(e) {
+            // Ignore: execCommand throws an exception if the iframe is hidden through CSS. This can happen when the
+            // rich text area is loaded in background.
+        }
 
         var outer = this;
         iframe.contentWindow.onunload = function() {

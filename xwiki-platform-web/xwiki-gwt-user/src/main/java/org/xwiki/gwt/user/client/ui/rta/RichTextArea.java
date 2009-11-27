@@ -55,6 +55,11 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     public static final String LOADED = "__loaded";
 
     /**
+     * @see #setEnabled(boolean)
+     */
+    public static final String ENABLED = "__enabled";
+
+    /**
      * The command manager that executes commands on this rich text area.
      */
     private final CommandManager cm;
@@ -206,4 +211,33 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /*-{
         return this.@com.google.gwt.user.client.ui.RichTextArea::impl;
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.google.gwt.user.client.ui.RichTextArea#isEnabled()
+     * @see #setEnabled(boolean)
+     */
+    public boolean isEnabled()
+    {
+        return getElement().getPropertyBoolean(ENABLED);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * NOTE: We overwrite this method to prevent the use of the {@code disabled} property which blocks rich text area
+     * events in Internet Explorer. For instance, the load event is not fired if the {@code disabled} property is set to
+     * {@code true} on the in-line frame element used by the rich text area. In order to be consistent with all the
+     * browsers we chose to use a different property to mark the enabled/disabled state. This way we can disable the
+     * rich text area while it is loading to prevent its content from being submitted and enable it when the load event
+     * fires.
+     * 
+     * @see com.google.gwt.user.client.ui.RichTextArea#setEnabled(boolean)
+     * @see #isEnabled()
+     */
+    public void setEnabled(boolean enabled)
+    {
+        getElement().setPropertyBoolean(ENABLED, enabled);
+    }
 }

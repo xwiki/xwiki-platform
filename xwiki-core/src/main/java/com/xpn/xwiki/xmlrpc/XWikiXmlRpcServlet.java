@@ -21,6 +21,7 @@
 package com.xpn.xwiki.xmlrpc;
 
 import java.io.IOException;
+import java.lang.reflect.Proxy;
 import java.net.URL;
 
 import javax.servlet.ServletConfig;
@@ -34,6 +35,7 @@ import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestSpecificProcessorFactoryFactory;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
+import org.xwiki.xmlrpc.XWikiXmlRpcApi;
 
 /**
  * This is the XMLRPC Servlet that is used as a gateway for serving XMLRPC requests.
@@ -54,6 +56,22 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
             @Override
             protected Object getRequestProcessor(Class class1, XmlRpcRequest request) throws XmlRpcException
             {
+                XWikiXmlRpcHttpRequestConfig config = (XWikiXmlRpcHttpRequestConfig) request.getConfig();
+
+                /*
+                 * Here we check that the requested class is the interface XWikiXmlRpcApi. In this case we return a
+                 * proxy object that provides an implementation of this interface. If the requested class is of another
+                 * type, we call the superclass method. This allows other handlers to be specified and used.
+                 */
+                if (XWikiXmlRpcApi.class.equals(class1)) {
+                    XWikiXmlRpcApi proxy =
+                        (XWikiXmlRpcApi) Proxy.newProxyInstance(XWikiXmlRpcApi.class.getClassLoader(),
+                            new Class[] {XWikiXmlRpcApi.class}, new XWikiXmlRpcApiInvocationHandler(config
+                                .getServletContext(), config.getRequest()));
+
+                    return proxy;
+                }
+
                 return super.getRequestProcessor(class1, request);
             }
         };
@@ -61,5 +79,22 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
         mapping.setRequestProcessorFactoryFactory(factory);
         mapping.load(Thread.currentThread().getContextClassLoader(), url);
         return mapping;
+    }
+
+    @Override
+    protected XmlRpcServletServer newXmlRpcServer(ServletConfig config) throws XmlRpcException
+    {
+        XmlRpcServletServer server = new XmlRpcServletServer()
+        {
+
+            @Override
+            protected XmlRpcHttpRequestConfigImpl newConfig(HttpServletRequest request)
+            {
+                return new XWikiXmlRpcHttpRequestConfig(XWikiXmlRpcServlet.this.getServletContext(), request);
+            }
+
+        };
+
+        return server;
     }
 }

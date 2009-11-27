@@ -22,6 +22,7 @@ package org.xwiki.rest.resources.attachments;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Enumeration;
 
 import javax.mail.BodyPart;
@@ -184,20 +185,13 @@ public class AttachmentsResource extends BaseAttachmentsResource
 
         doc.save();
 
-        /*
-         * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
-         * external URL for an attachment
-         */
-        xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-        String attachmentXWikiAbsoluteUrl =
-            xwikiDocument.getExternalAttachmentURL(attachmentName, "download", Utils.getXWikiContext(componentManager))
-                .toString();
-
+        URL url =
+            Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(attachmentName, spaceName,
+                doc.getName(), "download", null, wikiName, Utils.getXWikiContext(componentManager));
+        String attachmentXWikiAbsoluteUrl = url.toString();
         String attachmentXWikiRelativeUrl =
-            xwikiDocument.getAttachmentURL(attachmentName, "download", Utils.getXWikiContext(componentManager))
-                .toString();
+            Utils.getXWikiContext(componentManager).getURLFactory()
+                .getURL(url, Utils.getXWikiContext(componentManager));
 
         Attachment attachment =
             DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(

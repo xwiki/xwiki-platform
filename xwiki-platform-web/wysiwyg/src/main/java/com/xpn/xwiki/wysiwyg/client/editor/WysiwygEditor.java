@@ -185,11 +185,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private final DeferredUpdater updater = new DeferredUpdater(this);
 
     /**
-     * Listen to events and takes the appropriate actions.
-     */
-    private final WysiwygEditorListener listener = new WysiwygEditorListener(this);
-
-    /**
      * The collection of handler registrations used by this editor.
      */
     private final HandlerRegistrationCollection registrations = new HandlerRegistrationCollection();
@@ -302,14 +297,31 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     {
         if (event.getSource() == richTextEditor.getTextArea() && !loaded) {
             loaded = true;
+
             loadPlugins();
             initEditor();
             fillMenu();
             fillToolBar();
-            // Store the initial content of the rich text area.
-            richTextEditor.getTextArea().getCommandManager().execute(SUBMIT);
-            // Focus the rich text area to be sure it has reached design mode.
-            richTextEditor.getTextArea().setFocus(true);
+
+            // Enable the rich text area if needed.
+            int selectedTab = getSelectedTab();
+            // If the source tab is not selected then either we don't have tabs or the WYSIWYG tab is selected.
+            if (selectedTab != SOURCE_TAB_INDEX) {
+                if (selectedTab == WYSIWYG_TAB_INDEX) {
+                    // Disable the plain text area to prevent submitting its content. The plain text area was enabled
+                    // while the the rich text area was loading because the rich text area couldn't have been submitted
+                    // during that time.
+                    getPlainTextEditor().getTextArea().setEnabled(false);
+                }
+                // Focus the rich text area before executing the commands to ensure it has a proper selection.
+                richTextEditor.getTextArea().setFocus(true);
+                // Store the initial content of the rich text area.
+                richTextEditor.getTextArea().getCommandManager().execute(SUBMIT);
+                if (!richTextEditor.getTextArea().isEnabled()) {
+                    // Enable the rich text area in order to be able to submit its content, and notify the plug-ins.
+                    richTextEditor.getTextArea().getCommandManager().execute(new Command("enable"), true);
+                }
+            }
         }
     }
 
@@ -359,15 +371,19 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
 
         final String wysiwygTabName = "wysiwyg";
         final String cacheKeyActiveTextArea = "editor.activeTextArea";
-        if (wysiwygTabName.equals(cache.get(cacheKeyActiveTextArea, config.getParameter("defaultEditor")))) {
-            plainTextEditor.getTextArea().setEnabled(false);
-            tabs.selectTab(WYSIWYG_TAB_INDEX);
-        } else {
-            getRichTextEditor().getTextArea().setEnabled(false);
-            tabs.selectTab(SOURCE_TAB_INDEX);
-        }
+        String defaultEditor = cache.get(cacheKeyActiveTextArea, config.getParameter("defaultEditor"));
+        tabs.selectTab(wysiwygTabName.equals(defaultEditor) ? WYSIWYG_TAB_INDEX : SOURCE_TAB_INDEX);
 
-        registrations.add(tabs.addBeforeSelectionHandler(listener));
+        // We initially disable the rich text area because it is loaded asynchronously and during this time we can't
+        // submit its value. We enable it as soon as it finishes loading, if the WYSIWYG tab is selected. By enabling
+        // the plain text area we can switch to the source tab editor before the WYSIWYG tab is fully loaded.
+        plainTextEditor.getTextArea().setEnabled(true);
+        getRichTextEditor().getTextArea().setEnabled(false);
+
+        // Create the object that will handle the switch between the source editor and the rich text editor.
+        WysiwygEditorListener editorSwitcher = new WysiwygEditorListener(this);
+
+        registrations.add(tabs.addBeforeSelectionHandler(editorSwitcher));
         registrations.add(tabs.addSelectionHandler(new SelectionHandler<Integer>()
         {
             public void onSelection(SelectionEvent<Integer> event)
@@ -377,7 +393,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
                     : "source");
             }
         }));
-        registrations.add(tabs.addSelectionHandler(listener));
+        registrations.add(tabs.addSelectionHandler(editorSwitcher));
 
         return tabs;
     }
@@ -464,21 +480,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
             } else {
                 uieNotFound = true;
             }
-        }
-    }
-
-    /**
-     * Puts the editor in loading state or get it out of it.
-     * 
-     * @param loading {@code true} to put the editor in loading state, {@code false} to get it out of it
-     */
-    protected void setLoading(boolean loading)
-    {
-        if (isTabbed()) {
-            getRichTextEditor().setLoading(loading);
-            getPlainTextEditor().setLoading(loading);
-        } else {
-            getRichTextEditor().setLoading(loading);
         }
     }
 
@@ -571,6 +572,26 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private boolean isTabbed()
     {
         return Boolean.valueOf(getConfig().getParameter("displayTabs", "false"));
+    }
+
+    /**
+     * @return the index of the currently selected tab
+     */
+    public int getSelectedTab()
+    {
+        return ui instanceof TabPanel ? ((TabPanel) ui).getTabBar().getSelectedTab() : -1;
+    }
+
+    /**
+     * Sets the selected tab.
+     * 
+     * @param index the tab index
+     */
+    public void setSelectedTab(int index)
+    {
+        if (ui instanceof TabPanel) {
+            ((TabPanel) ui).selectTab(index);
+        }
     }
 
     /**

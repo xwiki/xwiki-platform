@@ -88,7 +88,7 @@ public class XWikiImportService implements ImportService
             configuration.setParameters(cleaningParams);
             Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
             HTMLUtils.stripHTMLEnvelope(cleanedDocument);
-            return HTMLUtils.toString(cleanedDocument);
+            return HTMLUtils.toString(cleanedDocument, true, true);
         } catch (Exception e) {
             LOG.error("Exception while cleaning office HTML content.", e);
             throw new RuntimeException(e.getLocalizedMessage());

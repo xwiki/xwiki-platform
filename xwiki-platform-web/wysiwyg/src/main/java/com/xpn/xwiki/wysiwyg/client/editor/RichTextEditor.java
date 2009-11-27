@@ -137,6 +137,14 @@ public class RichTextEditor extends Composite implements LoadHandler
     }
 
     /**
+     * @return {@code true} if this rich text editor is currently in loading state, {@code false} otherwise
+     */
+    public boolean isLoading()
+    {
+        return loadingPanel.isLoading();
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see Composite#onLoad()

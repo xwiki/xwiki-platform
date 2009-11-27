@@ -80,6 +80,11 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
     private final Cache cache;
 
     /**
+     * Flag indicating if this editor is in loading state.
+     */
+    private boolean loading;
+
+    /**
      * Creates a new plain text editor that wraps the given text area element.
      * 
      * @param hook the element replaced by the newly created plain text editor
@@ -129,13 +134,24 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
      */
     public void setLoading(boolean loading)
     {
-        if (loading) {
-            container.addStyleName(STYLE_NAME_LOADING);
-            textArea.addStyleName(STYLE_NAME_INVISIBLE);
-        } else {
-            container.removeStyleName(STYLE_NAME_LOADING);
-            textArea.removeStyleName(STYLE_NAME_INVISIBLE);
+        if (loading != this.loading) {
+            this.loading = loading;
+            if (loading) {
+                container.addStyleName(STYLE_NAME_LOADING);
+                textArea.addStyleName(STYLE_NAME_INVISIBLE);
+            } else {
+                container.removeStyleName(STYLE_NAME_LOADING);
+                textArea.removeStyleName(STYLE_NAME_INVISIBLE);
+            }
         }
+    }
+
+    /**
+     * @return {@code true} if this plain text editor is currently in loading state, {@code false} otherwise
+     */
+    public boolean isLoading()
+    {
+        return loading;
     }
 
     /**

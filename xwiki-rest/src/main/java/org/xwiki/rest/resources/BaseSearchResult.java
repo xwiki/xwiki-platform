@@ -52,6 +52,51 @@ public class BaseSearchResult extends XWikiResource
         OBJECTS
     }
 
+    /**
+     * Search for keyword in the given scopes. See {@link SearchScope} for more information.
+     * 
+     * @param searchScopes
+     * @param keywords
+     * @param wikiName
+     * @param space
+     * @param hasProgrammingRights
+     * @param number
+     * @return
+     * @throws IllegalArgumentException
+     * @throws UriBuilderException
+     * @throws QueryException
+     * @throws XWikiException
+     */
+    protected List<SearchResult> search(List<SearchScope> searchScopes, String keywords, String wikiName, String space,
+        boolean hasProgrammingRights, int number) throws IllegalArgumentException, UriBuilderException, QueryException,
+        XWikiException
+    {
+        List<SearchResult> result = new ArrayList<SearchResult>();
+
+        result.addAll(searchPages(searchScopes, keywords, wikiName, space, hasProgrammingRights, number));
+
+        if (searchScopes.contains(SearchScope.OBJECTS)) {
+            result.addAll(searchObjects(keywords, wikiName, space, hasProgrammingRights, number));
+        }
+
+        return result;
+    }
+
+    /**
+     * Search for keyword in the given scopes. Limit the search only to Pages. Search for keyword
+     * 
+     * @param searchScopes
+     * @param keywords
+     * @param wikiName
+     * @param space
+     * @param hasProgrammingRights
+     * @param number
+     * @return
+     * @throws QueryException
+     * @throws IllegalArgumentException
+     * @throws UriBuilderException
+     * @throws XWikiException
+     */
     protected List<SearchResult> searchPages(List<SearchScope> searchScopes, String keywords, String wikiName,
         String space, boolean hasProgrammingRights, int number) throws QueryException, IllegalArgumentException,
         UriBuilderException, XWikiException
@@ -107,7 +152,7 @@ public class BaseSearchResult extends XWikiResource
 
         String query = f.toString();
 
-        QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
+        QueryManager queryManager = com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
         List<Object> queryResult = null;
 
@@ -154,6 +199,20 @@ public class BaseSearchResult extends XWikiResource
         return result;
     }
 
+    /**
+     * Search for keyword in the given scopes. Limit the search only to Objects.
+     * 
+     * @param keywords
+     * @param wikiName
+     * @param space
+     * @param hasProgrammingRights
+     * @param number
+     * @return
+     * @throws QueryException
+     * @throws IllegalArgumentException
+     * @throws UriBuilderException
+     * @throws XWikiException
+     */
     protected List<SearchResult> searchObjects(String keywords, String wikiName, String space,
         boolean hasProgrammingRights, int number) throws QueryException, IllegalArgumentException, UriBuilderException,
         XWikiException
@@ -184,9 +243,7 @@ public class BaseSearchResult extends XWikiResource
 
         String query = f.toString();
 
-        System.out.format("Query: %s\n", query);
-
-        QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
+        QueryManager queryManager = com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
         List<Object> queryResult = null;
         if (space != null) {
@@ -247,6 +304,34 @@ public class BaseSearchResult extends XWikiResource
         }
 
         return result;
+    }
+
+    /**
+     * Return a list of {@link SearchScope} objects by parsing the strings provided in the search scope strings. If the
+     * list doesn't contain any valid scope string, then CONTENT is added by default.
+     * 
+     * @param searchScopeStrings The list of string to be parsed.
+     * @return The list of the parsed SearchScope elements.
+     */
+    protected List<SearchScope> parseSearchScopeStrings(List<String> searchScopeStrings)
+    {
+        List<SearchScope> searchScopes = new ArrayList<SearchScope>();
+        for (String searchScopeString : searchScopeStrings) {
+            if (searchScopeString != null && !searchScopes.contains(searchScopeString)) {
+                try {
+                    SearchScope searchScope = SearchScope.valueOf(searchScopeString.toUpperCase());
+                    searchScopes.add(searchScope);
+                } catch (IllegalArgumentException e) {
+                    // Ignore unrecognized scopes
+                }
+            }
+        }
+
+        if (searchScopes.isEmpty()) {
+            searchScopes.add(SearchScope.CONTENT);
+        }
+
+        return searchScopes;
     }
 
 }

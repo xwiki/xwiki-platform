@@ -19,7 +19,6 @@
  */
 package org.xwiki.rest.resources.wikis;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -55,31 +54,11 @@ public class WikiSearchResource extends BaseSearchResult
         try {
             xwikiContext.setDatabase(wikiName);
 
-            List<SearchScope> searchScopes = new ArrayList<SearchScope>();
-            for (String searchScopeString : searchScopeStrings) {
-                if (searchScopeString != null && !searchScopes.contains(searchScopeString)) {
-                    try {
-                        SearchScope searchScope = SearchScope.valueOf(searchScopeString.toUpperCase());
-                        searchScopes.add(searchScope);
-                    } catch (IllegalArgumentException e) {
-                        // Ignore unrecognized scopes
-                    }
-                }
-            }
-
-            if (searchScopes.isEmpty()) {
-                searchScopes.add(SearchScope.CONTENT);
-            }
+            List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
             searchResults.getSearchResults().addAll(
-                searchPages(searchScopes, keywords, wikiName, null, xwiki.getRightService().hasProgrammingRights(
+                search(searchScopes, keywords, wikiName, null, xwiki.getRightService().hasProgrammingRights(
                     xwikiContext), number));
-
-            if (searchScopes.contains(SearchScope.OBJECTS)) {
-                searchResults.getSearchResults().addAll(
-                    searchObjects(keywords, wikiName, null, xwiki.getRightService().hasProgrammingRights(xwikiContext),
-                        number));
-            }
         } finally {
             xwikiContext.setDatabase(database);
         }

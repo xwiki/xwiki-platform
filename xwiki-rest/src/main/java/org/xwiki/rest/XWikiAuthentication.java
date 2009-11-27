@@ -48,6 +48,10 @@ public class XWikiAuthentication extends Guard
     @Override
     public int authenticate(Request request)
     {
+        /*
+         * Browser authentication resource is a special resource that allows to trigger the authentication dialog box in
+         * web browsers
+         */
         if (request.getResourceRef().getPath().endsWith(BrowserAuthenticationResource.URI_PATTERN)) {
             return super.authenticate(request);
         }
@@ -74,9 +78,20 @@ public class XWikiAuthentication extends Guard
                 getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
             }
 
+            /*
+             * If we are here, either the xwikiContext contained good credentials for a previously authenticated user or
+             * these credentials are no longer valid or an error occurred during authentication. We consider all these
+             * three cases as "successful". In the first case we have an authenticated user, in the other two cases we
+             * continue to process the request as "Guest". The "Guest" user, infact, is setup in the
+             * XWikiSetupCleanupFilter, as the user that is associated by default to the request.
+             */
             return 1;
         }
 
+        /*
+         * If we are here, then an authorization header is present in the request. Make Restlet process this request.
+         * The standard way it does this is by calling the checkSecret() method with the appropriate parameters.
+         */
         return super.authenticate(request);
     }
 

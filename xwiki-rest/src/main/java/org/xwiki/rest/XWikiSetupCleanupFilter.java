@@ -82,6 +82,7 @@ public class XWikiSetupCleanupFilter extends Filter
 
             com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(xwiki, xwikiContext);
 
+            /* By default, set the XWiki user associated to the request to Guest */
             String xwikiUser = "XWiki.XWikiGuest";
             xwikiContext.setUser(xwikiUser);
 

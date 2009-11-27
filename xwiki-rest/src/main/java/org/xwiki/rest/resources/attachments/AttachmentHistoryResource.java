@@ -56,7 +56,6 @@ public class AttachmentHistoryResource extends XWikiResource
         @QueryParam("number") @DefaultValue("-1") Integer number) throws XWikiException
     {
         DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
-
         Document doc = documentInfo.getDocument();
 
         final com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachmentName);

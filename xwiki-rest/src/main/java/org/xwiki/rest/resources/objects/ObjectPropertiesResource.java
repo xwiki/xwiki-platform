@@ -30,21 +30,19 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
-import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Properties;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
  */
 @Component("org.xwiki.rest.resources.objects.ObjectPropertiesResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}/properties")
-public class ObjectPropertiesResource extends XWikiResource
+public class ObjectPropertiesResource extends BaseObjectsResource
 {
     @GET
     public Properties getObjectProperties(@PathParam("wikiName") String wikiName,
@@ -56,11 +54,7 @@ public class ObjectPropertiesResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-
-        com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
+        com.xpn.xwiki.objects.BaseObject baseObject = getBaseObject(doc, className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }

@@ -21,8 +21,6 @@ package org.xwiki.rest.resources.objects;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -39,7 +37,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
-import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.model.jaxb.Property;
@@ -55,7 +52,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 @Component("org.xwiki.rest.resources.objects.ObjectsResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects")
-public class ObjectsResource extends XWikiResource
+public class ObjectsResource extends BaseObjectsResource
 {
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
@@ -68,19 +65,8 @@ public class ObjectsResource extends XWikiResource
 
         Objects objects = objectFactory.createObjects();
 
-        List<com.xpn.xwiki.objects.BaseObject> objectList = new ArrayList<com.xpn.xwiki.objects.BaseObject>();
-
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-
-        Map<String, Vector<com.xpn.xwiki.objects.BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
-        for (String className : classToObjectsMap.keySet()) {
-            Vector<com.xpn.xwiki.objects.BaseObject> xwikiObjects = classToObjectsMap.get(className);
-            for (com.xpn.xwiki.objects.BaseObject object : xwikiObjects) {
-                objectList.add(object);
-            }
-        }
+        List<com.xpn.xwiki.objects.BaseObject> objectList = getBaseObjects(doc);
+        new ArrayList<com.xpn.xwiki.objects.BaseObject>();
 
         RangeIterable<com.xpn.xwiki.objects.BaseObject> ri =
             new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);
@@ -116,9 +102,12 @@ public class ObjectsResource extends XWikiResource
         XWikiDocument xwikiDocument =
             Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
                 Utils.getXWikiContext(componentManager));
+
         int objectNumber =
             xwikiDocument.createNewObject(object.getClassName(), Utils.getXWikiContext(componentManager));
+
         BaseObject xwikiObject = xwikiDocument.getObject(object.getClassName(), objectNumber);
+
         if (xwikiObject == null) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }

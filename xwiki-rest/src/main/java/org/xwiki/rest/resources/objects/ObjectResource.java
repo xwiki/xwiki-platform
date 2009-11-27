@@ -31,20 +31,18 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Utils;
-import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
  */
 @Component("org.xwiki.rest.resources.objects.ObjectResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/objects/{className}/{objectNumber}")
-public class ObjectResource extends XWikiResource
+public class ObjectResource extends BaseObjectsResource
 {
     @GET
     public Object getObject(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
@@ -55,11 +53,7 @@ public class ObjectResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-
-        com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
+        com.xpn.xwiki.objects.BaseObject baseObject = getBaseObject(doc, className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -82,11 +76,7 @@ public class ObjectResource extends XWikiResource
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-
-        com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
+        com.xpn.xwiki.objects.BaseObject baseObject = getBaseObject(doc, className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -97,7 +87,7 @@ public class ObjectResource extends XWikiResource
 
         doc.save();
 
-        baseObject = xwikiDocument.getObject(className, objectNumber);
+        baseObject = getBaseObject(doc, className, objectNumber);
 
         return Response.status(Status.ACCEPTED).entity(
             DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
@@ -117,16 +107,12 @@ public class ObjectResource extends XWikiResource
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-
-        com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
+        com.xpn.xwiki.objects.BaseObject baseObject = getBaseObject(doc, className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        xwikiDocument.removeObject(baseObject);
+        baseObject.getDocument(Utils.getXWikiContext(componentManager)).removeObject(baseObject);
 
         doc.save();
     }

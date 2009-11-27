@@ -54,5 +54,5 @@ public class AttachmentAtPageVersionResource extends XWikiResource
         }
 
         return Response.ok().type(xwikiAttachment.getMimeType()).entity(xwikiAttachment.getContent()).build();
-    }    
+    }
 }

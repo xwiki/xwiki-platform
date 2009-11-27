@@ -19,10 +19,7 @@
  */
 package org.xwiki.rest.resources.objects;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Vector;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,19 +31,17 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
 import org.xwiki.rest.Utils;
-import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Objects;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * @version $Id$
  */
 @Component("org.xwiki.rest.resources.objects.ObjectsAtPageVersionResource")
 @Path("/wikis/{wikiName}/spaces/{spaceName}/pages/{pageName}/history/{version}/objects")
-public class ObjectsAtPageVersionResource extends XWikiResource
+public class ObjectsAtPageVersionResource extends BaseObjectsResource
 {
     @GET
     public Objects getObjects(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
@@ -60,22 +55,7 @@ public class ObjectsAtPageVersionResource extends XWikiResource
 
         Objects objects = objectFactory.createObjects();
 
-        List<com.xpn.xwiki.objects.BaseObject> objectList = new ArrayList<com.xpn.xwiki.objects.BaseObject>();
-
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
-        xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(xwikiDocument, doc.getVersion(),
-                Utils.getXWikiContext(componentManager));
-
-        Map<String, Vector<com.xpn.xwiki.objects.BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
-        for (String className : classToObjectsMap.keySet()) {
-            Vector<com.xpn.xwiki.objects.BaseObject> xwikiObjects = classToObjectsMap.get(className);
-            for (com.xpn.xwiki.objects.BaseObject object : xwikiObjects) {
-                objectList.add(object);
-            }
-        }
+        List<com.xpn.xwiki.objects.BaseObject> objectList = getBaseObjects(doc);
 
         RangeIterable<com.xpn.xwiki.objects.BaseObject> ri =
             new RangeIterable<com.xpn.xwiki.objects.BaseObject>(objectList, start, number);

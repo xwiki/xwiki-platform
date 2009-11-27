@@ -45,24 +45,17 @@ public class WikiSearchResource extends BaseSearchResult
         @QueryParam("scope") List<String> searchScopeStrings, @QueryParam("number") @DefaultValue("-1") Integer number)
         throws QueryException, XWikiException
     {
-        String database = Utils.getXWikiContext(componentManager).getDatabase();
-
         SearchResults searchResults = objectFactory.createSearchResults();
         searchResults.setTemplate(String.format("%s?q={keywords}(&scope={content|name|title|objects})*", UriBuilder
             .fromUri(uriInfo.getBaseUri()).path(WikiSearchResource.class).build(wikiName).toString()));
 
-        /* This try is just needed for executing the finally clause. */
-        try {
-            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
+        Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
+        List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
-            searchResults.getSearchResults().addAll(
-                search(searchScopes, keywords, wikiName, null, Utils.getXWiki(componentManager).getRightService()
-                    .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number));
-        } finally {
-            Utils.getXWikiContext(componentManager).setDatabase(database);
-        }
+        searchResults.getSearchResults().addAll(
+            search(searchScopes, keywords, wikiName, null, Utils.getXWiki(componentManager).getRightService()
+                .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number));
 
         return searchResults;
     }

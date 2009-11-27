@@ -36,9 +36,11 @@ import com.noelios.restlet.http.HttpCall;
 import com.noelios.restlet.http.HttpRequest;
 
 /**
- * The Setup cleanup filter is used to populate the Restlet context with relevant variables that are used by the JAX-RS
- * resources. It is also used to release all the resources that are instantiated on a per-lookup basis using the
- * component manager. This is done in order to avoid memory leaks.
+ * <p>
+ * The Setup cleanup filter is used to populate the Restlet context with relevant variables that are used by JAX-RS
+ * resources. It is also used to release the JAX-RS resources that are instantiated by using the component manager, in
+ * order to avoid memory leaks.
+ * </p>
  * 
  * @version $Id$
  */
@@ -49,11 +51,11 @@ public class XWikiSetupCleanupFilter extends Filter
     {
         /*
          * We put the original HTTP request in context attributes because this is needed for reading
-         * application/www-form-urlencoded POSTs. In fact servlet filters might use getParameters() which invalidates
-         * the request body, making Restlet unable to process it. In the case we need to use getParameters as well
-         * instead of reading from the input stream, and for doing this we need the original HTTP request object. This
-         * is basically a hack that should be removed as soon as the Restlet JAX-RS extension will support the injection
-         * of the request object via the @Context annotation
+         * application/www-form-urlencoded POSTs. In fact servlet filters might call getParameters() which invalidates
+         * the request body, making Restlet unable to process it. In this case we need to use getParameters as well
+         * instead of reading form data from the input stream, and in order to do this we need the original HTTP request
+         * object. This is basically a hack that should be removed as soon as the Restlet JAX-RS extension will support
+         * the injection of the request object via the @Context annotation.
          */
         getContext().getAttributes().put(Constants.HTTP_REQUEST, getHttpRequest(request));
 
@@ -65,6 +67,7 @@ public class XWikiSetupCleanupFilter extends Filter
     {
         Map<String, Object> attributes = getContext().getAttributes();
 
+        /* Remove all the components that have been through the component manager and that have a PER_LOOKUP policy. */
         ComponentManager componentManager = (ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER);
         List<XWikiRestComponent> releasableComponents =
             (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES);
@@ -91,10 +94,12 @@ public class XWikiSetupCleanupFilter extends Filter
     }
 
     /**
-     * Builds the servlet request.
+     * <p>
+     * Retrieves the original servlet request.
+     * </p>
      * 
-     * @param req The request to handle.
-     * @return httpServletRequest The http servlet request.
+     * @param req The Restlet request to handle.
+     * @return httpServletRequest The original HTTP servlet request.
      */
     protected static HttpServletRequest getHttpRequest(Request req)
     {

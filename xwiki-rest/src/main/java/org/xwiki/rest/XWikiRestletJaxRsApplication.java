@@ -25,7 +25,10 @@ import org.restlet.ext.jaxrs.JaxRsApplication;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
 /**
- * This class implements the main Restlet application using the Restlet's JAX-RS extension.
+ * <p>
+ * This class implements the main Restlet application using the Restlet's JAX-RS extension. The implementation also
+ * setups the needed filters for handling the requests (setup/cleanup and authentication filters)
+ * </p>
  * 
  * @version $Id$
  */

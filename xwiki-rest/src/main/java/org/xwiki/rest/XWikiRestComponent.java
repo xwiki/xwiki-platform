@@ -22,8 +22,10 @@ package org.xwiki.rest;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
+ * <p>
  * This interface is used to mark JAX-RS resources and providers that should be made available to the component manager
  * for lookup.
+ * </p>
  * 
  * @version $Id$
  */

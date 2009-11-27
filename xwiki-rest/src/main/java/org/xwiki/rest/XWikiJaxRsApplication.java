@@ -31,13 +31,24 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
+ * <p>
  * This class is used to configure JAX-RS resources and providers. They are dynamically discovered using the component
  * manager.
+ * </p>
+ * <p>
+ * JAX-RS resources and providers must be declared as components whose hint is the FQN of the class implementing it.
+ * This is needed because of how the Restlet object factory works. When Restlet requests an object it passes to the
+ * factory the FQN name of the class to be instantiated. We use this FQN to lookup the component among the ones that are
+ * implementing the XWikiRestComponent (marker) interface.
+ * </p>
  * 
  * @version $Id$
  */
 public class XWikiJaxRsApplication extends Application
 {
+    /*
+     * The set containing all the discovered resources and providers that will constitute the JAX-RS application.
+     */
     private Set<Class< ? >> jaxRsClasses;
 
     public XWikiJaxRsApplication(Context context)
@@ -46,6 +57,8 @@ public class XWikiJaxRsApplication extends Application
 
         ComponentManager componentManager =
             (ComponentManager) context.getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+
+        /* Look up all the component that are markes as XWikiRestComponent. */
         List<ComponentDescriptor<XWikiRestComponent>> cds =
             componentManager.getComponentDescriptorList(XWikiRestComponent.class);
 

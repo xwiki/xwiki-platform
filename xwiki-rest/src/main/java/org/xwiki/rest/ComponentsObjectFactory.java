@@ -30,10 +30,12 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
 /**
+ * <p>
  * This class is used to provide Restlet/JAX-RS a way to instantiate components. Instances requested through this
  * factory are created using the XWiki component manager. A special list stored in the current Restlet context is used
  * in order to keep track of all the allocated components that have a "per-lookup" policy. This is needed in order to
  * ensure proper release of those instances and to avoid memory leaks.
+ * </p>
  * 
  * @version $Id$
  */
@@ -64,6 +66,10 @@ public class ComponentsObjectFactory implements ObjectFactory
             /* Use the component manager to lookup the class. This ensure that injections are properly executed */
             XWikiRestComponent component = componentManager.lookup(XWikiRestComponent.class, clazz.getName());
 
+            /*
+             * JAX-RS resources and providers must be declared as components whose hint is the FQN of the class
+             * implementing it. This is needed because of they are looked up using the FQN as the hint.
+             */
             ComponentDescriptor componentDescriptor =
                 componentManager.getComponentDescriptor(XWikiRestComponent.class, clazz.getName());
 

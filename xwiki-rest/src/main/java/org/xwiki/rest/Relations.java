@@ -20,6 +20,10 @@
 package org.xwiki.rest;
 
 /**
+ * <p>
+ * This class contains the constants defining the relation types that can be specified for links in the representations.
+ * <p>
+ * 
  * @version $Id$
  */
 public class Relations

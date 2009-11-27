@@ -92,6 +92,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
+ * <p>
+ * This class contains utility methods for building representations using model objects.
+ * </p>
+ * 
  * @version $Id$
  */
 public class DomainObjectFactory

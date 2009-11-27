@@ -23,23 +23,41 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * <p>
  * This class wraps a List<T> and provides a view of it as if had only the elements that were included in the specified
  * range (start, number)
+ * </p>
  * 
  * @version $Id$
  */
 public class RangeIterable<T> implements Iterable<T>
 {
+    /**
+     * <p>
+     * The wrapped list.
+     * </p>
+     */
     private List<T> list;
 
+    /**
+     * <p>
+     * The initial offset of the sublist to be exposed
+     * </p>
+     */
     private int start;
 
+    /**
+     * <p>
+     * The number of elements of the sublist to be exposed.
+     * </p>
+     */
     private int number;
 
     public RangeIterable(List<T> list, int start, int number)
     {
         this.list = list;
 
+        /* Adjust start offset if out of bounds. */
         if (start < 0) {
             start = 0;
         }
@@ -48,6 +66,7 @@ public class RangeIterable<T> implements Iterable<T>
             start = list.size();
         }
 
+        /* Adjust the number of elements to convenient values. */
         if (number < 0) {
             number = list.size();
         }
@@ -61,10 +80,20 @@ public class RangeIterable<T> implements Iterable<T>
 
     }
 
+    /**
+     * <p>
+     * Return an iterator that will iterate over the sublist defined by (start, number)
+     * </p>
+     */
     public Iterator<T> iterator()
     {
         return new Iterator<T>()
         {
+            /**
+             * <p>
+             * The number of elements already returned
+             * </p>
+             */
             private int i = 0;
 
             public boolean hasNext()

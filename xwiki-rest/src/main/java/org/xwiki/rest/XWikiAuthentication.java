@@ -37,6 +37,23 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
+ * <p>
+ * The authentication filter is called before serving any request and it is responsible to set in the XWiki context the
+ * user that is carrying on the request. It implements the following logic:
+ * </p>
+ * <ul>
+ * <li>If authorization header is present in the HTTP request then it is used to authenticate the user. If the
+ * authentication is successful then the user is set in the XWikiContext associated to the request. Otherwise an
+ * UNAUTHORIZED response is sent to the client.</li>
+ * <li>If no authorization header is present in the HTTP request then:</li>
+ * <ul>
+ * <li>If session information about a previously authenticated user is present in the request, and it is valid, then
+ * that user is assumed carrying out the request.
+ * <li>If there is no session information in the request or it is invalid then XWiki.Guest is assumed carrying out the
+ * request.</li>
+ * </ul>
+ * </ul>
+ * 
  * @version $Id$
  */
 public class XWikiAuthentication extends Guard
@@ -62,6 +79,9 @@ public class XWikiAuthentication extends Guard
         XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
         XWiki xwiki = Utils.getXWiki(componentManager);
 
+        /* By default set XWiki.Guest as the user that is sending the request. */
+        xwikiContext.setUser("XWiki.XWikiGuest");
+
         Form headers = (Form) request.getAttributes().get(HttpConstants.ATTRIBUTE_HEADERS);
 
         if (headers.getValues(HttpConstants.HEADER_AUTHORIZATION) == null) {
@@ -83,8 +103,7 @@ public class XWikiAuthentication extends Guard
              * If we are here, either the xwikiContext contained good credentials for a previously authenticated user or
              * these credentials are no longer valid or an error occurred during authentication. We consider all these
              * three cases as "successful". In the first case we have an authenticated user, in the other two cases we
-             * continue to process the request as "Guest". The "Guest" user, infact, is setup in the
-             * XWikiSetupCleanupFilter, as the user that is associated by default to the request.
+             * continue to process the request as "Guest".
              */
             return 1;
         }

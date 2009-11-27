@@ -31,6 +31,19 @@ import org.xwiki.component.manager.ComponentManager;
 import com.noelios.restlet.ext.servlet.ServerServlet;
 
 /**
+ * <p>
+ * The XWiki Restlet servlet is used to provide additional initialization logic to the base Restlet servlet. This
+ * servlet does three things:
+ * </p>
+ * <ul>
+ * <li>Creates the Restlet application.</li>
+ * <li>Initialize the logging system by reading the configuration from well-defined locations.</li>
+ * <li>Injects the component manager in the Restlet application context so that it will be accessible by all the other
+ * Restlet components.</li>
+ * <li>Set the object factory for the JAX-RS application to a factory that will use the component manager in order to
+ * create instances (this will allow us to declare JAX-RS resources as XWiki components)</li>
+ * </ul>
+ * 
  * @version $Id$
  */
 public class XWikiRestletServlet extends ServerServlet

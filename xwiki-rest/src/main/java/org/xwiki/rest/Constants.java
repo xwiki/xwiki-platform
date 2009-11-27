@@ -25,26 +25,6 @@ package org.xwiki.rest;
 public class Constants
 {
     /**
-     * The key used to store the XWiki context in the current Restlet context.
-     */
-    public static final String XWIKI_CONTEXT = "xwikiContext";
-
-    /**
-     * The key used to store the XWiki private API object in the current Restlet context.
-     */
-    public static final String XWIKI = "xwiki";
-
-    /**
-     * The key used to store the XWiki public API object in the current Restlet context.
-     */
-    public static final String XWIKI_API = "xwikiApi";
-
-    /**
-     * The key used to store the XWiki user performing the request in the current Restlet context.
-     */
-    public static final String XWIKI_USER = "xwikiUser";
-
-    /**
      * The key used to store the XWiki component manager in the current Restlet context.
      */
     public static final String XWIKI_COMPONENT_MANAGER = "xwikiComponentManager";

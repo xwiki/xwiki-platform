@@ -94,9 +94,16 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(validator), isValid(validator));
     }
     
-    public void testRpd1s3FormValid() throws Exception
+    public void testRpd1s3FormValidSubmit() throws Exception
     {
         setValidatorDocument("<form><fieldset><submit/></fieldset></form>");
+        validator.validateRpd1s3();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd1s3FormValidInput() throws Exception
+    {
+        setValidatorDocument("<form><fieldset><input type='submit' /></fieldset></form>");
         validator.validateRpd1s3();
         assertTrue(getErrors(validator), isValid(validator));
     }

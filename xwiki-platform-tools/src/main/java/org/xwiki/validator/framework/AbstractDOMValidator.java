@@ -48,6 +48,13 @@ import org.xwiki.validator.ValidationError.Type;
  */
 public abstract class AbstractDOMValidator implements Validator
 {
+    // XPATH
+    
+    /**
+     * Catch All XPATH expression.
+     */
+    protected static final String XPATH_CATCHALL = "//";
+    
     // Commons.
 
     /**
@@ -76,9 +83,19 @@ public abstract class AbstractDOMValidator implements Validator
      * Link element.
      */
     protected static final String ELEM_LINK = "a";
+    
+    /**
+     * Input element.
+     */
+    protected static final String ELEM_INPUT = "input";
 
     // Attributes.
 
+    /**
+     * Type attribute.
+     */
+    protected static final String ATTR_TYPE = "type";
+    
     /**
      * Href attribute.
      */
@@ -271,7 +288,7 @@ public abstract class AbstractDOMValidator implements Validator
      */
     public NodeListIterable getElements(Collection<String> tagNames)
     {
-        String exprString = StringUtils.join(tagNames, "|//");
+        String exprString = StringUtils.join(tagNames, "|" + XPATH_CATCHALL);
 
         try {
             XPathExpression expr = xpath.compile(exprString);
@@ -292,11 +309,31 @@ public abstract class AbstractDOMValidator implements Validator
      */
     public boolean hasChildElement(Node element, String tagName)
     {
-        String exprString = "//submit";
+        String exprString = XPATH_CATCHALL + tagName;
         
         try {
             XPathExpression expr = xpath.compile(exprString);
             return (Boolean) expr.evaluate(element, XPathConstants.BOOLEAN);
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    /**
+     * Get children of a given type.
+     * 
+     * @param element element to search in
+     * @param tagName name of the tags to match
+     * @return a list of matching tags
+     */
+    public NodeListIterable getChildren(Node element, String tagName)
+    {
+        String exprString = XPATH_CATCHALL + tagName;
+        
+        try {
+            XPathExpression expr = xpath.compile(exprString);
+            NodeList nodeList = (NodeList) expr.evaluate(element, XPathConstants.NODESET);
+            return new NodeListIterable(nodeList);
         } catch (XPathExpressionException e) {
             throw new RuntimeException(e);
         }
@@ -311,7 +348,7 @@ public abstract class AbstractDOMValidator implements Validator
     public List<String> getChildrenTagNames(Node element)
     {
         List<String> childrenTagNames = new ArrayList<String>();
-        String exprString = "//*";
+        String exprString = XPATH_CATCHALL + "*";
         
         try {
             XPathExpression expr = xpath.compile(exprString);

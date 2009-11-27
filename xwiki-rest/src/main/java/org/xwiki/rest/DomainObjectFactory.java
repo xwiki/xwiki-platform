@@ -618,22 +618,7 @@ public class DomainObjectFactory
         ObjectSummary objectSummary = objectFactory.createObjectSummary();
         fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject);
 
-        String objectUri;
-
-        if (useVersion) {
-            objectUri =
-                UriBuilder.fromUri(baseUri).path(ObjectAtPageVersionResource.class).build(doc.getWiki(),
-                    doc.getSpace(), doc.getName(), doc.getVersion(), xwikiObject.getClassName(),
-                    xwikiObject.getNumber()).toString();
-        } else {
-            objectUri =
-                UriBuilder.fromUri(baseUri).path(ObjectResource.class).build(doc.getWiki(), doc.getSpace(),
-                    doc.getName(), xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
-        }
-
-        Link objectLink = objectFactory.createLink();
-        objectLink.setHref(objectUri);
-        objectLink.setRel(Relations.OBJECT);
+        Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.OBJECT);        
         objectSummary.getLinks().add(objectLink);
 
         String propertiesUri;
@@ -738,6 +723,15 @@ public class DomainObjectFactory
 
         }
 
+        Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.SELF);
+        object.getLinks().add(objectLink);
+
+        return object;
+    }
+
+    private static Link getObjectLink(ObjectFactory objectFactory, URI baseUri, Document doc, BaseObject xwikiObject,
+        boolean useVersion, String relation)
+    {
         String objectUri;
 
         if (useVersion) {
@@ -752,10 +746,9 @@ public class DomainObjectFactory
         }
         Link objectLink = objectFactory.createLink();
         objectLink.setHref(objectUri);
-        objectLink.setRel(Relations.SELF);
-        object.getLinks().add(objectLink);
-
-        return object;
+        objectLink.setRel(relation);
+        
+        return objectLink;
     }
 
     public static Class createClass(ObjectFactory objectFactory, URI baseUri, String wikiName,

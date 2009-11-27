@@ -19,22 +19,26 @@
  */
 package org.xwiki.rest;
 
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.manager.ComponentManager;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
 import com.noelios.restlet.http.HttpCall;
 import com.noelios.restlet.http.HttpRequest;
 
 /**
- * The Setup cleanup filter is used to initialize the XWiki context before serving the request, and to clean it up after
- * the request has been served. This filter also populates the Restlet context with XWiki-related variables so that they
- * are available to resources.
+ * The Setup cleanup filter is used to populate the Restlet context with relevant variables that are used by the JAX-RS
+ * resources. It is also used to release all the resources that are instantiated on a per-lookup basis using the
+ * component manager. This is done in order to avoid memory leaks.
  * 
  * @version $Id$
  */
@@ -45,11 +49,11 @@ public class XWikiSetupCleanupFilter extends Filter
     {
         /*
          * We put the original HTTP request in context attributes because this is needed for reading
-         * application/www-form-urlencoded POSTs. In fact servlet filters might use getParameters which invalidates the
-         * request body, making Restlet unable to process it. In the case we need to use getParameters as well instead
-         * of reading from the input stream, and for doing this we need the HTTP request object. This is basically a
-         * hack that should be removed as soon as the Restlet JAX-RS extension will support the injection of the request
-         * object via the @Context annotation
+         * application/www-form-urlencoded POSTs. In fact servlet filters might use getParameters() which invalidates
+         * the request body, making Restlet unable to process it. In the case we need to use getParameters as well
+         * instead of reading from the input stream, and for doing this we need the original HTTP request object. This
+         * is basically a hack that should be removed as soon as the Restlet JAX-RS extension will support the injection
+         * of the request object via the @Context annotation
          */
         getContext().getAttributes().put(Constants.HTTP_REQUEST, getHttpRequest(request));
 
@@ -60,8 +64,23 @@ public class XWikiSetupCleanupFilter extends Filter
     protected void afterHandle(Request request, Response response)
     {
         Map<String, Object> attributes = getContext().getAttributes();
-        attributes.remove(Constants.RELEASABLE_COMPONENT_REFERENCES);
-        attributes.remove(Constants.HTTP_REQUEST);
+
+        ComponentManager componentManager = (ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER);
+        List<XWikiRestComponent> releasableComponents =
+            (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES);
+        if (releasableComponents != null) {
+            /* Release all the releasable components. */
+            for (XWikiRestComponent component : releasableComponents) {
+                try {
+                    componentManager.release(component);
+                } catch (ComponentLifecycleException e) {
+                    getLogger().log(
+                        Level.WARNING,
+                        String.format("Unable to release component %s. (%s)", component.getClass().getName(), e
+                            .getMessage()));
+                }
+            }
+        }
 
         /* Avoid that empty entities make the engine forward the response creation to the XWiki servlet. */
         if (response.getEntity() != null) {
@@ -86,6 +105,7 @@ public class XWikiSetupCleanupFilter extends Filter
                 return ((ServletCall) httpCall).getRequest();
             }
         }
+
         return null;
     }
 

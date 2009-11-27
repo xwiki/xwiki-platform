@@ -47,7 +47,7 @@ public class XWikiRestletServlet extends ServerServlet
         /* Retrieve the application context in order to populate it with relevant variables. */
         Context applicationContext = application.getContext();
 
-        /* Retrieve the component manager and made it available in the application context. */
+        /* Retrieve the component manager and make it available in the restlet application context. */
         ComponentManager componentManager =
             (ComponentManager) getServletContext().getAttribute("org.xwiki.component.manager.ComponentManager");
         applicationContext.getAttributes().put(Constants.XWIKI_COMPONENT_MANAGER, componentManager);

@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Objects;
@@ -69,7 +70,9 @@ public class ObjectsResource extends XWikiResource
 
         List<com.xpn.xwiki.objects.BaseObject> objectList = new ArrayList<com.xpn.xwiki.objects.BaseObject>();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
 
         Map<String, Vector<com.xpn.xwiki.objects.BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
         for (String className : classToObjectsMap.keySet()) {
@@ -86,8 +89,8 @@ public class ObjectsResource extends XWikiResource
             /* By deleting objects, some of them might become null, so we must check for this */
             if (object != null) {
                 objects.getObjectSummaries().add(
-                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc,
-                        object, false));
+                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
+                        .getXWikiContext(componentManager), doc, object, false));
             }
         }
 
@@ -106,26 +109,31 @@ public class ObjectsResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+        if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-        int objectNumber = xwikiDocument.createNewObject(object.getClassName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
+        int objectNumber =
+            xwikiDocument.createNewObject(object.getClassName(), Utils.getXWikiContext(componentManager));
         BaseObject xwikiObject = xwikiDocument.getObject(object.getClassName(), objectNumber);
         if (xwikiObject == null) {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
 
         // We must initialize all the fields to an empty value in order to correctly create the object
-        BaseClass xwikiClass = xwiki.getClass(xwikiObject.getClassName(), xwikiContext);
+        BaseClass xwikiClass =
+            Utils.getXWiki(componentManager).getClass(xwikiObject.getClassName(),
+                Utils.getXWikiContext(componentManager));
         for (java.lang.Object propertyNameObject : xwikiClass.getPropertyNames()) {
             String propertyName = (String) propertyNameObject;
-            xwikiObject.set(propertyName, "", xwikiContext);
+            xwikiObject.set(propertyName, "", Utils.getXWikiContext(componentManager));
         }
 
         for (Property property : object.getProperties()) {
-            xwikiObject.set(property.getName(), property.getValue(), xwikiContext);
+            xwikiObject.set(property.getName(), property.getValue(), Utils.getXWikiContext(componentManager));
         }
 
         doc.save();
@@ -133,8 +141,8 @@ public class ObjectsResource extends XWikiResource
         return Response.created(
             UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName, spaceName, pageName,
                 object.getClassName(), objectNumber)).entity(
-            DomainObjectFactory
-                .createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, xwikiObject, false)).build();
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
+                .getXWikiContext(componentManager), doc, xwikiObject, false)).build();
     }
 
 }

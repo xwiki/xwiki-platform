@@ -46,25 +46,25 @@ public class SpaceResource extends XWikiResource
     public Space getSpace(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName)
         throws XWikiException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            List<String> spaceNames = xwikiApi.getSpaces();
+            List<String> spaceNames = Utils.getXWikiApi(componentManager).getSpaces();
             Collections.sort(spaceNames);
 
             String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
             Document home = null;
 
-            if (xwikiApi.exists(homeId)) {
-                home = xwikiApi.getDocument(homeId);
+            if (Utils.getXWikiApi(componentManager).exists(homeId)) {
+                home = Utils.getXWikiApi(componentManager).getDocument(homeId);
             }
 
             return DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home);
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
     }
 }

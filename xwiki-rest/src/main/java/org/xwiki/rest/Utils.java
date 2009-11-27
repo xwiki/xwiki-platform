@@ -20,11 +20,14 @@
 package org.xwiki.rest;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.context.Execution;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * @version $Id$
@@ -87,7 +90,7 @@ public class Utils
      * @return parent of the given document, null if none is specified.
      * @throws XWikiException if getting the parent document has failed.
      */
-    public static Document getParentDocument(Document doc, XWiki xwikiApi) throws XWikiException
+    public static Document getParentDocument(Document doc, com.xpn.xwiki.api.XWiki xwikiApi) throws XWikiException
     {
         if (StringUtils.isEmpty(doc.getParent())) {
             return null;
@@ -103,4 +106,40 @@ public class Utils
         return xwikiApi.getDocument(parentName);
     }
 
+    public static XWikiContext getXWikiContext(ComponentManager componentManager)
+    {
+        Execution execution = null;
+        XWikiContext xwikiContext = null;
+        try {
+            execution = componentManager.lookup(Execution.class);
+            xwikiContext = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+            return xwikiContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to get XWiki context", e);
+        }
+    }
+
+    public static com.xpn.xwiki.XWiki getXWiki(ComponentManager componentManager)
+    {
+        try {
+            return com.xpn.xwiki.XWiki.getXWiki(getXWikiContext(componentManager));
+        } catch (XWikiException e) {
+            throw new RuntimeException("Unable to get XWiki object", e);
+        }
+    }
+
+    public static com.xpn.xwiki.api.XWiki getXWikiApi(ComponentManager componentManager)
+    {
+        return new com.xpn.xwiki.api.XWiki(getXWiki(componentManager), getXWikiContext(componentManager));
+    }
+
+    public static String getXWikiUser(ComponentManager componentManager)
+    {
+        XWikiUser user = getXWikiContext(componentManager).getXWikiUser();
+        if (user == null) {
+            return "XWiki.Guest";
+        }
+
+        return user.getUser();
+    }
 }

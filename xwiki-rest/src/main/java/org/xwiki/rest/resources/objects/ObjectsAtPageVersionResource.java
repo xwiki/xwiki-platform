@@ -33,6 +33,7 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Objects;
 
@@ -61,8 +62,12 @@ public class ObjectsAtPageVersionResource extends XWikiResource
 
         List<com.xpn.xwiki.objects.BaseObject> objectList = new ArrayList<com.xpn.xwiki.objects.BaseObject>();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-        xwikiDocument = xwiki.getDocument(xwikiDocument, doc.getVersion(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
+        xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(xwikiDocument, doc.getVersion(),
+                Utils.getXWikiContext(componentManager));
 
         Map<String, Vector<com.xpn.xwiki.objects.BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
         for (String className : classToObjectsMap.keySet()) {
@@ -79,8 +84,8 @@ public class ObjectsAtPageVersionResource extends XWikiResource
             /* By deleting objects, some of them might become null, so we must check for this */
             if (object != null) {
                 objects.getObjectSummaries().add(
-                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc,
-                        object, true));
+                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
+                        .getXWikiContext(componentManager), doc, object, true));
             }
         }
 

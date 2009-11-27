@@ -30,8 +30,8 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Objects;
@@ -53,18 +53,16 @@ public class AllObjectsForClassNameResource extends XWikiResource
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
         throws XWikiException, QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Objects objects = new Objects();
 
         /* This try is just needed for executing the finally clause. Exceptions are actually re-thrown. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String query =
                 "select doc, obj from BaseObject as obj, XWikiDocument as doc where obj.name=doc.fullName and obj.className=:className";
-
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
             List<Object> queryResult = null;
             queryResult =
@@ -76,17 +74,17 @@ public class AllObjectsForClassNameResource extends XWikiResource
 
                 XWikiDocument xwikiDocument = (XWikiDocument) fields[0];
                 xwikiDocument.setDatabase(wikiName);
-                Document doc = new Document(xwikiDocument, xwikiContext);
+                Document doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
                 BaseObject xwikiObject = (BaseObject) fields[1];
 
                 ObjectSummary objectSummary =
-                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc,
-                        xwikiObject, false);
+                    DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
+                        .getXWikiContext(componentManager), doc, xwikiObject, false);
 
                 objects.getObjectSummaries().add(objectSummary);
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return objects;

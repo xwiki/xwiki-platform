@@ -28,7 +28,6 @@ import javax.ws.rs.core.UriBuilderException;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -152,10 +151,9 @@ public class BaseSearchResult extends XWikiResource
 
         String query = f.toString();
 
-        QueryManager queryManager = com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
-
         List<Object> queryResult = null;
 
+        /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
         if (space != null) {
             queryResult =
                 queryManager.createQuery(query, Query.XWQL).bindValue("keywords",
@@ -175,7 +173,7 @@ public class BaseSearchResult extends XWikiResource
 
             String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
-            if (xwikiApi.hasAccessLevel("view", pageId)) {
+            if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
                 SearchResult searchResult = objectFactory.createSearchResult();
                 searchResult.setType("page");
                 searchResult.setId(pageId);
@@ -243,9 +241,9 @@ public class BaseSearchResult extends XWikiResource
 
         String query = f.toString();
 
-        QueryManager queryManager = com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
-
         List<Object> queryResult = null;
+        
+        /* This is needed because if the :space placeholder is not in the query, setting it would cause an exception */
         if (space != null) {
             queryResult =
                 queryManager.createQuery(query, Query.XWQL).bindValue("keywords",
@@ -269,7 +267,7 @@ public class BaseSearchResult extends XWikiResource
             /* Avoid duplicates */
             if (!addedIds.contains(id)) {
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
-                if (xwikiApi.hasAccessLevel("view", pageId)) {
+                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
                     SearchResult searchResult = objectFactory.createSearchResult();
                     searchResult.setType("object");
                     searchResult.setId(id);

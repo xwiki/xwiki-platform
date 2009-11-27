@@ -105,7 +105,7 @@ public class DomainObjectFactory
         wikisLink.setHref(wikisUri);
         wikisLink.setRel(Relations.WIKIS);
         xwiki.getLinks().add(wikisLink);
-        
+
         String syntaxesUri = UriBuilder.fromUri(baseUri).path(SyntaxesResource.class).build().toString();
         Link syntaxesLink = objectFactory.createLink();
         syntaxesLink.setHref(syntaxesUri);
@@ -263,7 +263,7 @@ public class DomainObjectFactory
         pageSummary.setSyntax(doc.getSyntaxId());
 
         Document parent = Utils.getParentDocument(doc, xwikiApi);
-        pageSummary.setParent(doc.getParent());        
+        pageSummary.setParent(doc.getParent());
         // parentId must not be set if the parent document does not exist.
         if (parent != null && !parent.isNew()) {
             pageSummary.setParentId(parent.getPrefixedFullName());
@@ -618,7 +618,7 @@ public class DomainObjectFactory
         ObjectSummary objectSummary = objectFactory.createObjectSummary();
         fillObjectSummary(objectSummary, objectFactory, baseUri, doc, xwikiObject);
 
-        Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.OBJECT);        
+        Link objectLink = getObjectLink(objectFactory, baseUri, doc, xwikiObject, useVersion, Relations.OBJECT);
         objectSummary.getLinks().add(objectLink);
 
         String propertiesUri;
@@ -660,14 +660,14 @@ public class DomainObjectFactory
                 BaseProperty baseProperty = (BaseProperty) o;
                 Attribute attribute = objectFactory.createAttribute();
                 attribute.setName(baseProperty.getName());
-                
+
                 /* Check for null values in order to prevent NPEs */
                 if (baseProperty.getValue() != null) {
                     attribute.setValue(baseProperty.getValue().toString());
                 } else {
                     attribute.setValue("");
                 }
-                                
+
                 property.getAttributes().add(attribute);
             }
 
@@ -747,7 +747,7 @@ public class DomainObjectFactory
         Link objectLink = objectFactory.createLink();
         objectLink.setHref(objectUri);
         objectLink.setRel(relation);
-        
+
         return objectLink;
     }
 

@@ -51,13 +51,13 @@ public class PagesResource extends XWikiResource
         @QueryParam("number") @DefaultValue("-1") Integer number, @QueryParam("parentId") String parentFilterExpression)
         throws XWikiException, QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Pages pages = objectFactory.createPages();
 
         /* This try is just needed for executing the finally clause. Exceptions are actually re-thrown. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             /* Use an explicit query to improve performance */
             List<String> pageNames =
@@ -76,18 +76,18 @@ public class PagesResource extends XWikiResource
             for (String pageName : pageNames) {
                 String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
 
-                if (!xwikiApi.exists(pageFullName)) {
+                if (!Utils.getXWikiApi(componentManager).exists(pageFullName)) {
                     logger.warning(String
                         .format("[Page '%s' appears to be in space '%s' but no information is available.]", pageName,
                             spaceName));
                 } else {
-                    Document doc = xwikiApi.getDocument(pageFullName);
+                    Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
 
                     /* We only add pages we have the right to access */
                     if (doc != null) {
                         boolean add = true;
 
-                        Document parent = Utils.getParentDocument(doc, xwikiApi);
+                        Document parent = Utils.getParentDocument(doc, Utils.getXWikiApi(componentManager));
 
                         if (parentFilter != null) {
                             String parentId = "";
@@ -99,14 +99,14 @@ public class PagesResource extends XWikiResource
 
                         if (add) {
                             pages.getPageSummaries().add(
-                                DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc,
-                                    xwikiApi));
+                                DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, Utils
+                                    .getXWikiApi(componentManager)));
                         }
                     }
                 }
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return pages;

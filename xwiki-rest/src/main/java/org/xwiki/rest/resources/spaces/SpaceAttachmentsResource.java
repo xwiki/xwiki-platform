@@ -37,6 +37,7 @@ import org.xwiki.rest.resources.BaseAttachmentsResource;
 @Path("/wikis/{wikiName}/spaces/{spaceName}/attachments")
 public class SpaceAttachmentsResource extends BaseAttachmentsResource
 {
+    @Override
     @GET
     public Attachments getAttachments(@PathParam("wikiName") String wikiName, @PathParam("spaceName") String spaceName,
         @QueryParam("name") @DefaultValue("") String name, @QueryParam("page") @DefaultValue("") String page,

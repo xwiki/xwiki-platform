@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
@@ -55,8 +56,12 @@ public class ObjectPropertyAtPageVersionResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-        xwikiDocument = xwiki.getDocument(xwikiDocument, doc.getVersion(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
+        xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(xwikiDocument, doc.getVersion(),
+                Utils.getXWikiContext(componentManager));
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
@@ -64,7 +69,8 @@ public class ObjectPropertyAtPageVersionResource extends XWikiResource
         }
 
         Object object =
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject, true);
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
+                .getXWikiContext(componentManager), doc, baseObject, true);
 
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {

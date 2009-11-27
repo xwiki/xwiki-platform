@@ -30,6 +30,7 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Attachments;
 
@@ -65,15 +66,18 @@ public class AttachmentsAtPageVersionResource extends XWikiResource
          * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
          * external URL for an attachment
          */
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
 
         for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
             String attachmentXWikiAbsoluteUrl =
-                xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext)
-                    .toString();
+                xwikiDocument.getExternalAttachmentURL(xwikiAttachment.getFilename(), "download",
+                    Utils.getXWikiContext(componentManager)).toString();
 
             String attachmentXWikiRelativeUrl =
-                xwikiDocument.getAttachmentURL(xwikiAttachment.getFilename(), "download", xwikiContext).toString();
+                xwikiDocument.getAttachmentURL(xwikiAttachment.getFilename(), "download",
+                    Utils.getXWikiContext(componentManager)).toString();
 
             attachments.getAttachments().add(
                 DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,

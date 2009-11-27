@@ -19,38 +19,17 @@
  */
 package org.xwiki.rest;
 
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.restlet.Filter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.xwiki.component.manager.ComponentLifecycleException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerInitializer;
-import org.xwiki.context.Execution;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
-import com.noelios.restlet.ext.servlet.ServletContextAdapter;
 import com.noelios.restlet.http.HttpCall;
 import com.noelios.restlet.http.HttpRequest;
-import com.noelios.restlet.http.HttpResponse;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.XWikiServletContext;
-import com.xpn.xwiki.web.XWikiServletRequest;
-import com.xpn.xwiki.web.XWikiServletResponse;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * The Setup cleanup filter is used to initialize the XWiki context before serving the request, and to clean it up after
@@ -64,57 +43,15 @@ public class XWikiSetupCleanupFilter extends Filter
     @Override
     protected int beforeHandle(Request request, Response response)
     {
-        XWikiContext xwikiContext = null;
-        XWikiRequest xwikiRequest = new XWikiServletRequest(getHttpRequest(request));
-        XWikiResponse xwikiResponse = new XWikiServletResponse(getHttpResponse(response));
-        ServletContextAdapter adapter = (ServletContextAdapter) getContext();
-        ServletContext servletContext = adapter.getServletContext();
-        XWikiServletContext xwikiServletContext = new XWikiServletContext(servletContext);
-
-        try {
-            xwikiContext = com.xpn.xwiki.web.Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiServletContext);
-
-            initializeContainerComponent(xwikiContext);
-            XWiki xwiki = XWiki.getXWiki(xwikiContext);
-
-            XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(xwikiContext.getMode(), xwikiContext);
-            xwikiContext.setURLFactory(urlf);
-
-            com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(xwiki, xwikiContext);
-
-            /* By default, set the XWiki user associated to the request to Guest */
-            String xwikiUser = "XWiki.XWikiGuest";
-            xwikiContext.setUser(xwikiUser);
-
-            /* XWiki platform objects are stocked in the Restlet context so all Restlet components can retrieve them. */
-            Map<String, Object> attributes = getContext().getAttributes();
-            attributes.put(Constants.XWIKI_CONTEXT, xwikiContext);
-            attributes.put(Constants.XWIKI, xwiki);
-            attributes.put(Constants.XWIKI_API, xwikiApi);
-            attributes.put(Constants.XWIKI_USER, xwikiUser);
-
-            /*
-             * We put the original HTTP request in context attributes because this is needed for reading
-             * application/www-form-urlencoded POSTs. In fact servlet filters might use getParameters which invalidates
-             * the request body, making Restlet unable to process it. In the case we need to use getParameters as well
-             * instead of reading from the input stream, and for doing this we need the HTTP request object. This is
-             * basically a hack that should be removed as soon as the Restlet JAX-RS extension will support the
-             * injection of the request object via the @Context annotation
-             */
-            attributes.put(Constants.HTTP_REQUEST, getHttpRequest(request));
-        } catch (Exception e) {
-            if (xwikiContext != null) {
-                Map<String, Object> attributes = getContext().getAttributes();
-                cleanupComponents((ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER),
-                    (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES));
-            }
-
-            getLogger().log(Level.SEVERE, "Cannot initialize XWiki context.", e);
-
-            return Filter.STOP;
-        }
-
-        getLogger().log(Level.FINE, "XWiki context initialized.");
+        /*
+         * We put the original HTTP request in context attributes because this is needed for reading
+         * application/www-form-urlencoded POSTs. In fact servlet filters might use getParameters which invalidates the
+         * request body, making Restlet unable to process it. In the case we need to use getParameters as well instead
+         * of reading from the input stream, and for doing this we need the HTTP request object. This is basically a
+         * hack that should be removed as soon as the Restlet JAX-RS extension will support the injection of the request
+         * object via the @Context annotation
+         */
+        getContext().getAttributes().put(Constants.HTTP_REQUEST, getHttpRequest(request));
 
         return Filter.CONTINUE;
     }
@@ -123,19 +60,6 @@ public class XWikiSetupCleanupFilter extends Filter
     protected void afterHandle(Request request, Response response)
     {
         Map<String, Object> attributes = getContext().getAttributes();
-
-        XWikiContext xwikiContext = (XWikiContext) attributes.get(Constants.XWIKI_CONTEXT);
-        if (xwikiContext != null) {
-            cleanupComponents((ComponentManager) attributes.get(Constants.XWIKI_COMPONENT_MANAGER),
-                (List<XWikiRestComponent>) attributes.get(Constants.RELEASABLE_COMPONENT_REFERENCES));
-            getLogger().log(Level.FINE, "XWiki context cleaned up.");
-        }
-
-        /* Remove all the attributes from the current context */
-        attributes.remove(Constants.XWIKI_CONTEXT);
-        attributes.remove(Constants.XWIKI);
-        attributes.remove(Constants.XWIKI_API);
-        attributes.remove(Constants.XWIKI_USER);
         attributes.remove(Constants.RELEASABLE_COMPONENT_REFERENCES);
         attributes.remove(Constants.HTTP_REQUEST);
 
@@ -145,42 +69,6 @@ public class XWikiSetupCleanupFilter extends Filter
                 response.setEntity(null);
             }
         }
-    }
-
-    private void initializeContainerComponent(XWikiContext context) throws ServletException
-    {
-        ServletContainerInitializer containerInitializer =
-            com.xpn.xwiki.web.Utils.getComponent(ServletContainerInitializer.class);
-
-        try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(), context);
-            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
-            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
-        } catch (ServletContainerException e) {
-            throw new ServletException("Failed to initialize request/response or session", e);
-        }
-    }
-
-    private void cleanupComponents(ComponentManager componentManager, List<XWikiRestComponent> releasableComponents)
-    {
-        if (releasableComponents != null) {
-            /* Release all the releasable components. */
-            for (XWikiRestComponent component : releasableComponents) {
-                try {
-                    componentManager.release(component);
-                } catch (ComponentLifecycleException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        Container container = com.xpn.xwiki.web.Utils.getComponent(Container.class);
-        Execution execution = com.xpn.xwiki.web.Utils.getComponent(Execution.class);
-
-        container.removeRequest();
-        container.removeResponse();
-        container.removeSession();
-        execution.removeContext();
     }
 
     /**
@@ -201,21 +89,4 @@ public class XWikiSetupCleanupFilter extends Filter
         return null;
     }
 
-    /**
-     * Builds the servlet response.
-     * 
-     * @param res The response.
-     * @return httpServletResponse The http servlet response.
-     */
-    protected static HttpServletResponse getHttpResponse(Response res)
-    {
-        if (res instanceof HttpResponse) {
-            HttpResponse httpResponse = (HttpResponse) res;
-            HttpCall httpCall = httpResponse.getHttpCall();
-            if (httpCall instanceof ServletCall) {
-                return ((ServletCall) httpCall).getResponse();
-            }
-        }
-        return null;
-    }
 }

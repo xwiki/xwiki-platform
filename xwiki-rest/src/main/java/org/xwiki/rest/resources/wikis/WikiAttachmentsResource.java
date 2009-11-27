@@ -37,6 +37,7 @@ import org.xwiki.rest.resources.BaseAttachmentsResource;
 @Path("/wikis/{wikiName}/attachments")
 public class WikiAttachmentsResource extends BaseAttachmentsResource
 {
+    @Override
     @GET
     public Attachments getAttachments(@PathParam("wikiName") String wikiName,
         @QueryParam("name") @DefaultValue("") String name, @QueryParam("page") @DefaultValue("") String page,

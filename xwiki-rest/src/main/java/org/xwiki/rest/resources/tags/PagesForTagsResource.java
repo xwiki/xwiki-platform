@@ -33,6 +33,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Pages;
 
@@ -48,13 +49,13 @@ public class PagesForTagsResource extends XWikiResource
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
         throws XWikiException, QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Pages pages = objectFactory.createPages();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String[] tagNamesArray = tagNames.split(",");
 
@@ -73,15 +74,16 @@ public class PagesForTagsResource extends XWikiResource
             RangeIterable<String> ri = new RangeIterable<String>(documentNames, start, number);
 
             for (String documentName : ri) {
-                Document doc = xwikiApi.getDocument(documentName);
+                Document doc = Utils.getXWikiApi(componentManager).getDocument(documentName);
                 if (doc != null) {
                     pages.getPageSummaries().add(
-                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, xwikiApi));
+                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), doc, Utils
+                            .getXWikiApi(componentManager)));
                 }
             }
 
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return pages;

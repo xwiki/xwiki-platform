@@ -34,6 +34,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Attachments;
 
@@ -67,7 +68,9 @@ public class AttachmentHistoryResource extends XWikiResource
          * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
          * external URL for an attachment
          */
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
 
         Attachments attachments = new Attachments();
 
@@ -84,10 +87,12 @@ public class AttachmentHistoryResource extends XWikiResource
                 xwikiAttachment.getAttachmentRevision(version.toString());
 
             String attachmentXWikiAbsoluteUrl =
-                xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
+                xwikiDocument.getExternalAttachmentURL(attachmentName, "download",
+                    Utils.getXWikiContext(componentManager)).toString();
 
             String attachmentXWikiRelativeUrl =
-                xwikiDocument.getAttachmentURL(attachmentName, "download", xwikiContext).toString();
+                xwikiDocument.getAttachmentURL(attachmentName, "download", Utils.getXWikiContext(componentManager))
+                    .toString();
 
             attachments.getAttachments().add(
                 DomainObjectFactory.createAttachmentAtVersion(objectFactory, uriInfo.getBaseUri(),

@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Page;
 
@@ -56,7 +57,7 @@ public class ModifiablePageResource extends XWikiResource
         }
 
         if (page.getSyntax() != null) {
-            if (xwiki.getConfiguredSyntaxes().contains(page.getSyntax())) {
+            if (Utils.getXWiki(componentManager).getConfiguredSyntaxes().contains(page.getSyntax())) {
                 doc.setSyntaxId(page.getSyntax());
                 save = true;
             }
@@ -67,7 +68,7 @@ public class ModifiablePageResource extends XWikiResource
 
             page =
                 DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-                    false, xwikiApi);
+                    false, Utils.getXWikiApi(componentManager));
 
             if (documentInfo.isCreated()) {
                 return Response.created(uriInfo.getAbsolutePath()).entity(page).build();

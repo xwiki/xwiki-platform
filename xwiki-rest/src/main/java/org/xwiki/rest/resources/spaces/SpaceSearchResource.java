@@ -30,6 +30,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.QueryException;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.model.jaxb.SearchResults;
 import org.xwiki.rest.resources.BaseSearchResult;
 
@@ -44,22 +45,22 @@ public class SpaceSearchResource extends BaseSearchResult
         @QueryParam("q") String keywords, @QueryParam("scope") List<String> searchScopeStrings,
         @QueryParam("number") @DefaultValue("-1") Integer number) throws QueryException, XWikiException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         SearchResults searchResults = objectFactory.createSearchResults();
         searchResults.setTemplate(String.format("%s?q={keywords}(&scope={content|name|title|objects})*", UriBuilder
             .fromUri(uriInfo.getBaseUri()).path(SpaceSearchResource.class).build(wikiName, spaceName).toString()));
 
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             List<SearchScope> searchScopes = parseSearchScopeStrings(searchScopeStrings);
 
             searchResults.getSearchResults().addAll(
-                search(searchScopes, keywords, wikiName, spaceName, xwiki.getRightService().hasProgrammingRights(
-                    xwikiContext), number));
+                search(searchScopes, keywords, wikiName, spaceName, Utils.getXWiki(componentManager).getRightService()
+                    .hasProgrammingRights(Utils.getXWikiContext(componentManager)), number));
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return searchResults;

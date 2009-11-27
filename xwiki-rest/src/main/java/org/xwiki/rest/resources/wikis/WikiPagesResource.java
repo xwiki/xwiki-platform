@@ -35,8 +35,8 @@ import javax.ws.rs.core.UriBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.PageSummary;
@@ -60,7 +60,7 @@ public class WikiPagesResource extends XWikiResource
         @QueryParam("space") @DefaultValue("") String space, @QueryParam("author") @DefaultValue("") String author,
         @QueryParam("number") @DefaultValue("25") Integer number) throws QueryException, XWikiException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Pages pages = objectFactory.createPages();
 
@@ -111,7 +111,6 @@ public class WikiPagesResource extends XWikiResource
             String queryString = f.toString();
 
             /* Execute the query by filling the parameters */
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
             Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
             for (String param : filters.keySet()) {
                 query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
@@ -125,7 +124,7 @@ public class WikiPagesResource extends XWikiResource
                 XWikiDocument xwikiDocument = (XWikiDocument) object;
                 xwikiDocument.setDatabase(wikiName);
 
-                Document doc = new Document(xwikiDocument, xwikiContext);
+                Document doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
 
                 /*
                  * We manufacture page summaries in place because we don't have all the data for calling the
@@ -141,10 +140,11 @@ public class WikiPagesResource extends XWikiResource
                 pageSummary.setParent(doc.getParent());
 
                 URL absoluteUrl =
-                    xwikiContext.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), "view", null, null,
-                        xwikiContext);
+                    Utils.getXWikiContext(componentManager).getURLFactory().createExternalURL(doc.getSpace(),
+                        doc.getName(), "view", null, null, Utils.getXWikiContext(componentManager));
                 pageSummary.setXwikiAbsoluteUrl(absoluteUrl.toString());
-                pageSummary.setXwikiRelativeUrl(xwikiContext.getURLFactory().getURL(absoluteUrl, xwikiContext));
+                pageSummary.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
+                    absoluteUrl, Utils.getXWikiContext(componentManager)));
 
                 String baseUri = uriInfo.getBaseUri().toString();
 
@@ -160,7 +160,7 @@ public class WikiPagesResource extends XWikiResource
 
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return pages;

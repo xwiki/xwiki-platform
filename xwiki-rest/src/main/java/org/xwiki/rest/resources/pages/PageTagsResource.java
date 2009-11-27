@@ -87,7 +87,7 @@ public class PageTagsResource extends ModifiablePageResource
 
         Document doc = documentInfo.getDocument();
 
-        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+        if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
@@ -96,25 +96,29 @@ public class PageTagsResource extends ModifiablePageResource
             tagNames.add(tag.getName());
         }
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
         BaseObject xwikiObject = xwikiDocument.getObject("XWiki.TagClass", 0);
 
         if (xwikiObject == null) {
-            int objectNumber = xwikiDocument.createNewObject("XWiki.TagClass", xwikiContext);
+            int objectNumber = xwikiDocument.createNewObject("XWiki.TagClass", Utils.getXWikiContext(componentManager));
             xwikiObject = xwikiDocument.getObject("XWiki.TagClass", objectNumber);
             if (xwikiObject == null) {
                 throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
             }
 
             // We must initialize all the fields to an empty value in order to correctly create the object
-            BaseClass xwikiClass = xwiki.getClass(xwikiObject.getClassName(), xwikiContext);
+            BaseClass xwikiClass =
+                Utils.getXWiki(componentManager).getClass(xwikiObject.getClassName(),
+                    Utils.getXWikiContext(componentManager));
             for (java.lang.Object propertyNameObject : xwikiClass.getPropertyNames()) {
                 String propertyName = (String) propertyNameObject;
-                xwikiObject.set(propertyName, "", xwikiContext);
+                xwikiObject.set(propertyName, "", Utils.getXWikiContext(componentManager));
             }
         }
 
-        xwikiObject.set("tags", tagNames, xwikiContext);
+        xwikiObject.set("tags", tagNames, Utils.getXWikiContext(componentManager));
 
         doc.save();
 
@@ -123,7 +127,8 @@ public class PageTagsResource extends ModifiablePageResource
 
     private List<String> getTagsFromDocument(String documentId) throws XWikiException
     {
-        XWikiDocument document = xwiki.getDocument(documentId, xwikiContext);
+        XWikiDocument document =
+            Utils.getXWiki(componentManager).getDocument(documentId, Utils.getXWikiContext(componentManager));
         BaseObject object = document.getObject("XWiki.TagClass");
         if (object != null) {
             BaseProperty prop = (BaseProperty) object.safeget("tags");

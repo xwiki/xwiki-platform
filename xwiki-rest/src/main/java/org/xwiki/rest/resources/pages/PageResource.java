@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.model.jaxb.Page;
 
 import com.xpn.xwiki.XWikiException;
@@ -49,7 +50,7 @@ public class PageResource extends ModifiablePageResource
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-            false, xwikiApi);
+            false, Utils.getXWikiApi(componentManager));
     }
 
     @PUT

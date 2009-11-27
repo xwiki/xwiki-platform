@@ -27,6 +27,7 @@ import org.restlet.Guard;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rest.resources.BrowserAuthenticationResource;
 
 import com.noelios.restlet.http.HttpConstants;
@@ -56,8 +57,10 @@ public class XWikiAuthentication extends Guard
             return super.authenticate(request);
         }
 
-        XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
-        XWiki xwiki = (XWiki) getContext().getAttributes().get(Constants.XWIKI);
+        ComponentManager componentManager =
+            (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
+        XWiki xwiki = Utils.getXWiki(componentManager);
 
         Form headers = (Form) request.getAttributes().get(HttpConstants.ATTRIBUTE_HEADERS);
 
@@ -71,8 +74,6 @@ public class XWikiAuthentication extends Guard
                 if (xwikiUser != null) {
                     xwikiContext.setUser(xwikiUser.getUser());
                     getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", xwikiUser.getUser()));
-
-                    getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser.getUser());
                 }
             } catch (XWikiException e) {
                 getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
@@ -98,8 +99,10 @@ public class XWikiAuthentication extends Guard
     @Override
     public boolean checkSecret(Request request, String identifier, char[] secret)
     {
-        XWikiContext xwikiContext = (XWikiContext) getContext().getAttributes().get(Constants.XWIKI_CONTEXT);
-        XWiki xwiki = (XWiki) getContext().getAttributes().get(Constants.XWIKI);
+        ComponentManager componentManager =
+            (ComponentManager) getContext().getAttributes().get(Constants.XWIKI_COMPONENT_MANAGER);
+        XWikiContext xwikiContext = Utils.getXWikiContext(componentManager);
+        XWiki xwiki = Utils.getXWiki(componentManager);
 
         try {
             Principal principal = xwiki.getAuthService().authenticate(identifier, new String(secret), xwikiContext);
@@ -108,8 +111,6 @@ public class XWikiAuthentication extends Guard
 
                 xwikiContext.setUser(xwikiUser);
                 getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
-
-                getContext().getAttributes().put(Constants.XWIKI_USER, xwikiUser);
 
                 return true;
             }

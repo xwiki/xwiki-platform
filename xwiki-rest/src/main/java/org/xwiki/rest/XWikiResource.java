@@ -33,14 +33,12 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -54,14 +52,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XWikiResource implements XWikiRestComponent, Initializable
 {
-    protected XWikiContext xwikiContext;
-
-    protected com.xpn.xwiki.XWiki xwiki;
-
-    protected com.xpn.xwiki.api.XWiki xwikiApi;
-
-    protected String xwikiUser;
-
     @Context
     protected UriInfo uriInfo;
 
@@ -72,6 +62,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
     @Requirement
     protected ComponentManager componentManager;
 
+    @Requirement
     protected QueryManager queryManager;
 
     /**
@@ -105,27 +96,12 @@ public class XWikiResource implements XWikiRestComponent, Initializable
      */
     public void initialize() throws InitializationException
     {
-        xwikiContext = (XWikiContext) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_CONTEXT);
-        xwiki = (com.xpn.xwiki.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI);
-        xwikiApi = (com.xpn.xwiki.api.XWiki) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_API);
-        xwikiUser = (String) org.restlet.Context.getCurrent().getAttributes().get(Constants.XWIKI_USER);
-        try {
-            queryManager = (QueryManager) componentManager.lookup(QueryManager.class);
-        } catch (ComponentLookupException e) {
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        }
-
-        /*
-         * if ((xwikiContext == null) || (xwiki == null) || (xwikiApi == null) || (xwikiUser == null)) { throw new
-         * WebApplicationException(Status.INTERNAL_SERVER_ERROR); }
-         */
-
         logger = Logger.getLogger(this.getClass().getName());
 
         objectFactory = new ObjectFactory();
 
         logger.log(Level.FINE, String.format("Resource %s initialized. Serving user: '%s'\n", getClass().getName(),
-            xwikiUser));
+            Utils.getXWikiUser(componentManager)));
     }
 
     /**
@@ -156,7 +132,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
 
         String pageFullName = Utils.getPageId(wikiName, spaceName, pageName);
 
-        boolean existed = xwikiApi.exists(pageFullName);
+        boolean existed = Utils.getXWikiApi(componentManager).exists(pageFullName);
 
         if (failIfDoesntExist) {
             if (!existed) {
@@ -164,7 +140,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
             }
         }
 
-        Document doc = xwikiApi.getDocument(pageFullName);
+        Document doc = Utils.getXWikiApi(componentManager).getDocument(pageFullName);
 
         /* If doc is null, we don't have the rights to access the document */
         if (doc == null) {
@@ -186,7 +162,7 @@ public class XWikiResource implements XWikiRestComponent, Initializable
                     XWikiDocument xwikiDocument = new XWikiDocument(spaceName, pageName);
                     xwikiDocument.setDatabase(wikiName);
                     xwikiDocument.setLanguage(language);
-                    doc = new Document(xwikiDocument, xwikiContext);
+                    doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
 
                     existed = false;
                 }

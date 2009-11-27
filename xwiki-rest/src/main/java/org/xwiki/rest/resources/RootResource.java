@@ -24,6 +24,7 @@ import javax.ws.rs.Path;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Xwiki;
 
@@ -37,6 +38,7 @@ public class RootResource extends XWikiResource
     @GET
     public Xwiki getRoot()
     {
-        return DomainObjectFactory.createXWikiRoot(objectFactory, uriInfo.getBaseUri(), xwiki.getVersion());
+        return DomainObjectFactory.createXWikiRoot(objectFactory, uriInfo.getBaseUri(), Utils
+            .getXWiki(componentManager).getVersion());
     }
 }

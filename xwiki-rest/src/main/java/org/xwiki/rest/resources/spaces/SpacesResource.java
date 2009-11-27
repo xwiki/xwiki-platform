@@ -49,13 +49,13 @@ public class SpacesResource extends XWikiResource
         @QueryParam("start") @DefaultValue("0") Integer start, @QueryParam("number") @DefaultValue("-1") Integer number)
         throws XWikiException, QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Spaces spaces = objectFactory.createSpaces();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             List<String> spaceNames =
                 queryManager.getNamedQuery("getSpaces").setOffset(start).setLimit(number).execute();
@@ -64,15 +64,15 @@ public class SpacesResource extends XWikiResource
                 String homeId = Utils.getPageId(wikiName, spaceName, "WebHome");
                 Document home = null;
 
-                if (xwikiApi.exists(homeId)) {
-                    home = xwikiApi.getDocument(homeId);
+                if (Utils.getXWikiApi(componentManager).exists(homeId)) {
+                    home = Utils.getXWikiApi(componentManager).getDocument(homeId);
                 }
 
                 spaces.getSpaces().add(
                     DomainObjectFactory.createSpace(objectFactory, uriInfo.getBaseUri(), wikiName, spaceName, home));
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return spaces;

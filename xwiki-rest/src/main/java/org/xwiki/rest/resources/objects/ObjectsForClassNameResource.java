@@ -33,6 +33,7 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Objects;
 
@@ -61,7 +62,9 @@ public class ObjectsForClassNameResource extends XWikiResource
 
         List<com.xpn.xwiki.objects.BaseObject> objectList = new ArrayList<com.xpn.xwiki.objects.BaseObject>();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
 
         Map<String, Vector<com.xpn.xwiki.objects.BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
 
@@ -75,8 +78,8 @@ public class ObjectsForClassNameResource extends XWikiResource
 
         for (com.xpn.xwiki.objects.BaseObject object : ri) {
             objects.getObjectSummaries().add(
-                DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, object,
-                    false));
+                DomainObjectFactory.createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils
+                    .getXWikiContext(componentManager), doc, object, false));
         }
 
         return objects;

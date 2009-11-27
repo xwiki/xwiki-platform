@@ -66,16 +66,17 @@ public class PageChildrenResource extends XWikiResource
         for (String childPageFullName : childPageFullNames) {
             String pageId = Utils.getPageId(wikiName, childPageFullName);
 
-            if (!xwikiApi.exists(pageId)) {
+            if (!Utils.getXWikiApi(componentManager).exists(pageId)) {
                 logger.warning(String.format(
                     "[Page '%s' appears to be in space '%s' but no information is available.]", pageName, spaceName));
             } else {
-                Document childDoc = xwikiApi.getDocument(pageId);
+                Document childDoc = Utils.getXWikiApi(componentManager).getDocument(pageId);
 
                 /* We only add pages we have the right to access */
                 if (childDoc != null) {
                     pages.getPageSummaries().add(
-                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), childDoc, xwikiApi));
+                        DomainObjectFactory.createPageSummary(objectFactory, uriInfo.getBaseUri(), childDoc, Utils
+                            .getXWikiApi(componentManager)));
                 }
             }
         }

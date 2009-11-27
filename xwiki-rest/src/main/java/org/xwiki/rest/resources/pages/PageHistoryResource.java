@@ -32,8 +32,8 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.History;
 import org.xwiki.rest.model.jaxb.HistorySummary;
@@ -54,21 +54,19 @@ public class PageHistoryResource extends XWikiResource
         @QueryParam("number") @DefaultValue("-1") Integer number,
         @QueryParam("order") @DefaultValue("desc") String order) throws XWikiException, QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         History history = new History();
 
         /* This try is just needed for executing the finally clause. Exceptions are actually re-thrown. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             String query =
                 String
                     .format(
                         "select doc.space, doc.name, rcs.id, rcs.date, rcs.author from XWikiRCSNodeInfo as rcs, XWikiDocument as doc where rcs.id.docId=doc.id and doc.space=:space and doc.name=:name and doc.language=:language order by rcs.date %s, rcs.id.version1 %s, rcs.id.version2 %s",
                         order, order, order);
-
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
 
             List<Object> queryResult = null;
             queryResult =
@@ -90,7 +88,7 @@ public class PageHistoryResource extends XWikiResource
                 history.getHistorySummaries().add(historySummary);
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return history;

@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Object;
 
@@ -51,16 +52,20 @@ public class ObjectAtPageVersionResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
-        xwikiDocument = xwiki.getDocument(xwikiDocument, doc.getVersion(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
+        xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(xwikiDocument, doc.getVersion(),
+                Utils.getXWikiContext(componentManager));
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject,
-            true);
+        return DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
+            .getXWikiContext(componentManager), doc, baseObject, true);
     }
 
 }

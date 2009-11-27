@@ -32,7 +32,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
@@ -67,13 +66,13 @@ public class BaseAttachmentsResource extends XWikiResource
     public Attachments getAttachments(String wikiName, String name, String page, String space, String author,
         String types, Integer start, Integer number) throws QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Attachments attachments = objectFactory.createAttachments();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             Map<String, String> filters = new HashMap<String, String>();
             if (!name.equals("")) {
@@ -117,7 +116,6 @@ public class BaseAttachmentsResource extends XWikiResource
             String queryString = f.toString();
 
             /* Execute the query by filling the parameters */
-            QueryManager queryManager = (QueryManager) com.xpn.xwiki.web.Utils.getComponent(QueryManager.class);
             Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
             for (String param : filters.keySet()) {
                 query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
@@ -142,7 +140,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 String pageVersion = (String) fields[2];
                 XWikiAttachment xwikiAttachment = (XWikiAttachment) fields[3];
 
-                String mimeType = xwikiAttachment.getMimeType(xwikiContext);
+                String mimeType = xwikiAttachment.getMimeType(Utils.getXWikiContext(componentManager));
 
                 boolean add = true;
 
@@ -179,10 +177,12 @@ public class BaseAttachmentsResource extends XWikiResource
                     attachment.setVersion(xwikiAttachment.getVersion());
 
                     URL absoluteUrl =
-                        xwikiContext.getURLFactory().createAttachmentURL(xwikiAttachment.getFilename(), pageSpace,
-                            pageName, "download", null, wikiName, xwikiContext);
+                        Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(
+                            xwikiAttachment.getFilename(), pageSpace, pageName, "download", null, wikiName,
+                            Utils.getXWikiContext(componentManager));
                     attachment.setXwikiAbsoluteUrl(absoluteUrl.toString());
-                    attachment.setXwikiRelativeUrl(xwikiContext.getURLFactory().getURL(absoluteUrl, xwikiContext));
+                    attachment.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory().getURL(
+                        absoluteUrl, Utils.getXWikiContext(componentManager)));
 
                     String baseUri = uriInfo.getBaseUri().toString();
 
@@ -206,7 +206,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 }
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return attachments;

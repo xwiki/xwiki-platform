@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Attachment;
 
@@ -70,13 +71,15 @@ public class AttachmentResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+        if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
         boolean existed = false;
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
         XWikiAttachment xwikiAttachment = xwikiDocument.getAttachment(attachmentName);
         if (xwikiAttachment == null) {
             xwikiAttachment = new XWikiAttachment();
@@ -86,11 +89,11 @@ public class AttachmentResource extends XWikiResource
         }
 
         xwikiAttachment.setContent(content);
-        xwikiAttachment.setAuthor(xwikiUser);
+        xwikiAttachment.setAuthor(Utils.getXWikiUser(componentManager));
         xwikiAttachment.setFilename(attachmentName);
         xwikiAttachment.setDoc(xwikiDocument);
 
-        xwikiDocument.saveAttachmentContent(xwikiAttachment, xwikiContext);
+        xwikiDocument.saveAttachmentContent(xwikiAttachment, Utils.getXWikiContext(componentManager));
 
         doc.save();
 
@@ -98,16 +101,21 @@ public class AttachmentResource extends XWikiResource
          * We need to retrieve the base XWiki documents because Document doesn't have a method for retrieving the
          * external URL for an attachment
          */
-        xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
         String attachmentXWikiAbsoluteUrl =
-            xwikiDocument.getExternalAttachmentURL(attachmentName, "download", xwikiContext).toString();
+            xwikiDocument.getExternalAttachmentURL(attachmentName, "download", Utils.getXWikiContext(componentManager))
+                .toString();
 
         String attachmentXWikiRelativeUrl =
-            xwikiDocument.getAttachmentURL(attachmentName, "download", xwikiContext).toString();
+            xwikiDocument.getAttachmentURL(attachmentName, "download", Utils.getXWikiContext(componentManager))
+                .toString();
 
         Attachment attachment =
             DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), new com.xpn.xwiki.api.Attachment(
-                doc, xwikiAttachment, xwikiContext), attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl);
+                doc, xwikiAttachment, Utils.getXWikiContext(componentManager)), attachmentXWikiRelativeUrl,
+                attachmentXWikiAbsoluteUrl);
 
         if (existed) {
             return Response.status(Status.ACCEPTED).entity(attachment).build();
@@ -126,7 +134,7 @@ public class AttachmentResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+        if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
@@ -135,10 +143,12 @@ public class AttachmentResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
         XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
 
-        xwikiDocument.deleteAttachment(baseXWikiAttachment, xwikiContext);
+        xwikiDocument.deleteAttachment(baseXWikiAttachment, Utils.getXWikiContext(componentManager));
 
         doc.save();
     }

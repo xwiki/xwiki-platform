@@ -26,6 +26,7 @@ import javax.ws.rs.Path;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Wikis;
 
@@ -41,7 +42,8 @@ public class WikisResource extends XWikiResource
     @GET
     public Wikis get() throws XWikiException
     {
-        List<String> databaseNames = xwiki.getVirtualWikisDatabaseNames(xwikiContext);
+        List<String> databaseNames =
+            Utils.getXWiki(componentManager).getVirtualWikisDatabaseNames(Utils.getXWikiContext(componentManager));
 
         if (databaseNames.isEmpty()) {
             databaseNames.add("xwiki");

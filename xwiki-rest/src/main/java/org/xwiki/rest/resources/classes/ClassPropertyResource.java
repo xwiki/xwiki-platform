@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Class;
 import org.xwiki.rest.model.jaxb.Link;
@@ -48,12 +49,12 @@ public class ClassPropertyResource extends XWikiResource
         @PathParam("propertyName") String propertyName) throws XWikiException
     {
 
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
+            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
             if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
@@ -77,7 +78,7 @@ public class ClassPropertyResource extends XWikiResource
             throw new WebApplicationException(Status.NOT_FOUND);
 
         } finally {
-            xwiki.setDatabase(database);
+            Utils.getXWiki(componentManager).setDatabase(database);
         }
     }
 }

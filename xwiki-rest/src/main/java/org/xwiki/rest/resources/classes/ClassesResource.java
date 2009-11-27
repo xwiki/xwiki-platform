@@ -31,6 +31,7 @@ import javax.ws.rs.QueryParam;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Classes;
 
@@ -49,12 +50,12 @@ public class ClassesResource extends XWikiResource /* extends XWikiResource */
         throws XWikiException
     {
 
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
-            List<String> classNames = xwikiApi.getClassList();
+            List<String> classNames = Utils.getXWikiApi(componentManager).getClassList();
             Collections.sort(classNames);
 
             RangeIterable<String> ri = new RangeIterable<String>(classNames, start, number);
@@ -62,14 +63,14 @@ public class ClassesResource extends XWikiResource /* extends XWikiResource */
             Classes classes = objectFactory.createClasses();
 
             for (String className : ri) {
-                com.xpn.xwiki.api.Class xwikiClass = xwikiApi.getClass(className);
+                com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
                 classes.getClazzs().add(
                     DomainObjectFactory.createClass(objectFactory, uriInfo.getBaseUri(), wikiName, xwikiClass));
             }
 
             return classes;
         } finally {
-            xwiki.setDatabase(database);
+            Utils.getXWiki(componentManager).setDatabase(database);
         }
     }
 }

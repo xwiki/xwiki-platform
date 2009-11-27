@@ -23,6 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Syntaxes;
 
@@ -34,10 +35,11 @@ import org.xwiki.rest.model.jaxb.Syntaxes;
 public class SyntaxesResource extends XWikiResource
 {
     @GET
-    public Syntaxes getSyntaxes() {
+    public Syntaxes getSyntaxes()
+    {
         Syntaxes syntaxes = objectFactory.createSyntaxes();
-        syntaxes.getSyntaxes().addAll(xwiki.getConfiguredSyntaxes());
-        
+        syntaxes.getSyntaxes().addAll(Utils.getXWiki(componentManager).getConfiguredSyntaxes());
+
         return syntaxes;
     }
 }

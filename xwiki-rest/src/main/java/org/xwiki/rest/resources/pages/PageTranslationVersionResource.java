@@ -25,6 +25,7 @@ import javax.ws.rs.PathParam;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Page;
 
@@ -48,6 +49,6 @@ public class PageTranslationVersionResource extends XWikiResource
         Document doc = documentInfo.getDocument();
 
         return DomainObjectFactory.createPage(objectFactory, uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc,
-            false, xwikiApi);
+            false, Utils.getXWikiApi(componentManager));
     }
 }

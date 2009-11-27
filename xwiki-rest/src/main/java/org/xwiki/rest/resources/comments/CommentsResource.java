@@ -34,6 +34,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.RangeIterable;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.Comments;
@@ -82,7 +83,7 @@ public class CommentsResource extends XWikiResource
 
         int id = doc.createNewObject("XWiki.XWikiComments");
         com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", id);
-        commentObject.set("author", xwikiUser);
+        commentObject.set("author", Utils.getXWikiUser(componentManager));
         commentObject.set("date", new Date());
 
         boolean save = false;

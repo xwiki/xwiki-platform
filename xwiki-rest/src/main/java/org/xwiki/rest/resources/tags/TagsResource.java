@@ -31,6 +31,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Tag;
@@ -45,13 +46,13 @@ public class TagsResource extends XWikiResource
     @GET
     public Tags getTags(@PathParam("wikiName") String wikiName) throws XWikiException, QueryException
     {
-        String database = xwikiContext.getDatabase();
+        String database = Utils.getXWikiContext(componentManager).getDatabase();
 
         Tags tags = objectFactory.createTags();
 
         /* This try is just needed for executing the finally clause. */
         try {
-            xwikiContext.setDatabase(wikiName);
+            Utils.getXWikiContext(componentManager).setDatabase(wikiName);
 
             List<String> tagNames = getAllTags();
 
@@ -70,7 +71,7 @@ public class TagsResource extends XWikiResource
                 tags.getTags().add(tag);
             }
         } finally {
-            xwikiContext.setDatabase(database);
+            Utils.getXWikiContext(componentManager).setDatabase(database);
         }
 
         return tags;

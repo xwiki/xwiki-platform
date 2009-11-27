@@ -31,6 +31,7 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.DomainObjectFactory;
 import org.xwiki.rest.Relations;
+import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Object;
@@ -57,7 +58,9 @@ public class ObjectPropertyResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
@@ -65,7 +68,8 @@ public class ObjectPropertyResource extends XWikiResource
         }
 
         Object object =
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject, false);
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
+                .getXWikiContext(componentManager), doc, baseObject, false);
 
         for (Property property : object.getProperties()) {
             if (property.getName().equals(propertyName)) {
@@ -94,24 +98,27 @@ public class ObjectPropertyResource extends XWikiResource
 
         Document doc = documentInfo.getDocument();
 
-        if (!doc.hasAccessLevel("edit", xwikiUser)) {
+        if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
             throw new WebApplicationException(Status.UNAUTHORIZED);
         }
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getPrefixedFullName(), xwikiContext);
+        XWikiDocument xwikiDocument =
+            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+                Utils.getXWikiContext(componentManager));
 
         com.xpn.xwiki.objects.BaseObject baseObject = xwikiDocument.getObject(className, objectNumber);
         if (baseObject == null) {
             throw new WebApplicationException(Status.NOT_FOUND);
         }
 
-        baseObject.set(propertyName, property.getValue(), xwikiContext);
+        baseObject.set(propertyName, property.getValue(), Utils.getXWikiContext(componentManager));
 
         doc.save();
 
         baseObject = xwikiDocument.getObject(className, objectNumber);
         Object object =
-            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), xwikiContext, doc, baseObject, false);
+            DomainObjectFactory.createObject(objectFactory, uriInfo.getBaseUri(), Utils
+                .getXWikiContext(componentManager), doc, baseObject, false);
 
         for (Property p : object.getProperties()) {
             if (p.getName().equals(propertyName)) {

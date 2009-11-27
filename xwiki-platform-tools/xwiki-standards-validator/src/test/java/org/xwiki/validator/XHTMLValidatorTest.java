@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.accessibility;
+package org.xwiki.validator;
 
 import org.xwiki.validator.XHTMLValidator;
 

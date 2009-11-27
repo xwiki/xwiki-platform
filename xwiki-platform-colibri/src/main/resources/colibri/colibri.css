@@ -898,10 +898,13 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background: no-repeat 0px 3px;
 }
 
+.tme-extensible {
+  display: block;
+}
 .menuarrow {
   color: $theme.menuLinkColor;
   font-size: .5em;
-  line-height: 22px;
+  line-height: 1.8em;
   margin-right: 10px;
 }
 

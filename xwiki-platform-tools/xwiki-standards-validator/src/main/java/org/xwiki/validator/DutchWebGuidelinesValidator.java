@@ -139,8 +139,21 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
 
         // Form validation
         NodeListIterable formElements = getElements("form");
+        
         for (Node formElement : formElements) {
-            assertTrue(Type.ERROR, "rpd1s3.formSubmit", hasChildElement(formElement, "submit"));
+            boolean validForm = false;
+            
+            if (hasChildElement(formElement, "submit")) {
+                validForm = true;
+            }
+            
+            for (Node input : getChildren(formElement, ELEM_INPUT)) {
+                if (hasAttribute(input, ATTR_TYPE) && getAttributeValue(input, ATTR_TYPE).equals(SUBMIT)) {
+                    validForm = true;
+                }
+            }
+            
+            assertTrue(Type.ERROR, "rpd1s3.formSubmit", validForm);
         }
     }
 

@@ -20,42 +20,26 @@
 package org.xwiki.gwt.dom.client;
 
 /**
- * A browser window, displaying a DOM {@link Document}.
+ * In-line sub-windows.
  * 
  * @version $Id$
+ * @see <a href="http://www.w3.org/TR/1999/REC-html401-19991224/present/frames.html#edef-IFRAME">W3C HTML
+ *      Specification</a>
  */
-public class Window extends JavaScriptObject
+public class IFrameElement extends com.google.gwt.dom.client.IFrameElement
 {
     /**
      * Default constructor. Needs to be protected because all instances are created from JavaScript.
      */
-    protected Window()
+    protected IFrameElement()
     {
     }
 
     /**
-     * Gets the default window. This is the window displaying the document in which the module is running.
-     * 
-     * @return the default window
+     * @return a reference to the content window
      */
-    public static native Window get()
+    public final native Window getContentWindow()
     /*-{
-        return $wnd;
+        return this.contentWindow;
     }-*/;
-
-    /**
-     * @return a reference to the document that this window contains
-     */
-    public final native Document getDocument()
-    /*-{
-        return this.document;
-    }-*/;
-
-    /**
-     * Stop this window from loading its document.
-     */
-    public final void stop()
-    {
-        DOMUtils.getInstance().stop(this);
-    }
 }

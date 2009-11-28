@@ -19,8 +19,13 @@
  */
 package org.xwiki.gwt.dom.client;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.NodeList;
 
 /**
  * Extends the element implementation provided by GWT to add useful methods. All of them should be removed as soon as
@@ -116,24 +121,7 @@ public class Element extends com.google.gwt.dom.client.Element
      */
     public final String xGetInnerHTML()
     {
-        if (getFirstChildElement() == null) {
-            return getInnerHTML();
-        } else {
-            Element container = getOwnerDocument().createDivElement().cast();
-            StringBuffer innerHTML = new StringBuffer();
-            Node child = getFirstChild();
-            do {
-                if (child.getNodeType() == Node.ELEMENT_NODE) {
-                    innerHTML.append(Element.as(child).xGetString());
-                } else {
-                    container.appendChild(child.cloneNode(true));
-                    innerHTML.append(container.getInnerHTML());
-                    container.removeChild(container.getLastChild());
-                }
-                child = child.getNextSibling();
-            } while (child != null);
-            return innerHTML.toString();
-        }
+        return Element.as(cloneNode(true)).expandInnerMetaData().getInnerHTML();
     }
 
     /**
@@ -142,33 +130,81 @@ public class Element extends com.google.gwt.dom.client.Element
      */
     public final String xGetString()
     {
-        String outerHTML;
-        // We need to remove the meta data attribute on serialization
-        String metaDataHTML = null;
-        if (hasAttribute(META_DATA_ATTR)) {
-            metaDataHTML = xGetAttribute(META_DATA_ATTR);
-            // Remove the attribute from this element
-            removeAttribute(META_DATA_ATTR);
+        Node result = Element.as(cloneNode(true)).expandMetaData(true);
+        return Element.is(result) ? Element.as(result).getString() : DocumentFragment.as(result).getInnerHTML();
+    }
+
+    /**
+     * Expands inner elements with meta data.
+     * 
+     * @return this element
+     */
+    public final Element expandInnerMetaData()
+    {
+        // Get all the inner elements with meta data.
+        NodeList<com.google.gwt.dom.client.Element> elements = getElementsByTagName("*");
+        List<Element> elementsWithMetaData = new ArrayList<Element>();
+        for (int i = 0; i < elements.getLength(); i++) {
+            Element element = (Element) elements.getItem(i);
+            if (element.hasAttribute(META_DATA_ATTR)) {
+                elementsWithMetaData.add(element);
+            }
         }
-        if (hasChildNodes()) {
-            Element clone = Element.as(cloneNode(false));
-            clone.appendChild(getOwnerDocument().createTextNode(INNER_HTML_PLACEHOLDER));
-            outerHTML = clone.getString();
-            outerHTML = outerHTML.replace(INNER_HTML_PLACEHOLDER, xGetInnerHTML());
-        } else {
-            outerHTML = getString();
+        // Expand meta data. Don't iterate the node list directly because it is live and meta data can contain elements.
+        for (Element element : elementsWithMetaData) {
+            // Remove the cached reference to the meta data document fragment because it might be shared by clone nodes.
+            // We could have cloned the meta data document fragment but this is not reliable with some DOM nodes like
+            // embedded objects.
+            element.removeProperty(META_DATA_REF);
+            element.expandMetaData(false);
         }
-        // Some browsers, including IE, format the HTML returned by innerHTML and outerHTML properties by adding new
-        // lines or tabs. We have to remove leading and trailing white spaces from the outerHTML because when we reset
-        // the innerHTML or outerHTML properties these white spaces can generate additional text nodes which can, for
-        // instance, mess up the History mechanism.
-        outerHTML = outerHTML.trim();
-        if (metaDataHTML != null) {
-            // Put the meta data attribute back
-            setAttribute(META_DATA_ATTR, metaDataHTML);
-            outerHTML = metaDataHTML.replace(INNER_HTML_PLACEHOLDER, outerHTML);
+        return this;
+    }
+
+    /**
+     * Expands the meta data of this element and its descendants.
+     * 
+     * @param deep {@code true} to expand the inner elements with meta data, {@code false} otherwise
+     * @return this element if it isn't replaced by its meta data, otherwise the document fragment resulted from
+     *         expanding the meta data
+     */
+    public final Node expandMetaData(boolean deep)
+    {
+        DocumentFragment metaData = getMetaData();
+        if (metaData == null) {
+            return deep ? expandInnerMetaData() : this;
         }
-        return outerHTML;
+        // Remove the meta data from the element.
+        setMetaData(null);
+        // We have to find the place holder inside the meta data, replace it with this element and then insert the meta
+        // data where this element was previously located.
+        // Let's find the place holder.
+        Iterator<Node> iterator = ((Document) getOwnerDocument()).getIterator(metaData);
+        while (iterator.hasNext()) {
+            Node node = iterator.next();
+            if (INNER_HTML_PLACEHOLDER.equals(node.getNodeValue())) {
+                // Save the position of this element.
+                Node hook = ((Document) getOwnerDocument()).createComment("");
+                if (getParentNode() != null) {
+                    getParentNode().replaceChild(hook, this);
+                }
+                // Replace the place holder with this element.
+                node.getParentNode().replaceChild(this, node);
+                // Insert the meta data at the right location.
+                if (hook.getParentNode() != null) {
+                    hook.getParentNode().replaceChild(metaData, hook);
+                }
+                if (deep) {
+                    expandInnerMetaData();
+                }
+                return metaData;
+            }
+        }
+        // We didn't find the place holder so the meta data will just replace this element.
+        if (getParentNode() != null) {
+            getParentNode().replaceChild(metaData, this);
+        }
+        return metaData;
     }
 
     /**
@@ -227,8 +263,9 @@ public class Element extends com.google.gwt.dom.client.Element
             if (hasAttribute(META_DATA_ATTR)) {
                 // This element could be the result of node cloning or copy&paste.
                 // Let's update the cached meta data reference.
-                Element container = (Element) getOwnerDocument().createDivElement().cast();
-                container.xSetInnerHTML(xGetAttribute(META_DATA_ATTR));
+                Element container = Element.as(getOwnerDocument().createDivElement());
+                // Set the inner HTML without notifying the listeners to prevent the meta data from being altered.
+                DOMUtils.getInstance().setInnerHTML(container, xGetAttribute(META_DATA_ATTR));
                 metaData = container.extractContents();
                 ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
             }
@@ -243,14 +280,15 @@ public class Element extends com.google.gwt.dom.client.Element
      */
     public final void setMetaData(DocumentFragment metaData)
     {
-        // Save a reference to the meta data for fast retrieval.
-        ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
         if (metaData != null) {
+            // Save a reference to the meta data for fast retrieval.
+            ((JavaScriptObject) cast()).set(META_DATA_REF, metaData);
             // We have to serialize the meta data and store it using a custom attribute to avoid loosing the meta data
             // over node cloning or copy&paste. The custom attribute used for storing the meta data should be filtered
             // when getting the outer HTML.
             setAttribute(META_DATA_ATTR, metaData.getInnerHTML());
         } else {
+            removeProperty(META_DATA_REF);
             removeAttribute(META_DATA_ATTR);
         }
     };
@@ -409,5 +447,19 @@ public class Element extends com.google.gwt.dom.client.Element
         if (!editable) {
             domUtils.ensureBlockIsEditable(this);
         }
+    }
+
+    /**
+     * Removes a property from this element.
+     * 
+     * @param propertyName the name of the property to be removed
+     * @see #setPropertyBoolean(String, boolean)
+     * @see #setPropertyDouble(String, double)
+     * @see #setPropertyInt(String, int)
+     * @see #setPropertyString(String, String)
+     */
+    public final void removeProperty(String propertyName)
+    {
+        DOMUtils.getInstance().removeProperty(this, propertyName);
     }
 }

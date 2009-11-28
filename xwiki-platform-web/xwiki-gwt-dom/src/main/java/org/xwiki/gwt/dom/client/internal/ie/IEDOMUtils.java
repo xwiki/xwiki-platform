@@ -23,6 +23,7 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.dom.client.Window;
 
 import com.google.gwt.core.client.JsArrayString;
 import com.google.gwt.dom.client.Node;
@@ -211,4 +212,28 @@ public class IEDOMUtils extends DOMUtils
     /*-{
         return document.body.isContentEditable;
     }-*/;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#stop(Window)
+     */
+    public void stop(Window window)
+    {
+        window.getDocument().execCommand("Stop", null);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Internet Explorer stores element properties in attribute nodes. In order to remove a property we have to remove
+     * its attribute node too.
+     * 
+     * @see DOMUtils#removeProperty(Element, String)
+     */
+    public void removeProperty(Element element, String propertyName)
+    {
+        super.removeProperty(element, propertyName);
+        element.removeAttribute(propertyName);
+    }
 }

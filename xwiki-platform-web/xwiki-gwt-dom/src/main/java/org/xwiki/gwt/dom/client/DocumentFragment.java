@@ -38,6 +38,30 @@ public final class DocumentFragment extends Node
     }
 
     /**
+     * Determine whether the given {@link Node} can be cast to a {@link DocumentFragment}. A {@code null} node will
+     * cause this method to return {@code false}.
+     * 
+     * @param node a DOM node
+     * @return {@code true} if the given node is a document fragment, {@code false} otherwise
+     */
+    public static boolean is(Node node)
+    {
+        return (node != null) && (node.getNodeType() == DOMUtils.DOCUMENT_FRAGMENT_NODE);
+    }
+
+    /**
+     * Assert that the given {@link Node} is a {@link DocumentFragment} and automatically typecast it.
+     * 
+     * @param node a document fragment DOM node
+     * @return the given node, casted to a document fragment
+     */
+    public static DocumentFragment as(Node node)
+    {
+        assert is(node);
+        return (DocumentFragment) node;
+    }
+
+    /**
      * @return the HTML serialization of this document fragment
      */
     public String getInnerHTML()

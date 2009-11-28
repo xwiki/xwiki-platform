@@ -91,10 +91,10 @@
           <!-- Skip the tests by default because they need a 32-bit JRE and the CI machine is 64-bit -->
           <skipTests>true</skipTests>
           <!-- GWTTestCase derived tests need the hosted browser which in turn needs a 32-bit JRE. -->
-          <jvm>/usr/lib/jvm/ia32-java-1.5.0-sun/bin/java</jvm>
+          <jvm>/usr/lib/jvm/ia32-java-6-sun/bin/java</jvm>
           <!-- We can run the tests manually in any browser. -->
           <!-- <extraJvmArgs>-Dgwt.args="-manual -port 54321"</extraJvmArgs> -->
-          <testTimeOut>90</testTimeOut>
+          <testTimeOut>120</testTimeOut>
           <includes>org/xwiki/gwt/user/UserTestSuite.java</includes>
         </configuration>
         <executions>

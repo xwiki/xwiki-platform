@@ -22,6 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.gwt.user.client.Console;
 import org.xwiki.gwt.user.client.ui.LoadingPanel;
 import org.xwiki.gwt.user.client.ui.rta.Reloader;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
@@ -29,8 +30,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
 
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Refreshes all the macros present on the edited document.
@@ -89,9 +89,17 @@ public class RefreshExecutable extends AbstractExecutable
         params.put("html", html);
 
         Reloader reloader = new Reloader(rta);
-        reloader.reload(params, new LoadHandler()
+        reloader.reload(params, new AsyncCallback<Object>()
         {
-            public void onLoad(LoadEvent event)
+            public void onFailure(Throwable caught)
+            {
+                Console.getInstance().error(caught.getLocalizedMessage());
+                // Try to focus the rich text area.
+                rta.setFocus(true);
+                waiting.stopLoading();
+            }
+
+            public void onSuccess(Object result)
             {
                 // Reset the content of the rich text area.
                 rta.getCommandManager().execute(RESET);

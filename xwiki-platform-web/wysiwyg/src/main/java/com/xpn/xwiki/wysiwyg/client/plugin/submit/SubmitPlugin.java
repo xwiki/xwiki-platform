@@ -145,7 +145,9 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
                 // All the parameters of this hidden configuration will be prefixed with the name of the hook.
                 hiddenConfig.setNameSpace(hook.getAttribute(NAME_ATTRIBUTE));
                 // This flag tells the server that the editor output requires HTML conversion.
-                hiddenConfig.addFlag(REQUIRES_HTML_CONVERSION);
+                if (textArea.isEnabled()) {
+                    hiddenConfig.addFlag(REQUIRES_HTML_CONVERSION);
+                }
                 // The storage syntax for this rich text area.
                 hiddenConfig.setParameter(SYNTAX, config.getParameter(SYNTAX, DEFAULT_SYNTAX));
 

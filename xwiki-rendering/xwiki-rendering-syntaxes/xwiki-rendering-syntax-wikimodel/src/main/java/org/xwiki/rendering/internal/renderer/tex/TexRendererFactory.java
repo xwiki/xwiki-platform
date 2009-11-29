@@ -26,7 +26,7 @@ import org.xwiki.rendering.syntax.Syntax;
 /**
  * Create Plain Text Renderers.
  *
- * @version $Id: TexRendererFactory.java 22735 2009-08-14 07:34:43Z vmassol $
+ * @version $Id$
  * @since 2.1RC1
  */
 @Component("tex/1.0")

@@ -32,7 +32,7 @@ import org.xwiki.rendering.internal.renderer.wikimodel.WikiModelPrinterAdapter;
 /**
  * Generates LaTeX syntax from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
  *
- * @version $Id: TexRenderer.java 22760 2009-08-16 18:54:40Z vmassol $
+ * @version $Id$
  * @since 2.1RC1
  */
 @Component("tex/1.0")

@@ -1,5 +1,6 @@
 #set($tocreate = "$!{request.getParameter('tocreate')}")
 #set($title = "$!{request.getParameter('title')}")
+#set($etitle = $util.encodeURI($title))
 #set($template = "$!{request.getParameter('template')}")
 #set($parent = "$!{request.getParameter('parent')}")
 #set($auxparams = "$!{request.getParameter('auxparams')}")
@@ -22,7 +23,6 @@
 ##
 #elseif($tocreate=="page")
   #set($docname=$title.replaceAll("/", "."))
-  #set($etitle = $util.encodeURI($title))
   #set($etemplate = $util.encodeURI("${template}"))
   #set($eparent = $util.encodeURI("${parent}${auxparams}"))
   #set($redirectaction = "edit")
@@ -30,19 +30,18 @@
 ##
 ## Create space
 ##
-#elseif($tocreate=="space")
+#elseif($tocreate=='space')
   #set($title=$title.replaceAll(" \\.\\/", ""))
   #set($docname="${title}.WebHome")
   #set($eparent = $util.encodeURI("${parent}${auxparams}"))
   ## TODO : Use a WebHome template ?
   #set($redirectaction = "edit")
-  #set($redirectparams = "parent=${eparent}&title=$title")
+  #set($redirectparams = "parent=${eparent}&title=${etitle}")
 ##
 ## Create blog post
 ##
 #elseif($tocreate=="post")
   #set($docname="Blog.${title.replaceAll(' ', '')}")
-  #set($etitle = $util.encodeURI($title))
   #set($redirectaction = "inline")
   #set($redirectparams = "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle")
 #end

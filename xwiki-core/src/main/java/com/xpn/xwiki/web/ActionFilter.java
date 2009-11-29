@@ -33,8 +33,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -148,12 +146,8 @@ public class ActionFilter implements Filter
         // by the container, thus it will not work when XWiki uses a non-UTF-8 encoding.
         // First step, remove the context path, if any.
         String path = request.getRequestURI();
-        try {
-            path = URIUtil.decode(path);
-        } catch (URIException e) {
-            LOG.warn("Invalid URI: " + path);
-        }
-        String document = StringUtils.substringAfter(path, request.getContextPath());
+
+        String document = StringUtils.substringAfter(path.replaceAll("%2D", "-"), request.getContextPath());
 
         // Second step, remove the servlet path, if any.
         document = StringUtils.substringAfter(document, request.getServletPath());

@@ -21,7 +21,7 @@
 	<validationScript></validationScript>
 	<comment>Updated class property</comment>
 	<minorEdit>true</minorEdit>
-	<syntaxId>xwiki/1.0</syntaxId>
+	<syntaxId>xwiki/2.0</syntaxId>
 	<hidden>false</hidden>
 	<class>
 		<name>XWiki.XWikiUsers</name>
@@ -361,25 +361,5 @@
 			<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 		</validkey>
 	</class>
-	<content>1 $msg.get("xe.admin.users")
-
-		* &lt;a
-		href="$xwiki.getURL("XWiki.Register","register")"&gt;$msg.get("xe.admin.users.registernew")&lt;/a&gt;
-
-		1 $msg.get("xe.admin.users.existing")
-
-		#set ($sql = ", BaseObject as obj
-		where obj.name=doc.fullName and
-		obj.className='XWiki.XWikiUsers'")
-		#foreach ($item in $xwiki.searchDocuments($sql))
-		* [$item]
-		#end
-
-		1
-		$msg.get("xe.admin.users.administration")
-
-		* [XWikiUserTemplate]
-		*
-		[XWikiUserSheet]
-</content>
+	<content>{{include document="XWiki.ClassSheet" /}}</content>
 </xwikidoc>

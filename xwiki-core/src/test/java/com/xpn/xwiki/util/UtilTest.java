@@ -33,7 +33,7 @@ public class UtilTest extends TestCase
     {
         assertEquals("Search", Util.convertToAlphaNumeric("Search"));
         assertEquals("Search", Util.convertToAlphaNumeric("S.earch"));
-        assertEquals("e", Util.convertToAlphaNumeric("e$%£#^()"));
+        assertEquals("e", Util.convertToAlphaNumeric("e$%\u00a3#^()"));
         assertEquals("e", Util.convertToAlphaNumeric(":\u0205!"));
     }
 

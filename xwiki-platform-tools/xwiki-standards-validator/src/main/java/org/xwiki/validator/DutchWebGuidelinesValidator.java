@@ -144,12 +144,23 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             boolean validForm = false;
             
             if (hasChildElement(formElement, "submit")) {
+                // Form contains a <submit> element.
                 validForm = true;
             }
             
             for (Node input : getChildren(formElement, ELEM_INPUT)) {
-                if (hasAttribute(input, ATTR_TYPE) && getAttributeValue(input, ATTR_TYPE).equals(SUBMIT)) {
-                    validForm = true;
+                if (hasAttribute(input, ATTR_TYPE)) {
+                    if (getAttributeValue(input, ATTR_TYPE).equals(SUBMIT)) {
+                        // Form contains an <input type="submit" /> element.
+                        validForm = true;
+                    } else if (getAttributeValue(input, ATTR_TYPE).equals("image")) {
+                        if (hasAttribute(input, ATTR_ALT) 
+                            && !StringUtils.isEmpty(getAttributeValue(input, ATTR_ALT))) {
+                            // Form contains an <input type="image" alt="action" /> element.
+                            // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
+                            validForm = true;
+                        }
+                    }
                 }
             }
             

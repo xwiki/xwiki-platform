@@ -97,6 +97,11 @@ public abstract class AbstractDOMValidator implements Validator
     protected static final String ATTR_TYPE = "type";
     
     /**
+     * Type attribute.
+     */
+    protected static final String ATTR_ALT = "alt";
+    
+    /**
      * Href attribute.
      */
     protected static final String ATTR_HREF = "href";

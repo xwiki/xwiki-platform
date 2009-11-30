@@ -108,6 +108,20 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertTrue(getErrors(validator), isValid(validator));
     }
     
+    public void testRpd1s3FormInvalidImageInput() throws Exception
+    {
+        setValidatorDocument("<form><fieldset><input type='image' alt='' /></fieldset></form>");
+        validator.validateRpd1s3();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd1s3FormValidImageInput() throws Exception
+    {
+        setValidatorDocument("<form><fieldset><input type='image' alt='submit' /></fieldset></form>");
+        validator.validateRpd1s3();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
     public void testRpd1s3FormNoSubmit() throws Exception
     {
         setValidatorDocument("<form></form>");

@@ -21,13 +21,13 @@ package org.xwiki.officeimporter.internal;
 
 import groovy.lang.GroovyClassLoader;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameFactory;
@@ -236,18 +236,12 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * @throws OfficeImporterException if an error occurs while reading the stream.
      */
     private byte[] readStream(InputStream is) throws OfficeImporterException
-    {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buff = new byte[1024];
-        int count = 0;
+    {        
         try {
-            while (-1 != (count = is.read(buff))) {
-                bos.write(buff, 0, count);
-            }
+            return IOUtils.toByteArray(is);
         } catch (IOException ex) {
-            throw new OfficeImporterException("Erro while reading office document input stream.", ex);
+            throw new OfficeImporterException("Error while reading office document input stream.", ex);
         }
-        return bos.toByteArray();
     }
 
     /**

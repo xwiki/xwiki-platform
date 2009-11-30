@@ -21,6 +21,10 @@ xwiki.rendering.syntaxes = xwiki/1.0, xwiki/2.0
 #-# names.
 # xwiki.users.initialGroups=XWiki.XWikiAllGroup
 
+#-# Should all users be considered members of XWiki.XWikiAllGroup, even if they don't have an associated object in the
+#-# group's document?
+# xwiki.authentication.group.allgroupimplicit=0
+
 #-# Uncomment if you want to ignore requests for unmapped actions, and simply display the document
 # xwiki.unknownActionResponse=view
 

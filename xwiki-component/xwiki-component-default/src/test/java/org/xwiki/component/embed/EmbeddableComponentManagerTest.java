@@ -21,12 +21,14 @@
 package org.xwiki.component.embed;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
 /**
  * Unit tests for {@link EmbeddableComponentManager}.
@@ -133,16 +135,49 @@ public class EmbeddableComponentManagerTest
     @Test
     public void testLookupWhenComponentInParent() throws Exception
     {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.setParent(createParentComponentManager());
+
+        Role instance = ecm.lookup(Role.class);
+        Assert.assertNotNull(instance);
+    }
+    
+    @Test
+    public void testLookupListAndMapWhenSomeComponentsInParent() throws Exception
+    {
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.setParent(createParentComponentManager());
+        
+        // Register a component with the same Role and Hint as in the parent
+        DefaultComponentDescriptor<Role> cd1 = new DefaultComponentDescriptor<Role>();
+        cd1.setRole(Role.class);
+        cd1.setImplementation(RoleImpl.class);
+        Role roleImpl = new RoleImpl();
+        ecm.registerComponent(cd1, roleImpl);
+
+        // Register a component with the same Role as in the parent but with a different hint 
+        DefaultComponentDescriptor<Role> cd2 = new DefaultComponentDescriptor<Role>();
+        cd2.setRole(Role.class);
+        cd2.setRoleHint("hint");
+        cd2.setImplementation(RoleImpl.class);
+        ecm.registerComponent(cd2);
+
+        // Verify that the components are found
+        Assert.assertEquals(3, ecm.lookupList(Role.class).size());
+        // Note: We find only 2 components since 2 components are registered with the same Role and Hint.
+        // In this case we ensure that the component returned is the one from the client CM
+        Map<String, Role> instances = ecm.lookupMap(Role.class);
+        Assert.assertEquals(2, instances.size());
+        Assert.assertSame(roleImpl, instances.get("default"));
+    }
+
+    private ComponentManager createParentComponentManager() throws Exception
+    {
         EmbeddableComponentManager parent = new EmbeddableComponentManager();
         DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
         cd.setRole(Role.class);
         cd.setImplementation(RoleImpl.class);
         parent.registerComponent(cd);
-        
-        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
-        ecm.setParent(parent);
-
-        Role instance = ecm.lookup(Role.class);
-        Assert.assertNotNull(instance);
+        return parent;
     }
 }

@@ -116,9 +116,24 @@ public class EmbeddableComponentManager implements ComponentManager
      * 
      * @see ComponentManager#lookupList(Class)
      */
+    @SuppressWarnings("unchecked")
     public <T> List<T> lookupList(Class<T> role) throws ComponentLookupException
     {
-        return initializeList(role);
+        List<T> objects = new ArrayList<T>();
+        synchronized (this) {
+            for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
+                // It's possible Class reference are not the same when it's coming form different ClassLoader so we
+                // compare class names
+                if (roleHint.getRole().getName().equals(role.getName())) {
+                    objects.add(initialize((RoleHint<T>) roleHint));
+                }
+            }
+            // Add parent's list of components
+            if (getParent() != null) {
+                objects.addAll(getParent().lookupList(role));
+            }
+        }
+        return objects;
     }
 
     /**
@@ -126,9 +141,29 @@ public class EmbeddableComponentManager implements ComponentManager
      * 
      * @see ComponentManager#lookupMap(Class)
      */
+    @SuppressWarnings("unchecked")
     public <T> Map<String, T> lookupMap(Class<T> role) throws ComponentLookupException
     {
-        return initializeMap(role);
+        Map<String, T> objects = new HashMap<String, T>();
+        synchronized (this) {
+            for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
+                // It's possible Class reference are not the same when it coming for different ClassLoader so we
+                // compare class names
+                if (roleHint.getRole().getName().equals(role.getName())) {
+                    objects.put(roleHint.getHint(), initialize((RoleHint<T>) roleHint));
+                }
+            }
+            // Add parent's list of components
+            if (getParent() != null) {
+                // If the hint already exists in the children Component Manager then don't add the one from the parent.
+                for (Map.Entry<String, T> entry : getParent().lookupMap(role).entrySet()) {
+                    if (!objects.containsKey(entry.getKey())) {
+                        objects.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        }
+        return objects;
     }
 
     /**
@@ -291,38 +326,6 @@ public class EmbeddableComponentManager implements ComponentManager
     public void setParent(ComponentManager parentComponentManager)
     {
         this.parent = parentComponentManager;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> List<T> initializeList(Class<T> role) throws ComponentLookupException
-    {
-        List<T> objects = new ArrayList<T>();
-        synchronized (this) {
-            for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
-                // It's possible Class reference are not the same when it's coming form different ClassLoader so we
-                // compare class names
-                if (roleHint.getRole().getName().equals(role.getName())) {
-                    objects.add(initialize((RoleHint<T>) roleHint));
-                }
-            }
-        }
-        return objects;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> Map<String, T> initializeMap(Class< ? > role) throws ComponentLookupException
-    {
-        Map<String, T> objects = new HashMap<String, T>();
-        synchronized (this) {
-            for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
-                // It's possible Class reference are not the same when it coming for different ClassLoader so we
-                // compare class names
-                if (roleHint.getRole().getName().equals(role.getName())) {
-                    objects.put(roleHint.getHint(), initialize((RoleHint<T>) roleHint));
-                }
-            }
-        }
-        return objects;
     }
 
     @SuppressWarnings("unchecked")

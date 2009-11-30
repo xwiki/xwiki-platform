@@ -189,7 +189,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     /**
-     * Check whether the configuration specifies that every user is implicitely in XWikiAllGroup. Configured by the
+     * Check whether the configuration specifies that every user is implicitly in XWikiAllGroup. Configured by the
      * {@code xwiki.authentication.group.allgroupimplicit} parameter in {@code xwiki.cfg}.
      * 
      * @param context the current XWiki context

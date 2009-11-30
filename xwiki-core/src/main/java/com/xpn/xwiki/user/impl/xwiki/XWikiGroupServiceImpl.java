@@ -189,6 +189,21 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     }
 
     /**
+     * Check whether the configuration specifies that every user is implicitely in XWikiAllGroup. Configured by the
+     * {@code xwiki.authentication.group.allgroupimplicit} parameter in {@code xwiki.cfg}.
+     * 
+     * @param context the current XWiki context
+     * @return {@code true} if the group is implicit and all users should be by default in it, {@code false} if the
+     *         group behaves as all other groups, containing only the users/subgroups that are explicitly listed inside
+     *         the document.
+     */
+    protected boolean isAllGroupImplicit(XWikiContext context)
+    {
+        long implicit = context.getWiki().ParamAsLong("xwiki.authentication.group.allgroupimplicit", 0);
+        return (implicit == 1);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.user.api.XWikiGroupService#listGroupsForUser(java.lang.String, com.xpn.xwiki.XWikiContext)
@@ -218,6 +233,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                     } catch (QueryException ex) {
                         throw new XWikiException(0, 0, ex.getMessage(), ex);
                     }
+
+                    // If the 'XWiki.XWikiAllGroup' is implicit, all users/groups except XWikiGuest and XWikiAllGroup
+                    // itself are part of it.
+                    if (!list.contains("XWiki.XWikiAllGroup") && isAllGroupImplicit(context)
+                        && !username.endsWith("XWiki.XWikiAllGroup") && !username.endsWith("XWiki.XWikiGuest")) {
+                        list.add("XWiki.XWikiAllGroup");
+                    }
+
                     this.groupCache.set(key, list);
                 }
             }

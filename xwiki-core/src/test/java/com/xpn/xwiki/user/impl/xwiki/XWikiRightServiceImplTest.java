@@ -36,7 +36,7 @@ import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl}.
+ * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl}.
  * 
  * @version $Id$
  */

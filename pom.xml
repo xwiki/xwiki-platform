@@ -131,7 +131,6 @@
     <module>xwiki-url</module>
     <module>xwiki-context</module>
     <module>xwiki-containers</module>
-    <module>xwiki-plexus</module>
     <module>xwiki-action</module>
     <module>xwiki-velocity</module>
     <module>xwiki-observation</module>

@@ -27,7 +27,7 @@ import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.internal.ReflectionUtils;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;

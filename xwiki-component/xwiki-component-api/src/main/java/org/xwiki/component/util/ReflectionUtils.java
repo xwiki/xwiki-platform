@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.internal;
+package org.xwiki.component.util;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -28,7 +28,7 @@ import java.util.Map;
  * Various Reflection utilities.
  *  
  * @version $Id$
- * @since 2.0M1
+ * @since 2.1RC1
  */
 public class ReflectionUtils
 {

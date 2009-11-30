@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
-import org.xwiki.component.internal.ReflectionUtils;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;

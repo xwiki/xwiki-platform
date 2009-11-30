@@ -115,15 +115,34 @@ public class EmbeddableComponentManagerTest
         d1.setImplementation(RoleImpl.class);
         ecm.registerComponent(d1);
 
+        // Verify that the component is properly registered
         Assert.assertSame(RoleImpl.class, ecm.lookup(Role.class).getClass());
 
         ecm.unregisterComponent(d1.getRole(), d1.getRoleHint());
 
+        // Verify that the component is not registered anymore
         try {
             ecm.lookup(d1.getRole());
             Assert.fail("Should have thrown a ComponentLookupException");
-        } catch (ComponentLookupException e) {
-            // expected
+        } catch (ComponentLookupException expected) {
+            // The exception message doesn't matter. All we need to know is that the component descriptor 
+            // doesn't exist anymore.
         }
+    }
+    
+    @Test
+    public void testLookupWhenComponentInParent() throws Exception
+    {
+        EmbeddableComponentManager parent = new EmbeddableComponentManager();
+        DefaultComponentDescriptor<Role> cd = new DefaultComponentDescriptor<Role>();
+        cd.setRole(Role.class);
+        cd.setImplementation(RoleImpl.class);
+        parent.registerComponent(cd);
+        
+        EmbeddableComponentManager ecm = new EmbeddableComponentManager();
+        ecm.setParent(parent);
+
+        Role instance = ecm.lookup(Role.class);
+        Assert.assertNotNull(instance);
     }
 }

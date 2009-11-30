@@ -23,9 +23,9 @@ import java.util.Collections;
 
 import org.jmock.Mock;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.rendering.internal.transformation.TestSimpleMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroLookupException;

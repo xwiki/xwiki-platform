@@ -16,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package org.xwiki.component.manager;
 
@@ -91,7 +90,7 @@ public interface ComponentManager
     <T> List<T> lookupList(Class<T> role) throws ComponentLookupException;
 
     /**
-     * Add a component in the component repository programmaticaly.
+     * Add a component in the component repository dynamically.
      * <p>
      * If a component with the same role and role hint already exists it will be replaced by this provided one when
      * lookup.
@@ -104,7 +103,7 @@ public interface ComponentManager
     <T> void registerComponent(ComponentDescriptor<T> componentDescriptor) throws ComponentRepositoryException;
 
     /**
-     * Add a component in the component repository programmaticaly. This method also makes possible to set the instance
+     * Add a component in the component repository dynamically. This method also makes possible to set the instance
      * returned by the {@link ComponentManager} instead of letting it created it from descriptor.
      * <p>
      * If a component with the same role and role hint already exists it will be replaced by this provided one when
@@ -120,7 +119,7 @@ public interface ComponentManager
         throws ComponentRepositoryException;
 
     /**
-     * Remove a component from the component repository programmaticaly.
+     * Remove a component from the component repository dynamically.
      * 
      * @param role the role identifying the component
      * @param roleHint the hint identifying the component
@@ -145,7 +144,25 @@ public interface ComponentManager
     <T> List<ComponentDescriptor<T>> getComponentDescriptorList(Class<T> role);
 
     /**
-     * @param eventManager the manager to use to send events when a component is instantiated.
+     * @return the manager to use to send events when a component descriptor is registered
+     * @since 2.1RC1
+     */
+    ComponentEventManager getComponentEventManager();
+    
+    /**
+     * @param eventManager the manager to use to send events when a component descriptor is registered
      */
     void setComponentEventManager(ComponentEventManager eventManager);
+
+    /**
+     * @return the parent Component Manager of this Component Manager. When doing lookups if the
+     *        component cannot be found in the current Component Manager it'll also be looked for in the parent 
+     *        Component Manager
+     */
+    ComponentManager getParent();
+    
+    /**
+     * @param parentComponentManager see {@link #getParent()} 
+     */
+    void setParent(ComponentManager parentComponentManager);
 }

@@ -29,49 +29,37 @@
     <artifactId>xwiki-core-component</artifactId>
     <version>2.1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-core-component-api</artifactId>
-  <name>XWiki Platform - Core - Component - API</name>
+  <artifactId>xwiki-core-component-multi</artifactId>
+  <name>XWiki Platform - Core - Component - Multi Component Manager Implementation</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Core - Component - API</description>
+  <description>XWiki Platform - Core - Component - Multi Component Manager Implementation</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component-default</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-bridge</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-shared-tests</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <configuration>
-          <includes>
-            **/annotation/*.java
-          </includes>
-        </configuration>
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <!-- We run Clirr in a profile since Cobertura interferes with Clirr and thus we run
-           Cobertura instrumentation in a special profile (when the Cobertura profile is
-           executed, the Clirr one isn't). -->
-      <id>clirr</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <exclude>**/internal/**</exclude>
-                <!-- The excludes below need to be removed when 2.1RC1 is released -->
-                <exclude>org/xwiki/component/manager/ComponentManager</exclude>
-              </excludes>
-            </configuration>            
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
        

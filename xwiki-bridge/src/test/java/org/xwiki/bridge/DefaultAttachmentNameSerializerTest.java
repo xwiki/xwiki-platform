@@ -26,7 +26,7 @@ import org.jmock.Mockery;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.internal.DefaultAttachmentNameSerializer;
-import org.xwiki.component.internal.ReflectionUtils;
+import org.xwiki.component.util.ReflectionUtils;
 
 /**
  * Unit tests for {@link DefaultAttachmentNameSerializer}.

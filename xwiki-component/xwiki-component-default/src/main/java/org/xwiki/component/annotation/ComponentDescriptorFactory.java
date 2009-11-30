@@ -31,7 +31,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.descriptor.DefaultComponentDependency;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.internal.ReflectionUtils;
+import org.xwiki.component.util.ReflectionUtils;
 
 /**
  * Constructs a Component Descriptor out of a class definition that contains Annotations.

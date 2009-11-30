@@ -180,10 +180,40 @@ public class DefaultComponentManager implements ComponentManager, Composable
     /**
      * {@inheritDoc}
      * 
+     * @see ComponentManager#getComponentEventManager()
+     */
+    public ComponentEventManager getComponentEventManager()
+    {
+        return this.componentManager.getComponentEventManager();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see ComponentManager#setComponentEventManager(ComponentEventManager)
      */
     public void setComponentEventManager(ComponentEventManager eventManager)
     {
         this.componentManager.setComponentEventManager(eventManager);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ComponentManager#getParent()
+     */
+    public ComponentManager getParent()
+    {
+        return this.componentManager.getParent();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ComponentManager#setParent(ComponentManager)
+     */
+    public void setParent(ComponentManager parentComponentManager)
+    {
+        this.componentManager.setParent(parentComponentManager);
     }
 }

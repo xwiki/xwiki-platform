@@ -29,7 +29,6 @@ import org.xwiki.component.descriptor.ComponentDependency;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.internal.Composable;
-import org.xwiki.component.internal.ReflectionUtils;
 import org.xwiki.component.internal.RoleHint;
 import org.xwiki.component.logging.CommonsLoggingLogger;
 import org.xwiki.component.manager.ComponentEventManager;
@@ -39,6 +38,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentRepositoryException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.LogEnabled;
+import org.xwiki.component.util.ReflectionUtils;
 
 /**
  * Simple implementation of {@link ComponentManager} to be used when using some XWiki modules standalone.
@@ -49,6 +49,8 @@ import org.xwiki.component.phase.LogEnabled;
 public class EmbeddableComponentManager implements ComponentManager
 {
     private ComponentEventManager eventManager;
+    
+    private ComponentManager parent;
 
     private Map<RoleHint< ? >, ComponentDescriptor< ? >> descriptors =
         new HashMap<RoleHint< ? >, ComponentDescriptor< ? >>();
@@ -254,11 +256,41 @@ public class EmbeddableComponentManager implements ComponentManager
     /**
      * {@inheritDoc}
      * 
+     * @see ComponentManager#getComponentEventManager()
+     */
+    public ComponentEventManager getComponentEventManager()
+    {
+        return this.eventManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see ComponentManager#setComponentEventManager(ComponentEventManager)
      */
     public void setComponentEventManager(ComponentEventManager eventManager)
     {
         this.eventManager = eventManager;
+    }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ComponentManager#getParent()
+     */
+    public ComponentManager getParent()
+    {
+        return this.parent;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ComponentManager#setParent(ComponentManager)
+     */
+    public void setParent(ComponentManager parentComponentManager)
+    {
+        this.parent = parentComponentManager;
     }
 
     @SuppressWarnings("unchecked")
@@ -267,7 +299,7 @@ public class EmbeddableComponentManager implements ComponentManager
         List<T> objects = new ArrayList<T>();
         synchronized (this) {
             for (RoleHint< ? > roleHint : this.descriptors.keySet()) {
-                // It's possible Class reference are not the same when it coming for different ClassLoader so we
+                // It's possible Class reference are not the same when it's coming form different ClassLoader so we
                 // compare class names
                 if (roleHint.getRole().getName().equals(role.getName())) {
                     objects.add(initialize((RoleHint<T>) roleHint));
@@ -298,34 +330,35 @@ public class EmbeddableComponentManager implements ComponentManager
     {
         T instance;
         synchronized (this) {
+            // If the instance exists return it
             instance = (T) this.components.get(roleHint);
             if (instance == null) {
-                try {
-                    instance = createInstance(roleHint);
-                    if (instance == null) {
-                        throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]");
-                    } else if (this.descriptors.get(roleHint).getInstantiationStrategy() == ComponentInstantiationStrategy.SINGLETON) {
-                        this.components.put(roleHint, instance);
+                // If there's a component descriptor, create the instance
+                ComponentDescriptor<T> descriptor = (ComponentDescriptor<T>) this.descriptors.get(roleHint);
+                if (descriptor != null) {
+                    try {
+                        instance = createInstance(descriptor);
+                        if (instance == null) {
+                            throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]");
+                        } else if (this.descriptors.get(roleHint).getInstantiationStrategy() == ComponentInstantiationStrategy.SINGLETON) {
+                            this.components.put(roleHint, instance);
+                        }
+                    } catch (Exception e) {
+                        throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
                     }
-                } catch (Exception e) {
-                    throw new ComponentLookupException("Failed to lookup component [" + roleHint + "]", e);
+                } else {
+                    // Look for the component in the parent Component Manager (if there's a parent)
+                    ComponentManager parent = getParent();
+                    if (parent != null) {
+                        instance = getParent().lookup(roleHint.getRole(), roleHint.getHint());
+                    } else {
+                        throw new ComponentLookupException("Can't find descriptor for the component [" + roleHint + "]");
+                    }
                 }
             }
         }
 
         return instance;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> T createInstance(RoleHint<T> roleHint) throws Exception
-    {
-        ComponentDescriptor<T> descriptor = (ComponentDescriptor<T>) this.descriptors.get(roleHint);
-
-        if (descriptor == null) {
-            throw new ComponentLookupException("Can't find descriptor for the component [" + roleHint + "]");
-        }
-
-        return createInstance(descriptor);
     }
 
     private <T> T createInstance(ComponentDescriptor<T> descriptor) throws Exception

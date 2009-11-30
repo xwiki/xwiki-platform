@@ -24,7 +24,7 @@ import org.jmock.MockObjectTestCase;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
-import org.xwiki.component.internal.ReflectionUtils;
+import org.xwiki.component.util.ReflectionUtils;
 
 /**
  * Unit tests for {@link XWikiWikiModel}.

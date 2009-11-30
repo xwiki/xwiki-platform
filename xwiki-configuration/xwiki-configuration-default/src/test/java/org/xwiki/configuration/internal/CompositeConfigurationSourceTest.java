@@ -30,7 +30,7 @@ import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.internal.ReflectionUtils;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.test.AbstractComponentTestCase;
 

@@ -19,7 +19,6 @@
  */
 package org.xwiki.officeimporter.internal.openoffice;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,6 +31,7 @@ import net.sf.jodconverter.DefaultDocumentFormatRegistry;
 import net.sf.jodconverter.DocumentFormat;
 import net.sf.jodconverter.DocumentFormatRegistry;
 
+import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
@@ -112,33 +112,35 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
         if (ooManager.getState() != OpenOfficeManager.ManagerState.CONNECTED) {
             throw new OfficeImporterException(ERROR_SERVER_NOT_FOUND);
         }
-        // Prepare the result.
+        
         Map<String, InputStream> result = new HashMap<String, InputStream>();
+        
         // Copy bytes from the input stream into temporary input file.
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = new FileOutputStream(storage.getInputFile());
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                fos.write(buf, 0, len);
-            }
-            fos.close();
+            fos = new FileOutputStream(storage.getInputFile());
+            IOUtils.copy(in, fos);
         } catch (IOException ex) {
             throw new OfficeImporterException(ERROR_WRITING_TEMP_FILES, ex);
+        } finally {
+            IOUtils.closeQuietly(fos);
         }
+        
         // Make the conversion.
         ooManager.getDocumentConverter().convert(storage.getInputFile(), storage.getOutputFile(), htmlFormat);
+        
         // Collect the resulting artifact streams
         File[] artifacts = storage.getOutputDir().listFiles();
         for (File artifact : artifacts) {
+            FileInputStream fis = null;
             try {
-                FileInputStream fis = new FileInputStream(artifact);
+                fis = new FileInputStream(artifact);
                 result.put(artifact.getName(), fis);
             } catch (IOException ex) {
                 getLogger().error(String.format(ERROR_READING_ARTIFACT, artifact.getName()), ex);
-                // Skip the artifact.
             }
         }
+        
         return result;
     }
 
@@ -152,7 +154,6 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
             throw new OfficeImporterException(ERROR_SERVER_NOT_FOUND);
         }
 
-        // Prepare the result.
         Map<String, byte[]> result = new HashMap<String, byte[]>();
 
         // Create temporary storage.
@@ -160,13 +161,15 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
         OfficeImporterFileStorage storage = new OfficeImporterFileStorage(tempDir, docBridge.getCurrentUser());
 
         // Create the temporary input file.
+        FileOutputStream fos = null;
         try {
-            FileOutputStream fos = new FileOutputStream(storage.getInputFile());
-            fos.write(officeFileData);
-            fos.close();
+            fos = new FileOutputStream(storage.getInputFile());
+            fos.write(officeFileData);            
         } catch (IOException ex) {
             storage.cleanUp();
             throw new OfficeImporterException(ERROR_WRITING_TEMP_FILES, ex);
+        } finally {
+            IOUtils.closeQuietly(fos);
         }
 
         // Make the conversion. Ideally jodconverter should have a checked exception it it's convert() method because
@@ -180,21 +183,16 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
 
         // Collect the resulting artifacts
         File[] artifacts = storage.getOutputDir().listFiles();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         for (File artifact : artifacts) {
-            byte[] buf = new byte[1024];
-            int len = 0;
+            FileInputStream fis = null;                       
             try {
-                FileInputStream fis = new FileInputStream(artifact);
-                while ((len = fis.read(buf)) > 0) {
-                    bos.write(buf, 0, len);
-                }
-                result.put(artifact.getName(), bos.toByteArray());
-                bos.reset();
+                fis = new FileInputStream(artifact);                
+                result.put(artifact.getName(), IOUtils.toByteArray(fis));                
             } catch (IOException ex) {
                 getLogger().error(String.format(ERROR_READING_ARTIFACT, artifact.getName()), ex);
-                // Skip the artifact.
-            }
+            } finally {                
+                IOUtils.closeQuietly(fis);
+            }            
         }
 
         // Cleanup the storage.

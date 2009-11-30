@@ -26,11 +26,13 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentName;
 import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
@@ -45,14 +47,14 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
  * @since 2.1M1
  */
 @Component
-public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBuilder
+public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implements XHTMLOfficeDocumentBuilder
 {
     /**
      * Used to serialize the reference document name.
      */
     @Requirement
     private DocumentNameSerializer nameSerializer;
-    
+
     /**
      * Document converter used to invoke openoffice server and convert office documents.
      */
@@ -80,19 +82,23 @@ public class DefaultXHTMLOfficeDocumentBuilder implements XHTMLOfficeDocumentBui
 
         // Invoke openoffice document converter.
         Map<String, byte[]> artifacts = documentConverter.convert(officeFileData);
-        
+
         // Parse and clean the html output.
         InputStream htmlStream = new ByteArrayInputStream(artifacts.remove("output.html"));
-        InputStreamReader reader = null;
+        InputStreamReader htmlReader = null;
+        Document xhtmlDoc = null;
         try {
-            reader = new InputStreamReader(htmlStream, "UTF-8");
+            htmlReader = new InputStreamReader(htmlStream, "UTF-8");
+            HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
+            configuration.setParameters(params);
+            xhtmlDoc = this.ooHtmlCleaner.clean(htmlReader, configuration);
         } catch (UnsupportedEncodingException ex) {
             throw new OfficeImporterException("Error: Could not encode html office content.", ex);
+        } finally {
+            IOUtils.closeQuietly(htmlReader);
+            IOUtils.closeQuietly(htmlStream);
         }
-        HTMLCleanerConfiguration configuration = this.ooHtmlCleaner.getDefaultConfiguration();
-        configuration.setParameters(params);
-        Document xhtmlDoc = this.ooHtmlCleaner.clean(reader, configuration);
-        
+
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);
     }

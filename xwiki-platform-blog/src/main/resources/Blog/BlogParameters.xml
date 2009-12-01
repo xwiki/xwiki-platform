@@ -21,9 +21,11 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>## Blog
+<content>{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+## Blog
 #set($blogClassname = 'Blog.BlogClass')
 #set($blogTemplate = 'Blog.BlogTemplate')
 #set($blogSheet = 'Blog.BlogSheet')
@@ -57,5 +59,7 @@
  *#
 #macro(toolImage $attachmentName $alt)
   &lt;img class="icon-manage" src="$blogStyleDocument.getAttachmentURL($attachmentName)" alt="${alt}"/&gt;
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

@@ -21,9 +21,11 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 #if($hasAdmin)
 ##
 ##
@@ -31,21 +33,23 @@
 ## TODO: Display the number of articles in each blog
 ## TODO: Provide some management links: delete, edit title, configure...
 ##
-1 $msg.get('xe.blog.manage.existing')
+= $msg.get('xe.blog.manage.existing') =
 
 #foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
-  #getBlogTitle($item $title)
+  #set($title = $xwiki.blog.getBlogTitle($item, $blogClassname))
   #if($title != '')
-    * [$title&gt;$item.fullName]
+    * [[$title&gt;&gt;$item.fullName]]
   #else
-    * [$item.displayTitle&gt;$item.fullName]
+    * [[$item.displayTitle&gt;&gt;$item.fullName]]
+&lt;p/&gt;
   #end
 #end
 ##
 ##
 ## New blog
 ##
-1 $msg.get('xe.blog.manage.createnew')
+
+= $msg.get('xe.blog.manage.createnew') =
 
 #set($title = "$!request.blogTitle")
 #if($title != '')
@@ -85,4 +89,7 @@
   #xwikimessageboxstart($msg.get('error') $msg.get('notallowed'))
   #xwikimessageboxend()
 #end
-</content></xwikidoc>
+
+{{/html}}
+{{/velocity}}</content>
+</xwikidoc>

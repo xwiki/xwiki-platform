@@ -27,7 +27,7 @@
 
 1 $msg.get('xe.blog.unpublished.entries')
 
-#getBlogEntriesBaseQuery($query)
-#getUnpublishedBlogEntries($xwiki.getDocument('Blog.WebHome') $query $entries)
+#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+#set($entries = $xwiki.blog.getUnpublishedBlogEntryNames($xwiki.getDocument('Blog.WebHome'), $query).entries)
 #displayBlog($entries 'unpublished' true)
 </content></xwikidoc>

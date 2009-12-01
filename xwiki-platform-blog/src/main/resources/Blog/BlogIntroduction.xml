@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -159,21 +159,21 @@
 <property>
 <content>This is your wiki's blog first post. Its goal is to provide a short description of your blog's main features.
 
-* You can *create new blog posts* through the input field located on [your Blog's homepage&gt;Blog.WebHome]. The status of a blog post may be any one of the following:
-** ~~Unpublished~~: your post is still a draft. It can be seen by its creator &amp;amp; by administrators. Once you have clicked publish, you cannot unpublish a post. However, you can choose to hide it.
-** ~~Published~~: your post can be read by every user that has access to your blog.
-** ~~Published &amp;amp; hidden~~: your post is published but only its creator &amp;amp; admins can see it. This is useful if you need to make modifications on a post that has already been published by mistake.
+* You can **create new blog posts** through the input field located on [[your Blog's homepage&gt;&gt;Blog.WebHome]]. The status of a blog post may be any one of the following:
+** //Unpublished//: your post is still a draft. It can be seen by its creator and by administrators. Once you have clicked publish, you cannot unpublish a post. However, you can choose to hide it.
+** //Published//: your post can be read by every user that has access to your blog.
+** //Published &amp;amp; hidden//: your post is published but only its creator and admins can see it. This is useful if you need to make modifications on a post that has already been published by mistake.
 
-* Every blog article can be *tagged* and/or *categorized*:
+* Every blog article can be **tagged** and/or **categorized**:
 ** You will be able to browse posts by category using the panel located on the left of the page
-** You can create new categories &amp;amp; subcategories when creating a new post
+** You can create new categories and subcategories when creating a new post
 ** The use of tags allows your article to be found by browsing your wiki's tags, along with any other wiki document
 
-* *Blog-specific panels* are available on the left of your blog page:
-** The ~~recent posts~~ lists the most recent entries to any visitor of the blog
-** The ~~unpublished panel~~ lists the blog posts you created, but didn't yet publish
-** The ~~categories panel~~ lets you browse blog posts listed by category &amp;amp; subcategory
-** The ~~archive panel~~ lets you browse blog posts by publication date
+* **Blog-specific panels** are available on the left of your blog page:
+** The //recent posts// lists the most recent entries to any visitor of the blog
+** The //unpublished panel// lists the blog posts you created, but didn't yet publish
+** The //categories panel// lets you browse blog posts listed by category and subcategory
+** The //archive panel// lets you browse blog posts by publication date
 
 Happy blogging!
 </content>
@@ -194,5 +194,5 @@ Happy blogging!
 <title>First blog post</title>
 </property>
 </object>
-<content>#includeForm('Blog.BlogPostSheet')</content>
+<content>{{include document='Blog.BlogPostSheet'/}}</content>
 </xwikidoc>

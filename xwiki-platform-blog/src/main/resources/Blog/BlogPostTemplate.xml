@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <object>
 <class>
@@ -150,6 +150,7 @@
 <name>Blog.BlogPostTemplate</name>
 <number>0</number>
 <className>Blog.BlogPostClass</className>
+<guid>150b08a7-8d34-4d98-ac35-f4d2c10b4afe</guid>
 <property>
 <category/>
 </property>
@@ -172,5 +173,5 @@
 <title>Enter your title here</title>
 </property>
 </object>
-<content>#includeForm('Blog.BlogPostSheet')</content>
+<content>{{include document="Blog.BlogPostSheet"/}}</content>
 </xwikidoc>

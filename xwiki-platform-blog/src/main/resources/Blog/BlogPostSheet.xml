@@ -21,19 +21,21 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
-#includeMacros("Blog.CategoriesCode")
+<content>{{include document="Blog.BlogCode2"/}}
+{{include document="Blog.CategoriesCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 $xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
 $xwiki.ssx.use('Blog.ManageCategories')##
-#getEntryObject($doc $entryObj)
+#set($entryObj = $xwiki.blog.getEntryObject($doc, $blogPostClassname))
 #if("$!entryObj" == '')
   #warning($msg.get("xe.blog.sheet.notpost"))
 #elseif($context.action != 'inline')
   ## View mode
-  #isPublished($entryObj $isPublished)
-  #isHidden($entryObj $isHidden)
+  #set($isPublished = $xwiki.blog.isPublished($entryObj))
+  #set($isHidden = $xwiki.blog.isHidden($entryObj))
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
   #displayBlog([$doc.fullName] 'single' false)
 #else
@@ -51,7 +53,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   &lt;/dd&gt;
   &lt;/dl&gt;
   #template('tagedit.vm')
-  #isPublished($entryObj $isPublished)
+  #set($isPublished = $xwiki.blog.isPublished($entryObj))
   #if($isPublished)
     #if($doc.creator == $context.user)
       #set(${publicationDate} = ${doc.display('publishDate', 'view', $entryObj)})
@@ -71,13 +73,15 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   #if($newtitle)
     #set($newtitle = $newtitle.replaceAll('"',"'"))
     &lt;script type="text/javascript"&gt;
-    {pre}
+    {{{
     ## TODO: Set the correct date. This does not work since the current form buttons break onsumbit events.
     ## Event.observe(document.getElementById('${formname}'), 'submit', function(evt) {alert(this); alert(evt); return false;}, true);
     var title = "${newtitle}";
     document.forms.inline["${entryObj.getxWikiClass().getName()}_${entryObj.number}_title"].value = title;
-    {/pre}
+    }}}
     &lt;/script&gt;
   #end
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

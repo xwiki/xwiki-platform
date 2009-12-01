@@ -21,26 +21,26 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.CategoriesCode")
+<content>{{include document="Blog.CategoriesCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 $xwiki.ssx.use("Blog.ManageCategories")##
 $xwiki.jsx.use("Blog.ManageCategories")##
 ##
 ##
 ##
 #if($doc.getObject($blogCategoryClassname))
-## 1 $doc.display("name")
-
   #getEntriesForCategory($doc.fullName $discard $totalEntries)
 
-  1 Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title="RSS"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.gif')" alt="(RSS)" title="RSS"/&gt;&lt;/a&gt;
+&lt;h1&gt;Category: #getCategoryName($doc) ($totalEntries posts) &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title="RSS"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.gif')" alt="(RSS)" title="RSS"/&gt;&lt;/a&gt;&lt;/h1&gt;
   #if($context.action != 'inline')
     #getCategoriesHierarchy($doc.space $tree)
     #if("$!{tree.get(${doc.fullName})}" != '')
       &lt;div class="blog-categories-list subcategories"&gt;
         &lt;div&gt;
-          *Subcategories*
+          **Subcategories**
         &lt;/div&gt;
         &lt;div&gt;
           #displayCategoriesHierarchyRecursive($tree $doc.fullName 1 'simple')
@@ -49,17 +49,22 @@ $xwiki.jsx.use("Blog.ManageCategories")##
     #end
     &lt;div class="clearfloats"&gt;&lt;/div&gt;
 
-    ## 1.1 Articles in this category
     #getEntriesForCategory($doc.fullName $entries $total)
-    #displayBlog($entries 'category' true true)
-    ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
-    ## document, as the macro fallbacks to 'paginated' in case the right setting cannot be determined.
-    #displayNavigationLinks($doc)
+    #if($total == 0)
+      #info('No entries in this category')
+    #else
+      #displayBlog($entries 'category' true true)
+      ## displayNavigationLinks requires a blog document, to determine how should the entries be split into pages. Return this
+      ## document, as the macro fallbacks to 'paginated' in case the right setting cannot be determined.
+      #displayNavigationLinks($doc)
+    #end
   #end
 #elseif($doc.fullName == $blogCategorySheet)
-  1 $msg.get('xe.blog.categories.sheet')
+= $msg.get('xe.blog.categories.sheet') =
   $msg.get('xe.blog.categories.sheetmessage')
 #else
   #warning($msg.get('xe.blog.categories.notcategory'))
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

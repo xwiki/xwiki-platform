@@ -63,6 +63,26 @@ public abstract class AbstractDOMValidator implements Validator
     protected static final String SUBMIT = "submit";
 
     // Elements.
+    
+    /**
+     * Heading 1 element.
+     */
+    protected static final String ELEM_H1 = "h1";
+    
+    /**
+     * Line break element.
+     */
+    protected static final String ELEM_BR = "br";
+    
+    /**
+     * Bold element.
+     */
+    protected static final String ELEM_BOLD = "b";
+    
+    /**
+     * Italics element.
+     */
+    protected static final String ELEM_ITALIC = "i";
 
     /**
      * Submit element.

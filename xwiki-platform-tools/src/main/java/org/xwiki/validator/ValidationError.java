@@ -130,4 +130,23 @@ public class ValidationError
     {
         return this.message;
     }
+    
+    /**
+     * @return the error in a human readable format
+     */
+    @Override
+    public String toString()
+    {
+        String prefix;
+        
+        if (getType().equals(Type.ERROR)) {
+            prefix = "ERROR: ";
+        } else if (getType().equals(Type.WARNING)) {
+            prefix = "WARNING: ";
+        } else {
+            prefix = "FATAL: ";
+        }
+        
+        return prefix + this.message;
+    }
 }

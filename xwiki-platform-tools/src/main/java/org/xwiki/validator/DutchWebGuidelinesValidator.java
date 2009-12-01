@@ -46,10 +46,9 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      * Message resources.
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
-    
-    
+
     /**
-     * Constructor. 
+     * Constructor.
      */
     public DutchWebGuidelinesValidator()
     {
@@ -91,6 +90,20 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         validateRpd2s8();
         validateRpd2s9();
         validateRpd3s1();
+        validateRpd3s2();
+        validateRpd3s3();
+        validateRpd3s4();
+        validateRpd3s5();
+        validateRpd3s6();
+        validateRpd3s7();
+        validateRpd3s8();
+        validateRpd3s9();
+        validateRpd3s10();
+        validateRpd3s11();
+        validateRpd3s12();
+        validateRpd3s13();
+        validateRpd3s14();
+        validateRpd3s15();
 
         return getErrors();
     }
@@ -101,8 +114,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd1s1()
     {
-        // Validating 1s1 means running XHTML validity tests.
-        // TODO : use XHTML validator
+        // HTML Validation errors are checked by XHTMLValidator.
     }
 
     /**
@@ -139,23 +151,22 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
 
         // Form validation
         NodeListIterable formElements = getElements("form");
-        
+
         for (Node formElement : formElements) {
             boolean validForm = false;
-            
+
             if (hasChildElement(formElement, "submit")) {
                 // Form contains a <submit> element.
                 validForm = true;
             }
-            
+
             for (Node input : getChildren(formElement, ELEM_INPUT)) {
                 if (hasAttribute(input, ATTR_TYPE)) {
                     if (getAttributeValue(input, ATTR_TYPE).equals(SUBMIT)) {
                         // Form contains an <input type="submit" /> element.
                         validForm = true;
                     } else if (getAttributeValue(input, ATTR_TYPE).equals("image")) {
-                        if (hasAttribute(input, ATTR_ALT) 
-                            && !StringUtils.isEmpty(getAttributeValue(input, ATTR_ALT))) {
+                        if (hasAttribute(input, ATTR_ALT) && !StringUtils.isEmpty(getAttributeValue(input, ATTR_ALT))) {
                             // Form contains an <input type="image" alt="action" /> element.
                             // See http://www.w3.org/TR/WCAG10-HTML-TECHS/#forms-graphical-buttons
                             validForm = true;
@@ -163,7 +174,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
                     }
                 }
             }
-            
+
             assertTrue(Type.ERROR, "rpd1s3.formSubmit", validForm);
         }
     }
@@ -173,7 +184,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd2s1()
     {
-        // HTML Validation errors are checked by Rpd1s1
+        // HTML Validation errors are checked by XHTMLValidator.
     }
 
     /**
@@ -181,7 +192,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd2s2()
     {
-        // HTML Validation errors are checked by Rpd1s1
+        // HTML Validation errors are checked by XHTMLValidator.
     }
 
     /**
@@ -190,7 +201,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd2s3()
     {
-        // Check doctype XHTML strict or HTML 4.01 strict
+        // This guideline cannot be automatically tested, however we check that a DOCTYPE has been specified.
+        assertFalse(Type.ERROR, "rpd2s3.noDoctype", document.getDoctype() == null);
     }
 
     /**
@@ -198,7 +210,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd2s4()
     {
-        // Check doctype XHTML strict or HTML 4.01 strict
+        // This guideline cannot be automatically tested, however we check that a DOCTYPE has been specified.
+        assertFalse(Type.ERROR, "rpd2s4.noDoctype", document.getDoctype() == null);
     }
 
     /**
@@ -208,8 +221,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         // Usage of frameset doctype is forbidden
         if (document.getDoctype() != null) {
-            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", 
-                StringUtils.containsIgnoreCase(document.getDoctype().getPublicId(), "frameset"));
+            assertFalse(Type.ERROR, "rpd2s5.framesetDoctype", StringUtils.containsIgnoreCase(document.getDoctype()
+                .getPublicId(), "frameset"));
         }
 
         // Usage of frameset is forbidden
@@ -224,7 +237,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd2s6()
     {
-        // TODO: use CSS validator
+        // CSS Validation errors are checked by CSSValidator.
     }
 
     /**
@@ -256,6 +269,32 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd3s1()
     {
+        // <b> and <i> are not allowed.
+        assertFalse(Type.ERROR, "rpd3s1.boldMarkup", containsElement("b"));
+        assertFalse(Type.ERROR, "rpd3s1.italicMarkup", containsElement("i"));
+    }
+
+    /**
+     * Use markup for headings that express the hierarchy of information on the page.
+     */
+    public void validateRpd3s2()
+    {
+        NodeListIterable h1s = getElements(ELEM_H1);
+
+        // A page must contain at least a h1.
+        assertTrue(Type.ERROR, "rpd3s2.noheading", h1s.getNodeList().getLength() > 0);
+
+        // It is recommended to use only one h1 per page.
+        if (h1s.getNodeList().getLength() > 1) {
+            addError(Type.WARNING, -1, -1, "rpd3s2.multipleh1");
+        }
+    }
+
+    /**
+     * Do not skip any levels in the hierarchy of headings in the markup.
+     */
+    public void validateRpd3s3()
+    {
         List<String> headings = Arrays.asList("h1", "h2", "h3", "h4", "h5", "h6");
 
         int previousLevel = 1;
@@ -263,12 +302,147 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             int currentLevel = Integer.parseInt(element.getNodeName().substring(1));
 
             // Verify that we haven't jumped from h1 to h3.
-            assertTrue(Type.ERROR, "rpd3s1.headings", currentLevel <= previousLevel + 1);
+            assertTrue(Type.ERROR, "rpd3s3.headings", currentLevel <= previousLevel + 1);
             previousLevel = currentLevel;
         }
+    }
 
+    /**
+     * Use the p (paragraph) element to indicate paragraphs. Do not use the br (linebreak) element to separate
+     * paragraphs.
+     */
+    public void validateRpd3s4()
+    {
+        for (Node br : getElements(ELEM_BR)) {
+
+            Node currentNode = br.getNextSibling();
+
+            while (currentNode != null && currentNode.getNodeType() == Node.TEXT_NODE
+                && StringUtils.isBlank(currentNode.getTextContent())) {
+                // Ignore white spaces between <br/>.
+                currentNode = currentNode.getNextSibling();
+            }
+
+            if (currentNode != null) {
+                assertFalse(Type.ERROR, "rpd3s4.linebreaks", currentNode.getNodeName().equals(ELEM_BR));
+            }
+        }
+    }
+
+    /**
+     * Use the em (emphasis) and strong elements to indicate emphasis.
+     */
+    public void validateRpd3s5()
+    {
         // <b> and <i> are not allowed.
-        assertFalse(Type.ERROR, "rpd3s1.boldMarkup", containsElement("b"));
-        assertFalse(Type.ERROR, "rpd3s1.italicMarkup", containsElement("i"));
+        String key = "rpd3s5.invalidMarkup";
+        assertFalse(Type.ERROR, key, containsElement(ELEM_BOLD));
+        assertFalse(Type.ERROR, key, containsElement(ELEM_ITALIC));
+    }
+
+    /**
+     * Use the abbr (abbreviation) element for an abbreviation if confusion could arise concerning its meaning, if the
+     * abbreviation plays a very important role in the text or if the abbreviation is not listed in the Dutch
+     * dictionary.
+     */
+    public void validateRpd3s6()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use the dfn (definition) element to indicate terms that are defined elsewhere in a definition list.
+     */
+    public void validateRpd3s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use the ins (insertion) and del (deletion) elements to indicate regular changes in the content of a page.
+     */
+    public void validateRpd3s8()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Avoid using the sup (superscript) and sub (subscript) element if possible.
+     */
+    public void validateRpd3s9()
+    {
+        // <sub> and <sup> are not allowed.
+        assertFalse(Type.ERROR, "rpd3s9.sub", containsElement("sub"));
+        assertFalse(Type.ERROR, "rpd3s9.sup", containsElement("sup"));
+    }
+
+    /**
+     * Use the cite element for references to people and titles.
+     */
+    public void validateRpd3s10()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Avoid using the q (quotation) element.
+     */
+    public void validateRpd3s11()
+    {
+        // <q> is not allowed.
+        assertFalse(Type.ERROR, "rpd3s11.quotation", containsElement("q"));
+    }
+
+    /**
+     * Use the blockquote element to indicate (long) quotations.
+     */
+    public void validateRpd3s12()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use ol (ordered list) and ul (unordered list) elements to indicate lists.
+     */
+    public void validateRpd3s13()
+    {
+        for (Node br : getElements(ELEM_BR)) {
+            Node previousNode = null;
+            String regex = "^\\s*(\\*|-|[0-9]\\.).*";
+
+            for (Node currentNode : new NodeListIterable(br.getParentNode().getChildNodes())) {
+                Node nextNode = currentNode.getNextSibling();
+
+                if (previousNode != null && nextNode != null) {
+                    boolean currentNodeMatches = currentNode.getNodeName().equals(ELEM_BR);
+                    boolean previousNodeMatches =
+                        previousNode.getNodeType() == Node.TEXT_NODE && previousNode.getTextContent().matches(regex);
+                    boolean nextNodeMatches =
+                        nextNode.getNodeType() == Node.TEXT_NODE && nextNode.getTextContent().matches(regex);
+
+                    assertFalse(Type.ERROR, "rpd3s13.lists", previousNodeMatches && currentNodeMatches 
+                        && nextNodeMatches);
+                }
+
+                previousNode = currentNode;
+            }
+        }
+    }
+
+    /**
+     * Use the dl (definition list), the dt (definition term) and dd (definition data) elements to indicate lists with
+     * definitions.
+     */
+    public void validateRpd3s14()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Give meaningful names to id and class attributes.
+     */
+    public void validateRpd3s15()
+    {
+        // This guideline cannot be automatically tested.
     }
 }

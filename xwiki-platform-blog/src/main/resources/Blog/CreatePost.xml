@@ -21,9 +21,11 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 #if($hasEdit)
 $xwiki.jsx.use($blogScriptsDocumentName)##
 ##
@@ -52,12 +54,14 @@ $xwiki.jsx.use($blogScriptsDocumentName)##
   ## Remove . and : from the document name, as they have a special meaning in XWiki document names
   #set($postDocName = "${space}.${name.replaceAll('[.:]', '')}")
   ## Get the target blog document, to set it as the parent
-  #getBlogDocument($space $blogDoc)
+  #set($blogDoc = $xwiki.blog.getBlogDocument($space, $blogClassname))
   #set($parent = $blogDoc.fullName)
   #set($title = $util.encodeURI($name))
   $response.sendRedirect($xwiki.getURL($postDocName, 'inline', "template=${blogPostTemplate}&amp;parent=${parent}&amp;title=${title}&amp;${blogPostClassname}_0_title=${title}"))
 #end## name == ''
 #elseif("$!request.entryTitle" != '')## !hasEdit &amp;&amp; form submitted
   #template('accessdenied.vm')
-#end## hasEdit</content>
+#end## hasEdit
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

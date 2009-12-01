@@ -21,15 +21,20 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.RssCode")
-##
-##
-##
-#getGlobalBlogEntries($entries)
-#set($entries = $xwiki.wrapDocs($entries))
-#if("$!{request.xpage}" == 'plain')
-  #displayGlobalBlogRss($entries)
-#end</content>
+<content>{{include document="Blog.BlogCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="false"}}
+#set($blogDoc = $xwiki.blog.getBlogDocument($doc.space, $blogClassname))
+#set($blogTitle = $xwiki.blog.getBlogTitle($blogDoc, $blogClassname))
+#set($feedMetadata = {
+  "title": $blogTitle,
+  "description": "Most recent blog posts in the wiki",
+  "url": $xwiki.getDocument('Main.WebHome').externalURL
+  })
+#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+$xwiki.feed.getBlogFeedOutput("${query} order by publishDate.value desc", 10, 0, $feedMetadata, 'rss_2.0')
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

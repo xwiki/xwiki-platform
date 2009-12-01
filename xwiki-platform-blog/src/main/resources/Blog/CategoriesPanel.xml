@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -95,11 +95,12 @@
 <name>Blog.CategoriesPanel</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>e385d6f7-ae21-4cf8-9e0d-e2f31563eaa0</guid>
 <property>
 <category>Information</category>
 </property>
 <property>
-<content>#includeMacros("Blog.CategoriesCode")
+<content>#includeMacros("Blog.CategoriesCode2")
 #panelheader('Blog Categories')
 #getCategoriesHierarchy('Blog' $tree)
 #displayCategoriesHierarchy($tree 'simple')
@@ -118,5 +119,5 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
+<content>{{include document="Panels.PanelSheet"/}}</content>
 </xwikidoc>

@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -74,7 +74,10 @@
 <name>Blog categories</name>
 </property>
 </object>
-<content>#includeMacros("Blog.CategoriesCode")
+<content>{{include document="Blog.CategoriesCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#includeMacros("Blog.CategoriesCode")
 $xwiki.ssx.use("Blog.ManageCategories")##
 $xwiki.jsx.use("Blog.ManageCategories")##
 
@@ -88,5 +91,7 @@ $xwiki.jsx.use("Blog.ManageCategories")##
 ##
 #end
 &lt;/div&gt;
-&lt;div class="clearfloats"&gt;&lt;/div&gt;</content>
+&lt;div class="clearfloats"&gt;&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

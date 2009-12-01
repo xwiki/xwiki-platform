@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -562,7 +562,6 @@ document.observe('xwiki:dom:loaded', function() {
   padding: 8px 0;
 }
 .subcategories {
-  margin-top: -22px;
   background: #f5f7ff;
   padding-right: 15px;
   padding-left: 15px;
@@ -655,15 +654,17 @@ input.category-name-input {
 <use>onDemand</use>
 </property>
 </object>
-<content>#set($space = "$!request.space")
-#includeMacros("Blog.CategoriesCode")
+<content>{{include document="Blog.CategoriesCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#set($space = "$!request.space")
 ##
 ##
 ######################################################
 ## Execute actions
 ######################################################
 #if ("$!request.xaction" == 'delete')
-  #foreach($item in $request.getParameterValues("category"))
+  #foreach($item in $request.getParameterValues('category'))
     #deleteCategory($item)
   #end
 #elseif("$!request.xaction" == 'rename')
@@ -676,7 +677,7 @@ input.category-name-input {
     #error($msg.get('thispagedoesnotexist'))
   #elseif($xwiki.exists($newFullName))
     $response.setStatus(409)
-    #error("$msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])")
+    #error($msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)]))
   #elseif(!$xwiki.hasAccessLevel('edit', $context.user, $newFullName))
     $response.setStatus(403)
     #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
@@ -717,5 +718,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
 $xwiki.jsx.use('Blog.ManageCategories', {'minify':false})##
 ##
 #displayCategoryManagementTree('' 'editable')
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

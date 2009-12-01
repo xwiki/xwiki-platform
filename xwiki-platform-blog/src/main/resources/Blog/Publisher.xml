@@ -21,19 +21,21 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 #set($xredirect = "$!{request.xredirect}")
 #if($xredirect == '')
-  #set($xredirect = $xwiki.getURL('Blog.WebHome'))
+  #set($xredirect = $xwiki.getURL("${space}.WebHome"))
 #end
 #set($entryName = "$!{request.entryName}")
 #if($entryName != '')
   #if($xwiki.hasAccessLevel('edit', $context.user, $entryName))
     #set($entryDoc = $xwiki.getDocument($entryName))
     #if ($entryDoc)
-      #getEntryObject($entryDoc $entryObj)
+      #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
       #if("$!{entryObj.getProperty('published').value}" == '0')
         #set($discard = $entryObj.set('hidden', 0))
         #set($discard = $entryObj.set('published', 1))
@@ -44,5 +46,7 @@
     #end
   #end
 #end
-$response.sendRedirect($xredirect)</content>
+$response.sendRedirect($xredirect)
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

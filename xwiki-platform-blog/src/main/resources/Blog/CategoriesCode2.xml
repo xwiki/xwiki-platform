@@ -2,7 +2,7 @@
 
 <xwikidoc>
 <web>Blog</web>
-<name>CategoriesCode</name>
+<name>CategoriesCode2</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -11,19 +11,21 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1226789865000</creationDate>
-<date>1229917290000</date>
-<contentUpdateDate>1229917290000</contentUpdateDate>
+<creationDate>1247276857000</creationDate>
+<date>1251506792000</date>
+<contentUpdateDate>1251506792000</contentUpdateDate>
 <version>1.1</version>
-<title>Macros for the Blog Categories</title>
+<title>Macros for the Blog Categories 2.0</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 ##
 ##
 ##
@@ -44,8 +46,8 @@
   #foreach($subcategory in $subcategories)
     #set($categories = "$!{categories}, '$subcategory'")
   #end
-  #getBlogEntriesBaseQuery($query)
-  #set ($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${categories})")
+  #set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+  #set($query = ", DBStringListProperty as categories join categories.list as category${query} and obj.id = categories.id.id and categories.id.name='category' and category in (${categories})")
   #set($totalEntries = $xwiki.countDocuments(${query}))
   #preparePagedViewParams($totalEntries 10)
   #set($entries = $xwiki.searchDocuments("${query} order by publishDate.value desc", $itemsPerPage, $startAt))
@@ -266,7 +268,6 @@
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showRenameCategory" &amp;&amp; "$!{request.category}" == $name) #renameCategoryForm() #end##
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == $name) #addCategoryForm() #end##
 &lt;/span&gt;
-
 #end
 ##
 ##
@@ -292,7 +293,7 @@
  *###
 #macro(displaySimpleCategory $name $level)
   #getEntriesForCategory($name $discard $totalEntries)
-  #foreach($i in [1..$level])*#end &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini.png')" alt="RSS"/&gt;&lt;/a&gt; &lt;a href="$xwiki.getURL($name)"&gt;#getCategoryName($xwiki.getDocument($name)) &lt;span class="itemCount"&gt;($totalEntries)&lt;/span&gt;&lt;/a&gt;
+  #foreach($i in [1..$level])*#end &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/black-rss-mini.png')" alt="RSS"/&gt;&lt;/a&gt; [[#getCategoryName($xwiki.getDocument($name)) (% class="itemCount" %)($totalEntries)(%%)&gt;&gt;$name]]
 #end
 ##
 ##
@@ -451,5 +452,7 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
   $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
   $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
   $categoryDoc.rename($newCategoryName)
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

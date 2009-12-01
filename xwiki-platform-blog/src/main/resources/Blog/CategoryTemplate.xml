@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <object>
 <class>
@@ -66,6 +66,7 @@
 <name>Blog.CategoryTemplate</name>
 <number>0</number>
 <className>Blog.CategoryClass</className>
+<guid>bbda1bac-f20a-4599-91ad-b5395b5e4efd</guid>
 <property>
 <description>Category description</description>
 </property>
@@ -73,5 +74,5 @@
 <name>CategoryName</name>
 </property>
 </object>
-<content>#includeForm("CategorySheet")</content>
+<content>{{include document="CategorySheet"/}}</content>
 </xwikidoc>

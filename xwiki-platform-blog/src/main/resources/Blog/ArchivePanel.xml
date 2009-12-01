@@ -95,6 +95,7 @@
 <name>Blog.ArchivePanel</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
+<guid>7a7707a2-9957-41c1-b1b3-a3b777560c70</guid>
 <property>
 <category>Navigation</category>
 </property>
@@ -104,10 +105,10 @@
 #if($space == '')
   #set($space = $doc.space)
 #end
-#getBlogDocument($space $blogDoc)
+#set($blogDoc = $xwiki.blog.getBlogDocument($space, $blogClassname))
 #if($space == $blogDoc.space || $showEmptyPanels)
   #panelheader('Blog Archive')
-  #getBlogEntriesBaseQuery($query)
+  #set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   ## Create a Jodatime date formatter that will be used to format dates
   #set($monthFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM'))
@@ -118,14 +119,14 @@
   #set($lastYear = '')
   #foreach($firstEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value)", 1, 0))
     #set($discard = $xwiki.getDocument($firstEntry))
-    #getEntryObject($discard $entryObj)
-    #getEntryDate($discard $entryObj $firstYear)
+    #set($entryObj = $xwiki.blog.getEntryObject($discard, $blogPostClassname))
+    #set($firstYear = $xwiki.blog.getEntryDate($entryObj))
     #set($firstYear = $util.parseInt($xwiki.formatDate($firstYear, 'yyyy')))
   #end
   #foreach($lastEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value) desc", 1, 0))
     #set($discard = $xwiki.getDocument($lastEntry))
-    #getEntryObject($discard $entryObj)
-    #getEntryDate($discard $entryObj $lastYear)
+    #set($entryObj = $xwiki.blog.getEntryObject($discard, $blogPostClassname))
+    #set($lastYear = $xwiki.blog.getEntryDate($entryObj))
     #set($lastYear = $util.parseInt($xwiki.formatDate($lastYear, 'yyyy')))
   #end
   #if("$!{firstYear}" != '') ## At least one entry exists

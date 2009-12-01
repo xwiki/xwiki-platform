@@ -101,13 +101,13 @@
 </property>
 <property>
 <content>#includeMacros("Blog.BlogCode")
-#getBlogEntriesBaseQuery($query)
+#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
 #set($query = "$!{query} and isPublished.value = 1 and hidden.value &lt;&gt; 1")
 #set($recentEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 10, 0))
 #if($recentEntries.size() &gt; 0 || $showEmptyPanels)
   #panelheader('Recent Blog Posts')
   #foreach($entryDoc in $xwiki.wrapDocs($recentEntries))
-    #getEntryObject($entryDoc $entryObj)
+    #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
     * [$!{entryDoc.display('title', 'view', $entryObj)}&gt;$!{entryDoc.fullName}]
   #end
   #panelfooter()

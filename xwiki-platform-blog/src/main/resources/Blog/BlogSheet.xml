@@ -21,14 +21,21 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode2"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 ##
 ##
 ##
-#showBlogInfo($doc)
-#if($context.action != 'inline')
-  #printBlog($doc)
-#end</content>
+#checkBlogPlugin($isAvailable)
+#if($isAvailable)
+  #showBlogInfo($doc)
+  #if($context.action != 'inline')
+    #printBlog($doc)
+  #end
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

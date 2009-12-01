@@ -775,7 +775,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String syntaxes = Param("xwiki.rendering.syntaxes", "xwiki/1.0");
         this.configuredSyntaxes = Arrays.asList(StringUtils.split(syntaxes, " ,"));
 
-        // Initialize all wiki macros
+        // Initialize all wiki macros.
+        // TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note
+        // that we need DB access to be available (at component initialization) to make this possible.
         registerWikiMacros();
     }
 
@@ -808,9 +810,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
-    protected void registerWikiMacros()
+    /**
+     * TODO: This is only a temporary work around, we need to use a component-based init mechanism instead. Note 
+     * that we need DB access to be available (at component initialization) to make this possible.
+     */
+    private void registerWikiMacros()
     {
-        // TODO: Use a component-based init mechanism instead. Note that we need the DB access to be available.
         try {
             WikiMacroInitializer wikiMacroInitializer = Utils.getComponentManager().lookup(WikiMacroInitializer.class);
             wikiMacroInitializer.registerExistingWikiMacros();

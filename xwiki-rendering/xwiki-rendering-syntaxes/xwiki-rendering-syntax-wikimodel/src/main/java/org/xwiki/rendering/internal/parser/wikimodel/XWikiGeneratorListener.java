@@ -57,6 +57,10 @@ import org.xwiki.rendering.util.IdGenerator;
  */
 public class XWikiGeneratorListener implements IWemListener
 {
+    /**
+     * Listener(s) for the generated XWiki Events. Organized as a stack so that a buffering listener can hijack all
+     * events for a while, for example. All generated events are sent to the top of the stack.
+     */
     private Stack<Listener> listener = new Stack<Listener>();
 
     private StreamParser parser;
@@ -90,16 +94,33 @@ public class XWikiGeneratorListener implements IWemListener
         this.plainRendererFactory = plainRendererFactory;
     }
 
+    /**
+     * Returns the 'default' listener to send xwiki events to, the top of the listeners stack.
+     * 
+     * @return the listener to send xwiki events to
+     */
     public Listener getListener()
     {
         return this.listener.peek();
     }
 
+    /**
+     * Pushes a new listener in the listeners stack, thus making it the 'default' listener, to which all events are
+     * sent.
+     * 
+     * @param listener the listener to add in the top of the stack
+     * @return the listener pushed in the top of the stack
+     */
     private Listener pushListener(Listener listener)
     {
         return this.listener.push(listener);
     }
 
+    /**
+     * Removes the listener from the top of the stack (the current 'default' listener).
+     * 
+     * @return the removed listener
+     */
     private Listener popListener()
     {
         return this.listener.pop();
@@ -408,11 +429,15 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void beginHeader(int level, WikiParameters params)
     {
+        // Heading needs to have an id generated from a plaintext representation of its content, so the header start
+        // event will be sent at the end of the header, after reading the content inside and generating the id. 
+        // For this:
+        // buffer all events in a queue until the header ends, and also send them to a print renderer to generate the ID
         CompositeListener composite = new CompositeListener();
-
         composite.addListener(new QueueListener());
         composite.addListener(this.plainRendererFactory.createRenderer(new DefaultWikiPrinter()));
 
+        // These 2 listeners will receive all events from now on until the header ends
         pushListener(composite);
     }
 
@@ -610,21 +635,29 @@ public class XWikiGeneratorListener implements IWemListener
      */
     public void endHeader(int level, WikiParameters params)
     {
+        // End all formats
         flushInline();
 
         CompositeListener composite = (CompositeListener) getListener();
 
+        // Get the listener where events inside the header were buffered
         QueueListener queue = (QueueListener) composite.getListener(0);
+        // and the listener in which the id was generated
         PrintRenderer renderer = (PrintRenderer) composite.getListener(1);
 
+        // Restore the 'default' listener as it was at the beginning of the header
         popListener();
 
         HeaderLevel headerLevel = HeaderLevel.parseInt(level);
+        // Generate the id from the content inside the header written to the renderer
         String id = this.idGenerator.generateUniqueId("H", renderer.getPrinter().toString());
         Map<String, String> parameters = convertParameters(params);
 
+        // Generate the begin header event to the 'default' listener
         getListener().beginHeader(headerLevel, id, parameters);
+        // Send all buffered events to the 'default' listener
         queue.consumeEvents(getListener());
+        // Generate the end header event to the 'default' listener
         getListener().endHeader(headerLevel, id, parameters);
     }
 
@@ -925,7 +958,7 @@ public class XWikiGeneratorListener implements IWemListener
 
             if (link.getType() == LinkType.URI && link.getReference().startsWith("image:")) {
                 String imageLocation = link.getReference().substring("image:".length());
-                
+
                 getListener().onImage(this.imageParser.parse(imageLocation), isFreeStandingURI, parameters);
             } else {
                 getListener().beginLink(link, isFreeStandingURI, parameters);

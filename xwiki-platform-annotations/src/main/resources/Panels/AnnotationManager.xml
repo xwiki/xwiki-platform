@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1240502446000</creationDate>
-<date>1259514202000</date>
-<contentUpdateDate>1259514202000</contentUpdateDate>
+<date>1259676301000</date>
+<contentUpdateDate>1259676301000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -100,92 +100,60 @@
 <category></category>
 </property>
 <property>
-<content>## Active/Desactive annotations
-#set ($active="false")
-#set ($hql = ", BaseObject as obj where doc.fullName='XWiki.AnnotationConfig' and obj.className='XWiki.AnnotationConfig'")
-#set ($configs= $xwiki.searchDocuments($hql))
-#foreach ($config in $configs)
-  #set ($confDoc = $xwiki.getDocument($config))
-  #set ($confObj = $confDoc.getObject('XWiki.AnnotationConfig'))
-  #if ($confObj.activated == 'Yes')
-    &lt;script type="text/javascript"&gt;
-    var annotationFeatureEnabled = true;
-    &lt;/script&gt;
-    #set ($active="true")
-  #else
-    &lt;script type="text/javascript"&gt;
-    var annotationFeatureEnabled = false;
-    &lt;/script&gt;
+<content>## Check if annotations are active and display panels only when annotations are active
+#set ($active = false)
+#set($confObj = $xwiki.getDocument("XWiki.AnnotationConfig").getObject("XWiki.AnnotationConfig"))
+#set($active = $confObj.getProperty("activated").value == 1)
+#if($active)
+  ## the annotation form, hidden by default which will be made visible by the client js upon annotation add
+  &lt;div id="annotationPanel" style="display:none"&gt;
+    &lt;label for="annotationInput"&gt;Annotation :&amp;nbsp;&lt;/label&gt;
+    &lt;textarea cols="10" rows="5" id="annotationInput" name="annotationInput" value="test"&gt;&lt;/textarea&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="annotationRequest" name="annotationRequest" class="button" value="Annotate" /&gt;&lt;/span&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" id="cancelRequest" name="cancelRequest" class="button" value="Cancel" /&gt;&lt;/span&gt;
+  &lt;/div&gt;
+
+  ## the annotations panel
+  &lt;div id="annotationResume" style="display:block"&gt;
+  #panelheader('Annotations')
+  #set ($annotations = $doc.getObjects('XWiki.AnnotationClass'))
+  ## build annotations js array to pass to the js functions toggling annotation display
+  #set ($annArray="[")
+  #foreach ($annotation in $annotations)
+    #if($annotation.get('state') == 'SAFE')
+      ## default this color on yellow if nothing else is found
+      ## todo: should be set in the config document
+      #set($color = '#FFFF00')
+      #set($color = $xwiki.getDocument($annotation.author).getObject('XWiki.XWikiUsers').annotationColor)
+      ## add the annotation text in a div, which toggles annotation display on hover and a delete button
+      &lt;div onClick="XWiki.Annotation.getInstance().toggleMode($annotation.get('annotationID'))" onMouseOut="XWiki.Annotation.getInstance().hideAnnotation($annotation.get('annotationID'))" onMouseOver="XWiki.Annotation.getInstance().showAnnotation($annotation.get('annotationID'), '$color')"&gt;
+        &lt;div id="annotext_ID$annotation.get('annotationID')" class="truncate"&gt;*$annotation.get('annotation')*&lt;/div&gt;
+        *...* by &lt;span style="background: $color"&gt;[$annotation.get('author')]&lt;/span&gt;
+        &lt;img src="$xwiki.getSkinFile('icons/silk/delete.gif')" onClick="XWiki.Annotation.getInstance().removeAnnotation($annotation.get('annotationID'))"/&gt;
+      &lt;/div&gt;
+      ## append this annotation to the annotation array
+      #set($annJSON = '{\"id\" : \"' + $annotation.annotationID + '\", \"color\" : \"' + $color + '\"}')
+      ## if it's not the first annotation, add a comma
+      #if($annArray != "[")
+        #set ($annArray = $annArray + ",")
+      #end
+      #set ($annArray = $annArray + $annJSON)
+    #end
   #end
-#end
+  #set ($annArray = $annArray + "]")
 
-&lt;style type="text/css"&gt;
-.truncate
-{
- overflow: hidden;
- white-space: nowrap;
-}
-#annotationPanel textarea 
-{
- width: 100%;
-}
-.untruncate
-{
- overflow: inherit;
- white-space: inherit;
-}
-&lt;/style&gt; 
+  ## show and hide buttons
+  {pre}
+  &lt;input type="submit" onClick='XWiki.Annotation.getInstance().showAllAnnotation("${annArray}")' name="showAllRequest" class="button" value="Show all" /&gt;
+  &lt;input type="submit" onClick='XWiki.Annotation.getInstance().hideAllAnnotation("${annArray}")' name="hideAllRequest" class="button" value="Hide all"/&gt;
+  {/pre}
 
-#if($active=="true")
- &lt;div id="annotationPanel" style="display:none"&gt;
- #panelheader('Annotation editor')
- &lt;label for="annotationInput"&gt;Annotation :&amp;nbsp;&lt;/label&gt;
- &lt;textarea cols="10" rows="5" id="annotationInput" name="annotationInput" value="test"/&gt;&lt;/textarea&gt;
- &lt;input type="submit" id="annotationRequest" name="annotationRequest" value="Annotate !"/&gt;
- &lt;input type="submit" id="cancelRequest" name="cancelRequest" value="Cancel"/&gt;
- #if ($xwiki.hasAdminRights())
-  &lt;p style="font-size:0.75em;padding-left:8px;"&gt;
-  &lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
- #end
- #panelfooter()
- &lt;/div&gt;
-
- &lt;div id="annotationResume" style="display:block"&gt;
- #panelheader('Annotations')
- #set ($annotations = $doc.getObjects('XWiki.AnnotationClass'))
- #set ($str="[")
- #foreach ($annotation in $annotations)
-  #if($annotation.get('state') == 'SAFE')
-   #set ($hql = " where doc.fullName='"+$annotation.get('author')+"'")
-   #set ($docs= $xwiki.searchDocuments($hql))
-   #foreach ($doc in $docs)
-    #set ($doc = $xwiki.getDocument($doc))
-    #set ($user = $doc.getObject('XWiki.XWikiUsers'))
-    #set ($color = $user.annotationColor)
-    #break
-   #end
-   ## '$annotation.get('annotation').toString().replaceAll("[^\\]*'", "\\'")'
-   &lt;div onClick="XWiki.Annotation.getInstance().toggleMode($annotation.get('annotationID'))" onMouseOut="XWiki.Annotation.getInstance().hideAnnotation($annotation.get('annotationID'))" onMouseOver="XWiki.Annotation.getInstance().showAnnotation($annotation.get('annotationID'), '$color')"&gt;
-   &lt;div id="annotext_ID$annotation.get('annotationID')" class="truncate"&gt;*$annotation.get('annotation')*&lt;/div&gt;
-   *...* by &lt;span style="background: $color"&gt;[$annotation.get('author')]&lt;/span&gt;
-   &lt;img src="/xwiki/resources/icons/silk/delete.gif" onClick="XWiki.Annotation.getInstance().removeAnnotation($annotation.get('annotationID'))"/&gt;
-   &lt;/div&gt;
-   #if($str != "[")
-    #set ($str = $str + ",{\'id\' : \'"+$annotation.get('annotationID')+"\', \'color\' : \'"+$color+"\'}")
-   #else
-    #set ($str = $str + "{\'id\' : \'"+$annotation.get('annotationID')+"\', \'color\' : \'"+$color+"\'}")
-   #end
+  ## and the edit panel link, as for all panels
+  #if ($xwiki.hasAdminRights())
+   &lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.AnnotationManager").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
   #end
- #end
-
- #set ($str = $str + "]")
- &lt;input type="submit" onClick="XWiki.Annotation.getInstance().showAllAnnotation('{pre}$str{/pre}')" name="showAllRequest" value="Show all"/&gt;
- &lt;input type="submit" onClick="XWiki.Annotation.getInstance().hideAllAnnotation('{pre}$str{/pre}')" name="hideAllRequest" value="Hide all"/&gt;
- #if ($xwiki.hasAdminRights())
-  &lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;
- #end
- #panelfooter()
- &lt;/div&gt;
+  #panelfooter()
+  &lt;/div&gt;
 #end</content>
 </property>
 <property>
@@ -273,12 +241,7 @@
 <cache>default</cache>
 </property>
 <property>
-<code>/*
- * annotationFeatureEnabled boolean variable must be
- * true in order to activate annotation feature.
- */
-
-if (typeof (XWiki) == 'undefined') {
+<code>if (typeof (XWiki) == 'undefined') {
     XWiki = new Object();
 }
 
@@ -359,9 +322,6 @@ XWiki.Annotation.prototype = {
         $('annotationPanel').style.top = (y - Element
                 .getHeight($('annotationPanel'))) + 'px';
         $('annotationPanel').style.left = x + 'px';
-        $('annotationPanel').style.padding = '0px 0px';
-        $('annotationPanel').style.padding = '0px 0px';
-        $('annotationPanel').style.margin = '0px 0px';
     },
 
     hideAnnotationInputPanel : function() {
@@ -542,7 +502,8 @@ XWiki.Annotation.prototype = {
                     'type' : 'submit',
                     'onClick' : 'XWiki.Annotation.getInstance().showAllAnnotation(\'' + Object
                             .toJSON(XWiki.Annotation.getInstance().annotationsArg) + '\')',
-                    'value' : 'Show all'
+                    'value' : 'Show all',
+                    'class' : 'button'
                 });
         var hide = new Element(
                 'input',
@@ -550,7 +511,8 @@ XWiki.Annotation.prototype = {
                     'type' : 'submit',
                     'onClick' : 'XWiki.Annotation.getInstance().hideAllAnnotation(\'' + Object
                             .toJSON(XWiki.Annotation.getInstance().annotationsArg) + '\')',
-                    'value' : 'Hide all'
+                    'value' : 'Hide all',
+                    'class' : 'button'
                 });
         $('annotationResume').select('[class="xwikipanelcontents"]')[0]
                 .insert({
@@ -812,18 +774,132 @@ XWiki.Annotation.getInstance = function() {
     return XWiki.Annotation.prototype.__singleton__;
 };
 
+## only load if the annotations are configured as active
+#set ($active = false)
+#set($confObj = $xwiki.getDocument("XWiki.AnnotationConfig").getObject("XWiki.AnnotationConfig"))
+#set($active = $confObj.getProperty("activated").value == 1)
+#if($active)
 (function() {
     function onDOMLoaded() {
-        if (typeof (annotationFeatureEnabled) != 'undefined'
-                &amp;&amp; annotationFeatureEnabled == true) {
-            XWiki.Annotation.getInstance();
-        }
+        // should check if the annotations panel is present too, or the context action to be view, etc
+        XWiki.Annotation.getInstance();
     }
     document.observe('dom:loaded', function(event) {
         onDOMLoaded();
     });
 })();
+#end
 </code></property><property><name>Annotation Feature Client Side Code</name>
+</property>
+<property>
+<parse>1</parse>
+</property>
+<property>
+<use>always</use>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.StyleSheetExtension</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<cache>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>cache</name>
+<number>5</number>
+<prettyName>Caching policy</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>long|short|default|forbid</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</cache>
+<code>
+<name>code</name>
+<number>2</number>
+<prettyName>Code</prettyName>
+<rows>20</rows>
+<size>50</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</code>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<parse>
+<displayFormType>select</displayFormType>
+<displayType>yesno</displayType>
+<name>parse</name>
+<number>4</number>
+<prettyName>Parse content</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</parse>
+<use>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>use</name>
+<number>3</number>
+<prettyName>Use this extension</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>onDemand=On demand|always=Always</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</use>
+</class>
+<name>Panels.AnnotationManager</name>
+<number>0</number>
+<className>XWiki.StyleSheetExtension</className>
+<guid>96e32b27-da3f-4c71-a4e5-f3d3d094b851</guid>
+<property>
+<cache></cache>
+</property>
+<property>
+<code>.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+}
+#annotationPanel textarea  {
+  width: 100%;
+}
+.untruncate {
+  overflow: inherit;
+  white-space: inherit;
+}
+
+/* annotation form background and paddings */
+#annotationPanel {
+  background: #F5F5F5 none repeat scroll 0 0;
+  border: 1px solid #EEEEEE;
+  overflow: hidden;
+  padding: 4px 8px;
+}
+
+/* annotation panel buttons style */
+#annotationResume .button {
+  margin-top: 3px;
+}</code>
+</property>
+<property>
+<name>Annotation Feature Style Sheet</name>
 </property>
 <property>
 <parse>0</parse>
@@ -832,5 +908,6 @@ XWiki.Annotation.getInstance = function() {
 <use>always</use>
 </property>
 </object>
-<content></content>
+<content>#warning("Do not edit this macro inline, because the content will be messed up, use the objects editor to change it.")
+#includeForm("Panels.PanelSheet")</content>
 </xwikidoc>

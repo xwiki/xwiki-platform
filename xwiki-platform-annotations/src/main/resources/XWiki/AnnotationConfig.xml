@@ -12,8 +12,8 @@
   <customClass></customClass>
   <contentAuthor>XWiki.Admin</contentAuthor>
   <creationDate>1243945864000</creationDate>
-  <date>1244635773000</date>
-  <contentUpdateDate>1244635773000</contentUpdateDate>
+  <date>1259665061000</date>
+  <contentUpdateDate>1259665061000</contentUpdateDate>
   <version>1.0</version>
   <title></title>
   <template></template>
@@ -111,6 +111,8 @@
       <quickAnnotation>1</quickAnnotation>
     </property>
   </object>
-  <content>
-  </content>
+  <content>{{velocity}}
+    Annotations activated: $doc.display("activated")
+    Quick annotations activated: $doc.display("quickAnnotation")
+    {{/velocity}}</content>
 </xwikidoc>

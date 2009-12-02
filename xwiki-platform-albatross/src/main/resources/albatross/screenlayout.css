@@ -755,7 +755,7 @@ Scriptaculous Acordeon
   overflow: hidden !important;
 }
 
-.accordionTabTitleBar h6{
+.accordionTabTitleBar h1{
   margin: 0px;
   padding: 0px 4px;
 }

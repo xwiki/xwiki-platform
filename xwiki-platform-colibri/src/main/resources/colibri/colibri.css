@@ -1347,8 +1347,10 @@ fieldset.xwikimessage .xwikimessage {
   text-align: left;
 }
 
-/* -----------------Rico Accordeon-----------------------*/
-.accordionTabTitleBar h6 {
+/* ----------------- Accordion -----------------------*/
+
+.accordionTabTitleBar h1 {
+  display:block;
   background: $theme.panelHeaderBackgroundColor url( $xwiki.getSkinFile('icons/xwiki/accordion.png')) 0 50% no-repeat;
   border-bottom: 1px solid $theme.borderColor;
   border-top: 1px solid $theme.pageContentBackgroundColor;

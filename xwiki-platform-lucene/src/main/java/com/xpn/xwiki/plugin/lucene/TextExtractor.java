@@ -34,9 +34,8 @@ import com.xpn.xwiki.plugin.lucene.textextraction.PlainTextExtractor;
 import com.xpn.xwiki.plugin.lucene.textextraction.XmlTextExtractor;
 
 /**
- * Extraction of text from various binary formats. Extraction itself is done by the textExtractor
- * classes in Packages below <code>org.outerj.daisy</code> taken from the <a
- * href="http://new.cocoondev.org/daisy">Daisy project </a>.
+ * Extraction of text from various binary formats. Extraction itself is done by the textExtractor classes in Packages
+ * below <code>org.outerj.daisy</code> taken from the <a href="http://new.cocoondev.org/daisy">Daisy project </a>.
  * 
  * @version $Id$
  */
@@ -44,24 +43,26 @@ public class TextExtractor
 {
     private static final Log LOG = LogFactory.getLog(TextExtractor.class);
 
-    static final Map<String, MimetypeTextExtractor> textExtractors = new HashMap<String, MimetypeTextExtractor>();
+    private static final Map<String, MimetypeTextExtractor> TEXTEXTRACTORS =
+            new HashMap<String, MimetypeTextExtractor>();
 
     static {
         // TODO: make text extractors more pluggable by moving this into a config file.
         final XmlTextExtractor xmlTextExtractor = new XmlTextExtractor();
-        textExtractors.put("application/xhtml+xml", xmlTextExtractor);
-        textExtractors.put("text/xml", xmlTextExtractor);
-        textExtractors.put("text/plain", new PlainTextExtractor());
-        textExtractors.put("application/pdf", new PDFTextExtractor());
+
+        TEXTEXTRACTORS.put("application/xhtml+xml", xmlTextExtractor);
+        TEXTEXTRACTORS.put("text/xml", xmlTextExtractor);
+        TEXTEXTRACTORS.put("text/plain", new PlainTextExtractor());
+        TEXTEXTRACTORS.put("application/pdf", new PDFTextExtractor());
         // textExtractors.put ("application/vnd.sun.xml.writer", new OpenOfficeTextExtractor ());
-        textExtractors.put("application/msword", new MSWordTextExtractor());
-        textExtractors.put("application/ms-word", new MSWordTextExtractor());
-        textExtractors.put("application/vnd.msword", new MSWordTextExtractor());
-        textExtractors.put("application/vnd.ms-word", new MSWordTextExtractor());
-        textExtractors.put("application/vnd.ms-powerpoint", new MSPowerPointTextExtractor());
-        textExtractors.put("application/ms-powerpoint", new MSPowerPointTextExtractor());
-        textExtractors.put("application/ms-excel", new MSExcelTextExtractor());
-        textExtractors.put("application/vnd.ms-excel", new MSExcelTextExtractor());
+        TEXTEXTRACTORS.put("application/msword", new MSWordTextExtractor());
+        TEXTEXTRACTORS.put("application/ms-word", new MSWordTextExtractor());
+        TEXTEXTRACTORS.put("application/vnd.msword", new MSWordTextExtractor());
+        TEXTEXTRACTORS.put("application/vnd.ms-word", new MSWordTextExtractor());
+        TEXTEXTRACTORS.put("application/vnd.ms-powerpoint", new MSPowerPointTextExtractor());
+        TEXTEXTRACTORS.put("application/ms-powerpoint", new MSPowerPointTextExtractor());
+        TEXTEXTRACTORS.put("application/ms-excel", new MSExcelTextExtractor());
+        TEXTEXTRACTORS.put("application/vnd.ms-excel", new MSExcelTextExtractor());
     }
 
     /**
@@ -71,18 +72,17 @@ public class TextExtractor
      */
     public static String getText(byte[] content, String mimetype)
     {
-        final MimetypeTextExtractor extractor =
-            (MimetypeTextExtractor) textExtractors.get(mimetype);
+        final MimetypeTextExtractor extractor = TEXTEXTRACTORS.get(mimetype);
         if (extractor != null) {
             try {
                 return extractor.getText(content);
             } catch (Exception e) {
-                LOG.error("error getting text for mimetype " + mimetype, e);
-                e.printStackTrace();
+                LOG.error("Error getting text for mimetype [" + mimetype + "]", e);
             }
         } else {
-            LOG.info("no text extractor for mimetype " + mimetype);
+            LOG.info("No text extractor for mimetype [" + mimetype + "]");
         }
+
         return null;
     }
 }

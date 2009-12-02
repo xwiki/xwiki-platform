@@ -54,7 +54,7 @@
 	cursor: pointer;
 }
 
-.panel .accordionTabTitleBar h6 {
+.panel .accordionTabTitleBar h1 {
 	border-top: 1px solid #999;
 }
 
@@ -85,7 +85,7 @@ li.selected {
 	cursor: pointer;
 }
 
-#xwikieditcontent .accordionTabTitleBar h6 {
+#xwikieditcontent .accordionTabTitleBar h1 {
 	width: 100%;
 }
 

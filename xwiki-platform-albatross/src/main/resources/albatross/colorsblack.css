@@ -520,7 +520,7 @@ th{
   border-top: 1px solid #384554 !important;
   border-bottom: 1px solid #384554 !important;
 }
-.panel .accordionTabTitleBar h6{
+.panel .accordionTabTitleBar h1{
   margin: 0px;
   color: #FFF !important;
   font-style: normal !important;
@@ -531,7 +531,7 @@ th{
   border-bottom: 2px solid #384554 !important;
   border-top: 1px solid #384554;
 }
-.panel .accordionTabTitleBar h6:hover{
+.panel .accordionTabTitleBar h1:hover{
   background: transparent url("icons/black-more-3.png") right center no-repeat !important;
 }
 

@@ -27,7 +27,7 @@ import org.apache.commons.lang.time.FastDateFormat;
 /**
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of
  * special field values like dates.
- *
+ * 
  * @version $Id$
  */
 public abstract class IndexFields
@@ -119,11 +119,11 @@ public abstract class IndexFields
      */
     public static final String DATE_FORMAT = "yyyyMMddHHmm";
 
-    private static final FastDateFormat df = FastDateFormat.getInstance(IndexFields.DATE_FORMAT);
+    private static final FastDateFormat DF = FastDateFormat.getInstance(IndexFields.DATE_FORMAT);
 
     public static final String dateToString(Date date)
     {
-        return df.format(date);
+        return DF.format(date);
     }
 
     public static final Date stringToDate(String dateValue)
@@ -134,14 +134,11 @@ public abstract class IndexFields
         } catch (Exception e) {
             // silently ignore
         }
+
         return null;
     }
 
-    /**
-     *
-     */
     private IndexFields()
     {
-        super();
     }
 }

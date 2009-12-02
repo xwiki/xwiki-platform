@@ -27,10 +27,9 @@ import org.apache.commons.collections.BufferUnderflowException;
 import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
 
 /**
- * This class represents a Queue (FirstInFirstOut) for XWikiDocument objects. It is used during
- * indexing of the wiki. The index is updated whenever the processing queue is not empty. This class
- * is threadsafe, as usually several threads add elements and one thread removes them for
- * processing.
+ * This class represents a Queue (FirstInFirstOut) for XWikiDocument objects. It is used during indexing of the wiki.
+ * The index is updated whenever the processing queue is not empty. This class is threadsafe, as usually several threads
+ * add elements and one thread removes them for processing.
  * 
  * @version $Id$
  */
@@ -47,22 +46,22 @@ public class XWikiDocumentQueue
     private Buffer namesQueue = new UnboundedFifoBuffer();
 
     /**
-     * Remove an item from the queue and return it. Since this is a FIFO, the element returned will
-     * be the oldes one in the queue.
+     * Remove an item from the queue and return it. Since this is a FIFO, the element returned will be the oldes one in
+     * the queue.
      * 
      * @return The oldest element in the queue.
      * @throws BufferUnderflowException If the queue is empty.
      */
     public synchronized IndexData remove() throws BufferUnderflowException
     {
-        return documentsByName.remove(namesQueue.remove());
+        return this.documentsByName.remove(this.namesQueue.remove());
     }
 
     /**
-     * Adds an item to the queue. Since this is a FIFO, it will be removed after all the other items
-     * already in the queue have been processed. If the element was already in the queue, it will
-     * not be added again (as a duplicate), its position will remain unchanged, but the associated
-     * data is updated, so the new version will replace the old unprocessed one.
+     * Adds an item to the queue. Since this is a FIFO, it will be removed after all the other items already in the
+     * queue have been processed. If the element was already in the queue, it will not be added again (as a duplicate),
+     * its position will remain unchanged, but the associated data is updated, so the new version will replace the old
+     * unprocessed one.
      * 
      * @param data IndexData object to add to the queue.
      */
@@ -70,13 +69,14 @@ public class XWikiDocumentQueue
     public synchronized void add(IndexData data)
     {
         final String key = data.getId();
-        if (!documentsByName.containsKey(key)) {
+        if (!this.documentsByName.containsKey(key)) {
             // Document with this name not yet in the Queue, so add it
-            namesQueue.add(key);
+            this.namesQueue.add(key);
         }
+
         // In any case put new version of this document in the map, overwriting
         // possibly existing older version
-        documentsByName.put(key, data);
+        this.documentsByName.put(key, data);
     }
 
     /**
@@ -86,7 +86,7 @@ public class XWikiDocumentQueue
      */
     public synchronized boolean isEmpty()
     {
-        return namesQueue.isEmpty();
+        return this.namesQueue.isEmpty();
     }
 
     /**
@@ -96,6 +96,6 @@ public class XWikiDocumentQueue
      */
     public synchronized int getSize()
     {
-        return namesQueue.size();
+        return this.namesQueue.size();
     }
 }

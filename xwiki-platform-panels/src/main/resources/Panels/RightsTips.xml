@@ -101,7 +101,7 @@
 #largepanelheader($msg.get("xe.panels.rights.tips"))
 &lt;div id="xwikirightstips"&gt;
   &lt;div id="xwikitipspublic"&gt;
-    &lt;div id="xwikitipspublicHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;$msg.get("xe.panels.rights.publicwiki")&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikitipspublicHeader" class="accordionTabTitleBar"&gt;&lt;h1&gt;$msg.get("xe.panels.rights.publicwiki")&lt;/h1&gt;&lt;/div&gt;
     &lt;div id="xwikitipspublicContent" class="accordionTabContentBox"&gt;
 $msg.get("xe.panels.rights.openwiki")
 
@@ -112,7 +112,7 @@ $msg.get("xe.panels.rights.openwiki")
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div id="xwikitipsregistered" class="accordion"&gt;
-    &lt;div id="xwikitipsregisteredHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;$msg.get("xe.panels.rights.authenticate")&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikitipsregisteredHeader" class="accordionTabTitleBar"&gt;&lt;h1&gt;$msg.get("xe.panels.rights.authenticate")&lt;/h1&gt;&lt;/div&gt;
     &lt;div id="xwikitipsregisteredContent" class="accordionTabContentBox"&gt;
 $msg.get("xe.panels.rights.protectedwiki")
 
@@ -123,7 +123,7 @@ $msg.get("xe.panels.rights.protectedwiki")
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div id="xwikitipsbanned"&gt;
-    &lt;div id="xwikitipsbannedHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;$msg.get("xe.panels.rights.banned")&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikitipsbannedHeader" class="accordionTabTitleBar"&gt;&lt;h1&gt;$msg.get("xe.panels.rights.banned")&lt;/h1&gt;&lt;/div&gt;
     &lt;div id="xwikitipsbannedContent" class="accordionTabContentBox"&gt;
 $msg.get("xe.panels.rights.bannedgroup")
 

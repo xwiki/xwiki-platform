@@ -150,7 +150,7 @@
     #end
     #set($i = $i + 1)
     &lt;div id="xwikinav${space}"&gt;
-    &lt;div id="xwikinav${space}Header" class="accordionTabTitleBar"&gt;&lt;h6&gt;$space&lt;/h6&gt;&lt;/div&gt;
+    &lt;div id="xwikinav${space}Header" class="accordionTabTitleBar"&gt;&lt;h1&gt;$space&lt;/h1&gt;&lt;/div&gt;
     &lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
     #set ($escapedSpace = $space.replaceAll("'", "''"))
     #set($hql = $xwiki.searchDocuments("doc.space='$escapedSpace' order by doc.name"))

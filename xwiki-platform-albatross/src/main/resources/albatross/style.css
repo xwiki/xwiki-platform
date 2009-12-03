@@ -54,7 +54,8 @@
 	cursor: pointer;
 }
 
-.panel .accordionTabTitleBar h1 {
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSALBATROSS-71 */
+.panel .accordionTabTitleBar h1, .panel .accordionTabTitleBar h6 {
 	border-top: 1px solid #999;
 }
 
@@ -85,7 +86,9 @@ li.selected {
 	cursor: pointer;
 }
 
-#xwikieditcontent .accordionTabTitleBar h1 {
+
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSALBATROSS-71 */
+#xwikieditcontent .accordionTabTitleBar h1, #xwikieditcontent .accordionTabTitleBar h6 {
 	width: 100%;
 }
 

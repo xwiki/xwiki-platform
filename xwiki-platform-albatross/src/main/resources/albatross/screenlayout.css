@@ -755,7 +755,8 @@ Scriptaculous Acordeon
   overflow: hidden !important;
 }
 
-.accordionTabTitleBar h1{
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSALBATROSS-71 */
+.accordionTabTitleBar h1, .accordionTabTitleBar h6 {
   margin: 0px;
   padding: 0px 4px;
 }

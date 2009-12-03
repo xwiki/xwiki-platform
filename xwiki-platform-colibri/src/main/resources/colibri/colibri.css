@@ -52,10 +52,13 @@ a img {
 }
 
 h1, h2, h3, h4 , h5, h6{
+  border-bottom: 1px dotted $theme.borderColor;
   color: $theme.titleColor;
   display: block;
   font-weight: 400;
   line-height: 1.2em;
+  margin: 20px 0;
+  overflow: hidden;
 }
 
 /* Font size for Hn is 1.1^(7-n) */
@@ -83,17 +86,9 @@ h6 {
   font-size: 1.1em;
 }
 
-h1 span, h2 span, h3 span, h4 span {
-  border-bottom: 1px dotted $theme.borderColor;
-  display: block;
-  margin: 20px 0;
-  overflow: hidden;
-}
-
 p {
   line-height: 1.4em;
   margin: .5em 0;
-  text-align: justify;
 }
 
 ol {
@@ -216,7 +211,7 @@ span.wikicreatelink a {
   display: block;
   height: 24px;
   line-height: 24px;
-  margin: -19px 0 -1em;
+  margin: -19px 0 0;
   overflow: hidden;
   position: relative;
   visibility:hidden;
@@ -376,9 +371,9 @@ body.content #contentcolumn .main {
 }
 
 #document-title h1 {
-  border-bottom: 1px dotted $theme.borderColor;
   font-size: 2.15em;
   letter-spacing: -1px;
+  margin: 0;
   padding: 5px 0;
 }
 
@@ -1111,6 +1106,7 @@ h1.xwikipaneltitle {
   font-size: .8em;
   font-weight: 700;
   letter-spacing: 0;
+  margin: 0;
   padding: 6px 20px 6px 15px;
   text-align: left;
   text-transform: uppercase;
@@ -1749,12 +1745,6 @@ body .listGrid {
 }
 
 /* ------------------------Dif---------------------------*/
-/* Should be in microformats.css - Recent Members */
-h1 span span, h2 span span, h3 span span, h4 span span {
-  border-bottom: 0;
-  margin-bottom: 0;
-}
-
 /* Should be in RecentChanges ssx*/
 table.recentChanges {
   border-collapse: separate;

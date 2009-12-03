@@ -40,6 +40,9 @@ import com.xpn.xwiki.web.Utils;
 
 public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
+    /** Anything which doesn't contain any of these characters cannot be velocity code */
+    private static final String VELOCITY_CHARACTERS = "$#";
+
     private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
 
     /**
@@ -59,6 +62,11 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
      */
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
     {
+        // If there are no # or $ characters than the content doesn't contain any velocity code
+        // see: http://velocity.apache.org/engine/releases/velocity-1.5/vtl-reference-guide.html
+        if (StringUtils.containsNone(content, VELOCITY_CHARACTERS)) {
+            return content;
+        }
         VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         Document previousdoc = (Document) vcontext.get("doc");

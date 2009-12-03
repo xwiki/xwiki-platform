@@ -112,6 +112,8 @@
     #getEntryObject($entryDoc $entryObj)
     * [[$!{entryDoc.display('title', 'view', $entryObj)}&gt;&gt;$!{entryDoc.fullName}]]
   #end
+
+
   #panelfooter()
 #end
 {{/html}}

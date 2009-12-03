@@ -21,9 +21,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity output="false"}}
 ##
 ##
 ##
@@ -259,9 +260,9 @@
 &lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title=""&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/bullet_feed.gif')" alt="(RSS)" title="RSS"/&gt;&lt;/a&gt;##
 &lt;a href="$xwiki.getDocument($name).getURL()"&gt;#getCategoryName($xwiki.getDocument($name)) ($totalEntries)&lt;/a&gt;&lt;/span&gt; ##
 &lt;span class="blog-category-tools"&gt;##
-#if($xwiki.hasAccessLevel('delete', $context.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$doc.getURL('view', "xaction=showRenameCategory&amp;amp;category=$name")" class="tool rename"&gt;#categoryToolImage('pencil' 'Rename ')&lt;/a&gt;#end ##
-#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=$name")" class="tool add-subcategory"&gt;#categoryToolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt; #end ##
-#if($xwiki.hasAccessLevel('delete', $context.user, $name)) &lt;a href="$doc.getURL('view', "xaction=delete&amp;amp;category=$name")" class="tool delete"&gt;#categoryToolImage('cross' 'Delete ')&lt;/a&gt;#end ##
+#if($xwiki.hasAccessLevel('delete', $context.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$name")" class="tool rename"&gt;#categoryToolImage('pencil' 'Rename ')&lt;/a&gt;#end ##
+#if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; ("$!{request.xaction}" != "showAddCategory" || "$!{request.parentCategory}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showAddCategory&amp;amp;parentCategory=$name")" class="tool add-subcategory"&gt;#categoryToolImage('chart_organisation_add' 'Add a subcategory ')&lt;/a&gt; #end ##
+#if($xwiki.hasAccessLevel('delete', $context.user, $name)) &lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=delete&amp;amp;category=$name")" class="tool delete"&gt;#categoryToolImage('cross' 'Delete ')&lt;/a&gt;#end ##
 &lt;/span&gt;##
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showRenameCategory" &amp;&amp; "$!{request.category}" == $name) #renameCategoryForm() #end##
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == $name) #addCategoryForm() #end##
@@ -451,5 +452,6 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
   $categoryDoc.getObject('Blog.CategoryClass').set('name', $newCategoryName)
   $categoryDoc.save($msg.get('xe.blog.manageCategories.comment.updatedCategory'), true)
   $categoryDoc.rename($newCategoryName)
-#end</content>
+#end
+{{/velocity}}</content>
 </xwikidoc>

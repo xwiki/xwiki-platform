@@ -21,13 +21,16 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 
-1 $msg.get('xe.blog.unpublished.entries')
+= $msg.get('xe.blog.unpublished.entries') =
 
-#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
-#set($entries = $xwiki.blog.getUnpublishedBlogEntryNames($xwiki.getDocument('Blog.WebHome'), $query).entries)
-#displayBlog($entries 'unpublished' true)
-</content></xwikidoc>
+#getBlogEntriesBaseQuery($query)
+#getUnpublishedBlogEntries($xwiki.getDocument('Blog.WebHome') $query $entries)
+#displayBlog($entries 'unpublished' true true)
+{{/html}}
+{{/velocity}}</content></xwikidoc>

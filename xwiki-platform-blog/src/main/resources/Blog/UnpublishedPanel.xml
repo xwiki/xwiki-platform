@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -100,19 +100,25 @@
 <category>Navigation</category>
 </property>
 <property>
-<content>#includeMacros("Blog.BlogCode")
-#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#getBlogEntriesBaseQuery($query)
 #set($query = "$!{query} and isPublished.value = 0")
 #set($unpublishedEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 5, 0))
 #if($unpublishedEntries.size() &gt; 0 || $showEmptyPanels)
   #panelheader($msg.get('xe.blog.unpublished.entries'))
   #foreach($entryDoc in $xwiki.wrapDocs($unpublishedEntries))
-    #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
-    * [$!{entryDoc.display('title', 'view', $entryObj)}&gt;$!{entryDoc.fullName}]
+    #getEntryObject($entryDoc $entryObj)
+    * [[$!{entryDoc.display('title', 'view', $entryObj)}&gt;&gt;$!{entryDoc.fullName}]]
   #end
-  [$msg.get('xe.blog.unpublished.viewall') ($xwiki.countDocuments($query))&gt;Blog.Unpublished]
+
+
+  [[$msg.get('xe.blog.unpublished.viewall') (% class="itemCount" %)($xwiki.countDocuments($query))(%%)&gt;&gt;Blog.Unpublished]]
   #panelfooter()
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </property>
 <property>
 <description>Shows the most recent unpublished blog entries.</description>
@@ -124,5 +130,5 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
+<content>{{include document="Panels.PanelSheet"/}}</content>
 </xwikidoc>

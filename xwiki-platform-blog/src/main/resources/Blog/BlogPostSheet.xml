@@ -23,21 +23,48 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{include document="Blog.BlogCode2"/}}
-{{include document="Blog.CategoriesCode2"/}}
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>Blog.BlogPostSheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>c3a48d28-a427-465c-9949-145bb521497c</guid>
+<property>
+<defaultEditMode></defaultEditMode>
+</property>
+</object>
+<content>{{include document="Blog.BlogCode"/}}
+{{include document="Blog.CategoriesCode"/}}
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 $xwiki.jsx.use('Blog.ManageCategories', {'mode' : 'select'})##
 $xwiki.ssx.use('Blog.ManageCategories')##
-#set($entryObj = $xwiki.blog.getEntryObject($doc, $blogPostClassname))
+#getEntryObject($doc $entryObj)
 #if("$!entryObj" == '')
   #warning($msg.get("xe.blog.sheet.notpost"))
 #elseif($context.action != 'inline')
   ## View mode
-  #set($isPublished = $xwiki.blog.isPublished($entryObj))
-  #set($isHidden = $xwiki.blog.isHidden($entryObj))
+  #isPublished($entryObj $isPublished)
+  #isHidden($entryObj $isHidden)
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
-  #displayBlog([$doc.fullName] 'single' false)
+  #displayBlog([$doc.fullName] 'single' false false)
 #else
   &lt;dl&gt;
   &lt;dt&gt;$msg.get("xe.blog.sheet.title")&lt;/dt&gt;
@@ -53,7 +80,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   &lt;/dd&gt;
   &lt;/dl&gt;
   #template('tagedit.vm')
-  #set($isPublished = $xwiki.blog.isPublished($entryObj))
+  #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $context.user)
       #set(${publicationDate} = ${doc.display('publishDate', 'view', $entryObj)})

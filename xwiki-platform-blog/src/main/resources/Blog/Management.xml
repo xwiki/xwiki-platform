@@ -23,7 +23,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{include document="Blog.BlogCode2"/}}
+<content>{{include document="Blog.BlogCode"/}}
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 #if($hasAdmin)
@@ -36,7 +36,7 @@
 = $msg.get('xe.blog.manage.existing') =
 
 #foreach($item in $xwiki.wrapDocs($xwiki.searchDocuments(", BaseObject obj where obj.name = doc.fullName and obj.className = '$blogClassname'")))
-  #set($title = $xwiki.blog.getBlogTitle($item, $blogClassname))
+  #getBlogTitle($item $title)
   #if($title != '')
     * [[$title&gt;&gt;$item.fullName]]
   #else

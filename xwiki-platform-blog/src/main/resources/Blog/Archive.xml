@@ -21,14 +21,16 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 ##
 ##
 ##
 #macro(displayBlogFullArchive $blogDoc)
-  #set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+  #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   ## Create a Jodatime date formatter that will be used to format dates
   #set($monthFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM'))
@@ -39,26 +41,26 @@
   #set($lastYear = '')
   #foreach($firstEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value)", 1, 0))
     #set($discard = $xwiki.getDocument($firstEntry))
-    #set($entryObj = $xwiki.blog.getEntryObject($discard, $blogPostClassname))
-    #set($firstYear = $xwiki.blog.getEntryDate($entryObj))
+    #getEntryObject($discard $entryObj)
+    #getEntryDate($discard $entryObj $firstYear)
     #set($firstYear = $util.parseInt($xwiki.formatDate($firstYear, 'yyyy')))
   #end
   #foreach($lastEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value) desc", 1, 0))
     #set($discard = $xwiki.getDocument($lastEntry))
-    #set($entryObj = $xwiki.blog.getEntryObject($discard, $blogPostClassname))
-    #set($lastYear = $xwiki.blog.getEntryDate($entryObj))
+    #getEntryObject($discard $entryObj)
+    #getEntryDate($discard $entryObj $lastYear)
     #set($lastYear = $util.parseInt($xwiki.formatDate($lastYear, 'yyyy')))
   #end
   #if("$!{firstYear}" != '') ## At least one entry exists
     #foreach($year in [$firstYear..$lastYear])
       #set($yearArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year"))
       #if($yearArticleCount &gt; 0)
-        * &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}")"&gt;$year ($yearArticleCount)&lt;/a&gt;
+        * [[$year ($yearArticleCount)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}]]
         #foreach($month in [1..12])
           #set($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month"))
           #if($monthArticleCount &gt; 0)
             $tempDate.setMonthOfYear($month)
-            ** &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}&amp;amp;month=${month}")"&gt;$monthFormatter.print($tempDate) (${monthArticleCount})&lt;/a&gt;
+            ** [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]]
           #end
         #end
       #end
@@ -71,8 +73,8 @@
 ##
 ##
 #macro(displayBlogYearArchive $blogDoc $year)
-  1 $msg.get('xe.blog.archive.postsyear', [$year])
-  #set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+= $msg.get('xe.blog.archive.postsyear', [$year]) =
+  #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   #set($query = "${query} and year(publishDate.value) = $year")
   ## Create a Jodatime date formatter that will be used to format dates
@@ -84,12 +86,13 @@
       #set($monthArticleCount = $xwiki.countDocuments("${query} and month(publishDate.value) = $month"))
       #if($monthArticleCount &gt; 0)
         $tempDate.setMonthOfYear($month)
-        1.1 &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}&amp;amp;month=${month}")"&gt;$monthFormatter.print($tempDate) (${monthArticleCount})&lt;/a&gt;
+== [[$monthFormatter.print($tempDate) (${monthArticleCount})&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]] ==
         #foreach($entryDoc in $xwiki.wrapDocs($xwiki.searchDocuments("${query} and month(publishDate.value) = $month order by publishDate.value")))
-          #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
-          #set($isPublished = $xwiki.blog.isPublished($entryObj))
-          #set($isHidden = $xwiki.blog.isHidden($entryObj))
-          * &lt;a href="$entryDoc.getURL()"&gt;$entryDoc.display('title', 'view', $entryObj)&lt;/a&gt;#if(!$isPublished) $msg.get('xe.blog.archive.unpublished')#elseif($isHidden) $msg.get('xe.blog.archive.hidden')#end
+          #getEntryObject($entryDoc $entryObj)
+          #isPublished($entryObj $isPublished)
+          #isHidden($entryObj $isHidden)
+          * [[$entryDoc.display('title', 'view', $entryObj)&gt;&gt;$entryDoc]]#if(!$isPublished) $msg.get('xe.blog.archive.unpublished')#elseif($isHidden) $msg.get('xe.blog.archive.hidden')#end
+
         #end
       #end
     #end
@@ -105,15 +108,15 @@
   #set($tempDate = $xwiki.jodatime.mutableDateTime)
   $tempDate.setYear($util.parseInt($year))##
   $tempDate.setMonthOfYear($util.parseInt($month))##
-  1 $msg.get('xe.blog.archive.postsfor') $dateFormatter.print($tempDate)
-  #set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+= $msg.get('xe.blog.archive.postsfor') $dateFormatter.print($tempDate) =
+  #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   #set($query = "${query} and year(publishDate.value) = $year and month(publishDate.value) = $month")
   #set($monthArticleCount = $xwiki.countDocuments(${query}))
   #if($monthArticleCount &gt; 0)
     #foreach($entryDoc in $xwiki.wrapDocs($xwiki.searchDocuments("${query} order by publishDate.value")))
-      #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
-      #displayEntry($entryDoc $entryObj true)
+      #getEntryObject($entryDoc $entryObj)
+      #displayEntry($entryDoc $entryObj true true)
     #end
   #else
     #info($msg.get('xe.blog.archive.noarticlesmonth'))
@@ -126,7 +129,7 @@
 #if($space == '')
   #set($space = 'Blog')
 #end
-#set($blogDoc = $xwiki.blog.getBlogDocument($space, $blogClassname))
+#getBlogDocument($space $blogDoc)
 #set($month = "$!{request.month}")
 #set($year = "$!{request.year}")
 #if($year == '')
@@ -140,5 +143,7 @@
     ## Show all entries in the month (extract)
     #displayBlogMonthArchive($blogDoc $year $month)
   #end
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </xwikidoc>

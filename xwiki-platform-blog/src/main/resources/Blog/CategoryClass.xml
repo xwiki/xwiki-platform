@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <class>
 <name>Blog.CategoryClass</name>
@@ -62,5 +62,5 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
 </class>
-<content>#includeForm("XWiki.ClassSheet")</content>
+<content>{{include document="XWiki.ClassSheet"/}}</content>
 </xwikidoc>

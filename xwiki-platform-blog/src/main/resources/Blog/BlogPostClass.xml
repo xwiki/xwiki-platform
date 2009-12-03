@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <class>
 <name>Blog.BlogPostClass</name>
@@ -146,5 +146,4 @@
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </title>
 </class>
-<content>
-</content></xwikidoc>
+<content>{{include document="XWiki.ClassSheet"/}}</content></xwikidoc>

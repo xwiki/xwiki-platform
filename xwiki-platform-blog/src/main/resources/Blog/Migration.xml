@@ -21,9 +21,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#if($request.migrate)
+<content>{{velocity filter="none"}}
+#if($request.migrate)
   #set($newContent = '#includeForm("Blog.BlogPostSheet")')
   #set($query = ", BaseObject obj where obj.name = doc.fullName and obj.className = 'XWiki.ArticleClass'")
   #foreach($article in $xwiki.searchDocuments($query))
@@ -40,17 +41,20 @@
       #set($discard = $articleDoc.removeObjects('XWiki.ArticleClass'))
       $articleDoc.setContent($newContent)
       $!articleDoc.save($msg.get('xe.blog.migration.migrated'), true)
-      * $msg.get('xe.blog.migration.updated') [$entryObj.title&gt;$article] ($msg.get('xe.blog.migration.inspace') [$articleDoc.space&gt;${articleDoc.space}.WebHome])
+      * $msg.get('xe.blog.migration.updated') [[$entryObj.title&gt;&gt;${article}]] ($msg.get('xe.blog.migration.inspace') [[$articleDoc.space&gt;&gt;${articleDoc.space}.WebHome]])
     #else
-      * $msg.get('xe.blog.migration.skipping') [$article]
+      * $msg.get('xe.blog.migration.skipping') [[$article]]
     #end
   #end
-  $msg.get('xe.blog.migration.done') [$msg.get('xe.blog.migration.backtoblog')&gt;Blog.WebHome]
+  $msg.get('xe.blog.migration.done') [[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
 #else
   $msg.get('xe.blog.migration.pleaseconfirm')
+{{html clean="false" wiki="true"}}
   &lt;form action="$doc.getURL()" method="post"&gt;
     &lt;div&gt;&lt;input type="submit" name="migrate" value="$msg.get('xe.blog.migration.confirm')"/&gt;&lt;/div&gt;
   &lt;/form&gt;
-  [$msg.get('xe.blog.migration.backtoblog')&gt;Blog.WebHome]
-#end</content>
+{{/html}}
+  [[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
+#end
+{{/velocity}}</content>
 </xwikidoc>

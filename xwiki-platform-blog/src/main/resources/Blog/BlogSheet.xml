@@ -23,18 +23,42 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{include document="Blog.BlogCode2"/}}
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>Blog.BlogSheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>fe4d8a34-5c80-4bc4-9352-45cfbd48bfcb</guid>
+<property>
+<defaultEditMode></defaultEditMode>
+</property>
+</object>
+<content>{{include document="Blog.BlogCode"/}}
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 ##
 ##
 ##
-#checkBlogPlugin($isAvailable)
-#if($isAvailable)
-  #showBlogInfo($doc)
-  #if($context.action != 'inline')
-    #printBlog($doc)
-  #end
+#showBlogInfo($doc)
+#if($context.action != 'inline')
+  #printBlog($doc)
 #end
 {{/html}}
 {{/velocity}}</content>

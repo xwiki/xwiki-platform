@@ -100,14 +100,18 @@
 <category>Information</category>
 </property>
 <property>
-<content>#includeMacros("Blog.CategoriesCode2")
+<content>{{include document="Blog.CategoriesCode"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 #panelheader('Blog Categories')
 #getCategoriesHierarchy('Blog' $tree)
 #displayCategoriesHierarchy($tree 'simple')
 #if($xwiki.hasAdminRights())
-  &lt;div style="font-size:75%;"&gt;(&lt;a href="$xwiki.getURL('Blog.ManageCategories')"&gt;$msg.get("xe.blog.categories.edit")&lt;/a&gt;)&lt;/div&gt;
+  &lt;div style="font-size:75%;"&gt;([[$msg.get('xe.blog.categories.edit')&gt;&gt;Blog.ManageCategories]])&lt;/div&gt;
 #end
-#panelfooter()</content>
+#panelfooter()
+{{/html}}
+{{/velocity}}</content>
 </property>
 <property>
 <description>List all Blog Categories. A Category is a name used to organize Blog articles that you post. XWiki is preconfigured with three categories: News, Personal and Others.</description>

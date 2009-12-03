@@ -23,18 +23,20 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{include document="Blog.BlogCode2"/}}
+<content>{{include document="Blog.BlogCode"/}}
 {{velocity filter="none"}}
+#if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')
 {{html clean="false" wiki="false"}}
-#set($blogDoc = $xwiki.blog.getBlogDocument($doc.space, $blogClassname))
-#set($blogTitle = $xwiki.blog.getBlogTitle($blogDoc, $blogClassname))
+#getBlogDocument($doc.space $blogDoc)
+#getBlogTitle($blogDoc $title)
 #set($feedMetadata = {
-  "title": $blogTitle,
+  "title": $title,
   "description": "Most recent blog posts in the wiki",
   "url": $xwiki.getDocument('Main.WebHome').externalURL
   })
-#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+#getBlogEntriesBaseQuery($query)
 $xwiki.feed.getBlogFeedOutput("${query} order by publishDate.value desc", 10, 0, $feedMetadata, 'rss_2.0')
 {{/html}}
+#end
 {{/velocity}}</content>
 </xwikidoc>

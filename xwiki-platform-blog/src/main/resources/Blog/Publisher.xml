@@ -23,9 +23,8 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{include document="Blog.BlogCode2"/}}
-{{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity output="false"}}
 #set($xredirect = "$!{request.xredirect}")
 #if($xredirect == '')
   #set($xredirect = $xwiki.getURL("${space}.WebHome"))
@@ -35,7 +34,7 @@
   #if($xwiki.hasAccessLevel('edit', $context.user, $entryName))
     #set($entryDoc = $xwiki.getDocument($entryName))
     #if ($entryDoc)
-      #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
+      #getEntryObject($entryDoc $entryObj)
       #if("$!{entryObj.getProperty('published').value}" == '0')
         #set($discard = $entryObj.set('hidden', 0))
         #set($discard = $entryObj.set('published', 1))
@@ -47,6 +46,5 @@
   #end
 #end
 $response.sendRedirect($xredirect)
-{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

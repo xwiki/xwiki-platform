@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -100,18 +100,22 @@
 <category>Navigation</category>
 </property>
 <property>
-<content>#includeMacros("Blog.BlogCode")
-#set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
+#getBlogEntriesBaseQuery($query)
 #set($query = "$!{query} and isPublished.value = 1 and hidden.value &lt;&gt; 1")
 #set($recentEntries = $xwiki.searchDocuments("${query} order by publishDate.value desc", 10, 0))
 #if($recentEntries.size() &gt; 0 || $showEmptyPanels)
   #panelheader('Recent Blog Posts')
   #foreach($entryDoc in $xwiki.wrapDocs($recentEntries))
-    #set($entryObj = $xwiki.blog.getEntryObject($entryDoc, $blogPostClassname))
-    * [$!{entryDoc.display('title', 'view', $entryObj)}&gt;$!{entryDoc.fullName}]
+    #getEntryObject($entryDoc $entryObj)
+    * [[$!{entryDoc.display('title', 'view', $entryObj)}&gt;&gt;$!{entryDoc.fullName}]]
   #end
   #panelfooter()
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </property>
 <property>
 <description>Shows the most recent (published) blog posts.</description>
@@ -123,5 +127,5 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
+<content>{{include document="Panels.PanelSheet"/}}</content>
 </xwikidoc>

@@ -23,8 +23,7 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{velocity filter="none"}}
-{{html clean="false" wiki="true"}}
+<content>{{velocity output="false"}}
 ## Blog
 #set($blogClassname = 'Blog.BlogClass')
 #set($blogTemplate = 'Blog.BlogTemplate')
@@ -60,6 +59,5 @@
 #macro(toolImage $attachmentName $alt)
   &lt;img class="icon-manage" src="$blogStyleDocument.getAttachmentURL($attachmentName)" alt="${alt}"/&gt;
 #end
-{{/html}}
 {{/velocity}}</content>
 </xwikidoc>

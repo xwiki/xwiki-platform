@@ -23,7 +23,34 @@
 <minorEdit>false</minorEdit>
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>{{include document="Blog.CategoriesCode2"/}}
+<object>
+<class>
+<name>XWiki.SheetClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<defaultEditMode>
+<name>defaultEditMode</name>
+<number>1</number>
+<prettyName>Default Edit Mode</prettyName>
+<size>15</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</defaultEditMode>
+</class>
+<name>Blog.CategorySheet</name>
+<number>0</number>
+<className>XWiki.SheetClass</className>
+<guid>a0c19db1-addb-4599-855e-55696c51eecd</guid>
+<property>
+<defaultEditMode></defaultEditMode>
+</property>
+</object>
+<content>{{include document="Blog.CategoriesCode"/}}
 {{velocity filter="none"}}
 {{html clean="false" wiki="true"}}
 $xwiki.ssx.use("Blog.ManageCategories")##

@@ -21,9 +21,10 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity output="false"}}
 ##
 ##
 ##
@@ -35,7 +36,6 @@
  * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
  *###
 #macro(displayBlogRss $blogDoc $entries)
-{pre}
   ## Create a Jodatime date formatter that will be used to format dates
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
   ## Set the right mimetype
@@ -46,7 +46,6 @@
   #printBlogRssImage($blogDoc)
   #printBlogRssItems($entries)
   #printBlogRssFooter()
-{/pre}
 #end
 ##
 ##
@@ -58,7 +57,6 @@
  * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
  *###
 #macro(displayGlobalBlogRss $entries)
-{pre}
   ## Create a Jodatime date formatter that will be used to format dates
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
   ## Set the right mimetype
@@ -69,7 +67,6 @@
   #printWikiRssImage($blogDoc)
   #printBlogRssItems($entries)
   #printBlogRssFooter()
-{/pre}
 #end
 ##
 ##
@@ -83,7 +80,6 @@
  * @param entries The entries to display. Usually, these are the last entries belonging to the blog.
  *###
 #macro(displayBlogCategoryRss $blogDoc $categoryDoc $entries)
-{pre}
   ## Create a Jodatime date formatter that will be used to format dates
   #set($dateFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern("yyyy-MM-dd'T'hh:mm:ssZZ"))
   ## Set the right mimetype
@@ -93,7 +89,6 @@
   #printBlogCategoryRssChannelDescription($categoryDoc $entries)
   #printBlogRssItems($entries)
   #printBlogRssFooter()
-{/pre}
 #end
 ##
 ##
@@ -332,5 +327,6 @@ $escapetool.xml($entryDoc.display($fieldName, 'view', $entryObj))#end
     #set($port = ":${request.serverPort}")
   #end
   #set($logoUrl = "${request.scheme}://${request.serverName}${port}$logoUrl")
-#end</content>
+#end
+{{/velocity}}</content>
 </xwikidoc>

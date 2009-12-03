@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -73,5 +73,5 @@
 <name>News</name>
 </property>
 </object>
-<content>#includeForm("CategorySheet")</content>
+<content>{{include document="CategorySheet"/}}</content>
 </xwikidoc>

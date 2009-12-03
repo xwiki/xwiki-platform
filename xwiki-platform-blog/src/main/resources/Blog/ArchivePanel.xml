@@ -21,7 +21,7 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>false</hidden>
 <object>
 <class>
@@ -100,15 +100,17 @@
 <category>Navigation</category>
 </property>
 <property>
-<content>#includeMacros("Blog.BlogCode")
+<content>{{include document="Blog.BlogCode"/}}
+{{velocity filter="none"}}
+{{html clean="false" wiki="true"}}
 #set($space = "$!{request.space}")
 #if($space == '')
   #set($space = $doc.space)
 #end
-#set($blogDoc = $xwiki.blog.getBlogDocument($space, $blogClassname))
+#getBlogDocument($space $blogDoc)
 #if($space == $blogDoc.space || $showEmptyPanels)
   #panelheader('Blog Archive')
-  #set($query = $xwiki.blog.getBlogEntriesBaseQuery($blogPostTemplate, $blogPostClassname))
+  #getBlogEntriesBaseQuery($query)
   #set($query = "${query} and (doc.space = '${blogDoc.space}' or doc.parent = '${blogDoc.fullName}')")
   ## Create a Jodatime date formatter that will be used to format dates
   #set($monthFormatter = $xwiki.jodatime.getDateTimeFormatterForPattern('MMMM'))
@@ -119,27 +121,27 @@
   #set($lastYear = '')
   #foreach($firstEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value)", 1, 0))
     #set($discard = $xwiki.getDocument($firstEntry))
-    #set($entryObj = $xwiki.blog.getEntryObject($discard, $blogPostClassname))
-    #set($firstYear = $xwiki.blog.getEntryDate($entryObj))
+    #getEntryObject($discard $entryObj)
+    #getEntryDate($discard $entryObj $firstYear)
     #set($firstYear = $util.parseInt($xwiki.formatDate($firstYear, 'yyyy')))
   #end
   #foreach($lastEntry in $xwiki.searchDocuments("${query} order by year(publishDate.value) desc", 1, 0))
     #set($discard = $xwiki.getDocument($lastEntry))
-    #set($entryObj = $xwiki.blog.getEntryObject($discard, $blogPostClassname))
-    #set($lastYear = $xwiki.blog.getEntryDate($entryObj))
+    #getEntryObject($discard $entryObj)
+    #getEntryDate($discard $entryObj $lastYear)
     #set($lastYear = $util.parseInt($xwiki.formatDate($lastYear, 'yyyy')))
   #end
   #if("$!{firstYear}" != '') ## At least one entry exists
     #foreach($year in [$firstYear..$lastYear])
       #set($yearArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year"))
       #if($yearArticleCount &gt; 0)
-        * &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}")"&gt;$year &lt;span class="itemCount"&gt;($yearArticleCount)&lt;/span&gt;&lt;/a&gt;
+        * [[$year (% class="itemCount" %)(${yearArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}]]
         #if($year == $currentYear)
           #foreach($month in [1..12])
             #set($monthArticleCount = $xwiki.countDocuments("${query} and year(publishDate.value) = $year and month(publishDate.value) = $month"))
             #if($monthArticleCount &gt; 0)
               $tempDate.setMonthOfYear($month)
-              ** &lt;a href="$xwiki.getURL('Blog.Archive', 'view', "space=${blogDoc.space}&amp;amp;year=${year}&amp;amp;month=${month}")"&gt;$monthFormatter.print($tempDate) &lt;span class="itemCount"&gt;(${monthArticleCount})&lt;/span&gt;&lt;/a&gt;
+              ** [[$monthFormatter.print($tempDate) (% class="itemCount" %)(${monthArticleCount})(%%)&gt;&gt;Blog.Archive?space=${blogDoc.space}&amp;year=${year}&amp;month=${month}]]
             #end
           #end
         #end
@@ -149,7 +151,9 @@
     #info($msg.get('xe.blog.archive.noarticle'))
   #end
   #panelfooter()
-#end</content>
+#end
+{{/html}}
+{{/velocity}}</content>
 </property>
 <property>
 <description>Displays an archive of the current blog.</description>
@@ -161,5 +165,5 @@
 <type>view</type>
 </property>
 </object>
-<content>#includeForm("Panels.PanelSheet")</content>
+<content>{{include document="Panels.PanelSheet"/}}</content>
 </xwikidoc>

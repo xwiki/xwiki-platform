@@ -2315,7 +2315,8 @@ Rico Acordeon
     font-size: 0.9em;
 }
 
-.accordionTabTitleBar h1 {
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSTOUCAN-137 */
+.accordionTabTitleBar h1, .accordionTabTitleBar h6 {
 	display:block;
     margin: 0;
     padding: 4px;
@@ -2324,8 +2325,9 @@ Rico Acordeon
     background-color: #8799b3;
 }
 
-#panellistaccordion #xwikinav .accordionTabTitleBar h1,
-    #xwikinav .accordionTabTitleBar h1 {
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSTOUCAN-137 */
+#panellistaccordion #xwikinav .accordionTabTitleBar h1, #xwikinav .accordionTabTitleBar h1,
+#panellistaccordion #xwikinav .accordionTabTitleBar h6, #xwikinav .accordionTabTitleBar h6 {
     background-color: #fff;
     color: #333;
     border: 1px solid #999;
@@ -2342,7 +2344,8 @@ Rico Acordeon
     border-width: 1px 0;
 }
 
-#xwikieditcontent .accordionTabTitleBar h1 {
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSTOUCAN-137 */
+#xwikieditcontent .accordionTabTitleBar h1, #xwikieditcontent .accordionTabTitleBar h6 {
     margin: 0;
     padding: 4px 21px;
     height: 20px;
@@ -2357,7 +2360,8 @@ Rico Acordeon
     background-position: 0% 50%;
 }
 
-#panellistaccordion #xwikinav .accordionTabTitleBar h1 {
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSTOUCAN-137 */
+#panellistaccordion #xwikinav .accordionTabTitleBar h1, #panellistaccordion #xwikinav .accordionTabTitleBar h6 {
     background-image: none;
     height: auto;
     padding: 2px 3px;

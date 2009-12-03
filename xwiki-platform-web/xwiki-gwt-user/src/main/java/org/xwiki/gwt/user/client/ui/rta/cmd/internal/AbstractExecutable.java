@@ -20,9 +20,13 @@
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
 import org.xwiki.gwt.dom.client.DOMUtils;
+import org.xwiki.gwt.dom.client.Document;
+import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
+import com.google.gwt.dom.client.Node;
 
 /**
  * Base class for all {@link Executable}s that manipulate a DOM document using the selection and range APIs.
@@ -53,7 +57,29 @@ public abstract class AbstractExecutable implements Executable
      */
     public boolean isEnabled(RichTextArea rta)
     {
-        return isSupported(rta) && rta.getDocument().getSelection().getRangeCount() > 0;
+        return isSupported(rta) && rta.isEnabled() && hasValidSelection(rta);
+    }
+
+    /**
+     * @param rta a rich text area
+     * @return {@code true} if the given rich text area has a valid selection, {@code false} otherwise
+     */
+    protected boolean hasValidSelection(RichTextArea rta)
+    {
+        Document document = rta.getDocument();
+        Selection selection = document.getSelection();
+        for (int i = 0; i < selection.getRangeCount(); i++) {
+            Node ancestor = selection.getRangeAt(i).getCommonAncestorContainer();
+            if (ancestor.getNodeType() == Node.DOCUMENT_NODE) {
+                return false;
+            } else if (ancestor.getNodeType() != Node.ELEMENT_NODE) {
+                ancestor = ancestor.getParentNode();
+            }
+            if (!document.getBody().isOrHasChild(Element.as(ancestor))) {
+                return false;
+            }
+        }
+        return selection.getRangeCount() > 0;
     }
 
     /**

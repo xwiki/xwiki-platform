@@ -57,7 +57,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     /**
      * @see #setEnabled(boolean)
      */
-    public static final String ENABLED = "__enabled";
+    public static final String DISABLED = "__disabled";
 
     /**
      * The command manager that executes commands on this rich text area.
@@ -220,7 +220,7 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     public boolean isEnabled()
     {
-        return getElement().getPropertyBoolean(ENABLED);
+        return !getElement().getPropertyBoolean(DISABLED);
     }
 
     /**
@@ -238,6 +238,6 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      */
     public void setEnabled(boolean enabled)
     {
-        getElement().setPropertyBoolean(ENABLED, enabled);
+        getElement().setPropertyBoolean(DISABLED, !enabled);
     }
 }

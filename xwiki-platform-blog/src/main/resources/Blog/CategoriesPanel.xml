@@ -106,6 +106,7 @@
 #panelheader('Blog Categories')
 #getCategoriesHierarchy('Blog' $tree)
 #displayCategoriesHierarchy($tree 'simple')
+
 #if($xwiki.hasAdminRights())
   &lt;div style="font-size:75%;"&gt;([[$msg.get('xe.blog.categories.edit')&gt;&gt;Blog.ManageCategories]])&lt;/div&gt;
 #end

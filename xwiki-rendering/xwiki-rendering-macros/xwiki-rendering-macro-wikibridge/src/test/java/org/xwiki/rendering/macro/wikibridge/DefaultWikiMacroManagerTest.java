@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.xwiki.rendering.macro.wikibridge;
 
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ import org.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Test case for verifying correct macro registration.
  * 
- * @version $id$
+ * @version $Id$
  * @since 2.0M2
  */
 public class DefaultWikiMacroManagerTest extends AbstractXWikiComponentTestCase

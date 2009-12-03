@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -116,9 +117,12 @@ public class WikiMacroDescriptor implements MacroDescriptor
      */
     public Map<String, ParameterDescriptor> getParameterDescriptorMap()
     {
-        Map<String, ParameterDescriptor> descriptors = new HashMap<String, ParameterDescriptor>();
+        // Note: use a linked hash map to preserve the parameter order.
+        // TODO: Replace saving the descriptors as a list and use a map instead so that this method becomes performant
+        // (as it should be).
+        Map<String, ParameterDescriptor> descriptors = new LinkedHashMap<String, ParameterDescriptor>();
 
-        for (WikiMacroParameterDescriptor descriptor : parameterDescriptors) {
+        for (WikiMacroParameterDescriptor descriptor : this.parameterDescriptors) {
             descriptors.put(descriptor.getId(), descriptor);
         }
 

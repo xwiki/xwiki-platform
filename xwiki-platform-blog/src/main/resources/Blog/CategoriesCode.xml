@@ -201,7 +201,6 @@
 &lt;/span&gt;##
 #end
 &lt;/span&gt;
-
 #end
 ##
 ##
@@ -267,7 +266,6 @@
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showRenameCategory" &amp;&amp; "$!{request.category}" == $name) #renameCategoryForm() #end##
 #if($xwiki.hasAccessLevel('edit', $context.user, $doc.fullName) &amp;&amp; "$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == $name) #addCategoryForm() #end##
 &lt;/span&gt;
-
 #end
 ##
 ##

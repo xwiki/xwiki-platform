@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,7 +95,8 @@ public class XWikiMacroService implements MacroService
                 contentDescriptor.setMandatory(descriptor.getContentDescriptor().isMandatory());
             }
 
-            Map<String, ParameterDescriptor> parameterDescriptorMap = new HashMap<String, ParameterDescriptor>();
+            // We use a linked hash map to preserve the order of the macro parameters.
+            Map<String, ParameterDescriptor> parameterDescriptorMap = new LinkedHashMap<String, ParameterDescriptor>();
             for (Map.Entry<String, org.xwiki.rendering.macro.descriptor.ParameterDescriptor> entry : descriptor
                 .getParameterDescriptorMap().entrySet()) {
                 parameterDescriptorMap.put(entry.getKey(), createMacroParameterDescriptor(entry.getValue()));

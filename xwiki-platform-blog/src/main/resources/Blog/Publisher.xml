@@ -27,7 +27,7 @@
 {{velocity output="false"}}
 #set($xredirect = "$!{request.xredirect}")
 #if($xredirect == '')
-  #set($xredirect = $xwiki.getURL("${space}.WebHome"))
+  #set($xredirect = $xwiki.getURL('Blog.WebHome'))
 #end
 #set($entryName = "$!{request.entryName}")
 #if($entryName != '')

@@ -308,10 +308,8 @@ public class MacroDisplayer implements InnerHTMLListener
      */
     private DocumentFragment extractMetaData(Node start, Node stop)
     {
-        Document document = textArea.getDocument();
-        DocumentFragment metaData = document.createDocumentFragment();
+        DocumentFragment metaData = textArea.getDocument().createDocumentFragment();
         metaData.appendChild(start);
-        metaData.appendChild(document.createTextNode(Element.INNER_HTML_PLACEHOLDER));
         metaData.appendChild(stop);
         return metaData;
     }

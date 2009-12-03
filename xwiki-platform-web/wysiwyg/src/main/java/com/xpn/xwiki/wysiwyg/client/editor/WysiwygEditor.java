@@ -159,12 +159,6 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     private static final Command SUBMIT = new Command("submit");
 
     /**
-     * The interface of the WYSIWYG editor. It can be either a {@link RichTextEditor} or a {@link TabPanel} containing
-     * the {@link RichTextEditor} and the {@link PlainTextEditor}.
-     */
-    private final Widget ui;
-
-    /**
      * The configuration object.
      */
     private final Config config;
@@ -194,6 +188,12 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      * has been placed on the tool bar.
      */
     private final Map<String, UIExtension> toolBarFeatures = new HashMap<String, UIExtension>();
+
+    /**
+     * The interface of the WYSIWYG editor. It can be either a {@link RichTextEditor} or a {@link TabPanel} containing
+     * the {@link RichTextEditor} and the {@link PlainTextEditor}.
+     */
+    private Widget ui;
 
     /**
      * The plug-in manager.
@@ -230,7 +230,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
         this.pfm = pfm;
 
         if (isTabbed()) {
-            ui = createTabPanel();
+            createTabPanel();
         } else {
             ui = getRichTextEditor();
         }
@@ -364,6 +364,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
         PlainTextEditor plainTextEditor = new PlainTextEditor(getHook(), cache);
 
         TabPanel tabs = new TabPanel();
+        ui = tabs;
         tabs.add(getRichTextEditor(), Strings.INSTANCE.wysiwyg());
         tabs.add(plainTextEditor, Strings.INSTANCE.source());
         tabs.setStyleName("xRichTextEditorTabPanel");

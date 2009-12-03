@@ -179,7 +179,7 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
      */
     public void update()
     {
-        if (levels != null) {
+        if (levels != null && levels.isEnabled()) {
             String level = getTextArea().getCommandManager().getStringValue(Command.FORMAT_BLOCK);
             if (level != null) {
                 for (int i = 0; i < levels.getItemCount(); i++) {

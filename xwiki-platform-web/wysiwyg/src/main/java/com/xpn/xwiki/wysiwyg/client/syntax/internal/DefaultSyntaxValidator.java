@@ -64,6 +64,7 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("italic", Command.ITALIC));
         addValidationRule(new DefaultValidationRule("underline", Command.UNDERLINE));
         addValidationRule(new DefaultValidationRule("strikethrough", Command.STRIKE_THROUGH));
+        addValidationRule(new DefaultValidationRule("teletype", Command.TELETYPE));
         addValidationRule(new DefaultValidationRule("subscript", Command.SUB_SCRIPT));
         addValidationRule(new DefaultValidationRule("superscript", Command.SUPER_SCRIPT));
         addValidationRule(new DefaultValidationRule("justifyleft", Command.JUSTIFY_LEFT));
@@ -84,27 +85,8 @@ public class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
         addValidationRule(new DefaultValidationRule("hr", Command.INSERT_HORIZONTAL_RULE));
         addValidationRule(new DefaultValidationRule("symbol", Command.INSERT_HTML));
-        addValidationRule(new DefaultValidationRule("image", Command.INSERT_IMAGE));
-        // FIXME : Register the following validation rules in the related plug-ins.
-        addValidationRule(new DefaultValidationRule("importer", Command.INSERT_HTML));
-        addTableValidationRules();
         // Add the validation rule for the image selection behavior.
         addValidationRule(new ImageSelectionBehaviourRule());
-    }
-
-    /**
-     * Adds constraints for table features.
-     */
-    private void addTableValidationRules()
-    {
-        addValidationRule(new DefaultValidationRule("deletecol"));
-        addValidationRule(new DefaultValidationRule("deleterow"));
-        addValidationRule(new DefaultValidationRule("deletetable"));
-        addValidationRule(new DefaultValidationRule("insertcolafter"));
-        addValidationRule(new DefaultValidationRule("insertcolbefore"));
-        addValidationRule(new DefaultValidationRule("insertrowafter"));
-        addValidationRule(new DefaultValidationRule("insertrowbefore"));
-        addValidationRule(new DefaultValidationRule("inserttable"));
     }
 
     /**

@@ -38,26 +38,20 @@ public final class NativeSelection extends JavaScriptObject
     }
 
     /**
+     * NOTE: If there's no selected range in the given document then the returned selection object corresponds to the
+     * parent document. As a consequence, ranges obtained through this selection object using the native API are from
+     * the parent document. {@link #ensureSelectionIsPreserved(Document)} tries to fix this, but we have to return a
+     * non-null selection object even if it's not the right one, as long as we set the {@code ownerDocument} property to
+     * the right value.
+     * 
      * @param document the DOM document for which to retrieve the selection object
      * @return the selection object associated with the given in-line frame
      */
     public static synchronized native NativeSelection getInstance(Document document)
     /*-{
         var selection = document.selection;
-        // If there's no selected range in the given document then the returned selection object corresponds to the
-        // parent document. Let's check if we got the right selection object. We can do this by comparing the owner
-        // document of the returned selection object with the given document. We can get the owner document only from
-        // the currently selected range.
-        var selectedRange = selection.createRange();
-        var ownerDocument = selectedRange.item ? selectedRange.item(0).ownerDocument :
-            selectedRange.parentElement().ownerDocument;
-        if (document == ownerDocument) {
-            selection.ownerDocument = document;
-            return selection;
-        } else {
-            // The given document has no selection. You must focus its window.
-            return null;
-        }
+        selection.ownerDocument = document;
+        return selection;
     }-*/;
 
     /**

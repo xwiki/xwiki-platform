@@ -89,6 +89,7 @@ $xwiki.jsx.use("Blog.ManageCategories")##
 #if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "${doc.fullName}") #addCategoryForm() #end
 ##
 #end
+
 &lt;/div&gt;
 &lt;div class="clearfloats"&gt;&lt;/div&gt;
 {{/html}}

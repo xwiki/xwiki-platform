@@ -61,7 +61,8 @@ public class SubmitExecutable implements Executable
     {
         Element field = (Element) Document.get().getElementById(fieldId);
         if (field != null) {
-            field.setPropertyString(VALUE, rta.getHTML());
+            // Use the special xGetInnerHTML method which expands element meta data.
+            field.setPropertyString(VALUE, Element.as(rta.getDocument().getBody()).xGetInnerHTML());
             return true;
         }
         return false;

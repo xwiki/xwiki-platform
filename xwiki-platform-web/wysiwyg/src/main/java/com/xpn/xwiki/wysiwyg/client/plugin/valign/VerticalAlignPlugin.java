@@ -136,7 +136,9 @@ public class VerticalAlignPlugin extends AbstractStatefulPlugin implements Click
     public void update()
     {
         for (Map.Entry<ToggleButton, Command> entry : buttons.entrySet()) {
-            entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
+            if (entry.getKey().isEnabled()) {
+                entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
+            }
         }
     }
 }

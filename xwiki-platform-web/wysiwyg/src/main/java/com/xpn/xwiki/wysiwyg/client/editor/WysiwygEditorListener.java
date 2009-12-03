@@ -26,13 +26,18 @@ import java.util.Map;
 import org.xwiki.gwt.user.client.CancelableAsyncCallback;
 import org.xwiki.gwt.user.client.Console;
 import org.xwiki.gwt.user.client.ui.rta.Reloader;
+import org.xwiki.gwt.user.client.ui.rta.SelectionPreserver;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.BeforeSelectionEvent;
 import com.google.gwt.event.logical.shared.BeforeSelectionHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.DeferredCommand;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.xpn.xwiki.wysiwyg.client.converter.HTMLConverter;
@@ -98,15 +103,47 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     private String lastConvertedSourceText;
 
     /**
+     * The object used to save the DOM selection before the rich text area is hidden (i.e. before the source tab is
+     * selected) and to restore it when the user switches back to WYSIWYG tab without having changed the source text.
+     */
+    private SelectionPreserver domSelectionPreserver;
+
+    /**
+     * Marks the end points of the source text selection before the plain text area is hidden (i.e. before the WYSIWYG
+     * tab is selected). This information is used to restore the selection on the plain text area when the user switches
+     * back to source tab without having changed the rich text.
+     */
+    private int[] sourceRange = new int[2];
+
+    /**
      * Creates a new tab-switch handler for the given WYSIWYG editor.
      * 
      * @param editor the {@link WysiwygEditor} instance
      */
-    WysiwygEditorListener(WysiwygEditor editor)
+    WysiwygEditorListener(final WysiwygEditor editor)
     {
         this.editor = editor;
         reloader = new Reloader(editor.getRichTextEditor().getTextArea());
         sourceSyntax = editor.getConfig().getParameter("syntax", WysiwygEditor.DEFAULT_SYNTAX);
+        domSelectionPreserver = new SelectionPreserver(editor.getRichTextEditor().getTextArea());
+
+        // Prevent a useless conversion the first time the user switches from source to rich text if the source text
+        // didn't change and the user switched to source tab before the rich text area finished loading.
+        lastConvertedSourceText = editor.getPlainTextEditor().getTextArea().getText();
+
+        // Prevent a useless conversion the first time the user switches from rich text to source.
+        final HandlerRegistration[] registrations = new HandlerRegistration[1];
+        registrations[0] = editor.getRichTextEditor().getTextArea().addLoadHandler(new LoadHandler()
+        {
+            public void onLoad(LoadEvent event)
+            {
+                registrations[0].removeHandler();
+                if (editor.getSelectedTab() == WysiwygEditor.WYSIWYG_TAB_INDEX) {
+                    lastConvertedHTML =
+                        editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
+                }
+            }
+        });
     }
 
     /**
@@ -125,6 +162,12 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
             // We have to do this before the tabs are actually switched because plug-ins can't access the computed style
             // of the rich text area when it is hidden.
             editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT);
+            // Save the DOM selection before the rich text area is hidden.
+            domSelectionPreserver.saveSelection();
+        } else if (currentlySelectedTab == WysiwygEditor.SOURCE_TAB_INDEX && !editor.getPlainTextEditor().isLoading()) {
+            // Save the source selection before the plain text area is hidden.
+            sourceRange[0] = editor.getPlainTextEditor().getTextArea().getCursorPos();
+            sourceRange[1] = editor.getPlainTextEditor().getTextArea().getSelectionLength();
         }
     }
 
@@ -148,7 +191,10 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     private void switchToSource()
     {
         // If the rich text editor is loading then there's no HTML to convert to source.
-        if (!editor.getRichTextEditor().isLoading()) {
+        if (editor.getRichTextEditor().isLoading()) {
+            // The plain text area lost the focus while it was hidden. We have to restore its selection.
+            restoreSourceSelection();
+        } else {
             // At this point we should have the HTML, adjusted by plug-ins, submitted.
             // See #onBeforeSelection(BeforeSelectionEvent)
             String currentHTML = editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
@@ -156,6 +202,10 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
             if (!currentHTML.equals(lastConvertedHTML)) {
                 // Update the HTML to prevent duplicated requests while the conversion is in progress.
                 lastConvertedHTML = currentHTML;
+                // Clear the saved source selection range because a new source text will be loaded. Place the caret at
+                // start.
+                sourceRange[0] = 0;
+                sourceRange[1] = 0;
                 // If there is a conversion is progress, cancel it.
                 if (sourceCallback != null) {
                     sourceCallback.setCanceled(true);
@@ -178,7 +228,7 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
                 });
                 // Make the request to convert the HTML to source syntax.
                 converter.fromHTML(currentHTML, sourceSyntax, sourceCallback);
-            } else {
+            } else if (!editor.getPlainTextEditor().isLoading()) {
                 enableSourceTab();
             }
         }
@@ -228,10 +278,19 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
         editor.getPlainTextEditor().getTextArea().setEnabled(true);
         // Store the initial value of the plain text area in case it is submitted without gaining focus.
         editor.getPlainTextEditor().submit();
+        // Restore the selected text or just place the caret at start.
+        restoreSourceSelection();
+    }
+
+    /**
+     * Restores the previously selected source text, or just places the caret at start.
+     */
+    private void restoreSourceSelection()
+    {
         // Try giving focus to the plain text area (this might not work if the browser window is not focused).
         editor.getPlainTextEditor().getTextArea().setFocus(true);
-        // Place the caret at the start.
-        editor.getPlainTextEditor().getTextArea().setCursorPos(0);
+        // Restore the selected text or place the caret at start.
+        editor.getPlainTextEditor().getTextArea().setSelectionRange(sourceRange[0], sourceRange[1]);
     }
 
     /**
@@ -240,12 +299,25 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
     private void switchToWysiwyg()
     {
         // If the plain text editor is loading then there's no source text to convert to HTML.
-        if (!editor.getPlainTextEditor().isLoading()) {
+        if (editor.getPlainTextEditor().isLoading()) {
+            // The rich text area lost the focus while it was hidden. We have to restore its selection.
+            // NOTE: We have to use a deferred command in order to let the rich text area re-initialize its internal
+            // selection object after it was hidden. The internal selection object is null at this point.
+            DeferredCommand.addCommand(new com.google.gwt.user.client.Command()
+            {
+                public void execute()
+                {
+                    restoreDOMSelection();
+                }
+            });
+        } else {
             String currentSourceText = editor.getPlainTextEditor().getTextArea().getText();
             // If the source text didn't change then there's no point in doing the conversion again.
             if (!currentSourceText.equals(lastConvertedSourceText)) {
                 // Update the source text to prevent duplicated conversion requests while the conversion is in progress.
                 lastConvertedSourceText = currentSourceText;
+                // Clear the saved selection because the document is reloaded.
+                domSelectionPreserver.clearPlaceHolders();
                 editor.getRichTextEditor().setLoading(true);
                 // Reload the rich text area.
                 Map<String, String> params = new HashMap<String, String>();
@@ -262,8 +334,20 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
                         onSwitchToWysiwygSuccess();
                     }
                 });
-            } else {
-                enableWysiwygTab();
+            } else if (!editor.getRichTextEditor().isLoading()) {
+                // NOTE: We have to use a deferred command in order to let the rich text area re-initialize its internal
+                // selection object after it was hidden. The internal selection object is null at this point.
+                DeferredCommand.addCommand(new com.google.gwt.user.client.Command()
+                {
+                    public void execute()
+                    {
+                        // Double check the selected tab.
+                        if (editor.getSelectedTab() == WysiwygEditor.WYSIWYG_TAB_INDEX
+                            && !editor.getRichTextEditor().isLoading()) {
+                            enableWysiwygTab();
+                        }
+                    }
+                });
             }
         }
     }
@@ -303,13 +387,24 @@ public class WysiwygEditorListener implements SelectionHandler<Integer>, BeforeS
         // Disable the plain text area to prevent submitting its content.
         editor.getPlainTextEditor().getTextArea().setEnabled(false);
 
-        // Focus the rich text area before executing the commands to ensure it has a proper selection.
-        editor.getRichTextEditor().getTextArea().setFocus(true);
+        // Restore the DOM selection before executing the commands.
+        restoreDOMSelection();
         // Store the initial value of the rich text area in case it is submitted without gaining focus.
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(SUBMIT, true);
         // Update the HTML to prevent a useless HTML to source conversion when we already know the source.
         lastConvertedHTML = editor.getRichTextEditor().getTextArea().getCommandManager().getStringValue(SUBMIT);
         // Enable the rich text area in order to be able to submit its content.
         editor.getRichTextEditor().getTextArea().getCommandManager().execute(ENABLE, true);
+    }
+
+    /**
+     * Restores the selection on the rich text area. It does nothing if the selection wan't previously saved.
+     */
+    private void restoreDOMSelection()
+    {
+        // Focus the rich text area.
+        editor.getRichTextEditor().getTextArea().setFocus(true);
+        // Restore the DOM selection.
+        domSelectionPreserver.restoreSelection();
     }
 }

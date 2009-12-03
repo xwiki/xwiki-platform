@@ -49,17 +49,6 @@ public class RichTextAreaImplSafari extends com.google.gwt.user.client.ui.impl.R
     }
 
     /**
-     * {@inheritDoc} <br />
-     * NOTE: We need this method to be able to hook simplification of the DOM tree storing meta data in elements.
-     * 
-     * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#getHTMLImpl()
-     */
-    protected String getHTMLImpl()
-    {
-        return ((Element) IFrameElement.as(elem).getContentDocument().getBody().cast()).xGetInnerHTML();
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see com.google.gwt.user.client.ui.impl.RichTextAreaImplSafari#initElement()

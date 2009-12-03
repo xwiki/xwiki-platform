@@ -160,7 +160,9 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickHandler
     public void update()
     {
         for (Map.Entry<ToggleButton, Command> entry : buttons.entrySet()) {
-            entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
+            if (entry.getKey().isEnabled()) {
+                entry.getKey().setDown(getTextArea().getCommandManager().isExecuted(entry.getValue()));
+            }
         }
     }
 }

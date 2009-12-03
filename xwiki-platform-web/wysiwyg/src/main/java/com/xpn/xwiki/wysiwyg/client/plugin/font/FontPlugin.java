@@ -159,7 +159,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
     public void update()
     {
         for (Map.Entry<Picker, Command> entry : pickers.entrySet()) {
-            entry.getKey().setSelectedValue(getTextArea().getCommandManager().getStringValue(entry.getValue()));
+            if (((FocusWidget) entry.getKey()).isEnabled()) {
+                entry.getKey().setSelectedValue(getTextArea().getCommandManager().getStringValue(entry.getValue()));
+            }
         }
     }
 }

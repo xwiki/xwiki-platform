@@ -1349,7 +1349,8 @@ fieldset.xwikimessage .xwikimessage {
 
 /* ----------------- Accordion -----------------------*/
 
-.accordionTabTitleBar h1 {
+/* Note that h6 styling is provided in order to ensure backward compatibility after XSCOLIBRI-160 */
+.accordionTabTitleBar h1, .accordionTabTitleBar h6 {
   display:block;
   background: $theme.panelHeaderBackgroundColor url( $xwiki.getSkinFile('icons/xwiki/accordion.png')) 0 50% no-repeat;
   border-bottom: 1px solid $theme.borderColor;

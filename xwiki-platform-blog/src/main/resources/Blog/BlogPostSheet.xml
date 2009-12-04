@@ -94,7 +94,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
       ## The publish date was not set, force it to be the creation date
       $entryObj.set('publishDate', $doc.creationDate)
     #end
-    #publishMessageBox("$msg.get('xe.blog.sheet.notpublished') &lt;label&gt;*$msg.get('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}*&lt;/label&gt;\\&lt;label&gt;$msg.get('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
+    #publishMessageBox("$msg.get('xe.blog.sheet.notpublished') &lt;label&gt;**$msg.get('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}**&lt;/label&gt;\\&lt;label&gt;$msg.get('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
   #end
   #set($newtitle = $request.title)
   #if($newtitle)

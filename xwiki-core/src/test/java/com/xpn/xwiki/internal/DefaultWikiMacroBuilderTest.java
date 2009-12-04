@@ -37,9 +37,9 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiDocument macroDefinitionDoc;
-    
+
     private Mock mockXWiki;
-    
+
     private WikiMacroFactory wikiMacroFactory;
 
     @Override
@@ -47,7 +47,7 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
     {
         super.setUp();
         this.wikiMacroFactory = getComponentManager().lookup(WikiMacroFactory.class);
-        
+
         // Build the macro definition document.
         BaseObject obj = new BaseObject();
         obj.setClassName("XWiki.WikiMacroClass");
@@ -60,27 +60,45 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
         obj.setStringValue("code", "==Hi==");
         macroDefinitionDoc = new XWikiDocument("xwiki", "Macros", "Test");
         macroDefinitionDoc.addObject("XWiki.WikiMacroClass", obj);
-        
+
         // Setup the mock xwiki.
         this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getDocument").will(returnValue(macroDefinitionDoc));
-        
+
         // Set this mock xwiki in context.
         getContext().setWiki((XWiki) mockXWiki.proxy());
     }
-    
+
     public void testWikiMacroBuilding() throws Exception
     {
         // Build a wiki macro.
         WikiMacro macro = this.wikiMacroFactory.createWikiMacro("xwiki:Macros.Test");
         assertNotNull(macro);
-        
+
         // Check if the macro was built correctly.
         assertEquals("testmacro", macro.getId());
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
         assertEquals("Test", macro.getDescriptor().getDefaultCategory());
         assertTrue(macro.supportsInlineMode());
-        assertNull(macro.getDescriptor().getContentDescriptor());        
+        assertNull(macro.getDescriptor().getContentDescriptor());
+    }
+
+    public void testWikiMacroWithoutName() throws Exception
+    {
+        BaseObject obj = macroDefinitionDoc.getObject("XWiki.WikiMacroClass");
+        obj.setStringValue("name", "");
+
+        // Build a wiki macro.
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro("xwiki:Macros.Test");
+        assertNotNull(macro);
+
+        // Check if the macro was built correctly.
+        assertEquals("testmacro", macro.getId());
+        assertEquals("testmacro", macro.getDescriptor().getName());
+        assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
+        assertEquals("Test", macro.getDescriptor().getDefaultCategory());
+        assertTrue(macro.supportsInlineMode());
+        assertNull(macro.getDescriptor().getContentDescriptor());
     }
 }

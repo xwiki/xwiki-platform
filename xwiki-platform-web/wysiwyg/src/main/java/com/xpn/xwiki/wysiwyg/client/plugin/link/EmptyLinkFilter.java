@@ -100,8 +100,8 @@ public class EmptyLinkFilter implements CommandListener
      */
     private boolean isEmpty(AnchorElement anchor)
     {
-        return !StringUtils.isEmpty(anchor.getHref()) && anchor.getOffsetWidth() == 0 && anchor.getOffsetHeight() == 0
-            && isDisplayed(anchor);
+        // NOTE: Don't test the offsetHeight against 0 because it can be the same as the line height.
+        return !StringUtils.isEmpty(anchor.getHref()) && anchor.getOffsetWidth() == 0 && isDisplayed(anchor);
     }
 
     /**

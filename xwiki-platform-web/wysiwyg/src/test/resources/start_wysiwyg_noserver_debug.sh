@@ -3,7 +3,7 @@
 XE_VERSION=2.1-SNAPSHOT;
 GWT_VERSION=1.7.0;
 
-JAVA32_HOME=/usr/lib/jvm/ia32-java-1.5.0-sun/bin;
+JAVA32_HOME=/usr/lib/jvm/ia32-java-6-sun/bin/;
 M2_REPO=~/.m2/repository;
 APP_DIR=`dirname $0`/webapps/xwiki;
 WYSIWYG_PATH=resources/js/xwiki/wysiwyg/xwe;

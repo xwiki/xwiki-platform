@@ -21,10 +21,13 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.RssCode")
-#includeMacros("Blog.CategoriesCode")
+<content>{{include document="Blog.RssCode"/}}
+{{include document="Blog.CategoriesCode"/}}
+{{velocity filter="none"}}
+#if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')
+{{html clean="false" wiki="false"}}
 ##
 ##
 ##
@@ -40,7 +43,9 @@
 #getEntriesForCategory($tempCategoryDoc.fullName $entries $totalEntries)
 #set($categoryDoc = $tempCategoryDoc)
 #set($entries = $xwiki.wrapDocs($entries))
-#if("$!{request.xpage}" == 'plain')
-  #displayBlogCategoryRss($categoryDoc $categoryDoc $entries)
-#end</content>
+#displayBlogCategoryRss($categoryDoc $categoryDoc $entries)
+{{/html}}
+#end
+{{/velocity}}
+</content>
 </xwikidoc>

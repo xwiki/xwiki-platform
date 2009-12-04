@@ -19,13 +19,13 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.ArrayList;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
-
-import java.util.ArrayList;
 
 public class DeleteAttachmentAction extends XWikiAction
 {
@@ -42,8 +42,7 @@ public class DeleteAttachmentAction extends XWikiAction
             // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
             // we want to use our own decoding.
             String requestUri = request.getRequestURI();
-            filename =
-                Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
+            filename = Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
         }
 
         XWikiDocument newdoc = (XWikiDocument) doc.clone();
@@ -51,7 +50,7 @@ public class DeleteAttachmentAction extends XWikiAction
         // An attachment can be indicated either using an id, or using the filename.
         if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
-            attachment = (XWikiAttachment) newdoc.getAttachmentList().get(id);
+            attachment = newdoc.getAttachmentList().get(id);
         } else {
             attachment = newdoc.getAttachment(filename);
         }
@@ -62,14 +61,13 @@ public class DeleteAttachmentAction extends XWikiAction
         ArrayList params = new ArrayList();
         params.add(filename);
         if (attachment.isImage(context)) {
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment",
-                params));
+            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment", params));
         } else {
-            newdoc.setComment(context.getMessageTool().get(
-                "core.comment.deleteAttachmentComment", params));
+            newdoc.setComment(context.getMessageTool().get("core.comment.deleteAttachmentComment", params));
         }
 
         newdoc.deleteAttachment(attachment, context);
+
         // forward to attach page
         String redirect = Utils.getRedirect("attach", context);
         sendRedirect(response, redirect);

@@ -111,6 +111,7 @@
  *        For any other value, the default ("simple") is considered.
  *###
 #macro(displayCategoriesHierarchy $tree $displayMethod)
+  #set($processedCategories = $util.arrayList)
   #displayCategoriesHierarchyRecursive($tree $defaultCategoryParent 1 $displayMethod)
 #end
 ##

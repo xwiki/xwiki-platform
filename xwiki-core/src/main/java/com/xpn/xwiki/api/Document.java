@@ -1065,17 +1065,19 @@ public class Document extends Api
     }
 
     /**
-     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels are
-     * written in a syntax other than the main document. The problem is that currently the displayPanel() velocity macro
-     * in macros.vm calls display() on the main document and not on the panel document. Thus if we don't tell what
-     * syntax to use the main document syntax will be used to display panels even if they're written in another syntax.
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param obj the object containing the field to display
+     * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
+     *            escaping depending of the syntax.
+     * @return the rendered field
      */
-    public String display(String fieldname, String type, Object obj, String syntaxId)
+    public String display(String fieldname, String type, Object obj, String wrappingSyntaxId)
     {
         if (obj == null) {
             return "";
         }
-        return this.doc.display(fieldname, type, obj.getBaseObject(), syntaxId, getXWikiContext());
+        return this.doc.display(fieldname, type, obj.getBaseObject(), wrappingSyntaxId, getXWikiContext());
     }
 
     public String display(String fieldname, String mode, Object obj)
@@ -1189,8 +1191,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
-                    "Error while making content diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+                        "Error while making content diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1218,8 +1220,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
-                    "Error while making xml diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
+                        "Error while making xml diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1247,8 +1249,9 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
-                    "Error while making rendered diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                        XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
+                        "Error while making rendered diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1275,8 +1278,9 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                    "Error while making meta data diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                        XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+                        "Error while making meta data diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1303,8 +1307,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
-                    "Error while making meta object diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
+                        "Error while making meta object diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1331,8 +1335,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
-                    "Error while making class diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
+                        "Error while making class diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1357,12 +1361,13 @@ public class Document extends Api
             return this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
             java.lang.Object[] args =
-                {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
-                (newdoc != null) ? newdoc.getVersion() : null};
+                    {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
+                    (newdoc != null) ? newdoc.getVersion() : null};
             List list = new ArrayList();
             XWikiException xe =
-                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
-                    "Error while making attachment diff of {0} between version {1} and version {2}", e, args);
+                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                        XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
+                        "Error while making attachment diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -2006,8 +2011,8 @@ public class Document extends Api
 
     /**
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
-     * which list the document we are renaming as their parent.
-     * See {@link #renameDocument(String, java.util.List, java.util.List)} for more details.
+     * which list the document we are renaming as their parent. See
+     * {@link #renameDocument(String, java.util.List, java.util.List)} for more details.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @throws XWikiException in case of an error
@@ -2041,7 +2046,7 @@ public class Document extends Api
      * <li>[currentwiki:CurrentSpace.Page]</li>
      * </ul>
      * <p>
-     * Note: links without a space are renamed with the space added and all documents which have the document being 
+     * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
      * </p>
      * 
@@ -2058,34 +2063,35 @@ public class Document extends Api
             this.doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
         }
     }
-    
+
     /**
-     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document
-     * as their parent is passed in parameter.
+     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document as
+     * their parent is passed in parameter.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
-     *        new renamed document.
+     *            new renamed document.
      * @param childDocumentNames the list of documents whose parent field will be set to the new document name.
      * @throws XWikiException in case of an error
      */
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames) 
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames)
         throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
+        if (hasAccessLevel("delete")
+            && this.context.getWiki().checkAccess("edit",
+                this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
 
             // Every page given in childDocumentNames has it's parent changed whether it needs it or not.
             // Let's make sure the user has edit permission on any page given which is not actually a child.
-            // Otherwise it would be embarrassing if a user called: 
-            //   $doc.rename("mynewpage",$doc.getBacklinks(),$xwiki.searchDocuments("true"))
+            // Otherwise it would be embarrassing if a user called:
+            // $doc.rename("mynewpage",$doc.getBacklinks(),$xwiki.searchDocuments("true"))
             int counter = childDocumentNames.size();
             List<String> actuallyChildren = getChildren();
             while (counter > 0) {
                 counter--;
-                if (!actuallyChildren.contains(childDocumentNames.get(counter)) 
-                    && !this.context.getWiki().checkAccess("edit", this.context.getWiki().getDocument(
-                        childDocumentNames.get(counter), this.context), this.context)) {
+                if (!actuallyChildren.contains(childDocumentNames.get(counter))
+                    && !this.context.getWiki().checkAccess("edit",
+                        this.context.getWiki().getDocument(childDocumentNames.get(counter), this.context), this.context)) {
                     return;
                 }
             }

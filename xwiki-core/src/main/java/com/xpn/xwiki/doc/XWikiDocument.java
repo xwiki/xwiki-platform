@@ -1773,6 +1773,11 @@ public class XWikiDocument implements DocumentModelBridge
         return result;
     }
 
+    /**
+     * @param fieldname the name of the field to display
+     * @param context the XWiki context
+     * @return the rendered field
+     */
     public String display(String fieldname, XWikiContext context)
     {
         String result = "";
@@ -1791,6 +1796,12 @@ public class XWikiDocument implements DocumentModelBridge
         return result;
     }
 
+    /**
+     * @param fieldname the name of the field to display
+     * @param obj the object containing the field to display
+     * @param context the XWiki context
+     * @return the rendered field
+     */
     public String display(String fieldname, BaseObject obj, XWikiContext context)
     {
         String type = null;
@@ -1806,16 +1817,36 @@ public class XWikiDocument implements DocumentModelBridge
         return display(fieldname, type, obj, context);
     }
 
+    /**
+     * @param fieldname the name of the field to display
+     * @param mode the mode to use ("view", "edit", ...)
+     * @param context the XWiki context
+     * @return the rendered field
+     */
     public String display(String fieldname, String mode, XWikiContext context)
     {
         return display(fieldname, mode, "", context);
     }
 
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param obj the object containing the field to display
+     * @param context the XWiki context
+     * @return the rendered field
+     */
     public String display(String fieldname, String type, BaseObject obj, XWikiContext context)
     {
         return display(fieldname, type, "", obj, context);
     }
 
+    /**
+     * @param fieldname the name of the field to display
+     * @param mode the mode to use ("view", "edit", ...)
+     * @param prefix the prefix to add in the field identifier in edit display for example
+     * @param context the XWiki context
+     * @return the rendered field
+     */
     public String display(String fieldname, String mode, String prefix, XWikiContext context)
     {
         try {
@@ -1834,23 +1865,44 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Note: We've introduced this signature taking an extra syntaxId parameter to handle the case where Panels are
-     * written in a syntax other than the main document. The problem is that currently the displayPanel() velocity macro
-     * in macros.vm calls display() on the main document and not on the panel document. Thus if we don't tell what
-     * syntax to use the main document syntax will be used to display panels even if they're written in another syntax.
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param obj the object containing the field to display
+     * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
+     *            escaping depending of the syntax.
+     * @param context the XWiki context
+     * @return the rendered field
      */
-    public String display(String fieldname, String type, BaseObject obj, String syntaxId, XWikiContext context)
+    public String display(String fieldname, String type, BaseObject obj, String wrappingSyntaxId, XWikiContext context)
     {
-        return display(fieldname, type, "", obj, syntaxId, context);
+        return display(fieldname, type, "", obj, wrappingSyntaxId, context);
     }
 
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example
+     * @param obj the object containing the field to display
+     * @param context the XWiki context
+     * @return the rendered field
+     */
     public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context)
     {
         return display(fieldname, type, pref, obj, context.getWiki().getCurrentContentSyntaxId(getSyntaxId(), context),
             context);
     }
 
-    public String display(String fieldname, String type, String pref, BaseObject obj, String syntaxId,
+    /**
+     * @param fieldname the name of the field to display
+     * @param type the type of the field to display
+     * @param pref the prefix to add in the field identifier in edit display for example 
+     * @param obj the object containing the field to display
+     * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
+     *            escaping depending of the syntax.
+     * @param context the XWiki context
+     * @return the rendered field
+     */
+    public String display(String fieldname, String type, String pref, BaseObject obj, String wrappingSyntaxId,
         XWikiContext context)
     {
         if (obj == null) {
@@ -1877,7 +1929,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // This mode is deprecated for the new rendering and should also be removed for the old rendering
                 // since the way to implement this now is to choose the type of rendering to do in the class itself.
                 // Thus for the new rendering we simply make this mode work like the "view" mode.
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append(getRenderedContent(fcontent, getSyntaxId(), context));
                 } else {
                     result.append(fcontent);
@@ -1890,13 +1942,13 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is not "xwiki/1.0", i.e. if the new rendering engine is used then we need to
                 // protect the content with a <pre> since otherwise whitespaces will be stripped by the HTML macro
                 // used to surround the object property content (see below).
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append("{pre}");
                 } else {
                     result.append("<pre>");
                 }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append("{/pre}");
                 } else {
                     result.append("</pre>");
@@ -1905,23 +1957,23 @@ public class XWikiDocument implements DocumentModelBridge
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append("{pre}");
                 }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append("{/pre}");
                 }
             } else if (type.equals("search")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
                 // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
                 // escaping. For example for a textarea check the TextAreaClass class.
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append("{pre}");
                 }
                 prefix = obj.getxWikiClass(context).getName() + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                if (is10Syntax(syntaxId)) {
+                if (is10Syntax(wrappingSyntaxId)) {
                     result.append("{/pre}");
                 }
             } else {
@@ -1935,7 +1987,7 @@ public class XWikiDocument implements DocumentModelBridge
             // directly from a template and in this case we only want HTML as a result and not wiki syntax.
             // TODO: find a more generic way to handle html macro because this works only for XWiki 1.0 and XWiki 2.0
             // Add the {{html}}{{/html}} only when result really contains html since it's not needed for pure text
-            if (isInRenderingEngine && !is10Syntax(syntaxId)
+            if (isInRenderingEngine && !is10Syntax(wrappingSyntaxId)
                 && (result.indexOf("<") != -1 || result.indexOf(">") != -1)) {
                 result.insert(0, "{{html clean=\"false\" wiki=\"false\"}}");
                 result.append("{{/html}}");

@@ -133,8 +133,8 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
         
         // Verify macro name.
         if (StringUtils.isEmpty(macroName)) {
-            throw new WikiMacroException(String.format(
-                "Incomplete macro definition in [%s], macro name is empty", fullDocumentName));
+            getLogger().warn(
+                String.format("Incomplete macro definition in [%s], macro name is empty", fullDocumentName));
         }
 
         // Verify macro description.

@@ -374,6 +374,8 @@ $!categoryDoc.getObject(${blogCategoryClassname}).getProperty('description').val
     * &lt;span class="blog-add-category-label"&gt;&lt;a href="$doc.getURL('view', "xaction=showAddCategory&amp;amp;parentCategory=")"&gt;$msg.get("xe.blog.categories.addcategory")&lt;/a&gt;&lt;/span&gt;
      #if("$!{request.xaction}" == "showAddCategory" &amp;&amp; "$!{request.parentCategory}" == "") #addCategoryForm() #end
   #end
+
+
 &lt;/div&gt;
 #end
 ##

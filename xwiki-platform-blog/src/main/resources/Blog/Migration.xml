@@ -48,13 +48,15 @@
   #end
   $msg.get('xe.blog.migration.done') [[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
 #else
-  $msg.get('xe.blog.migration.pleaseconfirm')
+$msg.get('xe.blog.migration.pleaseconfirm')
+
 {{html clean="false" wiki="true"}}
   &lt;form action="$doc.getURL()" method="post"&gt;
     &lt;div&gt;&lt;input type="submit" name="migrate" value="$msg.get('xe.blog.migration.confirm')"/&gt;&lt;/div&gt;
   &lt;/form&gt;
 {{/html}}
-  [[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
+
+[[$msg.get('xe.blog.migration.backtoblog')&gt;&gt;Blog.WebHome]]
 #end
 {{/velocity}}</content>
 </xwikidoc>

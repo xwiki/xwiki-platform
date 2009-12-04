@@ -46,6 +46,5 @@
 #displayBlogCategoryRss($categoryDoc $categoryDoc $entries)
 {{/html}}
 #end
-{{/velocity}}
-</content>
+{{/velocity}}</content>
 </xwikidoc>

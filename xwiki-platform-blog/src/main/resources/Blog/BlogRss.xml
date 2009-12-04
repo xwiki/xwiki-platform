@@ -21,16 +21,20 @@
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
-<syntaxId>xwiki/1.0</syntaxId>
+<syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
-<content>#includeMacros("Blog.RssCode")
+<content>{{include document="Blog.RssCode"/}}
+{{velocity filter="none"}}
+#if("$!{request.xpage}" == 'plain' || "$!{request.xpage}" == 'rdf')
+{{html clean="false" wiki="false"}}
 ##
 ##
 ##
 #getTargetBlog($blogDoc)
 #getBlogEntries($blogDoc $entries)
 #set($entries = $xwiki.wrapDocs($entries))
-#if("$!{request.xpage}" == 'plain')
-  #displayBlogRss($blogDoc $entries)
-#end</content>
+#displayBlogRss($blogDoc $entries)
+{{/html}}
+#end
+{{/velocity}}</content>
 </xwikidoc>

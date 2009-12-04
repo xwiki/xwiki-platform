@@ -193,7 +193,7 @@
             <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <!-- The excludes below need to be removed when 2.1RC1 is released -->
+                <!-- The excludes below need to be removed when 2.1 is released -->
                 <exclude>org/xwiki/rendering/macro/descriptor/ParameterDescriptor</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener</exclude>
                 <exclude>org/xwiki/rendering/listener/chaining/LookaheadChainingListener$Event</exclude>

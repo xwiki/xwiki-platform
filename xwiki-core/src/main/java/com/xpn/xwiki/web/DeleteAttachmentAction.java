@@ -58,7 +58,7 @@ public class DeleteAttachmentAction extends XWikiAction
         newdoc.setAuthor(context.getUser());
 
         // Set "deleted attachment" as the version comment.
-        ArrayList params = new ArrayList();
+        ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
         if (attachment.isImage(context)) {
             newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment", params));
@@ -71,6 +71,7 @@ public class DeleteAttachmentAction extends XWikiAction
         // forward to attach page
         String redirect = Utils.getRedirect("attach", context);
         sendRedirect(response, redirect);
+
         return false;
     }
 }

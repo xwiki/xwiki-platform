@@ -1056,7 +1056,7 @@ $fn
     #if (!$pobj)
       ## discarded
     #else
-      $!doc.display("content", "view", $pobj, $paneldoc.getSyntaxId())
+      $!doc.display("content", "view", $pobj)
     #end
   #end
 #end

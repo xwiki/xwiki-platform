@@ -343,23 +343,23 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   &lt;div class="hfeed $!{displaying}"&gt;
   &lt;div class="blogDay"&gt;
   #foreach ($entryDoc in $xwiki.wrapDocs($entries))
-      #getEntryObject($entryDoc $entryObj)
-      ## Although all entries should have one of the two objects, better check to be sure.
-      #if("$!{entryObj}" != '')
-        #getEntryDate($entryDoc $entryObj $entryDate)
-        ## Display a "calendar sheet" for each day. All entries posted on the same day share one such sheet.
-        #set($entryDateStr = $xwiki.formatDate($entryDate, 'yyyyMMMMdd'))
-        #if($blogDay != $entryDateStr)
-          #if($blogDay != '')
-            &lt;/div&gt;
-            &lt;div class="blogDay"&gt;
-          #end
-          #displayBlogDate($entryDate)
-          #set ($blogDay = $entryDateStr)
+    #getEntryObject($entryDoc $entryObj)
+    ## Although all entries should have one of the two objects, better check to be sure.
+    #if("$!{entryObj}" != '')
+      #getEntryDate($entryDoc $entryObj $entryDate)
+      ## Display a "calendar sheet" for each day. All entries posted on the same day share one such sheet.
+      #set($entryDateStr = $xwiki.formatDate($entryDate, 'yyyyMMMMdd'))
+      #if($blogDay != $entryDateStr)
+        #if($blogDay != '')
+          &lt;/div&gt;
+          &lt;div class="blogDay"&gt;
         #end
-        ## Finally, display the entry.
-        #displayEntry($entryDoc $entryObj $onlyExtract $shouldDisplayTitles)
+        #displayBlogDate($entryDate)
+        #set ($blogDay = $entryDateStr)
       #end
+      ## Finally, display the entry.
+      #displayEntry($entryDoc $entryObj $onlyExtract $shouldDisplayTitles)
+    #end
   #end
   &lt;/div&gt; ## blogDay
   &lt;/div&gt; ## hfeed

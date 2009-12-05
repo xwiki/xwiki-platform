@@ -342,10 +342,7 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
   #set($blogDay = "")
   &lt;div class="hfeed $!{displaying}"&gt;
   &lt;div class="blogDay"&gt;
-  #foreach ($entry in $entries)
-    #set($entryDoc = $xwiki.getDocument($entry))
-    ## This fails if the document is not accessible, due to access rights.
-    #if($entryDoc.fullName == $entry)
+  #foreach ($entryDoc in $xwiki.wrapDocs($entries))
       #getEntryObject($entryDoc $entryObj)
       ## Although all entries should have one of the two objects, better check to be sure.
       #if("$!{entryObj}" != '')
@@ -363,7 +360,6 @@ $!xwiki.jsx.use($blogScriptsDocumentName)##
         ## Finally, display the entry.
         #displayEntry($entryDoc $entryObj $onlyExtract $shouldDisplayTitles)
       #end
-    #end
   #end
   &lt;/div&gt; ## blogDay
   &lt;/div&gt; ## hfeed

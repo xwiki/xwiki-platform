@@ -64,7 +64,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   #isPublished($entryObj $isPublished)
   #isHidden($entryObj $isHidden)
   ## displayBlog requires a list of documents, and whether to display only an extract or the full entry.
-  #displayBlog([$doc.fullName] 'single' false false)
+  #displayBlog([$tdoc] 'single' false false)
 #else
   &lt;dl&gt;
   &lt;dt&gt;$msg.get("xe.blog.sheet.title")&lt;/dt&gt;

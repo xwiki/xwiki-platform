@@ -35,11 +35,11 @@ import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
 import org.xwiki.xml.XMLUtils;
 
+import com.sun.syndication.feed.synd.SyndCategory;
+import com.sun.syndication.feed.synd.SyndCategoryImpl;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndCategory;
-import com.sun.syndication.feed.synd.SyndCategoryImpl;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -83,21 +83,21 @@ public class SyndEntryDocumentSource implements SyndEntrySource
             int indexStartPos = strRep.indexOf('_');
             if (indexStartPos < 0) {
                 // class name and object index are not specified
-                className = null;
-                objectIndex = 0;
-                propertyName = strRep;
+                this.className = null;
+                this.objectIndex = 0;
+                this.propertyName = strRep;
             } else {
                 int propStartPos = strRep.indexOf("_", indexStartPos + 1);
                 if (propStartPos < 0) {
                     // object index is not specified
-                    className = strRep.substring(0, indexStartPos);
-                    objectIndex = 0;
-                    propertyName = strRep.substring(indexStartPos + 1);
+                    this.className = strRep.substring(0, indexStartPos);
+                    this.objectIndex = 0;
+                    this.propertyName = strRep.substring(indexStartPos + 1);
                 } else {
                     // all three have been specified
-                    className = strRep.substring(0, indexStartPos);
-                    objectIndex = Integer.parseInt(strRep.substring(indexStartPos + 1, propStartPos));
-                    propertyName = strRep.substring(propStartPos + 1);
+                    this.className = strRep.substring(0, indexStartPos);
+                    this.objectIndex = Integer.parseInt(strRep.substring(indexStartPos + 1, propStartPos));
+                    this.propertyName = strRep.substring(propStartPos + 1);
                 }
             }
         }
@@ -107,7 +107,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
          */
         public String getClassName()
         {
-            return className;
+            return this.className;
         }
 
         /**
@@ -115,7 +115,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
          */
         public int getObjectIndex()
         {
-            return objectIndex;
+            return this.objectIndex;
         }
 
         /**
@@ -123,7 +123,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
          */
         public String getPropertyName()
         {
-            return propertyName;
+            return this.propertyName;
         }
     }
 
@@ -217,7 +217,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      */
     public Map<String, Object> getParams()
     {
-        return params;
+        return this.params;
     }
 
     /**
@@ -243,7 +243,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * 
      * @see SyndEntrySource#source(SyndEntry, Object, Map, XWikiContext)
      */
-    public void source(SyndEntry entry, Object obj, Map<String, Object> params, XWikiContext context) 
+    public void source(SyndEntry entry, Object obj, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
         // cast source
@@ -270,7 +270,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
      * @param context the XWiki context
      * @throws XWikiException
      */
-    public void sourceDocument(SyndEntry entry, Document doc, Map<String, Object> params, XWikiContext context) 
+    public void sourceDocument(SyndEntry entry, Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
         entry.setUri(getURI(doc, params, context));
@@ -284,7 +284,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         entry.setContributors(getContributors(doc, params, context));
     }
 
-    protected String getDefaultURI(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
+    protected String getDefaultURI(Document doc, Map<String, Object> params, XWikiContext context)
+        throws XWikiException
     {
         return doc.getExternalURL("view", "language=" + doc.getRealLanguage());
     }
@@ -301,7 +302,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         }
     }
 
-    protected String getDefaultLink(Document doc, Map<String, Object> params, XWikiContext context) 
+    protected String getDefaultLink(Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
         return getDefaultURI(doc, params, context);
@@ -345,7 +346,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return String.format(descFormat, new Object[] {doc.getVersion(), author, doc.getDate()});
     }
 
-    protected SyndContent getDescription(Document doc, Map<String, Object> params, XWikiContext context) throws XWikiException
+    protected SyndContent getDescription(Document doc, Map<String, Object> params, XWikiContext context)
+        throws XWikiException
     {
         String description;
         String mapping = (String) params.get(FIELD_DESCRIPTION);
@@ -375,26 +377,26 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return Collections.emptyList();
     }
 
-    protected List<SyndCategory> getCategories(Document doc, Map<String, Object> params, XWikiContext context) 
+    protected List<SyndCategory> getCategories(Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
         String mapping = (String) params.get(FIELD_CATEGORIES);
         if (mapping == null) {
             return getDefaultCategories(doc, params, context);
         }
-        
+
         List<Object> categories;
-        if (isVelocityCode(mapping)) {            
+        if (isVelocityCode(mapping)) {
             categories = parseList(mapping, doc, context);
         } else {
             categories = getListValue(mapping, doc, context);
         }
-        
+
         List<SyndCategory> result = new ArrayList<SyndCategory>();
-        for(Object category: categories) {
-            if(category instanceof SyndCategory) {
+        for (Object category : categories) {
+            if (category instanceof SyndCategory) {
                 result.add((SyndCategory) category);
-            } else if(category != null) {
+            } else if (category != null) {
                 SyndCategory scat = new SyndCategoryImpl();
                 scat.setName(category.toString());
                 result.add(scat);
@@ -408,7 +410,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return doc.getCreationDate();
     }
 
-    protected Date getPublishedDate(Document doc, Map<String, Object> params, XWikiContext context) 
+    protected Date getPublishedDate(Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
         String mapping = (String) params.get(FIELD_PUBLISHED_DATE);
@@ -463,21 +465,21 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         return contributors;
     }
 
-    protected List<String> getContributors(Document doc, Map<String, Object> params, XWikiContext context) 
+    protected List<String> getContributors(Document doc, Map<String, Object> params, XWikiContext context)
         throws XWikiException
     {
         String mapping = (String) params.get(FIELD_CONTRIBUTORS);
         if (mapping == null) {
             return getDefaultContributors(doc, params, context);
         }
-        
-        List<Object> rawContributors;         
+
+        List<Object> rawContributors;
         if (isVelocityCode(mapping)) {
             rawContributors = parseList(mapping, doc, context);
         } else {
             rawContributors = getListValue(mapping, doc, context);
         }
-        
+
         List<String> contributors = new ArrayList<String>();
         for (Object rawContributor : rawContributors) {
             if (rawContributor instanceof String) {
@@ -486,7 +488,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
                 contributors.add(rawContributor.toString());
             }
         }
-        
+
         return contributors;
     }
 
@@ -598,7 +600,7 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     {
         Map<String, Object> params = new HashMap<String, Object>();
         params.putAll(base);
-        
+
         for (Map.Entry<String, Object> entry : extra.entrySet()) {
             if (params.get(entry.getKey()) == null) {
                 params.put(entry.getKey(), entry.getValue());

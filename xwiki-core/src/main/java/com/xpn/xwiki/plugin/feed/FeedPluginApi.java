@@ -34,14 +34,15 @@ import com.sun.syndication.feed.synd.SyndImage;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class FeedPluginApi extends Api
+public class FeedPluginApi extends PluginApi<FeedPlugin>
 {
     private static final String BLOG_POST_CLASS_NAME = "Blog.BlogPostClass";
+
     private static final String BLOG_POST_TEMPLATE_NAME = "Blog.BlogPostTemplate";
 
     private static final Map<String, Object> BLOG_FIELDS_MAPPING;
@@ -55,142 +56,179 @@ public class FeedPluginApi extends Api
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "Blog.BlogPostClass_category");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
     }
-        private FeedPlugin plugin;
 
-        public FeedPluginApi(FeedPlugin plugin, XWikiContext context) {
-            super(context);
-            setPlugin(plugin);
-        }
-
-    public FeedPlugin getPlugin() {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
+    public FeedPluginApi(FeedPlugin plugin, XWikiContext context)
+    {
+        super(plugin, context);
     }
 
-    public void setPlugin(FeedPlugin plugin) {
-        this.plugin = plugin;
+    /**
+     * Return the inner plugin object, if the user has the required programming rights.
+     * 
+     * @return The wrapped plugin object.
+     * @deprecated Use {@link PluginApi#getInternalPlugin()}
+     */
+    @Deprecated
+    public FeedPlugin getPlugin()
+    {
+        return super.getInternalPlugin();
     }
 
-    public SyndFeed getFeeds(String sfeeds) throws IOException {
-        return plugin.getFeeds(sfeeds, getXWikiContext());
+    public SyndFeed getFeeds(String sfeeds) throws IOException
+    {
+        return getProtectedPlugin().getFeeds(sfeeds, getXWikiContext());
     }
 
-    public SyndFeed getFeeds(String sfeeds, boolean force) throws IOException {
-        return plugin.getFeeds(sfeeds, force, getXWikiContext());
+    public SyndFeed getFeeds(String sfeeds, boolean force) throws IOException
+    {
+        return getProtectedPlugin().getFeeds(sfeeds, force, getXWikiContext());
     }
 
-    public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, boolean force) throws IOException {
-        return plugin.getFeeds(sfeeds, ignoreInvalidFeeds, force, getXWikiContext());
+    public SyndFeed getFeeds(String sfeeds, boolean ignoreInvalidFeeds, boolean force) throws IOException
+    {
+        return getProtectedPlugin().getFeeds(sfeeds, ignoreInvalidFeeds, force, getXWikiContext());
     }
 
-    public SyndFeed getFeed(String sfeed) throws IOException {
-        return plugin.getFeed(sfeed, false, getXWikiContext());
+    public SyndFeed getFeed(String sfeed) throws IOException
+    {
+        return getProtectedPlugin().getFeed(sfeed, false, getXWikiContext());
     }
 
-    public SyndFeed getFeed(String sfeed, boolean force) throws IOException {
-        return plugin.getFeed(sfeed, force, getXWikiContext());
+    public SyndFeed getFeed(String sfeed, boolean force) throws IOException
+    {
+        return getProtectedPlugin().getFeed(sfeed, force, getXWikiContext());
     }
 
-    public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force) throws IOException {
-        return plugin.getFeed(sfeed, ignoreInvalidFeeds, force, getXWikiContext());
+    public SyndFeed getFeed(String sfeed, boolean ignoreInvalidFeeds, boolean force) throws IOException
+    {
+        return getProtectedPlugin().getFeed(sfeed, ignoreInvalidFeeds, force, getXWikiContext());
     }
 
-    public int updateFeeds() throws XWikiException {
+    public int updateFeeds() throws XWikiException
+    {
         return updateFeeds("XWiki.FeedList");
     }
 
-    public int updateFeeds(String feedDoc) throws XWikiException {
+    public int updateFeeds(String feedDoc) throws XWikiException
+    {
         return updateFeeds(feedDoc, true);
     }
 
-    public int updateFeeds(String feedDoc, boolean fullContent) throws XWikiException {
+    public int updateFeeds(String feedDoc, boolean fullContent) throws XWikiException
+    {
         return updateFeeds(feedDoc, fullContent, true);
     }
 
-    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry) throws XWikiException {
-        if (hasProgrammingRights())
-         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, getXWikiContext());
-        else
-         return -1;
-    }
-
-    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force) throws XWikiException {
-        if (hasProgrammingRights())
-         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, force, getXWikiContext());
-        else
-         return -1;
-    }
-
-    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force, String space) throws XWikiException {
-        if (hasProgrammingRights())
-         return plugin.updateFeeds(feedDoc, fullContent, oneDocPerEntry, force, space, getXWikiContext());
-        else
-         return -1;
-    }
-
-    public int updateFeedsInSpace(String space, boolean fullContent, boolean force) throws XWikiException {
-        if (hasProgrammingRights())
-         return plugin.updateFeedsInSpace(space, fullContent, true, force, getXWikiContext());
-        else
-         return -1;
-    }
-
-    public int updateFeed(String feedname, String feedurl) {
-        if (hasProgrammingRights())
-            return plugin.updateFeed(feedname, feedurl, false, true, getXWikiContext());
-        else
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeeds(feedDoc, fullContent, oneDocPerEntry, getXWikiContext());
+        } else {
             return -1;
+        }
     }
 
-    public int updateFeed(String feedname, String feedurl, boolean fullContent) {
-        if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, fullContent, true, getXWikiContext());
-        else
-         return -1;
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force)
+        throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeeds(feedDoc, fullContent, oneDocPerEntry, force, getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry) {
-        if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, getXWikiContext());
-        else
-         return -1;
+    public int updateFeeds(String feedDoc, boolean fullContent, boolean oneDocPerEntry, boolean force, String space)
+        throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeeds(feedDoc, fullContent, oneDocPerEntry, force, space,
+                getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force) {
-        if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, getXWikiContext());
-        else
-         return -1;
+    public int updateFeedsInSpace(String space, boolean fullContent, boolean force) throws XWikiException
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeedsInSpace(space, fullContent, true, force, getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force, String space) {
-        if (hasProgrammingRights())
-         return plugin.updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, space, getXWikiContext());
-        else
-         return -1;
+    public int updateFeed(String feedname, String feedurl)
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeed(feedname, feedurl, false, true, getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public boolean startUpdateFeedsInSpace(String space, int scheduleTimer)  throws XWikiException {
-        return plugin.startUpdateFeedsInSpace(space, false, scheduleTimer, context);
+    public int updateFeed(String feedname, String feedurl, boolean fullContent)
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeed(feedname, feedurl, fullContent, true, getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer)  throws XWikiException {
-        return plugin.startUpdateFeedsInSpace(space, fullContent, scheduleTimer, context);
+    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry)
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public void stopUpdateFeedsInSpace(String space)  throws XWikiException {
-        plugin.stopUpdateFeedsInSpace(space, context);
+    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force)
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force,
+                getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-
-    public UpdateThread getUpdateThread(String space) {
-        return plugin.getUpdateThread(space, context);
+    public int updateFeed(String feedname, String feedurl, boolean fullContent, boolean oneDocPerEntry, boolean force,
+        String space)
+    {
+        if (hasProgrammingRights()) {
+            return getProtectedPlugin().updateFeed(feedname, feedurl, fullContent, oneDocPerEntry, force, space,
+                getXWikiContext());
+        } else {
+            return -1;
+        }
     }
 
-    public Collection<String> getActiveUpdateThreads() {
-        return plugin.getActiveUpdateThreads();
+    public boolean startUpdateFeedsInSpace(String space, int scheduleTimer) throws XWikiException
+    {
+        return getProtectedPlugin().startUpdateFeedsInSpace(space, false, scheduleTimer, this.context);
+    }
+
+    public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer) throws XWikiException
+    {
+        return getProtectedPlugin().startUpdateFeedsInSpace(space, fullContent, scheduleTimer, this.context);
+    }
+
+    public void stopUpdateFeedsInSpace(String space) throws XWikiException
+    {
+        getProtectedPlugin().stopUpdateFeedsInSpace(space, this.context);
+    }
+
+    public UpdateThread getUpdateThread(String space)
+    {
+        return getProtectedPlugin().getUpdateThread(space, this.context);
+    }
+
+    public Collection<String> getActiveUpdateThreads()
+    {
+        return getProtectedPlugin().getActiveUpdateThreads();
     }
 
     /**
@@ -204,7 +242,7 @@ public class FeedPluginApi extends Api
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
-            SyndEntrySource source = plugin.getSyndEntrySource(className, params, getXWikiContext());
+            SyndEntrySource source = getProtectedPlugin().getSyndEntrySource(className, params, getXWikiContext());
             return new SyndEntrySourceApi(source, getXWikiContext());
         } catch (XWikiException e) {
             getXWikiContext().put(FEED_PLUGIN_EXCEPTION, e);
@@ -275,7 +313,7 @@ public class FeedPluginApi extends Api
      */
     public SyndEntry getFeedEntry()
     {
-        return plugin.getFeedEntry(getXWikiContext());
+        return getProtectedPlugin().getFeedEntry(getXWikiContext());
     }
 
     /**
@@ -285,7 +323,7 @@ public class FeedPluginApi extends Api
      */
     public SyndImage getFeedImage()
     {
-        return plugin.getFeedImage(context);
+        return getProtectedPlugin().getFeedImage(this.context);
     }
 
     /**
@@ -339,7 +377,7 @@ public class FeedPluginApi extends Api
      */
     public SyndFeed getFeed()
     {
-        return plugin.getFeed(getXWikiContext());
+        return getProtectedPlugin().getFeed(getXWikiContext());
     }
 
     /**
@@ -426,7 +464,7 @@ public class FeedPluginApi extends Api
      * @param sourceParams strategy parameters
      * @return a new feed
      */
-    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi, 
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi,
         Map<String, Object> sourceParams)
     {
         Map<String, Object> metadata = Collections.emptyMap();
@@ -496,7 +534,7 @@ public class FeedPluginApi extends Api
      */
     public SyndFeed getBlogFeed(String query, int count, int start)
     {
-        return getBlogFeed(query, count, start, Collections.EMPTY_MAP);
+        return getBlogFeed(query, count, start, Collections.<String, Object> emptyMap());
     }
 
     /**
@@ -509,12 +547,13 @@ public class FeedPluginApi extends Api
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      */
-    public SyndFeed getFeed(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams, 
+    public SyndFeed getFeed(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams,
         Map<String, Object> metadata)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
-            return plugin.getFeed(list, sourceApi.getSyndEntrySource(), sourceParams, metadata, getXWikiContext());
+            return getProtectedPlugin().getFeed(list, sourceApi.getSyndEntrySource(), sourceParams, metadata,
+                getXWikiContext());
         } catch (XWikiException e) {
             getXWikiContext().put(FEED_PLUGIN_EXCEPTION, e);
             return null;
@@ -569,34 +608,34 @@ public class FeedPluginApi extends Api
     {
         XWiki xwiki = getXWikiContext().getWiki();
         XWikiDocument doc = getXWikiContext().getDoc();
-        
+
         if (metadata.get("author") == null) {
             metadata.put("author", xwiki.getUserName(doc.getAuthor(), null, false, getXWikiContext()));
         }
-        
+
         if (!keyHasValue(metadata, "copyright", "")) {
             metadata.put("copyright", xwiki.getWebCopyright(getXWikiContext()));
         }
-        
+
         if (!keyHasValue(metadata, "encoding", "")) {
             metadata.put("encoding", xwiki.getEncoding());
         }
-        
+
         if (!keyHasValue(metadata, "url", "")) {
             metadata.put("url", "http://" + getXWikiContext().getRequest().getServerName());
         }
-        
+
         if (!keyHasValue(metadata, "language", "")) {
             metadata.put("language", doc.getDefaultLanguage());
         }
-        
+
         return metadata;
     }
 
     private Map<String, Object> fillWebFeedMetadata(Map<String, Object> metadata)
     {
         fillDefaultFeedMetadata(metadata);
-        
+
         // these strings should be taken from a resource bundle
         String title = "Feed for document changes";
         String description = title;
@@ -614,7 +653,7 @@ public class FeedPluginApi extends Api
         // Make sure that we don't have an immutable Map
         Map<String, Object> result = new HashMap<String, Object>(metadata);
         fillDefaultFeedMetadata(result);
-        
+
         // these strings should be taken from a resource bundle
         String title = "Personal Wiki Blog";
         String description = title;
@@ -656,8 +695,9 @@ public class FeedPluginApi extends Api
     public SyndFeed getBlogFeed(List<Object> list, Map<String, Object> metadata)
     {
         Map<String, Object> params = Collections.emptyMap();
-        SyndFeed blogFeed =  getFeed(list, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), 
-            BLOG_FIELDS_MAPPING), params, fillBlogFeedMetadata(metadata));
+        SyndFeed blogFeed =
+            getFeed(list, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), BLOG_FIELDS_MAPPING), params,
+                fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }
@@ -676,13 +716,13 @@ public class FeedPluginApi extends Api
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      */
-    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi, 
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySourceApi sourceApi,
         Map<String, Object> sourceParams, Map<String, Object> metadata)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
-            return plugin.getFeed(query, count, start, sourceApi.getSyndEntrySource(), sourceParams, metadata,
-                getXWikiContext());
+            return getProtectedPlugin().getFeed(query, count, start, sourceApi.getSyndEntrySource(), sourceParams,
+                metadata, getXWikiContext());
         } catch (XWikiException e) {
             getXWikiContext().put(FEED_PLUGIN_EXCEPTION, e);
             return null;
@@ -703,7 +743,7 @@ public class FeedPluginApi extends Api
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      * @see SyndEntryDocumentSource
      */
-    public SyndFeed getDocumentFeed(String query, int count, int start, Map<String, Object> params, 
+    public SyndFeed getDocumentFeed(String query, int count, int start, Map<String, Object> params,
         Map<String, Object> metadata)
     {
         return getFeed(query, count, start, getSyndEntryDocumentSource(), params, metadata);
@@ -769,32 +809,37 @@ public class FeedPluginApi extends Api
 
     /**
      * Instantiates the default article feed.
-     *
+     * 
      * @param query the HQL query used for retrieving the articles
      * @param count the maximum number of articles to retrieve
      * @param start the start index
-     * @param blogPostClassName The name of the Blog Class the data are retrieved from. If null the Default Blog Application is used.
+     * @param blogPostClassName The name of the Blog Class the data are retrieved from. If null the Default Blog
+     *            Application is used.
      * @param metadata feed meta data (includes the author, description, copyright, encoding, url, title)
      * @return a new feed
      * @see #getArticleFeed(String, int, int, Map)
      */
-    public SyndFeed getBlogFeed(String query, int count, int start, String blogPostClassName, Map<String, Object> metadata)
+    public SyndFeed getBlogFeed(String query, int count, int start, String blogPostClassName,
+        Map<String, Object> metadata)
     {
         if (query == null) {
             XWikiRequest request = getXWikiContext().getRequest();
             String category = request.getParameter("category");
             if (category == null || category.equals("")) {
                 query =
-                    ", BaseObject as obj where obj.name=doc.fullName and obj.className='" + BLOG_POST_CLASS_NAME + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME + "' order by doc.creationDate desc";
+                    ", BaseObject as obj where obj.name=doc.fullName and obj.className='" + BLOG_POST_CLASS_NAME
+                        + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME + "' order by doc.creationDate desc";
             } else {
                 query =
-                    ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='" + BLOG_POST_CLASS_NAME + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME + "' and obj.id=prop.id.id and prop.id.name='category' and list = '"
-                        + category + "' order by doc.creationDate desc";
+                    ", BaseObject as obj, DBStringListProperty as prop join prop.list list where obj.name=doc.fullName and obj.className='"
+                        + BLOG_POST_CLASS_NAME + "' and obj.name<>'" + BLOG_POST_TEMPLATE_NAME
+                        + "' and obj.id=prop.id.id and prop.id.name='category' and list = '" + category
+                        + "' order by doc.creationDate desc";
             }
         }
         Map<String, Object> params = Collections.emptyMap();
         Map<String, Object> blogMappings = null;
-        if( blogPostClassName == null ) {
+        if (blogPostClassName == null) {
             blogMappings = BLOG_FIELDS_MAPPING;
         } else {
             blogMappings = new HashMap<String, Object>();
@@ -803,7 +848,9 @@ public class FeedPluginApi extends Api
             blogMappings.put(SyndEntryDocumentSource.FIELD_CATEGORIES, blogPostClassName + "_category");
             blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
         }
-        SyndFeed blogFeed =  getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), blogMappings), params, fillBlogFeedMetadata(metadata));
+        SyndFeed blogFeed =
+            getFeed(query, count, start, getSyndEntrySource(SyndEntryDocumentSource.class.getName(), blogMappings),
+                params, fillBlogFeedMetadata(metadata));
         if (blogFeed != null) {
             blogFeed.setImage(getDefaultFeedImage());
         }
@@ -819,20 +866,21 @@ public class FeedPluginApi extends Api
      * @return the string representation of the given feed using the syntax associated with the specified feed type
      */
     public String getFeedOutput(SyndFeed feed, String type)
-    {        
-        return plugin.getFeedOutput(feed, type, getXWikiContext());
+    {
+        return getProtectedPlugin().getFeedOutput(feed, type, getXWikiContext());
     }
 
     /**
      * @see #getFeedOutput(SyndFeed, String)
      * @see #getFeed(List, SyndEntrySourceApi, Map, Map)
      */
-    public String getFeedOutput(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams, Map<String, Object> metadata, String type)
+    public String getFeedOutput(List<Object> list, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams,
+        Map<String, Object> metadata, String type)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
-            return plugin.getFeedOutput(list, sourceApi.getSyndEntrySource(), sourceParams, metadata, type,
-                getXWikiContext());
+            return getProtectedPlugin().getFeedOutput(list, sourceApi.getSyndEntrySource(), sourceParams, metadata,
+                type, getXWikiContext());
         } catch (XWikiException e) {
             getXWikiContext().put(FEED_PLUGIN_EXCEPTION, e);
             return null;
@@ -843,7 +891,8 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(List, SyndEntrySourceApi, Map, Map, String)
      * @see SyndEntryDocumentSource
      */
-    public String getDocumentFeedOutput(List<Object> list, Map<String, Object> params, Map<String, Object> metadata, String type)
+    public String getDocumentFeedOutput(List<Object> list, Map<String, Object> params, Map<String, Object> metadata,
+        String type)
     {
         return getFeedOutput(list, getSyndEntryDocumentSource(), params, metadata, type);
     }
@@ -880,13 +929,13 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(SyndFeed, String)
      * @see #getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
      */
-    public String getFeedOutput(String query, int count, int start, SyndEntrySourceApi sourceApi, Map<String, Object> sourceParams,
-        Map<String, Object> metadata, String type)
+    public String getFeedOutput(String query, int count, int start, SyndEntrySourceApi sourceApi,
+        Map<String, Object> sourceParams, Map<String, Object> metadata, String type)
     {
         getXWikiContext().remove(FEED_PLUGIN_EXCEPTION);
         try {
-            return plugin.getFeedOutput(query, count, start, sourceApi.getSyndEntrySource(), sourceParams, metadata,
-                type, getXWikiContext());
+            return getProtectedPlugin().getFeedOutput(query, count, start, sourceApi.getSyndEntrySource(),
+                sourceParams, metadata, type, getXWikiContext());
         } catch (XWikiException e) {
             getXWikiContext().put(FEED_PLUGIN_EXCEPTION, e);
             return null;
@@ -897,7 +946,8 @@ public class FeedPluginApi extends Api
      * @see #getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
      * @see SyndEntryDocumentSource
      */
-    public String getDocumentFeedOutput(String query, int count, int start, Map<String, Object> params, Map<String, Object> metadata, String type)
+    public String getDocumentFeedOutput(String query, int count, int start, Map<String, Object> params,
+        Map<String, Object> metadata, String type)
     {
         return getFeedOutput(query, count, start, getSyndEntryDocumentSource(), params, metadata, type);
     }
@@ -934,10 +984,11 @@ public class FeedPluginApi extends Api
      * @see #getBlogFeed(String, int, int, Map)
      * @see #getFeedOutput(SyndFeed, String)
      */
-    public String getBlogFeedOutput(String query, int count, int start, String blogPostClassName, Map<String, Object> metadata, String type)
+    public String getBlogFeedOutput(String query, int count, int start, String blogPostClassName,
+        Map<String, Object> metadata, String type)
     {
         SyndFeed feed = getBlogFeed(query, count, start, blogPostClassName, metadata);
-        String ret = getFeedOutput( feed, type );
+        String ret = getFeedOutput(feed, type);
         return ret;
     }
 }

@@ -29,6 +29,7 @@
   #set($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
 ## Reuse the old object, just add the range.
   $criteria.setRange($range)
+  #set($versions = $util.reverseList($tdoc.getRevisions($criteria)))
   #if ($tdoc.realLanguage!="")
     #set($lang = "&amp;language=${tdoc.realLanguage}")
   #else

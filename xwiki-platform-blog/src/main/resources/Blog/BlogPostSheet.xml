@@ -83,8 +83,7 @@ $xwiki.ssx.use('Blog.ManageCategories')##
   #isPublished($entryObj $isPublished)
   #if($isPublished)
     #if($doc.creator == $context.user)
-      #set(${publicationDate} = ${doc.display('publishDate', 'view', $entryObj)})
-      #publishMessageBox($msg.get("xe.blog.sheet.publicationdate", [${publicationDate}]))
+      #publishMessageBox($msg.get("xe.blog.sheet.publicationdate", [${doc.display('publishDate', 'view', $entryObj)}]))
       #set($hideArticle = ${doc.display('hidden', 'edit', $entryObj)})
       #hideMessageBox($msg.get("xe.blog.sheet.hidearticle", [${hideArticle}]))
     #end

@@ -678,7 +678,7 @@ input.category-name-input {
   #set ($newFullName = "$!{request.newCategoryName}")
   #if($newFullName.trim().equals(''))
     $response.setStatus(400)
-    #error($msg.get('core.rename.emptyName'))
+    #error($msg.get('xe.blog.manageCategories.rename.error.emptyName'))
   #elseif(!$xwiki.exists($request.category))
     $response.setStatus(404)
     #error($msg.get('thispagedoesnotexist'))
@@ -692,20 +692,25 @@ input.category-name-input {
     #renameCategory($request.category, $newFullName)
   #end
 #elseif("$!request.xaction" == 'create')
-  #set($title = $request.newCategoryName)
-  #set($name = "${doc.space}.${title}")
-  #set($title = $util.encodeURI($title))
-  #set($newCategoryParent = $util.encodeURI($request.newCategoryParent))
-  #if($request.ajax)
-    #if("$!{request.mode}" == 'select')
-      #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}")})
-    #else
-      #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}")})
-    #end
-    $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=$util.encodeURI($xredirect)"))
+  #set($title = "$!{request.newCategoryName}")
+  #if ($title.trim().equals(''))
+    $response.setStatus(400)
+    #error($msg.get('xe.blog.manageCategories.create.error.emptyName'))
   #else
-    $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${util.encodeURI(${doc.getURL()})}"))
-  #end
+    #set($name = "${doc.space}.${title}")
+    #set($title = $util.encodeURI($title))
+    #set($newCategoryParent = $util.encodeURI($request.newCategoryParent))
+    #if($request.ajax)
+      #if("$!{request.mode}" == 'select')
+        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;listType=selectable&amp;root=${newCategoryParent}")})
+      #else
+        #set($xredirect = ${doc.getURL('view', "xpage=plain&amp;display=list&amp;root=${newCategoryParent}")})
+      #end
+      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=$util.encodeURI($xredirect)"))
+    #else ## request.ajax
+      $response.sendRedirect($xwiki.getURL($name, 'save', "template=${blogCategoryTemplate}&amp;parent=${newCategoryParent}&amp;${blogCategoryClassname}_0_name=${title}&amp;${blogCategoryClassname}_0_description=&amp;xredirect=${util.encodeURI(${doc.getURL()})}"))
+    #end
+  #end ## empty title
 #end
 #####################################################
 ## Action execution done

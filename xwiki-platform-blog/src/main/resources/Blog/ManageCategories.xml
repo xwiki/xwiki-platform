@@ -113,6 +113,7 @@ if (typeof(XWiki.blog) == 'undefined') {
  */
 XWiki.blog.Categories = Class.create({
   categoriesSelector : ".blog-category-level",
+  activeForm: false,
   /** Constructor. Adds all the JS improvements of the categories tree. */
   initialize : function() {
     if ($$(".blog-categories-list")) {
@@ -122,6 +123,14 @@ XWiki.blog.Categories = Class.create({
       this.addAddCategoryListener();
       this.addRenameListener();
     }
+  },
+  activateForm : function(form) {
+    if (this.activeForm) {
+      this.activeForm.hide();
+    }
+    form.show();
+    this.activeForm = form;
+    form.down('input[type=text]').focus();
   },
   addHoverListener : function() {
     if (Prototype.Browser.IE) {
@@ -197,8 +206,7 @@ XWiki.blog.Categories = Class.create({
     item.up('.blog-category-tools').insert({after : form});
     var category = form.down('input[name=category]');
     category.value = item.href.substring(item.href.indexOf('category=') + 9);
-    form.show();
-    form.down('input[type=text]').focus();
+    this.activateForm(form);
   },
   ajaxifyRenameForm : function(form) {
     form.setAttribute('autocomplete', 'off');
@@ -338,8 +346,7 @@ XWiki.blog.Categories = Class.create({
       item.up('ul').insert({after : form});
       select.up('label').show();
     }
-    form.show();
-    form.down('input[type=text]').focus();
+    this.activateForm(form);
   },
   ajaxifyAddForm : function(form) {
     form.setAttribute('autocomplete', 'off');

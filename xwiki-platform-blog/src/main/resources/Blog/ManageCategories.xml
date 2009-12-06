@@ -564,12 +564,14 @@ document.observe('xwiki:dom:loaded', function() {
 <cache>long</cache>
 </property>
 <property>
-<code>.blog-categories-list {
+<code>#template('colorThemeInit.vm')
+
+.blog-categories-list {
   float: left;
   padding: 8px 0;
 }
 .subcategories {
-  background: #f5f7ff;
+  background: $theme.backgroundSecondaryColor;
   margin-top: 1.4em;
   padding-right: 15px;
   padding-left: 15px;
@@ -585,9 +587,9 @@ document.observe('xwiki:dom:loaded', function() {
 }
 .blog-category-level:hover,
 .blog-category-level-hover {
-  background: #ffd;
+  background: $theme.highlightColor;
   padding-bottom: 2px;
-  border-bottom: 1px solid #f5f5f5; 
+  border-bottom: 1px solid $theme.borderColor; 
 }
 .blog-category-level img {
   vertical-align: middle;
@@ -613,12 +615,12 @@ document.observe('xwiki:dom:loaded', function() {
 }
 
 .blog-add-category-label a {
-  color: #999;
+  color: $theme.textSecondaryColor;
 }
 
 .category-add-form, .category-rename-form {
   margin-left: 40px;
-  border: 1px solid #F9F9F9;
+  border: 1px solid $theme.borderColor;
   vertical-align: top !important;
 }
 * html .category-add-form, * html .category-rename-form {
@@ -628,8 +630,7 @@ li .category-add-form, li .category-rename-form{
   margin-left: 16px;
 }
 .category-add-form div, .category-rename-form div {
-  background: #F5F5F5;
-  border: 1px solid #EEE;
+  background: $theme.backgroundSecondaryColor;
   overflow: hidden;
   padding: 4px 8px;
 }
@@ -637,7 +638,7 @@ li .category-add-form, li .category-rename-form{
 .category-add-form label, .category-rename-form label {
   font-size: 80%;
   margin: 2px 0;
-  color: #999;
+  color: $theme.textSecondaryColor;
 }
 
 .category-add-form .buttonwrapper, .category-rename-form .buttonwrapper {
@@ -645,10 +646,10 @@ li .category-add-form, li .category-rename-form{
 }
 
 input.category-name-input {
-  border: 1px solid #DDD;
+  border: 1px solid $theme.borderColor;
   height: 80%;
   margin-right: 3px;
-  width:16em;
+  width: 16em;
 }</code>
 </property>
 <property>

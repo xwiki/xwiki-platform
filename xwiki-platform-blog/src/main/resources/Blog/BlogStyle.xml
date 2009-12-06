@@ -24,15 +24,6 @@
 <syntaxId>xwiki/2.0</syntaxId>
 <hidden>true</hidden>
 <attachment>
-<filename>grey-grad.png</filename>
-<filesize>247</filesize>
-<author>XWiki.Admin</author>
-<date>1228857706000</date>
-<version>1.2</version>
-<comment></comment>
-<content>iVBORw0KGgoAAAANSUhEUgAAAAEAAABkCAIAAADITs03AAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9gIHQsSFbnGi7gAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAZElEQVQY062PsQ3DQAwD77j/nL8GU1jOf1ykckFIgIgjxVorwK80QihBAgYbanTubdDDQ8QULs+w1EAjbtYzj4shDqMHY7pIeu/Dkm7e0//9Y3ucWYjTs3e/ejCYTI/9T/f39AEi1hSpIeTVZQAAAABJRU5ErkJggg==</content>
-</attachment>
-<attachment>
 <filename>edit.png</filename>
 <filesize>571</filesize>
 <author>XWiki.Admin</author>
@@ -161,7 +152,34 @@
 <cache>long</cache>
 </property>
 <property>
-<code>/* A blog day is a container for entries published in the same day. Space out days vertically. */
+<code>## First establish the colors. Try to use the theme, if it is defined.
+#template('colorThemeInit.vm')
+##
+## text
+#set($textColor = "$!theme.textColor")
+##
+## background
+#set($bgColor = "$!theme.pageContentBackgroundColor")
+#if($bgColor == 'transparent')
+  #set($bgColor = "$!theme.pageBackgroundColor")
+#end
+##
+## border
+#set($borderColor = "$!theme.borderColor")
+##
+## For the highlighted part of the calendar page, reverse background and text color
+##
+## highlighted text
+#set($htextColor = $bgColor)
+##
+## highlighted background
+#set($hbgColor = $textColor)
+##
+## hidden color
+#set($hiddenColor = "$!theme.secondaryTextColor")
+## Done setting colors
+
+/* A blog day is a container for entries published in the same day. Space out days vertically. */
 .blogDay {
   clear: both;
   padding: 10px 0;
@@ -173,9 +191,7 @@
   font-size: 70%;
   width: 48px;
   text-align: center;
-  background: #f6f6f6 url($doc.getAttachmentURL('grey-grad.png')) left top repeat-x;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
+  background: $hbgColor;
   padding: 0;
   /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
   float: left;
@@ -196,17 +212,22 @@
   font-size: 250%;
   font-weight: 900;
   line-height: 110%;
+  color: $textColor;
   float: left;
+  background: $bgColor;
+  border: 1px solid $borderColor;
   width: 46px;
 }
 #body .blogdate .month, #body .blogdate .year {
   display: inline;
+  color: $htextColor;
 }
 /* Restyle the paging links */
 .pagingLinks {
   margin: 5px 0;
   padding: 2px 0;
   border: none;
+  border-top: 1px solid $borderColor;
   font-size: 75%;
   font-variant: normal;
 }
@@ -224,12 +245,12 @@
 }
 /* Add a space + line between consecutive blog entries */
 .hentry + .hentry {
-  border-top: 1px solid #888;
+  border-top: 1px solid $borderColor;
   padding-top: 2em;
 }
 /* Grey-out the hidden and unpublished entries */
 .index .hidden-article *, .index .unpublished-article *, .category .hidden-article *, .category .unpublished-article * {
-  color: #ddd !important;
+  color: $hiddenColor !important;
 }
 /* The current skins are not well designed. Ideally, the title should just have the skin style. Remove this once the skins are clean enough. */
 .hentry .entry-title {
@@ -243,7 +264,7 @@
 }
 /* The entry footer, a bit smaller than the rest */
 .hentry .entry-footer {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid $borderColor;
   margin: 0px 0px 2em;
   font-size: 75%;
   font-weight: normal;
@@ -262,68 +283,6 @@ div.hide-message{
   font-size: 140%;
   width: 100%;
   font-weight: bold;
-}
-## ###################################
-## Some style changes
-## ###################################
-## First establish the colors. Try to use the 
-## theme, if it is defined.
-##
-## text
-#set($textColor = "$!theme.dark1")
-#if($textColor == "")
-#set($textColor = '#4A4945')
-#end
-##
-## background
-#set($bgColor = "$!theme.light1")
-#if($bgColor == "")
-#set($bgColor = '#FFF')
-#end
-##
-## border
-#set($borderColor = "$!theme.light2")
-#if($borderColor == "")
-#set($borderColor = '#E5E5E5')
-#end
-##
-## shadow
-#set($shadowColor = "$!theme.light3")
-#if($shadowColor == "")
-#set($shadowColor = '#F8F8F8')
-#end
-##
-## highlighted text
-#set($htextColor = "$!theme.light1")
-#if($htextColor == "")
-#set($htextColor = '#4A4945')
-#set($htextColor = '#FFF')
-#end
-##
-## highlighted background
-#set($hbgColor = "$!theme.highlight1")
-#if($hbgColor == "")
-#set($hbgColor = '#E5E5E5')
-#set($hbgColor = '#4A4945')
-#end
-/* Calendar sheet display of a blogging day */
-#body .blogdate {
-  background: $hbgColor;
-  border: 1px solid $borderColor;
-  border: 2px solid $shadowColor;
-}
-/* The day is the most important part, make it extra large */
-#body .blogdate .day {
-  color: $textColor;
-  background: $bgColor;
-  border: 1px solid $borderColor;
-}
-#body .blogdate .month, #body .blogdate .year {
-  color: $htextColor;
-}
-.pagingLinks {
-  border-top: 1px solid #DDD;
-}
 }</code>
 </property>
 <property>

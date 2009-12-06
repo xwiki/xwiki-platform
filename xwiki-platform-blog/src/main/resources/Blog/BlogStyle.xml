@@ -138,6 +138,7 @@
   width: 48px;
   text-align: center;
   background: $hbgColor;
+  border: 1px solid $borderColor;
   padding: 0;
   /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
   float: left;
@@ -161,8 +162,7 @@
   color: $textColor;
   float: left;
   background: $bgColor;
-  border: 1px solid $borderColor;
-  width: 46px;
+  width: 100%;
 }
 #body .blogdate .month, #body .blogdate .year {
   display: inline;

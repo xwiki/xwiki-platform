@@ -122,7 +122,7 @@
 #set($hbgColor = $textColor)
 ##
 ## hidden color
-#set($hiddenColor = "$!theme.secondaryTextColor")
+#set($hiddenColor = "$!theme.textSecondaryColor")
 ## Done setting colors
 
 /* A blog day is a container for entries published in the same day. Space out days vertically. */

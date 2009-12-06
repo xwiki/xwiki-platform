@@ -1421,6 +1421,12 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
   padding: 10px;
 }
 
+/* --------------------- Icons --------------------------*/
+
+.icon {
+  vertical-align: middle;
+}
+
 /* @group MACROS */
 /* --------------------------------------------------------------
   * Different classes for specific macro usage

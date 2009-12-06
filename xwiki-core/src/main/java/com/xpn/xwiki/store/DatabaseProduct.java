@@ -61,6 +61,11 @@ public class DatabaseProduct
     public static final DatabaseProduct DB2 = new DatabaseProduct("DB2/");
 
     /**
+     * The product name for MySQL databases.
+     */
+    public static final DatabaseProduct MYSQL = new DatabaseProduct("MySQL");
+
+    /**
      * Represents an unknown database for which we were not able to find the product name.
      */
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
@@ -127,6 +132,8 @@ public class DatabaseProduct
         } else if (productNameAsString.startsWith(DB2.getProductName())) {
             // See documentation above on why we check starts with for DB2
             product = DB2;
+        } else if (productNameAsString.equalsIgnoreCase(MYSQL.getProductName())) {
+            product = MYSQL;
         } else {
             product = UNKNOWN;
         }

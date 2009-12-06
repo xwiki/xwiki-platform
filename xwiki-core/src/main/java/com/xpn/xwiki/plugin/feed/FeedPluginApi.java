@@ -54,6 +54,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_TITLE, "Blog.BlogPostClass_title");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, "Blog.BlogPostClass_content");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_CATEGORIES, "Blog.BlogPostClass_category");
+        BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.FIELD_PUBLISHED_DATE, "Blog.BlogPostClass_publishDate");
         BLOG_FIELDS_MAPPING.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
     }
 
@@ -846,6 +847,7 @@ public class FeedPluginApi extends PluginApi<FeedPlugin>
             blogMappings.put(SyndEntryDocumentSource.FIELD_TITLE, blogPostClassName + "_title");
             blogMappings.put(SyndEntryDocumentSource.FIELD_DESCRIPTION, blogPostClassName + "_content");
             blogMappings.put(SyndEntryDocumentSource.FIELD_CATEGORIES, blogPostClassName + "_category");
+            blogMappings.put(SyndEntryDocumentSource.FIELD_PUBLISHED_DATE, blogPostClassName + "_publishDate");
             blogMappings.put(SyndEntryDocumentSource.CONTENT_LENGTH, new Integer(400));
         }
         SyndFeed blogFeed =

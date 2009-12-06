@@ -241,6 +241,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 stmt.execute("CREATE SCHEMA " + schema + " AUTHORIZATION DBA");
             } else if (DatabaseProduct.DB2 == databaseProduct) {
                 stmt.execute("CREATE SCHEMA " + schema);
+            } else if (DatabaseProduct.MYSQL == databaseProduct) {
+                // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
+                if (context.getWiki().getEncoding().equals("UTF-8")) {
+                    stmt.execute("create database " + schema + " CHARACTER SET utf8 COLLATE utf8_bin");
+                } else {
+                    stmt.execute("create database " + schema);
+                }
             } else {
                 stmt.execute("create database " + schema);
             }

@@ -348,8 +348,14 @@ XWiki.editors.FullScreenEditing = Class.create({
       'width' : parent.style['width'],
       'height' : parent.style['height']
     };
+    var root = $(document.body).up();
+    root._originalStyle = {
+      'overflow' : root.style['overflow'],
+      'width' : root.style['width'],
+      'height' : root.style['height']
+    };
     $(document.body).setStyle({'overflow': 'hidden', 'width': '100%', 'height': '100%'});
-    $(document.body).up().setStyle({'overflow': "hidden", 'width': "100%", 'height': "100%"});
+    root.setStyle({'overflow': "hidden", 'width': "100%", 'height': "100%"});
 
     // Make sure to resize the targetElement when the window dimensions are changed. Both document and window are monitored,
     // since different browsers send events to different elements.
@@ -396,6 +402,7 @@ XWiki.editors.FullScreenEditing = Class.create({
       parent = parent.up();
     }
     document.body.setStyle(document.body._originalStyle);
+    $(document.body).up().setStyle($(document.body).up()._originalStyle);
     // Restore the toolbar and action buttons to their initial position
     this.buttonsPlaceholder.replace(this.buttons);
     if (this.buttons._x_isCustom) {

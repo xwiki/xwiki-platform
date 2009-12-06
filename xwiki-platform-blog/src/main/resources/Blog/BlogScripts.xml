@@ -110,19 +110,19 @@ XWiki.Blog = {
   blogToolsValues: {
     show: {
       title: "This blog post is not visible to other users. Make it visible",
-      imageSrc: "$blogStyleDocument.getAttachmentURL('show.png')",
+      imageSrc: "$xwiki.getSkinFile('icons/silk/lock_open.gif')",
       imageAlt: "show",
       comment: "Made%20entry%20visible"
     },
     hide: {
       title: "Hide this blog post from other users",
-      imageSrc: "$blogStyleDocument.getAttachmentURL('hide.png')",
+      imageSrc: "$xwiki.getSkinFile('icons/silk/lock.gif')",
       imageAlt: "hide",
       comment: "Hidden%20entry"
     },
     loading: {
       title: "Loading...",
-      imageSrc: "$blogStyleDocument.getAttachmentURL('ajax-loader.gif')",
+      imageSrc: "$xwiki.getSkinFile('icons/xwiki/spinner.gif')",
       imageAlt: "loading"
     }
   },
@@ -357,5 +357,5 @@ document.observe("dom:loaded", XWiki.Blog.initialize);</code>
 <use>onDemand</use>
 </property>
 </object>
-<content>
-</content></xwikidoc>
+<content></content>
+</xwikidoc>

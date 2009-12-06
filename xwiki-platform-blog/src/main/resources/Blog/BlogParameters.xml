@@ -53,11 +53,11 @@
 #**
  * Displays an image, taken from the blog style document.
  * 
- * @param attachmentName The name of the attachment to use.
+ * @param $imgName The name of the icon to use (without the extension).
  * @param alt The alternate text that should be displayed when images are not viewable.
  *#
-#macro(toolImage $attachmentName $alt)
-  &lt;img class="icon-manage" src="$blogStyleDocument.getAttachmentURL($attachmentName)" alt="${alt}"/&gt;
+#macro(toolImage $imgName $alt)
+  &lt;img class="icon-manage" src="$xwiki.getSkinFile("icons/silk/${imgName}.gif")" alt="${alt}"/&gt;
 #end
 {{/velocity}}</content>
 </xwikidoc>

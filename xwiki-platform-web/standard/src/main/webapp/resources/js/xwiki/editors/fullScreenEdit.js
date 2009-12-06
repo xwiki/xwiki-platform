@@ -348,7 +348,8 @@ XWiki.editors.FullScreenEditing = Class.create({
       'width' : parent.style['width'],
       'height' : parent.style['height']
     };
-    document.body.setStyle({'overflow' : 'hidden', 'width': '100%', 'height': '100%'});
+    $(document.body).setStyle({'overflow': 'hidden', 'width': '100%', 'height': '100%'});
+    $(document.body).up().setStyle({'overflow': "hidden", 'width': "100%", 'height': "100%"});
 
     // Make sure to resize the targetElement when the window dimensions are changed. Both document and window are monitored,
     // since different browsers send events to different elements.

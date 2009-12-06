@@ -95,18 +95,6 @@ $xwiki.ssx.use('Blog.ManageCategories')##
     #end
     #publishMessageBox("$msg.get('xe.blog.sheet.notpublished') &lt;label&gt;**$msg.get('xe.blog.sheet.publish') ${doc.display('published', 'edit', $entryObj)}**&lt;/label&gt;\\&lt;label&gt;$msg.get('xe.blog.sheet.setdate') ${doc.display('publishDate', 'edit', $entryObj)}&lt;/label&gt;")
   #end
-  #set($newtitle = $request.title)
-  #if($newtitle)
-    #set($newtitle = $newtitle.replaceAll('"',"'"))
-    &lt;script type="text/javascript"&gt;
-    {{{
-    ## TODO: Set the correct date. This does not work since the current form buttons break onsumbit events.
-    ## Event.observe(document.getElementById('${formname}'), 'submit', function(evt) {alert(this); alert(evt); return false;}, true);
-    var title = "${newtitle}";
-    document.forms.inline["${entryObj.getxWikiClass().getName()}_${entryObj.number}_title"].value = title;
-    }}}
-    &lt;/script&gt;
-  #end
 #end
 {{/html}}
 {{/velocity}}</content>

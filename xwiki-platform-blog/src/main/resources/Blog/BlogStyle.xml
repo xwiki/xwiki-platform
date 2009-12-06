@@ -166,24 +166,24 @@
   clear: both;
   padding: 10px 0;
   /* Make way for the calendarsheet-like day display */
-  margin-left: 128px;
+  margin-left: 56px;
 }
 /* Calendar sheet display of a blogging day */
 .blogdate {
-  color: #777;
+  font-size: 70%;
+  width: 48px;
   text-align: center;
-  font-size: 120%;
-  /* Background aspect: glossy gray sheet */
-  width: 94px;
   background: #f6f6f6 url($doc.getAttachmentURL('grey-grad.png')) left top repeat-x;
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  padding: 8px;
+  padding: 0;
   /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
   float: left;
   /* Large negative bottom margin fixes a float push bug in IE */
-  margin: 0px 8px -10000in -128px;
+  margin: 0px 8px -10000in -56px;
 }
+
+
 /* Reorganize the date as 3 centered rows */
 .blogdate .month, .blogdate .year, .blogdate .day {
   display: block;
@@ -196,6 +196,25 @@
   font-size: 250%;
   font-weight: 900;
   line-height: 110%;
+  float: left;
+  width: 46px;
+}
+#body .blogdate .month, #body .blogdate .year {
+  display: inline;
+}
+/* Restyle the paging links */
+.pagingLinks {
+  margin: 5px 0;
+  padding: 2px 0;
+  border: none;
+  font-size: 75%;
+  font-variant: normal;
+}
+.pagingLinks .separator {
+  display: none;
+}
+.pagingLinks a:hover {
+  text-decoration: none;
 }
 /* The toolbox, floated on the right of the title */
 .blog-entry-toolbox {
@@ -287,54 +306,24 @@ div.hide-message{
 #set($hbgColor = '#E5E5E5')
 #set($hbgColor = '#4A4945')
 #end
-/* A blog day is a container for entries published in the same day. Space out days vertically. */
-#body .blogDay {
-  /* Make way for the calendarsheet-like day display */
-  margin-left: 56px;
-}
 /* Calendar sheet display of a blogging day */
 #body .blogdate {
-  font-size: 70%;
-  width: 48px;
-  padding: 0px;
-  /* Positioning: float it on the left side, in the extra-large margin left by the blogDay container */
-  float: left;
-  /* Large negative bottom margin fixes a float push bug in IE */
-  margin: 0px 8px -10000in -56px;
   background: $hbgColor;
   border: 1px solid $borderColor;
   border: 2px solid $shadowColor;
-  text-align: center;
 }
 /* The day is the most important part, make it extra large */
 #body .blogdate .day {
-  font-size: 250%;
-  font-weight: 900;
-  line-height: 110%;
   color: $textColor;
-  float: left;
   background: $bgColor;
   border: 1px solid $borderColor;
-  width: 46px;
 }
 #body .blogdate .month, #body .blogdate .year {
-  display: inline;
   color: $htextColor;
 }
-/* Restyle the paging links */
 .pagingLinks {
-  margin: 5px 0;
-  padding: 2px 0;
-  border: none;
   border-top: 1px solid #DDD;
-  font-size: 75%;
-  font-variant: normal;
 }
-.pagingLinks .separator {
-  display: none;
-}
-.pagingLinks a:hover {
-  text-decoration: none;
 }</code>
 </property>
 <property>
@@ -347,5 +336,5 @@ div.hide-message{
 <use>onDemand</use>
 </property>
 </object>
-<content>
-</content></xwikidoc>
+<content></content>
+</xwikidoc>

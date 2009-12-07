@@ -101,9 +101,9 @@
 </property>
 <property>
 <content>#panelheader($msg.get("xe.panels.quicklinks"))
-* [$msg.get("xe.panels.quicklinks.dashboard")&gt;Main.WebHome] &lt;a href="$xwiki.getURL('Main.WebRss', 'view', 'xpage=plain')"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.gif')" alt="(RSS)" title="RSS feed for wiki updates" class="icon rss"/&gt;&lt;/a&gt;
+* [$msg.get("xe.panels.quicklinks.dashboard")&gt;Main.WebHome] &lt;a href="$xwiki.getURL('Main.WebRss', 'view', 'xpage=plain')"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/rss-medium.png')" alt="(RSS)" title="RSS feed for wiki updates" class="icon rss"/&gt;&lt;/a&gt;
 * [$msg.get("xe.panels.quicklinks.index")&gt;Main.AllDocs]
-* [$msg.get("xe.panels.quicklinks.blog")&gt;Blog.WebHome] &lt;a href="$xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')"&gt;&lt;img src="$xwiki.getSkinFile('icons/silk/feed.gif')" alt="(RSS)" title="RSS feed for blog posts" class="icon rss"/&gt;&lt;/a&gt;
+* [$msg.get("xe.panels.quicklinks.blog")&gt;Blog.WebHome] &lt;a href="$xwiki.getURL('Blog.GlobalBlogRss', 'view', 'xpage=plain')"&gt;&lt;img src="$xwiki.getSkinFile('icons/xwiki/rss-medium.png')" alt="(RSS)" title="RSS feed for blog posts" class="icon rss"/&gt;&lt;/a&gt;
 * [$msg.get("xe.panels.quicklinks.sandbox")&gt;Sandbox.WebHome]
 #if ($xwiki.hasAdminRights())
 &lt;p&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;$msg.get("xe.panels.edit")&lt;/a&gt;&lt;/p&gt;

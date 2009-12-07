@@ -182,15 +182,10 @@ public class Utils
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki private API object.
-     * @throws RuntimException If there was an error while initializing the XWiki private API object.
      */
     public static com.xpn.xwiki.XWiki getXWiki(ComponentManager componentManager)
     {
-        try {
-            return com.xpn.xwiki.XWiki.getXWiki(getXWikiContext(componentManager));
-        } catch (XWikiException e) {
-            throw new RuntimeException("Unable to get XWiki object", e);
-        }
+        return getXWikiContext(componentManager).getWiki();
     }
 
     /**

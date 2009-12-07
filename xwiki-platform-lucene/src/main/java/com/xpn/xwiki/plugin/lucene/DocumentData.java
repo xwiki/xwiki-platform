@@ -21,15 +21,32 @@ package com.xpn.xwiki.plugin.lucene;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.PasswordClass;
+import com.xpn.xwiki.objects.classes.ListItem;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+
+import java.util.Map;
+import java.util.List;
 
 /**
- * Holds all data but the content of a wiki page to be indexed. The content is retrieved at indexing
- * time, which should save us some memory especially when rebuilding an index for a big wiki.
+ * Holds all data but the content of a wiki page to be indexed. The content is retrieved at indexing time, which should
+ * save us some memory especially when rebuilding an index for a big wiki.
  * 
  * @version $Id$
  */
 public class DocumentData extends IndexData
 {
+    private static final Log LOG = LogFactory.getLog(DocumentData.class);
+
     public DocumentData(final XWikiDocument doc, final XWikiContext context)
     {
         super(doc, context);
@@ -49,17 +66,132 @@ public class DocumentData extends IndexData
     }
 
     /**
-     * @return a string containing the result of {@link IndexData#getFullText} plus the full text
-     *         content of this document (in the given language)
+     * @return a string containing the result of {@link IndexData#getFullText} plus the full text content of this
+     *         document (in the given language)
      */
-    public String getFullText(XWikiDocument doc, XWikiContext context)
+    protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer text = new StringBuffer(super.getFullText(doc, context));
-        text.append(" ");
-        text.append(super.getDocumentTitle());
-        text.append(" ");
-        text.append(doc.getContent());
+        super.getFullText(sb, doc, context);
 
-        return text.toString();
+        sb.append(" ");
+        sb.append(getDocumentTitle());
+        sb.append(" ");
+        sb.append(doc.getContent());
+        sb.append(" ");
+
+        getObjectFullText(sb, doc, context);
     }
+
+    /**
+     * Add to the string builder, the result of {@link IndexData#getFullText(XWikiDocument,XWikiContext)}plus the full
+     * text content (values of title,category,content and extract ) XWiki.ArticleClass Object, as far as it could be
+     * extracted.
+     */
+    private void getObjectFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
+    {
+        super.getFullText(sb, doc, context);
+        getObjectContentAsText(sb, doc, context);
+    }
+
+    /**
+     * Add to the string builder the value of title,category,content and extract of XWiki.ArticleClass
+     */
+    private void getObjectContentAsText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
+    {
+        LOG.info(doc.getFullName());
+
+        for (String className : doc.getxWikiObjects().keySet()) {
+            for (BaseObject obj : doc.getObjects(className)) {
+                extractObjectContent(sb, obj, context);
+            }
+        }
+    }
+
+    private void getObjectContentAsText(StringBuilder contentText, BaseObject baseObject, String property,
+        XWikiContext context)
+    {
+        BaseProperty baseProperty;
+        baseProperty = (BaseProperty) baseObject.getField(property);
+        // XXX Can baseProperty really be null?
+        if (baseProperty != null && baseProperty.getValue() != null) {
+            PropertyInterface prop = baseObject.getxWikiClass(context).getField(property);
+            if (!(prop instanceof PasswordClass)) {
+                contentText.append(baseProperty.getValue().toString());
+            }
+        }
+    }
+
+    private void extractObjectContent(StringBuilder contentText, BaseObject baseObject, XWikiContext context)
+    {
+        if (baseObject != null) {
+            String[] propertyNames = baseObject.getPropertyNames();
+            for (String propertyName : propertyNames) {
+                getObjectContentAsText(contentText, baseObject, propertyName, context);
+                contentText.append(" ");
+            }
+        }
+    }
+
+    @Override
+    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc, XWikiDocument doc,
+        XWikiContext context)
+    {
+        super.addDataToLuceneDocument(luceneDoc, doc, context);
+        for (String className : doc.getxWikiObjects().keySet()) {
+            for (BaseObject obj : doc.getObjects(className)) {
+                if (obj != null) {
+                    luceneDoc.add(new Field(IndexFields.OBJECT, obj.getClassName(), Field.Store.YES,
+                        Field.Index.ANALYZED));
+                    Object[] propertyNames = obj.getPropertyNames();
+                    for (int i = 0; i < propertyNames.length; i++) {
+                        indexProperty(luceneDoc, obj, (String) propertyNames[i], context);
+                    }
+                }
+            }
+        }
+    }
+
+    private void indexProperty(Document luceneDoc, BaseObject baseObject,
+        String propertyName, XWikiContext context)
+    {
+        String fieldFullName = baseObject.getClassName() + "." + propertyName;
+        BaseClass bClass = baseObject.getxWikiClass(context);
+        PropertyInterface prop = bClass.getField(propertyName);
+
+        if (prop instanceof PasswordClass) {
+            // Do not index passwords
+        } else if (prop instanceof StaticListClass && ((StaticListClass) prop).isMultiSelect()) {
+            indexStaticList(luceneDoc, baseObject, (StaticListClass) prop, propertyName, context);
+        } else {
+            StringBuilder sb = new StringBuilder();
+            getObjectContentAsText(sb, baseObject, propertyName, context);
+            luceneDoc.add(new Field(fieldFullName, sb.toString(), Field.Store.YES, Field.Index.ANALYZED));
+        }
+    }
+
+    private void indexStaticList(Document luceneDoc, BaseObject baseObject,
+        StaticListClass prop, String propertyName, XWikiContext context)
+    {
+        Map<String, ListItem> possibleValues = prop.getMap(context);
+        String fieldFullName = baseObject.getClassName() + "." + propertyName;
+
+        for (String value : (List<String>) baseObject.getListValue(propertyName)) {
+            ListItem item = possibleValues.get(value);
+            if (item != null) {
+                // we index the key of the list
+                String fieldName = fieldFullName + ".key";
+                luceneDoc.add(new Field(fieldName, item.getId(), Field.Store.YES, Field.Index.ANALYZED));
+                // we index the value
+                fieldName = fieldFullName + ".value";
+                luceneDoc.add(new Field(fieldName, item.getValue(), Field.Store.YES, Field.Index.ANALYZED));
+                if (!item.getId().equals(item.getValue())) {
+                    luceneDoc.add(new Field(fieldFullName, item.getValue(), Field.Store.YES, Field.Index.ANALYZED));
+                }
+            }
+
+            // we index both if value is not equal to the id(key)
+            luceneDoc.add(new Field(fieldFullName, value, Field.Store.YES, Field.Index.ANALYZED));
+        }
+    }
+
 }

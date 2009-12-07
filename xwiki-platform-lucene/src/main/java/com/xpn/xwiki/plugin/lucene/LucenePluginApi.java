@@ -184,14 +184,6 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
     }
 
     /**
-     * @return the number of documents in the second queue gave to Lucene.
-     */
-    public long getActiveQueueSize()
-    {
-        return getProtectedPlugin().getActiveQueueSize();
-    }
-
-    /**
      * @return the number of documents Lucene index writer.
      */
     public long getLuceneDocCount()

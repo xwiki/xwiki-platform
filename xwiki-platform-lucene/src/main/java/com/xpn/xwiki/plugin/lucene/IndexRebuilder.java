@@ -49,17 +49,15 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * </ul>
  * </li>
  * </ul>
- * The rebuild can be triggered using the {@link LucenePluginApi#rebuildIndex()} method of the
- * {@link LucenePluginApi}. Once a rebuild request is made, a new thread is created, so the
- * requesting script can continue processing, while the rebuilding is done in the background. The
- * actual indexing is done by the IndexUpdater thread, this thread just gathers the data and passes
- * it to the IndexUpdater.
+ * The rebuild can be triggered using the {@link LucenePluginApi#rebuildIndex()} method of the {@link LucenePluginApi}.
+ * Once a rebuild request is made, a new thread is created, so the requesting script can continue processing, while the
+ * rebuilding is done in the background. The actual indexing is done by the IndexUpdater thread, this thread just
+ * gathers the data and passes it to the IndexUpdater.
  * </p>
  * <p>
  * As a summary, this plugin:
  * <ul>
- * <li>cleans the Lucene search indexes and re-submits all the contents of all the wikis for
- * indexing</li>
+ * <li>cleans the Lucene search indexes and re-submits all the contents of all the wikis for indexing</li>
  * <li>without clogging the indexing thread (since 1.2)</li>
  * <li>all in a background thread (since 1.2)</li>
  * <li>making sure that only one rebuild is in progress (since 1.2)</li>
@@ -74,7 +72,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     private static final Log LOG = LogFactory.getLog(IndexRebuilder.class);
 
     /** The actual object/thread that indexes data. */
-    private IndexUpdater indexUpdater;
+    private final IndexUpdater indexUpdater;
 
     /** The XWiki context. */
     private XWikiContext context;
@@ -83,12 +81,12 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     private static int retryInterval = 30000;
 
     /** Variable used for indicating that a rebuild is already in progress. */
-    private boolean rebuildInProgress = false;
+    private volatile boolean rebuildInProgress = false;
 
-    public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
+    public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context, boolean needInitialBuild)
     {
         this.indexUpdater = indexUpdater;
-        if (indexUpdater.needInitialBuild) {
+        if (needInitialBuild) {
             this.startRebuildIndex(context);
             LOG.info("Launched initial lucene indexing");
         }
@@ -98,6 +96,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     {
         if (rebuildInProgress) {
             LOG.warn("Cannot launch rebuild because a build is in progress");
+
             return LucenePluginApi.REBUILD_IN_PROGRESS;
         } else {
             this.rebuildInProgress = true;
@@ -109,6 +108,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             indexRebuilderThread.setPriority(3);
             // Finally, start the rebuild in the background
             indexRebuilderThread.start();
+
             // Too bad that now we can't tell how many items are there to be indexed...
             return 0;
         }
@@ -148,11 +148,11 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             // automatically recreated by the velocity renderer, if it isn't found in the xcontext.
             context.remove("vcontext");
 
-            // Since this is where a new thread is created this is where we need to initialize the Container 
+            // Since this is where a new thread is created this is where we need to initialize the Container
             // ThreadLocal variables and not in the init() method. Otherwise we would simply overwrite the
             // Container values for the main thread...
             initXWikiContainer(context);
-            
+
             // The original request and response should not be used outside the actual request
             // processing thread, as they will be cleaned later by the container.
             context.setRequest(null);
@@ -172,16 +172,17 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             }
             MDC.remove("url");
         }
+
         LOG.debug("Lucene index rebuild done");
     }
 
     /**
-     * First empties the index, then fetches all Documents, their translations and their attachments
-     * for re-addition to the index.
+     * First empties the index, then fetches all Documents, their translations and their attachments for re-addition to
+     * the index.
      * 
      * @param context
-     * @return total number of documents and attachments successfully added to the indexer queue, -1
-     *         when errors occured.
+     * @return total number of documents and attachments successfully added to the indexer queue, -1 when errors
+     *         occured.
      */
     private int rebuildIndex(XWikiContext context) throws IOException
     {
@@ -224,6 +225,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     protected int indexWiki(String wikiName, XWikiContext context)
     {
         LOG.info("Reading content of wiki " + wikiName);
+        
         // Number of index entries processed
         int retval = 0;
         XWiki xwiki = context.getWiki();
@@ -235,9 +237,8 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             try {
                 docNames = xwiki.getStore().searchDocumentsNames("", context);
             } catch (XWikiException ex) {
-                LOG.warn(String.format(
-                    "Error getting document names for wiki [%s]. Internal error is: $s",
-                    wikiName, ex.getMessage()));
+                LOG.warn(String.format("Error getting document names for wiki [%s]. Internal error is: $s", wikiName,
+                    ex.getMessage()));
                 return -1;
             }
             for (String docName : docNames) {
@@ -246,6 +247,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                     document = xwiki.getDocument(docName, context);
                 } catch (XWikiException e2) {
                     LOG.error("error fetching document " + wikiName + ":" + docName, e2);
+                    
                     continue;
                 }
 
@@ -256,7 +258,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                     // rest of the platform, as the index rebuilder could fill the queue, and then a
                     // user trying to save a document would cause an exception. Thus, it is better
                     // to limit the index rebuilder thread only, and not the index updater.
-                    while (this.indexUpdater.getQueueSize() > this.indexUpdater.maxQueueSize) {
+                    while (this.indexUpdater.getQueueSize() > this.indexUpdater.getMaxQueueSize()) {
                         try {
                             // Don't leave any database connections open while sleeping
                             // This shouldn't be needed, but we never know what bugs might be there
@@ -270,32 +272,14 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                     retval++;
                     retval += addTranslationsOfDocument(document, context);
                     retval += this.indexUpdater.addAttachmentsOfDocument(document, context);
-                    retval += addObjectsOfDocument(document, context);
                 } else {
                     if (LOG.isInfoEnabled()) {
-                        LOG.info("XWiki delivered null for document name " + wikiName + ":"
-                            + docName);
+                        LOG.info("XWiki delivered null for document name " + wikiName + ":" + docName);
                     }
                 }
             }
         } finally {
             context.setDatabase(database);
-        }
-
-        return retval;
-    }
-
-    /**
-     * Getting the content(values of title/category/content/extract properties ) from the
-     * XWiki.ArticleClass objects
-     */
-    private int addObjectsOfDocument(XWikiDocument document, XWikiContext wikiContext)
-    {
-        int retval = 0;
-
-        if (document.hasElement(XWikiDocument.HAS_OBJECTS)) {
-            retval += document.getxWikiObjects().size();
-            this.indexUpdater.addObject(document, wikiContext);
         }
 
         return retval;
@@ -309,20 +293,18 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         try {
             translations = document.getTranslationList(wikiContext);
         } catch (XWikiException e) {
-            LOG.error("error getting list of translations from document "
-                + document.getFullName(), e);
-            e.printStackTrace();
+            LOG.error("error getting list of translations from document " + document.getFullName(), e);
+
             return 0;
         }
 
         for (String lang : translations) {
             try {
-                this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext),
-                    wikiContext);
+                this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext), wikiContext);
                 retval++;
             } catch (XWikiException e1) {
-                LOG.error("Error getting translated document for document "
-                    + document.getFullName() + " and language " + lang, e1);
+                LOG.error("Error getting translated document for document " + document.getFullName() + " and language "
+                    + lang, e1);
             }
         }
 

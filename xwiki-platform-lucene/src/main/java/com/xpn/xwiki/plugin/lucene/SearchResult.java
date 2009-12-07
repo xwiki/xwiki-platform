@@ -101,7 +101,7 @@ public class SearchResult
                 LOG.error("error retrieving url for attachment " + this.filename + " of document " + fullDocName);
                 e.printStackTrace();
             }
-        } else if (LucenePlugin.DOCTYPE_OBJECTS.equals(type)) {
+        } else {
             objects = doc.getValues("object");
         }
     }
@@ -246,8 +246,7 @@ public class SearchResult
      */
     public boolean isWikiContent()
     {
-        return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(this.type) || LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type) || LucenePlugin.DOCTYPE_OBJECTS
-            .equals(this.type));
+        return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(this.type) || LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type));
     }
 
 }

@@ -68,6 +68,9 @@ public class DeleteAttachmentAction extends XWikiAction
 
         newdoc.deleteAttachment(attachment, context);
 
+        // Also save the document and attachment metadata
+        context.getWiki().saveDocument(doc, context);
+
         // forward to attach page
         String redirect = Utils.getRedirect("attach", context);
         sendRedirect(response, redirect);

@@ -244,7 +244,7 @@
   #getEntriesForCategory($name $discard $totalEntries)
   #foreach($i in [1..$level])*#end ##
 &lt;span class="blog-category-level"&gt;&lt;span class="blog-category"&gt;##
-&lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title="RSS"&gt;#toolImage('bullet_feed', '[RSS]')&lt;/a&gt;##
+&lt;a href="$xwiki.getURL('Blog.CategoryRss', 'view', "xpage=plain&amp;amp;category=$name")" title="RSS"&gt;&lt;img class="icon icon-manage" src="$xwiki.getSkinFile("icons/xwiki/rss-medium.png")" alt="[RSS]"/&gt;&lt;/a&gt;##
 [[#getCategoryName($xwiki.getDocument($name)) (% class="itemCount" %)($totalEntries)(%%)&gt;&gt;${name}]]&lt;/span&gt; ##
 &lt;span class="blog-category-tools"&gt;##
 #if($xwiki.hasAccessLevel('delete', $context.user, $name) &amp;&amp; ("$!{request.xaction}" != 'showRenameCategory' || "$!{request.category}" != $name))&lt;a href="$xwiki.getURL('Blog.ManageCategories', 'view', "xaction=showRenameCategory&amp;amp;category=$name")" class="tool rename"&gt;#toolImage('pencil' 'Rename ')&lt;/a&gt;#end ##

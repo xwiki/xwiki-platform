@@ -889,7 +889,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .actionmenu .hasIcon {
-  padding-left: 20px;
   background: no-repeat 0px 3px;
 }
 
@@ -915,6 +914,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   width: auto;
   white-space: nowrap;
   text-transform: uppercase;
+}
+
+.actionmenu .hasIcon .tme {
+  padding-left: 20px;
 }
 
 .dropdownnolink a.tme:hover {

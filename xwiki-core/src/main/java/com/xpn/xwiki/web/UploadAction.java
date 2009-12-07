@@ -111,7 +111,7 @@ public class UploadAction extends XWikiAction
         }
 
         // Also save the document and attachment metadata
-        context.getWiki().getStore().saveXWikiDoc(doc, context, true);
+        context.getWiki().saveDocument(doc, context);
 
         LOG.debug("Found files to upload: " + fileNames);
         LOG.debug("Failed attachments: " + failedFiles);

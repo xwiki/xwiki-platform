@@ -88,11 +88,6 @@
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-plexus</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
 
     <!-- Needed for GWT/WYSIWYG -->
     <dependency>

@@ -19,21 +19,22 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.search.Hits;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.XWiki;
-import org.apache.lucene.search.Hits;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Container for the results of a search.
  * <p>
- * This class handles paging through search results and enforces the xwiki rights management by only
- * returning search results the user executing the search is allowed to view.
+ * This class handles paging through search results and enforces the xwiki rights management by only returning search
+ * results the user executing the search is allowed to view.
  * </p>
  * 
  * @version $Id$
@@ -46,7 +47,7 @@ public class SearchResults extends Api
 
     private static final Log LOG = LogFactory.getLog(SearchResults.class);
 
-    private List relevantResults;
+    private List<SearchResult> relevantResults;
 
     /**
      * @param hits Lucene search results
@@ -60,10 +61,10 @@ public class SearchResults extends Api
         this.xwiki = xwiki;
     }
 
-    private List getRelevantResults()
+    private List<SearchResult> getRelevantResults()
     {
-        if (relevantResults == null) {
-            relevantResults = new ArrayList();
+        if (this.relevantResults == null) {
+            this.relevantResults = new ArrayList<SearchResult>();
             final int hitcount = hits.length();
 
             String database = this.context.getDatabase();
@@ -71,29 +72,28 @@ public class SearchResults extends Api
                 for (int i = 0; i < hitcount; i++) {
                     SearchResult result = null;
                     try {
-                        result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
+                        result = new SearchResult(this.hits.doc(i), this.hits.score(i), this.xwiki);
 
                         this.context.setDatabase(result.getWiki());
 
                         String pageName = null;
                         if (result.isWikiContent()) {
-                            pageName =
-                                result.getWiki() + ":" + result.getWeb() + "." + result.getName();
+                            pageName = result.getWiki() + ":" + result.getSpace() + "." + result.getName();
                         }
-                        if (result != null && result.isWikiContent()
-                            && xwiki.checkAccess(pageName, "view") && xwiki.exists(pageName)) {
+                        if (result.isWikiContent() && this.xwiki.checkAccess(pageName, "view")
+                            && this.xwiki.exists(pageName)) {
                             relevantResults.add(result);
                         }
                     } catch (Exception e) {
-                        LOG.error("error getting search result", e);
-                        e.printStackTrace();
+                        LOG.error("Error getting search result", e);
                     }
                 }
             } finally {
                 this.context.setDatabase(database);
             }
         }
-        return relevantResults;
+
+        return this.relevantResults;
     }
 
     /**
@@ -103,12 +103,12 @@ public class SearchResults extends Api
     {
         final int itemCount = Integer.parseInt(items);
         final int begin = Integer.parseInt(beginIndex);
+
         return begin + itemCount - 1 < getRelevantResults().size();
     }
 
     /**
-     * @return true when there is a page before the one currently displayed, that is, when
-     *         <code>beginIndex > 1</code>
+     * @return true when there is a page before the one currently displayed, that is, when <code>beginIndex > 1</code>
      */
     public boolean hasPrevious(String beginIndex)
     {
@@ -116,24 +116,26 @@ public class SearchResults extends Api
     }
 
     /**
-     * @return the value to be used for the firstIndex URL parameter to build a link pointing to the
-     *         next page of results
+     * @return the value to be used for the firstIndex URL parameter to build a link pointing to the next page of
+     *         results
      */
     public int getNextIndex(String beginIndex, String items)
     {
         final int itemCount = Integer.parseInt(items);
         final int resultcount = getRelevantResults().size();
         int retval = Integer.parseInt(beginIndex) + itemCount;
+
         return retval > resultcount ? (resultcount - itemCount + 1) : retval;
     }
 
     /**
-     * @return the value to be used for the firstIndex URL parameter to build a link pointing to the
-     *         previous page of results
+     * @return the value to be used for the firstIndex URL parameter to build a link pointing to the previous page of
+     *         results
      */
     public int getPreviousIndex(String beginIndex, String items)
     {
         int retval = Integer.parseInt(beginIndex) - Integer.parseInt(items);
+
         return 0 < retval ? retval : 1;
     }
 
@@ -147,53 +149,53 @@ public class SearchResults extends Api
         if (retval > resultcount) {
             return resultcount;
         }
+
         return retval;
     }
 
     /**
-     * Helper method for use in velocity templates, takes string values instead of ints. See {@link
-     * #getResults(int,int)}.
+     * Helper method for use in velocity templates, takes string values instead of ints. See
+     * {@link #getResults(int,int)}.
      */
-    public List getResults(String beginIndex, String items)
+    public List<SearchResult> getResults(String beginIndex, String items)
     {
         return getResults(Integer.parseInt(beginIndex), Integer.parseInt(items));
     }
 
     /**
-     * Returns a list of search results. According to beginIndex and endIndex, only a subset of the
-     * results is returned. To get the first ten results, one would use beginIndex=1 and items=10.
+     * Returns a list of search results. According to beginIndex and endIndex, only a subset of the results is returned.
+     * To get the first ten results, one would use beginIndex=1 and items=10.
      * 
      * @param beginIndex 1-based index of first result to return.
      * @param items number of items to return
-     * @return List of SearchResult instances starting at <code>beginIndex</code> and containing
-     *         up to <code>items</code> elements.
+     * @return List of SearchResult instances starting at <code>beginIndex</code> and containing up to
+     *         <code>items</code> elements.
      */
-    public List getResults(int beginIndex, int items)
+    public List<SearchResult> getResults(int beginIndex, int items)
     {
         final int listStartIndex = beginIndex - 1;
         final int listEndIndex = listStartIndex + items;
         int resultcount = 0;
-        List relResults = relevantResults;
+        List<SearchResult> relResults = this.relevantResults;
         if (relResults == null) {
-            relResults = new ArrayList();
-            final int hitcount = hits.length();
+            relResults = new ArrayList<SearchResult>();
+            final int hitcount = this.hits.length();
 
             String database = this.context.getDatabase();
             try {
                 for (int i = 0; i < hitcount; i++) {
                     SearchResult result = null;
                     try {
-                        result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
+                        result = new SearchResult(this.hits.doc(i), this.hits.score(i), this.xwiki);
 
                         this.context.setDatabase(result.getWiki());
 
                         String pageName = null;
                         if (result.isWikiContent()) {
-                            pageName =
-                                result.getWiki() + ":" + result.getWeb() + "." + result.getName();
+                            pageName = result.getWiki() + ":" + result.getSpace() + "." + result.getName();
                         }
-                        if (result != null && result.isWikiContent() && xwiki.exists(pageName)
-                            && xwiki.checkAccess(pageName, "view")) {
+                        if (result.isWikiContent() && this.xwiki.exists(pageName)
+                            && this.xwiki.checkAccess(pageName, "view")) {
                             if (resultcount >= listStartIndex) {
                                 relResults.add(result);
                             }
@@ -203,7 +205,6 @@ public class SearchResults extends Api
                         }
                     } catch (Exception e) {
                         LOG.error("error getting search result", e);
-                        e.printStackTrace();
                     }
                 }
             } finally {
@@ -213,15 +214,15 @@ public class SearchResults extends Api
             return relResults;
         } else {
             resultcount = getRelevantResults().size();
-            return getRelevantResults().subList(listStartIndex,
-                listEndIndex < resultcount ? listEndIndex : resultcount);
+
+            return getRelevantResults().subList(listStartIndex, listEndIndex < resultcount ? listEndIndex : resultcount);
         }
     }
 
     /**
      * @return all search results in one list.
      */
-    public List getResults()
+    public List<SearchResult> getResults()
     {
         return getRelevantResults();
     }
@@ -239,7 +240,7 @@ public class SearchResults extends Api
      */
     public int getTotalHitcount()
     {
-        return hits.length();
+        return this.hits.length();
     }
 
 }

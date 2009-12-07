@@ -78,8 +78,9 @@ public class AttachmentData extends IndexData
     public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
     {
         super.addDataToLuceneDocument(luceneDoc, doc, context);
-        if (filename != null) {
-            luceneDoc.add(new Field(IndexFields.FILENAME, filename, Field.Store.YES, Field.Index.TOKENIZED));
+
+        if (this.filename != null) {
+            luceneDoc.add(new Field(IndexFields.FILENAME, filename, Field.Store.YES, Field.Index.ANALYZED));
         }
     }
 
@@ -104,7 +105,7 @@ public class AttachmentData extends IndexData
      */
     public String getFilename()
     {
-        return filename;
+        return this.filename;
     }
 
     /**
@@ -122,7 +123,7 @@ public class AttachmentData extends IndexData
      */
     public String getId()
     {
-        return new StringBuffer(super.getId()).append(".file.").append(filename).toString();
+        return new StringBuffer(super.getId()).append(".file.").append(this.filename).toString();
     }
 
     /**
@@ -146,16 +147,16 @@ public class AttachmentData extends IndexData
         String contentText = null;
 
         try {
-            XWikiAttachment att = doc.getAttachment(filename);
+            XWikiAttachment att = doc.getAttachment(this.filename);
 
-            LOG.debug("have attachment for filename " + filename + ": " + att);
+            LOG.debug("have attachment for filename " + this.filename + ": " + att);
 
             byte[] content = att.getContent(context);
-            if (filename != null) {
-                String[] nameParts = filename.split("\\.");
+            if (this.filename != null) {
+                String[] nameParts = this.filename.split("\\.");
                 if (nameParts.length > 1) {
                     contentText =
-                        TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
+                            TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
                 }
             }
         } catch (Exception e) {

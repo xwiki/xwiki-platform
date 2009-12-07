@@ -21,14 +21,17 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -42,7 +45,7 @@ public abstract class IndexData
 
     private String documentName;
 
-    private String documentWeb;
+    private String documentSpace;
 
     private String documentFullName;
 
@@ -59,102 +62,87 @@ public abstract class IndexData
     private Date modificationDate;
 
     /**
-     * name of the virtual wiki this doc belongs to
+     * name of the wiki this doc belongs to
      */
     private String wiki;
 
     public IndexData(final XWikiDocument doc, final XWikiContext context)
     {
         setDocumentName(doc.getName());
-        setDocumentTitle(doc.getDisplayTitle(context));
-        setDocumentWeb(doc.getSpace());
+        try {
+            setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
+        } catch (XWikiException e) {
+            LOG.error("Failed to render document title content", e);
+            setDocumentTitle(doc.getName());
+        }
+        setDocumentSpace(doc.getSpace());
         setDocumentFullName(doc.getFullName());
         setWiki(doc.getDatabase() == null ? context.getDatabase() : doc.getDatabase());
-        setFullName(new StringBuffer(wiki).append(":").append(documentWeb).append(".").append(
-            documentName).toString());
+        setFullName(new StringBuffer(this.wiki).append(":").append(this.documentSpace).append(".").append(
+            this.documentName).toString());
         setLanguage(doc.getLanguage());
     }
 
     /**
-     * Adds this documents data to a lucene Document instance for indexing. <p> <strong>Short introduction to Lucene
-     * field types </strong> </p> <p> Which type of Lucene field is used determines what Lucene does with data and how
-     * we can use it for searching and showing search results: </p> <ul> <li>Keyword fields don't get tokenized, but are
-     * searchable and stored in the index. This is perfect for fields you want to search in programmatically (like ids
-     * and such), and date fields. Since all user-entered queries are tokenized, letting the user search these fields
-     * makes almost no sense, except of queries for date fields, where tokenization is useless.</li> <li>the stored text
-     * fields are used for short texts which should be searchable by the user, and stored in the index for
-     * reconstruction. Perfect for document names, titles, abstracts.</li> <li>the unstored field takes the biggest part
-     * of the content - the full text. It is tokenized and indexed, but not stored in the index. This makes sense, since
-     * when the user wants to see the full content, he clicks the link to vie the full version of a document, which is
-     * then delivered by xwiki.</li> </ul>
-     *
+     * Adds this documents data to a lucene Document instance for indexing.
+     * <p>
+     * <strong>Short introduction to Lucene field types </strong>
+     * </p>
+     * <p>
+     * Which type of Lucene field is used determines what Lucene does with data and how we can use it for searching and
+     * showing search results:
+     * </p>
+     * <ul>
+     * <li>Keyword fields don't get tokenized, but are searchable and stored in the index. This is perfect for fields
+     * you want to search in programmatically (like ids and such), and date fields. Since all user-entered queries are
+     * tokenized, letting the user search these fields makes almost no sense, except of queries for date fields, where
+     * tokenization is useless.</li>
+     * <li>the stored text fields are used for short texts which should be searchable by the user, and stored in the
+     * index for reconstruction. Perfect for document names, titles, abstracts.</li>
+     * <li>the unstored field takes the biggest part of the content - the full text. It is tokenized and indexed, but
+     * not stored in the index. This makes sense, since when the user wants to see the full content, he clicks the link
+     * to vie the full version of a document, which is then delivered by xwiki.</li>
+     * </ul>
+     * 
      * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
-     * content in the default language will be used.
+     *            content in the default language will be used.
      */
-    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc,
-        XWikiDocument doc, XWikiContext context)
+    public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc, XWikiDocument doc,
+        XWikiContext context)
     {
         // Keyword fields: stored and indexed, but not tokenized
         // Note: ID field must be UN_TOKENIZED to enable case sensitive IDs
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_ID,
-            getId(),
-            Field.Store.YES,
-            Field.Index.UN_TOKENIZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_LANGUAGE,
-            this.language,
-            Field.Store.YES,
-            Field.Index.TOKENIZED));
-        if (wiki != null && wiki.length() > 0) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_WIKI,
-                wiki,
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_ID, getId(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_LANGUAGE, this.language, Field.Store.YES, Field.Index.ANALYZED));
+        if (!StringUtils.isEmpty(this.wiki)) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_WIKI, this.wiki, Field.Store.YES, Field.Index.ANALYZED));
         }
         if (getType() != null) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_TYPE,
-                getType(),
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_TYPE, getType(), Field.Store.YES, Field.Index.ANALYZED));
         }
-        if (modificationDate != null) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_DATE, IndexFields
-                .dateToString(modificationDate), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        if (this.modificationDate != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_DATE, IndexFields.dateToString(this.modificationDate),
+                Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
-        if (creationDate != null) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATIONDATE, IndexFields
-                .dateToString(creationDate), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        if (this.creationDate != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATIONDATE, IndexFields.dateToString(this.creationDate),
+                Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
         // stored Text fields: tokenized and indexed
-        if (documentTitle != null) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_TITLE,
-                documentTitle,
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
+        if (this.documentTitle != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_TITLE, this.documentTitle, Field.Store.YES,
+                Field.Index.ANALYZED));
         }
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME,
-            documentName,
-            Field.Store.YES,
-            Field.Index.TOKENIZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB,
-            documentWeb,
-            Field.Store.YES,
-            Field.Index.TOKENIZED));
-        luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME,
-            documentFullName,
-            Field.Store.YES,
-            Field.Index.TOKENIZED));
-        if (author != null) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_AUTHOR,
-                author,
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME, this.documentName, Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB, this.documentSpace, Field.Store.YES, Field.Index.ANALYZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME, this.documentFullName, Field.Store.YES,
+            Field.Index.ANALYZED));
+        if (this.author != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_AUTHOR, this.author, Field.Store.YES, Field.Index.ANALYZED));
         }
-        if (creator != null) {
-            luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATOR,
-                creator,
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
+        if (this.creator != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATOR, this.creator, Field.Store.YES, Field.Index.ANALYZED));
         }
 
         // UnStored fields: tokenized and indexed, but no reconstruction of
@@ -162,20 +150,17 @@ public abstract class IndexData
         try {
             final String ft = getFullText(doc, context);
             if (ft != null) {
-                luceneDoc.add(new Field(IndexFields.FULLTEXT,
-                    ft,
-                    Field.Store.NO,
-                    Field.Index.TOKENIZED));
+                luceneDoc.add(new Field(IndexFields.FULLTEXT, ft, Field.Store.NO, Field.Index.ANALYZED));
             }
         } catch (Exception e) {
-            LOG.error("error extracting fulltext for document " + this, e);
+            LOG.error("Error extracting fulltext for document [" + this + "]", e);
         }
     }
 
     /**
      * Builds a Lucene query matching only the document this instance represents. This is used for removing old versions
      * of a document from the index before adding a new one.
-     *
+     * 
      * @return a query matching the field DOCUMENT_ID to the value of #getId()
      */
     public Query buildQuery()
@@ -189,12 +174,14 @@ public abstract class IndexData
     public String getId()
     {
         StringBuffer retval = new StringBuffer();
-        if (wiki != null && wiki.length() > 0) {
-            retval.append(wiki).append(":");
+
+        if (!StringUtils.isEmpty(this.wiki)) {
+            retval.append(this.wiki).append(":");
         }
-        retval.append(documentWeb).append(".");
-        retval.append(documentName).append(".");
-        retval.append(language);
+        retval.append(this.documentSpace).append(".");
+        retval.append(this.documentName).append(".");
+        retval.append(this.language);
+
         return retval.toString();
     }
 
@@ -203,10 +190,17 @@ public abstract class IndexData
      */
     public String getFullText(XWikiDocument doc, XWikiContext context)
     {
-        StringBuffer sb =
-            new StringBuffer(documentName).append(" ").append(documentWeb).append(" ").append(
-                author).append(creator);
+        StringBuilder sb = new StringBuilder();
+
+        getFullText(sb, doc, context);
+
         return sb.toString();
+    }
+
+    protected void getFullText(StringBuilder sb, XWikiDocument doc, XWikiContext context)
+    {
+        sb.append(this.documentName).append(" ").append(this.documentSpace).append(" ").append(this.author).append(" ").append(
+            this.creator);
     }
 
     public abstract String getType();
@@ -242,10 +236,17 @@ public abstract class IndexData
 
     /**
      * @param documentWeb The documentWeb to set.
+     * @deprecated use {@link #setDocumentSpace(String)} instead
      */
+    @Deprecated
     public void setDocumentWeb(String documentWeb)
     {
-        this.documentWeb = documentWeb;
+        setDocumentSpace(documentWeb);
+    }
+
+    public void setDocumentSpace(String documentSpace)
+    {
+        this.documentSpace = documentSpace;
     }
 
     /**
@@ -266,27 +267,36 @@ public abstract class IndexData
 
     public String getDocumentTitle()
     {
-        return documentTitle;
+        return this.documentTitle;
     }
 
     public String getDocumentName()
     {
-        return documentName;
+        return this.documentName;
     }
 
+    /**
+     * @deprecated use {@link #getDocumentSpace()} instead
+     */
+    @Deprecated
     public String getDocumentWeb()
     {
-        return documentWeb;
+        return getDocumentSpace();
+    }
+
+    public String getDocumentSpace()
+    {
+        return this.documentSpace;
     }
 
     public String getDocumentFullName()
     {
-        return documentFullName;
+        return this.documentFullName;
     }
 
     public String getWiki()
     {
-        return wiki;
+        return this.wiki;
     }
 
     public void setWiki(String wiki)
@@ -296,7 +306,7 @@ public abstract class IndexData
 
     public Date getCreationDate()
     {
-        return creationDate;
+        return this.creationDate;
     }
 
     public void setCreationDate(Date creationDate)
@@ -306,7 +316,7 @@ public abstract class IndexData
 
     public String getCreator()
     {
-        return creator;
+        return this.creator;
     }
 
     public void setCreator(String creator)
@@ -316,7 +326,7 @@ public abstract class IndexData
 
     public String getFullName()
     {
-        return fullName;
+        return this.fullName;
     }
 
     public void setFullName(String fullName)
@@ -326,12 +336,12 @@ public abstract class IndexData
 
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
 
     public void setLanguage(String lang)
     {
-        if (lang != null && lang.length() > 0) {
+        if (!StringUtils.isEmpty(lang)) {
             this.language = lang;
         } else {
             this.language = "default";

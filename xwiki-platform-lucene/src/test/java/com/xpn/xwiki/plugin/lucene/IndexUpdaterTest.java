@@ -49,7 +49,6 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         public XWikiDocument getDocument(String fullname, XWikiContext context)
         {
-            System.out.println("Fullname: " + fullname);
             return new LoremIpsum();
         }
 
@@ -65,8 +64,6 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         @Override
         public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
         {
-            System.out.println("Check access");
-
             return true;
         }
     }
@@ -285,18 +282,11 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         IndexSearcher searcher = new IndexSearcher(directory, true);
         TopDocs t = searcher.search(q, null, 10);
 
-        System.out.println("Searching for document id, number of hits: " + t.totalHits);
-
         assertEquals(1, t.totalHits);
 
         SearchResults results = plugin.getSearchResultsFromIndexes("Ipsum", "target/lucenetest", null, getContext());
 
         assertEquals(1, results.getTotalHitcount());
-
-        System.out.println("Searching for 'Ipsum', number of hits: " + results.getTotalHitcount());
-        for (SearchResult result : results.getResults()) {
-            System.out.println("id: " + result.getId());
-        }
     }
 
     public void testLock() throws IOException
@@ -314,8 +304,6 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         directory = FSDirectory.open(f);
 
         LucenePlugin plugin = new LucenePlugin("Monkey", "Monkey", getContext());
-
-        System.out.println("Creating new updater");
 
         final IndexUpdater indexUpdater =
                 new TestIndexUpdater(directory, indexingInterval, maxQueueSize, plugin, getContext());
@@ -336,7 +324,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
             {
                 try {
                     indexUpdater.cleanIndex();
-                    System.out.println("Done cleaning index.");
+
                     doneCleaningIndex[0] = true;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -357,7 +345,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         try {
             if (!IndexWriter.isLocked(indexUpdater.getDirectory())) {
-                System.out.println("Not locked!");
+
                 IndexWriter w = new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29));
             } else {
                 wasActuallyLocked = true;

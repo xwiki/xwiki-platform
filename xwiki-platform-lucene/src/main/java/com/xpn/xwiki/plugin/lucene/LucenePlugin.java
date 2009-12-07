@@ -471,7 +471,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
     public void init(Directory directory, XWikiContext context)
     {
-
         int indexingInterval;
         try {
             indexingInterval =
@@ -529,6 +528,8 @@ public class LucenePlugin extends XWikiDefaultPlugin
         if (LOG.isDebugEnabled()) {
             LOG.debug("Assigning index updater: " + indexUpdater);
         }
+
+        this.indexDirs = indexUpdater.getDirectory().toString();
 
         this.indexUpdater = indexUpdater;
         this.indexUpdater.setAnalyzer(this.analyzer);

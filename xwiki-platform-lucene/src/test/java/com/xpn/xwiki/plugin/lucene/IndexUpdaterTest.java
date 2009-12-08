@@ -230,7 +230,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         IndexUpdater indexUpdater = new TestIndexUpdater(directory, 100, 1000, plugin, getContext());
         IndexRebuilder indexRebuilder = new TestIndexRebuilder(indexUpdater, getContext(), true);
 
-        rebuildDone.acquireUninterruptibly();
+        this.rebuildDone.acquireUninterruptibly();
 
         assertTrue(IndexReader.indexExists(directory));
     }
@@ -312,7 +312,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         Thread permanentBlocker = new Thread(indexUpdater, "permanentBlocker");
         permanentBlocker.start();
-        writeBlockerAcquiresLock.acquireUninterruptibly();
+        this.writeBlockerAcquiresLock.acquireUninterruptibly();
 
         assertTrue(IndexWriter.isLocked(indexUpdater.getDirectory()));
 
@@ -322,13 +322,9 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
         {
             public void run()
             {
-                try {
-                    indexUpdater.cleanIndex();
+                indexUpdater.cleanIndex();
 
-                    doneCleaningIndex[0] = true;
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                doneCleaningIndex[0] = true;
             }
         }, "indexCleaner");
 
@@ -345,8 +341,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         try {
             if (!IndexWriter.isLocked(indexUpdater.getDirectory())) {
-
-                IndexWriter w = new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29));
+                new IndexWriter(indexUpdater.getDirectory(), new StandardAnalyzer(Version.LUCENE_29));
             } else {
                 wasActuallyLocked = true;
             }
@@ -360,7 +355,7 @@ public class IndexUpdaterTest extends AbstractBridgedXWikiComponentTestCase
 
         assertTrue(wasActuallyLocked);
 
-        writeBlockerWait.release();
+        this.writeBlockerWait.release();
 
         while (true) {
             try {

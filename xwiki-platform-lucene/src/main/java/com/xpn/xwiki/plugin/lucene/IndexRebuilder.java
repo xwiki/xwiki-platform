@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -94,11 +93,13 @@ public class IndexRebuilder extends AbstractXWikiRunnable
 
     public synchronized int startRebuildIndex(XWikiContext context)
     {
-        if (rebuildInProgress) {
+        if (this.rebuildInProgress) {
             LOG.warn("Cannot launch rebuild because a build is in progress");
 
             return LucenePluginApi.REBUILD_IN_PROGRESS;
         } else {
+            this.indexUpdater.cleanIndex();
+
             this.rebuildInProgress = true;
             this.context = context;
             Thread indexRebuilderThread = new Thread(this, "Lucene Index Rebuilder");
@@ -162,7 +163,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
         } catch (Exception e) {
             LOG.error("Error in lucene rebuild thread", e);
         } finally {
-            rebuildInProgress = false;
+            this.rebuildInProgress = false;
 
             // Cleanup Container component (it has ThreadLocal variables)
             cleanupXWikiContainer(context);
@@ -182,12 +183,12 @@ public class IndexRebuilder extends AbstractXWikiRunnable
      * 
      * @param context
      * @return total number of documents and attachments successfully added to the indexer queue, -1 when errors
-     *         occured.
+     *         occurred.
      */
-    private int rebuildIndex(XWikiContext context) throws IOException
+    private int rebuildIndex(XWikiContext context)
     {
-        this.indexUpdater.cleanIndex();
         int retval = 0;
+
         Collection<String> wikiServers;
         XWiki xwiki = context.getWiki();
         if (xwiki.isVirtualMode()) {
@@ -225,7 +226,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     protected int indexWiki(String wikiName, XWikiContext context)
     {
         LOG.info("Reading content of wiki " + wikiName);
-        
+
         // Number of index entries processed
         int retval = 0;
         XWiki xwiki = context.getWiki();
@@ -247,7 +248,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                     document = xwiki.getDocument(docName, context);
                 } catch (XWikiException e2) {
                     LOG.error("error fetching document " + wikiName + ":" + docName, e2);
-                    
+
                     continue;
                 }
 

@@ -302,7 +302,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         this.analyzer = analyzer;
     }
 
-    public void cleanIndex() throws IOException
+    public void cleanIndex()
     {
         if (LOG.isInfoEnabled()) {
             LOG.info("trying to clear index for rebuilding");
@@ -311,7 +311,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         try {
             openWriter(true).close();
         } catch (IOException e) {
-            LOG.error("Failed to clean index: " + e);
+            LOG.error("Failed to clean index", e);
         }
     }
 

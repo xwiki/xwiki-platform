@@ -529,7 +529,13 @@ public class LucenePlugin extends XWikiDefaultPlugin
             LOG.debug("Assigning index updater: " + indexUpdater);
         }
 
-        this.indexDirs = indexUpdater.getDirectory().toString();
+        if (this.indexDirs == null) {
+            this.indexDirs = this.config.getProperty(PROP_INDEX_DIR);
+            if (StringUtils.isEmpty(this.indexDirs)) {
+                File workDir = context.getWiki().getWorkSubdirectory("lucene", context);
+                this.indexDirs = workDir.getAbsolutePath();
+            }
+        }
 
         this.indexUpdater = indexUpdater;
         this.indexUpdater.setAnalyzer(this.analyzer);

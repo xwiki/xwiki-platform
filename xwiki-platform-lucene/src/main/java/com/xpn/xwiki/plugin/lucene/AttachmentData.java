@@ -93,6 +93,14 @@ public class AttachmentData extends IndexData
     }
 
     /**
+     * @return The size to set.
+     */
+    public int getSize()
+    {
+        return size;
+    }
+
+    /**
      * @see IndexData#getType()
      */
     public String getType()

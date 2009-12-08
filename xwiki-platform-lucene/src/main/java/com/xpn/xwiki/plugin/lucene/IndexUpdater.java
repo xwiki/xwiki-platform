@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -60,15 +61,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     /** The maximum number of milliseconds we have to wait before this thread is safely closed. */
     private static final int EXIT_INTERVAL = 3000;
 
-    private static final List<Event> EVENTS = new ArrayList<Event>()
-    {
-        {
-            add(new DocumentUpdateEvent());
-            add(new DocumentSaveEvent());
-            add(new DocumentDeleteEvent());
-            add(new ActionExecutionEvent("upload"));
-        }
-    };
+    private static final List<Event> EVENTS =
+            Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(), new DocumentDeleteEvent(),
+                new ActionExecutionEvent("upload"));
 
     /** Milliseconds of sleep between checks for changed documents. */
     private final int indexingInterval;
@@ -238,8 +233,6 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 if (LOG.isInfoEnabled()) {
                     LOG.info("indexed " + nb + " docs to lucene index");
                 }
-
-                writer.commit();
             } catch (Exception e) {
                 LOG.error("error indexing documents", e);
             } finally {
@@ -281,8 +274,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         }
     }
 
-    private void addToIndex(IndexWriter writer, IndexData data, XWikiDocument doc,
-        XWikiContext context) throws IOException
+    private void addToIndex(IndexWriter writer, IndexData data, XWikiDocument doc, XWikiContext context)
+        throws IOException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("addToIndex: " + data);
@@ -292,9 +285,9 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         data.addDataToLuceneDocument(luceneDoc, doc, context);
 
         // collecting all the fields for using up in search
-        for (Field fld : (List<Field>) luceneDoc.getFields()) {
-            if (!fields.contains(fld.name())) {
-                fields.add(fld.name());
+        for (Field field : (List<Field>) luceneDoc.getFields()) {
+            if (!fields.contains(field.name())) {
+                fields.add(field.name());
             }
         }
 

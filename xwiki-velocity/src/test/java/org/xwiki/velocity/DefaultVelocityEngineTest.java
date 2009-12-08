@@ -35,10 +35,11 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
 {
     private VelocityEngine engine;
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
-        this.engine = (VelocityEngine) getComponentManager().lookup(VelocityEngine.class);
+        this.engine = getComponentManager().lookup(VelocityEngine.class);
     }
 
     public void testEvaluateReader() throws Exception
@@ -68,7 +69,7 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         StringWriter writer = new StringWriter();
         this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
-            + ".newInstance())$object.size()");
+                + ".newInstance())$object.size()");
         assertEquals("$object.size()", writer.toString());
     }
 
@@ -82,7 +83,7 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
         StringWriter writer = new StringWriter();
         this.engine.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
-            + ".newInstance())$object.size()");
+                + ".newInstance())$object.size()");
         assertEquals("0", writer.toString());
     }
 }

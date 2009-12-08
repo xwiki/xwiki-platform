@@ -50,7 +50,7 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
     private static final String PREFIX = "velocity.";
 
     /**
-     * Defines from where to read the rendering configuration data. 
+     * Defines from where to read the rendering configuration data.
      */
     @Requirement
     private ConfigurationSource configuration;
@@ -58,13 +58,13 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
     /**
      * Default Tools.
      */
-    private Properties defaultTools = new Properties(); 
-    
+    private Properties defaultTools = new Properties();
+
     /**
      * Default properties.
      */
     private Properties defaultProperties = new Properties();
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -83,17 +83,17 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
 
         // Default Velocity properties
         this.defaultProperties.setProperty("resource.loader", "webapp");
-        this.defaultProperties.setProperty("webapp.resource.loader.class", 
+        this.defaultProperties.setProperty("webapp.resource.loader.class",
             "org.apache.velocity.tools.view.servlet.WebappLoader");
         this.defaultProperties.setProperty("velocimacro.messages.on", Boolean.FALSE.toString());
         this.defaultProperties.setProperty("resource.manager.logwhenfound", Boolean.FALSE.toString());
-        this.defaultProperties.setProperty("velocimacro.permissions.allow.inline.local.scope", "true");
+        this.defaultProperties.setProperty("velocimacro.permissions.allow.inline.local.scope", Boolean.TRUE.toString());
         // Prevents users from writing dangerous Velocity code like using Class.forName or Java threading APIs.
-        this.defaultProperties.setProperty("runtime.introspector.uberspect", 
+        this.defaultProperties.setProperty("runtime.introspector.uberspect",
             "org.xwiki.velocity.introspection.ChainingUberspector");
-        this.defaultProperties.setProperty("runtime.introspector.uberspect.chainClasses", 
+        this.defaultProperties.setProperty("runtime.introspector.uberspect.chainClasses",
             "org.apache.velocity.util.introspection.SecureUberspector,"
-            + "org.xwiki.velocity.introspection.DeprecatedCheckUberspector");
+                + "org.xwiki.velocity.introspection.DeprecatedCheckUberspector");
     }
 
     /**

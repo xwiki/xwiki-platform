@@ -598,23 +598,18 @@ public class LucenePlugin extends XWikiDefaultPlugin
         String[] dirs = StringUtils.split(indexDirs, ",");
         List<IndexSearcher> searchersList = new ArrayList<IndexSearcher>();
         for (int i = 0; i < dirs.length; i++) {
-            RETRY: while (true) {
+            while (true) {
                 try {
-                    try {
-                        if (!IndexReader.indexExists(dirs[i])) {
-                            // If there's no index there, create an empty one; otherwise the reader
-                            // constructor will throw an exception and fail to initialize
-                            new IndexWriter(dirs[i], analyzer).close();
-                        }
-                        IndexReader reader = IndexReader.open(dirs[i], true);
-                        searchersList.add(new IndexSearcher(reader));
-                        break RETRY;
-                    } catch (CorruptIndexException e) {
-                        handleCorruptIndex(context);
+                    if (!IndexReader.indexExists(dirs[i])) {
+                        // If there's no index there, create an empty one; otherwise the reader
+                        // constructor will throw an exception and fail to initialize
+                        new IndexWriter(dirs[i], this.analyzer).close();
                     }
-                } catch (IOException e) {
-                    LOG.error("cannot open index " + dirs[i], e);
-                    throw new RuntimeException(e);
+                    IndexReader reader = IndexReader.open(dirs[i], true);
+                    searchersList.add(new IndexSearcher(reader));
+                    break ;
+                } catch (CorruptIndexException e) {
+                    handleCorruptIndex(context);
                 }
             }
         }

@@ -83,6 +83,7 @@ public class DefaultVelocityConfiguration implements Initializable, VelocityConf
 
         // Default Velocity properties
         this.defaultProperties.setProperty("resource.loader", "webapp");
+        this.defaultProperties.setProperty("directive.set.null.allowed", Boolean.TRUE.toString());
         this.defaultProperties.setProperty("webapp.resource.loader.class",
             "org.apache.velocity.tools.view.servlet.WebappLoader");
         this.defaultProperties.setProperty("velocimacro.messages.on", Boolean.FALSE.toString());

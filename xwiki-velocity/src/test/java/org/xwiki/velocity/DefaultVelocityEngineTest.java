@@ -22,11 +22,13 @@ package org.xwiki.velocity;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
+import org.apache.velocity.context.Context;
 import org.xwiki.test.AbstractXWikiComponentTestCase;
 import org.xwiki.velocity.internal.DefaultVelocityEngine;
-
 
 /**
  * Unit tests for {@link DefaultVelocityEngine}.
@@ -71,6 +73,25 @@ public class DefaultVelocityEngineTest extends AbstractXWikiComponentTestCase
             "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
                 + ".newInstance())$object.size()");
         assertEquals("$object.size()", writer.toString());
+    }
+
+    /**
+     * Verify that the default configuration allows #setting existing variables to null.
+     */
+    public void testSettingNullAllowedByDefault() throws Exception
+    {
+        this.engine.initialize(new Properties());
+        StringWriter writer = new StringWriter();
+        Context context = new org.apache.velocity.VelocityContext();
+        context.put("null", null);
+        List<String> list = new ArrayList<String>();
+        list.add("1");
+        list.add(null);
+        list.add("3");
+        context.put("list", list);
+        this.engine.evaluate(context, writer, "mytemplate", "#set($foo = true)${foo}#set($foo = $null)${foo}\n"
+            + "#foreach($i in $list)${velocityCount}=$!{i} #end");
+        assertEquals("true${foo}\n1=1 2= 3=3 ", writer.toString());
     }
 
     public void testOverrideConfiguration() throws Exception

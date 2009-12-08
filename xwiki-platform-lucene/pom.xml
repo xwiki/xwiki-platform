@@ -27,14 +27,14 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>20-SNAPSHOT</version>
+    <version>19</version>
   </parent>
   <artifactId>xwiki-plugin-lucene</artifactId>
   <name>XWiki Platform - Plugins - Lucene search</name>
   <version>1.12-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Lucene search</description>
   <properties>
-    <platform.core.version>2.0.1</platform.core.version>
+    <platform.core.version>2.0.4</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

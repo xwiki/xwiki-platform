@@ -233,8 +233,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
     public SearchResults getSearchResults(String query, String sortField, String virtualWikiNames, String languages,
         XWikiContext context) throws Exception
     {
-        // TODO Why is this here? This is slow, as it closes and opens indexes for each query.
-        // openSearchers();
         return search(query, sortField, virtualWikiNames, languages, this.searchers, context);
     }
 
@@ -340,8 +338,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
         Searcher[] indexes, XWikiContext context) throws IOException, ParseException
     {
         MultiSearcher searcher = new MultiSearcher(indexes);
+
         // Enhance the base query with wiki names and languages.
         Query q = buildQuery(query, virtualWikiNames, languages);
+
         // Perform the actual search
         Hits hits = (sort == null) ? searcher.search(q) : searcher.search(q, sort);
         if (LOG.isDebugEnabled()) {

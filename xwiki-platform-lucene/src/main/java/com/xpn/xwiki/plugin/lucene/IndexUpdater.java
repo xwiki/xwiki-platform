@@ -33,7 +33,6 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.xwiki.observation.EventListener;
@@ -119,7 +118,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     public void doExit()
     {
-        exit = true;
+        this.exit = true;
     }
 
     /**
@@ -164,9 +163,11 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             if (this.indexingTimer == 0) {
                 // Reset the indexing timer.
                 this.indexingTimer = this.indexingInterval;
+
                 // Poll the queue for documents to be indexed.
                 updateIndex();
             }
+
             // Remove the exit interval from the indexing timer.
             int sleepInterval = Math.min(EXIT_INTERVAL, this.indexingTimer);
             this.indexingTimer -= sleepInterval;
@@ -193,14 +194,12 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
             XWikiContext context = (XWikiContext) this.context.clone();
             context.getWiki().getStore().cleanUp(context);
 
-            IndexSearcher searcher;
             IndexWriter writer;
             RETRY: while (true) {
                 // We will retry after repairing if the index was
                 // corrupt
                 try {
                     try {
-                        searcher = new IndexSearcher(this.directory, true);
                         writer = openWriter(false);
                         break RETRY;
                     } catch (CorruptIndexException e) {
@@ -230,7 +229,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                             doc = doc.getTranslatedDocument(data.getLanguage(), context);
                         }
 
-                        addToIndex(writer, searcher, data, doc, context);
+                        addToIndex(writer, data, doc, context);
                         ++nb;
                     } catch (Exception e) {
                         LOG.error("error indexing document " + id, e);
@@ -246,11 +245,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                 LOG.error("error indexing documents", e);
             } finally {
                 this.context.getWiki().getStore().cleanUp(this.context);
-                try {
-                    searcher.close();
-                } catch (IOException e) {
-                    LOG.warn("Failed to close searcher.");
-                }
+
                 try {
                     writer.optimize();
                     writer.close();
@@ -287,7 +282,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
         }
     }
 
-    private void addToIndex(IndexWriter writer, IndexSearcher searcher, IndexData data, XWikiDocument doc,
+    private void addToIndex(IndexWriter writer, IndexData data, XWikiDocument doc,
         XWikiContext context) throws IOException
     {
         if (LOG.isDebugEnabled()) {
@@ -452,7 +447,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
 
     public int getMaxQueueSize()
     {
-        return maxQueueSize;
+        return this.maxQueueSize;
     }
 
 }

@@ -65,7 +65,7 @@ public class SearchResults extends Api
     {
         if (this.relevantResults == null) {
             this.relevantResults = new ArrayList<SearchResult>();
-            final int hitcount = hits.length();
+            final int hitcount = this.hits.length();
 
             String database = this.context.getDatabase();
             try {
@@ -82,7 +82,7 @@ public class SearchResults extends Api
                         }
                         if (result.isWikiContent() && this.xwiki.checkAccess(pageName, "view")
                             && this.xwiki.exists(pageName)) {
-                            relevantResults.add(result);
+                            this.relevantResults.add(result);
                         }
                     } catch (Exception e) {
                         LOG.error("Error getting search result", e);

@@ -124,7 +124,6 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     /**
      * Return a reference to the directory that this updater is currently working with.
      */
-
     public Directory getDirectory()
     {
         return this.directory;

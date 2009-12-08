@@ -283,6 +283,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             return feed;
         } catch (Exception ex) {
             if (ignoreInvalidFeeds) {
+                @SuppressWarnings("unchecked")
                 Map<String, Exception> map = (Map<String, Exception>) context.get("invalidFeeds");
                 if (map == null) {
                     map = new HashMap<String, Exception>();
@@ -466,6 +467,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                 return 0;
             }
         } catch (Exception e) {
+            @SuppressWarnings("unchecked")
             Map<String, Exception> map = (Map<String, Exception>) context.get("updateFeedError");
             if (map == null) {
                 map = new HashMap<String, Exception>();
@@ -474,12 +476,6 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             map.put(feedurl, e);
         }
         return -1;
-    }
-
-    private int saveFeed(String feedname, String feedurl, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry,
-        boolean force, XWikiContext context) throws XWikiException
-    {
-        return saveFeed(feedname, feedurl, feed, fullContent, oneDocPerEntry, force, "Feeds", context);
     }
 
     private int saveFeed(String feedname, String feedurl, SyndFeed feed, boolean fullContent, boolean oneDocPerEntry,
@@ -501,6 +497,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             }
         }
 
+        @SuppressWarnings("unchecked")
         List<SyndEntry> entries = feed.getEntries();
         int nb = entries.size();
         for (int i = nb - 1; i >= 0; i--) {
@@ -686,6 +683,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         // set document title to the feed title
         doc.setTitle(entry.getTitle());
         obj.setIntValue("flag", 0);
+        @SuppressWarnings("unchecked")
         List<SyndCategory> categList = entry.getCategories();
         StringBuffer categs = new StringBuffer("");
         if (categList != null) {
@@ -701,6 +699,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         StringBuffer contents = new StringBuffer("");
         String description = (entry.getDescription() == null) ? null : entry.getDescription().getValue();
 
+        @SuppressWarnings("unchecked")
         List<SyndContent> contentList = entry.getContents();
         if (contentList != null && contentList.size() > 0) {
             for (SyndContent content : contentList) {
@@ -771,7 +770,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return null;
     }
 
-    public List search(String query, XWikiContext context) throws XWikiException
+    public List<com.xpn.xwiki.api.Object> search(String query, XWikiContext context) throws XWikiException
     {
         String[] queryTab = query.split(" ");
 
@@ -799,6 +798,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
                         apiObjs.add(apiObj);
                     }
                 } catch (Exception e) {
+                    @SuppressWarnings("unchecked")
                     Map<String, Exception> map = (Map<String, Exception>) context.get("searchFeedError");
                     if (map == null) {
                         map = new HashMap<String, Exception>();

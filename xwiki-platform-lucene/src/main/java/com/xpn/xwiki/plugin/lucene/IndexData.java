@@ -69,12 +69,7 @@ public abstract class IndexData
     public IndexData(final XWikiDocument doc, final XWikiContext context)
     {
         setDocumentName(doc.getName());
-        try {
-            setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
-        } catch (XWikiException e) {
-            LOG.error("Failed to render document title content", e);
-            setDocumentTitle(doc.getName());
-        }
+        setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, context));
         setDocumentSpace(doc.getSpace());
         setDocumentFullName(doc.getFullName());
         setWiki(doc.getDatabase() == null ? context.getDatabase() : doc.getDatabase());

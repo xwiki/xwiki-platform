@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -19,10 +18,11 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.velocity.VelocityManager;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.ExportURLFactory;
 import com.xpn.xwiki.web.Utils;
 
@@ -192,8 +192,8 @@ public class HtmlPackager
     private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf, XWikiContext context)
         throws XWikiException, IOException
     {
-        ExecutionContextManager ecim = (ExecutionContextManager) Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = (Execution) Utils.getComponent(Execution.class);
+        ExecutionContextManager ecim = Utils.getComponent(ExecutionContextManager.class);
+        Execution execution = Utils.getComponent(Execution.class);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
@@ -214,7 +214,7 @@ public class HtmlPackager
             // the VelocityRequestInitializer class.
             execution.pushContext(ec);
 
-            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
 
             // At this stage we have a clean Velocity Context
             VelocityContext vcontext = velocityManager.getVelocityContext();
@@ -266,7 +266,7 @@ public class HtmlPackager
         renderDocuments(zos, tempdir, urlf, context);
 
         // Add required skins to ZIP file
-        for (String skinName : (Collection<String>) urlf.getNeededSkins()) {
+        for (String skinName : urlf.getNeededSkins()) {
             addSkinToZip(skinName, zos, context);
         }
 

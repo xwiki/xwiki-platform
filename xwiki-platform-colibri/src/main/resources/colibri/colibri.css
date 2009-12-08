@@ -916,7 +916,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   text-transform: uppercase;
 }
 
-.actionmenu .hasIcon .tme {
+.actionmenu .hasIcon a.tme {
   padding-left: 20px;
 }
 

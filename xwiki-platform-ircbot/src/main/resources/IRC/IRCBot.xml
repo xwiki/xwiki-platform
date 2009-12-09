@@ -477,7 +477,7 @@ class IRCEventListener implements EventListener
 
     List&lt;Event&gt; getEvents()
     {
-        return Arrays.asList(new DocumentUpdateEvent())
+        return Arrays.asList(new DocumentUpdateEvent(), new DocumentSaveEvent(), new DocumentDeleteEvent());
     }
 
     void onEvent(Event event, Object source, Object data)
@@ -486,11 +486,14 @@ class IRCEventListener implements EventListener
         if (!source.fullName.startsWith("IRC.${bot.getChannels()[0][1..-1]}Archive")) {
             def author = source.author
             def comment = source.comment
-            if (source.isNew()) {
+            def action = "modified"
+            if (event instanceof DocumentSaveEvent) {
+                action = "created"
+            } else if (event instanceof DocumentDeleteEvent) {
                 author = context.user
-                comment = "deleted document"
+                action = "deleted"
             }
-            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was modified by ${author} ${comment ? "(${comment})" : ""} - ${source.getExternalURL("view", data)}")
+            bot.sendMessage(bot.getChannels()[0], "${source.fullName} was ${action} by ${author} ${comment ? "(${comment})" : ""} - ${source.getExternalURL("view", data)}")
         }
     }
 }

@@ -178,6 +178,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         // --- draw the calendar ---
         // -------------------------
         String tempMonthUrl;
+        String msgPreviousMonth = context.getMessageTool().get("web.paging.previousPage");
+        String msgNextMonth = context.getMessageTool().get("web.paging.nextPage");
 
         output.append("<table summary=\"Event calendar\"");
         output.append(" id=\"wiki-calendar-table-" + id + "\"");
@@ -185,9 +187,9 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
         output.append("<tr class=\"wiki-calendar-month\">");
         if ((tempMonthUrl = calendarParams.computePrevMonthURL(context)) != "") {
-            tempMonthUrl = "<a href=\"" + tempMonthUrl + "\">&lt;</a>";
+            tempMonthUrl = "<a href=\"" + tempMonthUrl + "\">" + msgPreviousMonth + "</a>";
         } else {
-            tempMonthUrl = "<span class=\"disabled\">&lt</span>";
+            tempMonthUrl = "<span class=\"disabled\">" + msgPreviousMonth + "</span>";
         }
         output.append("<th class=\"wiki-calendar-month-nav prev-month\">" + tempMonthUrl + "</th>");
 
@@ -196,9 +198,9 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         output.append("</th>");
 
         if ((tempMonthUrl = calendarParams.computeNextMonthURL(context)) != "") {
-            tempMonthUrl = "<a href=\"" + tempMonthUrl + "\">&gt;</a>";
+            tempMonthUrl = "<a href=\"" + tempMonthUrl + "\">" + msgNextMonth + "</a>";
         } else {
-            tempMonthUrl = "<span class=\"disabled\">&gt</span>";
+            tempMonthUrl = "<span class=\"disabled\">" + msgNextMonth + "</span>";
         }
         output.append("<th class=\"wiki-calendar-month-nav next-month\">" + tempMonthUrl + "</th>");
 

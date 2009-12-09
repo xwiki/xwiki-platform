@@ -31,7 +31,7 @@ import org.xwiki.test.AbstractComponentTestCase;
 /**
  * Unit tests for {@link PlainTextChainingRenderer} that cannot easily be performed using the Renderng Test framework.
  * 
- * @version $Id: PlainTextChainingRendererTest.java 24898 2009-11-06 12:58:22Z sdumitriu $
+ * @version $Id$
  * @since 2.1M1
  */
 public class PlainTextChainingRendererTest extends AbstractComponentTestCase

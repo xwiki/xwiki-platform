@@ -101,29 +101,29 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, XWikiDocument doc, String user,
-        XWikiContext context) throws XWikiException
+    public String getHTMLCalendar(CalendarParams calendarParams, XWikiDocument doc, String user, XWikiContext context)
+        throws XWikiException
     {
         CalendarData cData = new CalendarData(doc, user, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, String hql, String user,
-        XWikiContext context) throws XWikiException
+    public String getHTMLCalendar(CalendarParams calendarParams, String hql, String user, XWikiContext context)
+        throws XWikiException
     {
         CalendarData cData = new CalendarData(hql, user, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, String hql, int nb,
-        XWikiContext context) throws XWikiException
+    public String getHTMLCalendar(CalendarParams calendarParams, String hql, int nb, XWikiContext context)
+        throws XWikiException
     {
         CalendarData cData = new CalendarData(hql, nb, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, CalendarData calendarData,
-        XWikiContext context) throws XWikiException
+    public String getHTMLCalendar(CalendarParams calendarParams, CalendarData calendarData, XWikiContext context)
+        throws XWikiException
     {
         StringBuffer output = new StringBuffer();
         Calendar cal; // For iterating through days of month
@@ -189,8 +189,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         } else {
             tempMonthUrl = "<span class=\"disabled\">&lt</span>";
         }
-        output.append("<th class=\"wiki-calendar-month-nav prev-month\">" + tempMonthUrl
-            + "</th>");
+        output.append("<th class=\"wiki-calendar-month-nav prev-month\">" + tempMonthUrl + "</th>");
 
         output.append("<th colspan=\"5\" " + "class=\"wiki-calendar-monthyearrow\">");
         output.append(formatTitle.format(dayCal.getTime()));
@@ -201,8 +200,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         } else {
             tempMonthUrl = "<span class=\"disabled\">&gt</span>";
         }
-        output.append("<th class=\"wiki-calendar-month-nav next-month\">" + tempMonthUrl
-            + "</th>");
+        output.append("<th class=\"wiki-calendar-month-nav next-month\">" + tempMonthUrl + "</th>");
 
         output.append("</tr>");
 
@@ -216,8 +214,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
         output.append("</tr>");
         int weeks =
-            (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal
-                .get(Calendar.DAY_OF_WEEK)
+            (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal.get(Calendar.DAY_OF_WEEK)
                 - dayCal.getFirstDayOfWeek() + 7) % 7) / 7.0);
         for (int w = 0; w < weeks; w++) {
             output.append("<tr>");
@@ -227,9 +224,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
                 if (script == null)
                     content =
-                        calendarData.getContent(cal, (String) calendarParams.get("user"),
-                            (String) calendarParams.get("location"), (List) calendarParams
-                                .get("categories"), context);
+                        calendarData.getContent(cal, (String) calendarParams.get("user"), (String) calendarParams
+                            .get("location"), (List) calendarParams.get("categories"), context);
                 else
                     content = calendarData.getContent(cal, script, context);
 
@@ -237,8 +233,7 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 ((cal.get(Calendar.DAY_OF_MONTH) == todayCal.get(Calendar.DAY_OF_MONTH))
                     && (cal.get(Calendar.MONTH) == todayCal.get(Calendar.MONTH))
                     && (cal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR))) {
-                    printDay(output, cal, content, true, cal.get(Calendar.MONTH) == dayCal
-                        .get(Calendar.MONTH));
+                    printDay(output, cal, content, true, cal.get(Calendar.MONTH) == dayCal.get(Calendar.MONTH));
                 } else if // day is in calendar month
                 ((cal.get(Calendar.MONTH) == dayCal.get(Calendar.MONTH))
                     && (cal.get(Calendar.YEAR) == dayCal.get(Calendar.YEAR))) {
@@ -256,17 +251,15 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
         /*
          * output.append("<tr class=\"wiki-calendar-nextprev\">"); output.append("<td colspan=\"7\" align=\"center\">");
-         * output.append("<a href=\""+ calendarParams.computeTodayMonthUrl() +"\"
-         * class=\"wiki-calendar-navbar\">" + msg.get("calendar.today") +"</a>"); output.append("</td>");
-         * output.append("</tr>");
+         * output.append("<a href=\""+ calendarParams.computeTodayMonthUrl() +"\" class=\"wiki-calendar-navbar\">" +
+         * msg.get("calendar.today") +"</a>"); output.append("</td>"); output.append("</tr>");
          */
 
         output.append("</table>");
         return output.toString();
     }
 
-    private void printDay(StringBuffer output, Calendar cal, String content,
-        boolean today, boolean inThisMonth)
+    private void printDay(StringBuffer output, Calendar cal, String content, boolean today, boolean inThisMonth)
     {
         if (inThisMonth) {
             if (today) {
@@ -281,8 +274,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 output.append("<td class=\"wiki-calendar-daynotinmonth\">");
             }
         }
-       
-        String classname = "wiki-calendar-daytitle"; 
+
+        String classname = "wiki-calendar-daytitle";
         if (content != null && content.length() > 0) {
             classname += " wiki-calendar-daytitle-hasevent";
         }
@@ -296,9 +289,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
     }
 
     /**
-     * Helper method to build the names of the weekdays. This used to take place in the
-     * <code>CalendarTag</code> constructor, but there, <code>mLocale</code> doesn't have the
-     * correct value yet.
+     * Helper method to build the names of the weekdays. This used to take place in the <code>CalendarTag</code>
+     * constructor, but there, <code>mLocale</code> doesn't have the correct value yet.
      */
     private String[] buildDayNames(Locale locale)
     {
@@ -343,8 +335,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return new CalendarPluginApi((CalendarPlugin) plugin, context);
     }
 
-    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, XWikiContext context)
-        throws ParserException, IOException
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, XWikiContext context) throws ParserException,
+        IOException
     {
         CalendarBuilder builder = new CalendarBuilder();
         String sical = context.getWiki().getURLContent(surl, context);
@@ -353,8 +345,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return calendar;
     }
 
-    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username,
-        String password, XWikiContext context) throws ParserException, IOException
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username, String password,
+        XWikiContext context) throws ParserException, IOException
     {
         CalendarBuilder builder = new CalendarBuilder();
         String sical = context.getWiki().getURLContent(surl, username, password, context);

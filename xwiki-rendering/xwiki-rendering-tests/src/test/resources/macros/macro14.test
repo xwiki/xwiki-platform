@@ -12,9 +12,7 @@ beginParagraph
 onWord [An]
 onSpace
 beginMacroMarkerInline [testsimpleinlinemacro] [] [Inline macro ]
-beginParagraph
 onWord [simpleinlinemacro2]
-endParagraph
 endMacroMarkerInline [testsimpleinlinemacro] [] [Inline macro ]
 onSpace
 onWord [first]
@@ -28,11 +26,11 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml/1.0
 .#-----------------------------------------------------
-<p>An <p>simpleinlinemacro2</p> first</p><p>simpleinlinemacro3</p>
+<p>An simpleinlinemacro2 first</p><p>simpleinlinemacro3</p>
 .#-----------------------------------------------------
 .expect|annotatedxhtml/1.0
 .#-----------------------------------------------------
-<p>An <!--startmacro:testsimpleinlinemacro|-||-|Inline macro --><p>simpleinlinemacro2</p><!--stopmacro--> first</p><!--startmacro:testsimpleinlinemacro|-||-|A macro that should not be inline--><p>simpleinlinemacro3</p><!--stopmacro-->
+<p>An <!--startmacro:testsimpleinlinemacro|-||-|Inline macro -->simpleinlinemacro2<!--stopmacro--> first</p><!--startmacro:testsimpleinlinemacro|-||-|A macro that should not be inline--><p>simpleinlinemacro3</p><!--stopmacro-->
 .#-----------------------------------------------------
 .expect|xwiki/2.0
 .#-----------------------------------------------------
@@ -42,4 +40,4 @@ An {{testsimpleinlinemacro}}Inline macro {{/testsimpleinlinemacro}} first
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>An <!--startmacro:testsimpleinlinemacro|-||-|Inline macro --><p>simpleinlinemacro2</p><!--stopmacro--> first</p><!--startmacro:testsimpleinlinemacro|-||-|A macro that should not be inline--><p>simpleinlinemacro3</p><!--stopmacro--></html>
+<p>An <!--startmacro:testsimpleinlinemacro|-||-|Inline macro -->simpleinlinemacro2<!--stopmacro--> first</p><!--startmacro:testsimpleinlinemacro|-||-|A macro that should not be inline--><p>simpleinlinemacro3</p><!--stopmacro-->

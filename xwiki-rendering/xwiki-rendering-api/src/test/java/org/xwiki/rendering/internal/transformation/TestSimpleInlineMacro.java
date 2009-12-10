@@ -58,7 +58,8 @@ public class TestSimpleInlineMacro extends AbstractNoParameterMacro
         throws MacroExecutionException
     {
         int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
-        return Arrays.<Block>asList(new ParagraphBlock(Arrays.<Block> asList(new WordBlock("simpleinlinemacro"
-            + wordCount))));
+
+        List<Block> result = Arrays.<Block> asList(new WordBlock("simpleinlinemacro" + wordCount));
+        return context.isInline() ? result : Arrays.<Block> asList(new ParagraphBlock(result));
     }
 }

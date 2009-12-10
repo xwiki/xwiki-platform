@@ -59,15 +59,7 @@
   #end
   </span>
 #end
-##      <a href="$!xwiki.getURL("Doc.WebHome","view")">$!msg.get("doc")</a>
-    </div> #*
-#if($searchdoc.isNew()==false)
-    <div id="globalsearch">
-      <form action="$!searchdoc.getURL("view")">
-        <p><input type="text" name="text" value="" size="15"/>&nbsp;<input type="submit" class="button" value="Search"/></p>
-      </form>
     </div>
-#end *#
   </div>
 </div>
 #end

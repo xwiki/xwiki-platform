@@ -21,9 +21,7 @@ package org.xwiki.validator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.List;
 
-import org.xwiki.validator.DutchWebGuidelinesValidator;
 import org.xwiki.validator.ValidationError.Type;
 
 import junit.framework.TestCase;
@@ -56,7 +54,13 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
 
     private String getErrors(DutchWebGuidelinesValidator validator)
     {
-        return validator.getErrors().toString();
+        StringBuffer buffer = new StringBuffer();
+        
+        for (ValidationError error : validator.getErrors()) {
+            buffer.append(error + "\n");
+        }
+        
+        return buffer.toString();
     }
 
     private boolean isValid(DutchWebGuidelinesValidator validator)
@@ -331,5 +335,80 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         validator.validateRpd3s13();
         assertFalse(getErrors(validator), isValid(validator));
     }
+    
+    public void testRpd6s1Doctypes() throws Exception
+    {        
+        setValidatorDocument("<!DOCTYPE html PUBLIC '-//ORG//DTD FOO 1.0 Bar//EN' "
+            + "'http://www.foo.bar/xhtml1-strict.dtd'><html></html>");
+        validator.validateRpd6s1();
+        assertFalse(getErrors(validator), isValid(validator));
 
+        setValidatorDocument("<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN' "
+            + "'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'><html></html>");
+        validator.validateRpd6s1();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd7s1ValidAlts() throws Exception
+    {
+        setValidatorDocument("<body><img alt='' /></body>");
+        validator.validateRpd7s1();
+        assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><area alt='' /></body>");
+        validator.validateRpd7s1();
+        assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><input alt='' type='image' /></body>");
+        validator.validateRpd7s1();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd7s1MissingAlts() throws Exception
+    {
+        setValidatorDocument("<body><img /></body>");
+        validator.validateRpd7s1();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><area /></body>");
+        validator.validateRpd7s1();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><input type='image' /></body>");
+        validator.validateRpd7s1();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+
+    public void testRpd7s4ImagesInLinks() throws Exception
+    {
+        setValidatorDocument("<body><a><img alt=''/></a></body>");
+        validator.validateRpd7s4();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a><img alt=''/>text</a></body>");
+        validator.validateRpd7s4();
+        assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a><img alt='text' /></a></body>");
+        validator.validateRpd7s4();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd7s5ImageMaps() throws Exception 
+    {
+        setValidatorDocument("<body><img alt='' usemap='#map' /></body>");
+        validator.validateRpd7s5();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><img alt='text' usemap='#map' /><map name='map'><area alt='' /></map></body>");
+        validator.validateRpd7s5();
+        assertFalse(getErrors(validator), isValid(validator));
+
+        setValidatorDocument("<body><img alt='text' usemap='#map' /><map name='map'><area alt='text' /></map></body>");
+        validator.validateRpd7s5();
+        assertTrue(getErrors(validator), isValid(validator));
+
+    }
+    
+    
 }

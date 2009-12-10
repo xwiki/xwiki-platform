@@ -77,9 +77,12 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public List<ValidationError> validate()
     {
+        // RPD 1
         validateRpd1s1();
         validateRpd1s2();
         validateRpd1s3();
+
+        // RPD 2
         validateRpd2s1();
         validateRpd2s2();
         validateRpd2s3();
@@ -89,6 +92,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         validateRpd2s7();
         validateRpd2s8();
         validateRpd2s9();
+
+        // RPD 3
         validateRpd3s1();
         validateRpd3s2();
         validateRpd3s3();
@@ -104,6 +109,31 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         validateRpd3s13();
         validateRpd3s14();
         validateRpd3s15();
+
+        // RPD 4
+        validateRpd4s1();
+        validateRpd4s2();
+        validateRpd4s3();
+        validateRpd4s4();
+        validateRpd4s5();
+        validateRpd4s6();
+        validateRpd4s7();
+
+        // RPD 5
+        validateRpd5s1();
+
+        // RPD 6
+        validateRpd6s1();
+        validateRpd6s2();
+
+        // RPD 7
+        validateRpd7s1();
+        validateRpd7s2();
+        validateRpd7s3();
+        validateRpd7s4();
+        validateRpd7s5();
+        validateRpd7s6();
+        validateRpd7s7();
 
         return getErrors();
     }
@@ -420,7 +450,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
                     boolean nextNodeMatches =
                         nextNode.getNodeType() == Node.TEXT_NODE && nextNode.getTextContent().matches(regex);
 
-                    assertFalse(Type.ERROR, "rpd3s13.lists", previousNodeMatches && currentNodeMatches 
+                    assertFalse(Type.ERROR, "rpd3s13.lists", previousNodeMatches && currentNodeMatches
                         && nextNodeMatches);
                 }
 
@@ -442,6 +472,193 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      * Give meaningful names to id and class attributes.
      */
     public void validateRpd3s15()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Create unique, unchanging URLs.
+     */
+    public void validateRpd4s1()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * Dynamically generated URLs should continue to refer to the same content if content is changed or added.
+     */
+    public void validateRpd4s2()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * Avoid using sessions in URLs.
+     */
+    public void validateRpd4s3()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * Provide redirection to the new location if information is moved.
+     */
+    public void validateRpd4s4()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * Automatic redirection should be carried by the server if possible.
+     */
+    public void validateRpd4s5()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * Use friendly URLs that are readable and recognizable.
+     */
+    public void validateRpd4s6()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * Set up a readable, expandable directory structure.
+     */
+    public void validateRpd4s7()
+    {
+        // URL guidelines can't be automatically tested, this validator allow to validate content only.
+    }
+
+    /**
+     * In the event that important information is provided through a closed standard, the same information should also
+     * be provided through an open standard.
+     */
+    public void validateRpd5s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Each HTML or XHTML document must begin with a valid doctype declaration.
+     */
+    public void validateRpd6s1()
+    {
+        assertTrue(Type.ERROR, "rpd6s1.doctype", StringUtils.containsIgnoreCase(document.getDoctype().getPublicId(),
+            "html"));
+    }
+
+    /**
+     * Put the content of the page in the HTML source code in order of importance.
+     */
+    public void validateRpd6s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * The alt (alternative) attribute should be used on every img (image) and area element and should be provided with
+     * an effective alternative text.
+     */
+    public void validateRpd7s1()
+    {
+        // alt attributes are mandatory in <img>
+        for (Node img : getElements(ELEM_IMG)) {
+            assertTrue(Type.ERROR, "rpd7s1.img", hasAttribute(img, ATTR_ALT));
+        }
+
+        // alt attributes are mandatory in <area>
+        for (Node area : getElements(ELEM_AREA)) {
+            assertTrue(Type.ERROR, "rpd7s1.area", hasAttribute(area, ATTR_ALT));
+        }
+
+        // alt attributes are mandatory in <input type="image">
+        for (Node input : getElements(ELEM_INPUT)) {
+            if (getAttributeValue(input, ATTR_TYPE).equals(IMAGE)) {
+                assertTrue(Type.ERROR, "rpd7s1.input", hasAttribute(input, ATTR_ALT));
+            }
+        }
+    }
+
+    /**
+     * Do not use an alt attribute to display tooltips.
+     */
+    public void validateRpd7s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not use d-links on websites. Use of the longdesc (long description) attribute is preferred if the text
+     * alternative on the alt attribute is inadequate for understanding the information in the image.
+     */
+    public void validateRpd7s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Images placed in a link should have a non-empty text alternative to enable visitors who do not see the image to
+     * follow the link.
+     */
+    public void validateRpd7s4()
+    {
+        for (Node link : getElements(ELEM_LINK)) {
+
+            // Look for images in the link.
+            boolean hasNonEmptyAlt = false;
+            for (Node child : getChildren(link, ELEM_IMG)) {
+                if (!StringUtils.isEmpty(getAttributeValue(child, ATTR_ALT))) {
+                    hasNonEmptyAlt = true;
+                }
+            }
+
+            // Look for text in the link.
+            boolean hasText = false;
+            for (Node linkChild : new NodeListIterable(link.getChildNodes())) {
+                if (linkChild.getNodeType() == Node.TEXT_NODE) {
+                    hasText = true;
+                }
+            }
+
+            // Images in links must have a not empty alt attribute if there's no text in the link.
+            assertTrue(Type.ERROR, "rpd7s4.links", hasNonEmptyAlt || hasText);
+        }
+    }
+
+    /**
+     * When using image maps, indicate an effective text alternative for both the img element and each area element by
+     * means of the alt attribute.
+     */
+    public void validateRpd7s5()
+    {
+        // Non-empty alt attributes are mandatory in <img usemap=''>
+        for (Node img : getElements(ELEM_IMG)) {
+            if (hasAttribute(img, "usemap")) {
+                assertFalse(Type.ERROR, "rpd7s5.img", StringUtils.isEmpty(getAttributeValue(img, ATTR_ALT)));
+            }
+        }
+
+        // Non-empty alt attributes are mandatory in <area>
+        for (Node area : getElements(ELEM_AREA)) {
+            assertFalse(Type.ERROR, "rpd7s5.area", StringUtils.isEmpty(getAttributeValue(area, ATTR_ALT)));
+        }
+    }
+
+    /**
+     * Decorative images should be inserted via CSS as much as possible. Informative images should be inserted via HTML.
+     */
+    public void validateRpd7s6()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Applying CSS Image Replacement techniques to essential information is not recommended.
+     */
+    public void validateRpd7s7()
     {
         // This guideline cannot be automatically tested.
     }

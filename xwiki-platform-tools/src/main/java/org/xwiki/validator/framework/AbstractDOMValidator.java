@@ -61,6 +61,11 @@ public abstract class AbstractDOMValidator implements Validator
      * Submit.
      */
     protected static final String SUBMIT = "submit";
+    
+    /**
+     * Image.
+     */
+    protected static final String IMAGE = "image";
 
     // Elements.
     
@@ -108,6 +113,16 @@ public abstract class AbstractDOMValidator implements Validator
      * Input element.
      */
     protected static final String ELEM_INPUT = "input";
+    
+    /**
+     * Image element.
+     */
+    protected static final String ELEM_IMG = "img";
+    
+    /**
+     * Area element.
+     */
+    protected static final String ELEM_AREA = "area";    
 
     // Attributes.
 

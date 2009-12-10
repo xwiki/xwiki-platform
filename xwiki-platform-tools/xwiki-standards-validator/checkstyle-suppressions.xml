@@ -6,6 +6,7 @@
 
 <suppressions>
   <suppress checks="CyclomaticComplexity"
-             files="DutchWebGuidelinesValidator.java"
-             lines="0-100000"/>
+             files="DutchWebGuidelinesValidator.java" />
+  <suppress checks="StatementCount"
+             files="DutchWebGuidelinesValidator.java" />
 </suppressions>

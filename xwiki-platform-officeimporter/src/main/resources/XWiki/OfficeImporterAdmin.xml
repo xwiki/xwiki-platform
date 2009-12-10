@@ -109,7 +109,7 @@ $msgParameter|$msgValue
 #end
 {table}
 #if($enableControls)
- &lt;p&gt;&lt;input type="submit" value="$msgUpdate"/&gt;&lt;/p&gt;
+ &lt;p&gt;&lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msgUpdate" class="button"/&gt;&lt;/span&gt;&lt;/p&gt;
  &lt;/form&gt;
 #end
 

@@ -26,7 +26,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
 ## Import the documents from the selected XAR.
 ##---------------------------------------------------------------------------
 #if("$!{request.action}" == "import")
-  <p class="legend">$msg.get("import") #if($request.withversions && $request.withversions=="1")$msg.get("export_addhistory")#end</p>
+  <p class="legend">$msg.get('import') #if("$!{request.withversions}" == '1')$msg.get('export_addhistory')#end</p>
   #macro(showfilelist $list $text)
     #if($list.size()>0)
       <h4 class="legend">$msg.get("import_listof${text}files")</h4>
@@ -37,16 +37,16 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
       </ul>
     #end
   #end
-  $msg.get("importing") $!request.name: $msg.get("import_install_${xwiki.package.status}")
+  $msg.get('importing') $!request.name: $msg.get("import_install_${xwiki.package.status}")
   <br/>
   <ul>
-    <li>$xwiki.package.installed.size() $msg.get("import_documentinstalled")</li>
-    <li>$xwiki.package.skipped.size() $msg.get("import_documentskipped")</li>
-    <li>$xwiki.package.errors.size() $msg.get("import_documenterrors")</li>
+    <li>$xwiki.package.installed.size() $msg.get('import_documentinstalled')</li>
+    <li>$xwiki.package.skipped.size() $msg.get('import_documentskipped')</li>
+    <li>$xwiki.package.errors.size() $msg.get('import_documenterrors')</li>
   </ul>
-  #showfilelist($xwiki.package.installed "installed")
-  #showfilelist($xwiki.package.skipped "skipped")
-  #showfilelist($xwiki.package.errors "errors")
+  #showfilelist($xwiki.package.installed 'installed')
+  #showfilelist($xwiki.package.skipped 'skipped')
+  #showfilelist($xwiki.package.errors 'errors')
 
 ##---------------------------------------------------------------------------
 ## Browse the XARs and let the user select a XAR and the list of documents
@@ -54,12 +54,12 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
 ##---------------------------------------------------------------------------
 #else
   <script type="text/javascript" src="$xwiki.getSkinFile("js/xwiki/importer/import.js", true)"></script>
-  <h4 class="legend">$msg.get("availablefilestoimport")</h4>
-  $msg.get("selectfiletoimport"):
+  <h4 class="legend">$msg.get('availablefilestoimport')</h4>
+  $msg.get('selectfiletoimport'):
   #set($attachments = $doc.attachmentList)
   <div id="attachments">
     #if($attachments.size()>0)
-      <table class="xwikidatatable" summary="$msg.get("document") $xwiki.getXMLEncoded(${doc.displayTitle}) &mdash; $msg.get("attachments")">
+      <table class="xwikidatatable" summary="$msg.get('document') $xwiki.getXMLEncoded(${doc.displayTitle}) &mdash; $msg.get('attachments')">
         <col class="attachmentname"/>
         <col class="attachmentauthor"/>
         <col class="attachmentversion"/>
@@ -68,33 +68,33 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
         <col class="attachmentdelete"/>
         #foreach ($attach in $attachments)
           <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
-            <td><a href="javascript:void()" title="$msg.get("choosethispackage")" onclick="selectPackage('$doc.space', '$doc.name', '$attach.filename'); return false;">#packName($attach.filename)</a></td>
+            <td><a href="javascript:void()" title="$msg.get('choosethispackage')" onclick="selectPackage('$doc.space', '$doc.name', '$attach.filename'); return false;">#packName($attach.filename)</a></td>
             <td>$xwiki.getLocalUserName($attach.author)</td>
-            <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></td>
+            <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get('viewattachmenthistory')">$attach.version</a></td>
             <td>$!xwiki.formatDate($attach.date)</td>
             <td>$attach.filesize</td>
             #if($hasedit || $hasadmin)
 			  #set($attachurl = $doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$!{redirect}").replaceAll("&", "&amp;"))
-              <td class="xwikibuttonlinks"><a class="deletelink" href="${attachurl}" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></td>
+              <td class="xwikibuttonlinks"><a class="deletelink" href="${attachurl}" onclick="return confirm('$msg.get('confirmdelattachment')');" title="$msg.get('deletethisattachment')">$msg.get('delete')</a></td>
             #end
           </tr>
         #end
       </table>
     #else
-      $msg.get("noattachments")
+      $msg.get('noattachments')
     #end
   </div>
   ## List the documents that can be imported from the currently selected XAR.
   ## If no XAR has been selected explain that the user needs to select one.
-  <h4 class="legend">$msg.get("availabledocumentstoimport")</h4>
+  <h4 class="legend">$msg.get('availabledocumentstoimport')</h4>
   ## The following div will be hidden by the import.js script when a XAR document is selected.
-  <span id="noSelectedDocs">$msg.get("selectdocumentstoimport")</span>
+  <span id="noSelectedDocs">$msg.get('selectdocumentstoimport')</span>
   ## This div will be made visible if there are no documents inside the selected XAR
-  <span id="noDocsInArchive" style="display: none;">$msg.get("nodocstoimport")</span>
+  <span id="noDocsInArchive" style="display: none;">$msg.get('nodocstoimport')</span>
   <span id="selectDocsActions" style="display: none;">
-    $msg.get("select")
-    <a href="javascript:void()" onclick="selectItems('selCheckedDoc', false); return false;" class="Exportlink">$msg.get("none")</a>,
-    <a href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a>
+    $msg.get('select')
+    <a href="javascript:void()" onclick="selectItems('selCheckedDoc', false); return false;" class="Exportlink">$msg.get('none')</a>,
+    <a href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get('all')</a>
   </span>
 
   ## The form action cannot be $doc.getURL("import") here.
@@ -111,12 +111,12 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
       ## Placeholder for adding the name of the XAR as <input type="hidden">.
       <div id="importDocName"></div>
       <div id="importDocs" style="display:none;">
-        <input type="checkbox" name="withversions" id="withversions" value="1"/><i>$msg.get("export_addhistory")</i>
-        <br /><input type="submit" value="$msg.get("import")" />
+        <input type="checkbox" name="withversions" id="withversions" value="1"/><em>$msg.get('export_addhistory')</em>
+        <br /><input type="submit" value="$msg.get('import')" />
       </div>
   </form>
   ## Let the user upload XAR files.
-  <h4 class="legend">$msg.get("uploadnewarchivetoimport")</h4>
+  <h4 class="legend">$msg.get('uploadnewarchivetoimport')</h4>
   <form action="$doc.getURL('upload')" enctype="multipart/form-data" method="post" id="AddAttachment">
     <div>
       <input type="hidden" name="xredirect" value="${xwiki.getFormEncoded($redirect)}" />

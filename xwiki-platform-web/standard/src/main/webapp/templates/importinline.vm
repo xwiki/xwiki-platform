@@ -112,7 +112,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/attachments.css', true)##
       <div id="importDocName"></div>
       <div id="importDocs" style="display:none;">
         <input type="checkbox" name="withversions" id="withversions" value="1"/><em>$msg.get('export_addhistory')</em>
-        <br /><input type="submit" value="$msg.get('import')" />
+        <br /><span class="buttonwrapper"><input type="submit" value="$msg.get('import')" class="button"/></span>
       </div>
   </form>
   ## Let the user upload XAR files.

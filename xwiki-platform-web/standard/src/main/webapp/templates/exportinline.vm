@@ -16,7 +16,7 @@
 <label><input type="checkbox" name="history" id="history" value="true"/><em>$msg.get('export_addhistory')</em></label><br/>
 <label><input type="checkbox" name="backup" id="backup" value="true"/><em>$msg.get('export_backuppack') ($msg.get('export_authorpreserved'))</em></label><br/>
 <div class="floatcontainer">
-<span class="buttonwrapper"><input type="submit" value="$msg.get('export')" /></span>
+<span class="buttonwrapper"><input type="submit" value="$msg.get('export')" class="button"/></span>
 </div>
 </div>
 </form>

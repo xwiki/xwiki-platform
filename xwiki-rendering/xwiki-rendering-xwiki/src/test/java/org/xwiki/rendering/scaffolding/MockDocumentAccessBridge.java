@@ -286,6 +286,16 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#isDocumentEditable(org.xwiki.bridge.DocumentName)
+     */
+    public boolean isDocumentEditable(DocumentName documentName)
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#hasProgrammingRights()
      */

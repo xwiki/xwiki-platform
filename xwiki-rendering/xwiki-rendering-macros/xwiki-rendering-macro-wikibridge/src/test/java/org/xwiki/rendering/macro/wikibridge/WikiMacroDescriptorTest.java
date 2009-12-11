@@ -26,7 +26,6 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.junit.Test;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 
@@ -43,14 +42,14 @@ public class WikiMacroDescriptorTest
      * descriptors are passed to the Wiki Macro descriptor. This is useful for example to ensure that the
      * WYSIWYG editor will display the wiki macro parameter in the same order as the Wiki Macro Object order.
      */
-    @Test
+    @org.junit.Test
     public void testGetParameterDescriptorMapInCorrectOrder()
     {
         List<WikiMacroParameterDescriptor> paramDescriptors = Arrays.asList(
             new WikiMacroParameterDescriptor("id1", "description1", true),
             new WikiMacroParameterDescriptor("id2", "description2", true));
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor("name", "description", "category",
-            new DefaultContentDescriptor(), paramDescriptors);
+            WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(), paramDescriptors);
         Map<String, ParameterDescriptor> result = descriptor.getParameterDescriptorMap();
 
         Iterator<String> it = result.keySet().iterator();

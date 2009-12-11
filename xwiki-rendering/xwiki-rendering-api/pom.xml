@@ -128,6 +128,7 @@
             **/rendering/configuration/*.java,
             **/rendering/converter/*.java,
             **/rendering/internal/configuration/*.java,
+            **/rendering/internal/macro/*.java,
             **/rendering/internal/parser/*.java,
             **/rendering/internal/renderer/BasicLinkRenderer.java,
             **/rendering/listener/*.java,

@@ -19,12 +19,11 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
  * Component interface responsible for managing wiki macro instances.
- * 
- * TODO: Need to change all the string based document names to DocumentName. 
  * 
  * @version $Id$
  * @since 2.0M2
@@ -33,26 +32,39 @@ import org.xwiki.component.annotation.ComponentRole;
 public interface WikiMacroManager
 {
     /**
-     * Registers the given {@link WikiMacro} against ComponentManager and keeps a reference to it for future reference.
-     * 
-     * @param documentName name of the document which contains the wiki macro.
-     * @param wikiMacro the {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance.
+     * Registers the given {@link WikiMacro} against the ComponentManager matching the Wiki Macro visibility defined
+     * (Current User, Current Wiki, Global). For example Macros defined with a "Current User" visibility are
+     * registered against the User Component Manager so that they are only visible from that Component Manager and not
+     * from other Component Manager.
+     * <p/>
+     * Note that the Execution Context must be set properly (the current user or the current wiki must be set) prior
+     * to calling this API.
+     *
+     * @param documentName the name of the document which contains the wiki macro
+     * @param wikiMacro the {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance
+     * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist,
+     *            not enough privilege, etc)
+     * @since 2.2.M1
      */
-    void registerWikiMacro(String documentName, WikiMacro wikiMacro);
+    void registerWikiMacro(DocumentName documentName, WikiMacro wikiMacro) throws WikiMacroException;
 
     /**
-     * Unregisters a wiki macro defined on the given document (if there is one).
+     * Unregisters the wiki macro defined on the given document (if there is one).
      * 
-     * @param documentName name of the document which contains the wiki macro.
+     * @param documentName the name of the document which contains the wiki macro
+     * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist,
+     *            not enough privilege, etc)
+     * @since 2.2.M1
      */
-    void unregisterWikiMacro(String documentName);
+    void unregisterWikiMacro(DocumentName documentName) throws WikiMacroException;
 
     /**
      * Utility method for querying {@link WikiMacroManager} to see if there is a {@link WikiMacro} already registered
      * for the given document.
      * 
-     * @param documentName name of the document which contains the wiki macro.
-     * @return true if there is already a macro registered under the givend document name.
+     * @param documentName the name of the document which contains the wiki macro
+     * @return true if there is already a macro registered under the given document name
+     * @since 2.2.M1
      */
-    boolean hasWikiMacro(String documentName);
+    boolean hasWikiMacro(DocumentName documentName);
 }

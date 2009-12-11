@@ -47,8 +47,14 @@ public interface DocumentModelBridge
      * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
      * 
      * @return A <code>String</code> representation of the document's full name.
+     * @deprecated use #getDocumentName instead
      */
     String getFullName();
+
+    /**
+     * @return the full document's name, including Wiki, Space and Page
+     */
+    DocumentName getDocumentName();
 
     /**
      * Retrieve the name of the virtual wiki this document belongs to.

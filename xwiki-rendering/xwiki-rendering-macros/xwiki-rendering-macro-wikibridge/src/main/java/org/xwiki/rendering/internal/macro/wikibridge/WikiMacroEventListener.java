@@ -19,13 +19,11 @@
  */
 package org.xwiki.rendering.internal.macro.wikibridge;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -51,18 +49,6 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 public class WikiMacroEventListener extends AbstractLogEnabled implements EventListener
 {
     /**
-     * The {@link DocumentAccessBridge} component.
-     */
-    @Requirement
-    private DocumentAccessBridge docBridge;
-
-    /**
-     * The {@link DocumentNameSerializer} component.
-     */
-    @Requirement
-    private DocumentNameSerializer docNameSerializer;
-
-    /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
     @Requirement
@@ -87,11 +73,10 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
      */
     public List<Event> getEvents()
     {
-        List<Event> events = new ArrayList<Event>();
-        events.add(new DocumentSaveEvent());
-        events.add(new DocumentUpdateEvent());
-        events.add(new DocumentDeleteEvent());
-        return events;
+        return Arrays.<Event>asList(
+            new DocumentSaveEvent(),
+            new DocumentUpdateEvent(),
+            new DocumentDeleteEvent());
     }
 
     /**
@@ -101,51 +86,64 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
     {
         if (event instanceof AbstractDocumentEvent) {
             DocumentModelBridge document = (DocumentModelBridge) source;
-            DocumentName documentName = docBridge.getDocumentName(document.getFullName());
-            String fullDocumentName = docNameSerializer.serialize(documentName);
+            DocumentName documentName = document.getDocumentName();
+
+            // We've decided not to log any exception raised in the XWiki logs since a failure to register or
+            // unregister a macro isn't a failure of the XWiki software. It's something normal, same as, for example,
+            // not being able to edit a page if the user doesn't have edit rights.
+            // The problem here is that since Macros are registered by an Event Listener there's no way defined
+            // to let the user know about the status. We'd need to:
+            // - create a status page listing the state of all macros with the last error messages
+            // - don't use a listener to register macros and instead have a page listing all macros with a
+            //   register/unregister button (and thus provide visual feedback when the action fails).
 
             if (event instanceof DocumentSaveEvent || event instanceof DocumentUpdateEvent) {
                 // Unregister any existing macro registered under this document.
-                if (wikiMacroManager.hasWikiMacro(fullDocumentName)) {
-                    wikiMacroManager.unregisterWikiMacro(fullDocumentName);
+                if (unregisterMacroInternal(documentName)) {
+
+                    // Check whether the given document has a wiki macro defined in it.
+                    if (macroFactory.containsWikiMacro(documentName)) {
+
+                        // Attempt to create a wiki macro.
+                        WikiMacro wikiMacro = null;
+                        try {
+                            wikiMacro = macroFactory.createWikiMacro(documentName);
+                        } catch (WikiMacroException e) {
+                            getLogger().debug(String.format("Failed to create wiki macro [%s]", documentName), e);
+                            return;
+                        }
+
+                        // Register the macro.
+                        registerMacroInternal(documentName, wikiMacro);
+                    }
                 }
-
-                // Check whether the given document has a wiki macro defined in it.
-                if (macroFactory.containsWikiMacro(fullDocumentName)) {
-                    // Make sure the wiki macro is defined on the main wiki.
-                    if (!fullDocumentName.startsWith("xwiki:")) {
-                        getLogger().error("Wiki macro registration from virtual wikis are not allowed");
-                        return;
-                    }
-
-                    // Attempt to create a wiki macro.
-                    WikiMacro wikiMacro = null;
-                    try {
-                        wikiMacro = macroFactory.createWikiMacro(fullDocumentName);
-                    } catch (WikiMacroException ex) {
-                        getLogger().error(ex.getMessage());
-                        return;
-                    }
-
-                    // Check if the user has programming rights before continuing further.
-                    // TODO: This is temporary and it's done to prevent users in a farm to be able to create wiki
-                    // macros since they would be visible by all wikis in the farm. In the future this will be
-                    // fixed when we introduce the notion of Realms in the Component Manager. When this happens
-                    // we'll be able to register the macro so it's visible in the current user's realm only and
-                    // offer an admin screen so that admins can promote user-visible macros to wiki-instance-visible
-                    // macros.
-                    if (!docBridge.hasProgrammingRights()) {
-                        String errorMessage = "Unable to register macro [%s] due to insufficient privileges";
-                        getLogger().error(String.format(errorMessage, wikiMacro.getId()));
-                        return;
-                    }
-
-                    // Register macro.
-                    wikiMacroManager.registerWikiMacro(fullDocumentName, wikiMacro);
-                }
-            } else if (event instanceof DocumentDeleteEvent && wikiMacroManager.hasWikiMacro(fullDocumentName)) {
-                wikiMacroManager.unregisterWikiMacro(fullDocumentName);
+            } else if (event instanceof DocumentDeleteEvent) {
+                unregisterMacroInternal(documentName);
             }
         }
+    }
+
+    private void registerMacroInternal(DocumentName documentName, WikiMacro wikiMacro)
+    {
+        try {
+            this.wikiMacroManager.registerWikiMacro(documentName, wikiMacro);
+        } catch (WikiMacroException e) {
+            getLogger().debug(String.format("Unable to register macro [%s] in document [%s]",
+                wikiMacro.getId(), documentName), e);
+        }
+    }
+
+    private boolean unregisterMacroInternal(DocumentName documentName)
+    {
+        boolean result = true;
+        if (this.wikiMacroManager.hasWikiMacro(documentName)) {
+            try {
+                this.wikiMacroManager.unregisterWikiMacro(documentName);
+            } catch (WikiMacroException e) {
+                getLogger().debug(String.format("Unable to unregister macro in document [%s]", documentName), e);
+                result = false;
+            }
+        }
+        return result;
     }
 }

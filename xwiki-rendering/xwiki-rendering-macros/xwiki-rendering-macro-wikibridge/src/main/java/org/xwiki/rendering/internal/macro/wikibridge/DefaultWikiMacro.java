@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
@@ -56,7 +57,7 @@ import org.xwiki.rendering.util.ParserUtils;
 public class DefaultWikiMacro implements WikiMacro
 {
     /**
-     * The key under which macro context will be available in the XwikiContext for scripts.
+     * The key under which macro context will be available in the XWikiContext for scripts.
      */
     private static final String MACRO_KEY = "macro";
 
@@ -93,7 +94,7 @@ public class DefaultWikiMacro implements WikiMacro
     /**
      * Document which contains the definition of this macro.
      */
-    private String macroDocument;
+    private DocumentName macroDocumentName;
 
     /**
      * Id under which this macro is registered with component manager.
@@ -128,17 +129,18 @@ public class DefaultWikiMacro implements WikiMacro
     /**
      * Constructs a new {@link DefaultWikiMacro}.
      * 
-     * @param macroDocument document which contains the definition of this macro.
+     * @param macroDocumentName the name of the document which contains the definition of this macro
      * @param macroId id under which this macro is registered with component manager.
      * @param descriptor the {@link MacroDescriptor} describing this macro.
      * @param macroContent macro content to be evaluated.
      * @param syntaxId syntax of the macroContent.
      * @param componentManager {@link ComponentManager} component used to look up for other components.
+     * @since 2.2M1
      */
-    public DefaultWikiMacro(String macroDocument, String macroId, boolean supportsInlineMode,
+    public DefaultWikiMacro(DocumentName macroDocumentName, String macroId, boolean supportsInlineMode,
         MacroDescriptor descriptor, String macroContent, String syntaxId, ComponentManager componentManager)
     {
-        this.macroDocument = macroDocument;
+        this.macroDocumentName = macroDocumentName;
         this.macroId = macroId;
         this.supportsInlineMode = supportsInlineMode;
         this.descriptor = descriptor;
@@ -158,6 +160,8 @@ public class DefaultWikiMacro implements WikiMacro
         throws MacroExecutionException
     {
         // First verify that all mandatory parameters are provided.
+        // Note that we currently verify automatically mandatory parameters in Macro Transformation but for the moment
+        // this is only checked for Java-based macros. Hence why we need to check here too.
         Map<String, ParameterDescriptor> parameterDescriptors = getDescriptor().getParameterDescriptorMap();
         for (String parameterName : parameterDescriptors.keySet()) {
             ParameterDescriptor parameterDescriptor = parameterDescriptors.get(parameterName);
@@ -166,7 +170,7 @@ public class DefaultWikiMacro implements WikiMacro
             }
         }
 
-        // Verify macro content against the content descriptor.
+        // Verify the a macro content is not empty if it was declared mandatory.
         if (getDescriptor().getContentDescriptor() != null && getDescriptor().getContentDescriptor().isMandatory()) {
             if (StringUtils.isEmpty(macroContent)) {
                 throw new MacroExecutionException("Missing macro content: this macro requires content (a body)");
@@ -174,7 +178,7 @@ public class DefaultWikiMacro implements WikiMacro
         }
 
         // Parse the wiki macro content.
-        XDOM xdom = null;
+        XDOM xdom;
         try {
             Parser parser = componentManager.lookup(Parser.class, syntaxId);
             xdom = parser.parse(new StringReader(this.content));
@@ -200,11 +204,13 @@ public class DefaultWikiMacro implements WikiMacro
         macroContext.put(MACRO_PARAMS_KEY, parameters);
         macroContext.put(MACRO_CONTENT_KEY, macroContent);
         macroContext.put(MACRO_CONTEXT_KEY, context);
-        Map xwikiContext = null;
-        Object contextDoc = null;
+
+        Map xwikiContext;
+        Object contextDoc;
         try {
             Execution execution = componentManager.lookup(Execution.class);
             xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
+
             xwikiContext.put(MACRO_KEY, macroContext);
 
             // Save current context document.
@@ -265,11 +271,12 @@ public class DefaultWikiMacro implements WikiMacro
     }
 
     /**
-     * {@inheritDoc}
+     * @return the name of the document containing the macro class definition
+     * @since 2.2M1
      */
-    public String getDocumentName()
+    public DocumentName getDocumentName()
     {
-        return this.macroDocument;
+        return this.macroDocumentName;
     }
 
     /**

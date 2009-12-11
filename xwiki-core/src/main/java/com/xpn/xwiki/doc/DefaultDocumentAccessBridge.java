@@ -495,10 +495,22 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#isDocumentEditable(String)
+     * @deprecated use {@link #isDocumentEditable(DocumentName)} instead
      */
     public boolean isDocumentEditable(String documentName)
     {
         return hasRight(documentName, "edit");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#isDocumentEditable(org.xwiki.bridge.DocumentName)
+     * @since 2.2M1
+     */
+    public boolean isDocumentEditable(DocumentName documentName)
+    {
+        return hasRight(this.documentNameSerializer.serialize(documentName), "edit");
     }
 
     /**

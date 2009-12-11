@@ -50,6 +50,13 @@
       <artifactId>xwiki-core-context</artifactId>
       <version>${pom.version}</version>
     </dependency>        
+    <!-- Make sure the Multi Components components are available for the tests -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component-multi</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -62,7 +69,18 @@
             <include>**/**Test.java</include>
           </includes>
         </configuration>     
-      </plugin>      
+      </plugin>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <includes>
+            **/rendering/internal/macro/wikibridge/DefaultWikiMacroManager.java,
+            **/rendering/macro/wikibridge/*.java
+          </includes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

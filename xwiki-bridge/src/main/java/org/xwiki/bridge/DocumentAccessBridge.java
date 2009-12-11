@@ -314,8 +314,16 @@ public interface DocumentAccessBridge
     /**
      * @param documentName The name of the document to be edited.
      * @return True if current user has 'edit' access on the target document.
+     * @deprecated use {@link #isDocumentEditable(DocumentName)} instead
      */
     boolean isDocumentEditable(String documentName);
+
+    /**
+     * @param documentName the name of the document to be edited.
+     * @return True if current user has 'edit' access on the target document.
+     * @since 2.2M1
+     */
+    boolean isDocumentEditable(DocumentName documentName);
 
     /**
      * @return true if the current document's author has programming rights.

@@ -57,8 +57,15 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
     @Requirement
     private MacroManager macroManager;
 
+    /**
+     * Internal help class to be able to search Macros matching a Macro Id.
+     */
     private interface MacroMatcher
     {
+        /**
+         * @param macroId the macro Id to match
+         * @return true if the concerned macro matches the macro Id
+         */
         boolean match(MacroId macroId);
     }
 
@@ -119,6 +126,7 @@ public class DefaultMacroCategoryManager extends AbstractLogEnabled implements M
     /**
      * @param matcher a macro name matcher to be able to filter macros, used to filter macros for a given syntax
      * @return macro names grouped by category, including the 'null' macro category.
+     * @exception MacroLookupException if any error occurs when getting macros ids by category
      */
     private Map<String, Set<MacroId>> getMacroIdsByCategory(MacroMatcher matcher) throws MacroLookupException
     {

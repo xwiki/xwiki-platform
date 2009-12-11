@@ -53,10 +53,12 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
     private MacroIdFactory macroIdFactory;
 
     /**
-     * The component manager we use to lookup macro implementations registered as components.
+     * The Root Component Manager we use find the Context Component Manager (if it exists) to lookup macro
+     * implementations registered as components. Note that Context Component Manager allows Macros to be 
+     * registered for a specific user, for a specific wiki, etc. 
      */
     @Requirement
-    private ComponentManager componentManager;
+    private ComponentManager rootComponentManager;
 
     /**
      * {@inheritDoc}
@@ -80,7 +82,7 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
         // Lookup all registered macros
         Map<String, Macro> allMacros;
         try {
-            allMacros = this.componentManager.lookupMap(Macro.class);
+            allMacros = getComponentManager().lookupMap(Macro.class);
         } catch (ComponentLookupException e) {
             throw new MacroLookupException("Failed to lookup Macros", e);
         }
@@ -118,11 +120,11 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
         // First search for a macro registered for the passed macro id.
         String macroHint = macroId.toString();
         try {
-            return this.componentManager.lookup(Macro.class, macroHint);
+            return getComponentManager().lookup(Macro.class, macroHint);
         } catch (ComponentLookupException ex1) {
             // Now search explicitly for a macro registered for all syntaxes.
             try {
-                return this.componentManager.lookup(Macro.class, macroId.getId());
+                return getComponentManager().lookup(Macro.class, macroId.getId());
             } catch (ComponentLookupException ex2) {
                 // TODO: Improve this since it's possible the macro wasn't found because it contains some invalid
                 // requirement and since we're not passing the raised exception it's hard to know why the macro
@@ -142,10 +144,32 @@ public class DefaultMacroManager extends AbstractLogEnabled implements MacroMana
         String macroHint = macroId.toString();
         boolean hasMacro = true;
         try {
-            this.componentManager.lookup(Macro.class, macroHint);
+            getComponentManager().lookup(Macro.class, macroHint);
         } catch (ComponentLookupException ex) {
             hasMacro = false;
         }
         return hasMacro;
+    }
+
+    /**
+     * @return the Component Manager to use to lookup Macros. If the Context Component Manager is available
+     *         we use it thus allowing Macros to be registered only for a given Wiki or for a given User (for example).
+     * @since 2.2M1
+     */
+    private ComponentManager getComponentManager()
+    {
+        ComponentManager componentManagerToUse;
+        
+        // Look for the Context Component Manager so that Macros can be registered for a specific user, for a
+        // specific wiki, etc. If it's not found use the Root Component Manager. This allows the Rendering module
+        // to work outside of XWiki when there's no notion of Execution Context and Wiki Model for example.
+        try {
+            componentManagerToUse = this.rootComponentManager.lookup(ComponentManager.class, "context");
+        } catch (ComponentLookupException e) {
+            // This means the Context CM doesn't exist, use the Root CM.
+            componentManagerToUse = this.rootComponentManager;
+        }
+        
+        return componentManagerToUse;
     }
 }

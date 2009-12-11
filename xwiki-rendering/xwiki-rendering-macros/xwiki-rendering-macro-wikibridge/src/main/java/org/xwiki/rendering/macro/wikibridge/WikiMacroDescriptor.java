@@ -51,6 +51,11 @@ public class WikiMacroDescriptor implements MacroDescriptor
     private String defaultCategory;
 
     /**
+     * Whether the macro is visible in the current wiki, for the current user or global.
+     */
+    private WikiMacroVisibility visibility;
+    
+    /**
      * Macro content description.
      */
     private ContentDescriptor contentDescriptor;
@@ -66,10 +71,12 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * @param name the macro name 
      * @param description macro description
      * @param defaultCategory default category under which this macro should be listed.
+     * @param visibility the macro visibility (only visible in the current wiki, for the current user or global)
      * @param contentDescriptor macro content description.
-     * @param parameterDescriptors parameter descriptors. 
+     * @param parameterDescriptors parameter descriptors.
+     * @since 2.2M1
      */
-    public WikiMacroDescriptor(String name, String description, String defaultCategory,
+    public WikiMacroDescriptor(String name, String description, String defaultCategory, WikiMacroVisibility visibility,
         ContentDescriptor contentDescriptor, List<WikiMacroParameterDescriptor> parameterDescriptors)
     {
         this.name = name;
@@ -77,6 +84,7 @@ public class WikiMacroDescriptor implements MacroDescriptor
         this.contentDescriptor = contentDescriptor;
         this.parameterDescriptors = parameterDescriptors;
         this.defaultCategory = defaultCategory;
+        this.visibility = visibility;
     }
 
     /**
@@ -134,5 +142,15 @@ public class WikiMacroDescriptor implements MacroDescriptor
     public String getDefaultCategory()
     {
         return this.defaultCategory;
+    }
+
+    /**
+     * @return the visibility of the macro (ie whether the macro is visible in the current wiki, for the current user
+     *         or global)
+     * @since 2.2M1
+     */
+    public WikiMacroVisibility getVisibility()
+    {
+        return this.visibility;
     }
 }

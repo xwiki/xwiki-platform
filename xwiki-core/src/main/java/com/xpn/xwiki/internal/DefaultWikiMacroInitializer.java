@@ -20,11 +20,12 @@
 package com.xpn.xwiki.internal;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.xwiki.bridge.DocumentName;
+import org.xwiki.bridge.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -51,11 +52,6 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements WikiMacroInitializer, WikiMacroConstants
 {
     /**
-     * Main wiki identifier.
-     */
-    private static final String MAIN_WIKI = "xwiki";
-
-    /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroFactory} component.
      */
     @Requirement
@@ -73,6 +69,9 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     @Requirement
     private Execution execution;
 
+    @Requirement
+    private DocumentNameFactory documentNameFactory;
+    
     /**
      * Utility method for accessing XWikiContext.
      * 
@@ -98,41 +97,69 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
             throw new Exception(String.format(message, WIKI_MACRO_CLASS, WIKI_MACRO_PARAMETER_CLASS));
         }
 
-        // Only consider the main wiki.
-        xcontext.setDatabase(MAIN_WIKI);
-
-        // Search for all those documents with macro definitions.
-        // TODO: Use the query manager instead
-        String sql =
-            "select doc.fullName from XWikiDocument doc, BaseObject obj where doc.fullName=obj.name and obj.className=?";
-        List<Object> wikiMacroDocs = null;
+        // Register the wiki macros that exist in each wiki
+        String originalWiki = xcontext.getDatabase();
         try {
-            wikiMacroDocs = xcontext.getWiki().getStore().search(sql, 0, 0, Arrays.asList(WIKI_MACRO_CLASS), xcontext);
+            // If we're in multi wiki mode get the list of all subwikis, otherwise just look into the main wiki
+            List<String> wikiNames;
+            if (xcontext.getWiki().isVirtualMode()) {
+                wikiNames = xcontext.getWiki().getVirtualWikisDatabaseNames(xcontext);
+            } else {
+                wikiNames = Collections.singletonList(xcontext.getMainXWiki());
+            }
+
+            for (String wikiName : wikiNames) {
+                // Set the context to be in that wiki so that both the search for XWikiMacro class objects and the
+                // registration of macros refistered for the current wiki will work.
+                // TODO: In the future when we have APIs for it, move the code to set the current wiki and the current
+                // user (see below) to the WikiMacroManager's implementation.
+                xcontext.setDatabase(wikiName);
+
+                // Search for all those documents with macro definitions and for each register the macro
+                for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
+                    DocumentName wikiMacroDocumentName = this.documentNameFactory.createDocumentName(
+                        wikiName + ":" + wikiMacroDocumentData[0]);
+                    String wikiMacroDocumentAuthor = (String) wikiMacroDocumentData[1];
+                    try {
+                        WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentName);
+
+                        // Set the author in the context to be the author who last modified the document containing
+                        // the wiki macro class definition, so that if the Macro has the "Current User" visibility
+                        // the correct user will be found in the Execution Context.
+                        String originalAuthor = xcontext.getUser();
+                        try {
+                            xcontext.setUser(wikiMacroDocumentAuthor);
+                            wikiMacroManager.registerWikiMacro(wikiMacroDocumentName, macro);
+                        } finally {
+                            xcontext.setUser(originalAuthor);
+                        }
+                    } catch (WikiMacroException ex) {
+                        // Just log the exception and skip to the next.
+                        getLogger().error(ex.getMessage(), ex);
+                    }
+                }
+            }
+        } finally {
+            xcontext.setDatabase(originalWiki);
+        }
+    }
+
+    private List<String[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
+    {
+        // TODO: Use the query manager instead
+        String sql = "select doc.fullName, doc.author from XWikiDocument doc, BaseObject obj where "
+            + "doc.fullName=obj.name and obj.className=?";
+        List<String[]> wikiMacroDocumentData;
+        try {
+            wikiMacroDocumentData = xcontext.getWiki().getStore().search(sql, 0, 0, Arrays.asList(WIKI_MACRO_CLASS),
+                xcontext);
         } catch (XWikiException ex) {
             throw new Exception("Error while searching for macro documents", ex);
         }
 
-        // Build macros.
-        Map<String, WikiMacro> wikiMacros = new HashMap<String, WikiMacro>();
-        for (Object obj : wikiMacroDocs) {
-            String wikiMacroDoc = (String) obj;
-            try {
-                WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDoc);
-                wikiMacros.put(wikiMacroDoc, macro);
-            } catch (WikiMacroException ex) {
-                // Just log the exception and skip to the next.
-                getLogger().error(ex.getMessage(), ex);
-            }
-        }
-
-        // Register the wiki macros against WikiMacroManager.
-        for (String documentName : wikiMacros.keySet()) {
-            // TODO: Fix this to allow macros to be registered for any wiki
-            // TODO: In addition the main wiki name should never be hardcoded!!
-            wikiMacroManager.registerWikiMacro(MAIN_WIKI + ":" + documentName, wikiMacros.get(documentName));
-        }
+        return wikiMacroDocumentData;
     }
-    
+
     private boolean setWikiMacroClassesDocumentFields(XWikiDocument doc, String title)
     {
         boolean needsUpdate = false;
@@ -182,12 +209,12 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
         needsUpdate |= bclass.addTextAreaField(MACRO_DESCRIPTION_PROPERTY, "Macro description", 40, 5);
         needsUpdate |= bclass.addTextField(MACRO_DEFAULT_CATEGORY_PROPERTY, "Default category", 30);
         needsUpdate |= bclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
-        needsUpdate |=
-            bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
-                "Mandatory|Optional|No content", "select", "|");
-        needsUpdate |=
-            bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
-                "Content description (Not applicable for \"No content\" type)", 40, 5);
+        needsUpdate |= bclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
+            "Current User|Current Wiki|Global", "select", "|");
+        needsUpdate |= bclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
+            "Mandatory|Optional|No content", "select", "|");
+        needsUpdate |= bclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
+            "Content description (Not applicable for \"No content\" type)", 40, 5);
         needsUpdate |= bclass.addTextAreaField(MACRO_CODE_PROPERTY, "Macro code", 40, 20);
 
         if (needsUpdate) {

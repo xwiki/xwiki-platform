@@ -17,16 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.internal;
 
 import org.jmock.Mock;
+import org.xwiki.bridge.DocumentName;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
 
 /**
  * Unit test for {@link DefaultWikiMacroFactory}.
@@ -34,7 +36,7 @@ import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
  * @since 2.0M3
  * @version $Id$
  */
-public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTestCase
+public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiDocument macroDefinitionDoc;
 
@@ -55,6 +57,7 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
         obj.setStringValue("name", "Test Macro");
         obj.setStringValue("description", "This is a macro used for testing purposes.");
         obj.setStringValue("defaultCategory", "Test");
+        obj.setStringValue("visibility", "Current User");
         obj.setIntValue("supportsInlineMode", 1);
         obj.setStringValue("contentType", "No content");
         obj.setStringValue("code", "==Hi==");
@@ -69,10 +72,10 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
         getContext().setWiki((XWiki) mockXWiki.proxy());
     }
 
-    public void testWikiMacroBuilding() throws Exception
+    public void testCreateWikiMacro() throws Exception
     {
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro("xwiki:Macros.Test");
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentName("xwiki", "Macros", "Test"));
         assertNotNull(macro);
 
         // Check if the macro was built correctly.
@@ -80,25 +83,21 @@ public class DefaultWikiMacroBuilderTest extends AbstractBridgedXWikiComponentTe
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
         assertEquals("Test", macro.getDescriptor().getDefaultCategory());
+        assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());
     }
 
-    public void testWikiMacroWithoutName() throws Exception
+    public void testCreateWikiMacroWithoutName() throws Exception
     {
         BaseObject obj = macroDefinitionDoc.getObject("XWiki.WikiMacroClass");
         obj.setStringValue("name", "");
 
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro("xwiki:Macros.Test");
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentName("xwiki", "Macros", "Test"));
         assertNotNull(macro);
 
         // Check if the macro was built correctly.
-        assertEquals("testmacro", macro.getId());
         assertEquals("testmacro", macro.getDescriptor().getName());
-        assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
-        assertEquals("Test", macro.getDescriptor().getDefaultCategory());
-        assertTrue(macro.supportsInlineMode());
-        assertNull(macro.getDescriptor().getContentDescriptor());
     }
 }

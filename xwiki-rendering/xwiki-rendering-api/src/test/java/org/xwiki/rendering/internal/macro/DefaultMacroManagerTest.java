@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.jmock.Mock;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.logging.Logger;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.rendering.internal.transformation.TestSimpleMacro;
@@ -55,7 +56,7 @@ public class DefaultMacroManagerTest extends AbstractXWikiComponentTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.scaffolding.AbstractXWikiComponentTestCase#setUp() 
+     * @see AbstractXWikiComponentTestCase#setUp()
      */
     @Override
     protected void setUp() throws Exception
@@ -145,9 +146,11 @@ public class DefaultMacroManagerTest extends AbstractXWikiComponentTestCase
      */
     public void testInvalidMacroHint() throws Exception
     {
+        this.mockComponentManager.expects(once()).method("lookup").with(
+            eq(ComponentManager.class), eq("context")).will(throwException(new ComponentLookupException("error")));
         this.mockComponentManager.expects(once()).method("lookupMap").will(
             returnValue(Collections.singletonMap("macro/invalidsyntax", "dummy")));
-        ReflectionUtils.setFieldValue(this.macroManager, "componentManager", this.mockComponentManager.proxy());
+        ReflectionUtils.setFieldValue(this.macroManager, "rootComponentManager", this.mockComponentManager.proxy());
 
         // Verify that when a Macro has an invalid hint it's logged as a warning.
         this.mockLogger.expects(once()).method("warn").with(

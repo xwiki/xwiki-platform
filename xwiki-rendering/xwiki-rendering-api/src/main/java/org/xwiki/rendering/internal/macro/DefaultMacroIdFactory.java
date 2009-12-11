@@ -35,6 +35,15 @@ import org.xwiki.rendering.parser.ParseException;
 @Component
 public class DefaultMacroIdFactory implements MacroIdFactory
 {
+    /**
+     * Error message when the macro id format is invalid.
+     */
+    private static final String INVALID_MACRO_ID_FORMAT = "Invalid macro id format [%s]";
+
+    /**
+     * For creating Syntax objects when creating MacroId from a string representing the syntax id and the
+     * syntax version.
+     */
     @Requirement
     private SyntaxFactory syntaxFactory;
 
@@ -53,9 +62,10 @@ public class DefaultMacroIdFactory implements MacroIdFactory
             // We've found a macro id for a macro that should be available only for a given syntax
             Syntax syntax;
             try {
-                syntax = this.syntaxFactory.createSyntaxFromIdString(hintParts[1] + "/" + hintParts[2]);
+                syntax = this.syntaxFactory.createSyntaxFromIdString(
+                    String.format("%s/%s", hintParts[1], hintParts[2]));
             } catch (ParseException e) {
-                throw new ParseException("Invalid macro id format [" + macroIdAsString + "]", e);
+                throw new ParseException(String.format(INVALID_MACRO_ID_FORMAT, macroIdAsString), e);
             }
             macroId = new MacroId(hintParts[0], syntax);
         } else if (hintParts.length == 1) {
@@ -63,7 +73,7 @@ public class DefaultMacroIdFactory implements MacroIdFactory
             macroId = new MacroId(macroIdAsString);
         } else {
             // Invalid format
-            throw new ParseException("Invalid macro id format [" + macroIdAsString + "]");
+            throw new ParseException(String.format(INVALID_MACRO_ID_FORMAT, macroIdAsString));
         }
 
         return macroId;

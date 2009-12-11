@@ -66,6 +66,11 @@ public abstract class AbstractDOMValidator implements Validator
      * Image.
      */
     protected static final String IMAGE = "image";
+    
+    /**
+     * mailto.
+     */
+    protected static final String MAILTO = "mailto:";
 
     // Elements.
     
@@ -103,6 +108,11 @@ public abstract class AbstractDOMValidator implements Validator
      * Frame element.
      */
     protected static final String ELEM_FRAME = "frame";
+    
+    /**
+     * Iframe element.
+     */
+    protected static final String ELEM_IFRAME = "iframe";
 
     /**
      * Link element.
@@ -122,7 +132,17 @@ public abstract class AbstractDOMValidator implements Validator
     /**
      * Area element.
      */
-    protected static final String ELEM_AREA = "area";    
+    protected static final String ELEM_AREA = "area";
+    
+    /**
+     * Table element.
+     */
+    protected static final String ELEM_TABLE = "table";
+    
+    /**
+     * Table Header element.
+     */
+    protected static final String ELEM_TH = "th";    
 
     // Attributes.
 
@@ -144,37 +164,37 @@ public abstract class AbstractDOMValidator implements Validator
     /**
      * Blur attribute.
      */
-    protected static final String ATTR_BLUR = "blur";
+    protected static final String ATTR_BLUR = "onblur";
 
     /**
      * Change attribute.
      */
-    protected static final String ATTR_CHANGE = "change";
+    protected static final String ATTR_CHANGE = "onchange";
 
     /**
      * Click attribute.
      */
-    protected static final String ATTR_CLICK = "click";
+    protected static final String ATTR_CLICK = "onclick";
 
     /**
      * Focus attribute.
      */
-    protected static final String ATTR_FOCUS = "focus";
+    protected static final String ATTR_FOCUS = "onfocus";
 
     /**
      * Load attribute.
      */
-    protected static final String ATTR_LOAD = "load";
+    protected static final String ATTR_LOAD = "onload";
 
     /**
      * Mouseover attribute.
      */
-    protected static final String ATTR_MOUSEOVER = "mouseover";
+    protected static final String ATTR_MOUSEOVER = "onmouseover";
 
     /**
      * Select attribute.
      */
-    protected static final String ATTR_SELECT = "select";
+    protected static final String ATTR_SELECT = "onselect";
 
     /**
      * Submmit attribute.
@@ -185,6 +205,16 @@ public abstract class AbstractDOMValidator implements Validator
      * Unload attribute.
      */
     protected static final String ATTR_UNLOAD = "unload";
+    
+    /**
+     * Accesskey attribute.
+     */
+    protected static final String ATTR_ACCESSKEY = "accesskey";
+    
+    /**
+     * Scope attribute.
+     */
+    protected static final String ATTR_SCOPE = "scope";
 
     /**
      * XPath instance.
@@ -487,5 +517,13 @@ public abstract class AbstractDOMValidator implements Validator
         }
 
         return results;
+    }
+    
+    /**
+     * @return The body element in the XHTML document.
+     */
+    public Node getBodyElement()
+    {
+        return getElements("body").getNodeList().item(0);
     }
 }

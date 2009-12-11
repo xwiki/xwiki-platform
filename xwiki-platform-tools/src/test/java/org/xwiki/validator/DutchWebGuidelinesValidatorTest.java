@@ -106,11 +106,19 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         assertFalse(getErrors(validator), isValid(validator));
     }
 
-    public void testRpd1s3LinkWrongAttribute() throws Exception
+    public void testRpd1s3LinkEventHandlers() throws Exception
     {
-        setValidatorDocument("<a href='test' mouseover=''>test</a>");
+        setValidatorDocument("<a href='' onclick=''></a>");
         validator.validateRpd1s3();
         assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<a href='#' onclick=''></a>");
+        validator.validateRpd1s3();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<a href='test' onclick=''></a>");
+        validator.validateRpd1s3();
+        assertTrue(getErrors(validator), isValid(validator));
     }
 
     public void testRpd1s3FormValidSubmit() throws Exception
@@ -407,8 +415,122 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         setValidatorDocument("<body><img alt='text' usemap='#map' /><map name='map'><area alt='text' /></map></body>");
         validator.validateRpd7s5();
         assertTrue(getErrors(validator), isValid(validator));
-
     }
+    
+    public void testRpd8s1Links() throws Exception 
+    {
+        setValidatorDocument("<body><a>to get the resource, click here</a></body>");
+        validator.validateRpd8s1();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a>resource</a></body>");
+        validator.validateRpd8s1();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd8s11Accesskeys() throws Exception 
+    {
+        setValidatorDocument("<body><a accesskey='a'></a></body>");
+        validator.validateRpd8s11();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a accesskey='8'></a></body>");
+        validator.validateRpd8s11();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd8s14Links() throws Exception 
+    {
+        setValidatorDocument("<body><a target='any'></a></body>");
+        validator.validateRpd8s14();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a onclick='window.open'></a></body>");
+        validator.validateRpd8s14();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd8s16Links() throws Exception 
+    {
+        setValidatorDocument("<body><a href='mailto:text@text.com'>text@text.com</a></body>");
+        validator.validateRpd8s16();
+        assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a href='mailto:text@text.com'>mail</a></body>");
+        validator.validateRpd8s16();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd8s17Links() throws Exception 
+    {
+        setValidatorDocument("<body><a href='mailto:text@text.com text'>text@text.com</a></body>");
+        validator.validateRpd8s16();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd9s1StyleAttr() throws Exception 
+    {
+        setValidatorDocument("<body><div style='test'></div></body>");
+        validator.validateRpd9s1();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd9s1StyleTag() throws Exception 
+    {
+        setValidatorDocument("<body><style></style></body>");
+        validator.validateRpd9s1();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd11s2Table() throws Exception 
+    {
+        setValidatorDocument("<body><table></table></body>");
+        validator.validateRpd11s2();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><table><th/></table></body>");
+        validator.validateRpd11s2();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd11s4Table() throws Exception 
+    {
+        setValidatorDocument("<body><table><th/><th/></table></body>");
+        validator.validateRpd11s4();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><table><th scope=''/></table></body>");
+        validator.validateRpd11s4();
+        assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><table><th id='a' /><td headers='a'/></table></body>");
+        validator.validateRpd11s4();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd11s5Table() throws Exception 
+    {
+        setValidatorDocument("<body><table><th/><th/></table></body>");
+        validator.validateRpd11s5();
+        assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><table><th scope=''/></table></body>");
+        validator.validateRpd11s5();
+        assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><table><th id='a' /><td headers='a'/></table></body>");
+        validator.validateRpd11s5();
+        assertTrue(getErrors(validator), isValid(validator));
+    }
+    
+    public void testRpd12s1Iframe() throws Exception 
+    {
+        setValidatorDocument("<body><iframe/></body>");
+        validator.validateRpd12s1();
+        assertFalse(getErrors(validator), isValid(validator));
+    }
+    
+    
     
     
 }

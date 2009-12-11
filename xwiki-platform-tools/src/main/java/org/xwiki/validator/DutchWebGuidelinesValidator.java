@@ -23,6 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
@@ -135,6 +139,109 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         validateRpd7s6();
         validateRpd7s7();
 
+        // RPD 8
+        validateRpd8s1();
+        validateRpd8s2();
+        validateRpd8s3();
+        validateRpd8s4();
+        validateRpd8s5();
+        validateRpd8s6();
+        validateRpd8s7();
+        validateRpd8s8();
+        validateRpd8s9();
+        validateRpd8s10();
+        validateRpd8s11();
+        validateRpd8s12();
+        validateRpd8s13();
+        validateRpd8s14();
+        validateRpd8s15();
+        validateRpd8s16();
+        validateRpd8s17();
+        validateRpd8s18();
+        validateRpd8s19();
+        validateRpd8s20();
+        validateRpd8s21();
+        validateRpd8s22();
+        validateRpd8s23();
+
+        // RPD 9
+        validateRpd9s1();
+        validateRpd9s2();
+
+        // RPD 10
+        validateRpd10s1();
+        validateRpd10s2();
+        validateRpd10s3();
+
+        // RPD 11
+        validateRpd11s1();
+        validateRpd11s2();
+        validateRpd11s3();
+        validateRpd11s4();
+        validateRpd11s5();
+        validateRpd11s6();
+        validateRpd11s7();
+        validateRpd11s8();
+        validateRpd11s9();
+        validateRpd11s10();
+
+        // RPD 12
+        validateRpd12s1();
+
+        // RPD 13
+        validateRpd13s1();
+        validateRpd13s2();
+        validateRpd13s3();
+        validateRpd13s4();
+        validateRpd13s5();
+        validateRpd13s6();
+        validateRpd13s7();
+        validateRpd13s8();
+        validateRpd13s9();
+        validateRpd13s10();
+        validateRpd13s11();
+        validateRpd13s12();
+        validateRpd13s13();
+        validateRpd13s14();
+        validateRpd13s15();
+        validateRpd13s16();
+        validateRpd13s17();
+        validateRpd13s18();
+
+        // RPD 14
+        validateRpd14s1();
+
+        // RPD 15
+        validateRpd15s1();
+        validateRpd15s2();
+        validateRpd15s3();
+        validateRpd15s4();
+        validateRpd15s5();
+        validateRpd15s6();
+        validateRpd15s7();
+
+        // RPD 16
+        validateRpd16s1();
+        validateRpd16s2();
+        validateRpd16s3();
+        validateRpd16s4();
+
+        // RPD 18
+        validateRpd18s1();
+        validateRpd18s2();
+
+        // RPD 22
+        validateRpd22s1();
+        validateRpd22s2();
+        validateRpd22s3();
+        validateRpd22s4();
+        validateRpd22s5();
+        validateRpd22s6();
+        validateRpd22s7();
+        validateRpd22s8();
+        validateRpd22s9();
+        validateRpd22s10();
+
         return getErrors();
     }
 
@@ -175,8 +282,11 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             Arrays.asList(ATTR_BLUR, ATTR_CHANGE, ATTR_CLICK, ATTR_FOCUS, ATTR_LOAD, ATTR_MOUSEOVER, ATTR_SELECT,
                 ATTR_SELECT, ATTR_UNLOAD);
         for (Node linkElement : linkElements) {
-            assertTrue(Type.ERROR, "rpd1s3.inlineEventHandlers", ListUtils.intersection(getAttributeNames(linkElement),
-                forbiddenAttributes).isEmpty());
+            if (!ListUtils.intersection(getAttributeNames(linkElement), forbiddenAttributes).isEmpty()) {
+                assertFalse(Type.ERROR, "rpd1s3.inlineEventHandlers", getAttributeValue(linkElement, ATTR_HREF).equals(
+                    "")
+                    || getAttributeValue(linkElement, ATTR_HREF).equals("#"));
+            }
         }
 
         // Form validation
@@ -659,6 +769,773 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      * Applying CSS Image Replacement techniques to essential information is not recommended.
      */
     public void validateRpd7s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not describe the mechanism behind following a link.
+     */
+    public void validateRpd8s1()
+    {
+        List<String> forbiddenLinkTexts = Arrays.asList(messages.getString("rpd8s1.forbiddenLinkTexts").split(","));
+
+        for (Node link : getElements(ELEM_LINK)) {
+            for (Node linkChild : new NodeListIterable(link.getChildNodes())) {
+                if (linkChild.getNodeType() == Node.TEXT_NODE) {
+                    for (String forbiddenLinkText : forbiddenLinkTexts) {
+                        assertFalse(Type.ERROR, "rpd8s1.link", StringUtils.containsIgnoreCase(linkChild
+                            .getTextContent(), forbiddenLinkText));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Write clear, descriptive text for links.
+     */
+    public void validateRpd8s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use the minimum amount of text needed to understand where the link leads.
+     */
+    public void validateRpd8s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Provide sufficient information on the destination of a link to prevent unpleasant surprises for the visitor.
+     */
+    public void validateRpd8s4()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * When using client-side script in combination with a link: make the script functionality an expansion of the basic
+     * functionality of the link.
+     */
+    public void validateRpd8s5()
+    {
+        // Already checked by RPD 1s3
+    }
+
+    /**
+     * When using client-side script in combination with a link: if the link does not lead to anything, do not confront
+     * the visitor without support for client-side script with a non-working link.
+     */
+    public void validateRpd8s6()
+    {
+        // Already checked by RPD 1s3
+    }
+
+    /**
+     * When using client-side script in combination with a link: if necessary, use client-side script as an expansion of
+     * server-side functions.
+     */
+    public void validateRpd8s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Links must be easy to distinguish from other text.
+     */
+    public void validateRpd8s8()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Provide a logical order for the links on the page. Use the tabindex attribute to deviate from the standard tab
+     * order for links if this order is inadequate for correct use of the page by keyboard users.
+     */
+    public void validateRpd8s9()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not make it impossible to tab to links. Do not remove the focus rectangle surrounding a link or the
+     * possibility of focusing on a link.
+     */
+    public void validateRpd8s10()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Avoid using the Access key attribute. If the decision is nevertheless made to apply this attribute, only use it
+     * on links that remain unchanged throughout the site (e.g. main navigation) and limit the shortcut key combinations
+     * to numbers.
+     */
+    public void validateRpd8s11()
+    {
+        for (Node link : getElements(ELEM_LINK)) {
+            if (hasAttribute(link, ATTR_ACCESSKEY)) {
+                assertTrue(Type.ERROR, "rpd8s11.accesskey", StringUtils.isNumeric(getAttributeValue(link,
+                    ATTR_ACCESSKEY)));
+            }
+        }
+    }
+
+    /**
+     * Give blind visitors additional options to skip long lists of links.
+     */
+    public void validateRpd8s12()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * At the top of pages with many topics, provide a page index with links to navigate to the different topics.
+     */
+    public void validateRpd8s13()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Links on websites should not automatically open new windows without warning.
+     */
+    public void validateRpd8s14()
+    {
+        for (Node link : getElements(ELEM_LINK)) {
+            // target attribute is forbidden
+            assertFalse(Type.ERROR, "rpd8s14.target", hasAttribute(link, "target"));
+            if (hasAttribute(link, ATTR_CLICK)) {
+                // Usage of window.open is forbidden
+                assertFalse(Type.ERROR, "rpd8s14.window", getAttributeValue(link, ATTR_CLICK).contains("window.open"));
+            }
+        }
+    }
+
+    /**
+     * Do not open any new windows automatically, unless the location of the link contains useful information that may
+     * be necessary during an important uninterruptible process.
+     */
+    public void validateRpd8s15()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Links to e-mail addresses: the e-mail address to which the message is addressed must be visible in the link text.
+     */
+    public void validateRpd8s16()
+    {
+        for (Node link : getElements(ELEM_LINK)) {
+            String href = getAttributeValue(link, ATTR_HREF);
+            if (href != null && href.startsWith(MAILTO)) {
+                String email = StringUtils.substringAfter(href, MAILTO);
+                assertTrue(Type.ERROR, "rpd8s16.email", link.getTextContent().contains(email));
+            }
+        }
+    }
+
+    /**
+     * Links to e-mail addresses: the URL in the href attribute of a link to an e-mail address may only contain the
+     * mailto protocol and an e-mail address.
+     */
+    public void validateRpd8s17()
+    {
+        for (Node link : getElements(ELEM_LINK)) {
+            String href = getAttributeValue(link, ATTR_HREF);
+            if (href != null && href.startsWith(MAILTO)) {
+                String email = StringUtils.substringAfter(href, MAILTO);
+                assertTrue(Type.ERROR, "rpd8s17.email", email
+                    .matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"));
+            }
+        }
+    }
+
+    /**
+     * Do not apply any technical measures to the website to hide an e-mail address from spam robots.
+     */
+    public void validateRpd8s18()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Be extremely cautious when publishing e-mail addresses of visitors to the website. Inform the visitor of which
+     * information will be published on the site, or do not publish the visitor's e-mail address.
+     */
+    public void validateRpd8s19()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * When presenting downloadable files, inform the visitor how to download and then use them.
+     */
+    public void validateRpd8s20()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Serve files with the correct MIME type.
+     */
+    public void validateRpd8s21()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not automatically open links to downloadable files in a new window.
+     */
+    public void validateRpd8s22()
+    {
+        // Duplicate of 8s14
+    }
+
+    /**
+     * Do not intentionally serve downloadable files with an unknown or incorrect MIME type to force the browser to do
+     * something.
+     */
+    public void validateRpd8s23()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * CSS should be placed in linked files and not mixed with the HTML source code.
+     */
+    public void validateRpd9s1()
+    {
+        try {
+            XPathExpression expr = xpath.compile("//@style");
+            assertFalse(Type.ERROR, "rpd9s1.attr", ((Boolean) expr.evaluate(getBodyElement(), XPathConstants.BOOLEAN)));
+        } catch (XPathExpressionException e) {
+            // this cannot happen.
+        }
+
+        assertFalse(Type.ERROR, "rpd9s1.tag", getChildren(getBodyElement(), "style").getNodeList().getLength() > 0);
+    }
+
+    /**
+     * Pages should remain usable if a web browser does not support CSS.
+     */
+    public void validateRpd9s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Make sure that the meaning of communicative elements is not expressed only through colour.
+     */
+    public void validateRpd10s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Be consistent with colour use when indicating meaning.
+     */
+    public void validateRpd10s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Make sure there is sufficient brightness contrast between the text and the background colour.
+     */
+    public void validateRpd10s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use tables to display relational information and do not use them for layout.
+     */
+    public void validateRpd11s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use the th (table header) to describe a column or row in a table with relational information.
+     */
+    public void validateRpd11s2()
+    {
+        for (Node table : getElements(ELEM_TABLE)) {
+            assertTrue(Type.ERROR, "rpd11s2.th", getChildrenTagNames(table).contains(ELEM_TH));
+        }
+    }
+
+    /**
+     * Group rows with only th (table header) cells with the thead (table head) element. Group the rest of the table
+     * with the tbody (table body) element.
+     */
+    public void validateRpd11s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+    
+    /**
+     * @param table Table to analyze
+     * @return true if the table contains th with ids and td 
+     */
+    private boolean hasTableHeadersAndIds(Node table)
+    {
+        boolean hasHeadersAndIds = false;
+
+        try {
+            XPathExpression expr = xpath.compile("//td[@headers]");
+            hasHeadersAndIds = (Boolean) expr.evaluate(table, XPathConstants.BOOLEAN);
+            xpath.compile("//th[@id]");
+            hasHeadersAndIds = hasHeadersAndIds && (Boolean) expr.evaluate(table, XPathConstants.BOOLEAN);
+        } catch (XPathExpressionException e) {
+            // this cannot happen.
+        }
+        
+        return hasHeadersAndIds;
+    }
+
+    /**
+     * Use the scope attribute to associate table labels (th cells) with columns or rows.
+     */
+    public void validateRpd11s4()
+    {
+        for (Node table : getElements(ELEM_TABLE)) {
+            boolean hasHeadersAndIds = hasTableHeadersAndIds(table);
+            
+            if (!hasHeadersAndIds) {
+                for (Node th : getChildren(table, ELEM_TH)) {
+                    assertTrue(Type.ERROR, "rpd11s4.scope", hasAttribute(th, ATTR_SCOPE));
+                }
+            }
+        }
+    }
+
+    /**
+     * Use the headers and id attributes to associate table labels (th cells) with individual cells in complex tables.
+     */
+    public void validateRpd11s5()
+    {
+        for (Node table : getElements(ELEM_TABLE)) {
+
+            boolean hasScope = false;
+
+            for (Node th : getChildren(table, ELEM_TH)) {
+                if (hasAttribute(th, ATTR_SCOPE)) {
+                    hasScope = true;
+                }
+            }
+
+            if (!hasScope) {
+                assertTrue(Type.ERROR, "rpd11s5.headers", hasTableHeadersAndIds(table));
+            }
+        }
+    }
+
+    /**
+     * Provide abbreviations for table labels (th cells) by means of the abbr (abbreviation) attribute if the content of
+     * the table label is so long that repetition in a speech browser could cause irritation.
+     */
+    public void validateRpd11s6()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use the caption element or heading markup to provide a heading above a table.
+     */
+    public void validateRpd11s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * When modifying an existing website: use CSS for the presentation and layout of web pages, and avoid using tables
+     * for layout.
+     */
+    public void validateRpd11s8()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * When using tables for layout: do not use more than one table and use CSS for the design of this table as much as
+     * possible.
+     */
+    public void validateRpd11s9()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * When using tables for layout: do not apply any accessibility markup.
+     */
+    public void validateRpd11s10()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not use frames on websites. This applies to regular frames in framesets as well as iframes.
+     */
+    public void validateRpd12s1()
+    {
+        // Usage of iframes is forbidden
+        // frameset and frame tags are checked in RPD2.5.
+        assertFalse(Type.ERROR, "rpd12s1.iframe", containsElement(ELEM_IFRAME));
+    }
+
+    /**
+     * Use the label element to explicitly associate text with an input field in a form.
+     */
+    public void validateRpd13s1()
+    {
+        // TODO
+    }
+
+    /**
+     * Use the tabindex attribute to deviate from the standard tab order on form fields if this order is inadequate for
+     * correct use of the form by keyboard users.
+     */
+    public void validateRpd13s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Apply grouping of input fields by means of the fieldset element.
+     */
+    public void validateRpd13s3()
+    {
+        // TODO
+    }
+
+    /**
+     * Avoid automatic redirection during interaction with forms.
+     */
+    public void validateRpd13s4()
+    {
+        // TODO
+    }
+
+    /**
+     * Do not use client-side script or forms as the only way of accessing information on the site.
+     */
+    public void validateRpd13s5()
+    {
+        // TODO
+    }
+
+    /**
+     * Do not confront a visitor with a non-working form if optional technologies – such as CSS or client-side script –
+     * are not supported by the browser.
+     */
+    public void validateRpd13s6()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use CSS sparingly for input fields and form buttons.
+     */
+    public void validateRpd13s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * If a visitor has to provide personal data, let him know what will be done with this data, e.g. in the form of a
+     * privacy statement.
+     */
+    public void validateRpd13s8()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not ask a visitor to provide more information by means of a form than necessary for the purpose of the form.
+     * Keep forms as short as possible and limit the mandatory completion of form fields.
+     */
+    public void validateRpd13s9()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Indicate which fields are mandatory and which are optional.
+     */
+    public void validateRpd13s10()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Provide alternate contact options, such as address details, telephone number or e-mail addresses, if available.
+     */
+    public void validateRpd13s11()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Let the visitor know what will be done with the form when it is sent.
+     */
+    public void validateRpd13s12()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Give the visitor the option of saving his reply.
+     */
+    public void validateRpd13s13()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Once the visitor has completed and sent the form, send him confirmation that his message has been received by the
+     * recipient (autoreply).
+     */
+    public void validateRpd13s14()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Before displaying complex forms, give the visitor an impression of the size of the form.
+     */
+    public void validateRpd13s15()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * List documents which the visitor might need while completing the form beforehand.
+     */
+    public void validateRpd13s16()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Provide forms with instructions for the visitor if necessary, particularly for the applicable input fields.
+     */
+    public void validateRpd13s17()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not add any reset buttons to forms.
+     */
+    public void validateRpd13s18()
+    {
+        // TODO
+    }
+
+    /**
+     * Do not use client-side script for essential functionality on web pages, unless any lack of support for these
+     * scripts is sufficiently compensated by HTML alternatives and/or server-side script.
+     */
+    public void validateRpd14s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * The visitor should have the option of choosing between languages on every page of the site.
+     */
+    public void validateRpd15s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Links for language choice should have a clear and consistent place in the navigation of the site.
+     */
+    public void validateRpd15s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use fully written out (textual) links to the language versions.
+     */
+    public void validateRpd15s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Write links to language versions in their corresponding languages.
+     */
+    public void validateRpd15s4()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Do not use associations with nationalities for language choice.
+     */
+    public void validateRpd15s5()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Specify the base language of a page in the markup.
+     */
+    public void validateRpd15s6()
+    {
+        // TODO
+    }
+
+    /**
+     * Indicate language variations in the content of pages in the markup.
+     */
+    public void validateRpd15s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Specify the character set for web pages.
+     */
+    public void validateRpd16s1()
+    {
+        // TODO
+    }
+
+    /**
+     * Specify the UTF-8 character set.
+     */
+    public void validateRpd16s2()
+    {
+        // TODO
+    }
+
+    /**
+     * Also specify the character set by means of HTTP headers, if possible.
+     */
+    public void validateRpd16s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use (at least) the meta element to specify the character set and place this element as high as possible in the
+     * head section of the markup.
+     */
+    public void validateRpd16s4()
+    {
+        // TODO
+    }
+
+    /**
+     * Use a unique, descriptive title for each page.
+     */
+    public void validateRpd18s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Write short, concise text, in which the main message is mentioned at the top of the page.
+     */
+    public void validateRpd18s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use language that the visitor understands: limit the use of jargon, difficult terms and abbreviations.
+     */
+    public void validateRpd22s1()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Give visitors an ‘escape route’: possibilities to continue if they get stuck. Escape routes include useful links,
+     * being able to use the back button, a search function, and being able to correct input errors immediately.
+     */
+    public void validateRpd22s2()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Don't make visitors guess: provide information on how they can correct errors they have made. Take into account
+     * the most common errors.
+     */
+    public void validateRpd22s3()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Make modified error pages – for errors such as dead links (404 Not Found) – where the visitor is given options
+     * for continuing within the site.
+     */
+    public void validateRpd22s4()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * In the event of an error message as a result of sending a form, give the visitor the option of correcting the
+     * error in the form immediately and don't make him be dependent on the use of the back button.
+     */
+    public void validateRpd22s5()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * When implementing a search engine on the website: use ‘smart’ search technology that takes into account spelling
+     * errors, similar search terms, terms in singular or plural form, etc.
+     */
+    public void validateRpd22s6()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Provide a well-organised list of the most relevant search results. If too many search results are provided, it
+     * takes visitors too long to find the desired information. Give visitors the option of entering search criteria, or
+     * sorting the search results.
+     */
+    public void validateRpd22s7()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Give visitors the option of reporting errors on the site.
+     */
+    public void validateRpd22s8()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Use colours, icons and textual explanations to draw the visitor's attention to an error message and explain the
+     * problem.
+     */
+    public void validateRpd22s9()
+    {
+        // This guideline cannot be automatically tested.
+    }
+
+    /**
+     * Give visitors the option of finding information in alternate ways. For example, by providing a sitemap, search
+     * functions, or by means of a request by e-mail, letter or telephone.
+     */
+    public void validateRpd22s10()
     {
         // This guideline cannot be automatically tested.
     }

@@ -22,8 +22,9 @@
 package com.xpn.xwiki.web;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+
+import org.apache.commons.lang.math.NumberUtils;
 
 public class EditForm extends XWikiForm
 {
@@ -149,25 +150,21 @@ public class EditForm extends XWikiForm
     public int getObjectNumbers(String prefix)
     {
         String nb = getRequest().getParameter(prefix + "_nb");
-        if ((nb == null) || (nb.equals(""))) {
-            return 0;
-        }
-        return Integer.parseInt(nb);
+        return NumberUtils.toInt(nb);
     }
 
-    public Map getObject(String prefix)
+    public Map<String, String[]> getObject(String prefix)
     {
-        Map map = getRequest().getParameterMap();
-        HashMap map2 = new HashMap();
-        Iterator it = map.keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
+        @SuppressWarnings("unchecked")
+        Map<String, String[]> allParameters = getRequest().getParameterMap();
+        Map<String, String[]> result = new HashMap<String, String[]>();
+        for (String name : allParameters.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                map2.put(newname, map.get(name));
+                result.put(newname, allParameters.get(name));
             }
         }
-        return map2;
+        return result;
     }
 
     public String getParent()

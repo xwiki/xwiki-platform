@@ -9,4 +9,8 @@
              files="DutchWebGuidelinesValidator.java" />
   <suppress checks="StatementCount"
              files="DutchWebGuidelinesValidator.java" />
+  <suppress checks="NCSS"
+             files="DutchWebGuidelinesValidator.java" />
+  <suppress checks="MethodLength"
+             files="DutchWebGuidelinesValidator.java" />
 </suppressions>

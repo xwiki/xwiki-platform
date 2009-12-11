@@ -186,8 +186,8 @@ public class XWikiDocument implements DocumentModelBridge
     private String author;
 
     /**
-     * The last user that has changed the document's content (ie not object, attachments). The Content author is only 
-     * changed when the document content changes. Note that Content Author is used to check programming rights on a 
+     * The last user that has changed the document's content (ie not object, attachments). The Content author is only
+     * changed when the document content changes. Note that Content Author is used to check programming rights on a
      * document and this is the reason we need to know the last author who's modified the content since programming
      * rights depend on this.
      */
@@ -1895,7 +1895,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * @param fieldname the name of the field to display
      * @param type the type of the field to display
-     * @param pref the prefix to add in the field identifier in edit display for example 
+     * @param pref the prefix to add in the field identifier in edit display for example
      * @param obj the object containing the field to display
      * @param wrappingSyntaxId the syntax of the content in which the result will be included. This to take care of some
      *            escaping depending of the syntax.
@@ -4243,7 +4243,7 @@ public class XWikiDocument implements DocumentModelBridge
      * <li>[currentwiki:CurrentSpace.Page]</li>
      * </ul>
      * <p>
-     * Note: links without a space are renamed with the space added and all documents which have the document being 
+     * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
      * </p>
      * 
@@ -4260,17 +4260,17 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document
-     * as their parent is passed in parameter.
+     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document as
+     * their parent is passed in parameter.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
-     *        new renamed document.
+     *            new renamed document.
      * @param childDocumentNames the list of documents whose parent field will be set to the new document name.
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      */
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames, 
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames,
         XWikiContext context) throws XWikiException
     {
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
@@ -4305,16 +4305,16 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Step 1: Copy the document and all its translations under a new name
         xwiki.copyDocument(getFullName(), newDocumentName, false, context);
-         
+
         // Step 2: For each child document, update parent.
-        if(childDocumentNames != null){
+        if (childDocumentNames != null) {
             // Note: We're adding the fully qualified document name (i.e. including the wiki name).
             String newParent = newDocName.getWiki() + ":" + newDocName.getSpace() + "." + newDocName.getPage();
-    
+
             for (String childDocumentName : childDocumentNames) {
                 XWikiDocument childDocument = xwiki.getDocument(childDocumentName, context);
                 childDocument.setParent(newParent);
-                xwiki.saveDocument(childDocument, context.getMessageTool().get("core.comment.renameParent", 
+                xwiki.saveDocument(childDocument, context.getMessageTool().get("core.comment.renameParent",
                     Arrays.asList(new String[] {newDocumentName})), true, context);
             }
         }
@@ -4323,10 +4323,10 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: we ignore invalid links here. Invalid links should be shown to the user so
         // that they fix them but the rename feature ignores them.
         DocumentParser documentParser = new DocumentParser();
-         
+
         for (String backlinkDocumentName : backlinkDocumentNames) {
             XWikiDocument backlinkDocument = xwiki.getDocument(backlinkDocumentName, context);
-         
+
             if (backlinkDocument.is10Syntax()) {
                 // Note: Here we cannot do a simple search/replace as there are several ways to point
                 // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
@@ -4340,14 +4340,14 @@ public class XWikiDocument implements DocumentModelBridge
                 backlinkDocument.refactorDocumentLinks(oldDocName, newDocName, context);
             }
 
-            xwiki.saveDocument(backlinkDocument, context.getMessageTool().get("core.comment.renameLink", 
+            xwiki.saveDocument(backlinkDocument, context.getMessageTool().get("core.comment.renameLink",
                 Arrays.asList(new String[] {newDocumentName})), true, context);
         }
-         
+
         // Step 4: Delete the old document
         xwiki.deleteDocument(this, context);
-         
-        // Step 5: The current document needs to point to the renamed document as otherwise it's pointing to an 
+
+        // Step 5: The current document needs to point to the renamed document as otherwise it's pointing to an
         // invalid XWikiDocument object as it's been deleted...
         clone(xwiki.getDocument(newDocumentName, context));
     }
@@ -5452,7 +5452,7 @@ public class XWikiDocument implements DocumentModelBridge
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
         backup.put("doc", context.getDoc());
-        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
+        VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         if (vcontext != null) {
             backup.put("vdoc", vcontext.get("doc"));
@@ -5526,7 +5526,7 @@ public class XWikiDocument implements DocumentModelBridge
             context.setDoc(this);
             com.xpn.xwiki.api.Document apidoc = this.newDocument(context);
             com.xpn.xwiki.api.Document tdoc = apidoc.getTranslatedDocument();
-            VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.class);
+            VelocityManager velocityManager = Utils.getComponent(VelocityManager.class);
             VelocityContext vcontext = velocityManager.getVelocityContext();
             Map gcontext = (Map) context.get("gcontext");
             if (vcontext != null) {

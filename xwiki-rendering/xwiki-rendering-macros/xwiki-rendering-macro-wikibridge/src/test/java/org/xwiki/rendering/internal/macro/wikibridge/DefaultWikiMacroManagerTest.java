@@ -83,7 +83,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         // Simulate a user with programming rights
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); will(returnValue(wikiMacro.getDocumentName()));
+            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
             allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
         }});
@@ -109,7 +109,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         // Simulate a user with programming rights
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); will(returnValue(wikiMacro.getDocumentName()));
+            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
             allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentName()); will(returnValue(true));
         }});
@@ -128,7 +128,6 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
 
         // Simulate a user with programming rights
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); will(returnValue(wikiMacro.getDocumentName()));
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
             allowing(mockDocumentAccessBridge).isDocumentEditable(wikiMacro.getDocumentName()); will(returnValue(true));
         }});

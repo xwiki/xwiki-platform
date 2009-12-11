@@ -75,7 +75,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         this.wikiMacroDocumentName = new DocumentName("wiki", "space", "macroPage");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); will(returnValue(wikiMacroDocumentName));
+            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("dummy"));
             allowing(mockDocumentAccessBridge).hasProgrammingRights(); will(returnValue(true));
 

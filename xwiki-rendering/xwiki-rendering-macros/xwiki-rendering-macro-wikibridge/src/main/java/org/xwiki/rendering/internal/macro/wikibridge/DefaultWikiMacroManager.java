@@ -136,12 +136,12 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 this.wikiMacroMap.put(documentName,
                     new WikiMacroData(componentDescriptor.getRoleHint(), wikiMacro));
             } catch (Exception e) {
-                throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s]", wikiMacro.getId(),
-                    documentName, e));
+                throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
+                    wikiMacro.getId(), documentName, macroDescriptor.getVisibility()), e);
             }
         } else {
-            throw new WikiMacroException(String.format("Unable to register macro [%s] in [%s] due to insufficient "
-                + "privileges", wikiMacro.getId(), documentName));
+            throw new WikiMacroException(String.format("Unable to register macro [%s] in [%s] for visibility [%s] "
+                + "due to insufficient privileges", wikiMacro.getId(), documentName, macroDescriptor.getVisibility()));
         }
     }
 
@@ -162,12 +162,13 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                         macroData.getHint());
                     this.wikiMacroMap.remove(documentName);
                 } catch (Exception e) {
-                    throw new WikiMacroException(String.format("Failed to unregister macro [%s] in [%s]",
-                        macroData.getHint(), documentName), e);
+                    throw new WikiMacroException(String.format("Failed to unregister macro [%s] in [%s] for "
+                        + "visibility [%s]", macroData.getHint(), documentName, macroDescriptor.getVisibility()), e);
                 }
             } else {
-                throw new WikiMacroException(String.format("Unable to unregister macro [%s] in [%s] due to "
-                    + "insufficient privileges", macroData.getWikiMacro().getId(), documentName));
+                throw new WikiMacroException(String.format("Unable to unregister macro [%s] in [%s] for visibility "
+                    + "[%s] due to insufficient privileges", macroData.getWikiMacro().getId(), documentName,
+                    macroDescriptor.getVisibility()));
             }
         } else {
             throw new WikiMacroException(String.format("Macro [%s] in [%s] isn't registered",

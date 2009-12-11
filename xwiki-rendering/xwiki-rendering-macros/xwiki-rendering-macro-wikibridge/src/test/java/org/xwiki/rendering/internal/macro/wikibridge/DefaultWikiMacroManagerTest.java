@@ -155,7 +155,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
             Assert.assertEquals("Unable to register macro [testwikimacro] in [wiki = [xwiki], space = [Main], "
-                + "page = [TestWikiMacro]] due to insufficient privileges", e.getMessage());
+                + "page = [TestWikiMacro]] for visibility [GLOBAL] due to insufficient privileges", e.getMessage());
         }
     }
 
@@ -175,7 +175,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
             Assert.assertEquals("Unable to register macro [testwikimacro] in [wiki = [xwiki], space = [Main], "
-                + "page = [TestWikiMacro]] due to insufficient privileges", e.getMessage());
+                + "page = [TestWikiMacro]] for visibility [WIKI] due to insufficient privileges", e.getMessage());
         }
     }
 
@@ -195,7 +195,7 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
             Assert.assertEquals("Unable to register macro [testwikimacro] in [wiki = [xwiki], space = [Main], "
-                + "page = [TestWikiMacro]] due to insufficient privileges", e.getMessage());
+                + "page = [TestWikiMacro]] for visibility [USER] due to insufficient privileges", e.getMessage());
         }
     }
 

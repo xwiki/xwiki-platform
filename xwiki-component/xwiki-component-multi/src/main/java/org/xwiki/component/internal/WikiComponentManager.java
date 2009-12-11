@@ -67,6 +67,6 @@ public class WikiComponentManager extends AbstractGenericComponentManager implem
     @Override
     protected String getKey()
     {
-        return this.documentAccessBridge.getCurrentDocumentName().getWiki();
+        return this.documentAccessBridge.getCurrentWiki();
     }
 }

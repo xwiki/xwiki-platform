@@ -103,9 +103,9 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         state.become("otheruser");
         mockery.checking(new Expectations() {{
             oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user2")); 
-            oneOf(mockDocumentAccessBridge).getCurrentDocumentName(); 
-                will(returnValue(new DocumentName("wiki", "space", "page")));
+            oneOf(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
         }});
+
         try {
             contextCM.lookup(Role.class);
             Assert.fail("Should have raised an exception");
@@ -120,8 +120,8 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         final States state  = mockery.states("test");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); when(state.isNot("otherwiki")); 
-                will(returnValue(new DocumentName("wiki", "space1", "page")));
+            allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
+                will(returnValue("wiki1"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
                 will(returnValue("user")); 
         }});
@@ -141,8 +141,7 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         state.become("otherwiki");
         mockery.checking(new Expectations() {{
             oneOf(mockDocumentAccessBridge).getCurrentUser(); will(returnValue("user")); 
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); 
-                will(returnValue(new DocumentName("wiki", "space2", "page")));
+            allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki2"));
         }});
         try {
             contextCM.lookup(Role.class);
@@ -158,8 +157,8 @@ public class ContextComponentManagerTest extends AbstractComponentTestCase
         final States state  = mockery.states("test");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); when(state.isNot("otherwiki")); 
-                will(returnValue(new DocumentName("wiki", "space", "page")));
+            allowing(mockDocumentAccessBridge).getCurrentWiki();  when(state.isNot("otherwiki"));
+                will(returnValue("wiki"));
             allowing(mockDocumentAccessBridge).getCurrentUser(); when(state.isNot("otherwiki"));
                 will(returnValue("user")); 
         }});

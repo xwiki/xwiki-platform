@@ -568,6 +568,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getCurrentWiki()
+     */
+    public String getCurrentWiki()
+    {
+        XWikiContext xcontext = getContext();
+        return xcontext.getDatabase();
+    }
+
+    /**
      * Utility method for checking access rights of the current user on a target document.
      * 
      * @param documentName The name of the document.

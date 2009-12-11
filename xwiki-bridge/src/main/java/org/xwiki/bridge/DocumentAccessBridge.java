@@ -359,4 +359,9 @@ public interface DocumentAccessBridge
      * @param backupObjects the object containing the backed-up context properties to restore
      */
     void popDocumentFromContext(Map<String, Object> backupObjects);
+
+    /**
+     * @return the current wiki
+     */
+    String getCurrentWiki();
 }

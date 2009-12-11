@@ -403,4 +403,14 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     {
         throw new RuntimeException("Not implemented");
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getCurrentWiki() 
+     */
+    public String getCurrentWiki()
+    {
+        throw new RuntimeException("Not implemented");
+    }
 }

@@ -42,6 +42,7 @@ public interface DocumentAccessBridge
      * @param documentName the name of the document to find
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
+     * @deprecated use {@link #getDocument(DocumentName)} instead
      */
     DocumentModelBridge getDocument(String documentName) throws Exception;
 

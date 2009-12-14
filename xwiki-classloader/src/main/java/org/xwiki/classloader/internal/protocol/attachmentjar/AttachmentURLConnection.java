@@ -24,7 +24,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.xwiki.bridge.AttachmentName;
+import org.xwiki.model.AttachmentName;
 import org.xwiki.bridge.DocumentAccessBridge;
 
 /**
@@ -41,6 +41,7 @@ public class AttachmentURLConnection extends URLConnection
 
     /**
      * @param url the URL to connect to
+     * @since 2.2M1
      */
     public AttachmentURLConnection(URL url, AttachmentName attachmentName, DocumentAccessBridge documentAccessBridge)
     {

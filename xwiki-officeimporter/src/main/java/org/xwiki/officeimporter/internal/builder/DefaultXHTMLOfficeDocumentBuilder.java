@@ -28,8 +28,8 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -69,6 +69,7 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
 
     /**
      * {@inheritDoc}
+     * @since 2.2M1
      */
     public XHTMLOfficeDocument build(byte[] officeFileData, DocumentName reference, boolean filterStyles)
         throws OfficeImporterException
@@ -101,5 +102,17 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
 
         // Return a new XHTMLOfficeDocument instance.
         return new XHTMLOfficeDocument(xhtmlDoc, artifacts);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @deprecated use {@link #build(byte[], org.xwiki.model.DocumentName, boolean)} since 2.2M1
+     */
+    @Deprecated
+    public XHTMLOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,
+        boolean filterStyles) throws OfficeImporterException
+    {
+        return build(officeFileData, new DocumentName(reference.getWiki(), reference.getSpace(), reference.getPage()),
+            filterStyles);
     }
 }

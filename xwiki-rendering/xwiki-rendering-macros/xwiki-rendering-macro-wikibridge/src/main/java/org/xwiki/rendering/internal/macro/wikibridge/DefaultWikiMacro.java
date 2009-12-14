@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;

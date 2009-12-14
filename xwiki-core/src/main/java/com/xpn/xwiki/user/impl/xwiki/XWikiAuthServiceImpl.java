@@ -39,9 +39,9 @@ import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

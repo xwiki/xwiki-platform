@@ -35,9 +35,9 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

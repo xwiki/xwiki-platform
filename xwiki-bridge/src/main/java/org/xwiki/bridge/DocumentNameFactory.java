@@ -26,8 +26,10 @@ import org.xwiki.component.annotation.ComponentRole;
  *  
  * @version $Id$
  * @since 1.8.1
+ * @deprecated use {@link org.xwiki.model.DocumentNameFactory} instead since 2.2M1
  */
 @ComponentRole
+@Deprecated
 public interface DocumentNameFactory
 {
     /**
@@ -35,5 +37,5 @@ public interface DocumentNameFactory
      *        The supported format is up to implementers of this method.
      * @return the object representing a document reference
      */
-    DocumentName createDocumentName(String reference);    
+    DocumentName createDocumentName(String reference);
 }

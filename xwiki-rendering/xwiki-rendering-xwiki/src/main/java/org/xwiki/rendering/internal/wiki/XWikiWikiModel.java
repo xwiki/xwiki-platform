@@ -24,10 +24,11 @@ import java.net.URLEncoder;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.Model;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
@@ -44,7 +45,10 @@ public class XWikiWikiModel implements WikiModel
 
     @Requirement
     private DocumentNameSerializer documentNameSerializer;
-    
+
+    @Requirement
+    private Model model;
+
     /**
      * {@inheritDoc}
      * @see WikiModel#getAttachmentURL(String, String)
@@ -82,7 +86,7 @@ public class XWikiWikiModel implements WikiModel
         // the new document is created with the current page as its parent.
         String modifiedQueryString = queryString;
         if (StringUtils.isBlank(queryString)) {
-            DocumentName name = this.documentAccessBridge.getCurrentDocumentName();
+            DocumentName name = this.model.getCurrentDocumentName();
             if (name != null) {
                 try {
                     // Note: we encode using UTF8 since it's the W3C recommendation.

@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 

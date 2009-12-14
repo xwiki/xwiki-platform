@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -45,8 +45,8 @@ public class CompactDocumentNameSerializer extends DefaultDocumentNameSerializer
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.doc.DefaultDocumentNameSerializer#appendWikiName(java.lang.StringBuffer,
-     *      org.xwiki.bridge.DocumentName)
+     * @see DefaultDocumentNameSerializer#appendWikiName(StringBuffer, DocumentName)
+     * @since 2.2M1
      */
     @Override
     protected void appendWikiName(StringBuffer result, DocumentName documentName)

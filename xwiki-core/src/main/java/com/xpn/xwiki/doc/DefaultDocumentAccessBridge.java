@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.AttachmentName;
+import org.xwiki.model.AttachmentName;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -60,10 +60,10 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     @Requirement 
     private DocumentNameSerializer documentNameSerializer;
-    
-    @Requirement 
+
+    @Requirement
     private DocumentNameFactory documentNameFactory;
-    
+
     private XWikiContext getContext()
     {
         return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
@@ -83,7 +83,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.bridge.DocumentName)
+     * @see DocumentAccessBridge#getDocument(DocumentName)
+     * @since 2.2M1
      */
     public DocumentModelBridge getDocument(DocumentName documentName) throws Exception
     {
@@ -98,10 +99,23 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * {@inheritDoc}
-     * 
-     * @see DocumentAccessBridge#getDocumentName(String)
+     *
+     * @see DocumentAccessBridge#getDocument(DocumentName)
+     * @deprecated replaced by {@link #getDocument(DocumentName)} since 2.2M1
      */
-    public DocumentName getDocumentName(String documentName)
+    @Deprecated
+    public DocumentModelBridge getDocument(org.xwiki.bridge.DocumentName documentName) throws Exception
+    {
+        return getDocument(new DocumentName(documentName.getWiki(), documentName.getSpace(), documentName.getPage()));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getModelDocumentName(String)
+     * @since 2.2M1
+     */
+    public DocumentName getModelDocumentName(String documentName)
     {
         XWikiDocument document = new XWikiDocument();
         document.setFullName(documentName, getContext());
@@ -112,13 +126,28 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentName()
+     * @see DocumentAccessBridge#getDocumentName(String)
+     * @deprecated use {@link #getModelDocumentName(String)} since 2.2.M1
      */
-    public DocumentName getCurrentDocumentName()
+    @Deprecated
+    public org.xwiki.bridge.DocumentName getDocumentName(String documentName)
+    {
+        DocumentName docName = getModelDocumentName(documentName);
+        return new org.xwiki.bridge.DocumentName(docName.getWiki(), docName.getSpace(), docName.getPage());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentName()
+     * @deprecated replaced by {@link org.xwiki.model.Model#getCurrentDocumentName()} since 2.2M1
+     */
+    @Deprecated
+    public org.xwiki.bridge.DocumentName getCurrentDocumentName()
     {
         XWikiDocument currentDocument = getContext().getDoc();
 
-        return currentDocument == null ? null : new DocumentName(currentDocument.getWikiName(),
+        return currentDocument == null ? null : new org.xwiki.bridge.DocumentName(currentDocument.getWikiName(),
             currentDocument.getSpaceName(), currentDocument.getPageName());
     }
 
@@ -136,7 +165,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentContentForDefaultLanguage(java.lang.String)
+     * @see DocumentAccessBridge#getDocumentContentForDefaultLanguage(java.lang.String)
      */
     public String getDocumentContentForDefaultLanguage(String documentName) throws Exception
     {
@@ -190,7 +219,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentAccessBridge#getDocumentSyntaxId(java.lang.String)
+     * @see DocumentAccessBridge#getDocumentSyntaxId(java.lang.String)
      */
     public String getDocumentSyntaxId(String documentName) throws Exception
     {
@@ -332,6 +361,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getAttachmentContent(String, String)
      * @deprecated use {@link #getAttachmentContent(AttachmentName)} instead
      */
+    @Deprecated
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         XWikiContext xcontext = getContext();
@@ -342,7 +372,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentContent(AttachmentName)
-     * @since 2.0.1
+     * @since 2.2M1
      */
     public InputStream getAttachmentContent(AttachmentName attachmentName) throws Exception
     {
@@ -351,6 +381,20 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             this.documentNameSerializer.serialize(attachmentName.getDocumentName()), xcontext);
         return new ByteArrayInputStream(
             attachmentDocument.getAttachment(attachmentName.getFileName()).getContent(xcontext));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getAttachmentContent(org.xwiki.bridge.AttachmentName)
+     * @deprecated replaced by {@link #getAttachmentContent(AttachmentName)} since 2.2M1
+     */
+    @Deprecated
+    public InputStream getAttachmentContent(org.xwiki.bridge.AttachmentName attachmentName) throws Exception
+    {
+        return getAttachmentContent(new AttachmentName(
+            new DocumentName(attachmentName.getDocumentName().getWiki(), attachmentName.getDocumentName().getSpace(),
+                attachmentName.getDocumentName().getPage()), attachmentName.getFileName()));
     }
 
     /**
@@ -384,17 +428,17 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * {@inheritDoc}
-     * 
-     * @see DocumentAccessBridge#getAttachments(DocumentName)
-     * @since 2.0.1
+     *
+     * @see DocumentAccessBridge#getAttachmentNames(org.xwiki.model.DocumentName)
+     * @since 2.2M1
      */
-    public List<AttachmentName> getAttachments(DocumentName documentName) throws Exception
+    public List<AttachmentName> getAttachmentNames(DocumentName documentName) throws Exception
     {
         List<AttachmentName> attachmentNames = new ArrayList<AttachmentName>();
         XWikiContext xcontext = getContext();
         DocumentName resolvedName = documentName;
         if (documentName == null) {
-            resolvedName = this.documentNameFactory.createDocumentName(xcontext.getDoc().getFullName()); 
+            resolvedName = this.documentNameFactory.createDocumentName(xcontext.getDoc().getFullName());
         }
         List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
             this.documentNameSerializer.serialize(resolvedName), xcontext).getAttachmentList();
@@ -402,6 +446,27 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             attachmentNames.add(new AttachmentName(resolvedName, attachment.getFilename()));
         }
         return attachmentNames;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getAttachments(DocumentName)
+     * @deprecated replaced by {@link #getAttachmentNames(DocumentName)} since 2.2M1
+     */
+    @Deprecated
+    public List<org.xwiki.bridge.AttachmentName> getAttachments(org.xwiki.bridge.DocumentName documentName)
+        throws Exception
+    {
+        List<org.xwiki.bridge.AttachmentName> results = new ArrayList<org.xwiki.bridge.AttachmentName>();
+        List<AttachmentName> names = getAttachmentNames(new DocumentName(documentName.getWiki(),
+            documentName.getSpace(), documentName.getPage()));
+        for (AttachmentName name : names) {
+            results.add(new org.xwiki.bridge.AttachmentName(new org.xwiki.bridge.DocumentName(
+                name.getDocumentName().getWiki(), name.getDocumentName().getSpace(), name.getDocumentName().getPage()),
+                name.getFileName()));
+        }
+        return results;
     }
 
     /**
@@ -427,8 +492,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentURL(String, String)
-     * @deprecated use {@link #getAttachmentURL(org.xwiki.bridge.AttachmentName, boolean)} instead
+     * @deprecated use {@link #getAttachmentURL(AttachmentName, boolean)} instead
      */
+    @Deprecated
     public String getAttachmentURL(String documentName, String attachmentName)
     {
         XWikiContext xcontext = getContext();
@@ -448,7 +514,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentURL(AttachmentName, boolean)
-     * @since 2.0RC1
+     * @since 2.2M1
      */
     public String getAttachmentURL(AttachmentName attachmentName, boolean isFullURL)
     {
@@ -467,18 +533,47 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
 
     /**
      * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getAttachmentURL(org.xwiki.bridge.AttachmentName, boolean)
+     * @deprecated replaced by {@link #getAttachmentURL(AttachmentName, boolean)} since 2.2M1
+     */
+    @Deprecated
+    public String getAttachmentURL(org.xwiki.bridge.AttachmentName attachmentName, boolean isFullURL)
+    {
+        return getAttachmentURL(new AttachmentName(new DocumentName(attachmentName.getDocumentName().getWiki(),
+            attachmentName.getDocumentName().getWiki(), attachmentName.getDocumentName().getPage()),
+            attachmentName.getFileName()), isFullURL);
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getAttachmentURLs(DocumentName, boolean)
-     * @since 2.0RC1
-     * @deprecated use {@link #getAttachments(DocumentName)} instead 
+     * @deprecated use {@link #getAttachmentNames(DocumentName)} instead
+     * @since 2.2M1
      */
+    @Deprecated
     public List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception
     {
         List<String> urls = new ArrayList<String>();
-        for (AttachmentName attachmentName : getAttachments(documentName)) {
+        for (AttachmentName attachmentName : getAttachmentNames(documentName)) {
             urls.add(getAttachmentURL(attachmentName, isFullURL));
         }
         return urls;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getAttachmentURLs(org.xwiki.bridge.DocumentName, boolean)
+     * @deprecated use {@link #getAttachmentNames(DocumentName)} instead
+     */
+    @Deprecated
+    public List<String> getAttachmentURLs(org.xwiki.bridge.DocumentName documentName, boolean isFullURL)
+        throws Exception
+    {
+        return getAttachmentURLs(new DocumentName(documentName.getWiki(), documentName.getSpace(),
+            documentName.getPage()), isFullURL);
     }
 
     /**
@@ -497,6 +592,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#isDocumentEditable(String)
      * @deprecated use {@link #isDocumentEditable(DocumentName)} instead
      */
+    @Deprecated
     public boolean isDocumentEditable(String documentName)
     {
         return hasRight(documentName, "edit");
@@ -505,7 +601,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      *
-     * @see DocumentAccessBridge#isDocumentEditable(org.xwiki.bridge.DocumentName)
+     * @see DocumentAccessBridge#isDocumentEditable(DocumentName)
      * @since 2.2M1
      */
     public boolean isDocumentEditable(DocumentName documentName)

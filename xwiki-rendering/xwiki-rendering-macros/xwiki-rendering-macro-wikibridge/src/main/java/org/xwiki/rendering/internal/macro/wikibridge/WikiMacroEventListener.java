@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -86,7 +86,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
     {
         if (event instanceof AbstractDocumentEvent) {
             DocumentModelBridge document = (DocumentModelBridge) source;
-            DocumentName documentName = document.getDocumentName();
+            DocumentName documentName = document.getModelDocumentName();
 
             // We've decided not to log any exception raised in the XWiki logs since a failure to register or
             // unregister a macro isn't a failure of the XWiki software. It's something normal, same as, for example,
@@ -123,6 +123,9 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
         }
     }
 
+    /**
+     * @since 2.2M1
+     */
     private void registerMacroInternal(DocumentName documentName, WikiMacro wikiMacro)
     {
         try {
@@ -133,6 +136,9 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
         }
     }
 
+    /**
+     * @since 2.2M1
+     */
     private boolean unregisterMacroInternal(DocumentName documentName)
     {
         boolean result = true;

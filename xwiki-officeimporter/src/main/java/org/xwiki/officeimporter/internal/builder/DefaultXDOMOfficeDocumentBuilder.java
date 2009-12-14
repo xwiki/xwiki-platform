@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.internal.builder;
 import java.io.StringReader;
 
 import org.w3c.dom.Document;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
@@ -65,6 +65,7 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
     
     /**
      * {@inheritDoc}
+     * @since 2.2M1
      */
     public XDOMOfficeDocument build(byte[] officeFileData, DocumentName reference, boolean filterStyles)
         throws OfficeImporterException
@@ -86,5 +87,17 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
             throw new OfficeImporterException("Error: Could not parse xhtml office content.", ex);
         }        
         return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifacts(), componentManager);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @deprecated use {@link #build(byte[], org.xwiki.model.DocumentName, boolean)} since 2.2M1
+     */
+    @Deprecated
+    public XDOMOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,
+        boolean filterStyles) throws OfficeImporterException
+    {
+        return build(officeFileData, new DocumentName(reference.getWiki(), reference.getSpace(), reference.getPage()),
+            filterStyles);
     }
 }

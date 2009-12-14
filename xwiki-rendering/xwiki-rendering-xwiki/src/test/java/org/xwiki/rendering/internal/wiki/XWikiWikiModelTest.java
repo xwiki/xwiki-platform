@@ -19,12 +19,13 @@
  */
 package org.xwiki.rendering.internal.wiki;
 
-import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.Model;
 
 /**
  * Unit tests for {@link XWikiWikiModel}.
@@ -32,26 +33,34 @@ import org.xwiki.component.util.ReflectionUtils;
  * @version $Id$
  * @since 2.0M1
  */
-public class XWikiWikiModelTest extends MockObjectTestCase
+public class XWikiWikiModelTest
 {
+    @org.junit.Test
     public void testGetDocumentEditURLWhenNoQueryStringSpecified() throws Exception
     {
-        XWikiWikiModel model = new XWikiWikiModel();
+        Mockery mockery = new Mockery();
+        XWikiWikiModel wikiModel = new XWikiWikiModel();
 
-        Mock mockDocumentNameSerializer = mock(DocumentNameSerializer.class);
-        mockDocumentNameSerializer.expects(once()).method("serialize").will(returnValue("wiki:Space.Page\u20AC"));
-        ReflectionUtils.setFieldValue(model, "documentNameSerializer", mockDocumentNameSerializer.proxy());
-        
-        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
-        mockDocumentAccessBridge.expects(once()).method("getCurrentDocumentName").will(returnValue(
-            new DocumentName("wiki", "Space", "Page")));
+        final DocumentNameSerializer mockDocumentNameSerializer = mockery.mock(DocumentNameSerializer.class);
+        ReflectionUtils.setFieldValue(wikiModel, "documentNameSerializer", mockDocumentNameSerializer);
 
-        // The test is here: we verify that getURL is called with the query string already encoded since getURL()
-        // doesn't encode it.
-        mockDocumentAccessBridge.expects(once()).method("getURL").with(eq("Space.Page\u20AC"), eq("edit"),
-            eq("parent=wiki%3ASpace.Page%E2%82%AC"), eq("anchor"));
-        ReflectionUtils.setFieldValue(model, "documentAccessBridge", mockDocumentAccessBridge.proxy());
+        final Model mockModel = mockery.mock(Model.class);
+        ReflectionUtils.setFieldValue(wikiModel, "model", mockModel);
 
-        model.getDocumentEditURL("Space.Page\u20AC", "anchor", null);
+        final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
+        ReflectionUtils.setFieldValue(wikiModel, "documentAccessBridge", mockDocumentAccessBridge);
+
+        final DocumentName docName = new DocumentName("wiki", "Space", "Page");
+        mockery.checking(new Expectations() {{
+            oneOf(mockModel).getCurrentDocumentName(); will(returnValue(docName));
+            oneOf(mockDocumentNameSerializer).serialize(docName); will(returnValue("wiki:Space.Page\u20AC"));
+
+            // The test is here: we verify that getURL is called with the query string already encoded since getURL()
+            // doesn't encode it.
+            oneOf(mockDocumentAccessBridge).getURL("Space.Page\u20AC", "edit", "parent=wiki%3ASpace.Page%E2%82%AC",
+                "anchor");
+        }});
+
+        wikiModel.getDocumentEditURL("Space.Page\u20AC", "anchor", null);
     }
 }

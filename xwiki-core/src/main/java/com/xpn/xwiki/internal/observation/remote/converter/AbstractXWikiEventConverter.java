@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;

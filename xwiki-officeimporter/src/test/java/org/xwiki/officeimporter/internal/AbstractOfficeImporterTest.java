@@ -21,8 +21,8 @@ package org.xwiki.officeimporter.internal;
 
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameFactory;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.test.AbstractComponentTestCase;
 

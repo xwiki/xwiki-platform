@@ -20,8 +20,8 @@
 package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 
@@ -52,7 +52,8 @@ public class MockDocumentNameSerializer implements DocumentNameSerializer
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentNameSerializer#serialize(org.xwiki.bridge.DocumentName)
+     * @see DocumentNameSerializer#serialize(org.xwiki.model.DocumentName)
+     * @since 2.2M1
      */
     public String serialize(DocumentName documentName)
     {

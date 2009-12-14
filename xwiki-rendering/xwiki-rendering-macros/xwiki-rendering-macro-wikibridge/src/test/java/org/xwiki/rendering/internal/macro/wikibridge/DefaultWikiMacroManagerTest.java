@@ -25,7 +25,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.Macro;

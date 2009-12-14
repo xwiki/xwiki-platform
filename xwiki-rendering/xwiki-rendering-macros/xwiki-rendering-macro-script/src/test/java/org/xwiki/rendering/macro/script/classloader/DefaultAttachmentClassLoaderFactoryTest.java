@@ -25,7 +25,7 @@ import junit.framework.Assert;
 
 import org.jmock.Mockery;
 import org.junit.Test;
-import org.xwiki.bridge.AttachmentNameFactory;
+import org.xwiki.model.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;

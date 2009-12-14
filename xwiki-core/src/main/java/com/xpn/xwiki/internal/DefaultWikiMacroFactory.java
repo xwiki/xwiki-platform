@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -87,6 +87,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
 
     /**
      * {@inheritDoc}
+     * @since 2.2M1
      */
     public WikiMacro createWikiMacro(DocumentName documentName) throws WikiMacroException
     {
@@ -109,7 +110,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
      */
     private WikiMacro buildMacro(XWikiDocument doc) throws WikiMacroException
     {
-        DocumentName documentName = doc.getDocumentName();
+        DocumentName documentName = doc.getModelDocumentName();
 
         // Check whether this document contains a macro definition.
         BaseObject macroDefinition = doc.getObject(WIKI_MACRO_CLASS);
@@ -225,6 +226,7 @@ public class DefaultWikiMacroFactory extends AbstractLogEnabled implements WikiM
 
     /**
      * {@inheritDoc}
+     * @since 2.2M1
      */
     public boolean containsWikiMacro(DocumentName documentName)
     {

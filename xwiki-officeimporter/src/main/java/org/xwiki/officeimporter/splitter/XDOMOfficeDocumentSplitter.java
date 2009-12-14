@@ -21,10 +21,11 @@ package org.xwiki.officeimporter.splitter;
 
 import java.util.Map;
 
-import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.DocumentName;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.internal.splitter.TargetPageDescriptor;
 
 /**
  * Component responsible for splitting office imports.
@@ -57,8 +58,38 @@ public interface XDOMOfficeDocumentSplitter
      * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
      *         name for the corresponding xdom office document.
      * @throws OfficeImporterException if an error occurs while splitting.
+     * @since 2.2M1
      */
     Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentName baseDocumentName)
+        throws OfficeImporterException;
+
+    /**
+     * Splits an {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances using the provided
+     * heading levels as boundaries. The namingCriterion & the baseName determines the target wiki pages for the newly
+     * split documents.
+     *
+     * @param xdomOfficeDocument {@link XDOMOfficeDocument} to be split.
+     * @param headingLevelsToSplit heading levels (1..6) to be used as boundaries. The split process is recursive, if
+     *            there are multiple heading levels specified, the original document will be split from the highest
+     *            heading level (lowest value >= 1) first and then the resulting office documents will be re-split from
+     *            the next highest heading level.
+     * @param namingCriterionHint naming criterion to be used when producing target page names for the newly split
+     *            documents. Currently three schemes are supported:
+     *            <ul>
+     *            <li>headingNames - Uses the first heading name as target document name.</li>
+     *            <li>mainPageNameAndHeading - Base document name followed by heading name.</li>
+     *            <li>mainPageNameAndNumbering - Base document name followed by index.</li>
+     *            </ul>
+     * @param baseDocumentName base (root) page name to be used when generating target page names for child
+     *            (newly split) documents.
+     * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
+     *         name for the corresponding xdom office document.
+     * @throws OfficeImporterException if an error occurs while splitting.
+     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.DocumentName)} since 2.2.M1
+     */
+    @Deprecated
+    Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+        int[] headingLevelsToSplit, String namingCriterionHint, org.xwiki.bridge.DocumentName baseDocumentName)
         throws OfficeImporterException;
 }

@@ -26,10 +26,11 @@ import org.apache.commons.io.IOUtils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
+import org.xwiki.model.Model;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -73,12 +74,19 @@ public class RenderingTests extends TestCase
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
+        // Model Mock
+        final Model mockModel = context.mock(Model.class);
+        DefaultComponentDescriptor<Model> descriptorModel =
+            new DefaultComponentDescriptor<Model>();
+        descriptorModel.setRole(Model.class);
+        componentManager.registerComponent(descriptorModel, mockModel);
+
         final DocumentName documentName = new DocumentName(null, "Test", "Test");
         
         context.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getURL(with(any(String.class)), with(any(String.class)), 
                 with(any(String.class)), with(any(String.class))); will(returnValue("http://localhost/charts"));
-            allowing(mockDocumentAccessBridge).getCurrentDocumentName(); will(returnValue(documentName));
+            allowing(mockModel).getCurrentDocumentName(); will(returnValue(documentName));
             allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(true));
             allowing(mockDocumentAccessBridge).getDocumentSyntaxId(with(any(String.class))); will(returnValue("xwiki/2.0"));
             allowing(mockDocumentAccessBridge).getDocumentContent("Test.Test");

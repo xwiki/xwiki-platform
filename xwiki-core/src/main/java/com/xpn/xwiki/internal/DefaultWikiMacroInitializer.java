@@ -24,8 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;

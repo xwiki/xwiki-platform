@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.splitter;
+package org.xwiki.officeimporter.internal.splitter;
 
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
@@ -57,6 +57,7 @@ public class TargetPageDescriptor
      * 
      * @param pageName name of the target wiki page.
      * @param componentManager used to lookup for various name serializers.
+     * @since 2.2M1
      */
     public TargetPageDescriptor(DocumentName pageName, ComponentManager componentManager)
     {
@@ -66,6 +67,7 @@ public class TargetPageDescriptor
 
     /**
      * @return target page name.
+     * @since 2.2M1
      */
     public DocumentName getPageName()
     {
@@ -82,6 +84,7 @@ public class TargetPageDescriptor
 
     /**
      * @return target parent page name.
+     * @since 2.2M1
      */
     public DocumentName getParentName()
     {
@@ -100,6 +103,7 @@ public class TargetPageDescriptor
      * Sets the name of the parent wiki page.
      * 
      * @param parentName parent wiki page name.
+     * @since 2.2M1
      */
     public void setParentName(DocumentName parentName)
     {
@@ -112,6 +116,7 @@ public class TargetPageDescriptor
      * @param documentName document name.
      * @param serializerHint which serializer to use.
      * @return documentName parameter serialized into a string.
+     * @since 2.2M1
      */
     private String serializeDocumentName(DocumentName documentName, String serializerHint)
     {

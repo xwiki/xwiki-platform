@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -109,6 +109,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     /**
      * {@inheritDoc}
      * @see WikiMacroManager#hasWikiMacro(DocumentName)
+     * @since 2.2M1
      */
     public boolean hasWikiMacro(DocumentName documentName)
     {
@@ -118,6 +119,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     /**
      * {@inheritDoc}
      * @see WikiMacroManager#registerWikiMacro(DocumentName, WikiMacro)
+     * @since 2.2M1
      */
     public void registerWikiMacro(DocumentName documentName, WikiMacro wikiMacro) throws WikiMacroException
     {
@@ -148,6 +150,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     /**
      * {@inheritDoc}
      * @see WikiMacroManager#unregisterWikiMacro(DocumentName)  
+     * @since 2.2M1
      */
     public void unregisterWikiMacro(DocumentName documentName) throws WikiMacroException
     {
@@ -184,6 +187,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      *         document (to ensure they cannot be defined by standard users in a wiki farm - since only farm admins
      *         have programming rights in a farm). Current user and current wiki visibility simply require edit rights
      *         on the document.
+     * @since 2.2M1
      */
     private boolean isAllowed(DocumentName documentName, WikiMacroVisibility visibility)
     {

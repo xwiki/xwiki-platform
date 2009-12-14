@@ -122,6 +122,7 @@
     </dependency>
   </dependencies>
   <modules>
+    <module>xwiki-model</module>
     <module>xwiki-xmlrpc</module>
     <module>xwiki-cache</module>
     <module>xwiki-xml</module>

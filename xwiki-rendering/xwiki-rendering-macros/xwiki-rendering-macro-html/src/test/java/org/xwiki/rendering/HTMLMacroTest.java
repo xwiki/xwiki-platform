@@ -24,9 +24,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -47,7 +46,7 @@ public class HTMLMacroTest extends AbstractComponentTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see AbstractComponentTestCase#setUp()
      */
     @Before
     public void setUp() throws Exception

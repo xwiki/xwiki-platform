@@ -23,7 +23,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.*;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.converter.Converter;

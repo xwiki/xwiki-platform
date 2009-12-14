@@ -33,6 +33,7 @@ import org.xwiki.component.util.ReflectionUtils;
  * 
  * @version $Id$
  */
+@Deprecated
 public class DefaultAttachmentNameFactoryTest
 {
     private Mockery context;

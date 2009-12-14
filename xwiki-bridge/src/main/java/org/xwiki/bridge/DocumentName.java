@@ -26,7 +26,9 @@ import java.io.Serializable;
  * 
  * @version $Id$
  * @since 1.8RC2
+ * @deprecated use {@link org.xwiki.model.DocumentName} instead since 2.2M1
  */
+@Deprecated
 public class DocumentName implements Serializable
 {
     /**

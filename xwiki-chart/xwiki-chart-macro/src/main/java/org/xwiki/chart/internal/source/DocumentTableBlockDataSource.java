@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.Model;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -71,6 +72,12 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
     private DocumentNameSerializer nameSerializer;
 
     /**
+     * To get access to the current document name in the Execution Context.
+     */
+    @Requirement
+    private Model model;
+
+    /**
      * {@inheritDoc}
      */
     protected TableBlock getTableBlock(String macroContent, Map<String, String> macroParameters)
@@ -79,7 +86,7 @@ public class DocumentTableBlockDataSource extends AbstractTableBlockDataSource
         // Determine the document name.
         String documentName = macroParameters.get(DOCUMENT);
         if (null == documentName) {
-            documentName = nameSerializer.serialize(docBridge.getCurrentDocumentName());
+            documentName = nameSerializer.serialize(this.model.getCurrentDocumentName());
         }
         if (!docBridge.exists(documentName)) {
             throw new MacroExecutionException(String.format("Document [%s] does not exist.", documentName));

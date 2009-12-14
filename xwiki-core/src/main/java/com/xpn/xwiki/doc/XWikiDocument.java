@@ -73,9 +73,9 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
@@ -689,11 +689,26 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return a proper {@link DocumentName} for this document.
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.bridge.DocumentModelBridge#getModelDocumentName()
+     * @since 2.2M1
      */
-    public DocumentName getDocumentName()
+    public DocumentName getModelDocumentName()
     {
         return new DocumentName(getWikiName(), getSpaceName(), getPageName());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.bridge.DocumentModelBridge#getDocumentName()
+     * @deprecated replaced by {@link #getModelDocumentName()} since 2.2M1
+     */
+    @Deprecated
+    public org.xwiki.bridge.DocumentName getDocumentName()
+    {
+        return new org.xwiki.bridge.DocumentName(getWikiName(), getSpaceName(), getPageName());
     }
 
     /**
@@ -3254,7 +3269,7 @@ public class XWikiDocument implements DocumentModelBridge
             List<String> list = context.getUtil().getUniqueMatches(getContent(), "\\[(.*?)\\]", 1);
             pageNames = new HashSet<String>(list.size());
 
-            DocumentName currentDocumentName = getDocumentName();
+            DocumentName currentDocumentName = getModelDocumentName();
             for (String name : list) {
                 int i1 = name.indexOf(">");
                 if (i1 != -1) {
@@ -3348,7 +3363,7 @@ public class XWikiDocument implements DocumentModelBridge
                 List<LinkBlock> linkBlocks = dom.getChildrenByType(LinkBlock.class, true);
                 pageNames = new LinkedHashSet<String>(linkBlocks.size());
 
-                DocumentName currentDocumentName = getDocumentName();
+                DocumentName currentDocumentName = getModelDocumentName();
 
                 for (LinkBlock linkBlock : linkBlocks) {
                     org.xwiki.rendering.listener.Link link = linkBlock.getLink();
@@ -4291,7 +4306,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Get the full unique form of the ol and new document names to easily compare them with links references in
         // XDOM
-        DocumentName oldDocName = getDocumentName();
+        DocumentName oldDocName = getModelDocumentName();
         DocumentName newDocName = this.documentNameFactory.createDocumentName(newDocumentName);
 
         // Verify if the user is trying to rename to the same name... In that case, simply exits
@@ -4352,6 +4367,9 @@ public class XWikiDocument implements DocumentModelBridge
         clone(xwiki.getDocument(newDocumentName, context));
     }
 
+    /**
+     * @since 2.2M1
+     */
     private void refactorDocumentLinks(DocumentName oldDocumentName, DocumentName newDocumentName, XWikiContext context)
         throws XWikiException
     {

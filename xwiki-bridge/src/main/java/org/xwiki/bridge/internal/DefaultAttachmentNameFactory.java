@@ -32,8 +32,10 @@ import org.xwiki.component.annotation.Requirement;
  *  
  * @version $Id$
  * @since 2.0RC1
+ * @deprecated use {@link org.xwiki.model.internal.DefaultAttachmentNameFactory} instead since 2.2M1
  */
 @Component
+@Deprecated
 public class DefaultAttachmentNameFactory implements AttachmentNameFactory
 {
     /**

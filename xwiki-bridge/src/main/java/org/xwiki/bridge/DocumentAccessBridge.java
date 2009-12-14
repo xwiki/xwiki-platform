@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.AttachmentName;
+import org.xwiki.model.DocumentName;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -44,6 +46,7 @@ public interface DocumentAccessBridge
      * @throws Exception when the storage cannot be accessed
      * @deprecated use {@link #getDocument(DocumentName)} instead
      */
+    @Deprecated
     DocumentModelBridge getDocument(String documentName) throws Exception;
 
     /**
@@ -52,27 +55,50 @@ public interface DocumentAccessBridge
      * @param documentName the name of the document to find
      * @return the document object matching the passed document name
      * @throws Exception when the storage cannot be accessed
-     * @since 2.0M3
+     * @since 2.2M1
      */
     DocumentModelBridge getDocument(DocumentName documentName) throws Exception;
-    
+
+    /**
+     * Get the document object associated with the passed document name.
+     *
+     * @param documentName the name of the document to find
+     * @return the document object matching the passed document name
+     * @throws Exception when the storage cannot be accessed
+     * @deprecated replaced by {@link #getDocument(DocumentName)} since 2.2M1
+     */
+    @Deprecated
+    DocumentModelBridge getDocument(org.xwiki.bridge.DocumentName documentName) throws Exception;
+
     /**
      * Get the different parts of a document name (wiki, space, page).
      * 
      * @param documentName the name of the document for which to return name information
      * @return the document name object containing the information
+     * @since 2.2M1
      */
-    DocumentName getDocumentName(String documentName);
+    DocumentName getModelDocumentName(String documentName);
+
+    /**
+     * Get the different parts of a document name (wiki, space, page).
+     *
+     * @param documentName the name of the document for which to return name information
+     * @return the document name object containing the information
+     * @deprecated replaced by {@link #getModelDocumentName(String)} since 2.2M1
+     */
+    @Deprecated
+    org.xwiki.bridge.DocumentName getDocumentName(String documentName);
 
     /**
      * Get the different parts of a the current document name (wiki, space, page).
      * <p>
      * The current document is found in the context.
-     * 
+     *
      * @return the document name object containing the information
-     * @since 1.9M2
+     * @deprecated replaced by {@link org.xwiki.model.Model#getCurrentDocumentName()} since 2.2M1
      */
-    DocumentName getCurrentDocumentName();
+    @Deprecated
+    org.xwiki.bridge.DocumentName getCurrentDocumentName();
 
     /**
      * Check if a document exists or not in the wiki.
@@ -226,6 +252,7 @@ public interface DocumentAccessBridge
      * @throws Exception If the document cannot be accessed.
      * @deprecated use {@link #getAttachmentContent(AttachmentName)} instead
      */
+    @Deprecated
     byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception;
 
     /**
@@ -235,10 +262,22 @@ public interface DocumentAccessBridge
      * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
      *         not exist
      * @throws Exception If the document cannot be accessed.
-     * @since 2.0.1
+     * @since 2.2M1
      */
     InputStream getAttachmentContent(AttachmentName attachmentName) throws Exception;
-    
+
+    /**
+     * Returns the content of a document attachment.
+     *
+     * @param attachmentName the name of the attachment to access
+     * @return The content of the attachment, as an array of <code>byte</code>s, which is empty if the attachment does
+     *         not exist
+     * @throws Exception If the document cannot be accessed.
+     * @deprecated replaced by {@link #getAttachmentContent(AttachmentName)} since 2.2M1
+     */
+    @Deprecated
+    InputStream getAttachmentContent(org.xwiki.bridge.AttachmentName attachmentName) throws Exception;
+
     /**
      * Sets the content of a document attachment. If the document or the attachment does not exist, both will be created
      * newly.
@@ -270,9 +309,20 @@ public interface DocumentAccessBridge
      * @param documentName the document for which to retrieve all attachment names
      * @return the list of attachment names in the passed document
      * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
-     * @since 2.0.1
+     * @since 2.2M1
      */
-    List<AttachmentName> getAttachments(DocumentName documentName) throws Exception;
+    List<AttachmentName> getAttachmentNames(DocumentName documentName) throws Exception;
+
+    /**
+     * Retrieves all attachments in the passed document.
+     *
+     * @param documentName the document for which to retrieve all attachment names
+     * @return the list of attachment names in the passed document
+     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
+     * @deprecated replaced by {@link #getAttachmentNames(DocumentName)} since 2.2M1
+     */
+    @Deprecated
+    List<org.xwiki.bridge.AttachmentName> getAttachments(org.xwiki.bridge.DocumentName documentName) throws Exception;
 
     /**
      * Retrieves the relative URL (ie the path without the hostname and port) that can be used to access an attachment.
@@ -282,6 +332,7 @@ public interface DocumentAccessBridge
      * @return the attachment URL
      * @deprecated use {@link #getAttachmentURL(AttachmentName, boolean)} instead
      */
+    @Deprecated
     String getAttachmentURL(String documentName, String attachmentName);
 
     /**
@@ -291,21 +342,45 @@ public interface DocumentAccessBridge
      * @param attachmentName the attachment name for which to find the URL
      * @param isFullURL whether the returned URL will a relative URL or the full URL
      * @return the attachment URL
-     * @since 2.0RC1
+     * @since 2.2M1
      */
     String getAttachmentURL(AttachmentName attachmentName, boolean isFullURL);
+
+    /**
+     * Retrieves the URL (either relative ie the path without the hostname and port, or the full URL) that can be
+     * used to access an attachment.
+     *
+     * @param attachmentName the attachment name for which to find the URL
+     * @param isFullURL whether the returned URL will a relative URL or the full URL
+     * @return the attachment URL
+     * @deprecated replaced by {@link #getAttachmentURL(AttachmentName, boolean)} since 2.2M1
+     */
+    @Deprecated
+    String getAttachmentURL(org.xwiki.bridge.AttachmentName attachmentName, boolean isFullURL);
 
     /**
      * @param documentName the document for which to retrieve all attachment URLs
      * @param isFullURL whether the returned URL will a relative URL or the full URL
      * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full 
      *         URL) for all attachments in the passed document  
-     * @since 2.0RC1
      * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
-     * @deprecated use {@link #getAttachments(DocumentName)} instead 
+     * @deprecated use {@link #getAttachmentNames(DocumentName)} instead
+     * @since 2.2M1
      */
+    @Deprecated
     List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception;
-    
+
+    /**
+     * @param documentName the document for which to retrieve all attachment URLs
+     * @param isFullURL whether the returned URL will a relative URL or the full URL
+     * @return the list of attachment URLs (either relative ie the path without the hostname and port, or the full
+     *         URL) for all attachments in the passed document
+     * @throws Exception in case of a storage issue finding all attachments for the document matching the passed name
+     * @deprecated use {@link #getAttachmentNames(DocumentName)} instead
+     */
+    @Deprecated
+    List<String> getAttachmentURLs(org.xwiki.bridge.DocumentName documentName, boolean isFullURL) throws Exception;
+
     /**
      * @param documentName the name of the document to access.
      * @return true if current user can view provided document.

@@ -21,9 +21,9 @@ package org.xwiki.rendering.macro.script;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.xwiki.bridge.AttachmentNameFactory;
+import org.xwiki.model.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
 

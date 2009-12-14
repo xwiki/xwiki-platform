@@ -31,8 +31,10 @@ import org.xwiki.component.annotation.Requirement;
  * 
  * @version $Id$
  * @since 2.0.1
+ * @deprecated use {@link org.xwiki.model.internal.DefaultAttachmentNameSerializer} instead since 2.2M1
  */
 @Component
+@Deprecated
 public class DefaultAttachmentNameSerializer implements AttachmentNameSerializer
 {
     /**

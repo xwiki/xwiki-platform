@@ -23,7 +23,7 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 
@@ -58,7 +58,7 @@ public class XWikiLinkLabelGeneratorTest extends MockObjectTestCase
         this.mockModelBridge = mock(DocumentModelBridge.class);
 
         this.mockAccessBridge = mock(DocumentAccessBridge.class);
-        this.mockAccessBridge.stubs().method("getDocumentName").will(
+        this.mockAccessBridge.stubs().method("getModelDocumentName").will(
             returnValue(new DocumentName("xwiki", "Main", "HelloWorld")));
         this.generator.setDocumentAccessBridge((DocumentAccessBridge) mockAccessBridge.proxy());
     }
@@ -70,7 +70,8 @@ public class XWikiLinkLabelGeneratorTest extends MockObjectTestCase
 
         this.mockModelBridge.stubs().method("getTitle").will(returnValue("My title"));
         this.mockAccessBridge.stubs().method("getDocument").will(returnValue(this.mockModelBridge.proxy()));
-        assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World (My title)", this.generator.generate(link));
+        assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World (My title)",
+            this.generator.generate(link));
     }
 
     public void testGenerateWhenDocumentFailsToLoad()
@@ -96,7 +97,7 @@ public class XWikiLinkLabelGeneratorTest extends MockObjectTestCase
         this.mockModelBridge.stubs().method("getTitle").will(returnValue("$0"));
         this.mockAccessBridge.stubs().method("getDocument").will(returnValue(this.mockModelBridge.proxy()));
 
-        this.mockAccessBridge.stubs().method("getDocumentName").will(returnValue(new DocumentName("$0", "\\", "$0")));
+        this.mockAccessBridge.stubs().method("getModelDocumentName").will(returnValue(new DocumentName("$0", "\\", "$0")));
 
         assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new Link()));
     }

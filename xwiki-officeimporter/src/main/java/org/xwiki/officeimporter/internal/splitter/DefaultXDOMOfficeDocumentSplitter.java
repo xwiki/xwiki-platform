@@ -24,15 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
@@ -91,6 +90,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
     /**
      * {@inheritDoc}
+     * @since 2.2M1
      */
     public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, DocumentName baseDocumentName)
@@ -154,5 +154,18 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         } else {
             throw new OfficeImporterException("The specified naming criterion is not implemented yet.");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.DocumentName)} since 2.2.M1
+     */
+    @Deprecated
+    public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+        int[] headingLevelsToSplit, String namingCriterionHint, org.xwiki.bridge.DocumentName baseDocumentName)
+        throws OfficeImporterException
+    {
+        return split(xdomOfficeDocument, headingLevelsToSplit, namingCriterionHint, new DocumentName(
+            baseDocumentName.getWiki(), baseDocumentName.getSpace(), baseDocumentName.getPage()));
     }
 }

@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import org.xwiki.bridge.DocumentName;
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.DocumentName;
 
 /**
  * Component interface responsible for managing wiki macro instances.

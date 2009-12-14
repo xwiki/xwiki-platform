@@ -24,8 +24,8 @@ import java.security.Principal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiAuthService;

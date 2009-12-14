@@ -1,0 +1,3 @@
+org.xwiki.model.internal.DefaultAttachmentNameFactory
+org.xwiki.model.internal.DefaultAttachmentNameSerializer
+org.xwiki.model.internal.DefaultModel

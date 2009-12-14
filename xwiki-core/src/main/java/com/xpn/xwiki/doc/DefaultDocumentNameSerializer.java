@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 
 /**
@@ -37,6 +37,7 @@ public class DefaultDocumentNameSerializer implements DocumentNameSerializer
      * {@inheritDoc}
      * 
      * @see DocumentNameSerializer#serialize(DocumentName)
+     * @since 2.2M1
      */
     public String serialize(DocumentName documentName)
     {
@@ -51,18 +52,27 @@ public class DefaultDocumentNameSerializer implements DocumentNameSerializer
         return result.toString();
     }
 
+    /**
+     * @since 2.2M1
+     */
     protected void appendWikiName(StringBuffer result, DocumentName documentName)
     {
         result.append(documentName.getWiki());
         result.append(':');
     }
 
+    /**
+     * @since 2.2M1
+     */
     protected void appendSpaceName(StringBuffer result, DocumentName documentName)
     {
         result.append(documentName.getSpace());
         result.append('.');
     }
 
+    /**
+     * @since 2.2M1
+     */
     protected void appendPageName(StringBuffer result, DocumentName documentName)
     {
         result.append(documentName.getPage());

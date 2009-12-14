@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**

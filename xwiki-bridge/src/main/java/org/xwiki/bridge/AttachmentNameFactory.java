@@ -27,8 +27,10 @@ import org.xwiki.component.annotation.ComponentRole;
  *
  * @version $Id$
  * @since 2.0RC1
+ * @deprecated use {@link org.xwiki.model.AttachmentNameFactory} instead since 2.2M1
  */
 @ComponentRole
+@Deprecated
 public interface AttachmentNameFactory
 {
     /**

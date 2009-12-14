@@ -29,6 +29,7 @@ import org.junit.Test;
  * @version $Id$
  * @since 2.0RC1
  */
+@Deprecated
 public class AttachmentNameTest
 {
     @Test

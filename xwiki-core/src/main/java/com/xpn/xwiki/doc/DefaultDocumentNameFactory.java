@@ -20,8 +20,8 @@
 package com.xpn.xwiki.doc;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameFactory;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -72,6 +72,7 @@ public class DefaultDocumentNameFactory implements DocumentNameFactory
      * {@inheritDoc}
      * 
      * @see DocumentNameFactory#createDocumentName(String)
+     * @since 2.2M1
      */
     public DocumentName createDocumentName(String reference)
     {

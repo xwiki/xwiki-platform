@@ -28,6 +28,7 @@ import junit.framework.Assert;
  * 
  * @version $Id$
  */
+@Deprecated
 public class DocumentNameTest
 {
     @Test

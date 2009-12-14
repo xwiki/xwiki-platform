@@ -20,7 +20,7 @@
  */
 package org.xwiki.url;
 
-import org.xwiki.bridge.AttachmentName;
+import org.xwiki.model.AttachmentName;
 
 /**
  * 

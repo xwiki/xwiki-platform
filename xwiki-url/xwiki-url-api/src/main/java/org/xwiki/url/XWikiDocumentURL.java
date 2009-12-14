@@ -22,7 +22,7 @@ package org.xwiki.url;
 
 import java.util.Locale;
 
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 
 /**
  * 

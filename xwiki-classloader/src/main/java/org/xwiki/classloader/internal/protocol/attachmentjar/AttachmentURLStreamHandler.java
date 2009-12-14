@@ -26,8 +26,8 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLStreamHandler;
 
-import org.xwiki.bridge.AttachmentName;
-import org.xwiki.bridge.AttachmentNameFactory;
+import org.xwiki.model.AttachmentName;
+import org.xwiki.model.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.component.annotation.Component;

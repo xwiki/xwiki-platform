@@ -24,10 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.Model;
 import org.xwiki.rendering.block.TableBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -59,7 +60,13 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
      */
     @Requirement
     private DocumentNameSerializer nameSerializer;
-    
+
+    /**
+     * To get access to the current document name in the Execution Context.
+     */
+    @Requirement
+    private Model model;
+
     /**
      * {@inheritDoc}
      */
@@ -67,7 +74,7 @@ public class MacroContentTableBlockDataSource extends AbstractTableBlockDataSour
         throws MacroExecutionException
     {
         // Get the current document name.
-        String documentName = nameSerializer.serialize(docBridge.getCurrentDocumentName());
+        String documentName = nameSerializer.serialize(this.model.getCurrentDocumentName());
         
         // Parse the macro content into an XDOM.
         XDOM xdom;

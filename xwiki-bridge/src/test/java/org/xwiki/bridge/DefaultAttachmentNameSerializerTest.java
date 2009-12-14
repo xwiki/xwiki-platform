@@ -34,6 +34,7 @@ import org.xwiki.component.util.ReflectionUtils;
  * @version $Id$
  * @since 2.0.1
  */
+@Deprecated
 public class DefaultAttachmentNameSerializerTest
 {
     private Mockery context;

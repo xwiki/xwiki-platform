@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.renderer;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.bridge.DocumentName;
+import org.xwiki.model.DocumentName;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
@@ -50,7 +50,7 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
         String result;
 
         String format = this.configuration.getLinkLabelFormat();
-        DocumentName documentName = this.bridge.getDocumentName(link.getReference());
+        DocumentName documentName = this.bridge.getModelDocumentName(link.getReference());
         
         // Replace %w with the wiki name
         result = format.replace("%w", documentName.getWiki()); 

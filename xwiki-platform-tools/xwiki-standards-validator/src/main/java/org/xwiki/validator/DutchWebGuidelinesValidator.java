@@ -46,19 +46,19 @@ import org.xwiki.validator.framework.NodeListIterable;
 public class DutchWebGuidelinesValidator extends AbstractDOMValidator
 {
     /**
-     * Message resources.
-     */
-    private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
-
-    /**
      * Utility selector.
      */
-    private String contentTypeMetaSelector = "//meta[@http-equiv='Content-Type']";
+    private static final String CONTENT_TYPE_META_SELECTOR = "//meta[@http-equiv='Content-Type']";
     
     /**
      * String used to identify the charset in the content-type meta.
      */
-    private String contentCharsetFragment = "charset=";
+    private static final String CONTENT_CHARSET_FRAGMENT = "charset=";
+    
+    /**
+     * Message resources.
+     */
+    private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
 
     /**
      * Constructor.
@@ -1463,13 +1463,13 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s1()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(document, contentTypeMetaSelector, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s1.nometa", metas.getNodeList().getLength() > 0);
 
         for (Node meta : metas) {
             assertTrue(Type.ERROR, "rpd16s1.charset", StringUtils.containsIgnoreCase(getAttributeValue(meta,
-                ATTR_CONTENT), contentCharsetFragment));
+                ATTR_CONTENT), CONTENT_CHARSET_FRAGMENT));
         }
     }
 
@@ -1479,7 +1479,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd16s2()
     {
         NodeListIterable metas =
-            new NodeListIterable((NodeList) evaluate(document, contentTypeMetaSelector, XPathConstants.NODESET));
+            new NodeListIterable((NodeList) evaluate(document, CONTENT_TYPE_META_SELECTOR, XPathConstants.NODESET));
 
         assertTrue(Type.ERROR, "rpd16s2.nometa", metas.getNodeList().getLength() > 0);
 
@@ -1487,7 +1487,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             String content = getAttributeValue(meta, ATTR_CONTENT);
             assertTrue(Type.ERROR, "rpd16s2.notutf8", StringUtils.containsIgnoreCase(content, "charset=utf-8"));
             assertTrue(Type.ERROR, "rpd16s2.differs", 
-                StringUtils.containsIgnoreCase(content, contentCharsetFragment + document.getXmlEncoding()));
+                StringUtils.containsIgnoreCase(content, CONTENT_CHARSET_FRAGMENT + document.getXmlEncoding()));
         }
     }
 
@@ -1508,7 +1508,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
         Node meta = getElement(ELEM_META);
 
         assertTrue(Type.ERROR, "rpd16s4.position", hasAttribute(meta, ATTR_CONTENT) 
-            && StringUtils.containsIgnoreCase(getAttributeValue(meta, ATTR_CONTENT), contentCharsetFragment));
+            && StringUtils.containsIgnoreCase(getAttributeValue(meta, ATTR_CONTENT), CONTENT_CHARSET_FRAGMENT));
     }
 
     /**

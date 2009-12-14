@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -49,46 +50,66 @@ import org.xwiki.validator.ValidationError.Type;
 public abstract class AbstractDOMValidator implements Validator
 {
     // XPATH
-    
+
     /**
      * Catch All XPATH expression.
      */
     protected static final String XPATH_CATCHALL = "//";
-    
+
     // Commons.
 
     /**
      * Submit.
      */
     protected static final String SUBMIT = "submit";
-    
+
     /**
      * Image.
      */
     protected static final String IMAGE = "image";
-    
+
+    /**
+     * Reset.
+     */
+    protected static final String RESET = "reset";
+
+    /**
+     * Button.
+     */
+    protected static final String BUTTON = "button";
+
     /**
      * mailto.
      */
     protected static final String MAILTO = "mailto:";
 
     // Elements.
-    
+
+    /**
+     * HTML element.
+     */
+    protected static final String ELEM_HTML = "html";
+
+    /**
+     * Body element.
+     */
+    protected static final String ELEM_BODY = "body";
+
     /**
      * Heading 1 element.
      */
     protected static final String ELEM_H1 = "h1";
-    
+
     /**
      * Line break element.
      */
     protected static final String ELEM_BR = "br";
-    
+
     /**
      * Bold element.
      */
     protected static final String ELEM_BOLD = "b";
-    
+
     /**
      * Italics element.
      */
@@ -108,7 +129,7 @@ public abstract class AbstractDOMValidator implements Validator
      * Frame element.
      */
     protected static final String ELEM_FRAME = "frame";
-    
+
     /**
      * Iframe element.
      */
@@ -118,31 +139,46 @@ public abstract class AbstractDOMValidator implements Validator
      * Link element.
      */
     protected static final String ELEM_LINK = "a";
-    
+
     /**
      * Input element.
      */
     protected static final String ELEM_INPUT = "input";
-    
+
     /**
      * Image element.
      */
     protected static final String ELEM_IMG = "img";
-    
+
     /**
      * Area element.
      */
     protected static final String ELEM_AREA = "area";
-    
+
     /**
      * Table element.
      */
     protected static final String ELEM_TABLE = "table";
-    
+
     /**
      * Table Header element.
      */
-    protected static final String ELEM_TH = "th";    
+    protected static final String ELEM_TH = "th";
+
+    /**
+     * Form element.
+     */
+    protected static final String ELEM_FORM = "form";
+
+    /**
+     * Fieldset element.
+     */
+    protected static final String ELEM_FIELDSET = "fieldset";
+    
+    /**
+     * Fieldset element.
+     */
+    protected static final String ELEM_META = "meta";
 
     // Attributes.
 
@@ -150,12 +186,12 @@ public abstract class AbstractDOMValidator implements Validator
      * Type attribute.
      */
     protected static final String ATTR_TYPE = "type";
-    
+
     /**
      * Type attribute.
      */
     protected static final String ATTR_ALT = "alt";
-    
+
     /**
      * Href attribute.
      */
@@ -199,22 +235,37 @@ public abstract class AbstractDOMValidator implements Validator
     /**
      * Submmit attribute.
      */
-    protected static final String ATTR_SUBMIT = SUBMIT;
+    protected static final String ATTR_SUBMIT = "onsubmit";
 
     /**
      * Unload attribute.
      */
     protected static final String ATTR_UNLOAD = "unload";
-    
+
     /**
      * Accesskey attribute.
      */
     protected static final String ATTR_ACCESSKEY = "accesskey";
-    
+
     /**
      * Scope attribute.
      */
     protected static final String ATTR_SCOPE = "scope";
+
+    /**
+     * ID attribute.
+     */
+    protected static final String ATTR_ID = "id";
+    
+    /**
+     * Content attribute.
+     */
+    protected static final String ATTR_CONTENT = "content";
+    
+    /**
+     * Charset attribute.
+     */
+    protected static final String ATTR_CHARSET = "charset";
 
     /**
      * XPath instance.
@@ -225,7 +276,7 @@ public abstract class AbstractDOMValidator implements Validator
      * Document to be validated.
      */
     protected Document document;
-    
+
     /**
      * XML document builder.
      */
@@ -238,21 +289,19 @@ public abstract class AbstractDOMValidator implements Validator
 
     /**
      * Constructor.
-     *  
      */
     public AbstractDOMValidator()
     {
         try {
             DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilder = docBuilderFactory.newDocumentBuilder();
-            documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());            
+            documentBuilder.setEntityResolver(new XMLResourcesEntityResolver());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
+
     /**
-     * 
      * {@inheritDoc}
      * 
      * @see org.xwiki.validator.Validator#setDocument(java.io.InputStream)
@@ -351,6 +400,26 @@ public abstract class AbstractDOMValidator implements Validator
     }
 
     /**
+     * Evaluate a XPATH string against a node.
+     * 
+     * @param node node to evaluate
+     * @param exprString evaluation expression
+     * @param returnType type of the results to return
+     * @return the result of the xpath evaluation
+     */
+    public Object evaluate(Node node, String exprString, QName returnType)
+    {
+        try {
+            XPathExpression expr = xpath.compile(exprString);
+            return expr.evaluate(document, returnType);
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Get all the elements matching one of the given tags.
      * 
      * @param tagNames tag names to match
@@ -359,15 +428,7 @@ public abstract class AbstractDOMValidator implements Validator
     public NodeListIterable getElements(Collection<String> tagNames)
     {
         String exprString = StringUtils.join(tagNames, "|" + XPATH_CATCHALL);
-
-        try {
-            XPathExpression expr = xpath.compile(exprString);
-            return new NodeListIterable((NodeList) expr.evaluate(document, XPathConstants.NODESET));
-        } catch (XPathExpressionException e) {
-            // This cannot
-        }
-
-        return null;
+        return new NodeListIterable((NodeList) evaluate(document, exprString, XPathConstants.NODESET));
     }
 
     /**
@@ -380,15 +441,10 @@ public abstract class AbstractDOMValidator implements Validator
     public boolean hasChildElement(Node element, String tagName)
     {
         String exprString = XPATH_CATCHALL + tagName;
-        
-        try {
-            XPathExpression expr = xpath.compile(exprString);
-            return (Boolean) expr.evaluate(element, XPathConstants.BOOLEAN);
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException(e);
-        }
+        return (Boolean) evaluate(element, exprString, XPathConstants.BOOLEAN);
+
     }
-    
+
     /**
      * Get children of a given type.
      * 
@@ -399,14 +455,8 @@ public abstract class AbstractDOMValidator implements Validator
     public NodeListIterable getChildren(Node element, String tagName)
     {
         String exprString = XPATH_CATCHALL + tagName;
-        
-        try {
-            XPathExpression expr = xpath.compile(exprString);
-            NodeList nodeList = (NodeList) expr.evaluate(element, XPathConstants.NODESET);
-            return new NodeListIterable(nodeList);
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException(e);
-        }
+        NodeList nodeList = (NodeList) evaluate(element, exprString, XPathConstants.NODESET);
+        return new NodeListIterable(nodeList);
     }
 
     /**
@@ -419,15 +469,11 @@ public abstract class AbstractDOMValidator implements Validator
     {
         List<String> childrenTagNames = new ArrayList<String>();
         String exprString = XPATH_CATCHALL + "*";
-        
-        try {
-            XPathExpression expr = xpath.compile(exprString);
-            NodeListIterable children = new NodeListIterable((NodeList) expr.evaluate(element, XPathConstants.NODESET));
-            for (Node child : children) {
-                childrenTagNames.add(child.getNodeName());
-            }
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException(e);
+
+        NodeListIterable children = new NodeListIterable((NodeList) evaluate(element, exprString, 
+            XPathConstants.NODESET));
+        for (Node child : children) {
+            childrenTagNames.add(child.getNodeName());
         }
 
         return childrenTagNames;
@@ -518,12 +564,13 @@ public abstract class AbstractDOMValidator implements Validator
 
         return results;
     }
-    
+
     /**
-     * @return The body element in the XHTML document.
+     * @param tagName name of the tag to match
+     * @return The first element found for the given tag name in the XHTML document.
      */
-    public Node getBodyElement()
+    public Node getElement(String tagName)
     {
-        return getElements("body").getNodeList().item(0);
+        return getElements(tagName).getNodeList().item(0);
     }
 }

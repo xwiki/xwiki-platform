@@ -24,12 +24,11 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xwiki.validator.ValidationError.Type;
 import org.xwiki.validator.framework.AbstractDOMValidator;
 import org.xwiki.validator.framework.NodeListIterable;
@@ -50,6 +49,16 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      * Message resources.
      */
     private ResourceBundle messages = ResourceBundle.getBundle("DutchWebGuidelines");
+
+    /**
+     * Utility selector.
+     */
+    private String contentTypeMetaSelector = "//meta[@http-equiv='Content-Type']";
+    
+    /**
+     * String used to identify the charset in the content-type meta.
+     */
+    private String contentCharsetFragment = "charset=";
 
     /**
      * Constructor.
@@ -657,7 +666,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     public void validateRpd6s1()
     {
         assertTrue(Type.ERROR, "rpd6s1.doctype", StringUtils.containsIgnoreCase(document.getDoctype().getPublicId(),
-            "html"));
+            ELEM_HTML));
     }
 
     /**
@@ -1009,14 +1018,11 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd9s1()
     {
-        try {
-            XPathExpression expr = xpath.compile("//@style");
-            assertFalse(Type.ERROR, "rpd9s1.attr", ((Boolean) expr.evaluate(getBodyElement(), XPathConstants.BOOLEAN)));
-        } catch (XPathExpressionException e) {
-            // this cannot happen.
-        }
-
-        assertFalse(Type.ERROR, "rpd9s1.tag", getChildren(getBodyElement(), "style").getNodeList().getLength() > 0);
+        String exprString = "//@style";
+        assertFalse(Type.ERROR, "rpd9s1.attr", ((Boolean) evaluate(getElement(ELEM_BODY), exprString,
+            XPathConstants.BOOLEAN)));
+        assertFalse(Type.ERROR, "rpd9s1.tag", 
+            getChildren(getElement(ELEM_BODY), "style").getNodeList().getLength() > 0);
     }
 
     /**
@@ -1077,24 +1083,20 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         // This guideline cannot be automatically tested.
     }
-    
+
     /**
      * @param table Table to analyze
-     * @return true if the table contains th with ids and td 
+     * @return true if the table contains th with ids and td
      */
     private boolean hasTableHeadersAndIds(Node table)
     {
         boolean hasHeadersAndIds = false;
 
-        try {
-            XPathExpression expr = xpath.compile("//td[@headers]");
-            hasHeadersAndIds = (Boolean) expr.evaluate(table, XPathConstants.BOOLEAN);
-            xpath.compile("//th[@id]");
-            hasHeadersAndIds = hasHeadersAndIds && (Boolean) expr.evaluate(table, XPathConstants.BOOLEAN);
-        } catch (XPathExpressionException e) {
-            // this cannot happen.
-        }
-        
+        String exprString = "//td[@headers]";
+        hasHeadersAndIds = (Boolean) evaluate(table, exprString, XPathConstants.BOOLEAN);
+        exprString = "//th[@id]";
+        hasHeadersAndIds = hasHeadersAndIds && (Boolean) evaluate(table, exprString, XPathConstants.BOOLEAN);
+
         return hasHeadersAndIds;
     }
 
@@ -1105,7 +1107,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         for (Node table : getElements(ELEM_TABLE)) {
             boolean hasHeadersAndIds = hasTableHeadersAndIds(table);
-            
+
             if (!hasHeadersAndIds) {
                 for (Node th : getChildren(table, ELEM_TH)) {
                     assertTrue(Type.ERROR, "rpd11s4.scope", hasAttribute(th, ATTR_SCOPE));
@@ -1193,7 +1195,25 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd13s1()
     {
-        // TODO
+        String message = "rpd13s1.label";
+        // type = text|password|checkbox|radio|submit|reset|file|hidden|image|button
+        List<String> inputWithoutLabels = Arrays.asList(SUBMIT, RESET, IMAGE, BUTTON);
+
+        for (Node input : getElements(ELEM_INPUT)) {
+            // Some inputs doesn't need a label.
+            if (!inputWithoutLabels.contains(getAttributeValue(input, ATTR_TYPE))) {
+
+                // Labelled inputs must have an ID.
+                String id = getAttributeValue(input, ATTR_ID);
+                assertFalse(Type.ERROR, message, id == null);
+
+                if (id != null) {
+                    // Looking for the label associated to the input.
+                    String exprString = "//label[@for='" + id + "']";
+                    assertTrue(Type.ERROR, message, (Boolean) evaluate(document, exprString, XPathConstants.BOOLEAN));
+                }
+            }
+        }
     }
 
     /**
@@ -1210,7 +1230,12 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd13s3()
     {
-        // TODO
+        // Display a warning if a form without fieldset is present.
+        for (Node form : getElements(ELEM_FORM)) {
+            if (!getChildrenTagNames(form).contains(ELEM_FIELDSET)) {
+                addError(Type.WARNING, -1, -1, "rpd13s3.fieldset");
+            }
+        }
     }
 
     /**
@@ -1218,7 +1243,23 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd13s4()
     {
-        // TODO
+        for (Node form : getElements(ELEM_FORM)) {
+            boolean hasSubmit = false;
+            boolean hasDynamicSelect = false;
+
+            String exprString = "//input[@type='submit']";
+            hasSubmit = (Boolean) evaluate(form, exprString, XPathConstants.BOOLEAN);
+            exprString = "//input[@type='image']";
+            hasSubmit = hasSubmit || (Boolean) evaluate(document, exprString, XPathConstants.BOOLEAN);
+            assertTrue(Type.ERROR, "rpd13s4.submit", hasSubmit);
+
+            exprString = "//select[@onchange]";
+            hasDynamicSelect = (Boolean) evaluate(form, exprString, XPathConstants.BOOLEAN);
+
+            if (hasDynamicSelect) {
+                addError(Type.WARNING, -1, -1, "rpd13s4.select");
+            }
+        }
     }
 
     /**
@@ -1226,7 +1267,17 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd13s5()
     {
-        // TODO
+        for (Node form : getElements(ELEM_FORM)) {
+            // Display a warning if the form has a "onsubmit" event handler.
+            if (hasAttribute(form, ATTR_SUBMIT)) {
+                addError(Type.WARNING, -1, -1, "rpd13s5.onsubmit");
+            }
+
+            // Display a warning if the form has a "onchange" event handler.
+            if (hasAttribute(form, ATTR_CHANGE)) {
+                addError(Type.WARNING, -1, -1, "rpd13s5.onchange");
+            }
+        }
     }
 
     /**
@@ -1334,7 +1385,8 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd13s18()
     {
-        // TODO
+        String exprString = "//input[@type='reset']";
+        assertFalse(Type.ERROR, "rpd13s18.reset", (Boolean) evaluate(document, exprString, XPathConstants.BOOLEAN));
     }
 
     /**
@@ -1391,7 +1443,10 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd15s6()
     {
-        // TODO
+        Node html = getElement(ELEM_HTML);
+
+        // Check for lang attribute in th html node.
+        assertTrue(Type.ERROR, "rpd15s6.lang", html != null && hasAttribute(html, "lang"));
     }
 
     /**
@@ -1407,7 +1462,15 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd16s1()
     {
-        // TODO
+        NodeListIterable metas =
+            new NodeListIterable((NodeList) evaluate(document, contentTypeMetaSelector, XPathConstants.NODESET));
+
+        assertTrue(Type.ERROR, "rpd16s1.nometa", metas.getNodeList().getLength() > 0);
+
+        for (Node meta : metas) {
+            assertTrue(Type.ERROR, "rpd16s1.charset", StringUtils.containsIgnoreCase(getAttributeValue(meta,
+                ATTR_CONTENT), contentCharsetFragment));
+        }
     }
 
     /**
@@ -1415,7 +1478,17 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd16s2()
     {
-        // TODO
+        NodeListIterable metas =
+            new NodeListIterable((NodeList) evaluate(document, contentTypeMetaSelector, XPathConstants.NODESET));
+
+        assertTrue(Type.ERROR, "rpd16s2.nometa", metas.getNodeList().getLength() > 0);
+
+        for (Node meta : metas) {
+            String content = getAttributeValue(meta, ATTR_CONTENT);
+            assertTrue(Type.ERROR, "rpd16s2.notutf8", StringUtils.containsIgnoreCase(content, "charset=utf-8"));
+            assertTrue(Type.ERROR, "rpd16s2.differs", 
+                StringUtils.containsIgnoreCase(content, contentCharsetFragment + document.getXmlEncoding()));
+        }
     }
 
     /**
@@ -1432,7 +1505,10 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
      */
     public void validateRpd16s4()
     {
-        // TODO
+        Node meta = getElement(ELEM_META);
+
+        assertTrue(Type.ERROR, "rpd16s4.position", hasAttribute(meta, ATTR_CONTENT) 
+            && StringUtils.containsIgnoreCase(getAttributeValue(meta, ATTR_CONTENT), contentCharsetFragment));
     }
 
     /**

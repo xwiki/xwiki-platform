@@ -21,12 +21,12 @@ package org.xwiki.gwt.dom.client.internal.ie;
 
 import java.util.Iterator;
 
+import org.xwiki.gwt.dom.client.AbstractDOMTest;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.RangeCompare;
-import org.xwiki.gwt.dom.client.SelectionTest;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Node;
@@ -42,7 +42,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class IERangeTest extends SelectionTest
+public class IERangeTest extends AbstractDOMTest
 {
     /**
      * A range factory to be used in tests. It allows us to use deferred binding and load a IE specific implementation
@@ -536,5 +536,73 @@ public class IERangeTest extends SelectionTest
         assertEquals(startContainer, range.getStartContainer());
         assertEquals(2, startContainer.getChildNodes().getLength());
         assertEquals(0, range.getStartOffset());
+    }
+
+    /**
+     * Checks if the caret is correctly detected inside a duplicated text.
+     */
+    public void testDetectCaretInsideDuplicatedText()
+    {
+        Range range = getRange("aaa<em>aaa</em>aa|a");
+        assertTrue(range.isCollapsed());
+        assertEquals(2, range.getStartOffset());
+        assertEquals(getContainer().getLastChild(), range.getStartContainer());
+    }
+
+    /**
+     * Checks if the caret is correctly detected inside relative positioned elements.
+     */
+    public void testDetectCaretInsideRelativePositionedElements()
+    {
+        Range range =
+            getRange("<h1><span>Title 1</span></h1>"
+                + "<h2 style=\"position:relative;\"><span>Title 2<br/>|foo</span></h2>");
+        assertTrue(range.isCollapsed());
+        assertEquals(0, range.getStartOffset());
+        assertEquals(getContainer().getLastChild().getFirstChild().getLastChild(), range.getStartContainer());
+    }
+
+    /**
+     * Checks if the caret is correctly detected inside text with non-breaking spaces, {@code &nbsp;}.
+     */
+    public void testDetectCaretInsideTextWithNonBreakingSpaces()
+    {
+        Range range = getRange("one<em>two</em> th&nbsp;&nbsp;|&nbsp;ree");
+        assertTrue(range.isCollapsed());
+        assertEquals(5, range.getStartOffset());
+        assertEquals(getContainer().getLastChild(), range.getStartContainer());
+    }
+
+    /**
+     * Checks if the caret is correctly detected after a hidden element.
+     */
+    public void testDetectCaretAfterHiddenElement()
+    {
+        Range range = getRange("one<!--x--><strong style=\"display:none;\">two</strong><em></em>thr|ee");
+        assertTrue(range.isCollapsed());
+        assertEquals(3, range.getStartOffset());
+        assertEquals(getContainer().getLastChild(), range.getStartContainer());
+    }
+
+    /**
+     * Checks if the caret is correctly detected after a horizontal ruler.
+     */
+    public void testDetectCaretAfterHorizontalRuler()
+    {
+        Range range = getRange("<p>before</p><hr/>|<p>after</p>");
+        assertTrue(range.isCollapsed());
+        assertEquals(2, range.getStartOffset());
+        assertEquals(getContainer(), range.getStartContainer());
+    }
+
+    /**
+     * Checks if the caret is correctly detected before an image, when that image is preceded by invisible nodes.
+     */
+    public void testDetectCaretBeforeImageWithGarbage()
+    {
+        Range range = getRange("before<!--x--><em></em><strong style=\"display:none\">y</strong>|<img/>after");
+        assertTrue(range.isCollapsed());
+        assertEquals(4, range.getStartOffset());
+        assertEquals(getContainer(), range.getStartContainer());
     }
 }

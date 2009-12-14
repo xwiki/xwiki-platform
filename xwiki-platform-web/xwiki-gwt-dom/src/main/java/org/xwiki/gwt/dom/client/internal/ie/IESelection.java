@@ -82,11 +82,6 @@ public class IESelection extends AbstractSelection
     }
 
     /**
-     * The list of elements supporting control selection.
-     */
-    private static final String[] SELECTABLE_ELEMENTS = new String[] {"img", "button"};
-
-    /**
      * The underlying native selection object provided by the browser.
      */
     private final NativeSelection nativeSelection;
@@ -155,32 +150,21 @@ public class IESelection extends AbstractSelection
         if (range.getStartContainer() == range.getEndContainer()
             && range.getStartContainer().getNodeType() == Node.ELEMENT_NODE
             && range.getStartOffset() == range.getEndOffset() - 1) {
+            // The given range wraps a DOM node.
             Node selectedNode = range.getStartContainer().getChildNodes().getItem(range.getStartOffset());
-            // Test if the selected node supports control selection.
-            if (supportsControlSelection(selectedNode)) {
+            // Try to make a control selection.
+            try {
                 ControlRange controlRange = ControlRange.newInstance(nativeSelection.getOwnerDocument());
                 controlRange.add((Element) selectedNode);
                 controlRange.select();
                 return;
+            } catch (Exception e) {
+                // The selected node doesn't support control selection.
             }
         }
 
         // Otherwise use text selection.
         addTextRange(adjustRangeAndDOM(range));
-    }
-
-    /**
-     * @param node a DOM node
-     * @return {@code true} if the given node supports control selection, {@code false} otherwise
-     */
-    private boolean supportsControlSelection(Node node)
-    {
-        for (int i = 0; i < SELECTABLE_ELEMENTS.length; i++) {
-            if (SELECTABLE_ELEMENTS[i].equalsIgnoreCase(node.getNodeName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -362,151 +346,71 @@ public class IESelection extends AbstractSelection
         TextRange refRange = textRange.duplicate();
         refRange.collapse(start);
         Node container = refRange.getParentElement();
-        // The specified range boundary is either between child nodes or inside a text node.
 
-        // We use a text range to find the text node that could possibly contain the range boundary.
+        // We use another text range to find the boundary position within its element container.
         TextRange searchRange = TextRange.newInstance(textRange.getOwnerDocument());
-        searchRange.moveToElementText((Element) container);
-
-        // The claws used to catch the specified range boundary.
-        RangeCompare compareStart = RangeCompare.valueOf(true, start);
-        RangeCompare compareEnd = RangeCompare.valueOf(false, start);
+        // Initially the boundary can be anywhere inside its element container.
+        searchRange.moveToElementText(Element.as(container));
+        // The object used to compare the start point of the search range with the searched boundary.
+        RangeCompare compareStart = RangeCompare.valueOf(start, true);
 
         // Iterate through all child nodes in search for the range boundary.
         Node child = container.getFirstChild();
         int offset = 0;
         while (child != null) {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
-                // Move the reference range before this child element.
-                moveTextRangeBeforeElement(refRange, (Element) child);
-                // Let's see if the boundary is before this child element.
-                if (textRange.compareEndPoints(compareStart, refRange) <= 0) {
+                refRange.moveToElementText(Element.as(child));
+                // Reduce the search range by moving its start point after the current element.
+                searchRange.setEndPoint(RangeCompare.END_TO_START, refRange);
+                if (searchRange.compareEndPoints(compareStart, textRange) > 0) {
                     break;
                 }
             } else if (child.getNodeType() == Node.TEXT_NODE && child.getNodeValue().length() > 0) {
-                // Select this text node.
-                refRange = searchRange.duplicate();
-                // We have to convert nbsp's to plain spaces because TextRange#getText seems to do so.
-                if (!refRange.findText(child.getNodeValue().replace('\u00A0', '\u0020'), 0, 4)) {
-                    // We shouldn't get here!
-                    throw new RuntimeException("Unexpected behavior of TextRange#findText");
-                }
-                // See if the range boundary is inside this text node.
-                if (textRange.compareEndPoints(compareEnd, refRange) <= 0) {
-                    if (textRange.compareEndPoints(compareStart, refRange) >= 0) {
-                        container = child;
-                        // Now we have to compute the offset within this text node.
-                        offset = getOffset(refRange, textRange, start);
-                    }
-                    // We either found the boundary or passed beyond it.
+                // Reduce the search range by moving its start point after the current text node.
+                searchRange.moveStart(Unit.CHARACTER, child.getNodeValue().length());
+                if (searchRange.compareEndPoints(compareStart, textRange) >= 0) {
+                    container = child;
+                    // Now we have to compute the offset within this text node.
+                    refRange = textRange.duplicate();
+                    refRange.collapse(start);
+                    searchRange.collapse(true);
+                    searchRange.moveStart(Unit.CHARACTER, -child.getNodeValue().length());
+                    offset = getOffset(refRange, searchRange);
                     break;
                 }
-                // Update the search range.
-                searchRange.setEndPoint(RangeCompare.END_TO_START, refRange);
             }
             child = child.getNextSibling();
             offset++;
         }
+
         return new RangeBoundary(container, offset);
     }
 
     /**
-     * Moves the given text range before the specified element.
+     * Binary search the position of the given caret inside the specified text.
      * 
-     * @param textRange the text range to be moved
-     * @param element the element before which the text range is moved
+     * @param caret a text range collapsed inside a text node
+     * @param text a text range selecting a text node
+     * @return the offset of the given caret inside the text selected by the second range
      */
-    protected void moveTextRangeBeforeElement(TextRange textRange, Element element)
+    private int getOffset(TextRange caret, TextRange text)
     {
-        textRange.moveToElementText(element);
-        if (isRendered(element)) {
-            // Sometimes moveToElementText has unexpected results. Let's test if textRange starts before element and if
-            // not then try something different.
-            int left = getLeft(element);
-            int top = getTop(element);
-            if (textRange.getOffsetLeft() != left || top < textRange.getOffsetTop()
-                || top > (textRange.getOffsetTop() + getFirstLineHeight(textRange))) {
-                // This can fail moving textRange before element too (that's why we tried moveToElementText first).
-                textRange.moveToPoint(left, top);
-                // Don't bet on the result!
+        int start = 0;
+        int end = text.getText().length();
+        TextRange finder = TextRange.newInstance(caret.getOwnerDocument());
+        while (start < end) {
+            int middle = (start + end) / 2;
+            finder.setEndPoint(RangeCompare.START_TO_START, text);
+            finder.move(Unit.CHARACTER, middle);
+            int delta = caret.compareEndPoints(RangeCompare.START_TO_START, finder);
+            if (delta == 0) {
+                return middle;
+            } else if (delta < 0) {
+                end = middle;
+            } else {
+                start = middle + 1;
             }
         }
-    }
-
-    /**
-     * NOTE: For a {@code strong} element that starts in the middle of a line and spans multiple lines this method
-     * returns the distance in pixels from its first character (provided it starts with text) to the left boundary of
-     * the parent window. This is important since the bounding rectangle of the {@code strong} element can have the
-     * width of the parent window so the distance from the left side of this bounding rectangle to the left boundary of
-     * the parent window could be 0.
-     * 
-     * @param element a DOM element
-     * @return the distance, in pixels, from the given element's start point to the left boundary of the parent window
-     */
-    protected native int getLeft(Element element)
-    /*-{
-        var left = -element.ownerDocument.documentElement.scrollLeft;
-        while (element) {
-            left += element.offsetLeft + element.clientLeft - element.scrollLeft;
-            element = element.offsetParent;
-        }
-        return left;
-    }-*/;
-
-    /**
-     * @param element a DOM element
-     * @return the distance, in pixels, from the given element's start point to the top boundary of the parent window
-     */
-    protected native int getTop(Element element)
-    /*-{
-        var top = -element.ownerDocument.documentElement.scrollTop;
-        while (element) {
-            top += element.offsetTop + element.clientTop - element.scrollTop;
-            element = element.offsetParent;
-        }
-        return top;
-    }-*/;
-
-    /**
-     * The elements with {@code display:none} and all of their descendants are not rendered by the browser. Also, the
-     * elements that are not attached to the document are not rendered.
-     * 
-     * @param element a DOM element
-     * @return {@code true} if the given element is rendered by the browser, {@code false} otherwise
-     */
-    protected native boolean isRendered(Element element)
-    /*-{
-        return element.getClientRects().length > 0;
-    }-*/;
-
-    /**
-     * @param textRange a text range
-     * @return the height, in pixels, of the first line selected by the given text range
-     */
-    protected native int getFirstLineHeight(TextRange textRange)
-    /*-{
-        var firstLineRect = textRange.getClientRects()[0];
-        return firstLineRect.bottom - firstLineRect.top;
-    }-*/;
-
-    /**
-     * Computes the number of characters between the start of the left range to the specified boundary of the right
-     * range. The given ranges need to overlap and the start of the left range has to be before or equal to the
-     * specified boundary of the right range.
-     * 
-     * @param left the left text range
-     * @param right the rich text range
-     * @param rightBoundary specifies which boundary of the right text range to consider. Use {@code true} for start
-     *            boundary and {@code false} for end boundary.
-     * @return the offset of the right range from the start of the left range
-     */
-    protected int getOffset(TextRange left, TextRange right, boolean rightBoundary)
-    {
-        int offset = 0;
-        RangeCompare whichEndPoints = RangeCompare.valueOf(rightBoundary, true);
-        while (left.compareEndPoints(whichEndPoints, right) < 0 && left.moveStart(Unit.CHARACTER, 1) > 0) {
-            offset++;
-        }
-        return offset;
+        return start;
     }
 }

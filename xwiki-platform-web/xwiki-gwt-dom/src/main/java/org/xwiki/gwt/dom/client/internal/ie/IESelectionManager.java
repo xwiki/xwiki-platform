@@ -19,6 +19,9 @@
  */
 package org.xwiki.gwt.dom.client.internal.ie;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.dom.client.SelectionManager;
@@ -31,12 +34,48 @@ import org.xwiki.gwt.dom.client.SelectionManager;
 public final class IESelectionManager implements SelectionManager
 {
     /**
+     * The selection cache.
+     */
+    private final Map<Document, Selection> cache = new HashMap<Document, Selection>();
+
+    /**
      * {@inheritDoc}
      * 
      * @see SelectionManager#getSelection(Document)
      */
-    public Selection getSelection(Document doc)
+    public Selection getSelection(Document document)
     {
-        return new IESelection(NativeSelection.getInstance(doc));
+        Selection selection = cache.get(document);
+        if (selection == null) {
+            selection = new IESelectionCacheProxy(NativeSelection.getInstance(document));
+            cache.put(document, selection);
+            invalidateCacheOnUnload(document);
+        }
+        return selection;
+    }
+
+    /**
+     * Deletes from the cache the selection object associated with the given document before its window unloads.
+     * 
+     * @param document a DOM document that has its selection object cached
+     */
+    private native void invalidateCacheOnUnload(Document document)
+    /*-{
+        var self = this;
+        document.parentWindow.attachEvent('onunload', function() {
+            document.parentWindow.detachEvent('onunload', arguments.callee);
+            self.@org.xwiki.gwt.dom.client.internal.ie.IESelectionManager::invalidateCache(Lorg/xwiki/gwt/dom/client/Document;)(document);
+        });
+    }-*/;
+
+    /**
+     * Deletes from the cache the selection object associated with the given document.
+     * 
+     * @param document a DOM document that has its selection object cached
+     */
+    @SuppressWarnings("unused")
+    private void invalidateCache(Document document)
+    {
+        ((IESelectionCacheProxy) cache.remove(document)).release();
     }
 }

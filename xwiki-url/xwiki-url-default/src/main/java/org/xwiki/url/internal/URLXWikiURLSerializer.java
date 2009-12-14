@@ -41,7 +41,7 @@ public class URLXWikiURLSerializer implements XWikiURLSerializer<URL>
      * @param xwikiURL the XWiki URL to transform
      * @return the standard URL instance 
      */
-    public <T> T serialize(XWikiURL xwikiURL)
+    public URL serialize(XWikiURL xwikiURL)
     {
         throw new RuntimeException("Not implemented yet");
     }

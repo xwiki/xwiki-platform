@@ -100,7 +100,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
             ResourceName r = new ResourceName(getData().getReference(), true);
             return r.getFile();
         } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
-            return getSelectedItem().getData().getFilename();
+            return getSelectedItem().getData().getFileName();
         }
         return null;
     }
@@ -111,7 +111,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     @Override
     protected boolean matchesSelection(Attachment item, String selection)
     {
-        return selection != null && selection.equals(item.getFilename());
+        return selection != null && selection.equals(item.getFileName());
     }
 
     /**
@@ -122,7 +122,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
     {
         ListItem<Attachment> item = new ListItem<Attachment>();
         item.setData(data);
-        Label attachmentLabel = new Label(data.getFilename());
+        Label attachmentLabel = new Label(data.getFileName());
         attachmentLabel.addStyleName("xAttachPreview");
         item.add(attachmentLabel);
         return item;
@@ -180,7 +180,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
             boolean changedAttachment = true;
             ResourceName editedAttach = new ResourceName(getData().getReference(), true);
             if (!StringUtils.isEmpty(getData().getReference())
-                && editedAttach.getFile().equals(selectedAttach.getFilename())) {
+                && editedAttach.getFile().equals(selectedAttach.getFileName())) {
                 changedAttachment = false;
             }
             if (changedAttachment) {
@@ -189,7 +189,7 @@ public class CurrentPageAttachmentSelectorWizardStep extends AbstractListSelecto
                 // FIXME: move the reference setting logic in a controller
                 ResourceName ref = new ResourceName(selectedAttach.getReference(), true);
                 String attachmentRef = "attach:" + ref.getRelativeTo(editedResource).toString();
-                String attachmentURL = selectedAttach.getDownloadUrl();
+                String attachmentURL = selectedAttach.getURL();
                 getData().setReference(attachmentRef);
                 getData().setUrl(attachmentURL);
             }

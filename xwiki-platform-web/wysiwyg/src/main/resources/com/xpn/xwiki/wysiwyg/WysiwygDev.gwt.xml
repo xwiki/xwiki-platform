@@ -21,7 +21,10 @@
 -->
 <module rename-to="xwe">
   <inherits name="com.xpn.xwiki.wysiwyg.Wysiwyg" />
-  <set-property name="user.agent" value="gecko1_8" />
+  <!-- user.agent from {gecko, gecko1_8, ie6, ie8, safari, opera} -->
+  <set-property name="user.agent" value="ie6" />
+  <!-- gecko1_9 from {no, yes} -->
   <set-property name="gecko1_9" value="yes" />
+  <!-- locale from {default, fr, de, ...} -->
   <set-property name="locale" value="default" />
 </module>

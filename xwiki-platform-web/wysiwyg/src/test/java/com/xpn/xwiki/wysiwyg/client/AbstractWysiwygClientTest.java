@@ -32,7 +32,7 @@ public abstract class AbstractWysiwygClientTest extends GWTTestCase
     /**
      * The name of this GWT module.
      */
-    public static final String MODULE_NAME = "com.xpn.xwiki.wysiwyg.Wysiwyg";
+    public static final String MODULE_NAME = "com.xpn.xwiki.wysiwyg.WysiwygDev";
 
     /**
      * {@inheritDoc}

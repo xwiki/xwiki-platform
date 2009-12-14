@@ -20,9 +20,7 @@
  *
 -->
 <module rename-to="xwe">
-  <inherits name="com.google.gwt.http.HTTP"/>
   <inherits name='org.xwiki.gwt.user.User'/>
-  <inherits name="com.xpn.xwiki.gwt.api.Api"/>
   <inherits name="com.smartgwt.SmartGwtNoScript"/>
 
   <stylesheet src="stylesheets/Wysiwyg.css"/>

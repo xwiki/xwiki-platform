@@ -25,9 +25,9 @@ import org.xwiki.component.annotation.ComponentRole;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 
 /**
  * The service interface used on the server.
@@ -71,18 +71,18 @@ public interface WikiService extends RemoteService
      * @param count the number of pages to return
      * @return the recently {@code count} modified pages of the current user, starting from position {@code start}
      */
-    List<Document> getRecentlyModifiedPages(int start, int count);
+    List<WikiPage> getRecentlyModifiedPages(int start, int count);
 
     /**
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param keyword the keyword to search the pages for
-     * @return the {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
+     * @return the {@code count} pages whose full name or title match the keyword, starting from position {@code start}
      */
-    List<Document> getMatchingPages(String keyword, int start, int count);
+    List<WikiPage> getMatchingPages(String keyword, int start, int count);
 
     /**
-     * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
+     * Creates a page link (URL, reference) from the given parameters. None of them are mandatory, if one misses, it is
      * replaced with a default value.
      * 
      * @param wikiName the name of the wiki to which to link

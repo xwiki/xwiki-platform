@@ -139,7 +139,7 @@ public class AttachmentUploadWizardStep extends AbstractFileUploadWizardStep
         ResourceName ref = new ResourceName(attach.getReference(), true);
         // FIXME: move the reference setting logic in a controller
         linkData.setReference("attach:" + ref.getRelativeTo(editedResource).toString());
-        linkData.setUrl(attach.getDownloadUrl());
+        linkData.setUrl(attach.getURL());
         async.onSuccess(true);
     }
 }

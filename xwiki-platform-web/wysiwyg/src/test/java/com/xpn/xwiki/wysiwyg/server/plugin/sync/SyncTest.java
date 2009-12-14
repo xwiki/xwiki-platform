@@ -21,35 +21,47 @@ package com.xpn.xwiki.wysiwyg.server.plugin.sync;
 
 import org.jmock.cglib.MockObjectTestCase;
 
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
-import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
-import com.xpn.xwiki.wysiwyg.client.diff.PatchFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.diff.ToString;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncStatus;
-import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncEngine;
-import com.xpn.xwiki.wysiwyg.server.plugin.sync.SyncException;
 import com.xpn.xwiki.wysiwyg.server.plugin.sync.internal.DefaultSyncEngine;
 
+/**
+ * Unit tests for the synchronization code.
+ * 
+ * @version $Id$
+ */
 public class SyncTest extends MockObjectTestCase
 {
-    SyncEngine syncEngine;
+    /**
+     * The synchronization engine.
+     */
+    private SyncEngine syncEngine;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MockObjectTestCase#tearDown()
+     */
     protected void tearDown() throws Exception
     {
         super.tearDown();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MockObjectTestCase#setUp()
+     */
     public void setUp() throws Exception
     {
         super.setUp();
         this.syncEngine = new DefaultSyncEngine();
     }
 
-    public void testSimpleChanges() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testSimpleChanges() throws Exception
     {
         String currentContent = "";
         SyncStatus syncStatus = new SyncStatus("Test.Test", "1.1", "A\n");
@@ -72,8 +84,7 @@ public class SyncTest extends MockObjectTestCase
         assertEquals("Current version should be 1", 1, sync.getVersion());
     }
 
-    public void testSimpleChanges2() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testSimpleChanges2() throws Exception
     {
         String currentContent = "";
         SyncStatus syncStatus = new SyncStatus("Test.Test", "1.1", "A\n");
@@ -96,8 +107,7 @@ public class SyncTest extends MockObjectTestCase
         assertEquals("Current version should be 1", 1, sync.getVersion());
     }
 
-    public void testMerge(String original, String change1, String change2, String expected) throws XWikiGWTException,
-        SyncException, PatchFailedException, DifferentiationFailedException
+    public void testMerge(String original, String change1, String change2, String expected) throws Exception
     {
         String currentContentUser1 = "";
         String currentContentUser2 = "";
@@ -170,89 +180,73 @@ public class SyncTest extends MockObjectTestCase
 
     }
 
-    public void testSpacedMerge1() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testSpacedMerge1() throws Exception
     {
         testMerge("A\n", "A B\n", "A C\n", "A C B\n");
     }
 
-    public void testSpacedMerge2() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testSpacedMerge2() throws Exception
     {
         testMerge("A\n", "A\nB\n", "A\nC\n", "A\nC\nB\n");
     }
 
-    public void testSpacedMerge3() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testSpacedMerge3() throws Exception
     {
         testMerge("A B C D E\n", "A X B C D E\n", "A B C D Y E\n", "A X B C D Y E\n");
     }
 
-    public void testCloseMerge() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testCloseMerge() throws Exception
     {
         testMerge("A\n", "AB\n", "AC\n", "ACB\n");
     }
 
-    public void testDoubleMerge1() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMerge1() throws Exception
     {
         testMerge("A\n", "XA B\n", "A C\n", "XA C B\n");
     }
 
-    public void testDoubleMerge2() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMerge2() throws Exception
     {
         testMerge("A\n", "XYA B\n", "A C\n", "XYA C B\n");
     }
 
-    public void testDoubleMerge3() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMerge3() throws Exception
     {
         testMerge("A\n", "XYZA B\n", "A C\n", "XYZA C B\n");
     }
 
-    public void testDoubleMerge4() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMerge4() throws Exception
     {
         testMerge("A\n", "XYZTA B\n", "A C\n", "XYZTA C B\n");
     }
 
-    public void testDoubleMergeWithSpace1() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMergeWithSpace1() throws Exception
     {
         testMerge("A\n", "X A B\n", "A C\n", "X A C B\n");
     }
 
-    public void testDoubleMergeWithSpace2() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMergeWithSpace2() throws Exception
     {
         testMerge("A\n", "XY A B\n", "A C\n", "XY A C B\n");
     }
 
-    public void testDoubleMergeWithSpace3() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDoubleMergeWithSpace3() throws Exception
     {
         testMerge("A\n", "XYZ A B\n", "A C\n", "XYZ A C B\n");
     }
 
-    public void testDeleteMergeOk1() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testDeleteMergeOk1() throws Exception
     {
         testMerge("ABCDEF\n", "ABEF\n", "ABCDEFGH\n", "ABEFGH\n");
     }
 
-//    // This one currently fails
-//    public void testDeleteMergeOk2() throws XWikiGWTException, SyncException, PatchFailedException,
-//        DifferentiationFailedException
-//    {
-//        testMerge("ABCD\n", "\n", "ABCDEF\n", "EF\n");
-//    }
+    public void failingTestDeleteMergeOk2() throws Exception
+    {
+        testMerge("ABCD\n", "\n", "ABCDEF\n", "EF\n");
+    }
 
-    public void testSameEditMerge() throws XWikiGWTException, SyncException, PatchFailedException,
-        DifferentiationFailedException
+    public void testSameEditMerge() throws Exception
     {
         testMerge("flower\n", "flowers\n", "flowers\n", "flowerss\n");
     }
-
 }

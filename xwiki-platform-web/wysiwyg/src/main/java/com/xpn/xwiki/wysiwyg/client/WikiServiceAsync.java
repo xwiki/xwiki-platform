@@ -22,9 +22,9 @@ package com.xpn.xwiki.wysiwyg.client;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 
 /**
  * Service interface used on the client. It should have all the methods from {@link WikiService} with an additional
@@ -72,19 +72,19 @@ public interface WikiServiceAsync
      * @param async object used for asynchronous communication between server and client, to return on success the
      *            recently {@code count} modified pages of the current user, starting from position {@code start}
      */
-    void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async);
+    void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<WikiPage>> async);
 
     /**
      * @param start the start index of the list of pages to return
      * @param count the number of pages to return
      * @param keyword the keyword to search the pages for
      * @param async object used for asynchronous communication between server and client, to return on success the
-     *            {@code count} pages whose fullname or title match the keyword, starting from position {@code start}
+     *            {@code count} pages whose full name or title match the keyword, starting from position {@code start}
      */
-    void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<Document>> async);
+    void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<WikiPage>> async);
 
     /**
-     * Creates a page link (url, reference) from the given parameters. None of them are mandatory, if one misses, it is
+     * Creates a page link (URL, reference) from the given parameters. None of them are mandatory, if one misses, it is
      * replaced with a default value.
      * 
      * @param wikiName the name of the wiki to which to link

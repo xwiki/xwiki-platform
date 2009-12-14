@@ -40,6 +40,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.wysiwyg.client.WikiService;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 
 /**
  * The default implementation for {@link WikiService}.
@@ -197,8 +198,10 @@ public class DefaultWikiService implements WikiService
 
     /**
      * {@inheritDoc}
+     * 
+     * @see WikiService#getRecentlyModifiedPages(int, int)
      */
-    public List<com.xpn.xwiki.gwt.api.client.Document> getRecentlyModifiedPages(int start, int count)
+    public List<WikiPage> getRecentlyModifiedPages(int start, int count)
     {
         try {
             List<XWikiDocument> docs =
@@ -214,8 +217,10 @@ public class DefaultWikiService implements WikiService
 
     /**
      * {@inheritDoc}
+     * 
+     * @see WikiService#getMatchingPages(String, int, int)
      */
-    public List<com.xpn.xwiki.gwt.api.client.Document> getMatchingPages(String keyword, int start, int count)
+    public List<WikiPage> getMatchingPages(String keyword, int start, int count)
     {
         try {
             String quote = "'";
@@ -251,24 +256,22 @@ public class DefaultWikiService implements WikiService
     }
 
     /**
-     * Helper function to prepare a list of {@link com.xpn.xwiki.gwt.api.client.Document}s (with fullname, title, etc)
-     * from a list of document names.
+     * Helper function to prepare a list of {@link WikiPage}s (with full name, title, etc) from a list of document
+     * names.
      * 
      * @param docs the list of the documents to include in the list
-     * @return the list of {@link com.xpn.xwiki.gwt.api.client.Document}s corresponding to the passed names
+     * @return the list of {@link WikiPage}s corresponding to the passed names
      * @throws XWikiException if anything goes wrong retrieving the documents
      */
-    private List<com.xpn.xwiki.gwt.api.client.Document> prepareDocumentResultsList(List<XWikiDocument> docs)
-        throws XWikiException
+    private List<WikiPage> prepareDocumentResultsList(List<XWikiDocument> docs) throws XWikiException
     {
-        List<com.xpn.xwiki.gwt.api.client.Document> results = new ArrayList<com.xpn.xwiki.gwt.api.client.Document>();
+        List<WikiPage> results = new ArrayList<WikiPage>();
         for (XWikiDocument doc : docs) {
-            com.xpn.xwiki.gwt.api.client.Document xwikiDoc = new com.xpn.xwiki.gwt.api.client.Document();
-            xwikiDoc.setFullName(doc.getFullName());
-            xwikiDoc.setTitle(doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext()));
-            // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
-            xwikiDoc.setUploadURL(doc.getURL(VIEW_ACTION, getXWikiContext()));
-            results.add(xwikiDoc);
+            WikiPage page = new WikiPage();
+            page.setName(doc.getFullName());
+            page.setTitle(doc.getRenderedTitle(Syntax.XHTML_1_0, getXWikiContext()));
+            page.setURL(doc.getURL(VIEW_ACTION, getXWikiContext()));
+            results.add(page);
         }
         return results;
     }
@@ -335,7 +338,7 @@ public class DefaultWikiService implements WikiService
         // all right, now set the reference and url and return
         String attachmentReference = getAttachmentReference(docReference, cleanedFileName);
         attach.setReference(attachmentReference);
-        attach.setDownloadUrl(doc.getAttachmentURL(cleanedFileName, context));
+        attach.setURL(doc.getAttachmentURL(cleanedFileName, context));
 
         return attach;
     }
@@ -421,8 +424,8 @@ public class DefaultWikiService implements WikiService
             XWikiDocument doc = context.getWiki().getDocument(docReference, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
                 Attachment currentAttach = new Attachment();
-                currentAttach.setFilename(attach.getFilename());
-                currentAttach.setDownloadUrl(doc.getAttachmentURL(attach.getFilename(), context));
+                currentAttach.setFileName(attach.getFilename());
+                currentAttach.setURL(doc.getAttachmentURL(attach.getFilename(), context));
                 currentAttach.setReference(getAttachmentReference(docReference, attach.getFilename()));
                 currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);

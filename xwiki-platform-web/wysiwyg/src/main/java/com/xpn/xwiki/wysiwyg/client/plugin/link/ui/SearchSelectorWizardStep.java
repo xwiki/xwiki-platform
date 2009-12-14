@@ -34,10 +34,10 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
-import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.WikiServiceAsync;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 
 /**
  * Wizard step to select the wiki page to link to, from the page search results for a keyword.
@@ -118,7 +118,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
                 getMainPanel().removeStyleName(STYLE_LOADING);
                 Label error = new Label(Strings.INSTANCE.linkErrorLoadingData());
                 error.addStyleName(STYLE_ERROR);
-                ListItem<Document> errorListItem = new ListItem<Document>();
+                ListItem<WikiPage> errorListItem = new ListItem<WikiPage>();
                 errorListItem.add(error);
                 getList().insertItem(errorListItem, 0);
             }
@@ -129,7 +129,7 @@ public class SearchSelectorWizardStep extends AbstractPageListSelectorWizardStep
      * {@inheritDoc}
      */
     @Override
-    protected void fetchData(AsyncCallback<List<Document>> callback)
+    protected void fetchData(AsyncCallback<List<WikiPage>> callback)
     {
         wikiService.getMatchingPages(getKeyword(), 0, 20, callback);
     }

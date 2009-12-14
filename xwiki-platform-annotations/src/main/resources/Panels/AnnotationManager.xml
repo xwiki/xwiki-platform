@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1240502446000</creationDate>
-<date>1259676301000</date>
-<contentUpdateDate>1259676301000</contentUpdateDate>
+<date>1260811068000</date>
+<contentUpdateDate>1260811068000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -277,6 +277,7 @@ XWiki.Annotation = function() {
 XWiki.Annotation.prototype = {
     /* Utils */
     getDocumentInfos : function() {
+        // TODO: get these from the XWiki object or meta tags
         var space = '';
         var page = '';
         window.location.pathname.toString().scan(/\/[^\/]+/, function(match) {
@@ -295,6 +296,7 @@ XWiki.Annotation.prototype = {
         page = page.replace('/', '');
         return {
             host : location.host,
+            'wiki' :  XWiki.currentWiki,
             'space' : space,
             'page' : page
         };
@@ -463,11 +465,18 @@ XWiki.Annotation.prototype = {
               XWiki.Annotation.getInstance().updateAnnotationResumeAux(items);
               return;
             }
-            var space = anno.author.split('.')[0];
-            var page = anno.author.split('.')[1];
+            var wiki = anno.author.split(':')[0];
+            var localAuthor = anno.author.split(':')[1];
+            // if there is no wiki in the username (user is already local), use XWiki.currentWiki for wiki and wiki for localAuthor
+            if (!localAuthor) {
+              localAuthor = wiki;
+              wiki = XWiki.currentWiki;
+            }
+            var space = localAuthor.split('.')[0];
+            var page = localAuthor.split('.')[1];
             var url = 'http://'
                     + location.host
-                    + '/xwiki/rest/wikis/xwiki/spaces/'
+                    + '/xwiki/rest/wikis/' + wiki + '/spaces/'
                     + space
                     + '/pages/'
                     + page
@@ -537,7 +546,7 @@ XWiki.Annotation.prototype = {
         }
         XWiki.Annotation.getInstance().annotatedDocumentFlag = 1;
         var infos = XWiki.Annotation.getInstance().getDocumentInfos();
-        var url = 'http://' + infos.host + '/xwiki/rest/wikis/xwiki/spaces/'
+        var url = 'http://' + infos.host + '/xwiki/rest/wikis/' + infos.wiki + '/spaces/'
                 + infos.space + '/pages/' + infos.page
                 + '/annotation?media=json';
         new Ajax.Request(url, {
@@ -549,7 +558,7 @@ XWiki.Annotation.prototype = {
 
     removeAnnotation : function(id) {
         var infos = XWiki.Annotation.getInstance().getDocumentInfos();
-        var url = 'http://' + infos.host + '/xwiki/rest/wikis/xwiki/spaces/'
+        var url = 'http://' + infos.host + '/xwiki/rest/wikis/' + infos.wiki + '/spaces/'
                 + infos.space + '/pages/' + infos.page + '/annotation/' + id
                 + '?method=DELETE&amp;media=json';
         new Ajax.Request(url, {
@@ -561,7 +570,7 @@ XWiki.Annotation.prototype = {
 
     addAnnotation : function() {
         var infos = XWiki.Annotation.getInstance().getDocumentInfos();
-        var url = 'http://' + infos.host + '/xwiki/rest/wikis/xwiki/spaces/'
+        var url = 'http://' + infos.host + '/xwiki/rest/wikis/' + infos.wiki + '/spaces/'
                 + infos.space + '/pages/' + infos.page
                 + '/annotation?method=PUT&amp;media=json';
         new Ajax.Request(url, {

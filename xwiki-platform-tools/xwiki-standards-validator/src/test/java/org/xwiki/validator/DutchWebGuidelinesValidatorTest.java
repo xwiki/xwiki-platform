@@ -547,6 +547,11 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
         setValidatorDocument("<body><form><label for='test' /><input name='test' id='test' /><input type='button'/></form></body>");
         validator.validateRpd13s1();
         assertTrue(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><form><label for='test' /><input name='test' id='test' /><input type='button'/>" +
+        		"<input type='hidden' /><input type='image' /><input type='reset' /><input type='submit' /></form></body>");
+        validator.validateRpd13s1();
+        assertTrue(getErrors(validator), isValid(validator));
     }
 
     public void testRpd13s4Submits() throws Exception

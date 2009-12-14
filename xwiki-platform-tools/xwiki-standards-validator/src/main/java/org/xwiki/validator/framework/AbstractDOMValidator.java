@@ -82,6 +82,11 @@ public abstract class AbstractDOMValidator implements Validator
      * mailto.
      */
     protected static final String MAILTO = "mailto:";
+    
+    /**
+     * hidden.
+     */
+    protected static final String HIDDEN = "hidden";
 
     // Elements.
 

@@ -1197,7 +1197,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
     {
         String message = "rpd13s1.label";
         // type = text|password|checkbox|radio|submit|reset|file|hidden|image|button
-        List<String> inputWithoutLabels = Arrays.asList(SUBMIT, RESET, IMAGE, BUTTON);
+        List<String> inputWithoutLabels = Arrays.asList(SUBMIT, RESET, IMAGE, BUTTON, HIDDEN);
 
         for (Node input : getElements(ELEM_INPUT)) {
             // Some inputs doesn't need a label.

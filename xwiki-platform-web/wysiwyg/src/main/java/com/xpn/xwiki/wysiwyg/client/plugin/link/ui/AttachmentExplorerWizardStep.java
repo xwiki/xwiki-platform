@@ -144,7 +144,7 @@ public class AttachmentExplorerWizardStep extends AbstractExplorerWizardStep
                             } else {
                                 ResourceName ref = new ResourceName(result.getReference(), true);
                                 getData().setReference(ATTACH_PREFIX + ref.getRelativeTo(editedResource).toString());
-                                getData().setUrl(result.getDownloadUrl());
+                                getData().setUrl(result.getURL());
                                 async.onSuccess(true);
                             }
                         }

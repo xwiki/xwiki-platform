@@ -170,7 +170,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
             boolean changedFile = true;
             ResourceName editedFile = new ResourceName(getData().getReference(), true);
             if (!StringUtils.isEmpty(getData().getReference())
-                && editedFile.getFile().equals(selectedImage.getFilename())) {
+                && editedFile.getFile().equals(selectedImage.getFileName())) {
                 changedFile = false;
             }
             if (changedFile) {
@@ -179,7 +179,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
                 // FIXME: move the reference setting logic in a controller
                 ResourceName ref = new ResourceName(selectedImage.getReference(), true);
                 getData().setReference(ref.getRelativeTo(editedResource).toString());
-                getData().setImageURL(selectedImage.getDownloadUrl());
+                getData().setImageURL(selectedImage.getURL());
             }
         }
     }
@@ -192,8 +192,8 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
     {
         ListItem<Attachment> imageItem = new ListItem<Attachment>();
         imageItem.setData(image);
-        Image htmlImage = new Image(image.getDownloadUrl() + "?width=135");
-        htmlImage.setTitle(image.getFilename());
+        Image htmlImage = new Image(image.getURL() + "?width=135");
+        htmlImage.setTitle(image.getFileName());
         FlowPanel previewPanel = new FlowPanel();
         previewPanel.addStyleName("xImagePreview");
         previewPanel.add(htmlImage);
@@ -227,7 +227,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
             ResourceName r = new ResourceName(getData().getReference(), true);
             return r.getFile();
         } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
-            return getSelectedItem().getData().getFilename();
+            return getSelectedItem().getData().getFileName();
         }
         return null;
     }
@@ -238,7 +238,7 @@ public class CurrentPageImageSelectorWizardStep extends AbstractListSelectorWiza
     @Override
     protected boolean matchesSelection(Attachment item, String selection)
     {
-        return selection != null && selection.equals(item.getFilename());
+        return selection != null && selection.equals(item.getFileName());
     }
 
     /**

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-XE_VERSION=2.1-SNAPSHOT;
+XE_VERSION=2.2-SNAPSHOT;
 GWT_VERSION=1.7.0;
 
 JAVA32_HOME=/usr/lib/jvm/ia32-java-6-sun/bin/;
@@ -13,7 +13,6 @@ $JAVA32_HOME/java \
 -cp \
 $APP_DIR/WEB-INF/lib/xwiki-web-wysiwyg-$XE_VERSION.jar:\
 $M2_REPO/com/xpn/xwiki/platform/xwiki-web-wysiwyg/$XE_VERSION/xwiki-web-wysiwyg-$XE_VERSION-sources.jar:\
-$M2_REPO/com/xpn/xwiki/platform/xwiki-web-gwt/$XE_VERSION/xwiki-web-gwt-$XE_VERSION-sources.jar:\
 $M2_REPO/org/xwiki/platform/xwiki-web-gwt-dom/$XE_VERSION/xwiki-web-gwt-dom-$XE_VERSION.jar:\
 $M2_REPO/org/xwiki/platform/xwiki-web-gwt-user/$XE_VERSION/xwiki-web-gwt-user-$XE_VERSION.jar:\
 $M2_REPO/org/xwiki/platform/xwiki-core-component-api/$XE_VERSION/xwiki-core-component-api-$XE_VERSION.jar:\

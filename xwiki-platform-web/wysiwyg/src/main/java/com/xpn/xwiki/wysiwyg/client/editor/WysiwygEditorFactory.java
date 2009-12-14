@@ -39,7 +39,6 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.separator.SeparatorPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.submit.SubmitPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.symbol.SymbolPluginFactory;
-import com.xpn.xwiki.wysiwyg.client.plugin.sync.SyncPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.text.TextPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.valign.VerticalAlignPluginFactory;
@@ -96,7 +95,8 @@ public final class WysiwygEditorFactory
         pfm.addPluginFactory(FormatPluginFactory.getInstance());
         pfm.addPluginFactory(FontPluginFactory.getInstance());
         pfm.addPluginFactory(ColorPluginFactory.getInstance());
-        pfm.addPluginFactory(SyncPluginFactory.getInstance());
+        // The experimental real-time editing feature.
+        // pfm.addPluginFactory(SyncPluginFactory.getInstance());
         pfm.addPluginFactory(SymbolPluginFactory.getInstance());
         pfm.addPluginFactory(LinkPluginFactory.getInstance());
         pfm.addPluginFactory(TablePluginFactory.getInstance());

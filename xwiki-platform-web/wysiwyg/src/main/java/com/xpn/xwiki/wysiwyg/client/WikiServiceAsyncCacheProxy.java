@@ -22,14 +22,14 @@ package com.xpn.xwiki.wysiwyg.client;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.util.Attachment;
+import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 
 /**
- * Cache proxy for {@link WikiServiceAsync}. This proxy is used to store on the client a set of values from the
- * server that cannot change without server restart, therefore without the reload of the page that holds the reference
- * to the {@link WikiService}.
+ * Cache proxy for {@link WikiServiceAsync}. This proxy is used to store on the client a set of values from the server
+ * that cannot change without server restart, therefore without the reload of the page that holds the reference to the
+ * {@link WikiService}.
  * 
  * @version $Id$
  */
@@ -73,7 +73,7 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      */
-    public void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<Document>> async)
+    public void getRecentlyModifiedPages(int start, int count, AsyncCallback<List<WikiPage>> async)
     {
         service.getRecentlyModifiedPages(start, count, async);
     }
@@ -81,7 +81,7 @@ public class WikiServiceAsyncCacheProxy implements WikiServiceAsync
     /**
      * {@inheritDoc}
      */
-    public void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<Document>> async)
+    public void getMatchingPages(String keyword, int start, int count, AsyncCallback<List<WikiPage>> async)
     {
         service.getMatchingPages(keyword, start, count, async);
     }

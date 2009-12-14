@@ -3,7 +3,7 @@
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-  <title>WYSIWYG Editor - Hosted Mode Demo</title>
+  <title>XWiki WYSIWYG Editor - Hosted Mode Demo</title>
   <meta name="gwt:property" content="locale=en" />
   <script type="text/javascript" src="/xwiki/resources/js/prototype/prototype.js"></script>
   <script type="text/javascript" src="/xwiki/bin/skin/resources/js/xwiki/xwiki.js"></script>
@@ -21,11 +21,6 @@
 <body>
   <button onclick="load(this)">Load</button>
   <script type="text/javascript">
-    // Configure the GWT module.
-    var Wysiwyg = {
-      xwikiservice: '/xwiki/XWikiService',
-      wysiwygServiceURL: '/xwiki/WysiwygService'
-    };
     function load(hook) {
       // Create a plain text area.
       var textArea = document.createElement('textarea');

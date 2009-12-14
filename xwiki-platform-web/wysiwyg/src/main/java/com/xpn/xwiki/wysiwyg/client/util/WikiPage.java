@@ -22,68 +22,65 @@ package com.xpn.xwiki.wysiwyg.client.util;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
- * Configuration object for an attachment, to be used to transmit data about attachments from the server to the client.
+ * Stores information about a wiki page.
  * 
  * @version $Id$
  */
-public class Attachment implements IsSerializable
+public class WikiPage implements IsSerializable
 {
     /**
-     * The wiki reference of this attachment, in the form wiki:Space.Page@filename.ext.
+     * The page name.
      */
-    private String reference;
+    private String name;
 
     /**
-     * The name of the attached file.
+     * The page title.
      */
-    private String fileName;
+    private String title;
 
     /**
-     * The attachment URL.
+     * The page URL.
      */
     private String url;
 
     /**
-     * The mime type of the attached file.
+     * @return the page name
      */
-    private String mimeType;
-
-    /**
-     * @return the reference
-     */
-    public String getReference()
+    public String getName()
     {
-        return reference;
+        return name;
     }
 
     /**
-     * @param reference the reference to set
-     */
-    public void setReference(String reference)
-    {
-        this.reference = reference;
-    }
-
-    /**
-     * @return the name of the attached file
-     */
-    public String getFileName()
-    {
-        return fileName;
-    }
-
-    /**
-     * Sets the name of the attached file.
+     * Sets the page name.
      * 
-     * @param fileName a file name
+     * @param name the new page name
      */
-    public void setFileName(String fileName)
+    public void setName(String name)
     {
-        this.fileName = fileName;
+        this.name = name;
     }
 
     /**
-     * @return the attachment URL
+     * @return the page title
+     */
+    public String getTitle()
+    {
+        return title;
+    }
+
+    /**
+     * Sets the page title.
+     * 
+     * @param title the new page title
+     */
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    /**
+     * @return the page URL
      */
     public String getURL()
     {
@@ -91,30 +88,12 @@ public class Attachment implements IsSerializable
     }
 
     /**
-     * Sets the attachment URL.
+     * Sets the page URL.
      * 
-     * @param url the attachment URL
+     * @param url the new page URL
      */
     public void setURL(String url)
     {
         this.url = url;
-    }
-
-    /**
-     * @return the mime type of the attached file
-     */
-    public String getMimeType()
-    {
-        return mimeType;
-    }
-
-    /**
-     * Sets the mime type of the attached file.
-     * 
-     * @param mimeType a mime type
-     */
-    public void setMimeType(String mimeType)
-    {
-        this.mimeType = mimeType;
     }
 }

@@ -38,7 +38,6 @@ import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.PushButton;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.wysiwyg.client.diff.Diff;
 import com.xpn.xwiki.wysiwyg.client.diff.DifferentiationFailedException;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
@@ -461,27 +460,11 @@ public class SyncPlugin extends AbstractPlugin implements ClickHandler, TimerLis
 
     public void showError(Throwable caught, AsyncCallback< ? > cb)
     {
-        debugMessage("Error should be shown " + caught.getMessage());
-        if (caught instanceof XWikiGWTException) {
-            debugMessage("Error is XWikiGWTException");
-            XWikiGWTException exp = ((XWikiGWTException) caught);
-            if (exp.getCode() == 9002) {
-                // This is a login error
-                showDialog("Synchronize", "You are not logged in.", cb);
-            } else if (exp.getCode() == 9001) {
-                // This is a right error
-                showDialog("Synchronize", "You are not allowed to perform this action.", cb);
-            } else {
-                showError("" + exp.getCode(), exp.getFullMessage(), cb);
-            }
-        } else {
-            debugMessage("Error is not XWikiGWTException");
-            if (caught != null) {
-                caught.printStackTrace();
-            }
+        if (caught != null) {
+            caught.printStackTrace();
             debugMessage("Error is: " + caught.toString());
-            showError("", (caught == null) ? "" : caught.toString(), cb);
         }
+        showError("", (caught == null) ? "" : caught.toString(), cb);
     }
 
     public void showError(String text, AsyncCallback< ? > cb)

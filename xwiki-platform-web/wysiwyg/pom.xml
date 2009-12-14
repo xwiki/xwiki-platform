@@ -53,25 +53,6 @@
     </dependency>
     <!-- GWT libraries -->
     <dependency>
-      <groupId>com.smartgwt</groupId>
-      <artifactId>smartgwt</artifactId>
-      <version>${smartgwt.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt</artifactId>
-      <version>${pom.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt</artifactId>
-      <version>${pom.version}</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-dom</artifactId>
       <version>${pom.version}</version>
@@ -81,6 +62,12 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt-user</artifactId>
       <version>${pom.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.smartgwt</groupId>
+      <artifactId>smartgwt</artifactId>
+      <version>${smartgwt.version}</version>
       <scope>provided</scope>
     </dependency>
     <!-- XWiki dependencies for server side -->
@@ -284,8 +271,7 @@
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncPlugin.java,
             com/xpn/xwiki/wysiwyg/client/plugin/sync/SyncTools.java,
             com/xpn/xwiki/wysiwyg/server/plugin/sync/internal/DefaultSyncEngine.java,
-            com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java,
-            com/xpn/xwiki/wysiwyg/server/DefaultWikiServiceTest.java
+            com/xpn/xwiki/wysiwyg/server/plugin/sync/SyncTest.java
           </excludes>
         </configuration>
       </plugin>

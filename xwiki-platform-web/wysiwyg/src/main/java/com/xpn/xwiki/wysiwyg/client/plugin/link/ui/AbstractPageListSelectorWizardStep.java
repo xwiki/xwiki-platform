@@ -24,11 +24,11 @@ import org.xwiki.gwt.user.client.ui.ListItem;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.xpn.xwiki.gwt.api.client.Document;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig;
 import com.xpn.xwiki.wysiwyg.client.plugin.link.ui.LinkWizard.LinkWizardSteps;
 import com.xpn.xwiki.wysiwyg.client.util.ResourceName;
+import com.xpn.xwiki.wysiwyg.client.util.WikiPage;
 import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizardStep;
 
 /**
@@ -36,7 +36,7 @@ import com.xpn.xwiki.wysiwyg.client.widget.wizard.util.AbstractListSelectorWizar
  * 
  * @version $Id$
  */
-public abstract class AbstractPageListSelectorWizardStep extends AbstractListSelectorWizardStep<LinkConfig, Document>
+public abstract class AbstractPageListSelectorWizardStep extends AbstractListSelectorWizardStep<LinkConfig, WikiPage>
 {
     /**
      * The currently edited resource (the currently edited page).
@@ -81,7 +81,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
         if (!StringUtils.isEmpty(getData().getReference())) {
             return getData().getReference();
         } else if (getSelectedItem() != null && getSelectedItem().getData() != null) {
-            return getSelectedItem().getData().getFullName();
+            return getSelectedItem().getData().getName();
         }
         return null;
     }
@@ -90,20 +90,20 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
      * {@inheritDoc}
      */
     @Override
-    protected boolean matchesSelection(Document item, String selection)
+    protected boolean matchesSelection(WikiPage item, String selection)
     {
-        return selection != null && selection.equals(item.getFullName());
+        return selection != null && selection.equals(item.getName());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected ListItem<Document> getListItem(Document data)
+    protected ListItem<WikiPage> getListItem(WikiPage data)
     {
-        ListItem<Document> item = new ListItem<Document>();
+        ListItem<WikiPage> item = new ListItem<WikiPage>();
         item.setData(data);
-        Label pageName = new Label(data.getFullName());
+        Label pageName = new Label(data.getName());
         pageName.addStyleName("xPagePreviewFullname");
         Label title = new Label(data.getTitle());
         title.addStyleName("xPagePreviewTitle");
@@ -113,7 +113,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
             ui.add(title);
         }
         String prettyName = StringUtils.isEmpty(data.getTitle()) ? "" : data.getTitle() + " - ";
-        prettyName += data.getFullName();
+        prettyName += data.getName();
         ui.setTitle(prettyName);
         ui.add(pageName);
         ui.addStyleName("xPagePreview");
@@ -125,9 +125,9 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
      * {@inheritDoc}
      */
     @Override
-    protected ListItem<Document> getNewOptionListItem()
+    protected ListItem<WikiPage> getNewOptionListItem()
     {
-        ListItem<Document> item = new ListItem<Document>();
+        ListItem<WikiPage> item = new ListItem<WikiPage>();
         item.setData(null);
         Label newOptionPanel = new Label(Strings.INSTANCE.linkNewPageOptionLabel());
         newOptionPanel.addStyleName("xNewPagePreview");
@@ -161,7 +161,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
     @Override
     protected void saveSelectedValue()
     {
-        Document selectedDocument = getSelectedItem().getData();
+        WikiPage selectedDocument = getSelectedItem().getData();
         if (selectedDocument == null) {
             // new page option, let's setup the link data accordingly
             getData().setWiki(editedResource.getWiki());
@@ -171,7 +171,7 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
             boolean changedDoc = true;
             ResourceName editedPage = new ResourceName(getData().getReference(), false).getRelativeTo(editedResource);
             ResourceName selectedPage =
-                new ResourceName(selectedDocument.getFullName(), false).getRelativeTo(editedResource);
+                new ResourceName(selectedDocument.getName(), false).getRelativeTo(editedResource);
             if (!StringUtils.isEmpty(getData().getReference()) && editedPage.equals(selectedPage)) {
                 changedDoc = false;
             }
@@ -179,10 +179,9 @@ public abstract class AbstractPageListSelectorWizardStep extends AbstractListSel
                 // existing page option, set up the LinkConfig
                 // page reference has to be relative to the currently edited page
                 // FIXME: move the reference setting logic in a controller
-                ResourceName ref = new ResourceName(selectedDocument.getFullName(), false);
+                ResourceName ref = new ResourceName(selectedDocument.getName(), false);
                 getData().setReference(ref.getRelativeTo(editedResource).toString());
-                // FIXME: shouldn't use upload URL here, but since we don't want to add a new field...
-                getData().setUrl(selectedDocument.getUploadURL());
+                getData().setUrl(selectedDocument.getURL());
             }
         }
     }

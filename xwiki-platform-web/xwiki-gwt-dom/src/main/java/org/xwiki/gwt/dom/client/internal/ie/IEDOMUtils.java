@@ -187,7 +187,7 @@ public class IEDOMUtils extends DOMUtils
      */
     public void ensureBlockIsEditable(Element block)
     {
-        if (!block.hasChildNodes()) {
+        if (!block.hasChildNodes() && block.canHaveChildren()) {
             // Note: appending an empty text node doesn't help.
             block.setInnerHTML("");
         }
@@ -235,5 +235,15 @@ public class IEDOMUtils extends DOMUtils
     {
         super.removeProperty(element, propertyName);
         element.removeAttribute(propertyName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DOMUtils#canHaveChildren(Node)
+     */
+    public boolean canHaveChildren(Node node)
+    {
+        return Element.is(node) && Element.as(node).getPropertyBoolean("canHaveChildren");
     }
 }

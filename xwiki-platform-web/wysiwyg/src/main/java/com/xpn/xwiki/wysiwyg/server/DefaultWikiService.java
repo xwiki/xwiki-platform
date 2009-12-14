@@ -27,8 +27,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.bridge.DocumentName;
-import org.xwiki.bridge.DocumentNameSerializer;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.syntax.Syntax;
@@ -351,6 +351,7 @@ public class DefaultWikiService implements WikiService
      * @param page the page name of the targeted document
      * @return the completed {@link DocumentName} corresponding to the passed parameters, with all the missing values
      *         completed with defaults
+     * @since 2.2M1
      */
     protected DocumentName prepareDocumentName(String wiki, String space, String page)
     {

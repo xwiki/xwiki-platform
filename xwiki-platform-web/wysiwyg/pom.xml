@@ -98,6 +98,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-model</artifactId>
+      <version>${platform.core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-container-api</artifactId>
       <version>${platform.core.version}</version>
       <scope>provided</scope>

@@ -1360,4 +1360,22 @@ public abstract class DOMUtils
     {
         ((JavaScriptObject) element.cast()).remove(propertyName);
     }
+
+    /**
+     * @param node a HTML DOM node
+     * @return {@code true} if the given node can have children, following the HTML strict DTD, {@code false} otherwise
+     */
+    public boolean canHaveChildren(Node node)
+    {
+        if (node == null || node.getNodeType() != Node.ELEMENT_NODE) {
+            return false;
+        }
+        String tagName = node.getNodeName().toLowerCase();
+        for (int i = 0; i < DOMUtils.HTML_EMPTY_TAGS.length; i++) {
+            if (DOMUtils.HTML_EMPTY_TAGS[i].equals(tagName)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

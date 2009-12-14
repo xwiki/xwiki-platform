@@ -866,4 +866,28 @@ public class DOMUtilsTest extends AbstractDOMTest
         assertTrue(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(4)));
         assertTrue(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(5)));
     }
+
+    /**
+     * Unit test for {@link DOMUtils#canHaveChildren(Node)}.
+     */
+    public void testCanHaveChildren()
+    {
+        assertFalse(domUtils.canHaveChildren(null));
+        assertFalse(domUtils.canHaveChildren(getDocument()));
+        assertFalse(domUtils.canHaveChildren(getDocument().createTextNode("text")));
+        assertFalse(domUtils.canHaveChildren(getDocument().createComment("comment")));
+        assertFalse(domUtils.canHaveChildren(getDocument().createBRElement()));
+        assertFalse(domUtils.canHaveChildren(getDocument().createHRElement()));
+        assertTrue(domUtils.canHaveChildren(getDocument().createSpanElement()));
+        assertTrue(domUtils.canHaveChildren(getDocument().getBody()));
+    }
+
+    /**
+     * Unit test for {@link DOMUtils#ensureBlockIsEditable(Element)} when the parameter is a horizontal ruler.
+     */
+    public void testEnsureHRIsEditable()
+    {
+        domUtils.ensureBlockIsEditable(Element.as(getDocument().createHRElement()));
+        // We should get here without any exception thrown and without any effect.
+    }
 }

@@ -95,6 +95,8 @@ public class MozillaDOMUtils extends DOMUtils
      */
     public void ensureBlockIsEditable(Element block)
     {
-        block.appendChild(block.getOwnerDocument().createBRElement());
+        if (block.canHaveChildren()) {
+            block.appendChild(block.getOwnerDocument().createBRElement());
+        }
     }
 }

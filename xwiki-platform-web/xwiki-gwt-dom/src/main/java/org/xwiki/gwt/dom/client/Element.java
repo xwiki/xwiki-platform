@@ -294,16 +294,11 @@ public class Element extends com.google.gwt.dom.client.Element
     };
 
     /**
-     * @return true if HTML Strict DTD specifies that this element must be empty.
+     * @return {@code true} if HTML Strict DTD specifies that this element can have children, {@code false} otherwise
      */
-    public final boolean mustBeEmpty()
+    public final boolean canHaveChildren()
     {
-        for (int i = 0; i < DOMUtils.HTML_EMPTY_TAGS.length; i++) {
-            if (DOMUtils.HTML_EMPTY_TAGS[i].equalsIgnoreCase(getTagName())) {
-                return true;
-            }
-        }
-        return false;
+        return DOMUtils.getInstance().canHaveChildren(this);
     }
 
     /**

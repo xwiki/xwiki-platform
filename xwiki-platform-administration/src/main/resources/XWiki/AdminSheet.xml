@@ -696,7 +696,7 @@ p.legend {
        #end
      &lt;/div&gt; ## admin-page-content
      #end
-     &lt;div id="admin-page-menu" style="#if($section != '')display:none;#end"&gt;
+     &lt;div id="admin-page-menu" #if($section != '')class="hidden"#end&gt;
        &lt;ul id="admin-icons"&gt;
          #foreach($asection in $sections)
            #if($xwiki.exists($asection) || $xwiki.exists("XWiki.Admin${asection}Sheet"))

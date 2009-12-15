@@ -108,7 +108,7 @@
 #displayCategoriesHierarchy($tree 'simple')
 
 #if($xwiki.hasAdminRights())
-  &lt;div style="font-size:75%;"&gt;([[$msg.get('xe.blog.categories.edit')&gt;&gt;Blog.ManageCategories]])&lt;/div&gt;
+  &lt;div class="edit-categories"&gt;([[$msg.get('xe.blog.categories.edit')&gt;&gt;Blog.ManageCategories]])&lt;/div&gt;
 #end
 #panelfooter()
 {{/html}}

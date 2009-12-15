@@ -29,7 +29,8 @@
   &lt;form method="post" action="$doc.getURL('view', 'xpage=plain')" onsubmit="cancelCancelEdit()"&gt;
     &lt;div&gt;
       &lt;input type="hidden" name="create" value="1"/&gt;
-      &lt;input type="text" name="panelTitle" value="$msg.get("xe.panels.create.title")" class="panelinput" onfocus="if(this.value=='$msg.get("xe.panels.create.title")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.create.title")'"/&gt;
+      &lt;label for="panelTitle" class="hidden"&gt;$msg.get("xe.panels.create.title")&lt;/label&gt;
+      &lt;input type="text" id="panelTitle" name="panelTitle" value="$msg.get("xe.panels.create.title")" class="panelinput" onfocus="if(this.value=='$msg.get("xe.panels.create.title")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.create.title")'"/&gt;
       &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;

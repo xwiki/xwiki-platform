@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.xwiki.model.DocumentName;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.internal.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;

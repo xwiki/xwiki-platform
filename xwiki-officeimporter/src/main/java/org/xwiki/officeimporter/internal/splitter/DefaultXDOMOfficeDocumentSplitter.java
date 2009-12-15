@@ -32,6 +32,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
+import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
@@ -83,7 +84,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     private DocumentSplitter documentSplitter;
 
     /**
-     * Used by {@link TargetPageDescriptor}.
+     * Used by {@link org.xwiki.officeimporter.splitter.TargetPageDescriptor}.
      */
     @Requirement
     private ComponentManager componentManager;

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.splitter;
+package org.xwiki.officeimporter.splitter;
 
 import org.xwiki.model.DocumentName;
 import org.xwiki.model.DocumentNameSerializer;

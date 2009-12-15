@@ -43,7 +43,7 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.internal.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.html.HTMLUtils;

@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.DocumentName;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.internal.splitter.TargetPageDescriptor;
 
 /**
  * Component responsible for splitting office imports.

@@ -46,6 +46,11 @@ import com.google.gwt.event.dom.client.MouseDownHandler;
 public class MacroSelector implements Updatable, MouseDownHandler, KeyUpHandler, CommandListener
 {
     /**
+     * The command used to notify all the rich text area listeners when its content has been reset.
+     */
+    private static final Command RESET = new Command("reset");
+
+    /**
      * The displayer used to select macros.
      */
     private final MacroDisplayer displayer;
@@ -85,6 +90,7 @@ public class MacroSelector implements Updatable, MouseDownHandler, KeyUpHandler,
      */
     public void destroy()
     {
+        selectedContainers.clear();
         registrations.removeHandlers();
         displayer.getTextArea().getCommandManager().removeCommandListener(this);
     }
@@ -127,7 +133,12 @@ public class MacroSelector implements Updatable, MouseDownHandler, KeyUpHandler,
      */
     public boolean onBeforeCommand(CommandManager sender, Command command, String param)
     {
-        // ignore
+        if (RESET.equals(command)) {
+            // Clear the list of selected macro containers each time the content is reset to release the referenced DOM
+            // nodes. Accessing these nodes after the rich text area has been reloaded can lead to "Access Denied"
+            // JavaScript exceptions in IE.
+            selectedContainers.clear();
+        }
         return false;
     }
 

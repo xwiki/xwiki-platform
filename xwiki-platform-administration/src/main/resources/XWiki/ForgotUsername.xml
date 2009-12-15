@@ -253,7 +253,7 @@
 
 $msg.get("xe.admin.passwordreset.enteremail")
   &lt;form method="post" action=""&gt;
-  &lt;div&gt;$msg.get("xe.admin.passwordreset.email")&lt;input type="text" name="e"/&gt; &lt;input type="submit" value="$msg.get("xe.admin.passwordreset.retrieve")"/&gt;&lt;/div&gt;
+    &lt;div&gt;&lt;label for="e"&gt;$msg.get("xe.admin.passwordreset.email")&lt;/label&gt; &lt;input type="text" id="e" name="e"/&gt; &lt;input type="submit" value="$msg.get("xe.admin.passwordreset.retrieve")"/&gt;&lt;/div&gt;
   &lt;/form&gt;
 #else
   #set($results = $xwiki.searchDocuments(", BaseObject obj, StringProperty prop where obj.name = doc.fullName and obj.className = 'XWiki.XWikiUsers' and prop.id.id = obj.id and prop.id.name = 'email' and prop.value = '$email'"))

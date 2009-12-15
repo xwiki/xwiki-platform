@@ -224,6 +224,9 @@ div.hide-message {
   background-image: url("$xwiki.getSkinFile('icons/silk/lock_open.gif')");
   background-position: 6px center;
 }
+div.edit-categories {
+  font-size: 75%;
+}
 /* Trick for making the entry title appear larger in the form editor */
 #Blog\.BlogPostClass_0_title {
   font-size: 140%;

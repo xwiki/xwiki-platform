@@ -100,7 +100,7 @@ public class DefaultWikiMacro implements WikiMacro
      * Id under which this macro is registered with component manager.
      */
     private String macroId;
-    
+
     /**
      * Whether this macro supports inline mode or not.
      */
@@ -187,15 +187,18 @@ public class DefaultWikiMacro implements WikiMacro
         } catch (ParseException ex) {
             throw new MacroExecutionException("Error while parsing macro content", ex);
         }
-        
-        // If in inline mode, check whether wiki macro code segment starts with a nested macro block.
-        // If this is the case, we need to force this nested macro to be an inline macro.
+
+        // Macro code segment is always parsed into a separate xdom document. Now if this code segment starts with
+        // another macro block, it will always be interpreted as a block macro regardless of the current wiki macro's
+        // context (because as far as the nested macro is concerned, it starts on a new line). This will introduce
+        // unnecessary paragraph elements when the wiki macro is used inline, so we need to force such opening macro
+        // blocks to behave as inline macros if the wiki macro is used inline.
         if (context.isInline()) {
             List<Block> children = xdom.getChildren();
             if (children.size() > 0 && children.get(0) instanceof MacroBlock) {
-               MacroBlock old = (MacroBlock) children.get(0);
-               MacroBlock replacement = new MacroBlock(old.getId(), old.getParameters(), old.getContent(), true);
-               xdom.replaceChild(replacement, old);
+                MacroBlock old = (MacroBlock) children.get(0);
+                MacroBlock replacement = new MacroBlock(old.getId(), old.getParameters(), old.getContent(), true);
+                xdom.replaceChild(replacement, old);
             }
         }
 

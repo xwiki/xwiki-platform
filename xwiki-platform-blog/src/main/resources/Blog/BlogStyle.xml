@@ -232,6 +232,12 @@ div.edit-categories {
   font-size: 140%;
   width: 100%;
   font-weight: bold;
+}
+.createPost {
+  background: transparent url(/xwiki/resources/icons/silk/add.gif) no-repeat scroll left center; 
+  font-size: 80%; 
+  font-weight: bold;
+  padding-left: 18px;
 }</code>
 </property>
 <property>

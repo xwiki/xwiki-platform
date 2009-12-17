@@ -464,8 +464,12 @@ public class DutchWebGuidelinesValidatorTest extends TestCase
     public void testRpd8s17Links() throws Exception
     {
         setValidatorDocument("<body><a href='mailto:text@text.com text'>text@text.com</a></body>");
-        validator.validateRpd8s16();
+        validator.validateRpd8s17();
         assertFalse(getErrors(validator), isValid(validator));
+        
+        setValidatorDocument("<body><a href='mailto:text@text.com'>text@text.com</a></body>");
+        validator.validateRpd8s17();
+        assertTrue(getErrors(validator), isValid(validator));
     }
 
     public void testRpd9s1StyleAttr() throws Exception

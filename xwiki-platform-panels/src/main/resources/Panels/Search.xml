@@ -22,39 +22,6 @@
 <comment></comment>
 <object>
 <class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<name>tags</name>
-<prettyName>Tags</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>1</relationalStorage>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<size>30</size>
-<separator> </separator>
-<cache>0</cache>
-<separators> ,|</separators>
-<values></values>
-<number>1</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Panels.Search</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
-<object>
-<class>
 <name>Panels.PanelClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -138,7 +105,8 @@
 <content>#panelhiddenheader($msg.get("panels.search.title"))
   &lt;form action="$xwiki.getURL('Main.WebSearch')"&gt;
     &lt;div class="globalsearch"&gt;
-      &lt;input class="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" onfocus="if (this.value == '$msg.get('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$msg.get('panels.search.inputText')'; this.blur()"/&gt;
+      &lt;label for="globalsearchinput" class="hidden"&gt;$msg.get('panels.search.query')&lt;/label&gt;
+      &lt;input id="globalsearchinput" class="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" onfocus="if (this.value == '$msg.get('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$msg.get('panels.search.inputText')'; this.blur()"/&gt;
 &amp;nbsp;
       &lt;input class="button" value="$msg.get('panels.search.submit')" type="image" src="$xwiki.getSkinFile('go.png')" alt="$msg.get('panels.search.submit')"/&gt;
     &lt;/div&gt;

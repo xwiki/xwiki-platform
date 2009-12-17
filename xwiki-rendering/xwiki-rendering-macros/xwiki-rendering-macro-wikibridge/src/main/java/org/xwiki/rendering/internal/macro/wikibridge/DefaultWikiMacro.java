@@ -202,43 +202,47 @@ public class DefaultWikiMacro implements WikiMacro
             }
         }
 
-        // Prepare macro execution environment.
+        // Prepare macro context.
         Map<String, Object> macroContext = new HashMap<String, Object>();
         macroContext.put(MACRO_PARAMS_KEY, parameters);
         macroContext.put(MACRO_CONTENT_KEY, macroContent);
         macroContext.put(MACRO_CONTEXT_KEY, context);
 
-        Map xwikiContext;
-        Object contextDoc;
+        Map xwikiContext = null;
+        Object contextDoc = null;
         try {
             Execution execution = componentManager.lookup(Execution.class);
-            xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
+            DocumentAccessBridge docBridge = componentManager.lookup(DocumentAccessBridge.class);
+            SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
+            Transformation macroTransformation = componentManager.lookup(Transformation.class, MACRO_HINT);
 
+            // Place macro context inside xwiki context ($context.macro).
+            xwikiContext = (Map) execution.getContext().getProperty("xwikicontext");
             xwikiContext.put(MACRO_KEY, macroContext);
 
             // Save current context document.
             contextDoc = xwikiContext.get(CONTEXT_DOCUMENT_KEY);
 
             // Set the macro definition document as the context document, this is required to give the macro access to
-            // it's parameters, otherwise macro will not be able to access it's parameters if the user executing the
-            // macro does not have programming rights.
-            DocumentAccessBridge docBridge = componentManager.lookup(DocumentAccessBridge.class);
+            // it's context ($context.macro) which holds macro parameters, macro content and other important structures.
+            // This workaround ensures that macro code is evaluated with programming rights, which in turn ensures that
+            // $context.macro is accessible within the macro code.
             xwikiContext.put(CONTEXT_DOCUMENT_KEY, docBridge.getDocument(getDocumentName()));
-        } catch (Exception ex) {
-            throw new MacroExecutionException("Error while preparing macro execution environment", ex);
-        }
 
-        // Perform internal macro transformations.
-        try {
-            SyntaxFactory syntaxFactory = componentManager.lookup(SyntaxFactory.class);
-            Transformation macroTransformation = componentManager.lookup(Transformation.class, MACRO_HINT);
+            // Perform internal macro transformations.
             macroTransformation.transform(xdom, syntaxFactory.createSyntaxFromIdString(syntaxId));
         } catch (Exception ex) {
             throw new MacroExecutionException("Error while performing internal macro transformations", ex);
+        } finally {
+            if (null != xwikiContext) {
+                // Remove macro context from xwiki context.
+                xwikiContext.remove(MACRO_KEY);
+                if (null != contextDoc) {
+                    // Reset the context document.
+                    xwikiContext.put(CONTEXT_DOCUMENT_KEY, contextDoc);
+                }
+            }
         }
-
-        // Reset the context document.
-        xwikiContext.put(CONTEXT_DOCUMENT_KEY, contextDoc);
 
         List<Block> result = xdom.getChildren();
         // If in inline mode remove any top level paragraph.

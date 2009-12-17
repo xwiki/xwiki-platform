@@ -958,7 +958,7 @@ public class DutchWebGuidelinesValidator extends AbstractDOMValidator
             if (href != null && href.startsWith(MAILTO)) {
                 String email = StringUtils.substringAfter(href, MAILTO);
                 assertTrue(Type.ERROR, "rpd8s17.email", email
-                    .matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"));
+                    .matches("^[\\w\\-]([\\.\\w])+[\\w]+@([\\w\\-]+\\.)+[a-zA-Z]{2,4}$"));
             }
         }
     }

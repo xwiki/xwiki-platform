@@ -359,6 +359,7 @@ public class IESelection extends AbstractSelection
         int offset = 0;
         while (child != null) {
             if (child.getNodeType() == Node.ELEMENT_NODE) {
+                // Select the element.
                 refRange.moveToElementText(Element.as(child));
                 // Reduce the search range by moving its start point after the current element.
                 searchRange.setEndPoint(RangeCompare.END_TO_START, refRange);
@@ -366,16 +367,25 @@ public class IESelection extends AbstractSelection
                     break;
                 }
             } else if (child.getNodeType() == Node.TEXT_NODE && child.getNodeValue().length() > 0) {
+                // Select the text node. Using TextRange#findText is so far the most reliable way of doing this. Moving
+                // the start point of the search range with the number of characters in the text node doesn't always
+                // jump over the text node because the search range can have caret positions left over before the text
+                // node (e.g. when moving from one table cell to the next you have to jump over the border, which is
+                // counted by TextRange#move as a character).
+                refRange = searchRange.duplicate();
+                // We have to convert nbsp's to plain spaces because TextRange#getText seems to do so.
+                if (!refRange.findText(child.getNodeValue().replace('\u00A0', '\u0020'), 0, 4)) {
+                    // We shouldn't get here!
+                    throw new RuntimeException("Unexpected behavior of TextRange#findText");
+                }
                 // Reduce the search range by moving its start point after the current text node.
-                searchRange.moveStart(Unit.CHARACTER, child.getNodeValue().length());
+                searchRange.setEndPoint(RangeCompare.END_TO_START, refRange);
                 if (searchRange.compareEndPoints(compareStart, textRange) >= 0) {
                     container = child;
                     // Now we have to compute the offset within this text node.
-                    refRange = textRange.duplicate();
-                    refRange.collapse(start);
-                    searchRange.collapse(true);
-                    searchRange.moveStart(Unit.CHARACTER, -child.getNodeValue().length());
-                    offset = getOffset(refRange, searchRange);
+                    searchRange = textRange.duplicate();
+                    searchRange.collapse(start);
+                    offset = getOffset(searchRange, refRange);
                     break;
                 }
             }

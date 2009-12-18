@@ -605,4 +605,28 @@ public class IERangeTest extends AbstractDOMTest
         assertEquals(4, range.getStartOffset());
         assertEquals(getContainer(), range.getStartContainer());
     }
+
+    /**
+     * Checks if the caret is correctly detected inside a table cell. This test verifies if the text nodes are correctly
+     * selected while determining the caret position.
+     */
+    public void testDetectCaretInsideTableCell()
+    {
+        Range range = getRange("<table><tr><td>alice</td><td>bo|b</td></tr></table>");
+        assertTrue(range.isCollapsed());
+        assertEquals(2, range.getStartOffset());
+        assertEquals(getContainer().getElementsByTagName("td").getItem(1).getFirstChild(), range.getStartContainer());
+    }
+
+    /**
+     * Checks if the caret is correctly detected inside a text node after a button element. This test verifies if the
+     * text nodes are correctly selected while determining the caret position.
+     */
+    public void testDetectCaretInTextAfterButton()
+    {
+        Range range = getRange("before<button>inside</button>aft|er");
+        assertTrue(range.isCollapsed());
+        assertEquals(getContainer().getLastChild(), range.getStartContainer());
+        assertEquals(3, range.getStartOffset());
+    }
 }

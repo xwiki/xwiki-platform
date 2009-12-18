@@ -267,40 +267,13 @@ public class SelectionPreserver
                 DOMUtils.getInstance().detach(placeHolder.getEnd());
             }
 
-            restoreRange(selection, startContainer, startOffset, endContainer, endOffset);
+            Range range = rta.getDocument().createRange();
+            range.setStart(startContainer, startOffset);
+            range.setEnd(endContainer, endOffset);
+            selection.addRange(range);
         }
         if (reset) {
             placeHolders.clear();
         }
-    }
-
-    /**
-     * Creates a new range specified by the given boundaries and adds it to the given selection object.
-     * 
-     * @param selection the selection object on which we'll restore the range
-     * @param start the node where the range starts
-     * @param startOffset the offset with the start node
-     * @param end the node where the range ends
-     * @param endOffset the offset within the end node
-     */
-    private void restoreRange(Selection selection, Node start, int startOffset, Node end, int endOffset)
-    {
-        Range range = rta.getDocument().createRange();
-        Node selectedNode = null;
-        if (start != end && endOffset == 0 && startOffset == DOMUtils.getInstance().getLength(start)) {
-            // If the range indirectly wraps a node we select that node. This might be the case when an image is
-            // inserted in the middle of the text.
-            Node leaf = DOMUtils.getInstance().getNextLeaf(start);
-            if (leaf == DOMUtils.getInstance().getPreviousLeaf(end)) {
-                selectedNode = leaf;
-            }
-        }
-        if (selectedNode != null) {
-            range.selectNode(selectedNode);
-        } else {
-            range.setStart(start, startOffset);
-            range.setEnd(end, endOffset);
-        }
-        selection.addRange(range);
     }
 }

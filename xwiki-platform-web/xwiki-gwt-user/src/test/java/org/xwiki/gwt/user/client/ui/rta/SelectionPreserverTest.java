@@ -23,6 +23,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
 import com.google.gwt.dom.client.Node;
 
@@ -202,7 +203,7 @@ public class SelectionPreserverTest extends RichTextAreaTestCase
         assertEquals("cd", selection.toString());
 
         preserver.saveSelection();
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "<ins>#</ins>"));
+        insertHTML("<ins>#</ins>");
 
         preserver.restoreSelection();
         assertEquals("#", selection.toString());
@@ -361,45 +362,6 @@ public class SelectionPreserverTest extends RichTextAreaTestCase
     }
 
     /**
-     * Test if the selection wraps an image after it was inserted. This is needed in order to have control selection
-     * over the image after it was inserted.
-     */
-    public void testSelectionAfterImageInsertion()
-    {
-        deferTest(new com.google.gwt.user.client.Command()
-        {
-            public void execute()
-            {
-                doTestSelectionAfterImageInsertion();
-            }
-        });
-    }
-
-    /**
-     * Test if the selection wraps an image after it was inserted. This is needed in order to have control selection
-     * over the image after it was inserted.
-     */
-    private void doTestSelectionAfterImageInsertion()
-    {
-        rta.setHTML("albatross");
-
-        Range range = rta.getDocument().createRange();
-        range.setStart(getBody().getFirstChild(), 2);
-        range.setEnd(getBody().getFirstChild(), 4);
-        select(range);
-
-        preserver.saveSelection();
-        assertTrue(rta.getCommandManager().execute(Command.INSERT_HTML, "<img src=\"clear.cache.gif\"/>"));
-
-        preserver.restoreSelection();
-        range = rta.getDocument().getSelection().getRangeAt(0);
-        assertEquals(getBody(), range.getStartContainer());
-        assertEquals(1, range.getStartOffset());
-        assertEquals(getBody(), range.getEndContainer());
-        assertEquals(2, range.getEndOffset());
-    }
-
-    /**
      * Test if the range boundary markers inserted by the selection preserver in the edited document appear in the HTML
      * output.
      */
@@ -428,15 +390,16 @@ public class SelectionPreserverTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild(), 4);
         select(range);
 
+        String selectedText = "blue";
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+
         preserver.saveSelection();
-        assertTrue(rta.getCommandManager().execute(Command.BOLD));
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        assertEquals(content, getBody().xGetInnerHTML());
 
         preserver.restoreSelection();
-        assertEquals("blue", rta.getDocument().getSelection().toString());
-        assertEquals("<span style=\"font-weight: bold;\">blue</span>bird", rta.getHTML().toLowerCase());
-
-        rta.getCommandManager().execute(Command.UNDO);
-        assertEquals(content, rta.getHTML());
+        assertEquals(selectedText, rta.getDocument().getSelection().toString());
+        assertEquals(content, getBody().xGetInnerHTML());
     }
 
     /**
@@ -467,20 +430,16 @@ public class SelectionPreserverTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.setStart(getBody().getLastChild().getFirstChild(), 0);
         range.collapse(true);
-
-        Selection selection = rta.getDocument().getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        assertTrue(selection.isCollapsed());
+        select(range);
 
         preserver.saveSelection();
         range.selectNodeContents(getBody().getFirstChild());
-        selection.removeAllRanges();
-        selection.addRange(range);
-        assertEquals("x", selection.toString());
+        select(range);
+        assertEquals("x", rta.getDocument().getSelection().toString());
 
         preserver.restoreSelection();
-        assertTrue(selection.isCollapsed());
-        assertEquals(getBody().getLastChild(), selection.getRangeAt(0).getStartContainer().getParentNode());
+        String html = "z";
+        insertHTML(html);
+        assertEquals(html, Element.as(getBody().getLastChild()).getInnerHTML());
     }
 }

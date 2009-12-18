@@ -40,11 +40,6 @@ public class StyleExecutableTest extends RichTextAreaTestCase
     private Executable executable;
 
     /**
-     * Utility executable used for inserting text after styling.
-     */
-    private Executable insertHTML;
-
-    /**
      * {@inheritDoc}
      * 
      * @see RichTextAreaTestCase#gwtSetUp()
@@ -55,7 +50,6 @@ public class StyleExecutableTest extends RichTextAreaTestCase
 
         if (executable == null) {
             executable = new ToggleInlineStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em");
-            insertHTML = new InsertHTMLExecutable();
         }
     }
 
@@ -72,7 +66,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
                 assertFalse(executable.isExecuted(rta));
                 assertTrue(executable.execute(rta, null));
                 assertTrue(executable.isExecuted(rta));
-                assertTrue(insertHTML.execute(rta, "a"));
+                insertHTML("a");
                 assertTrue(executable.isExecuted(rta));
                 assertEquals("<em>a</em>", rta.getHTML().toLowerCase());
                 assertTrue(executable.execute(rta, null));
@@ -111,7 +105,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         assertFalse(executable.isExecuted(rta));
         assertTrue(executable.execute(rta, null));
         assertTrue(executable.isExecuted(rta));
-        assertTrue(insertHTML.execute(rta, "b"));
+        insertHTML("b");
         assertTrue(executable.isExecuted(rta));
         assertEquals("a<em>b</em>c", rta.getHTML().toLowerCase());
         assertTrue(executable.execute(rta, null));
@@ -150,7 +144,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         assertTrue(executable.isExecuted(rta));
         assertTrue(executable.execute(rta, null));
         assertFalse(executable.isExecuted(rta));
-        assertTrue(insertHTML.execute(rta, "c"));
+        insertHTML("c");
         assertFalse(executable.isExecuted(rta));
         assertEquals("cd", rta.getHTML().toLowerCase());
     }
@@ -184,7 +178,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         assertFalse(executable.isExecuted(rta));
         assertTrue(executable.execute(rta, null));
         assertTrue(executable.isExecuted(rta));
-        assertTrue(insertHTML.execute(rta, "f"));
+        insertHTML("f");
         assertTrue(executable.isExecuted(rta));
         assertEquals("e<em>f</em>", rta.getHTML().toLowerCase());
         assertTrue(executable.execute(rta, null));
@@ -211,10 +205,12 @@ public class StyleExecutableTest extends RichTextAreaTestCase
      */
     private void doTestStyleWhenCaretIsAfterImage()
     {
-        rta.setHTML("#<img/>");
+        // NOTE: In IE8 with the document rendered in standards mode we can't place the caret after an image if it's the
+        // last child of its parent..
+        rta.setHTML("#<img/><em>$</em>");
 
         Range range = ((Document) rta.getDocument()).createRange();
-        range.setStartAfter(getBody().getLastChild());
+        range.setStartAfter(getBody().getChildNodes().getItem(1));
         range.collapse(true);
         select(range);
 
@@ -223,9 +219,9 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         assertTrue(executable.isExecuted(rta));
         assertTrue(executable.execute(rta, null));
         assertFalse(executable.isExecuted(rta));
-        assertTrue(insertHTML.execute(rta, "x"));
+        insertHTML("x");
         assertFalse(executable.isExecuted(rta));
-        assertEquals("#<img>x", rta.getHTML().toLowerCase());
+        assertEquals("#<img>x<em>$</em>", rta.getHTML().toLowerCase());
     }
 
     /**
@@ -257,7 +253,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         assertFalse(executable.isExecuted(rta));
         assertTrue(executable.execute(rta, null));
         assertTrue(executable.isExecuted(rta));
-        assertTrue(insertHTML.execute(rta, "y"));
+        insertHTML("y");
         assertTrue(executable.isExecuted(rta));
         assertEquals("<em>y</em><img>*", rta.getHTML().toLowerCase());
         assertTrue(executable.execute(rta, null));

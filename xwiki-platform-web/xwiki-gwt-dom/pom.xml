@@ -32,6 +32,10 @@
   <name>XWiki Platform - Web - GWT - DOM API</name>
   <packaging>jar</packaging>
   <description>An extension of the GWT DOM API, providing W3C Range and Selection support, depth-first pre-order iterator and lots of DOM utility methods</description>
+  <properties>
+    <gwt.skip.tests>true</gwt.skip.tests>
+    <gwt.extra.jvm.args></gwt.extra.jvm.args>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -66,11 +70,10 @@
         <version>1.1</version>
         <configuration>
           <!-- Skip the tests by default because they need a 32-bit JRE and the CI machine is 64-bit -->
-          <skipTests>true</skipTests>
+          <skipTests>${gwt.skip.tests}</skipTests>
           <!-- GWTTestCase derived tests need the hosted browser which in turn needs a 32-bit JRE. -->
           <jvm>/usr/lib/jvm/ia32-java-6-sun/bin/java</jvm>
-          <!-- We can run the tests manually in any browser. -->
-          <!-- <extraJvmArgs>-Dgwt.args="-manual -port 54321 -style DETAILED"</extraJvmArgs> -->
+          <extraJvmArgs>${gwt.extra.jvm.args}</extraJvmArgs>
           <testTimeOut>120</testTimeOut>
           <includes>org/xwiki/gwt/dom/DOMTestSuite.java</includes>
         </configuration>
@@ -106,4 +109,19 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>test</id>
+      <properties>
+        <gwt.skip.tests>false</gwt.skip.tests>
+      </properties>
+    </profile>
+    <profile>
+      <id>manual</id>
+      <properties>
+        <!-- Arguments required to run the tests manually in any browser. -->
+        <gwt.extra.jvm.args>-Dgwt.args="-manual -port 54321 -style DETAILED"</gwt.extra.jvm.args>
+      </properties>
+    </profile>
+  </profiles>
 </project>

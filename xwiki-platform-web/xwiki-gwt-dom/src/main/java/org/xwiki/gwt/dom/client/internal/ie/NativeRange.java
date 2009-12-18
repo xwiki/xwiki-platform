@@ -44,26 +44,32 @@ public class NativeRange extends JavaScriptObject
      */
     public final native void select()
     /*-{
+        var doc = this.ownerDocument;
+        var wnd = doc.parentWindow;
         // Test if the owner document holds the current selection.
-        if (typeof(this.ownerDocument.parentWindow.__xwe_savedRange) == 'undefined') {
+        if (typeof(wnd.__xwe_savedRange) == 'undefined') {
             // Try to apply this range.
             try {
                 this.select();
                 // This range was successfully applied. Reset the cache.
-                this.ownerDocument.parentWindow.__xwe_cachedRange = undefined;
-                this.ownerDocument.parentWindow.__xwe_cachedRangeWitness = undefined;
+                wnd.__xwe_cachedRange = undefined;
+                wnd.__xwe_cachedRangeWitness = undefined;
             } catch (e) {
-                // "Could not complete the operation due to error 800a025e"
-                // This range probably starts or ends inside a hidden element. In order to make the selection work for
-                // hidden elements (without visual representation, of course) we have to cache this range and return it
-                // next time if the selection doesn't change in the mean time.
-                this.ownerDocument.parentWindow.__xwe_cachedRange = @org.xwiki.gwt.dom.client.internal.ie.NativeRange::duplicate(Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;)(this);
-                // The cache expires when the witness range is not anymore selected.
-                this.ownerDocument.parentWindow.__xwe_cachedRangeWitness = this.ownerDocument.selection.createRange();
+                if (e.number == -2146827682) {
+                    // "Could not complete the operation due to error 800a025e"
+                    // This range probably starts or ends inside a hidden element. In order to make the selection work
+                    // for hidden elements (without visual representation, of course) we have to cache this range and
+                    // return it next time if the selection doesn't change in the mean time.
+                    wnd.__xwe_cachedRange = @org.xwiki.gwt.dom.client.internal.ie.NativeRange::duplicate(Lorg/xwiki/gwt/dom/client/internal/ie/NativeRange;)(this);
+                    // The cache expires when the witness range is not anymore selected.
+                    wnd.__xwe_cachedRangeWitness = doc.selection.createRange();
+                } else {
+                    throw e;
+                }
             }
         } else {
             // Save this range till the owner document gains the focus.
-            this.ownerDocument.parentWindow.__xwe_savedRange = this;
+            wnd.__xwe_savedRange = this;
         }
     }-*/;
 

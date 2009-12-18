@@ -25,6 +25,7 @@ import junit.framework.TestSuite;
 import org.xwiki.gwt.user.client.TimerTest;
 import org.xwiki.gwt.user.client.ui.rta.RichTextAreaTest;
 import org.xwiki.gwt.user.client.ui.rta.SelectionPreserverTest;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableTest;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableTest;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.StyleExecutableTest;
 
@@ -53,6 +54,7 @@ public class UserTestSuite extends GWTTestSuite
 
         suite.addTestSuite(TimerTest.class);
         suite.addTestSuite(RichTextAreaTest.class);
+        suite.addTestSuite(DeleteExecutableTest.class);
         suite.addTestSuite(InsertHTMLExecutableTest.class);
         suite.addTestSuite(StyleExecutableTest.class);
         suite.addTestSuite(SelectionPreserverTest.class);

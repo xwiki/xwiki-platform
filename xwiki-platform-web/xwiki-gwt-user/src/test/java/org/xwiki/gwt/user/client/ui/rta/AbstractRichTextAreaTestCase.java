@@ -64,7 +64,37 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
             rta.addLoadHandler(this);
         }
         RootPanel.get().add(rta);
+        initializeRichTextArea();
     }
+
+    /**
+     * @return the initial content of the rich text area
+     */
+    protected String getInitialContent()
+    {
+        StringBuffer content = new StringBuffer();
+        content.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n");
+        content.append("  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
+        content.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n");
+        content.append("<head></head>\n");
+        content.append("  <title>Rich Text Area Test</title>\n");
+        content.append("</head>\n");
+        content.append("<body></body>\n");
+        content.append("</html>");
+        return content.toString();
+    }
+
+    /**
+     * Initializes the rich text area used for testing.
+     */
+    private native void initializeRichTextArea()
+    /*-{
+        var rta = this.@org.xwiki.gwt.user.client.ui.rta.AbstractRichTextAreaTestCase::rta;
+        var iframe = rta.@com.google.gwt.user.client.ui.UIObject::getElement()();
+        var content = this.@org.xwiki.gwt.user.client.ui.rta.AbstractRichTextAreaTestCase::getInitialContent()();
+        iframe.contentWindow.content = content;
+        iframe.contentWindow.location = 'javascript:window.content';
+    }-*/;
 
     /**
      * {@inheritDoc}
@@ -126,6 +156,28 @@ public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implement
     protected void select(Range range)
     {
         Selection selection = rta.getDocument().getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    /**
+     * Inserts the given HTML fragment at the caret position or in place of the current selection. This method doesn't
+     * use the insert HTML command, but instead it uses the Range API, which is DOM oriented and doesn't know about the
+     * HTML syntax. As a consequence this method can lead to an invalid HTML DOM if it is called on the wrong selection.
+     * 
+     * @param html the HTML fragment to be inserted
+     */
+    protected void insertHTML(String html)
+    {
+        Selection selection = rta.getDocument().getSelection();
+        Range range = selection.getRangeAt(0);
+        // Parse the given HTML fragment.
+        Element container = Element.as(rta.getDocument().createDivElement());
+        container.xSetInnerHTML(html);
+        // Replace the selection.
+        range.deleteContents();
+        range.insertNode(container.extractContents());
+        // Update the selection.
         selection.removeAllRanges();
         selection.addRange(range);
     }

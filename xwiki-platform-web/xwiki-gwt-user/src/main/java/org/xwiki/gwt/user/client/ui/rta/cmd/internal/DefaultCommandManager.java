@@ -26,6 +26,8 @@ import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
+import com.google.gwt.core.client.GWT;
+
 
 /**
  * Default command manager.
@@ -47,7 +49,7 @@ public class DefaultCommandManager extends AbstractCommandManager
 
     static {
         Command[] defaultCommands =
-            new Command[] {Command.BACK_COLOR, Command.BOLD, Command.CREATE_LINK, Command.DELETE, Command.FONT_NAME,
+            new Command[] {Command.BACK_COLOR, Command.BOLD, Command.CREATE_LINK, Command.FONT_NAME,
                 Command.FONT_SIZE, Command.FORE_COLOR, Command.FORMAT_BLOCK, Command.INDENT,
                 Command.INSERT_HORIZONTAL_RULE, Command.INSERT_IMAGE, Command.INSERT_ORDERED_LIST,
                 Command.INSERT_PARAGRAPH, Command.INSERT_UNORDERED_LIST, Command.ITALIC, Command.JUSTIFY_CENTER,
@@ -60,6 +62,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         }
 
         // Register custom executables.
+        EXECUTABLES.put(Command.DELETE, (Executable) GWT.create(DeleteExecutable.class));
         EXECUTABLES.put(Command.INSERT_HTML, new InsertHTMLExecutable());
         EXECUTABLES.put(new Command("update"), new UpdateExecutable());
     }

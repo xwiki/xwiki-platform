@@ -88,8 +88,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 rta.setHTML("<em>ab</em><strong>ij</strong>");
 
                 Range range = rta.getDocument().createRange();
-                range.setStartBefore(getBody().getChildNodes().getItem(1));
-                range.setEndAfter(getBody().getChildNodes().getItem(1));
+                range.selectNode(getBody().getLastChild());
                 select(range);
 
                 assertEquals("ij", rta.getDocument().getSelection().toString());

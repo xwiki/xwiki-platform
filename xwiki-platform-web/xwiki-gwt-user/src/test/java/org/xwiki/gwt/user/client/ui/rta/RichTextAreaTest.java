@@ -22,7 +22,6 @@ package org.xwiki.gwt.user.client.ui.rta;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Node;
@@ -106,7 +105,7 @@ public class RichTextAreaTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(new InsertHTMLExecutable().execute(rta, "*"));
+                insertHTML("*");
                 assertEquals("<span></span>*", clean(rta.getHTML()));
             }
         });

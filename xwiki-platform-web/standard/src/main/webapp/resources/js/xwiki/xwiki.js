@@ -229,30 +229,10 @@ Object.extend(XWiki, {
         document.fire("xwiki:docextra:activated", {"id": extraID});
      };
 
-     // Nested function: insert a save button near a tages input field if the extra pane
-     // passed as an argument (extraID) is the doc information pane.
-     var insertTagSaveButton = function(extraID) {
-        if (extraID == "Information" && $('tageditsavewrapper') != null) {
-            $('tageditsavewrapper').className = "buttonwrapper";
-            Event.observe($('tageditsave'), 'click', function() {
-                new Ajax.Request(
-                        window.docsaveurl,
-                        {
-                            method: 'post',
-                            postBody: "tags=" + $('tags').value,
-                            onSuccess: function() { $('tageditsavesuccess').className=''; $('tageditsaveerror').className='hidden'; },
-                            onError: function() { $('tageditsavesuccess').className='hidden'; $('tageditsaveerror').className=''; }
-                        });
-                return false;
-            } , false);
-        }
-     };
-
      // Use Ajax.Updater to display the requested pane (extraID) : comments, attachments, etc.
      // On complete :
-     //   1. Call insertTagSaveButton()
-     //   2. Call dhtmlSwitch()
-     //   3. If the function call has been triggered by an event : reset location.href to #extraID
+     //   1. Call dhtmlSwitch()
+     //   2. If the function call has been triggered by an event : reset location.href to #extraID
      //      (because when the link has been first clicked the anchor was not loaded)
      if ($(extraID + "pane").className.indexOf("empty") != -1) {
         if (window.activeDocExtraPane != null) {
@@ -266,7 +246,6 @@ Object.extend(XWiki, {
                     method: 'post',
                     evalScripts: true,
                     onComplete: function(transport){
-                      insertTagSaveButton(extraID);
                       $("docextrapanes").className="";
 
                       // Let other know new content has been loaded

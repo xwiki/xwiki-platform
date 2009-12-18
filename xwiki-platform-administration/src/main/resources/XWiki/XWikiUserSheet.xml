@@ -32,7 +32,7 @@
   1 $msg.get("platform.core.profile.title", [$username])
   #if($context.action=="view")
     &lt;div class="vcard"&gt;
-    &lt;span class="fn" style="display:none"&gt;$username&lt;/span&gt;
+    &lt;span class="fn hidden"&gt;$username&lt;/span&gt;
   #end
   ##------------------------------------------------------------------
   ## Display a menu with common user actions:

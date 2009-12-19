@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +34,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.Filter;
@@ -45,11 +44,11 @@ import org.apache.struts.upload.MultipartRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 
-import com.novell.ldap.util.Base64;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.util.Util;
 
 public class Utils
 {
@@ -66,11 +65,37 @@ public class Utils
      */
     private static ComponentManager componentManager;
 
+    /**
+     * Generate the response by parsing a velocity template and printing the result to the {@link XWikiResponse
+     * Response}. This is the main entry point to the View part of the XWiki MVC architecture.
+     * 
+     * @param template The name of the template to parse, without the {@code .vm} prefix. The template will be searched
+     *            in the usual places: current XWikiSkins object, attachment of the current skin document, current skin
+     *            folder, baseskin folder, /templates/ folder.
+     * @param context the current context
+     * @throws XWikiException when the response cannot be written to the client (for example when the client canceled
+     *             the request, thus closing the socket)
+     * @see XWiki#parseTemplate(String, XWikiContext)
+     */
     public static void parseTemplate(String template, XWikiContext context) throws XWikiException
     {
         parseTemplate(template, true, context);
     }
 
+    /**
+     * Generate the response by parsing a velocity template and (optionally) printing the result to the
+     * {@link XWikiResponse Response}.
+     * 
+     * @param template The name of the template to parse, without the {@code .vm} prefix. The template will be searched
+     *            in the usual places: current XWikiSkins object, attachment of the current skin document, current skin
+     *            folder, baseskin folder, /templates/ folder.
+     * @param write Whether the generated response should be written to the client or not. If {@code false}, only the
+     *            needed headers are generated, suitable for implementing a HEAD response.
+     * @param context the current context
+     * @throws XWikiException when the response cannot be written to the client (for example when the client canceled
+     *             the request, thus closing the socket)
+     * @see XWiki#parseTemplate(String, XWikiContext)
+     */
     public static void parseTemplate(String template, boolean write, XWikiContext context) throws XWikiException
     {
         XWikiResponse response = context.getResponse();
@@ -116,7 +141,7 @@ public class Utils
         context.getWiki().getPluginManager().beginParsing(context);
         // This class allows various components in the rendering chain to use placeholders for some fragile data. For
         // example, the URL generated for the image macro should not be further rendered, as it might get broken by wiki
-        // filters. For this to work, keep a map of used placeholders -> values in the context, and replace them when
+        // filters. For this to work, keep a map of [used placeholders -> values] in the context, and replace them when
         // the content is fully rendered. The rendering code can use Utils.createPlaceholder.
         // Initialize the placeholder map
         enablePlaceholders(context);
@@ -167,84 +192,132 @@ public class Utils
         }
     }
 
+    /**
+     * Retrieve the URL to which the client should be redirected after the successful completion of the requested
+     * action. This is taken from the {@code xredirect} parameter in the query string. If this parameter is not set, or
+     * is set to an empty value, return the default redirect specified as the second argument.
+     * 
+     * @param request the current request
+     * @param defaultRedirect the default value to use if no {@code xredirect} parameter is present
+     * @return the destination URL, as specified in the {@code xredirect} parameter, or the specified default URL
+     */
     public static String getRedirect(XWikiRequest request, String defaultRedirect)
     {
         String redirect = request.getParameter("xredirect");
-        if ((redirect == null) || (redirect.equals(""))) {
+        if (StringUtils.isBlank(redirect)) {
             redirect = defaultRedirect;
         }
 
         return redirect;
     }
 
-    public static String getRedirect(String action, String params, XWikiContext context)
+    /**
+     * Retrieve the URL to which the client should be redirected after the successful completion of the requested
+     * action. This is taken from the {@code xredirect} parameter in the query string. If this parameter is not set, or
+     * is set to an empty value, compose an URL back to the current document, using the specified action and query
+     * string, and return it.
+     * 
+     * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
+     * @param queryString the query parameters to append to the fallback URL
+     * @param context the current context
+     * @return the destination URL, as specified in the {@code xredirect} parameter, or computed using the current
+     *         document and the specified action and query string
+     */
+    public static String getRedirect(String action, String queryString, XWikiContext context)
     {
         String redirect = context.getRequest().getParameter("xredirect");
         if (StringUtils.isBlank(redirect)) {
-            redirect = context.getDoc().getURL(action, params, true, context);
+            redirect = context.getDoc().getURL(action, queryString, true, context);
         }
 
         return redirect;
     }
 
+    /**
+     * Retrieve the URL to which the client should be redirected after the successful completion of the requested
+     * action. This is taken from the {@code xredirect} parameter in the query string. If this parameter is not set, or
+     * is set to an empty value, compose an URL back to the current document, using the specified action, and return it.
+     * 
+     * @param action the XWiki action to use for composing the default redirect URL ({@code view}, {@code edit}, etc)
+     * @param context the current context
+     * @return the destination URL, as specified in the {@code xredirect} parameter, or computed using the current
+     *         document and the specified action
+     */
     public static String getRedirect(String action, XWikiContext context)
     {
         return getRedirect(action, null, context);
     }
 
+    /**
+     * Retrieve the name of the velocity template which should be used to generate the response. This is taken from the
+     * {@code xpage} parameter in the query string. If this parameter is not set, or is set to an empty value, return
+     * the provided default name.
+     * 
+     * @param request the current request
+     * @param defaultpage the default value to use if no {@code xpage} parameter is set
+     * @return the name of the requested template, as specified in the {@code xpage} parameter, or the specified default
+     *         template
+     */
     public static String getPage(XWikiRequest request, String defaultpage)
     {
         String page = request.getParameter("xpage");
-        if ((page == null) || (page.equals(""))) {
+        if (StringUtils.isEmpty(page)) {
             page = defaultpage;
         }
 
         return page;
     }
 
+    /**
+     * Get the name of an uploaded file, corresponding to the specified form field.
+     * 
+     * @param filelist the list of uploaded files, computed by the FileUpload plugin
+     * @param name the name of the form field
+     * @return the original name of the file, if the specified field name does correspond to an uploaded file, or
+     *         {@code null} otherwise
+     */
     public static String getFileName(List<FileItem> filelist, String name)
     {
-        FileItem fileitem = null;
         for (FileItem item : filelist) {
             if (name.equals(item.getFieldName())) {
-                fileitem = item;
-                break;
+                return item.getName();
             }
         }
 
-        if (fileitem == null) {
-            return null;
-        }
-
-        return fileitem.getName();
+        return null;
     }
 
+    /**
+     * Get the content of an uploaded file, corresponding to the specified form field.
+     * 
+     * @param filelist the list of uploaded files, computed by the FileUpload plugin
+     * @param name the name of the form field
+     * @return the content of the file, if the specified field name does correspond to an uploaded file, or {@code null}
+     *         otherwise
+     * @throws XWikiException if the file cannot be read due to an underlying I/O exception
+     */
     public static byte[] getContent(List<FileItem> filelist, String name) throws XWikiException
     {
-        FileItem fileitem = null;
         for (FileItem item : filelist) {
             if (name.equals(item.getFieldName())) {
-                fileitem = item;
-                break;
+                byte[] data = new byte[(int) item.getSize()];
+                InputStream fileis = null;
+                try {
+                    fileis = item.getInputStream();
+                    fileis.read(data);
+                } catch (IOException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,
+                        "Exception while reading uploaded parsed file", e);
+                } finally {
+                    IOUtils.closeQuietly(fileis);
+                }
+
+                return data;
             }
         }
 
-        if (fileitem == null) {
-            return null;
-        }
-
-        byte[] data = new byte[(int) fileitem.getSize()];
-        InputStream fileis = null;
-        try {
-            fileis = fileitem.getInputStream();
-            fileis.read(data);
-            fileis.close();
-        } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
-        }
-
-        return data;
+        return null;
     }
 
     public static XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response,
@@ -255,8 +328,7 @@ public class Utils
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
 
-        // Push the URL into the Log4j MDC context so that we can display it in the generated logs
-        // using the
+        // Push the URL into the Log4j MDC context so that we can display it in the generated logs using the
         // %X{url} syntax.
         MDC.put("url", url);
 
@@ -278,20 +350,22 @@ public class Utils
     }
 
     /**
-     * Append request parameters from the specified String to the specified Map. It is presumed that the specified Map
-     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION
+     * Parse the request parameters from the specified String using the specified encoding. <strong>IMPLEMENTATION
      * NOTE</strong>: URL decoding is performed individually on the parsed name and value elements, rather than on the
      * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded "="
      * or "&" character that would otherwise be interpreted as a delimiter.
+     * <p>
+     * Code borrowed from Apache Tomcat 5.0
+     * </p>
      * 
-     * @param data Input string containing request parameters
-     * @throws IllegalArgumentException if the data is malformed <p/> Code borrowed from Apache Tomcat 5.0
+     * @param data input string containing request parameters
+     * @param encoding the encoding to use for transforming bytes into characters
+     * @throws IllegalArgumentException if the data is malformed
      */
     public static Map<String, String[]> parseParameters(String data, String encoding)
         throws UnsupportedEncodingException
     {
-        if ((data != null) && (data.length() > 0)) {
-
+        if (!StringUtils.isEmpty(data)) {
             // use the specified encoding to extract bytes out of the
             // given string so that the encoding is not lost. If an
             // encoding is not specified, let it use platform default
@@ -312,16 +386,20 @@ public class Utils
     }
 
     /**
-     * Append request parameters from the specified String to the specified Map. It is presumed that the specified Map
-     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION
+     * Parse the request parameters from the specified byte array using the specified encoding. <strong>IMPLEMENTATION
      * NOTE</strong>: URL decoding is performed individually on the parsed name and value elements, rather than on the
      * entire query string ahead of time, to properly deal with the case where the name or value includes an encoded "="
-     * or "&" character that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is modified by
-     * this method. Caller beware.
+     * or "&" character that would otherwise be interpreted as a delimiter.
+     * <p>
+     * NOTE: byte array data is modified by this method. Caller beware.
+     * </p>
+     * <p>
+     * Code borrowed from Apache Tomcat 5.0
+     * </p>
      * 
-     * @param data Input string containing request parameters
+     * @param data input byte array containing request parameters
      * @param encoding Encoding to use for converting hex
-     * @throws UnsupportedEncodingException if the data is malformed <p/> Code borrowed from Apache Tomcat 5.0
+     * @throws UnsupportedEncodingException if the data is malformed
      */
     public static Map<String, String[]> parseParameters(byte[] data, String encoding)
         throws UnsupportedEncodingException
@@ -373,9 +451,12 @@ public class Utils
     }
 
     /**
-     * Convert a byte character value to hexidecimal digit value.
+     * Convert a byte character value to the corresponding hexidecimal digit value.
+     * <p>
+     * Code borrowed from Apache Tomcat 5.0
+     * </p>
      * 
-     * @param b the character value byte <p/> Code borrowed from Apache Tomcat 5.0
+     * @param b the character value byte
      */
     private static byte convertHexDigit(byte b)
     {
@@ -393,16 +474,22 @@ public class Utils
     }
 
     /**
-     * Put name value pair in map. <p/> Put name and value pair in map. When name already exist, add value to array of
-     * values. <p/> Code borrowed from Apache Tomcat 5.0
+     * Put name-value pair in map. When an entry for {@code name} already exist, add the new value to the array of
+     * values.
+     * <p>
+     * Code borrowed from Apache Tomcat 5.0
+     * </p>
+     * 
+     * @param map the map that is being constructed
+     * @param name the name of the parameter
+     * @param value the value of the parameter
      */
     private static void putMapEntry(Map<String, String[]> map, String name, String value)
     {
         String[] newValues = null;
         String[] oldValues = map.get(name);
         if (oldValues == null) {
-            newValues = new String[1];
-            newValues[0] = value;
+            newValues = new String[] {value};
         } else {
             newValues = new String[oldValues.length + 1];
             System.arraycopy(oldValues, 0, newValues, 0, oldValues.length);
@@ -432,38 +519,27 @@ public class Utils
      * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)} since 1.3M2
      */
     @Deprecated
-    public static String encode(String name, XWikiContext context)
+    public static String encode(String text, XWikiContext context)
     {
-        try {
-            return URLEncoder.encode(name, context.getWiki().getEncoding());
-        } catch (Exception e) {
-            return name;
-        }
+        return Util.encodeURI(text, context);
     }
 
     /**
      * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)} since 1.3M2
      */
     @Deprecated
-    public static String decode(String name, XWikiContext context)
+    public static String decode(String text, XWikiContext context)
     {
-        try {
-            // Make sure + is considered as a space
-            String result = name.replaceAll("\\+", " ");
-
-            // It seems Internet Explorer can send us back UTF-8
-            // instead of ISO-8859-1 for URLs
-            if (Base64.isValidUTF8(result.getBytes(), false)) {
-                result = new String(result.getBytes(), "UTF-8");
-            }
-
-            // Still need to decode URLs
-            return URLDecoder.decode(result, context.getWiki().getEncoding());
-        } catch (Exception e) {
-            return name;
-        }
+        return Util.decodeURI(text, context);
     }
 
+    /**
+     * Process a multi-part request, extracting all the uploaded files.
+     * 
+     * @param request the current request to process
+     * @param context the current context
+     * @return the instance of the {@link FileUploadPlugin} used to parse the uploaded files
+     */
     public static FileUploadPlugin handleMultipart(HttpServletRequest request, XWikiContext context)
     {
         FileUploadPlugin fileupload = null;
@@ -516,6 +592,8 @@ public class Utils
      * @param role the class (aka role) that the component implements
      * @param hint a value to differentiate different component implementations for the same role
      * @return the component's instance
+     * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
+     *             initialized
      */
     public static <T> T getComponent(Class<T> role, String hint)
     {
@@ -540,6 +618,8 @@ public class Utils
      * 
      * @param role the class (aka role) that the component implements
      * @return the component's instance
+     * @throws RuntimeException if the component cannot be found/initialized, or if the component manager is not
+     *             initialized
      */
     public static <T> T getComponent(Class<T> role)
     {
@@ -550,6 +630,8 @@ public class Utils
      * @param <T> the component type
      * @param role the role for which to return implementing components
      * @return all components implementing the passed role
+     * @throws RuntimeException if some of the components cannot be found/initialized, or if the component manager is
+     *             not initialized
      * @since 2.0M3
      */
     public static <T> List<T> getComponentList(Class<T> role)
@@ -618,6 +700,7 @@ public class Utils
         if (!arePlaceholdersEnabled(context)) {
             return value;
         }
+        @SuppressWarnings("unchecked")
         Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         String key;
         do {
@@ -642,6 +725,7 @@ public class Utils
         }
 
         String result = content;
+        @SuppressWarnings("unchecked")
         Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         for (Entry<String, String> e : renderingKeys.entrySet()) {
             result = result.replace(e.getKey(), e.getValue());

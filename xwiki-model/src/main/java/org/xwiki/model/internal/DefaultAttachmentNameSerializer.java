@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Requirement;
  * Generate a fully qualified attachment reference string (ie of the form {@code wiki:space.page@filename}
  * out of a {@link AttachmentName}.
  * 
- * @version $Id: DefaultAttachmentNameSerializer.java 24594 2009-10-20 15:47:51Z sdumitriu $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

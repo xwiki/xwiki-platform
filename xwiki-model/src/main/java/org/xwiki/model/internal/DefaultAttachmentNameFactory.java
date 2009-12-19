@@ -30,7 +30,7 @@ import org.xwiki.model.Model;
 /**
  * Implementation that supports the format defined in {@link #createAttachmentName(String)}. 
  *  
- * @version $Id: DefaultAttachmentNameFactory.java 24371 2009-10-12 17:18:12Z vmassol $
+ * @version $Id$
  * @since 2.2M1
  */
 @Component

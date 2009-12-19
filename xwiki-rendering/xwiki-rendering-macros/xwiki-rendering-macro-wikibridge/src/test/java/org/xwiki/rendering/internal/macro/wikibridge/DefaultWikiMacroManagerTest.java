@@ -42,7 +42,7 @@ import org.xwiki.test.AbstractComponentTestCase;
 /**
  * Unit tests for {@link org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacroManager}.
  * 
- * @version $Id: DefaultWikiMacroManagerTest.java 25429 2009-12-03 15:04:48Z vmassol $
+ * @version $Id$
  * @since 2.0M2
  */
 public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase

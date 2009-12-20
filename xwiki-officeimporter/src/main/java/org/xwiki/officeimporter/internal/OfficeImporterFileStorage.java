@@ -28,7 +28,9 @@ import org.xwiki.officeimporter.OfficeImporterException;
  * 
  * @version $Id$
  * @since 1.8M2
+ * @deprecated since 2.2M2
  */
+@Deprecated
 public class OfficeImporterFileStorage
 {
     /**

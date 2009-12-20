@@ -71,8 +71,10 @@ public class OfficeImporterVelocityBridge
      * 
      * @param componentManager used to lookup for other necessary components.
      * @param logger logger.
+     * @throws OfficeImporterException if an error occurs while looking up for other required components.
      */
     public OfficeImporterVelocityBridge(ComponentManager componentManager, Logger logger)
+        throws OfficeImporterException
     {
         this.logger = logger;
         try {
@@ -81,9 +83,9 @@ public class OfficeImporterVelocityBridge
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
             this.nameFactory = componentManager.lookup(DocumentNameFactory.class);
         } catch (Exception ex) {
-            logger.error("Error while initializing office importer velocity bridge.", ex);
+            throw new OfficeImporterException("Error while initializing office importer velocity bridge.", ex);
         }
-    }    
+    }
 
     /**
      * Imports the passed Office document into the target wiki page.

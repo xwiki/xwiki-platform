@@ -24,6 +24,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterVelocityBridge;
 import org.xwiki.velocity.VelocityContextInitializer;
 
@@ -52,6 +53,12 @@ public class OfficeImporterVelocityContextInitializer extends AbstractLogEnabled
      */
     public void initialize(VelocityContext context)
     {
-        context.put(VELOCITY_CONTEXT_KEY, new OfficeImporterVelocityBridge(componentManager, getLogger()));
+        try {
+            OfficeImporterVelocityBridge bridge = new OfficeImporterVelocityBridge(componentManager, getLogger());
+            context.put(VELOCITY_CONTEXT_KEY, bridge);
+        } catch (OfficeImporterException ex) {
+            String message = "Unrecoverable error, office importer will not be available for velocity scripts.";
+            getLogger().error(message, ex);
+        }        
     }
 }

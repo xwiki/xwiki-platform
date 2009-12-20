@@ -17,21 +17,21 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal;
+package org.xwiki.officeimporter;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.Logger;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.officeimporter.OfficeImporter;
-import org.xwiki.officeimporter.OfficeImporterException;
+import org.xwiki.model.DocumentNameFactory;
 
 /**
  * A bridge between velocity and office importer.
  * 
- * @version $Id$
+ * @version $Id: OfficeImporterVelocityBridge.java 24508 2009-10-15 10:05:22Z asiri $
  * @since 1.8M1
  */
 public class OfficeImporterVelocityBridge
@@ -57,6 +57,11 @@ public class OfficeImporterVelocityBridge
     private DocumentAccessBridge docBridge;
 
     /**
+     * Used for converting string document names to {@link DocumentName} instances.
+     */
+    private DocumentNameFactory nameFactory;
+
+    /**
      * The {@link Logger} instance.
      */
     private Logger logger;
@@ -64,19 +69,21 @@ public class OfficeImporterVelocityBridge
     /**
      * Default constructor.
      * 
-     * @param execution current execution.
-     * @param importer internal office importer component.
-     * @param docBridge document access bridge.
+     * @param componentManager used to lookup for other necessary components.
      * @param logger logger.
      */
-    public OfficeImporterVelocityBridge(Execution execution, OfficeImporter importer, DocumentAccessBridge docBridge,
-        Logger logger)
+    public OfficeImporterVelocityBridge(ComponentManager componentManager, Logger logger)
     {
-        this.execution = execution;
-        this.importer = importer;
-        this.docBridge = docBridge;
         this.logger = logger;
-    }
+        try {
+            this.execution = componentManager.lookup(Execution.class);
+            this.importer = componentManager.lookup(OfficeImporter.class);
+            this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
+            this.nameFactory = componentManager.lookup(DocumentNameFactory.class);
+        } catch (Exception ex) {
+            logger.error("Error while initializing office importer velocity bridge.", ex);
+        }
+    }    
 
     /**
      * Imports the passed Office document into the target wiki page.
@@ -101,10 +108,37 @@ public class OfficeImporterVelocityBridge
             execution.getContext().setProperty(OFFICE_IMPORTER_ERROR, ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            execution.getContext().setProperty(OFFICE_IMPORTER_ERROR,
-                "Internal error while finalizing the target document.");
+            setErrorMessage("Internal error while finalizing the target document.");
         }
         return success;
+    }
+
+    /**
+     * @return an error message set inside current execution (during import process) or null.
+     */
+    public String getErrorMessage()
+    {
+        return (String) execution.getContext().getProperty(OFFICE_IMPORTER_ERROR);
+    }
+
+    /**
+     * Utility method for setting an error message inside current execution.
+     * 
+     * @param message error message.
+     */
+    private void setErrorMessage(String message)
+    {
+        execution.getContext().setProperty(OFFICE_IMPORTER_ERROR, message);
+    }
+
+    /**
+     * @return any error messages thrown while importing.
+     * @deprecated use {@link #getErrorMessage()} instead since 2.2M1.
+     */
+    @Deprecated
+    public String getLastErrorMessage()
+    {
+        return getErrorMessage();
     }
 
     /**
@@ -117,7 +151,7 @@ public class OfficeImporterVelocityBridge
      */
     private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException
     {
-        if (!docBridge.isDocumentEditable(targetDocument)) {
+        if (!docBridge.isDocumentEditable(nameFactory.createDocumentName(targetDocument))) {
             throw new OfficeImporterException("Inadequate privileges.");
         } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
             throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
@@ -134,14 +168,5 @@ public class OfficeImporterVelocityBridge
     {
         String appendParam = options.get("appendContent");
         return (appendParam != null) ? appendParam.equals("true") : false;
-    }
-
-    /**
-     * @return any error messages thrown while importing.
-     */
-    public String getLastErrorMessage()
-    {
-        Object error = execution.getContext().getProperty(OFFICE_IMPORTER_ERROR);
-        return (error != null) ? (String) error : null;
     }
 }

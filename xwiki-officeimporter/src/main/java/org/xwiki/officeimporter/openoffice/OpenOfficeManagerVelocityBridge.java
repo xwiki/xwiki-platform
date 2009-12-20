@@ -17,18 +17,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.openoffice;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.context.Execution;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
-import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 
 /**
  * A bridge between {@link OpenOfficeManager} and velocity scripts.
  * 
- * @version $Id$
+ * @version $Id: OpenOfficeManagerVelocityBridge.java 24508 2009-10-15 10:05:22Z asiri $
  * @since 1.8RC3
  */
 public class OpenOfficeManagerVelocityBridge
@@ -167,7 +165,7 @@ public class OpenOfficeManagerVelocityBridge
      */
     private boolean isMainXWiki()
     {
-        String currentWiki = docBridge.getCurrentDocumentName().getWiki();
+        String currentWiki = docBridge.getCurrentWiki();
         // TODO: Remove the hard-coded main wiki name when a fix becomes available.
         return (currentWiki != null) && currentWiki.equals("xwiki");
     }

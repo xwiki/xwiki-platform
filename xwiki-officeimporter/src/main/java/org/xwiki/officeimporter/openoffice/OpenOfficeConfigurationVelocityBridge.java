@@ -17,14 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.officeimporter.internal.openoffice;
+package org.xwiki.officeimporter.openoffice;
 
-import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
 
 /**
  * A link between {@link OpenOfficeConfiguration} and velocity scripts.
  * 
- * @version $Id$
+ * @version $Id: OpenOfficeConfigurationVelocityBridge.java 21281 2009-06-13 19:22:09Z sdumitriu $
  * @since 1.9RC1
  */
 public class OpenOfficeConfigurationVelocityBridge

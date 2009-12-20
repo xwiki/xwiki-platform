@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManagerVelocityBridge;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**

@@ -23,6 +23,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConfigurationVelocityBridge;
 import org.xwiki.velocity.VelocityContextInitializer;
 
 /**

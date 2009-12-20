@@ -21,20 +21,19 @@ package org.xwiki.officeimporter.internal;
 
 import groovy.lang.GroovyClassLoader;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.AttachmentName;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterFilter;
@@ -115,15 +114,20 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     public void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
         Map<String, String> params) throws OfficeImporterException
     {
+        // Deduct an office file name from documentFormat argument.
+        String extension = documentFormat.substring(documentFormat.lastIndexOf('.') + 1);
+        String officeFileName = "input." + extension;
+
         DocumentName baseDocument = nameFactory.createDocumentName(targetWikiDocument);
         if (isPresentation(documentFormat)) {
-            XDOMOfficeDocument presentation = presentationBuilder.build(readStream(documentStream));
+            XDOMOfficeDocument presentation = presentationBuilder.build(documentStream, officeFileName);
             saveDocument(presentation, new TargetPageDescriptor(baseDocument, this.componentManager), null,
                 isAppendRequest(params), false);
         } else {
             OfficeImporterFilter importerFilter = getImporterFilter(params);
             XHTMLOfficeDocument xhtmlDoc =
-                xhtmlOfficeDocumentBuilder.build(readStream(documentStream), baseDocument, shouldFilterStyles(params));
+                xhtmlOfficeDocumentBuilder.build(documentStream, officeFileName, baseDocument,
+                    shouldFilterStyles(params));
             importerFilter.filter(targetWikiDocument, xhtmlDoc.getContentDocument());
             XDOMOfficeDocument xdomDoc = xdomOfficeDocumentBuilder.build(xhtmlDoc);
             importerFilter.filter(targetWikiDocument, xdomDoc.getContentDocument(), false);
@@ -146,22 +150,31 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * {@inheritDoc}
      */
-    public String importAttachment(String documentName, String attachmentName, Map<String, String> params)
+    public String importAttachment(String strDocumentName, String strAttachmentFileName, Map<String, String> params)
         throws OfficeImporterException
     {
+        DocumentName documentName = nameFactory.createDocumentName(strDocumentName);
+        AttachmentName attachmentName = new AttachmentName(documentName, strAttachmentFileName);
+
+        InputStream attachmentStream;
+        try {
+            attachmentStream = docBridge.getAttachmentContent(attachmentName);
+        } catch (Exception ex) {
+            throw new OfficeImporterException("Error while reading attachment", ex);
+        }
+
         String result = null;
-        DocumentName baseDocument = nameFactory.createDocumentName(documentName);
-        byte[] data = readAttachment(documentName, attachmentName);
-        if (isPresentation(attachmentName)) {
-            XDOMOfficeDocument presentation = presentationBuilder.build(data);
+        if (isPresentation(strAttachmentFileName)) {
+            XDOMOfficeDocument presentation = presentationBuilder.build(attachmentStream, strAttachmentFileName);
             result = presentation.getContentAsString("xhtml/1.0");
-            attachArtifacts(documentName, presentation.getArtifacts());
+            attachArtifacts(strDocumentName, presentation.getArtifacts());
         } else {
             XHTMLOfficeDocument xhtmlDoc =
-                xhtmlOfficeDocumentBuilder.build(data, baseDocument, shouldFilterStyles(params));
+                xhtmlOfficeDocumentBuilder.build(attachmentStream, strAttachmentFileName, documentName,
+                    shouldFilterStyles(params));
             HTMLUtils.stripHTMLEnvelope(xhtmlDoc.getContentDocument());
             result = xhtmlDoc.getContentAsString();
-            attachArtifacts(documentName, xhtmlDoc.getArtifacts());
+            attachArtifacts(strDocumentName, xhtmlDoc.getArtifacts());
         }
         return result;
     }
@@ -196,10 +209,10 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             } else {
                 docBridge.setDocumentSyntaxId(target, Syntax.XWIKI_2_0.toIdString());
                 if (null != title) {
-                    docBridge.getDocument(target).setTitle(title);
+                    docBridge.getDocument(targetDescriptor.getPageName()).setTitle(title);
                 }
                 if (null != parent) {
-                    docBridge.getDocument(target).setParent(targetDescriptor.getParentName());
+                    docBridge.getDocument(targetDescriptor.getPageName()).setParent(targetDescriptor.getParentName());
                 }
                 docBridge.setDocumentContent(target, content, "Created by office importer", false);
             }
@@ -225,39 +238,6 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                 // Log the error and skip the artifact.
                 getLogger().error("Error while attaching artifact.", ex);
             }
-        }
-    }
-
-    /**
-     * Utility method for reading an input stream into a byte array.
-     * 
-     * @param is input stream.
-     * @return a byte array containing data read from the stream.
-     * @throws OfficeImporterException if an error occurs while reading the stream.
-     */
-    private byte[] readStream(InputStream is) throws OfficeImporterException
-    {        
-        try {
-            return IOUtils.toByteArray(is);
-        } catch (IOException ex) {
-            throw new OfficeImporterException("Error while reading office document input stream.", ex);
-        }
-    }
-
-    /**
-     * Utility method for reading an attachment.
-     * 
-     * @param documentName document name.
-     * @param attachmentName attachment name.
-     * @return attachment content as a byte array.
-     * @throws OfficeImporterException if an error occurs while accessing the attachment.
-     */
-    private byte[] readAttachment(String documentName, String attachmentName) throws OfficeImporterException
-    {
-        try {
-            return docBridge.getAttachmentContent(documentName, attachmentName);
-        } catch (Exception ex) {
-            throw new OfficeImporterException("Error while reading attachment.", ex);
         }
     }
 
@@ -331,7 +311,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      */
     private boolean isSplitRequest(Map<String, String> params)
     {
-        String splitDocumentParam = params.get("splitDocument");        
+        String splitDocumentParam = params.get("splitDocument");
         return (splitDocumentParam != null) ? splitDocumentParam.equals(Boolean.toString(true)) : false;
     }
 

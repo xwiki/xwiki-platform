@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.builder;
 
+import java.io.InputStream;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -37,9 +39,21 @@ public interface PresentationBuilder
     /**
      * Builds a (slide-show) {@link XDOMOfficeDocument} corresponding to the given office presentation.
      * 
+     * @param officeFileStream {@link InputStream} corresponding to the office presentation.
+     * @param officeFileName name of the office document (used to determine input document format).
+     * @return {@link XDOMOfficeDocument} corresponding to the given office presentation.
+     * @throws OfficeImporterException if an error occurs while performing the import operation.
+     */
+    XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException;
+
+    /**
+     * Builds a (slide-show) {@link XDOMOfficeDocument} corresponding to the given office presentation.
+     * 
      * @param officeFileData binary data of the office presentation.
      * @return an {@link XDOMOfficeDocument} containing a slide-show similar to that of the office document.
      * @throws OfficeImporterException if an error occurs while performing the import operation.
+     * @deprecated use {@link #build(InputStream, String)} instead since 2.2M1.
      */
+    @Deprecated
     XDOMOfficeDocument build(byte[] officeFileData) throws OfficeImporterException;
 }

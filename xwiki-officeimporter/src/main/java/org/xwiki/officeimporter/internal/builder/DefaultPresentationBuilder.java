@@ -19,9 +19,12 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -32,7 +35,8 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverterException;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -45,13 +49,7 @@ import org.xwiki.rendering.parser.Parser;
  */
 @Component
 public class DefaultPresentationBuilder implements PresentationBuilder
-{
-    /**
-     * Document converter used to invoke openoffice server and convert office documents.
-     */
-    @Requirement
-    private OpenOfficeDocumentConverter documentConverter;
-
+{    
     /**
      * XWiki/2.0 syntax parser used for building the presentation XDOM.
      */
@@ -63,17 +61,45 @@ public class DefaultPresentationBuilder implements PresentationBuilder
      */
     @Requirement
     private ComponentManager componentManager;
+    
+    /**
+     * Used to obtain document converter.
+     */
+    @Requirement
+    private OpenOfficeManager officeManager;
+
+    /**
+     * {@inheritDoc}    
+     */
+    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName) throws OfficeImporterException
+    {
+        // Invoke openoffice document converter.
+        Map<String, InputStream> inputStreams = new HashMap<String, InputStream>();
+        inputStreams.put(officeFileName, officeFileStream);
+        Map<String, byte[]> artifacts;
+        try {
+            artifacts = officeManager.getConverter().convert(inputStreams, officeFileName, "output.html");
+        } catch (OpenOfficeConverterException ex) {
+            String message = "Error while converting document [%s] into html.";
+            throw new OfficeImporterException(String.format(message, officeFileName), ex);
+        }
+        
+        // Create presentation archive.
+        byte[] presentationArchive = buildPresentationArchive(artifacts);
+        artifacts.clear();
+        artifacts.put("presentation.zip", presentationArchive);
+        
+        // Build presentation XDOM.
+        return new XDOMOfficeDocument(buildPresentationXDOM(), artifacts, componentManager);
+    }
 
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public XDOMOfficeDocument build(byte[] officeFileData) throws OfficeImporterException
     {
-        Map<String, byte[]> artifacts = documentConverter.convert(officeFileData);
-        byte[] presentationArchive = buildPresentationArchive(artifacts);
-        artifacts.clear();
-        artifacts.put("presentation.zip", presentationArchive);
-        return new XDOMOfficeDocument(buildPresentationXDOM(), artifacts, componentManager);
+        return build(new ByteArrayInputStream(officeFileData), "input.tmp");
     }
 
     /**

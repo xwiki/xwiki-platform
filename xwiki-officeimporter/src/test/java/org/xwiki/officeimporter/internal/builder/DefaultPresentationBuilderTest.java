@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,11 +30,11 @@ import org.jmock.Expectations;
 import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 
 /**
  * Test case for {@link DefaultPresentationBuilder}.
@@ -46,6 +48,11 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
      * The {@link PresentationBuilder} component.
      */
     private PresentationBuilder presentationBuilder;
+    
+    /**
+     * Used to setup a mock document converter.
+     */
+    private OpenOfficeManager officeManager;
 
     /**
      * {@inheritDoc}
@@ -55,29 +62,32 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
     {
         super.setUp();
         this.presentationBuilder = getComponentManager().lookup(PresentationBuilder.class);
+        this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
     }
     
     /**
      * Test presentation {@link XDOMOfficeDocument} building.
      * 
-     * @throws OfficeImporterException
+     * @throws Exception
      */
     @Test
-    public void testPresentationBuilding() throws  OfficeImporterException
+    public void testPresentationBuilding() throws  Exception
     {
         // Create & register a mock document converter to by-pass openoffice server.
-        final byte[] mockInput = new byte[1024];
+        final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
+        final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
+        mockInput.put("input.ppt", mockOfficeFileStream);
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put("output.html", "<html><head><title></tile></head><body><p>Slide1</p></body></html>".getBytes());
 
-        final OpenOfficeDocumentConverter mockDocumentConverter = this.context.mock(OpenOfficeDocumentConverter.class);
+        final OpenOfficeConverter mockDocumentConverter = this.context.mock(OpenOfficeConverter.class);
         this.context.checking(new Expectations() {{
-                allowing(mockDocumentConverter).convert(mockInput);
+                allowing(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");
                 will(returnValue(mockOutput));
         }});
-        ReflectionUtils.setFieldValue(presentationBuilder, "documentConverter", mockDocumentConverter);
+        ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
         
-        XDOMOfficeDocument presentation = presentationBuilder.build(mockInput);
+        XDOMOfficeDocument presentation = presentationBuilder.build(mockOfficeFileStream, "input.ppt");
         Assert.assertNotNull(presentation.getContentDocument());
         Assert.assertEquals(1, presentation.getArtifacts().size());
         Assert.assertTrue(presentation.getArtifacts().containsKey("presentation.zip"));

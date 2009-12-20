@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.builder;
 
+import java.io.InputStream;
+
 import org.xwiki.component.annotation.ComponentRole;
 import org.xwiki.model.DocumentName;
 import org.xwiki.officeimporter.OfficeImporterException;
@@ -38,7 +40,8 @@ public interface XDOMOfficeDocumentBuilder
     /**
      * Builds a {@link XDOMOfficeDocument} corresponding to the given office document.
      * 
-     * @param officeFileData binary data of the office document.
+     * @param officeFileStream {@link InputStream} corresponding to the office document.
+     * @param officeFileName name of the office document (used to determine input document format).
      * @param reference reference document w.r.t which html cleaning is performed. If the office file contains images or
      *            other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
      *            attachments to the reference document.
@@ -47,25 +50,8 @@ public interface XDOMOfficeDocumentBuilder
      * @throws OfficeImporterException if an error occurs while performing the import operation.
      * @since 2.2M1
      */
-    XDOMOfficeDocument build(byte[] officeFileData, DocumentName reference, boolean filterStyles)
-        throws OfficeImporterException;
-
-    /**
-     * Builds a {@link XDOMOfficeDocument} corresponding to the given office document.
-     *
-     * @param officeFileData binary data of the office document.
-     * @param reference reference document w.r.t which html cleaning is performed. If the office file contains images or
-     *            other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
-     *            attachments to the reference document.
-     * @param filterStyles whether to filter css styles present in the html content produced by openoffice server.
-     * @return an {@link XDOMOfficeDocument} corresponding to the office document.
-     * @throws OfficeImporterException if an error occurs while performing the import operation.
-     * @since 2.1M1
-     * @deprecated use {@link #build(byte[], org.xwiki.model.DocumentName, boolean)} since 2.2M1
-     */
-    @Deprecated
-    XDOMOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference, boolean filterStyles)
-        throws OfficeImporterException;
+    XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentName reference,
+        boolean filterStyles) throws OfficeImporterException;
 
     /**
      * Builds a {@link XDOMOfficeDocument} from the given {@link XHTMLOfficeDocument}.
@@ -75,4 +61,21 @@ public interface XDOMOfficeDocumentBuilder
      * @throws OfficeImporterException if an error occurs while parsing xhtml into xdom.
      */
     XDOMOfficeDocument build(XHTMLOfficeDocument xhtmlOfficeDocument) throws OfficeImporterException;
+
+    /**
+     * Builds a {@link XDOMOfficeDocument} corresponding to the given office document.
+     * 
+     * @param officeFileData binary data of the office document.
+     * @param reference reference document w.r.t which html cleaning is performed. If the office file contains images or
+     *            other binary artifacts, html cleaning will be performed assuming that those artifacts are present as
+     *            attachments to the reference document.
+     * @param filterStyles whether to filter css styles present in the html content produced by openoffice server.
+     * @return an {@link XDOMOfficeDocument} corresponding to the office document.
+     * @throws OfficeImporterException if an error occurs while performing the import operation.
+     * @since 2.1M1
+     * @deprecated use {@link #build(InputStream, String, DocumentName, boolean)} since 2.2M1
+     */
+    @Deprecated
+    XDOMOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference, boolean filterStyles)
+        throws OfficeImporterException;
 }

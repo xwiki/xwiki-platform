@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +36,8 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.openoffice.OpenOfficeDocumentConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
+import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 
 /**
  * Test case for {@link DefaultXDOMOfficeDocumentBuilder}.
@@ -53,6 +56,11 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
      * The {@link XDOMOfficeDocumentBuilder} component.
      */
     private XDOMOfficeDocumentBuilder xdomOfficeDocumentBuilder;
+    
+    /**
+     * Used to setup a mock document converter.
+     */
+    private OpenOfficeManager officeManager;
 
     /**
      * {@inheritDoc}
@@ -63,6 +71,7 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
         super.setUp();
         this.xhtmlDocumentBuilder = getComponentManager().lookup(XHTMLOfficeDocumentBuilder.class);
         this.xdomOfficeDocumentBuilder = getComponentManager().lookup(XDOMOfficeDocumentBuilder.class);
+        this.officeManager = getComponentManager().lookup(OpenOfficeManager.class);
     }
 
     /**
@@ -73,18 +82,20 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
     @Test
     public void testXDOMOfficeDocumentBuilding() throws Exception
     {
-        // Create & register a mock document converter to by-pass openoffice server.
-        final byte[] mockInput = new byte[1024];
+        // Create & register a mock document converter to by-pass openoffice server.        
+        final InputStream mockOfficeFileStream = new ByteArrayInputStream(new byte[1024]);
+        final Map<String, InputStream> mockInput = new HashMap<String, InputStream>();
+        mockInput.put("input.doc", mockOfficeFileStream);
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put("output.html",
             "<html><head><title></tile></head><body><p><strong>Hello There</strong></p></body></html>".getBytes());
 
-        final OpenOfficeDocumentConverter mockDocumentConverter = this.context.mock(OpenOfficeDocumentConverter.class);
+        final OpenOfficeConverter mockDocumentConverter = this.context.mock(OpenOfficeConverter.class);
         this.context.checking(new Expectations() {{
-                allowing(mockDocumentConverter).convert(mockInput);
+                allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
                 will(returnValue(mockOutput));            
         }});
-        ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "documentConverter", mockDocumentConverter);
+        ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
 
         // Create & register a mock document name serializer.
         final DocumentName mockDocumentName = new DocumentName("xwiki", "Main", "Test");
@@ -95,7 +106,8 @@ public class DefaultXDOMOfficeDocumentBuilderTest extends AbstractOfficeImporter
         }});
         ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "nameSerializer", nameSerializer);
 
-        XDOMOfficeDocument document = xdomOfficeDocumentBuilder.build(mockInput, mockDocumentName, true);
+        XDOMOfficeDocument document = 
+            xdomOfficeDocumentBuilder.build(mockOfficeFileStream, "input.doc", mockDocumentName, true);
         Assert.assertNotNull(document.getContentDocument());
         Assert.assertEquals("**Hello There**", document.getContentAsString());
         Assert.assertEquals(0, document.getArtifacts().size());

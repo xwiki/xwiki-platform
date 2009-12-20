@@ -19,6 +19,8 @@
  */
 package org.xwiki.officeimporter.internal.builder;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 
 import org.w3c.dom.Document;
@@ -50,27 +52,26 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
      */
     @Requirement
     private XHTMLOfficeDocumentBuilder xhtmlOfficeDocumentBuilder;
-    
+
     /**
      * XHTML/1.0 syntax parser used to build an XDOM from an XHTML input.
      */
     @Requirement("xhtml/1.0")
     private Parser xHtmlParser;
-    
+
     /**
      * Component manager to be passed into XDOMOfficeDocument.
      */
     @Requirement
     private ComponentManager componentManager;
-    
+
     /**
      * {@inheritDoc}
-     * @since 2.2M1
      */
-    public XDOMOfficeDocument build(byte[] officeFileData, DocumentName reference, boolean filterStyles)
-        throws OfficeImporterException
+    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentName reference,
+        boolean filterStyles) throws OfficeImporterException
     {
-        return build(xhtmlOfficeDocumentBuilder.build(officeFileData, reference, filterStyles));
+        return build(xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
     }
 
     /**
@@ -85,19 +86,18 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
             xdom = xHtmlParser.parse(new StringReader(HTMLUtils.toString(xhtmlDoc)));
         } catch (ParseException ex) {
             throw new OfficeImporterException("Error: Could not parse xhtml office content.", ex);
-        }        
+        }
         return new XDOMOfficeDocument(xdom, xhtmlOfficeDocument.getArtifacts(), componentManager);
     }
 
     /**
      * {@inheritDoc}
-     * @deprecated use {@link #build(byte[], org.xwiki.model.DocumentName, boolean)} since 2.2M1
      */
     @Deprecated
     public XDOMOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        return build(officeFileData, new DocumentName(reference.getWiki(), reference.getSpace(), reference.getPage()),
-            filterStyles);
+        return build(new ByteArrayInputStream(officeFileData), "input.tmp", new DocumentName(reference.getWiki(),
+            reference.getSpace(), reference.getPage()), filterStyles);
     }
 }

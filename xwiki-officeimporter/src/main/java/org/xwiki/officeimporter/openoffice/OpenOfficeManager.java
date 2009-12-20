@@ -83,7 +83,12 @@ public interface OpenOfficeManager
             return this.stateDescription;
         }
     }
-    
+
+    /**
+     * @return current state of {@link OpenOfficeManager}.
+     */
+    ManagerState getState();
+
     /**
      * If an internally managed openoffice server is configured (xwiki.properties), this method will start an openoffice
      * server process and connect to it. Otherwise this method will try to connect to an external openoffice server
@@ -105,12 +110,14 @@ public interface OpenOfficeManager
     void stop() throws OpenOfficeManagerException;
 
     /**
-     * @return current state of {@link OpenOfficeManager}.
+     * @return {@link OpenOfficeConverter} instance suitable for performing document conversion tasks.
      */
-    ManagerState getState();
+    OpenOfficeConverter getConverter();
 
     /**
      * @return a {@link OfficeDocumentConverter} associated with this {@link OpenOfficeManager}.
+     * @deprecated use {@link #getConverter()} instead since 2.2M1
      */
+    @Deprecated
     OfficeDocumentConverter getDocumentConverter();
 }

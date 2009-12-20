@@ -31,8 +31,10 @@ import org.xwiki.officeimporter.internal.OfficeImporterFileStorage;
  * 
  * @version $Id$
  * @since 1.8RC3
+ * @deprecated use {@link OpenOfficeManager#getConverter()} instead since 2.2M1
  */
 @ComponentRole
+@Deprecated
 public interface OpenOfficeDocumentConverter
 {
     /**
@@ -44,7 +46,7 @@ public interface OpenOfficeDocumentConverter
      * @param storage temporary disk storage to hold the resulting artifacts.
      * @return map of file names to file streams resulting from the conversion.
      * @throws OfficeImporterException if an error occurs during the conversion.
-     * @deprecated deprecated since 2.1M1m use {@link #convert(byte[])} instead.
+     * @deprecated use {@link #convert(byte[])} instead since 2.1M1.
      */
     @Deprecated
     Map<String, InputStream> convert(InputStream in, OfficeImporterFileStorage storage)
@@ -59,6 +61,8 @@ public interface OpenOfficeDocumentConverter
      * @return map of file names to file contents resulting from the conversion.
      * @throws OfficeImporterException if an error occurs during the conversion.
      * @since 2.1M1
+     * @deprecated use {@link OpenOfficeConverter#convert(Map, String, String)} instead since 2.2M1 
      */
+    @Deprecated
     Map<String, byte[]> convert(byte[] officeFileData) throws OfficeImporterException;
 }

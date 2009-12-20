@@ -49,8 +49,10 @@ import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
  * 
  * @version $Id$
  * @since 1.8RC3
+ * @deprecated use {@link OpenOfficeManager#getConverter()} instead since 2.2M1
  */
 @Component
+@Deprecated
 public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled implements OpenOfficeDocumentConverter,
     Initializable
 {
@@ -147,6 +149,7 @@ public class DefaultOpenOfficeDocumentConverter extends AbstractLogEnabled imple
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public Map<String, byte[]> convert(byte[] officeFileData) throws OfficeImporterException
     {
         // Make sure the openoffice server is connected.

@@ -32,7 +32,9 @@ import net.sf.jodconverter.office.OfficeManager;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.container.Container;
 import org.xwiki.officeimporter.openoffice.OpenOfficeConfiguration;
+import org.xwiki.officeimporter.openoffice.OpenOfficeConverter;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManagerException;
 
@@ -50,6 +52,12 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
      */
     @Requirement
     private OpenOfficeConfiguration ooConfig;
+    
+    /**
+     * Used to query global temporary working directory.
+     */
+    @Requirement
+    private Container container;
 
     /**
      * The {@link OfficeManager} used to control / connect openoffice server.
@@ -64,12 +72,17 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     /**
      * Flag indicating whether the officeManager is initialized or not.
      */
-    private boolean initialized;
-
+    private boolean initialized;    
+    
     /**
      * The {@link OfficeDocumentConverter} used to convert office documents.
      */
     private OfficeDocumentConverter documentConverter;
+    
+    /**
+     * Used for carrying out document conversion tasks.
+     */
+    private OpenOfficeConverter converter;
 
     /**
      * Initializes the internal {@link OfficeManager}.
@@ -100,6 +113,8 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
                 throw new OpenOfficeManagerException("Invalid configuration.");
             }
             this.documentConverter = new OfficeDocumentConverter(officeManager);
+            File workDir = container.getApplicationContext().getTemporaryDirectory();
+            this.converter = new DefaultOpenOfficeConverter(documentConverter, workDir, getLogger());
             this.initialized = true;
         }
     }
@@ -110,15 +125,7 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     public ManagerState getState()
     {
         return currentState;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public OfficeDocumentConverter getDocumentConverter()
-    {
-        return this.documentConverter;
-    }
+    }           
 
     /**
      * {@inheritDoc}
@@ -158,6 +165,14 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     }
 
     /**
+     * {@inheritDoc}    
+     */
+    public OpenOfficeConverter getConverter()
+    {        
+        return converter;
+    }
+
+    /**
      * Utility method for checking OpenOffice server instance state.
      * 
      * @return true if the OpenOffice server is connected.
@@ -166,4 +181,13 @@ public class DefaultOpenOfficeManager extends AbstractLogEnabled implements Open
     {
         return (currentState == ManagerState.CONNECTED);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Deprecated
+    public OfficeDocumentConverter getDocumentConverter()
+    {
+        return documentConverter;
+    }        
 }

@@ -52,8 +52,10 @@ import org.xwiki.xml.html.HTMLUtils;
  * 
  * @version $Id$
  * @since 1.8M1
+ * @deprecated use individual document builder components instead since 2.2M1
  */
 @Component
+@Deprecated
 public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeImporter
 {
     /**
@@ -111,6 +113,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
         Map<String, String> params) throws OfficeImporterException
     {
@@ -150,6 +153,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public String importAttachment(String strDocumentName, String strAttachmentFileName, Map<String, String> params)
         throws OfficeImporterException
     {

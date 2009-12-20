@@ -29,8 +29,10 @@ import org.xwiki.component.annotation.ComponentRole;
  * 
  * @version $Id$
  * @since 1.8M1
+ * @deprecated use individual document builder components instead since 2.2M1
  */
 @ComponentRole
+@Deprecated
 public interface OfficeImporter
 {
     /**
@@ -42,7 +44,9 @@ public interface OfficeImporter
      * @param params additional parameters for the import operation.
      * @return the xhtml code resulting from the import operation.
      * @throws OfficeImporterException if the import operation fails.
+     * @deprecated use individual document builder components instead since 2.2M1
      */
+    @Deprecated
     String importAttachment(String documentName, String attachmentName, Map<String, String> params)
         throws OfficeImporterException;
 
@@ -56,7 +60,9 @@ public interface OfficeImporter
      * @param targetWikiDocument target wiki document.
      * @param params additional parameters for the import operation.
      * @throws OfficeImporterException if the import operation fails.
+     * @deprecated use individual document builder components instead since 2.2M1
      */
+    @Deprecated
     void importStream(InputStream documentStream, String documentFormat, String targetWikiDocument,
         Map<String, String> params) throws OfficeImporterException;
 }

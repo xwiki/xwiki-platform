@@ -28,33 +28,45 @@ import org.xwiki.rendering.block.XDOM;
  * 
  * @version $Id$
  * @since 1.9M1
+ * @deprecated use individual document builder components and their results when performing intermediate filtering
+ *             operations since 2.2M1
  */
+@Deprecated
 public interface OfficeImporterFilter
 {
     /**
      * Injects the {@link DocumentAccessBridge} component to be used for accessing documents.
      * 
      * @param docBridge the {@link DocumentAccessBridge} component.
+     * @deprecated use individual document builder components and their results when performing intermediate filtering
+     *             operations since 2.2M1
      */
+    @Deprecated
     void setDocBridge(DocumentAccessBridge docBridge);
-    
+
     /**
      * Allows extended filtering on the main XHTML {@link Document} generated during the import process.
      * 
      * @param documentName name of the target wiki page.
      * @param document the {@link Document} containing the html content of the office document.
+     * @deprecated use individual document builder components and their results when performing intermediate filtering
+     *             operations since 2.2M1
      */
+    @Deprecated
     void filter(String documentName, Document document);
-    
+
     /**
      * Allows extended filtering on xwiki documents generated during the import process.
      * 
      * @param documentName name of the target wiki page.
      * @param xdom the {@link XDOM} representing the master wiki document.
      * @param isSplit if this document is a result of a split operation.
+     * @deprecated use individual document builder components and their results when performing intermediate filtering
+     *             operations since 2.2M1
      */
+    @Deprecated
     void filter(String documentName, XDOM xdom, boolean isSplit);
-    
+
     /**
      * Allows extended filtering on imported documents just before the content is saved.
      * 
@@ -62,6 +74,9 @@ public interface OfficeImporterFilter
      * @param content xwiki/2.0 content of the document.
      * @param isSplit if this document is a result of a split operation.
      * @return the filtered document content.
+     * @deprecated use individual document builder components and their results when performing intermediate filtering
+     *             operations since 2.2M1
      */
+    @Deprecated
     String filter(String documentName, String content, boolean isSplit);
 }

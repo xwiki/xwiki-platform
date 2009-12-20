@@ -29,12 +29,16 @@ import org.xwiki.rendering.block.XDOM;
  * 
  * @version $Id$
  * @since 1.9M1
+ * @deprecated use individual document builder components and their results when performing intermediate filtering
+ *             operations since 2.2M1
  */
+@Deprecated
 public class DefaultOfficeImporterFilter implements OfficeImporterFilter
 {
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void setDocBridge(DocumentAccessBridge docBridge)
     {
         // Do nothing.
@@ -43,6 +47,7 @@ public class DefaultOfficeImporterFilter implements OfficeImporterFilter
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void filter(String documentName, Document document)
     {
         // Do nothing.        
@@ -51,6 +56,7 @@ public class DefaultOfficeImporterFilter implements OfficeImporterFilter
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public void filter(String documentName, XDOM xdom, boolean isSplit)
     {
         // Do nothing
@@ -59,6 +65,7 @@ public class DefaultOfficeImporterFilter implements OfficeImporterFilter
     /**
      * {@inheritDoc}
      */
+    @Deprecated
     public String filter(String documentName, String content, boolean isSplit)
     {
         // Do nothing.

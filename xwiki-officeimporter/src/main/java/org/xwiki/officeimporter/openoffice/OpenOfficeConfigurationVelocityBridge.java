@@ -23,7 +23,7 @@ package org.xwiki.officeimporter.openoffice;
 /**
  * A link between {@link OpenOfficeConfiguration} and velocity scripts.
  * 
- * @version $Id: OpenOfficeConfigurationVelocityBridge.java 21281 2009-06-13 19:22:09Z sdumitriu $
+ * @version $Id$
  * @since 1.9RC1
  */
 public class OpenOfficeConfigurationVelocityBridge

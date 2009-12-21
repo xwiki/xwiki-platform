@@ -26,7 +26,7 @@ import org.xwiki.context.Execution;
 /**
  * A bridge between {@link OpenOfficeManager} and velocity scripts.
  * 
- * @version $Id: OpenOfficeManagerVelocityBridge.java 24508 2009-10-15 10:05:22Z asiri $
+ * @version $Id$
  * @since 1.8RC3
  */
 public class OpenOfficeManagerVelocityBridge

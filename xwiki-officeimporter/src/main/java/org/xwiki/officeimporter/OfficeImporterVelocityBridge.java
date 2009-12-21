@@ -43,7 +43,7 @@ import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 /**
  * A bridge between velocity and office importer.
  * 
- * @version $Id: OfficeImporterVelocityBridge.java 24508 2009-10-15 10:05:22Z asiri $
+ * @version $Id$
  * @since 1.8M1
  */
 public class OfficeImporterVelocityBridge

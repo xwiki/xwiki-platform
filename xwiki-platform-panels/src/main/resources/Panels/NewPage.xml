@@ -135,19 +135,20 @@
 #panelheader($msg.get("create"))
 &lt;form method="post" action="$doc.getURL("view", "xpage=create")"&gt;
 &lt;div class="padded centered"&gt;
-&lt;select name="tocreate" class="panelselect"&gt;
+&lt;label for="tocreate" class="hidden"&gt;$msg.get("xe.panels.new.itemType")&lt;/label&gt;
+&lt;select id="tocreate" name="tocreate" class="panelselect"&gt;
   &lt;option value="page"&gt;$msg.get("xe.panels.new.page")&lt;/option&gt;
   &lt;option value="space"&gt;$msg.get("xe.panels.new.space")&lt;/option&gt;
 &lt;/select&gt;
 &lt;/div&gt;
 &lt;div class="padded centered"&gt;
 &lt;input type="hidden" name="template" value="" /&gt;
+&lt;label for="title" class="hidden"&gt;$msg.get("xe.panels.new.name")&lt;/label&gt;
 &lt;input type="text" name="title" value="$msg.get("xe.panels.new.name")" class="panelinput" style="margin:auto;" onfocus="if(this.value=='$msg.get("xe.panels.new.name")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.new.name")'"/&gt;
 &lt;/div&gt;
 &lt;div class="padded centered" style="text-align:center;"&gt;
 &lt;input type="submit" class="button" style="margin:auto;" value="$msg.get("create")"/&gt;
 &lt;/div&gt;
-&lt;p style="font-size:0.75em;padding-left:8px;"&gt;$msg.get("xe.panels.new.pageinfo")&lt;/p&gt;
 &lt;/form&gt;
 #panelfooter()
 #end</content>

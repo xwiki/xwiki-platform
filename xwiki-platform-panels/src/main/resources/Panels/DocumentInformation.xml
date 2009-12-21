@@ -133,14 +133,13 @@ $xwiki.jsx.use($paneldoc.fullName)##
     &lt;dt&gt;$msg.get("panels.documentInformation.includesMore", [$pages.size()])&lt;/dt&gt;
   #end
   &lt;dd&gt;
-  &lt;table summary="$msg.get("panels.documentInformation.includesSummary")" id="xwikiincludeddocuments"&gt;
-  &lt;tbody&gt;
+  &lt;ul&gt;
   #foreach ($page in $pages)
-    &lt;tr&gt;&lt;td&gt;&lt;a href="$xwiki.getURL($page, "view")"&gt;$page&lt;/a&gt;&lt;/td&gt;
-    &lt;td class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL($page, "edit")"&gt;$msg.get("panels.documentInformation.editIncluded")&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;li&gt;&lt;a href="$xwiki.getURL($page, 'view')"&gt;$page&lt;/a&gt;
+    &lt;a href="$xwiki.getURL($page, 'edit')"&gt;&lt;img alt="$msg.get('panels.documentInformation.editIncluded', [$page])" src="$xwiki.getSkinFile('icons/silk/page_white_edit.gif')" /&gt;&lt;/a&gt;&lt;/li&gt;
   #end
-  &lt;/tbody&gt;
-  &lt;/table&gt;&lt;/dd&gt;
+  &lt;/ul&gt;
+  &lt;/dd&gt;
 #end
 &lt;/dl&gt;
 #template("tagedit.vm")

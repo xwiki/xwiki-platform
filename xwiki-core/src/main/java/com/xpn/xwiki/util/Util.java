@@ -206,7 +206,9 @@ public class Util
 
     public static Map<String, String[]> getObject(XWikiRequest request, String prefix)
     {
-        return getSubMap(request.getParameterMap(), prefix);
+        @SuppressWarnings("unchecked")
+        Map<String, String[]> parameters = request.getParameterMap();
+        return getSubMap(parameters, prefix);
     }
 
     public static <T> Map<String, T> getSubMap(Map<String, T> map, String prefix)

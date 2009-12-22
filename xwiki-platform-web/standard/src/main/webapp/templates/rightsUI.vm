@@ -65,6 +65,7 @@
       #end
     #end
     <div id="xwikieditcontent">
+        ## FIXME: the next block seems deprecated
         #if("$!editor" == "spacerights")
             <div class="spaceName">$msg.get("platform.core.rightsManagement.editRightsForSpace", [$space])&nbsp;&nbsp;
                 <select name="space" style="width: 130px;" class="filter" onchange="location='?editor=spacerights&amp;global=1&amp;space='+this.value;">
@@ -94,12 +95,14 @@
 	        <table class="xwiki-livetable-display">
 	          <thead class="xwiki-livetable-display-header">
 	             <tr class="userorgroups-header">
-				   <td class="usersorgroupsnames">
-                     <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
-                     <input type="radio" id="uorgu" name="uorg" value="users" onclick="if($('unregistered').hasClassName('hidden')) $('unregistered').removeClassName('hidden');" />$msg.get("Users")
-                   </td>
+				   <th scope="col" class="usersorgroupsnames">
+				     <label for="uorgg" class="hidden">$msg.get("rightsmanager.groups")</label>
+                     <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get("rightsmanager.groups")&nbsp;&nbsp;
+                     <label for="uorgu" class="hidden">$msg.get("rightsmanager.users")</label>
+                     <input type="radio" id="uorgu" name="uorg" value="users" onclick="if($('unregistered').hasClassName('hidden')) $('unregistered').removeClassName('hidden');" />$msg.get("rightsmanager.users")
+                   </th>
                    #foreach($i in [0..$maxlevel])
-                     <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
+                     <th scope="col" class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</th>
                    #end
                  </tr>
                  <tr id="unregistered">
@@ -109,9 +112,10 @@
                    #end
                  </tr>
                  <tr id="usersandgroupstable-filters">
-                   <td>$msg.get("rightsmanager.searchfilter") <input name="name" type="text" style="width:65%"/>
+                   <td><label for="name">$msg.get("rightsmanager.searchfilter")</label><input id="name" name="name" type="text" style="width:65%"/>
                      #if(!$context.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                      #if(!$mainwk) ## display the combobox only in a local wiki
+                       <label for="wiki">$msg.get('rightsmanager.searchscope')</label>
                        <select name="wiki" style="margin-left:10px;">
                          <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
                          <option value="global">$msg.get("rightsmanager.global")</option>

@@ -585,6 +585,7 @@ p.legend {
         &lt;div class="admin-page-header-spacer"&gt;&amp;nbsp;&lt;/div&gt;
         &lt;h1 id="admin-header"&gt;#if($section == '')$msg.get("admin.${editor}")#else $sectionname#end&lt;/h1&gt;
         &lt;div id="change-context"&gt;
+          &lt;label for="goto-select" class="hidden"&gt;$msg.get('admin.placetoadminister')&lt;/label&gt;
           &lt;select id="goto-select"&gt;
             #if ($xwiki.hasAccessLevel('admin', $context.user, 'XWiki.XWikiPreferences'))
               &lt;optgroup label="$msg.get('admin.gotoglobaladministration')"&gt;

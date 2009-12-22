@@ -29,6 +29,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
+import org.xwiki.model.DocumentName;
 import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
@@ -227,7 +228,7 @@ public class OfficeImporterVelocityBridge
      * </p>
      * 
      * @param xdomDocument {@link XDOMOfficeDocument} to be split.
-     * @param headingLevelsToSplit heading levels defining the split points on the original document.
+     * @param headingLevels heading levels defining the split points on the original document.
      * @param namingCriterionHint hint indicating the child pages naming criterion.
      * @param rootDocumentName name of the root document w.r.t which splitting will occur. In the results set the entry
      *            corresponding to <b>rootDocumentName</b> {@link TargetPageDescriptor} will hold an auto-generated TOC
@@ -236,17 +237,96 @@ public class OfficeImporterVelocityBridge
      *         instances or null if an error occurs.
      * @since 2.2M1
      */
-    public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, String rootDocumentName)
+    public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument, String[] headingLevels,
+        String namingCriterionHint, String rootDocumentName)
     {
+        int[] splitLevels = new int[headingLevels.length];
+        for (int i = 0; i < headingLevels.length; i++) {
+            splitLevels[i] = Integer.parseInt(headingLevels[i]);
+        }
         try {
-            return xdomSplitter.split(xdomDocument, headingLevelsToSplit, namingCriterionHint, nameFactory
+            return xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint, nameFactory
                 .createDocumentName(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
         }
         return null;
+    }
+
+    /**
+     * <p>
+     * Attempts to save the given {@link XDOMOfficeDocument} into the target wiki page specified by arguments.
+     * </p>
+     * 
+     * @param doc {@link XDOMOfficeDocument} to be saved.
+     * @param target name of the target wiki page.
+     * @param syntaxId syntax of the target wiki page.
+     * @param parent name of the parent wiki page or null.
+     * @param title title of the target wiki page or null.
+     * @param append whether to append content if the target wiki page exists.
+     * @return true if the operation completes successfully, false otherwise.
+     */
+    public boolean save(XDOMOfficeDocument doc, String target, String syntaxId, String parent, String title,
+        boolean append)
+    {
+        try {
+            DocumentName docName = nameFactory.createDocumentName(target);
+            DocumentName parentName = nameFactory.createDocumentName(parent);
+
+            // First check if the user has edit rights on the target document.
+            if (!docBridge.isDocumentEditable(docName)) {
+                String message = "You do not have edit rights on [%s] document.";
+                throw new OfficeImporterException(String.format(message, target));
+            }
+
+            // Save.
+            if (docBridge.exists(target) && append) {
+                // Check whether existing document's syntax is same as target syntax.
+                String currentSyntaxId = docBridge.getDocument(docName).getSyntaxId();
+                if (!currentSyntaxId.equals(syntaxId)) {
+                    String message =
+                        "Target document [%s] exists but it's sytax [%s] is different from specified syntax [%s]";
+                    throw new OfficeImporterException(String.format(message, target, currentSyntaxId, syntaxId));
+                }
+
+                // Append the content.
+                String currentContent = docBridge.getDocumentContent(target);
+                String newContent = currentContent + "\n" + doc.getContentAsString(syntaxId);
+                docBridge.setDocumentContent(target, newContent, "Updated by office importer.", false);
+            } else {
+                docBridge.setDocumentSyntaxId(target, syntaxId);
+                docBridge.setDocumentContent(target, doc.getContentAsString(syntaxId), "Created by office importer.",
+                    false);
+
+                // Set parent if provided.
+                if (null != parent) {
+                    docBridge.getDocument(docName).setParent(parentName);
+                }
+
+                // If no title is specified, try to extract one.
+                String docTitle = (null == title) ? doc.getTitle() : title;
+
+                // Set title if applicable.
+                if (null != docTitle) {
+                    docBridge.getDocument(docName).setTitle(docTitle);
+                }
+            }
+
+            // Finally attach all the artifacts into target document.
+            attachArtifacts(doc.getArtifacts(), target);
+            
+            return true;
+        } catch (OfficeImporterException ex) {
+            setErrorMessage(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
+        } catch (Exception ex) {
+            String message = "Error while saving document [%s].";
+            message = String.format(message, target);
+            setErrorMessage(message);
+            logger.error(message, ex);
+        }
+        return false;
     }
 
     /**
@@ -290,6 +370,24 @@ public class OfficeImporterVelocityBridge
         String extension = officeFileName.substring(officeFileName.lastIndexOf('.') + 1);
         return PRESENTATION_FORMAT_EXTENSIONS.contains(extension);
     }
+    
+    /**
+     * Utility method for attaching artifacts into a wiki page.
+     * 
+     * @param artifacts map of artifact content against their names.
+     * @param target target wiki page into which artifacts are to be attached.
+     */
+    private void attachArtifacts(Map<String, byte[]> artifacts, String target)
+    {
+        for (Map.Entry<String, byte[]> artifact : artifacts.entrySet()) {
+            try {
+                docBridge.setAttachmentContent(target, artifact.getKey(), artifact.getValue());
+            } catch (Exception ex) {
+                // Log the error and skip the artifact.
+                logger.error("Error while attaching artifact.", ex);
+            }
+        }
+    }
 
     /**
      * Imports the passed Office document into the target wiki page.
@@ -322,16 +420,6 @@ public class OfficeImporterVelocityBridge
     }
 
     /**
-     * @return any error messages thrown while importing.
-     * @deprecated use {@link #getErrorMessage()} instead since 2.2M1.
-     */
-    @Deprecated
-    public String getLastErrorMessage()
-    {
-        return getErrorMessage();
-    }
-
-    /**
      * Checks if this request is valid. For a request to be valid, the target document should be editable by the current
      * user. And if this is not an append request, the target document should not exist.
      * 
@@ -346,6 +434,16 @@ public class OfficeImporterVelocityBridge
         } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
             throw new OfficeImporterException("The target document " + targetDocument + " already exists.");
         }
+    }
+
+    /**
+     * @return any error messages thrown while importing.
+     * @deprecated use {@link #getErrorMessage()} instead since 2.2M1.
+     */
+    @Deprecated
+    public String getLastErrorMessage()
+    {
+        return getErrorMessage();
     }
 
     /**

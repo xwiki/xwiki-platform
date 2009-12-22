@@ -521,7 +521,7 @@ public class Context extends Api
      * @return The list with the currently displayed fields.
      * @see Document#display(String)
      */
-    public List getDisplayedFields()
+    public List<String> getDisplayedFields()
     {
         return getXWikiContext().getDisplayedFields();
     }

@@ -42,6 +42,7 @@ public abstract class Collection extends Element
         return new Class(getCollection().getxWikiClass(getXWikiContext()), getXWikiContext());
     }
 
+    @Override
     public String getName()
     {
         return getCollection().getName();
@@ -64,6 +65,7 @@ public abstract class Collection extends Element
 
     public Element[] getProperties()
     {
+        @SuppressWarnings("unchecked")
         java.util.Collection<BaseProperty> coll = getCollection().getFieldList();
         if (coll == null) {
             return null;

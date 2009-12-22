@@ -805,7 +805,7 @@ public class Util
         StringBuffer result = new StringBuffer(textNoAccents.length());
         char[] testChars = textNoAccents.toCharArray();
         for (char testChar : testChars) {
-            if (Character.isLetterOrDigit(testChar)) {
+            if (Character.isLetterOrDigit(testChar) && testChar < 128) {
                 result.append(testChar);
             }
         }

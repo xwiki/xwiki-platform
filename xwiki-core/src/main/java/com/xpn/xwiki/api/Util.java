@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Utility APIs, available from Velocity/Groovy scripting.
+ * Utility APIs, available to scripting environments under the {@code util} variable.
  * 
  * @version $Id$
  */
@@ -45,8 +45,11 @@ public class Util extends Api
     private com.xpn.xwiki.XWiki xwiki;
 
     /**
-     * {@inheritDoc}
+     * Simple constructor, initializes a new utility API with the current {@link com.xpn.xwiki.XWikiContext context} and
+     * the current global {@link com.xpn.xwiki.XWiki XWiki} object.
      * 
+     * @param xwiki the current global XWiki object
+     * @param context the current context
      * @see Api#Api(com.xpn.xwiki.XWikiContext)
      */
     public Util(com.xpn.xwiki.XWiki xwiki, XWikiContext context)
@@ -56,7 +59,9 @@ public class Util extends Api
     }
 
     /**
-     * Protect Text from Wiki transformation.
+     * Protect Text from Wiki transformation. This method is useful for preventing content generated with Velocity from
+     * being interpreted in the xwiki/1.0 rendering engine, and should not be used in xwiki/2.0 code. The result is
+     * valid only in HTML or XML documents.
      * 
      * @param text the text to escape
      * @return the escaped text
@@ -68,10 +73,12 @@ public class Util extends Api
     }
 
     /**
-     * Protect URLs from Wiki transformation.
+     * Protect URLs from Wiki transformation. This method is useful for preventing content generated with Velocity from
+     * being interpreted in the xwiki/1.0 rendering engine, and should not be used in xwiki/2.0 code. The result is
+     * valid only in HTML or XML documents.
      * 
      * @param url the url to escape
-     * @return the encoded URL
+     * @return the encoded URL, which can be used in the HTML output
      * @since 1.3 Milestone 2
      */
     public String escapeURL(String url)
@@ -80,65 +87,69 @@ public class Util extends Api
     }
 
     /**
-     * Make a text URI compliant
+     * Translates a string into <code>application/x-www-form-urlencoded</code> format, so that it can be safely used in
+     * a query string as a parameter value.
+     * 
      * @param text the non encoded text
      * @return encoded text
      * @since 1.3 Milestone 2
+     * @see #decodeURI(String)
      */
     public String encodeURI(String text)
     {
-        return com.xpn.xwiki.util.Util.encodeURI(text, context);
+        return com.xpn.xwiki.util.Util.encodeURI(text, this.context);
     }
 
     /**
-     * Make an URI compliant text readable
+     * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of {@link #encodeURI(String)}.
+     * 
      * @param text the encoded text
      * @return decoded text
      * @since 1.3 Milestone 2
+     * @see #encodeURI(String)
      */
     public String decodeURI(String text)
     {
-        return com.xpn.xwiki.util.Util.decodeURI(text, context);
+        return com.xpn.xwiki.util.Util.decodeURI(text, this.context);
     }
-    
 
     /**
-     * Creates an Array List. This is useful from Velocity since you cannot create Object from
-     * Velocity with our secure uberspector.
+     * Creates an {@link ArrayList}. This is useful from Velocity since new objects cannot be created.
      * 
-     * @return a {@link ArrayList} object
+     * @return an {@link ArrayList} object
      * @since 1.3 Milestone 2
      */
-    public List getArrayList()
+    public <T> List<T> getArrayList()
     {
-        return new ArrayList();
+        return new ArrayList<T>();
     }
 
     /**
-     * Creates a Hash Map. This is useful from Velocity since you cannot create Object from Velocity
-     * with our secure uberspector.
+     * Creates a {@link HashMap}. This is useful from Velocity since new objects cannot be created.
      * 
      * @return a {@link HashMap} object
      * @since 1.3 Milestone 2
      */
-    public Map getHashMap()
+    public <T, U> Map<T, U> getHashMap()
     {
-        return new HashMap();
+        return new HashMap<T, U>();
     }
 
     /**
-     * Creates a Tree Map. This is useful from Velocity since you cannot create Object from Velocity
-     * with our secure uberspector.
+     * Creates a {@link TreeMap}. This is useful from Velocity since new objects cannot be created.
      * 
      * @return a {@link TreeMap} object
      * @since 1.3 Milestone 2
      */
-    public Map getTreeMap()
+    public <T, U> Map<T, U> getTreeMap()
     {
-        return new TreeMap();
+        return new TreeMap<T, U>();
     }
 
     /**
+     * Creates a new {@link Date} object corresponding to the current time. This is useful from Velocity since new
+     * objects cannot be created.
+     * 
      * @return the current date
      * @since 1.3 Milestone 2
      */
@@ -148,9 +159,11 @@ public class Util extends Api
     }
 
     /**
+     * Creates a new {@link Date} object corresponding to the specified time. This is useful from Velocity since new
+     * objects cannot be created.
+     * 
      * @param time time in milliseconds since 1970, 00:00:00 GMT
-     * @return Date a date from a time in milliseconds since 01/01/1970 as a Java {@link Date}
-     *         Object
+     * @return Date a date from a time in milliseconds since 01/01/1970 as a Java {@link Date} Object
      * @since 1.3 Milestone 2
      */
     public Date getDate(long time)
@@ -159,9 +172,11 @@ public class Util extends Api
     }
 
     /**
+     * Compute the elapsed time, in milliseconds, since the specified unix-epoch timestamp. This is useful from Velocity
+     * since new objects cannot be created.
+     * 
      * @param time the time in milliseconds
-     * @return the time delta in milliseconds between the current date and the time passed as
-     *         parameter
+     * @return the time delta in milliseconds between the current date and the time passed as parameter
      * @since 1.3 Milestone 2
      */
     public int getTimeDelta(long time)
@@ -170,33 +185,35 @@ public class Util extends Api
     }
 
     /**
-     * Split a text to an array of texts, according to a separator.
+     * Split a text into an array of texts, according to a list of separator characters.
      * 
      * @param text the original text
-     * @param sep the separator characters. The separator is one or more of the separator characters
-     * @return An array containing the split text
+     * @param separator the separator characters
+     * @return an array containing the resulting text fragments
      * @since 1.3 Milestone 2
      */
-    public String[] split(String text, String sep)
+    public String[] split(String text, String separator)
     {
-        return this.xwiki.split(text, sep);
+        return this.xwiki.split(text, separator);
     }
 
     /**
-     * Reverse the order of the elements within a list, so that the last element is moved to the
-     * beginning of the list, the next-to-last element to the second position, and so on.
-     *
+     * Reverse the order of the elements within a list, so that the last element is moved to the beginning of the list,
+     * the next-to-last element to the second position, and so on. This is useful from Velocity since classes and their
+     * static methods cannot be accessed.
+     * 
      * @param list the list to reverse
      * @return the reversed list
      * @since 1.4 Milestone 1
      */
-    public List reverseList(List list) {
+    public <T> List<T> reverseList(List<T> list)
+    {
         Collections.reverse(list);
         return list;
-    }        
+    }
 
     /**
-     * Get a stack trace as a String
+     * Get a stack trace as a String.
      * 
      * @param e the exception to convert to a String
      * @return the exception stack trace as a String
@@ -208,38 +225,22 @@ public class Util extends Api
     }
 
     /**
-     * Sort a list using a standard comparator. Elements need to be mutally comparable and implement
-     * the Comparable interface.
+     * Sort a list using a standard comparator. Elements need to be mutually comparable and implement the Comparable
+     * interface. This is useful from Velocity since classes and their static methods cannot be accessed.
      * 
      * @param list the list to sort
-     * @return the sorted list (as the same oject reference)
+     * @return the sorted list (as the same object reference)
      * @see {@link java.util.Collections#sort(java.util.List)}
      * @since 1.3 Milestone 2
      */
-    public List sort(List list)
+    public <T extends Comparable<T>> List<T> sort(List<T> list)
     {
         Collections.sort(list);
         return list;
     }
 
     /**
-     * Convert an Object to a number and return null if the object is not a Number.
-     * 
-     * @param object the object to convert
-     * @return the object as a {@link Number}
-     * @since 1.3 Milestone 2
-     */
-    public Number toNumber(java.lang.Object object)
-    {
-        try {
-            return new Long(object.toString());
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    /**
-     * Generate a random string.
+     * Generate a random string, containing only alpha-numeric characters.
      * 
      * @param size the desired size of the string
      * @return the randomly generated string
@@ -251,9 +252,9 @@ public class Util extends Api
     }
 
     /**
-     * Output a BufferedImage object into the response outputstream. Once this method has been
-     * called, not further action is possible. Users should set $context.setFinished(true) to avoid
-     * template output The image is outpout as image/jpeg.
+     * Output a BufferedImage object into the response outputstream. Once this method has been called, no further action
+     * is possible. Users should set {@code $context.setFinished(true)} to avoid template output. The image is served as
+     * image/jpeg.
      * 
      * @param image the BufferedImage to output
      * @throws java.io.IOException if the output fails
@@ -269,10 +270,9 @@ public class Util extends Api
     }
 
     /**
-     * Get a Null object. This is useful in Velocity where there is no real null object for
-     * comparaisons.
+     * Get a Null value. This is useful in Velocity where there is no real {@code null} object for comparisons.
      * 
-     * @return a Null Object
+     * @return a {@code null} Object
      * @since 1.3 Milestone 2
      */
     public Object getNull()
@@ -281,8 +281,8 @@ public class Util extends Api
     }
 
     /**
-     * Get a New Line character. This is useful in Velocity where there is no real new line
-     * character for inclusion in texts.
+     * Get a New Line character. This is useful in Velocity where there is no real new line character for inclusion in
+     * texts.
      * 
      * @return a new line character
      * @since 1.3 Milestone 2
@@ -291,10 +291,28 @@ public class Util extends Api
     {
         return "\n";
     }
-    
+
     /**
-     * @param str the String containing the boolean representation to be parsed 
-     * @return the boolean represented by the string argument, false if the string is not representing a boolean.
+     * Convert an Object to a number and return {@code null} if the object is not a Number.
+     * 
+     * @param object the object to convert
+     * @return the object as a {@link Number}, or {@code null}
+     * @since 1.3 Milestone 2
+     */
+    public Number toNumber(java.lang.Object object)
+    {
+        try {
+            return new Long(object.toString());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Convert a {@code String} to a {@code Boolean} object.
+     * 
+     * @param str the String containing the boolean representation to be parsed
+     * @return the boolean represented by the string argument, {@code false} if the string is not representing a boolean
      * @since 1.8 Milestone 2
      */
     public Boolean parseBoolean(String str)
@@ -303,8 +321,10 @@ public class Util extends Api
     }
 
     /**
+     * Convert a {@code String} to a primitive {@code int}.
+     * 
      * @param str the String to convert to an integer
-     * @return the parsed integer or zero in case of exception
+     * @return the parsed integer or zero if the string is not a valid integer number
      * @since 1.3 Milestone 2
      */
     public int parseInt(String str)
@@ -317,8 +337,10 @@ public class Util extends Api
     }
 
     /**
+     * Convert a {@code String} to an {@code Integer} object.
+     * 
      * @param str the String to convert to an Integer Object
-     * @return the parsed integer or zero in case of exception
+     * @return the parsed integer or zero if the string is not a valid integer number
      * @since 1.3 Milestone 2
      */
     public Integer parseInteger(String str)
@@ -327,8 +349,10 @@ public class Util extends Api
     }
 
     /**
+     * Convert a {@code String} to a primitive {@code long}.
+     * 
      * @param str the String to convert to a long
-     * @return the parsed long or zero in case of exception
+     * @return the parsed long or zero if the string is not a valid long number
      * @since 1.3 Milestone 2
      */
     public long parseLong(String str)
@@ -341,8 +365,10 @@ public class Util extends Api
     }
 
     /**
+     * Convert a {@code String} to a primitive {@code float}.
+     * 
      * @param str the String to convert to a float
-     * @return the parsed float or zero in case of exception
+     * @return the parsed float or zero if the string is not a valid float number
      * @since 1.3 Milestone 2
      */
     public float parseFloat(String str)
@@ -355,8 +381,10 @@ public class Util extends Api
     }
 
     /**
+     * Convert a {@code String} to a primitive {@code double}.
+     * 
      * @param str the String to convert to a double
-     * @return the parsed double or zero in case of exception
+     * @return the parsed double or zero if the string is not a valid double number
      * @since 1.3 Milestone 2
      */
     public double parseDouble(String str)
@@ -369,7 +397,7 @@ public class Util extends Api
     }
 
     /**
-     * Escape text so that it can be used in a like clause or in a test for equality clause. For
+     * Escape text so that it can be used in a HQL/SQL query, in a like clause or in a test for equality clause. For
      * example it escapes single quote characters.
      * 
      * @param text the text to escape
@@ -382,7 +410,7 @@ public class Util extends Api
     }
 
     /**
-     * Replace all accents by their alpha equivalent.
+     * Replace all accented characters by their ASCII equivalent.
      * 
      * @param text the text to parse
      * @return a string with accents replaced with their alpha equivalent
@@ -394,11 +422,11 @@ public class Util extends Api
     }
 
     /**
-     * Add a and b because Velocity operations are not always working.
+     * Add two integer numbers. Useful in Velocity, since arithmetical operations are not always working.
      * 
-     * @param a an integer to add
-     * @param b an integer to add
-     * @return the sum of a and b
+     * @param a the first number to add
+     * @param b the second number to add
+     * @return the sum of the two parameters
      * @since 1.3 Milestone 2
      */
     public int add(int a, int b)
@@ -407,11 +435,11 @@ public class Util extends Api
     }
 
     /**
-     * Add a and b because Velocity operations are not working with longs.
+     * Add two long numbers. Useful in Velocity, since arithmetical operations are not always working.
      * 
-     * @param a a long to add
-     * @param b a long to add
-     * @return the sum of a and b
+     * @param a the first number to add
+     * @param b the second number to add
+     * @return the sum of the two parameters
      * @since 1.3 Milestone 2
      */
     public long add(long a, long b)
@@ -420,11 +448,11 @@ public class Util extends Api
     }
 
     /**
-     * Add a and b where a and b are non decimal numbers specified as Strings.
+     * Add two numbers, specified as strings. Useful in Velocity, since arithmetical operations are not always working.
      * 
-     * @param a a string representing a non decimal number
-     * @param b a string representing a non decimal number
-     * @return the sum of a and b as a String
+     * @param a a string representing a number to add
+     * @param b a string representing a number to add
+     * @return the sum of the two parameters, as a String
      * @since 1.3 Milestone 2
      */
     public String add(String a, String b)
@@ -434,21 +462,20 @@ public class Util extends Api
     }
 
     /**
-     * Cleans up the passed text by removing all accents and special characters to make it a valid
-     * page name.
+     * Cleans up the passed text by removing all accents and special characters to make it a valid page name.
      * 
-     * @param name the page name to normalize
-     * @return the valid page name
+     * @param documentName the document name to normalize
+     * @return the equivalent valid document name
      * @since 1.3 Milestone 2
      */
-    public String clearName(String name)
+    public String clearName(String documentName)
     {
-        return this.xwiki.clearName(name, getXWikiContext());
+        return this.xwiki.clearName(documentName, getXWikiContext());
     }
 
     /**
-     * Removes all non alpha numerical characters from the passed text. First tries to convert
-     * accented chars to their alpha numeric representation.
+     * Removes all non alpha numerical characters from the passed text. First tries to convert accented chars to their
+     * ASCII representation. Then it removes all the remaining non-alphanumeric non-ASCII characters.
      * 
      * @param text the text to convert
      * @return the alpha numeric equivalent

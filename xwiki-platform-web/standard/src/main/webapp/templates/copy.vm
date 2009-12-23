@@ -54,8 +54,7 @@
     #end
     <tr><td>$msg.get("core.copy.targetdoc"):</td>
     <td><input type="text" name="targetdoc" value="$!{request.targetdoc}" size="60" /></td></tr>
-    <tr><td><input type="submit" value="Copy" />
-    </td></tr>
+    <tr><td><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></td></tr>
     </table>
     </form>
     #end

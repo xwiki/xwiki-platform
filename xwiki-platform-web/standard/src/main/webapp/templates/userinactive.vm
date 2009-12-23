@@ -18,7 +18,7 @@ $msg.get("accountnotactive_email")
 <div>
 <input type="hidden" name="xwikiname" value="$context.user" />
 <input type="text" name="validkey" size="16" />
-<input type="submit" value="$msg.get("confirmaccount")" />
+<span class="buttonwrapper"><input type="submit" value="$msg.get("confirmaccount")" class="button"/></span>
 </div>
 </form>
 #end

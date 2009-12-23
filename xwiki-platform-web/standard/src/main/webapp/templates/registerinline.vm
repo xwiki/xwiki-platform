@@ -58,7 +58,7 @@
           <dt>$msg.get('core.register.email')</dt>
           <dd>$doc.displayEdit($prop, 'register_',  $obj)</dd>
         </dl>
-        <span class="buttonwrapper"><input type="submit" value="$msg.get('core.register.submit')"/></span>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get('core.register.submit')" class="button"/></span>
       </div>
     </form>
   #end

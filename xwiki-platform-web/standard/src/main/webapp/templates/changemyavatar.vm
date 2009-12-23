@@ -15,7 +15,7 @@
       <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get('uploadavatarfile'):</label></div>
       <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
       <div class="padded">
-      <input type="submit" value="$msg.get('setthisavatar')" class="button"/>
+      <span class="buttonwrapper"><input type="submit" value="$msg.get('setthisavatar')" class="button"/></span>
       ##<input type="reset" value="$msg.get('cancel')" onclick="hideForm(this.form);" class="button"/>
       </div>
       <a href="$doc.getURL("view")">$msg.get('cancelpwd')</a>

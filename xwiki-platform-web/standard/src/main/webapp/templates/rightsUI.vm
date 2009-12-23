@@ -112,7 +112,7 @@
                    #end
                  </tr>
                  <tr id="usersandgroupstable-filters">
-                   <td><label for="name">$msg.get("rightsmanager.searchfilter")</label><input id="name" name="name" type="text" style="width:65%"/>
+                   <td><label for="name">$msg.get("rightsmanager.searchfilter")</label><input id="name" name="name" type="text"/>
                      #if(!$context.isMainWiki()) #set($mainwk = false) #else #set($mainwk = true) #end
                      #if(!$mainwk) ## display the combobox only in a local wiki
                        <label for="wiki">$msg.get('rightsmanager.searchscope')</label>

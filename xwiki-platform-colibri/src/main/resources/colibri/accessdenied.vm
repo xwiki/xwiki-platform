@@ -2,7 +2,10 @@
 ### Access denied message
 ###
 ###
-$response.setStatus(403)
+#if(!$response.containsHeader('WWW-Authenticate'))
+  $response.setStatus(403)
+  ## Otherwise, unauthenticated user with Basic authentication, a 401 status has been set in Java.
+#end
 #if("$!request.ajax" != '')
 $msg.get('notallowed')
 #else

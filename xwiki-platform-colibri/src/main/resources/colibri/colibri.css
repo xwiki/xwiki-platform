@@ -1033,6 +1033,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url($xwiki.getSkinFile('icons/silk/user.gif'));
 }
 
+.actionmenu #tmProfile {
+  background-image: url($xwiki.getSkinFile('icons/silk/vcard.gif'));
+}
+
 .actionmenu #tmWatchlistManager {
   background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }

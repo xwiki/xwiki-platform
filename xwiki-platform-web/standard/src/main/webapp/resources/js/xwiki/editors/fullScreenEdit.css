@@ -81,3 +81,8 @@
 #xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {
   background-color:#FFF;
 }
+.fullScreenWrapper textarea {
+  margin: 0 !important;
+  padding: 0 2px !important;
+  border: 0 none !important;
+}

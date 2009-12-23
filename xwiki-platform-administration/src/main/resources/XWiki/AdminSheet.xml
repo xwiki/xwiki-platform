@@ -523,6 +523,10 @@ p.legend {
 #goto-select optgroup {
   margin: 6px;
 }
+
+#usersandgroupstable-filters #name {
+    width: 65%;
+}
 </code>
 </property>
 <property>

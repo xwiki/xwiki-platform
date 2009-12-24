@@ -14,7 +14,7 @@ Lightbox = Class.create({
     this.lbLoading();
     toggleClass($('lb-bg'), 'hidden');
     toggleClass($('lb-align'), 'hidden');
-    $('lb-bg').style.height = (document.body.offsetHeight + 35)+"px";
+    this.resizeBackground();
     if(browser.isIE6x) {
       $$('select').each(function(item) {
         if (item.up('#lb')) {
@@ -67,7 +67,7 @@ Lightbox = Class.create({
     for(var i = 0; i < scripts.length; ++i) {
       eval(scripts[i].text);
     }
-    $('lb-bg').style.height = (document.body.offsetHeight + 35)+"px";
+    this.resizeBackground();
   },
 
   lbSaveForm: function() {
@@ -163,6 +163,18 @@ Lightbox = Class.create({
     return str;
   },
 
+  resizeBackground: function() {
+    var newHeight = document.body.parentNode.scrollHeight;
+    if (document.body.scrollHeight > newHeight) {
+      // IE6
+      newHeight = document.body.scrollHeight;
+    }
+    if (document.body.parentNode.clientHeight > newHeight) {
+      // IE7
+      newHeight = document.body.parentNode.clientHeight;
+    }
+    $('lb-bg').style.height = newHeight + "px";
+  },
   roundedlightbottom:  function(bgcolor, bordercolor) {
     var str = '<div class="roundedlight"><b class="top">' + 
       '<b class="b4b" style="background:' + bordercolor + ';"></b>' +

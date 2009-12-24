@@ -472,9 +472,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         // Get entity groups in entity wiki
-        if (context.getWiki().isVirtualMode() &&
-                !context.getDatabase().equalsIgnoreCase(entityDocumentName.getWiki()))
-        {
+        if (context.getWiki().isVirtualMode() && !context.getDatabase().equalsIgnoreCase(entityDocumentName.getWiki())) {
             String database = context.getDatabase();
             try {
                 context.setDatabase(entityDocumentName.getWiki());
@@ -662,15 +660,15 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // Check if this document is denied/allowed
             // through the web WebPreferences Global Rights
 
-            String web = Util.getWeb(resourceKey);
+            String space = currentdoc.getSpace();
             ArrayList<String> spacesChecked = new ArrayList<String>();
             int recursiveSpaceChecks = 0;
-            while ((web != null) && (recursiveSpaceChecks <= maxRecursiveSpaceChecks)) {
+            while ((space != null) && (recursiveSpaceChecks <= maxRecursiveSpaceChecks)) {
                 // Add one to the recursive space checks
                 recursiveSpaceChecks++;
                 // add to list of spaces already checked
-                spacesChecked.add(web);
-                XWikiDocument webdoc = context.getWiki().getDocument(web, "WebPreferences", context);
+                spacesChecked.add(space);
+                XWikiDocument webdoc = context.getWiki().getDocument(space, "WebPreferences", context);
                 if (!webdoc.isNew()) {
                     if (hasDenyRights()) {
                         try {
@@ -701,15 +699,15 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     }
 
                     // find the parent web to check rights on it
-                    web = webdoc.getStringValue("XWiki.XWikiPreferences", "parent");
-                    if ((web == null) || (web.trim().equals("")) || spacesChecked.contains(web)) {
+                    space = webdoc.getStringValue("XWiki.XWikiPreferences", "parent");
+                    if ((space == null) || (space.trim().equals("")) || spacesChecked.contains(space)) {
                         // no parent space or space already checked (recursive loop). let's finish
                         // the loop
-                        web = null;
+                        space = null;
                     }
                 } else {
                     // let's finish the loop
-                    web = null;
+                    space = null;
                 }
             }
 
@@ -865,16 +863,19 @@ public class XWikiRightServiceImpl implements XWikiRightService
         } catch (XWikiRightNotFoundException e) {
         }
 
+        XWikiDocument documentName = new XWikiDocument();
+        documentName.setFullName(resourceKey);
+
         // Verify Web super user
-        String web = Util.getWeb(resourceKey);
+        String space = documentName.getSpace();
         ArrayList<String> spacesChecked = new ArrayList<String>();
         int recursiveSpaceChecks = 0;
-        while ((web != null) && (recursiveSpaceChecks <= maxRecursiveSpaceChecks)) {
+        while ((space != null) && (recursiveSpaceChecks <= maxRecursiveSpaceChecks)) {
             // Add one to the recursive space checks
             recursiveSpaceChecks++;
             // add to list of spaces already checked
-            spacesChecked.add(web);
-            XWikiDocument webdoc = context.getWiki().getDocument(web, "WebPreferences", context);
+            spacesChecked.add(space);
+            XWikiDocument webdoc = context.getWiki().getDocument(space, "WebPreferences", context);
             if (!webdoc.isNew()) {
                 try {
                     allow = checkRight(name, webdoc, "admin", user, true, true, context);
@@ -886,14 +887,14 @@ public class XWikiRightServiceImpl implements XWikiRightService
                 }
 
                 // find the parent web to check rights on it
-                web = webdoc.getStringValue("XWiki.XWikiPreferences", "parent");
-                if ((web == null) || (web.trim().equals("")) || spacesChecked.contains(web)) {
+                space = webdoc.getStringValue("XWiki.XWikiPreferences", "parent");
+                if ((space == null) || (space.trim().equals("")) || spacesChecked.contains(space)) {
                     // no parent space or space already checked (recursive loop). let's finish the
                     // loop
-                    web = null;
+                    space = null;
                 }
             } else {
-                web = null;
+                space = null;
             }
         }
 

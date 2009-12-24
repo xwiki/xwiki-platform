@@ -15,11 +15,25 @@ Lightbox = Class.create({
     toggleClass($('lb-bg'), 'hidden');
     toggleClass($('lb-align'), 'hidden');
     $('lb-bg').style.height = (document.body.offsetHeight + 35)+"px";
+    if(browser.isIE6x) {
+      $$('select').each(function(item) {
+        if (item.up('#lb')) {
+          return;
+        }
+        item._x_originalVisibility = item.style['visibility'];
+        item.setStyle({visibility: 'hidden'});
+      });
+    }
   },
 
   lbHide: function() {
     toggleClass($('lb-bg'), 'hidden');
     toggleClass($('lb-align'), 'hidden');
+    if(browser.isIE6x) {
+      $$('select').each(function(item) {
+        item.setStyle({visibility: item._x_originalVisibility});
+      });
+    }
   },
 
   lbLoading: function() {

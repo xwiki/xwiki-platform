@@ -110,7 +110,7 @@ public class DefaultOpenOfficeConverter implements OpenOfficeConverter
                     fis = new FileInputStream(file);
                     result.put(file.getName(), IOUtils.toByteArray(fis));
                 } finally {
-                    IOUtils.closeQuietly(fos);
+                    IOUtils.closeQuietly(fis);
                 }
             }
 

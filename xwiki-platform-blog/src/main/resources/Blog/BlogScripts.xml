@@ -150,27 +150,6 @@ XWiki.Blog = {
     }
   },
 
-  addBehaviorToNewPostForm : function() {
-    var form = $("newBlogPost");
-    if (form) {
-      var title = form.elements.namedItem("entryTitle");
-      if (title) {
-        Event.observe(title, "focus", function() {
-          if(title.value == title.defaultValue) {
-            title.value = "";
-          } else {
-            title.select();
-          }
-        });
-        Event.observe(title, "blur", function() {
-          if(title.value == "") {
-            title.value = title.defaultValue;
-          }
-        });
-      }
-    }
-  },
-
   makeEntryInvisible : function(event) {
     Event.stopObserving(this, "click", this.blogCallback);
     XWiki.Blog.setToolLoadingStatus(this, XWiki.Blog.blogToolsValues.loading);

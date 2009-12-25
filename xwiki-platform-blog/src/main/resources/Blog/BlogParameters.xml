@@ -32,6 +32,7 @@
 #set($blogPostClassname = 'Blog.BlogPostClass')
 #set($blogPostTemplate = 'Blog.BlogPostTemplate')
 #set($blogPostSheet = 'Blog.BlogPostSheet')
+#set($blogPostObjectNumber = $xwiki.getDocument($blogPostTemplate).getObject($blogPostClassname).number)
 #set($oldArticleClassname = 'XWiki.ArticleClass')
 ## Categories
 #set($blogCategoryClassname = 'Blog.CategoryClass')

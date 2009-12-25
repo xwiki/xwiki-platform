@@ -25,6 +25,7 @@ html, body, div, span, applet, object, iframe,
   outline: 0;
   padding: 0;
   vertical-align: baseline;
+  line-height: normal;
 }
 
 /* @group STANDARD */
@@ -51,7 +52,7 @@ a img {
   border: 0;
 }
 
-h1, h2, h3, h4 , h5, h6{
+h1, h2, h3, h4 , h5, h6 {
   border-bottom: 1px dotted $theme.borderColor;
   color: $theme.titleColor;
   display: block;
@@ -60,7 +61,9 @@ h1, h2, h3, h4 , h5, h6{
   margin: 20px 0;
   overflow: hidden;
 }
-
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
+  line-height: 1.2em;
+}
 /* Font size for Hn is 1.1^(7-n) */
 h1 {
   font-size: 1.77em;
@@ -89,6 +92,9 @@ h6 {
 p {
   line-height: 1.4em;
   margin: .5em 0;
+}
+p * {
+  line-height: 1.4em;
 }
 
 ol {
@@ -200,7 +206,9 @@ span.wikicreatelink a {
   list-style-position: inside;
   margin: 1em 0 1em 2em;
 }
-
+.main ol *, .main ul * {
+  line-height: 1.4em;
+}
 .main ol ol, .main ul ul {
   margin-bottom: 0;
   margin-top: 0;
@@ -313,10 +321,6 @@ span.wikicreatelink a {
 }
 
 /* ----------------------Content-------------------------*/
-#xwikimaincontainer{
-  line-height: 1.2em;
-}
-
 #xwikimaincontainerinner {
   background: $theme.pageBackgroundColor $!{theme.pageBackgroundImage} $!{theme.pageBackgroundPosition};
   clear: both;
@@ -592,7 +596,9 @@ div.buttonwrapper {
   line-height: 1.4em;
   padding: 1.5em 0 0;
 }
-
+#changes-info-boxes * {
+  line-height: 1.4em;
+}
 #changes-info-box-from {
   float: left;
   width: 49%;
@@ -1127,7 +1133,9 @@ h1.xwikipaneltitle {
   overflow: hidden;
   padding: 10px 15px;
 }
-
+.xwikipanelcontents * {
+  line-height: 1.6em;
+}
 .collapsed h1.xwikipaneltitle {
   background-color: $theme.panelCollapsedBackgroundColor;
   border: 0;

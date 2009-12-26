@@ -22,6 +22,7 @@ package com.xpn.xwiki.store;
 import java.util.Date;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -113,16 +114,18 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
     public XWikiDeletedDocument[] getAllDeletedDocuments(final XWikiDocument doc, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
-        return (XWikiDeletedDocument[]) executeRead(context, bTransaction, new HibernateCallback()
+        return executeRead(context, bTransaction, new HibernateCallback<XWikiDeletedDocument[]>()
         {
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+            public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                List lst =
-                    session.createCriteria(XWikiDeletedDocument.class).add(
-                        Restrictions.eq("fullName", doc.getFullName())).add(
-                        Restrictions.eq("language", doc.getLanguage())).addOrder(Order.desc("date")).list();
-                XWikiDeletedDocument[] result = new XWikiDeletedDocument[lst.size()];
-                return lst.toArray(result);
+                Criteria c = session.createCriteria(XWikiDeletedDocument.class);
+                c.add(Restrictions.eq("fullName", doc.getFullName()));
+                c.add(Restrictions.eq("language", doc.getLanguage()));
+                c.addOrder(Order.desc("date"));
+                @SuppressWarnings("unchecked")
+                List<XWikiDeletedDocument> deletedVersions = c.list();
+                XWikiDeletedDocument[] result = new XWikiDeletedDocument[deletedVersions.size()];
+                return deletedVersions.toArray(result);
             }
         });
     }

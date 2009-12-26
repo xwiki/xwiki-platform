@@ -68,12 +68,12 @@ public class DeleteAction extends XWikiAction
                     }
                     xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
                 }
-                sendRedirect(response, doc.getURL("view", context));
+                sendRedirect(response, Utils.getRedirect("view", context));
                 redirected = true;
             } else {
                 // No index parameter passed, redirect the user to the view template so that he gets the document
                 // don't exist dialog box.
-                sendRedirect(response, doc.getURL("view", context));
+                sendRedirect(response, Utils.getRedirect("view", context));
                 redirected = true;
             }
         } else {
@@ -94,12 +94,14 @@ public class DeleteAction extends XWikiAction
                 return true;
             }
         }
-        // If a xredirect param is passed then redirect to the page specified instead of going to the default
-        // confirmation page.
-        String redirect = Utils.getRedirect(request, null);
-        if (redirect != null) {
-            sendRedirect(response, redirect);
-            redirected = true;
+        if (!redirected) {
+            // If a xredirect param is passed then redirect to the page specified instead of going to the default
+            // confirmation page.
+            String redirect = Utils.getRedirect(request, null);
+            if (redirect != null) {
+                sendRedirect(response, redirect);
+                redirected = true;
+            }
         }
         return !redirected;
     }

@@ -20,35 +20,42 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
-
-import java.io.IOException;
+import com.xpn.xwiki.util.Util;
 
 /**
- *
  * @deprecated Use {@link ExportAction}.
  */
-public class PDFAction extends XWikiAction {
-	public String render(XWikiContext context) throws XWikiException {
-        XWikiURLFactory urlf = context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF, context);
+@Deprecated
+public class PDFAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        XWikiURLFactory urlf =
+            context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF, context);
         context.setURLFactory(urlf);
         PdfExportImpl pdfexport = new PdfExportImpl();
         XWikiDocument doc = context.getDoc();
         handleRevision(context);
-            
-        try {
-         context.getResponse().setContentType("application/pdf");
-         context.getResponse().addHeader("Content-disposition", "inline; filename=" + Utils.encode(doc.getSpace(), context) + "_" + Utils.encode(doc.getName(), context) + ".pdf");
 
-         pdfexport.export(doc, context.getResponse().getOutputStream(), PdfExportImpl.PDF, context);
+        try {
+            context.getResponse().setContentType("application/pdf");
+            context.getResponse().addHeader(
+                "Content-disposition",
+                "inline; filename=" + Util.encodeURI(doc.getSpace(), context) + "_"
+                    + Util.encodeURI(doc.getName(), context) + ".pdf");
+
+            pdfexport.export(doc, context.getResponse().getOutputStream(), PdfExportImpl.PDF, context);
         } catch (IOException e) {
-           throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                "Exception while sending response", e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
         }
         return null;
-	}
+    }
 }

@@ -19,19 +19,21 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.codehaus.plexus.util.StringUtils;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.export.html.HtmlPackager;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Exports in XAR, PDF, RTF or HTML formats.
@@ -45,6 +47,7 @@ public class ExportAction extends XWikiAction
      * 
      * @see XWikiAction#render(XWikiContext)
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         String defaultPage;
@@ -61,10 +64,8 @@ public class ExportAction extends XWikiAction
                 defaultPage = exportPDFOrRTF(format, context);
             }
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_EXPORT,
-                "Exception while exporting",
-                e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_EXPORT,
+                "Exception while exporting", e);
         }
 
         return defaultPage;
@@ -87,18 +88,18 @@ public class ExportAction extends XWikiAction
         String name = request.get("name");
         String[] pages = request.getParameterValues("pages");
 
-        List pageList = new ArrayList();
+        List<String> pageList = new ArrayList<String>();
         if (pages == null || pages.length == 0) {
             pageList.add(context.getDoc().getFullName());
 
-            if (name == null || name.trim().length() == 0) {
+            if (StringUtils.isBlank(name)) {
                 name = context.getDoc().getFullName();
             }
         } else {
-            Map wikiQueries = new HashMap();
+            Map<String, Object[]> wikiQueries = new HashMap<String, Object[]>();
             for (int i = 0; i < pages.length; ++i) {
                 String pattern = pages[i];
-                
+
                 String wikiName;
                 if (pattern.contains(":")) {
                     int index = pattern.indexOf(':');
@@ -107,42 +108,41 @@ public class ExportAction extends XWikiAction
                 } else {
                     wikiName = context.getDatabase();
                 }
-                
+
                 StringBuffer where;
-                List params;
-                
+                List<String> params;
+
                 if (!wikiQueries.containsKey(wikiName)) {
                     Object[] query = new Object[2];
                     query[0] = where = new StringBuffer("where ");
-                    query[1] = params = new ArrayList();
+                    query[1] = params = new ArrayList<String>();
                     wikiQueries.put(wikiName, query);
                 } else {
-                    Object[] query = (Object[])wikiQueries.get(wikiName);
-                    where = (StringBuffer)query[0];
-                    params = (List)query[1];
+                    Object[] query = wikiQueries.get(wikiName);
+                    where = (StringBuffer) query[0];
+                    params = (List<String>) query[1];
                 }
-                
+
                 if (i > 0) {
                     where.append(" or ");
                 }
-                
+
                 where.append("doc.fullName like ?");
                 params.add(pattern);
             }
-            
+
             String database = context.getDatabase();
             try {
-                for (Iterator it = wikiQueries.entrySet().iterator(); it.hasNext();) {
-                    Map.Entry entry = (Map.Entry)it.next();
-                    String wikiName = (String)entry.getKey();
-                    Object[] query = (Object[])entry.getValue();
-                    String where = ((StringBuffer)query[0]).toString();
-                    List params = (List)query[1];
-                    
+                for (Map.Entry<String, Object[]> entry : wikiQueries.entrySet()) {
+                    String wikiName = entry.getKey();
+                    Object[] query = entry.getValue();
+                    String where = ((StringBuffer) query[0]).toString();
+                    @SuppressWarnings("unchecked")
+                    List<String> params = (List<String>) query[1];
+
                     context.setDatabase(wikiName);
-                    List docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
-                    for (Iterator itDocName = docsNames.iterator(); itDocName.hasNext();) {
-                        String docName = (String)itDocName.next();
+                    List<String> docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
+                    for (String docName : docsNames) {
                         pageList.add(wikiName + XWikiDocument.DB_SPACE_SEP + docName);
                     }
                 }
@@ -150,7 +150,7 @@ public class ExportAction extends XWikiAction
                 context.setDatabase(database);
             }
         }
-        
+
         if (pageList.size() == 0) {
             return null;
         }
@@ -164,20 +164,18 @@ public class ExportAction extends XWikiAction
         if (description != null) {
             packager.setDescription(description);
         }
-        
+
         packager.addPages(pageList);
-        
+
         packager.export(context);
-        
+
         return null;
     }
 
-    private String exportPDFOrRTF(String format, XWikiContext context) throws XWikiException,
-        IOException
+    private String exportPDFOrRTF(String format, XWikiContext context) throws XWikiException, IOException
     {
         XWikiURLFactory urlf =
-            context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF,
-                context);
+            context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF, context);
         context.setURLFactory(urlf);
         PdfExportImpl pdfexport = new PdfExportImpl();
         XWikiDocument doc = context.getDoc();
@@ -193,8 +191,8 @@ public class ExportAction extends XWikiAction
         context.getResponse().setContentType("application/" + format);
         context.getResponse().addHeader(
             "Content-disposition",
-            "inline; filename=" + Utils.encode(doc.getSpace(), context) + "_"
-                + Utils.encode(doc.getName(), context) + "." + format);
+            "inline; filename=" + Util.encodeURI(doc.getSpace(), context) + "_"
+                + Util.encodeURI(doc.getName(), context) + "." + format);
         pdfexport.export(doc, context.getResponse().getOutputStream(), type, context);
 
         return null;

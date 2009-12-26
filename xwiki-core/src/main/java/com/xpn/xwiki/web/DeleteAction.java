@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -28,16 +30,19 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Action for delete document to recycle bin and for delete documents from recycle bin. 
+ * Action for delete document to recycle bin and for delete documents from recycle bin.
+ * 
  * @version $Id$
  */
 public class DeleteAction extends XWikiAction
 {
     /** confirm parameter name. */
     private static final String CONFIRM_PARAM = "confirm";
+
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -73,15 +78,12 @@ public class DeleteAction extends XWikiAction
             }
         } else {
             // delete to recycle bin
-            // If confirm=1 then delete the page. If not, the render action will go to the "delete"
-            // page so that the user can confirm. That "delete" page will then call 
-            // the delete action again with confirm=1.
+            // If confirm=1 then delete the page. If not, the render action will go to the "delete" page so that the
+            // user can confirm. That "delete" page will then call the delete action again with confirm=1.
             String confirm = request.getParameter(CONFIRM_PARAM);
             if ((confirm != null) && (confirm.equals("1"))) {
                 String language = xwiki.getLanguagePreference(context);
-                if ((language == null) || (language.equals(""))
-                    || language.equals(doc.getDefaultLanguage()))
-                {
+                if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
                     xwiki.deleteAllDocuments(doc, context);
                 } else {
                     // Only delete the translation
@@ -92,8 +94,8 @@ public class DeleteAction extends XWikiAction
                 return true;
             }
         }
-        // If a xredirect param is passed then redirect to the page specified instead of
-        // going to the default confirmation page.
+        // If a xredirect param is passed then redirect to the page specified instead of going to the default
+        // confirmation page.
         String redirect = Utils.getRedirect(request, null);
         if (redirect != null) {
             sendRedirect(response, redirect);
@@ -105,6 +107,7 @@ public class DeleteAction extends XWikiAction
     /**
      * {@inheritDoc}
      */
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();

@@ -748,11 +748,14 @@ public class Util
     }
 
     /**
-     * API to make a text URI compliant
+     * Translates a string into <code>application/x-www-form-urlencoded</code> format, so that it can be safely used in
+     * URIs, as a parameter value in a query string or as a segment in the URI path. This uses the UTF-8 encoding, the
+     * default encoding for URIs, as stated in {@link http://tools.ietf.org/html/rfc3986#section-2.5 RFC 3986}.
      * 
-     * @param text
-     * @param context
+     * @param text the non encoded text
+     * @param context the current context
      * @return encoded text
+     * @see #decodeURI(String, XWikiContext)
      */
     public static String encodeURI(String text, XWikiContext context)
     {
@@ -764,11 +767,14 @@ public class Util
     }
 
     /**
-     * API to make readable an URI compliant text
+     * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of {@link #encodeURI(String)}. This
+     * uses the UTF-8 encoding, the default encoding for URIs, as stated in {@link http
+     * ://tools.ietf.org/html/rfc3986#section-2.5 RFC 3986}.
      * 
-     * @param text
-     * @param context
+     * @param text the encoded text
+     * @param context the current context
      * @return decoded text
+     * @see #encodeURI(String, XWikiContext)
      */
     public static String decodeURI(String text, XWikiContext context)
     {

@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -146,6 +147,18 @@ public class Util extends Api
     public <T, U> Map<T, U> getTreeMap()
     {
         return new TreeMap<T, U>();
+    }
+
+    /**
+     * Creates a {@link LinkedHashMap}, a map implementation which preserves the order of insertion. This is useful from
+     * Velocity since new objects cannot be created.
+     * 
+     * @return a {@link LinkedHashMap} object
+     * @since 2.2 Milestone 1
+     */
+    public <T, U> Map<T, U> getLinkedHashMap()
+    {
+        return new LinkedHashMap<T, U>();
     }
 
     /**

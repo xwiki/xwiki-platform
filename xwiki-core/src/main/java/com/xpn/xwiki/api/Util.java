@@ -125,7 +125,8 @@ public class Util extends Api
     }
 
     /**
-     * Creates a {@link HashMap}. This is useful from Velocity since new objects cannot be created.
+     * Creates a {@link HashMap}, a generic map implementation optimized for performance. This is useful from Velocity
+     * since new objects cannot be created.
      * 
      * @return a {@link HashMap} object
      * @since 1.3 Milestone 2
@@ -136,7 +137,8 @@ public class Util extends Api
     }
 
     /**
-     * Creates a {@link TreeMap}. This is useful from Velocity since new objects cannot be created.
+     * Creates a {@link TreeMap}, a map implementation which always maintains the natural order of the elements. This is
+     * useful from Velocity since new objects cannot be created.
      * 
      * @return a {@link TreeMap} object
      * @since 1.3 Milestone 2

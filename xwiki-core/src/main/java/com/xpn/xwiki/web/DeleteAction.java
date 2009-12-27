@@ -50,6 +50,11 @@ public class DeleteAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         boolean redirected = false;
+        // If confirm=1 then delete the page. If not, the render action will go to the "delete" page so that the
+        // user can confirm. That "delete" page will then call the delete action again with confirm=1.
+        if (!"1".equals(request.getParameter(CONFIRM_PARAM))) {
+            return true;
+        }
 
         // If the document doesn't exist then delete it from the recycle bin.
         if (doc.isNew() && xwiki.hasRecycleBin(context)) {
@@ -57,7 +62,7 @@ public class DeleteAction extends XWikiAction
             if (sindex != null) {
                 long index = Long.parseLong(sindex);
                 XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
-                // If the document hasn't been previously delete (ie it's not in the deleted document store) then
+                // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
                 // don't try to delete it and instead redirect to the view page.
                 if (dd != null) {
                     DeletedDocument ddapi = new DeletedDocument(dd, context);
@@ -78,20 +83,13 @@ public class DeleteAction extends XWikiAction
             }
         } else {
             // delete to recycle bin
-            // If confirm=1 then delete the page. If not, the render action will go to the "delete" page so that the
-            // user can confirm. That "delete" page will then call the delete action again with confirm=1.
-            String confirm = request.getParameter(CONFIRM_PARAM);
-            if ((confirm != null) && (confirm.equals("1"))) {
-                String language = xwiki.getLanguagePreference(context);
-                if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
-                    xwiki.deleteAllDocuments(doc, context);
-                } else {
-                    // Only delete the translation
-                    XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
-                    xwiki.deleteDocument(tdoc, context);
-                }
+            String language = xwiki.getLanguagePreference(context);
+            if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
+                xwiki.deleteAllDocuments(doc, context);
             } else {
-                return true;
+                // Only delete the translation
+                XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+                xwiki.deleteDocument(tdoc, context);
             }
         }
         if (!redirected) {
@@ -113,11 +111,21 @@ public class DeleteAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        String confirm = request.getParameter(CONFIRM_PARAM);
-        if ((confirm != null) && (confirm.equals("1"))) {
-            return "deleted";
-        } else {
-            return "delete";
+        XWikiDocument doc = context.getDoc();
+        String sindex = request.getParameter("id");
+        boolean recycleIdIsValid = false;
+        if (sindex != null) {
+            long index = Long.parseLong(sindex);
+            if (context.getWiki().getRecycleBinStore().getDeletedDocument(doc, index, context, true) != null) {
+                recycleIdIsValid = true;
+            }
         }
+        String result = "delete";
+        if ("1".equals(request.getParameter(CONFIRM_PARAM))) {
+            result = "deleted";
+        } else if (doc.isNew() && !recycleIdIsValid) {
+            result = Utils.getPage(request, "docdoesnotexist");
+        }
+        return result;
     }
 }

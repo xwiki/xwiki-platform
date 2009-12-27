@@ -68,13 +68,15 @@
   #submenuitem($doc.getURL('view', "xpage=print&amp;$!docvariant") $msg.get('core.menu.preview') 'tmPrintPreview', '')
   #submenuitem($doc.getURL('view', "viewer=code") $msg.get('core.menu.view.source') 'tmViewSource', '')
   #set ($canDelete = !$doc.isNew() && $xwiki.checkAccess($doc.fullName, 'delete'))
-  #if($canDelete)
+  #if($canDelete || $xwiki.hasProgrammingRights())
     #submenuseparator()
-    #submenuitem($doc.getURL('delete', $!languageparams) $msg.get('core.menu.delete') 'tmActionDelete', '')
+  #end
+  #if($xwiki.hasProgrammingRights())
+    #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy', '')
+  #end
+  #if($canDelete)
     #submenuitem($doc.getURL('view', 'xpage=rename&amp;step=1') $msg.get('core.menu.rename') 'tmActionRename', '')
-    #if($xwiki.hasProgrammingRights())
-      #submenuitem($doc.getURL('view', 'xpage=copy') $msg.get('core.menu.copy') 'tmActionCopy', '')
-    #end
+    #submenuitem($doc.getURL('delete', $!languageparams) $msg.get('core.menu.delete') 'tmActionDelete', '')
   #end
   #xwikitopmenuentryend()
   #if($canDelete && $keyboardShortcutsEnabled)

@@ -110,39 +110,45 @@ public class DeletedDocument extends Api
         try {
             return hasAdminRights() || hasAccessLevel("undelete", getFullName());
         } catch (XWikiException ex) {
-            LOG.info("Failed to check rights: " + ex.getMessage());
+            // Public APIs should not throw exceptions
+            LOG.warn("Exception while checking if entry [" + getId() + "] can be restored from the recycle bin", ex);
             return false;
         }
     }
 
     /**
-     * @return can current user permanently delete this document
-     * @throws XWikiException if any error
+     * @return {@code true} if the current user can permanently delete this document, {@code false} otherwise
      * @xwikicfg xwiki.store.recyclebin.adminWaitDays How many days should an administrator wait before being able to
      *           permanently delete this document from the recycle bin. 0 by default.
      * @xwikicfg xwiki.store.recyclebin.waitDays How many days should a normal user with "delete" right wait before
      *           being able to permanently delete this document from the recycle bin. 7 by default.
      */
-    public boolean canDelete() throws XWikiException
+    public boolean canDelete()
     {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setFullName(getFullName(), this.context);
-        if (!hasAdminRights()
-            && !getXWikiContext().getWiki().getRightService().checkAccess("delete", doc, this.context)) {
+        try {
+            XWikiDocument doc = new XWikiDocument();
+            doc.setFullName(getFullName(), this.context);
+            if (!hasAdminRights()
+                && !getXWikiContext().getWiki().getRightService().checkAccess("delete", doc, this.context)) {
+                return false;
+            }
+            String waitdays;
+            XWikiConfig config = getXWikiContext().getWiki().getConfig();
+            if (hasAdminRights()) {
+                waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
+            } else {
+                waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
+            }
+            int seconds = (int) (Double.parseDouble(waitdays) * 24 * 60 * 60 + 0.5);
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(getDate());
+            cal.add(Calendar.SECOND, seconds);
+            return cal.before(Calendar.getInstance());
+        } catch (Exception ex) {
+            // Public APIs should not throw exceptions
+            LOG.warn("Exception while checking if entry [" + getId() + "] can be removed from the recycle bin", ex);
             return false;
         }
-        String waitdays;
-        XWikiConfig config = getXWikiContext().getWiki().getConfig();
-        if (hasAdminRights()) {
-            waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
-        } else {
-            waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
-        }
-        int seconds = (int) (Double.parseDouble(waitdays) * 24 * 60 * 60 + 0.5);
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(getDate());
-        cal.add(Calendar.SECOND, seconds);
-        return cal.before(Calendar.getInstance());
     }
 
     /**

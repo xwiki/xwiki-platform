@@ -27,8 +27,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
- * Archive of deleted attachment, stored in {@link com.xpn.xwiki.store.AttachmentRecycleBinStore}.
- * Immutable, because deleted attachments should not be modified.
+ * Archive of deleted attachment, stored in {@link com.xpn.xwiki.store.AttachmentRecycleBinStore}. Immutable, because
+ * deleted attachments should not be modified.
  * 
  * @version $Id$
  * @since 1.4M1
@@ -74,8 +74,8 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param context The current context. Used for determining the encoding.
      * @throws XWikiException If the attachment cannot be exported to XML.
      */
-    public DeletedAttachment(XWikiAttachment attachment, String deleter, Date deleteDate,
-        XWikiContext context) throws XWikiException
+    public DeletedAttachment(XWikiAttachment attachment, String deleter, Date deleteDate, XWikiContext context)
+        throws XWikiException
     {
         this.docId = attachment.getDocId();
         this.docName = attachment.getDoc().getFullName();
@@ -88,12 +88,11 @@ public class DeletedAttachment extends AbstractSimpleClass
     /**
      * Getter for {@link #id}.
      * 
-     * @return The synthetic id of this deleted document. Uniquely identifies an entry in the
-     *         recycle bin.
+     * @return The synthetic id of this deleted attachment. Uniquely identifies an entry in the recycle bin.
      */
     public long getId()
     {
-        return id;
+        return this.id;
     }
 
     /**
@@ -113,7 +112,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public long getDocId()
     {
-        return docId;
+        return this.docId;
     }
 
     /**
@@ -133,7 +132,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public String getDocName()
     {
-        return docName;
+        return this.docName;
     }
 
     /**
@@ -153,7 +152,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public String getFilename()
     {
-        return filename;
+        return this.filename;
     }
 
     /**
@@ -173,7 +172,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public Date getDate()
     {
-        return date;
+        return this.date;
     }
 
     /**
@@ -193,7 +192,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public String getDeleter()
     {
-        return deleter;
+        return this.deleter;
     }
 
     /**
@@ -213,7 +212,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      */
     public String getXml()
     {
-        return xml;
+        return this.xml;
     }
 
     /**
@@ -233,8 +232,7 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @param context The current context. Used in the XML export.
      * @throws XWikiException If an exception occurs during the XML export.
      */
-    protected void setAttachment(XWikiAttachment attachment, XWikiContext context)
-        throws XWikiException
+    protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         setXml(attachment.toStringXML(true, true, context));
     }
@@ -245,11 +243,10 @@ public class DeletedAttachment extends AbstractSimpleClass
      * @return Restored attachment
      * @param attachment Optional attachment object to restore, if not <code>null</code>.
      * @param context The current {@link XWikiContext context}.
-     * @throws XWikiException If an exception occurs while the Attachment is restored from the XML.
-     *             See {@link XWikiAttachment#fromXML(String)}.
+     * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
+     *             {@link XWikiAttachment#fromXML(String)}.
      */
-    public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context)
-        throws XWikiException
+    public XWikiAttachment restoreAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         XWikiAttachment result = attachment;
         if (result == null) {

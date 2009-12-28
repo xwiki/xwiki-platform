@@ -29,7 +29,8 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Action for restore document from recycle bin.
+ * Action for restoring documents from the recycle bin.
+ * 
  * @version $Id$
  * @since 1.2M1
  */
@@ -38,6 +39,7 @@ public class UndeleteAction extends XWikiAction
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -48,20 +50,17 @@ public class UndeleteAction extends XWikiAction
         if (doc.isNew() && xwiki.hasRecycleBin(context)) {
             String sindex = request.getParameter("id");
             long index = Long.parseLong(sindex);
-            XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(
-                doc, index, context, true);
+            XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(doc, index, context, true);
             xwiki.saveDocument(newdoc, "restored from recycle bin", context);
             xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
-            // save attachments
-            List attachlist = newdoc.getAttachmentList();
+            // Save attachments
+            List<XWikiAttachment> attachlist = newdoc.getAttachmentList();
             if (attachlist.size() > 0) {
-                for (int i = 0; i < attachlist.size(); i++) {
-                    XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                    // do not increment attachment version
+                for (XWikiAttachment attachment : attachlist) {
+                    // Do not increment attachment version
                     attachment.setMetaDataDirty(false);
                     attachment.getAttachment_content().setContentDirty(false);
-                    xwiki.getAttachmentStore().saveAttachmentContent(attachment, false,
-                        context, true);
+                    xwiki.getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                 }
             }
         }

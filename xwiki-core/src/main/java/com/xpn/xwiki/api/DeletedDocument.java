@@ -104,7 +104,6 @@ public class DeletedDocument extends Api
      * Check if the current user has the right to restore the document.
      * 
      * @return {@code true} if the current user can restore this document, {@code false} otherwise
-     * @throws XWikiException if any error
      */
     public boolean canUndelete()
     {

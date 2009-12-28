@@ -22,32 +22,42 @@ package com.xpn.xwiki.api;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Programming;
 
 /**
- * Information about deleted document in recycle bin.
+ * Information about a deleted document in the recycle bin.
  * 
  * @version $Id$
  */
 public class DeletedDocument extends Api
 {
-    /**
-     * original document.
-     */
-    private final XWikiDeletedDocument deldoc;
+    /** Logging helper object. */
+    private static final Log LOG = LogFactory.getLog(DeletedDocument.class);
 
     /**
-     * @param deldoc - original deleted document
-     * @param context - used for Api
+     * The internal object wrapped by this API.
      */
-    public DeletedDocument(XWikiDeletedDocument deldoc, XWikiContext context)
+    private final XWikiDeletedDocument deletedDoc;
+
+    /**
+     * Simple constructor, initializes a new API object with the current {@link com.xpn.xwiki.XWikiContext context} and
+     * the specified protected {@link com.xpn.xwiki.doc.XWikiDeletedDocument deleted document} object.
+     * 
+     * @param deletedDoc the internal object wrapped by this API
+     * @param context the current request context
+     */
+    public DeletedDocument(XWikiDeletedDocument deletedDoc, XWikiContext context)
     {
         super(context);
-        this.deldoc = deldoc;
+        this.deletedDoc = deletedDoc;
     }
 
     /**
@@ -55,7 +65,7 @@ public class DeletedDocument extends Api
      */
     public String getFullName()
     {
-        return deldoc.getFullName();
+        return this.deletedDoc.getFullName();
     }
 
     /**
@@ -63,7 +73,7 @@ public class DeletedDocument extends Api
      */
     public String getLanguage()
     {
-        return deldoc.getLanguage();
+        return this.deletedDoc.getLanguage();
     }
 
     /**
@@ -71,7 +81,7 @@ public class DeletedDocument extends Api
      */
     public Date getDate()
     {
-        return deldoc.getDate();
+        return this.deletedDoc.getDate();
     }
 
     /**
@@ -79,7 +89,7 @@ public class DeletedDocument extends Api
      */
     public String getDeleter()
     {
-        return deldoc.getDeleter();
+        return this.deletedDoc.getDeleter();
     }
 
     /**
@@ -87,32 +97,39 @@ public class DeletedDocument extends Api
      */
     public long getId()
     {
-        return deldoc.getId();
+        return this.deletedDoc.getId();
     }
 
     /**
-     * @return can current user restore this document from recycle bin
+     * Check if the current user has the right to restore the document.
+     * 
+     * @return {@code true} if the current user can restore this document, {@code false} otherwise
      * @throws XWikiException if any error
      */
-    public boolean canUndelete() throws XWikiException
+    public boolean canUndelete()
     {
-        return hasAdminRights() || hasAccessLevel("undelete", getFullName());
+        try {
+            return hasAdminRights() || hasAccessLevel("undelete", getFullName());
+        } catch (XWikiException ex) {
+            LOG.info("Failed to check rights: " + ex.getMessage());
+            return false;
+        }
     }
 
     /**
      * @return can current user permanently delete this document
      * @throws XWikiException if any error
-     * @xwikicfg xwiki.store.recyclebin.adminWaitDays how many days should wait admin to delete
-     *           document. 0 by default
-     * @xwikicfg xwiki.store.recyclebin.waitDays how many days should wait user with "delete" right
-     *           to delete document
+     * @xwikicfg xwiki.store.recyclebin.adminWaitDays How many days should an administrator wait before being able to
+     *           permanently delete this document from the recycle bin. 0 by default.
+     * @xwikicfg xwiki.store.recyclebin.waitDays How many days should a normal user with "delete" right wait before
+     *           being able to permanently delete this document from the recycle bin. 7 by default.
      */
     public boolean canDelete() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
-        doc.setFullName(getFullName(), context);
+        doc.setFullName(getFullName(), this.context);
         if (!hasAdminRights()
-            && !getXWikiContext().getWiki().getRightService().checkAccess("delete", doc, context)) {
+            && !getXWikiContext().getWiki().getRightService().checkAccess("delete", doc, this.context)) {
             return false;
         }
         String waitdays;
@@ -130,23 +147,28 @@ public class DeletedDocument extends Api
     }
 
     /**
-     * @return original deleted document if user has programming rights, else null.
+     * @return original deleted document if user has programming rights, else {@code null}.
      */
+    @Programming
     public XWikiDeletedDocument getDeletedDocument()
     {
         if (hasProgrammingRights()) {
-            return deldoc;
+            return this.deletedDoc;
         } else {
             return null;
         }
     }
 
     /**
-     * @return document, restored from recycle bin
-     * @throws XWikiException if error
+     * @return the document as it is in the recycle bin
      */
-    public Document getDocument() throws XWikiException
+    public Document getDocument()
     {
-        return new Document(deldoc.restoreDocument(null, context), context);
+        try {
+            return new Document(this.deletedDoc.restoreDocument(null, this.context), this.context);
+        } catch (XWikiException e) {
+            LOG.warn("Failed to parse deleted document: " + e.getMessage());
+            return null;
+        }
     }
 }

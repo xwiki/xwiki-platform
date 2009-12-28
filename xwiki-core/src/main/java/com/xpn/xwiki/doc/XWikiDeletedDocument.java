@@ -20,23 +20,25 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.Date;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.AbstractSimpleClass;
 
-import java.util.Date;
 /**
- * Archive of deleted document, stored in {@link com.xpn.xwiki.store.XWikiRecycleBinStoreInterface}
- * Immutable, because we don't need modify deleted document.
+ * Archive of deleted document, stored in {@link com.xpn.xwiki.store.XWikiRecycleBinStoreInterface} Immutable, because
+ * we don't need modify deleted document.
+ * 
  * @version $Id$
  * @since 1.2M1
  */
 public class XWikiDeletedDocument extends AbstractSimpleClass
 {
     /**
-     * synthetic id.
+     * Synthetic id.
      */
-    private long   id;
+    private long id;
 
     /**
      * @see XWikiDocument#getFullName()
@@ -51,7 +53,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     /**
      * date of delete action.
      */
-    private Date   date;
+    private Date date;
 
     /**
      * @see XWikiDeletedDocument#getDeleter()
@@ -66,7 +68,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     /**
      * Default constructor. Used only in hibernate.
      */
-    protected XWikiDeletedDocument() { }
+    protected XWikiDeletedDocument()
+    {
+    }
 
     /**
      * @param doc - deleted document
@@ -75,23 +79,24 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param context - used for environment
      * @throws XWikiException if any error
      */
-    public XWikiDeletedDocument(XWikiDocument doc, String deleter, Date deleteDate, 
-        XWikiContext context) throws XWikiException
+    public XWikiDeletedDocument(XWikiDocument doc, String deleter, Date deleteDate, XWikiContext context)
+        throws XWikiException
     {
-        this.fullName   = doc.getFullName();
-        this.language   = doc.getLanguage();
-        this.deleter    = deleter;
+        this.fullName = doc.getFullName();
+        this.language = doc.getLanguage();
+        this.deleter = deleter;
         this.date = deleteDate;
         setDocument(doc, context);
     }
 
     /**
-     * @return the synthetic id of this deleted document. unique only for document. 
+     * @return the synthetic id of this deleted document. unique only for document.
      */
     public long getId()
     {
-        return id;
+        return this.id;
     }
+
     /**
      * @param id - the synthetic id to set. used only in hibernate.
      */
@@ -105,8 +110,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     public String getFullName()
     {
-        return fullName;
+        return this.fullName;
     }
+
     /**
      * @param docFullName - {@link XWikiDocument#getFullName()} to set
      */
@@ -116,12 +122,13 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     }
 
     /**
-     * @return {@link XWikiDocument#getLanguage()} 
+     * @return {@link XWikiDocument#getLanguage()}
      */
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
+
     /**
      * @param language - {@link XWikiDocument#getLanguage()} to set
      */
@@ -135,8 +142,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     public Date getDate()
     {
-        return date;
+        return this.date;
     }
+
     /**
      * @param date - the date of delete action to set
      */
@@ -150,8 +158,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      */
     public String getDeleter()
     {
-        return deleter;
+        return this.deleter;
     }
+
     /**
      * @param deleter - the user which has removed the document to set
      */
@@ -163,8 +172,9 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     /** @return xml serialization of {@link XWikiDocument} */
     public String getXml()
     {
-        return xml;
+        return this.xml;
     }
+
     /** @param xml - xml serialization of {@link XWikiDocument} */
     protected void setXml(String xml)
     {
@@ -173,6 +183,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
 
     /**
      * export {@link XWikiDocument} to {@link XWikiDeletedDocument}.
+     * 
      * @param doc - deleted document
      * @param context - used in {@link XWikiDocument#toXML(XWikiContext)}
      * @throws XWikiException in error in {@link XWikiDocument#toXML(XWikiContext)}
@@ -188,8 +199,7 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
      * @param context - may be useful in future
      * @throws XWikiException if error in {@link XWikiDocument#fromXML(String)}
      */
-    public XWikiDocument restoreDocument(XWikiDocument doc, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument restoreDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         XWikiDocument result = doc;
         if (result == null) {

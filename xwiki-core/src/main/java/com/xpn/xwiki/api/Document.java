@@ -64,6 +64,7 @@ import com.xpn.xwiki.web.Utils;
 
 public class Document extends Api
 {
+    /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(Document.class);
 
     /**
@@ -1191,8 +1192,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
-                        "Error while making content diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+                    "Error while making content diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1220,8 +1221,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
-                        "Error while making xml diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
+                    "Error while making xml diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1249,9 +1250,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                        XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
-                        "Error while making rendered diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
+                    "Error while making rendered diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1278,9 +1278,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                        XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                        "Error while making meta data diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+                    "Error while making meta data diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1307,8 +1306,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
-                        "Error while making meta object diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
+                    "Error while making meta object diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1335,8 +1334,8 @@ public class Document extends Api
             java.lang.Object[] args = {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
-                        "Error while making class diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
+                    "Error while making class diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1361,13 +1360,12 @@ public class Document extends Api
             return this.doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
             java.lang.Object[] args =
-                    {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
-                    (newdoc != null) ? newdoc.getVersion() : null};
+                {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null,
+                (newdoc != null) ? newdoc.getVersion() : null};
             List list = new ArrayList();
             XWikiException xe =
-                    new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                        XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
-                        "Error while making attachment diff of {0} between version {1} and version {2}", e, args);
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF, XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
+                    "Error while making attachment diff of {0} between version {1} and version {2}", e, args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1518,7 +1516,7 @@ public class Document extends Api
      * @return a map where an heading (title) ID is the key and value is another map with two keys: text, level and
      *         numbering
      */
-    public Map getTOC(int init, int max, boolean numbered)
+    public Map<String, Map<String, java.lang.Object>> getTOC(int init, int max, boolean numbered)
     {
         getXWikiContext().put("tocNumbered", new Boolean(numbered));
         return TOCGenerator.generateTOC(getContent(), init, max, numbered, getXWikiContext());
@@ -1534,7 +1532,7 @@ public class Document extends Api
         return this.doc.getTagsList(getXWikiContext());
     }
 
-    public List getTagsPossibleValues()
+    public List<String> getTagsPossibleValues()
     {
         return this.doc.getTagsPossibleValues(getXWikiContext());
     }

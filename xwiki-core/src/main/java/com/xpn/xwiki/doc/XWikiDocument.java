@@ -73,13 +73,13 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.DocumentName;
+import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -690,7 +690,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.bridge.DocumentModelBridge#getModelDocumentName()
      * @since 2.2M1
      */
@@ -701,7 +701,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see org.xwiki.bridge.DocumentModelBridge#getDocumentName()
      * @deprecated replaced by {@link #getModelDocumentName()} since 2.2M1
      */
@@ -2243,7 +2243,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    public List getTagsPossibleValues(XWikiContext context)
+    public List<String> getTagsPossibleValues(XWikiContext context)
     {
         loadTags(context);
         String possibleValues =

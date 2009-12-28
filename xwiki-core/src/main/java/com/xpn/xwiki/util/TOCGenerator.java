@@ -22,14 +22,11 @@ package com.xpn.xwiki.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.collections.OrderedMap;
-import org.apache.commons.collections.map.ListOrderedMap;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -41,15 +38,14 @@ public class TOCGenerator
 
     public static final String TOC_DATA_TEXT = "text";
 
-    public static Map generateTOC(String content, int init, int max, boolean numbered,
+    public static Map<String, Map<String, Object>> generateTOC(String content, int init, int max, boolean numbered,
         XWikiContext context)
     {
-        OrderedMap tocData = ListOrderedMap.decorate(new HashMap());
-        List processedHeadings = new ArrayList();
+        LinkedHashMap<String, Map<String, Object>> tocData = new LinkedHashMap<String, Map<String, Object>>();
+        List<String> processedHeadings = new ArrayList<String>();
         int previousNumbers[] = {0, 0, 0, 0, 0, 0, 0};
 
-        Pattern pattern =
-            Pattern.compile("(?-s)^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
+        Pattern pattern = Pattern.compile("(?-s)^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             int level = (matcher.group(1).lastIndexOf("1") + 2) / 2;
@@ -57,13 +53,15 @@ public class TOCGenerator
             text = context.getWiki().parseContent(text, context);
 
             int occurence = 0;
-            for (Iterator iter = processedHeadings.iterator(); iter.hasNext();)
-                if (iter.next().equals(text))
+            for (String processed : processedHeadings) {
+                if (processed.equals(text)) {
                     occurence++;
+                }
+            }
 
             String id = makeHeadingID(text, occurence, context);
 
-            Map tocEntry = new HashMap();
+            Map<String, Object> tocEntry = new HashMap<String, Object>();
             tocEntry.put(TOC_DATA_LEVEL, new Integer(level));
             tocEntry.put(TOC_DATA_TEXT, text);
 
@@ -90,8 +88,9 @@ public class TOCGenerator
                             num = 1;
                             // incremet the previous number if there was already a number assigned
                             // to any of the depper levels
-                            if (i < level)
+                            if (i < level) {
                                 previousNumbers[i] = previousNumbers[i] + 1;
+                            }
                         }
 
                         // construct the string representation of the number

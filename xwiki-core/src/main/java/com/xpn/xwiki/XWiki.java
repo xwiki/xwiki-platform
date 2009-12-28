@@ -4781,13 +4781,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 String path;
 
                 String uri = request.getRequestURI();
-                try {
-                    uri = URIUtil.decode(uri);
-                } catch (URIException e) {
-                    LOG.warn("Invalid URI: " + uri);
-                }
                 String contextPath = request.getContextPath();
                 String servletPath = request.getServletPath();
+                try {
+                    contextPath = URIUtil.encodePath(contextPath);
+                    servletPath = URIUtil.encodePath(servletPath);
+                } catch (URIException e) {
+                    LOG.warn("Invalid paths: [" + contextPath + "] and [" + servletPath + "]");
+                }
 
                 if (!uri.startsWith(contextPath + servletPath)) {
                     LOG.warn("Request URI [" + request.getRequestURI() + "] should have matched " + "context path ["

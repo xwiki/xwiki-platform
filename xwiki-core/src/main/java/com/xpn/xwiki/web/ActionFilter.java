@@ -33,9 +33,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWiki;
 
 /**
  * <p>
@@ -144,29 +145,32 @@ public class ActionFilter implements Filter
 
         // Extract the document name from the requested path. We don't use getPathInfo() since it is decoded
         // by the container, thus it will not work when XWiki uses a non-UTF-8 encoding.
-        // First step, remove the context path, if any.
         String path = request.getRequestURI();
 
-        String document = StringUtils.substringAfter(path.replaceAll("%2D", "-"), request.getContextPath());
+        // First step, remove the context path, if any.
+        path = XWiki.stripSegmentFromPath(path, request.getContextPath());
 
         // Second step, remove the servlet path, if any.
-        document = StringUtils.substringAfter(document, request.getServletPath());
         String servletPath = request.getServletPath();
+        path = XWiki.stripSegmentFromPath(path, servletPath);
 
         // Third step, remove the struts mapping. This step is mandatory, so this filter will fail if the
         // requested action was a hidden (default) 'view', like in '/bin/Main/'. This is OK, since forms
         // don't use 'view' as a target.
-        int index = document.indexOf(PATH_SEPARATOR, 1);
+        int index = path.indexOf(PATH_SEPARATOR, 1);
+
+        // We need to also get rid of the wiki name in case of a XEM in usepath mode
         if ("1".equals(XWikiConfigurationService.getProperty("xwiki.virtual.usepath", "0", this.servletContext))) {
             if (servletPath.equals(PATH_SEPARATOR
                 + XWikiConfigurationService.getProperty("xwiki.virtual.usepath.servletpath", "wiki",
                     this.servletContext))) {
-                servletPath += document.substring(0, index);
-                index = document.indexOf(PATH_SEPARATOR, index + 1);
+                // Move the wiki name together with the servlet path
+                servletPath += path.substring(0, index);
+                index = path.indexOf(PATH_SEPARATOR, index + 1);
             }
         }
 
-        document = document.substring(index);
+        String document = path.substring(index);
 
         // Compose the target URL starting with the servlet path.
         return servletPath + newAction + document;

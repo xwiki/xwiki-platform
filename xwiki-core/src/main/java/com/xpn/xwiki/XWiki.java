@@ -4778,45 +4778,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // not to introduce any new bug right now we're reconstructing a path info that we
                 // pass to it using the following algorithm:
                 // path info = requestURI - (contextPath + servletPath)
-                String path;
 
-                String uri = request.getRequestURI();
-                String contextPath = request.getContextPath();
+                String path = request.getRequestURI();
+
+                // Remove the (eventual) context path from the URI, usually /xwiki
+                path = stripSegmentFromPath(path, request.getContextPath());
+
+                // Remove the (eventual) servlet path from the URI, usually /bin
                 String servletPath = request.getServletPath();
-                try {
-                    contextPath = URIUtil.encodePath(contextPath);
-                    servletPath = URIUtil.encodePath(servletPath);
-                } catch (URIException e) {
-                    LOG.warn("Invalid paths: [" + contextPath + "] and [" + servletPath + "]");
+                path = stripSegmentFromPath(path, servletPath);
+
+                // We need to get rid of the wiki name in case of a XEM in usepath mode
+                if ("1".equals(Param("xwiki.virtual.usepath", "0"))
+                    && servletPath.equals("/" + Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                    // Virtual mode, skip the wiki name
+                    path = path.substring(path.indexOf('/', 1));
                 }
 
-                if (!uri.startsWith(contextPath + servletPath)) {
-                    LOG.warn("Request URI [" + request.getRequestURI() + "] should have matched " + "context path ["
-                        + contextPath + "] and servlet path [" + servletPath + "]");
-                    // Even though this branch shouldn't get executed we never know what containers
-                    // will return and thus in order to be safe we fall back to the previous
-                    // behavior which was to use getPathInfo() for getting the path (with the
-                    // potential issue with i18n encoding as stated above).
-                    path = request.getPathInfo();
-                } else {
-                    // we need to get rid of /xwiki/bin/ or /xwiki/wiki/wikiname/ in case of a XEM in usepath
-                    // mode
-                    if ("1".equals(Param("xwiki.virtual.usepath", "0"))) {
-                        String[] vhi = uri.split("/");
-                        if (vhi.length > 2 && vhi[2].equals(Param("xwiki.virtual.usepath.servletpath", "wiki"))) {
-                            path =
-                                uri.substring(vhi[0].length() + 1 + vhi[1].length() + 1 + vhi[2].length() + 1
-                                    + vhi[3].length());
-                        } else {
-                            path = uri.substring(contextPath.length() + servletPath.length());
-                        }
-                    } else {
-                        path = uri.substring(contextPath.length() + servletPath.length());
-                    }
-                }
-
-                // Fix error in some containers, which don't hide the jsessionid parameter from the
-                // URL
+                // Fix error in some containers, which don't hide the jsessionid parameter from the URL
                 if (path.indexOf(";jsessionid=") != -1) {
                     path = path.substring(0, path.indexOf(";jsessionid="));
                 }
@@ -4825,6 +4804,37 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         return (docname.indexOf(":") < 0) ? context.getDatabase() + ":" + docname : docname;
+    }
+
+    /**
+     * Helper method, removes a predefined path segment (the context path or the servel path) from the start of the
+     * requested URI and returns the remainder. This method is needed because special characters in the path can be
+     * URL-encoded, depending on whether the request is forwarded through the request dispatcher or not, and also
+     * depending on the client (some browsers encode -, while some don't).
+     * 
+     * @param path the path, as taken from the requested URI
+     * @param segment the segment to remove, as reported by the container
+     * @return the path with the specified segment trimmed from its start
+     */
+    public static String stripSegmentFromPath(String path, String segment)
+    {
+        if (!path.startsWith(segment)) {
+            // The context path probably contains special characters that are encoded in the URL
+            try {
+                segment = URIUtil.encodePath(segment);
+            } catch (URIException e) {
+                LOG.warn("Invalid path: [" + segment + "]");
+            }
+        }
+        if (!path.startsWith(segment)) {
+            // Some clients also encode -, although it's allowed in the path
+            segment = segment.replaceAll("-", "%2D");
+        }
+        if (!path.startsWith(segment)) {
+            // Can't find the context path in the URL (shouldn't happen), just skip to the next path segment
+            return path.substring(path.indexOf('/', 1));
+        }
+        return path.substring(segment.length());
     }
 
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context, VelocityContext vcontext)

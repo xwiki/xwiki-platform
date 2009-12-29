@@ -111,7 +111,8 @@ public class DeletedDocument extends Api
             return hasAdminRights() || hasAccessLevel("undelete", getFullName());
         } catch (XWikiException ex) {
             // Public APIs should not throw exceptions
-            LOG.warn("Exception while checking if entry [" + getId() + "] can be restored from the recycle bin", ex);
+            LOG.warn(String.format("Exception while checking if entry [%s] can be restored from the recycle bin",
+                getId()), ex);
             return false;
         }
     }
@@ -146,7 +147,8 @@ public class DeletedDocument extends Api
             return cal.before(Calendar.getInstance());
         } catch (Exception ex) {
             // Public APIs should not throw exceptions
-            LOG.warn("Exception while checking if entry [" + getId() + "] can be removed from the recycle bin", ex);
+            LOG.warn(String.format("Exception while checking if entry [%s] can be removed from the recycle bin",
+                getId()), ex);
             return false;
         }
     }

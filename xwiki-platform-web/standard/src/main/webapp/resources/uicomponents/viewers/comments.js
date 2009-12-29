@@ -1,5 +1,4 @@
 // Make sure the XWiki 'namespace' exists.
-
 if (typeof(XWiki) == 'undefined') {
   XWiki = new Object();
 }
@@ -92,7 +91,7 @@ XWiki.viewers.Comments = Class.create({
                 this.updateCount();
               }.bind(this),
               onComplete : function() {
-                // In the end: re-inable the button
+                // In the end: re-enable the button
                 item.disabled = false;
               }
             },

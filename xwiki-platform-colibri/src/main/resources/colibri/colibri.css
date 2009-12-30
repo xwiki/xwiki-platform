@@ -881,6 +881,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 .topmenuentry {
+  cursor: default;
   display: block;
   float: left;
   margin-right: 5px;
@@ -911,7 +912,6 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 /* Links */
 .actionmenu a, .actionmenu a:visited {
   color: $theme.menuLinkColor;
-  cursor: pointer;
   display: block;
   float: left;
   font: normal normal 700 0.8em/1.8em sans-serif;
@@ -920,6 +920,9 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   width: auto;
   white-space: nowrap;
   text-transform: uppercase;
+}
+.actionmenu a:link, .actionmenu a:visited  {
+  cursor: pointer;
 }
 
 .actionmenu .hasIcon a.tme {
@@ -1059,11 +1062,12 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 /* --------------------------------------------------------------
   * Button elements different containers
 -------------------------------------------------------------- */
-input.button, .buttonwrapper  a:visited,.buttonwrapper  a:link, .buttonwrapper  a:active {
+input.button, .buttonwrapper a:visited, .buttonwrapper a:link, .buttonwrapper a:active {
   background-color: $theme.buttonPrimaryBackgroundColor;
   background-image: none;
   border: 1px solid $theme.buttonPrimaryBackgroundColor;
   color: $theme.buttonPrimaryTextColor;
+  cursor: pointer;
   font: normal normal 700 .8em/140% "Helvetica",sans-serif;
   margin: 5px 5px 0 0;
   padding: 2px 3px;

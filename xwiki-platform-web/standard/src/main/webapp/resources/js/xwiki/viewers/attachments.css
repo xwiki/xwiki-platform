@@ -7,6 +7,7 @@
   margin-bottom: 4px;
   background: transparent 2px center no-repeat;
   padding-left: 20px;
+  cursor: pointer;
 }
 .add-file-input {
   margin-left: 10px;

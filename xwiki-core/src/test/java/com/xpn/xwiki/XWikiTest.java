@@ -33,13 +33,11 @@ import javax.servlet.http.Cookie;
 import org.apache.commons.collections.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
-import org.jmock.core.constraint.IsSame;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
-import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -81,6 +79,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             }
 
             // Avoid all the error at XWiki initialization
+            @Override
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
             {
                 if (prefname.equals("plugins") || prefname.startsWith("macros_")) {
@@ -137,7 +136,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             });
         this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
         this.mockXWikiStore.stubs().method("exists").will(returnValue(true));
-        
+
         this.mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
             this.xwiki, getContext()});
@@ -301,7 +300,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         mockListener.expects(once()).method("getEvents").will(
             returnValue(Arrays.asList(new DocumentSaveEvent("xwikitest:Some.Document"))));
 
-        ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
+        ObservationManager om = getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument("xwikitest", "Some", "Document");
@@ -324,7 +323,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         mockListener.expects(once()).method("getEvents").will(
             returnValue(Arrays.asList(new DocumentDeleteEvent("xwikitest:Another.Document"))));
 
-        ObservationManager om = (ObservationManager) getComponentManager().lookup(ObservationManager.class);
+        ObservationManager om = getComponentManager().lookup(ObservationManager.class);
         om.addListener((EventListener) mockListener.proxy());
 
         XWikiDocument document = new XWikiDocument("xwikitest", "Another", "Document");

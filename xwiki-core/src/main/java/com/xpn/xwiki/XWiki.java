@@ -118,6 +118,7 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 import com.xpn.xwiki.objects.classes.LevelsClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
@@ -3262,25 +3263,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         try {
             XWikiRequest request = context.getRequest();
-            String xwikiname = convertUsername(request.getParameter("xwikiname"), context);
-            String validkey = request.getParameter("validkey");
+            // Get the user document
+            String username = convertUsername(request.getParameter("xwikiname"), context);
+            if (username.indexOf(".") == -1) {
+                username = "XWiki." + username;
+            }
+            XWikiDocument userDocument = getDocument(username, context);
 
-            if (xwikiname.indexOf(".") == -1) {
-                xwikiname = "XWiki." + xwikiname;
+            // Get the stored validation key
+            BaseObject userObject = userDocument.getObject("XWiki.XWikiUsers", 0);
+            String storedKey = userObject.getStringValue("validkey");
+
+            // Get the validation key from the URL
+            String validationKey = request.getParameter("validkey");
+            PropertyInterface validationKeyClass = getClass("XWiki.XWikiUsers", context).get("validkey");
+            if (validationKeyClass instanceof PasswordClass) {
+                validationKey = ((PasswordClass) validationKeyClass).getEquivalentPassword(storedKey, validationKey);
             }
 
-            XWikiDocument docuser = getDocument(xwikiname, context);
-            BaseObject userobj = docuser.getObject("XWiki.XWikiUsers", 0);
-            String validkey2 = userobj.getStringValue("validkey");
-            String email = userobj.getStringValue("email");
-            String password = userobj.getStringValue("password");
-
-            if ((!validkey2.equals("") && (validkey2.equals(validkey)))) {
-                userobj.setIntValue("active", 1);
-                saveDocument(docuser, context);
+            // Compare the two keys
+            if ((!storedKey.equals("") && (storedKey.equals(validationKey)))) {
+                userObject.setIntValue("active", 1);
+                saveDocument(userDocument, context);
 
                 if (withConfirmEmail) {
-                    sendValidationEmail(xwikiname, password, email, validkey, "confirmation_email_content", context);
+                    String email = userObject.getStringValue("email");
+                    String password = userObject.getStringValue("password");
+                    sendValidationEmail(username, password, email, request.getParameter("validkey"),
+                        "confirmation_email_content", context);
                 }
 
                 return 0;

@@ -42,11 +42,15 @@ import org.xwiki.observation.event.DocumentSaveEvent;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.StringProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
@@ -391,5 +395,54 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         getContext().put("sdoc", doc2);
 
         assertEquals("syntax2", this.xwiki.getCurrentContentSyntaxId(null, getContext()));
+    }
+
+    /**
+     * Check that the user validation feature works when the validation key is stored both as plain text and as a hashed
+     * field.
+     * 
+     * @throws Exception when any exception occurs inside XWiki
+     */
+    public void testValidationKeyStorage() throws Exception
+    {
+        XWikiContext context = getContext();
+
+        // Prepare the request
+        Mock request = mock(XWikiRequest.class);
+        request.stubs().method("getParameter").with(eq("xwikiname")).will(returnValue("TestUser"));
+        request.stubs().method("getParameter").with(eq("validkey")).will(returnValue("plaintextkey"));
+        context.setRequest((XWikiRequest) request.proxy());
+
+        // Prepare the user profile
+        XWikiDocument testUser = new XWikiDocument("XWiki", "TestUser");
+        BaseObject userObject = (BaseObject) this.xwiki.getUserClass(context).newObject(context);
+        testUser.addObject("XWiki.XWikiUsers", userObject);
+        this.xwiki.saveDocument(testUser, context);
+
+        // Check with a correct plaintext key
+        BaseProperty validationKey = new StringProperty();
+        validationKey.setValue("plaintextkey");
+        userObject.safeput("validkey", validationKey);
+
+        assertEquals(0, this.xwiki.validateUser(false, getContext()));
+
+        // Check with an incorrect plaintext key
+        validationKey.setValue("wrong key");
+
+        assertEquals(-1, this.xwiki.validateUser(false, getContext()));
+
+        // Check with a correct hashed key
+        validationKey = ((PropertyClass) this.xwiki.getUserClass(context).get("validkey")).fromString("plaintextkey");
+        assertTrue(validationKey.getValue().toString().startsWith("hash:"));
+        userObject.safeput("validkey", validationKey);
+
+        assertEquals(0, this.xwiki.validateUser(false, getContext()));
+
+        // Check with an incorrect hashed key
+        validationKey = ((PropertyClass) this.xwiki.getUserClass(context).get("validkey")).fromString("wrong key");
+        assertTrue(validationKey.getValue().toString().startsWith("hash:"));
+        userObject.safeput("validkey", validationKey);
+
+        assertEquals(-1, this.xwiki.validateUser(false, getContext()));
     }
 }

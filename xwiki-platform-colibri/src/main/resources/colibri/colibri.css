@@ -479,43 +479,6 @@ ul.xwikitabbar {
   text-decoration: none;
 }
 
-/* ---------------Comments----------------*/
-/* Overwrites comments.css - added form */
-form#AddComment, form#AddComment .commentcontainer textarea {
-  border-color: $theme.borderColor;
-}
-
-/* Overwrites comments.css - added .xwikicomment */
-.xwikicomment .commentheader {
-  border-bottom: 1px dotted $theme.borderColor;
-  color: $theme.textSecondaryColor;
-}
-
-.xwikicomment .commentheader:hover {
-  background-color: $theme.highlightColor;
-}
-
-.xwikicomment .commentauthor {
-  font-size: .9em;
-}
-
-.xwikicomment .commentcontent {
-  font-style: normal;
-}
-
-/* Overwrites comments.css - added #commentform */
-#AddComment #commentform label {
-  color: $theme.textSecondaryColor;
-  font-size: .9em;
-  font-weight: 400;
-}
-
-/* Overwrites comments.css - added #commentscontent */
-#commentscontent #AddComment .commentcontainer, #commentscontent #AddComment .commentcontainer label  {
-  background-image: none;
-  padding: 4px 0;
-}
-
 /* --------------Attachments--------------*/
 /* Should be in attachments.css */
 .attachment {

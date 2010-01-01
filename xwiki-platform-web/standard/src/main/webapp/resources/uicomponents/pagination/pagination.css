@@ -1,15 +1,15 @@
+#template('colorThemeInit.vm')
 .paginationFilter {
-  color: #888;
-  border-top: 1px solid #CCC;
-  padding: 2px 0px 5px 5px;
+  border-top: 1px solid $theme.borderColor;
+  color: $theme.textPrimaryColor;
   overflow: hidden;
-  line-height: 22px;
+  padding: 2px 0px 5px 5px;
 }
 .resultsNo {
   float: left;
 }
-.resultsNo .currentResultsNo, .resultsNo .totalResultsNo {
-  color: #4D4D4D;
+.resultsNo .currentResultsNo, .resultsNo .totalResultsNo, .pagination .currentPage {
+  color: $theme.textColor;
   font-weight: bold;
 } 
 .pagination {
@@ -17,39 +17,35 @@
   margin-right: 10px;
 }
 .pagination a {
-  color: #888;
+  color: $theme.textPrimaryColor;
 }
 .pagination a:hover {
-  color: #4D4D4D;
-}
-.pagination .currentPage {
-  color: #4D4D4D;
-  font-weight: bold;
+  color: $theme.linkColor;
 }
 .pagination a:focus {
-  outline: dotted 1px #000;
+  outline: dotted 1px $theme.linkColor;
 }
 .controlPagination {
   position: relative;
   width: 42px;
   height: 22px;
   overflow: hidden;
-  margin: 0!important;
-  padding: 0!important;
+  margin: 0 !important;
+  padding: 0 !important;
   float: right;
 }
 .controlPagination a, .controlPagination span {
-  position: absolute;
-  top: 0;
+  background-image: url("$xwiki.getSkinFile('icons/xwiki/pagination-controls.png')");
+  border: none;
+  height: 22px;
   left: 0;
   line-height: 25px;
-  text-indent: -1000px;
   outline: none;
   overflow: hidden;
-  border: none;
-  background-image: url($xwiki.getSkinFile('icons/xwiki/pagination-controls.png'));
+  position: absolute;
+  text-indent: -1000px;
+  top: 0;
   width: 21px;
-  height: 22px;
 }
 .controlPagination .prevPagination {
   background-position: left top;

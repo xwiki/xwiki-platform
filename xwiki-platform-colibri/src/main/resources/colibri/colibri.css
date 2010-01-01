@@ -1780,8 +1780,3 @@ td.recentChangesLeft {
   background-color: $theme.backgroundSecondaryColor;
   text-align: center;
 }
-
-/* Overwrites pagination.css - added div */
-div.paginationFilter {
-  border-color: $theme.borderColor;
-}

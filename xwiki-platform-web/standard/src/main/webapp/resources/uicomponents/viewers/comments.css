@@ -87,19 +87,10 @@ li.reply {
   width: auto;       /* Overriding toucan */
 }
 #AddComment .commentcontainer {
-  background: transparent url("$xwiki.getSkinFile('icons/xwiki/rquo.gif')") right 4px no-repeat;
-  padding: 4px 32px; /* The layout of the reply form should be similar to the layout of a comment's text for consistency */
+  padding: 4px 0;
 }
 #AddComment .commentcontainer label {
-  background: transparent url("$xwiki.getSkinFile('icons/xwiki/lquo.gif')") left top no-repeat;
-  display: inline;
-  height: 24px;
-  float: left;
-  line-height: 120px;
-  margin-left: -32px;
-  overflow: hidden;
-  text-indent: 100px;
-  width: 24px;
+  display: none;
 }
 #AddComment .commentcontainer textarea {
   width: 100%;

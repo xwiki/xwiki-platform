@@ -479,49 +479,6 @@ ul.xwikitabbar {
   text-decoration: none;
 }
 
-/* --------------Attachments--------------*/
-/* Should be in attachments.css */
-.attachment {
-  font-size: 85%;
-  padding: 10px 0;
-}
-
-.attachment .information {
-  color: $theme.textPrimaryColor;
-  overflow: hidden;
-}
-
-.attachment .mime, .attachment .name, .attachment .version {
-  float: left;
-  padding: 0 8px 0 0;
-}
-
-.attachment .name {
-  font-size: 1.35em;
-}
-
-.attachment .meta {
-  clear: left;
-}
-
-.attachment .size {
-  color: $theme.textSecondaryColor;
-}
-
-.attachment .xwikibuttonlinks {
-  float: right;
-  width: 40px;
-}
-
-.add-file-input{
-  color: $theme.linkColor;
-}
-
-/* Overwrites attachments.css - added form */
-form#AddAttachment{
-  border-color: $theme.borderColor;
-}
-
 /* ----------------History----------------*/
 #historyform .currentversion td {
   background-color: $theme.highlightColor;

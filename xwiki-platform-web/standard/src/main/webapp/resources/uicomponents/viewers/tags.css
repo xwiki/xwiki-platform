@@ -1,20 +1,20 @@
 #template("colorThemeInit.vm")
 .doc-tags {
-  width: 48%;
   float: left;
+  width: 48%;
 }
 .tag-wrapper {
- padding: 2px 1px;
+  padding: 2px 1px;
 }
 .tag-wrapper .separator {
- display: none;
+  display: none;
 }
 a.tag-delete, a.tag-delete:visited {
-  vertical-align: super;
+  color: $theme.pageContentBackgroundColor;
   font-size: 70%;
   font-weight: bold;
-  color: $theme.pageContentBackgroundColor;
   text-decoration: none !important;
+  vertical-align: super;
 }
 .tag-wrapper:hover a.tag-delete {
   color: #999;
@@ -36,10 +36,10 @@ a.tag-delete, a.tag-delete:visited {
 }
 
 .tag-add-form {
-  z-index: 1000;
   position: absolute;
   border: 1px solid #f9f9f9;
   vertical-align: top !important;
+  z-index: 1000;
 }
 * html .tag-add-form {
   width: 190px;

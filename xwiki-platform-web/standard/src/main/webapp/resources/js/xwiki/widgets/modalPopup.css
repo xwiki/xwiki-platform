@@ -1,3 +1,4 @@
+#template('colorThemeInit.vm')
 .xdialog-modal-container {
   position: fixed;
   top: 0px;
@@ -9,9 +10,11 @@
   text-align: center;
   z-index: 1005;
 }
+/* For IE6, which doesn't understand position: fixed. */
 * html .xdialog-modal-container {
   position: absolute;
 }
+/* Semi-transparent overlay screen that covers the entire page. */
 .xdialog-screen {
   position: absolute;
   top: 0px;
@@ -20,6 +23,7 @@
   right: 0px;
   width: 100%;
   height: 100%;
+  background-color: #000;
 }
 .xdialog-box {
   text-align: left;
@@ -27,8 +31,9 @@
   margin: auto;
   position: relative;
   width: 400px;
-  border: 2px solid;
-  background-color: #EEE; 
+  color: $theme.textColor;
+  border: 2px solid $theme.borderColor;
+  background-color: $theme.backgroundSecondaryColor;
 }
 .xdialog-close {
   float: right;
@@ -42,6 +47,7 @@
   text-transform: lowercase;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 8px;
+  color: $theme.textColor;
 }
 * html .xdialog-close {
   width: 22px;
@@ -51,4 +57,5 @@
   font-weight: bold;
   margin-top: -5px;
   margin-bottom: 10px;
+  color: $theme.textColor;
 }

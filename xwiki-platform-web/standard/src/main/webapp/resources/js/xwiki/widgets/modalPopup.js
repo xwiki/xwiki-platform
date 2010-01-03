@@ -9,14 +9,14 @@ if(typeof(XWiki.widgets) == 'undefined') {
 }
 
 XWiki.widgets.ModalPopup = Class.create({
-  /** Configuration. */
+  /** Configuration. Empty values will fall back to the CSS. */
   options : {
     title : "",
     displayCloseButton : true,
-    screenColor : "#000",
-    borderColor : "#333",
-    titleColor : "#333",
-    backgroundColor : "#EEE",
+    screenColor : "",
+    borderColor : "",
+    titleColor : "",
+    backgroundColor : "",
     screenOpacity : "0.5",
     verticalPosition : "center",
     horizontalPosition : "center"

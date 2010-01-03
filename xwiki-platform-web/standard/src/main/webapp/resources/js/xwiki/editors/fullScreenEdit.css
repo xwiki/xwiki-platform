@@ -1,10 +1,11 @@
+#template('colorThemeInit.vm')
 .fullScreenEditButton {
   cursor: ne-resize !important;
 }
 .fullScreenEditLinkContainer {
   text-transform: lowercase;
   font-size: 80%;
-  color: #009;
+  color: $theme.linkColor;
   cursor: pointer;
   display: block;
   margin-top: -1.4em;
@@ -47,7 +48,7 @@
   height: 100%;
   padding: 0 !important;
   margin: 0 !important;
-  background-color: #FFF;
+  background-color: $theme.pageContentBackgroundColor;
 }
 
 /* Comment this to make the version comment and minor edit checkbox visible in full screen */
@@ -79,7 +80,7 @@
   width: auto;
 }
 #xwikiobjects .fullScreenWrapper textarea:focus, #xwikiclassproperties .fullScreenWrapper textarea:focus {
-  background-color:#FFF;
+  background-color: $theme.pageContentBackgroundColor;
 }
 .fullScreenWrapper textarea {
   margin: 0 !important;

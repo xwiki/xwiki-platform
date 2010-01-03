@@ -371,35 +371,35 @@ div.xwiki-livetable-pagination-content span.pagenumber:focus {
 }
 
 .icon-manage {
-   cursor: pointer;
-   padding-right: 10px;
+  cursor: pointer;
+  padding-right: 10px;
 }
 
 .icon-manageg {
-   padding-right: 10px;
+  padding-right: 10px;
 }
 
 #ajax-loader {
-   margin: 0px;
-   padding: 0px;
-   position: absolute;
-   top: 50%;
-   left: 35%;
-   z-index: 1000000000;
-   display: none;
-   width: 220px;
-   background-color: #fff;
-   border: 1px solid #999;
-   font-size: 11px;
-   padding: 8px;
-   text-indent: 5px;
+  margin: 0px;
+  padding: 0px;
+  position: absolute;
+  top: 50%;
+  left: 35%;
+  z-index: 1000000000;
+  display: none;
+  width: 220px;
+  background-color: #fff;
+  border: 1px solid #999;
+  font-size: 11px;
+  padding: 8px;
+  text-indent: 5px;
 }
 
 .theader {
-   background-color: #ccc;
-   color: #FFF;
-   font-weight: bold;
-   font-size: 1em;
+  background-color: #ccc;
+  color: #FFF;
+  font-weight: bold;
+  font-size: 1em;
 }
 
 #table-filters {

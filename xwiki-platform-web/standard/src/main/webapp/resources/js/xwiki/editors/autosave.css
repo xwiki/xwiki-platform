@@ -1,15 +1,17 @@
+#template('colorThemeInit.vm')
 #autosaveControl {
   font-size: 80%;
   font-weight: bold;
   margin: 2px 16px;
 }
 #autosaveControl input.autosave-frequency {
-  border: 1px solid #FFF;
+  /* "Invisible" border. */
+  border: 1px solid $theme.pageContentBackgroundColor;
   overflow: visible;
   text-align: center;
 }
 #autosaveControl input.focused {
-  border: 1px solid #DDD;
+  border: 1px solid $theme.borderColor;
 }
 /** Override toucan styles */
 #body #autosaveControl label {

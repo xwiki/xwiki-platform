@@ -17,27 +17,27 @@ a.tag-delete, a.tag-delete:visited {
   vertical-align: super;
 }
 .tag-wrapper:hover a.tag-delete {
-  color: #999;
+  color: $theme.textPrimaryColor;
 }
 .tag-wrapper a.tag-delete:hover {
   color: #C00;
 }
 .tag-add {
-  color: #999;
+  color: $theme.textPrimaryColor;
   display: inline;
 }
 .tag-add a, .tag-add a:visited {
-  color: #999;
+  color: $theme.textPrimaryColor;
   font-size: 80%;
   text-decoration: none;
 }
 .tag-add a:hover {
-  color: #000;
+  color: $theme.linkColor;
 }
 
 .tag-add-form {
+  border: 1px outset $theme.borderColor;
   position: absolute;
-  border: 1px solid #f9f9f9;
   vertical-align: top !important;
   z-index: 1000;
 }
@@ -45,19 +45,18 @@ a.tag-delete, a.tag-delete:visited {
   width: 190px;
 }
 .tag-add-form div {
-  border: 1px solid #eee;
-  padding: 4px 8px;
-  background: #f5f5f5;
+  background: $theme.backgroundSecondaryColor;
   overflow: hidden;
+  padding: 4px 8px;
 }
 
 .tag-add-form label {
+  color: $theme.textColor;
   font-size: 80%;
   margin: 2px 0;
 }
 
 .tag-add-form .input-tag {
-  border: 1px solid #ddd;
   width: 16em;
   height: 80%;
   margin-right: 3px;

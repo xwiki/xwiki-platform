@@ -39,7 +39,7 @@
 .more-actions .edit-all {
   display: block;
   padding: 2px 18px;
-  background: transparent url($xwiki.getSkinFile('icons/silk/pencil.gif')) left top no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/silk/pencil.gif')") left top no-repeat;
 }
 
 /* Object editor */
@@ -90,8 +90,8 @@
   margin: 0;
 }
 .xobject-content dt, .xproperty-content dt {
-  font-size:75%;
-  font-weight:bold;
+  font-size: 75%;
+  font-weight: bold;
 }
 #body .xobject-title h3, #body .xclass-title {
   padding-left: 14px;
@@ -112,11 +112,11 @@
 }
 .xobject-title .delete {
   right: 0;
-  background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/cross.gif')");
 }
 .xobject-title .edit {
   right: 16px;
-  background-image: url($xwiki.getSkinFile('icons/silk/pencil.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')");
 }
 
 /* XProperty definition */
@@ -150,7 +150,7 @@
   margin: 0;
   font-size: 1em;
   font-weight: 100;
-  background: transparent url($xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')) 14px center no-repeat;
+  background: transparent url("$xwiki.getSkinFile('icons/datamodel/propertyType-Generic.png')") 14px center no-repeat;
   min-height: 16px;
 }
 .xproperty-title label {
@@ -174,19 +174,23 @@
 
 /* Expand/collapse */
 /* We need to increase the priority of the rule in order to override Toucan styles */
-#body .collapsable .xobject-title h3, #body .collapsable .xclass-title, #body .collapsable .xproperty-title {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif'));
+#body .collapsable .xobject-title h3,
+#body .collapsable .xclass-title,
+#body .collapsable .xproperty-title {
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif')");
   background-position: 0px center;
   background-repeat: no-repeat;
 }
-#body .collapsed .xobject-title h3, #body .collapsed .xclass-title, #body .collapsed .xproperty-title {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif'));
+#body .collapsed .xobject-title h3,
+#body .collapsed .xclass-title,
+#body .collapsed .xproperty-title {
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif')");
 }
 .xclass.collapsed .xclass-content, .xobject.collapsed .xobject-content, .xproperty.collapsed .xproperty-content {
   display: none;
 }
 .collapsable dt .collapser {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_minus.gif')");
   background-position: -4px center;
   background-repeat: no-repeat;
   cursor: default;
@@ -202,7 +206,7 @@
   margin-left: -10px;
 }
 .collapsable dt .collapsed {
-  background-image: url($xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif'));
+  background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.gif')");
 }
 /* XProperty reordering in the class editor */
 .xproperty-title .move {
@@ -219,38 +223,38 @@
 }
 /* Property type icons */
 .StringClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/string.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/string.png')");
 }
 .DateClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/calendar.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/calendar.png')");
 }
 .TextAreaClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/textarea.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/textarea.png')");
 }
 .NumberClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/number.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/number.png')");
 }
 .BooleanClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/boolean.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/boolean.png')");
 }
 .StaticListClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/staticlist.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/staticlist.png')");
 }
 .GroupsClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/groups.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/groups.png')");
 }
 .UsersClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/users.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/users.png')");
 }
 .LevelsClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/rights.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/rights.png')");
 }
 .DBListClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/database.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/database.png')");
 }
 .DBTreeListClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/tree.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/tree.png')");
 }
 .PasswordClass h2 {
-  background-image: url($xwiki.getSkinFile('icons/datamodel/password.png'));
+  background-image: url("$xwiki.getSkinFile('icons/datamodel/password.png')");
 }

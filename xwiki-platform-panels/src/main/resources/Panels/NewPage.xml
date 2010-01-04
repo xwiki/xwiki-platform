@@ -21,38 +21,6 @@
 <validationScript></validationScript>
 <object>
 <class>
-<name>XWiki.TagClass</name>
-<customClass></customClass>
-<customMapping></customMapping>
-<defaultViewSheet></defaultViewSheet>
-<defaultEditSheet></defaultEditSheet>
-<defaultWeb></defaultWeb>
-<nameField></nameField>
-<validationScript></validationScript>
-<tags>
-<name>tags</name>
-<prettyName>Tags</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>1</relationalStorage>
-<displayType>input</displayType>
-<multiSelect>1</multiSelect>
-<size>30</size>
-<separator> </separator>
-<separators> ,|</separators>
-<values></values>
-<number>1</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</tags>
-</class>
-<name>Panels.NewPage</name>
-<number>0</number>
-<className>XWiki.TagClass</className>
-<property>
-<tags/>
-</property>
-</object>
-<object>
-<class>
 <name>Panels.PanelClass</name>
 <customClass></customClass>
 <customMapping></customMapping>
@@ -144,10 +112,10 @@
 &lt;div class="padded centered"&gt;
 &lt;input type="hidden" name="template" value="" /&gt;
 &lt;label for="title" class="hidden"&gt;$msg.get("xe.panels.new.name")&lt;/label&gt;
-&lt;input type="text" id="title" name="title" value="$msg.get("xe.panels.new.name")" class="panelinput" style="margin:auto;" onfocus="if(this.value=='$msg.get("xe.panels.new.name")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.new.name")'"/&gt;
+&lt;input type="text" id="title" name="title" value="$msg.get("xe.panels.new.name")" class="panelinput" onfocus="if(this.value=='$msg.get("xe.panels.new.name")') this.value=''" onblur="if(this.value=='') this.value='$msg.get("xe.panels.new.name")'"/&gt;
 &lt;/div&gt;
-&lt;div class="padded centered" style="text-align:center;"&gt;
-&lt;input type="submit" class="button" style="margin:auto;" value="$msg.get("create")"/&gt;
+&lt;div class="padded centered"&gt;
+&lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
 &lt;/div&gt;
 &lt;/form&gt;
 #panelfooter()

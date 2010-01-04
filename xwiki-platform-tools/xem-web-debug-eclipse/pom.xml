@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.products</groupId>
-    <artifactId>xwiki-enterprise-web</artifactId>
+    <artifactId>xwiki-enterprise-parent</artifactId>
     <version>2.2-SNAPSHOT</version>
   </parent>
   <artifactId>xem-web-debug</artifactId>
@@ -101,7 +101,7 @@
       <version>${pom.version}</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <!-- GWT core dependencies -->
     <dependency>
       <groupId>com.google.gwt</groupId>
@@ -144,6 +144,53 @@
       <version>${platform.core.version}</version>
     </dependency>
 
+    <!-- XE plugins -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-watchlist</artifactId>
+      <version>${platform.watchlist.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>   
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-jodatime</artifactId>
+      <version>${platform.jodatime.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-lucene</artifactId>
+      <version>${platform.plugin.lucene.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-scheduler</artifactId>
+      <version>${platform.scheduler.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-mailsender</artifactId>
+      <version>${platform.plugin.mailsender.version}</version>
+    </dependency>   
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-skinx</artifactId>
+      <version>${platform.plugin.skinx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-tag</artifactId>
+      <version>${platform.tag.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-activitystream</artifactId>
+      <version>${platform.activitystream.version}</version>
+    </dependency>
     <!-- XEM plugins -->
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>

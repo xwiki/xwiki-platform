@@ -41,8 +41,8 @@
           #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
           #template('renameStep1.vm')
         #else
-          #set($backlinks = $util.arrayList)
-          #set($children = $util.arrayList)
+          #set($backlinks = [])
+          #set($children = [])
           #foreach($param in $request.parameterNames)
             #if($param.startsWith("backlink_"))
               #set($discard = $backlinks.add($param.substring(9)))

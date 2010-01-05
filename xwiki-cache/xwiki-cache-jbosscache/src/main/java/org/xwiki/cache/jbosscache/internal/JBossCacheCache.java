@@ -258,9 +258,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
             this.preEventData.put(key, data);
         } else {
             if (data.containsKey(DATA_KEY)) {
-                if (event.getModificationType() == NodeModifiedEvent.ModificationType.REMOVE_DATA) {
-                    cacheEntryRemoved(key, this.preEventData.get(key).get(DATA_KEY));
-                } else {
+                if (event.getModificationType() != NodeModifiedEvent.ModificationType.REMOVE_DATA) {
                     cacheEntryInserted(key, data.get(DATA_KEY));
                 }
             }
@@ -282,7 +280,13 @@ public class JBossCacheCache<T> extends AbstractCache<T>
 
         Map<String, T> preMap = this.preEventData.get(key);
 
-        if (preMap.containsKey(DATA_KEY)) {
+        T previousValue = preMap.get(DATA_KEY);
+        if (previousValue != null) {
+            if (previousValue != value) {
+                popDisposableCacheValue(key);
+                disposeCacheValue(previousValue);
+            }
+
             sendEntryModifiedEvent(event);
         } else {
             sendEntryAddedEvent(event);

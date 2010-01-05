@@ -59,8 +59,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     public void dispose()
     {
-        for (CacheEntryListener<T> listener : cacheEntryListeners.getListeners(CacheEntryListener.class)) {
-            cacheEntryListeners.remove(CacheEntryListener.class, listener);
+        for (CacheEntryListener<T> listener : this.cacheEntryListeners.getListeners(CacheEntryListener.class)) {
+            this.cacheEntryListeners.remove(CacheEntryListener.class, listener);
         }
     }
 
@@ -71,7 +71,7 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     public void addCacheEntryListener(CacheEntryListener<T> listener)
     {
-        cacheEntryListeners.add(CacheEntryListener.class, listener);
+        this.cacheEntryListeners.add(CacheEntryListener.class, listener);
     }
 
     /**
@@ -91,8 +91,8 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryAddedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener : cacheEntryListeners
-            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener
+                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryAdded(event);
         }
     }
@@ -104,22 +104,12 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryRemovedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener : cacheEntryListeners
-            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener
+                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryRemoved(event);
         }
 
-        T cacheValue = event.getEntry().getValue();
-        if (cacheValue instanceof DisposableCacheValue) {
-            try {
-                ((DisposableCacheValue) cacheValue).dispose();
-            } catch (Throwable e) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("Error when trying to dispose a cache object of cache ["
-                        + configuration.getConfigurationId() + "]", e);
-                }
-            }
-        }
+        disposeCacheValue(event.getEntry().getValue());
     }
 
     /**
@@ -129,9 +119,28 @@ public abstract class AbstractCache<T> implements Cache<T>
      */
     protected void sendEntryModifiedEvent(CacheEntryEvent<T> event)
     {
-        for (org.xwiki.cache.event.CacheEntryListener<T> listener : cacheEntryListeners
-            .getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
+        for (org.xwiki.cache.event.CacheEntryListener<T> listener
+                : this.cacheEntryListeners.getListeners(org.xwiki.cache.event.CacheEntryListener.class)) {
             listener.cacheEntryModified(event);
+        }
+    }
+
+    /**
+     * Dispose the value being removed from the cache.
+     * 
+     * @param value the value to dispose
+     */
+    protected void disposeCacheValue(T value)
+    {
+        if (value instanceof DisposableCacheValue) {
+            try {
+                ((DisposableCacheValue) value).dispose();
+            } catch (Throwable e) {
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Error when trying to dispose a cache object of cache ["
+                        + configuration.getConfigurationId() + "]", e);
+                }
+            }
         }
     }
 }

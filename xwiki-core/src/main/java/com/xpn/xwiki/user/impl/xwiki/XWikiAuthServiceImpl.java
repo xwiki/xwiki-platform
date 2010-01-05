@@ -70,10 +70,14 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         Utils.getComponent(DocumentReferenceFactory.class, "current");
 
     /**
-     * Used to convert a proper Document Name to string.
+     * Used to convert a Document Reference to a username to a string. Note that we must be careful not to include
+     * the wiki name as part of the serialized name since user names are saved in the database (for example as the
+     * document author when you create a new document) and we're only supposed to save the wiki part when the user
+     * is from another wiki. This should probably be fixed in the future though but it requires changing existing
+     * code that depend on this behavior.
      */
-    private EntityReferenceSerializer<String> compactEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class, "compact");
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
     /**
      * Each wiki has its own authenticator.
@@ -373,7 +377,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         if (principal != null) {
             DocumentReference userDocumentReference =
                 this.documentReferenceFactory.createDocumentReference(principal.getName());
-            contextUserName = this.compactEntityReferenceSerializer.serialize(userDocumentReference);
+            contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);
         } else {
             contextUserName = null;
         }

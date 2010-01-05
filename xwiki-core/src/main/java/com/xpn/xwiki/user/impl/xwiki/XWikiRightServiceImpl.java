@@ -68,7 +68,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    private DocumentReferenceFactory documentReferenceFactory =
+    private DocumentReferenceFactory<String> documentReferenceFactory =
         Utils.getComponent(DocumentReferenceFactory.class, "current");
 
     /**

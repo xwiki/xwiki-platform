@@ -59,10 +59,12 @@ public class CompactEntityReferenceSerializer extends DefaultEntityReferenceSeri
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
 
-        XWikiDocument currentDoc = getContext().getDoc();
-        if (currentDoc == null || currentReference.getChild() == null || representation.length() > 0) {
+        if (getContext() == null || getContext().getDoc() == null || currentReference.getChild() == null
+            || representation.length() > 0)
+        {
             shouldPrint = true;
         } else {
+            XWikiDocument currentDoc = getContext().getDoc();
             switch (currentReference.getType()) {
                 case WIKI:
                     if (!currentDoc.getWikiName().equals(currentReference.getName())) {

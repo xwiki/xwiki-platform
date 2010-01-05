@@ -40,20 +40,19 @@ public class CompactEntityReferenceSerializerTest extends AbstractComponentTestC
 {
     private EntityReferenceSerializer serializer;
 
-    private XWikiContext context;
-
     @Before
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.context = new XWikiContext();
-
-        Execution execution = getComponentManager().lookup(Execution.class);
-        execution.getContext().setProperty("xwikicontext", this.context);
-        Utils.setComponentManager(getComponentManager());
-
         this.serializer = getComponentManager().lookup(EntityReferenceSerializer.class, "compact");
+    }
+
+    @org.junit.Test
+    public void testSerializeWhenNoContext() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
     }
 
     @org.junit.Test
@@ -67,29 +66,30 @@ public class CompactEntityReferenceSerializerTest extends AbstractComponentTestC
     public void testSerializeDocumentReferenceWhenContextDocument() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        XWikiContext xcontext = setUpXWikiContext();
 
-        this.context.setDoc(new XWikiDocument("wiki", "space", "page"));
+        xcontext.setDoc(new XWikiDocument("wiki", "space", "page"));
         Assert.assertEquals("page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("wiki", "space", "otherpage"));
+        xcontext.setDoc(new XWikiDocument("wiki", "space", "otherpage"));
         Assert.assertEquals("page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("wiki", "otherspace", "otherpage"));
+        xcontext.setDoc(new XWikiDocument("wiki", "otherspace", "otherpage"));
         Assert.assertEquals("space.page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("otherwiki", "otherspace", "otherpage"));
+        xcontext.setDoc(new XWikiDocument("otherwiki", "otherspace", "otherpage"));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("wiki", "otherspace", "page"));
+        xcontext.setDoc(new XWikiDocument("wiki", "otherspace", "page"));
         Assert.assertEquals("space.page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("otherwiki", "otherspace", "page"));
+        xcontext.setDoc(new XWikiDocument("otherwiki", "otherspace", "page"));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("otherwiki", "space", "page"));
+        xcontext.setDoc(new XWikiDocument("otherwiki", "space", "page"));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("otherwiki", "space", "otherpage"));
+        xcontext.setDoc(new XWikiDocument("otherwiki", "space", "otherpage"));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
     }
 
@@ -98,14 +98,26 @@ public class CompactEntityReferenceSerializerTest extends AbstractComponentTestC
     {
         AttachmentReference reference = new AttachmentReference("filename",
             new DocumentReference("wiki", "space", "page"));
+        XWikiContext xcontext = setUpXWikiContext();
 
-        this.context.setDoc(new XWikiDocument("wiki", "space", "page"));
+        xcontext.setDoc(new XWikiDocument("wiki", "space", "page"));
         Assert.assertEquals("filename", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("wiki", "space", "otherpage"));
+        xcontext.setDoc(new XWikiDocument("wiki", "space", "otherpage"));
         Assert.assertEquals("page@filename", this.serializer.serialize(reference));
 
-        this.context.setDoc(new XWikiDocument("otherwiki", "space", "page"));
+        xcontext.setDoc(new XWikiDocument("otherwiki", "space", "page"));
         Assert.assertEquals("wiki:space.page@filename", this.serializer.serialize(reference));
+    }
+
+    private XWikiContext setUpXWikiContext() throws Exception
+    {
+        XWikiContext xcontext = new XWikiContext();
+
+        Execution execution = getComponentManager().lookup(Execution.class);
+        execution.getContext().setProperty("xwikicontext", xcontext);
+        Utils.setComponentManager(getComponentManager());
+
+        return xcontext;
     }
 }

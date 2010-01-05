@@ -67,29 +67,22 @@ public class SearchResults extends Api
             this.relevantResults = new ArrayList<SearchResult>();
             final int hitcount = this.hits.length();
 
-            String database = this.context.getDatabase();
-            try {
-                for (int i = 0; i < hitcount; i++) {
-                    SearchResult result = null;
-                    try {
-                        result = new SearchResult(this.hits.doc(i), this.hits.score(i), this.xwiki);
+            for (int i = 0; i < hitcount; i++) {
+                try {
+                    SearchResult result = new SearchResult(this.hits.doc(i), this.hits.score(i), this.xwiki);
 
-                        this.context.setDatabase(result.getWiki());
+                    String pageName = null;
+                    if (result.isWikiContent()) {
+                        pageName = result.getWiki() + ":" + result.getSpace() + "." + result.getName();
 
-                        String pageName = null;
-                        if (result.isWikiContent()) {
-                            pageName = result.getWiki() + ":" + result.getSpace() + "." + result.getName();
-                        }
-                        if (result.isWikiContent() && this.xwiki.checkAccess(pageName, "view")
-                            && this.xwiki.exists(pageName)) {
+                        if (this.xwiki.exists(pageName)
+                            && this.xwiki.hasAccessLevel("view", this.context.getUser(), pageName)) {
                             this.relevantResults.add(result);
                         }
-                    } catch (Exception e) {
-                        LOG.error("Error getting search result", e);
                     }
+                } catch (Exception e) {
+                    LOG.error("Error getting search result", e);
                 }
-            } finally {
-                this.context.setDatabase(database);
             }
         }
 
@@ -242,5 +235,4 @@ public class SearchResults extends Api
     {
         return this.hits.length();
     }
-
 }

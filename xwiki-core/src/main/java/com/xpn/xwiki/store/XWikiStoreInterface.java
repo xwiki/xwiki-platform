@@ -105,7 +105,7 @@ public interface XWikiStoreInterface
     /**
      * API allowing to count the total number of documents that would be returned by a parameterized query.
      * 
-     * @param wheresql Parameterized query to use, similar to the ones accepted by
+     * @param parametrizedSqlClause Parameterized query to use, similar to the ones accepted by
      *            {@link #searchDocuments(String, List, XWikiContext)}. It should not contain <code>order by</code> or
      *            <code>group</code> clauses, since this kind of queries are not portable.
      * @param parameterValues The parameter values that replace the question marks.

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store;
 
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import junit.framework.TestCase;
 
 /**
@@ -26,7 +27,7 @@ import junit.framework.TestCase;
  * 
  * @version $Id$
  */
-public class XWikiHibernateStoreTest extends TestCase
+public class XWikiHibernateStoreTest extends AbstractBridgedXWikiComponentTestCase
 {
     public void testGetColumnsForSelectStatement()
     {

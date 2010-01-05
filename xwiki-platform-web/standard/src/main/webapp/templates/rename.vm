@@ -41,11 +41,11 @@
           #error($msg.get('core.rename.targetNotWritable', [$newFullName]))
           #template('renameStep1.vm')
         #else
-          #set($renamedBLs = $util.arrayList)
+          #set($backlinks = $util.arrayList)
           #set($children = $util.arrayList)
           #foreach($param in $request.parameterNames)
             #if($param.startsWith("backlink_"))
-              #set($discard = $renamedBLs.add($param.substring(9)))
+              #set($discard = $backlinks.add($param.substring(9)))
             #elseif($param.startsWith("child_"))
               #set($discard = $children.add($param.substring(6)))
             #end
@@ -53,7 +53,7 @@
           ## Save the old document name so that we can display it in the notice box. After the rename the
           ## doc points to the new name!
           #set ($oldDocName = $doc.fullName)
-          $doc.rename($newFullName, $renamedBLs, $children)
+          $doc.rename($newFullName, $backlinks, $children)
           #xwikimessageboxstart("$msg.get('notice')" "$msg.get('core.rename.success', [$oldDocName, $doc.fullName, $xwiki.getURL($doc.fullName)])")
           #xwikimessageboxend()
         #end

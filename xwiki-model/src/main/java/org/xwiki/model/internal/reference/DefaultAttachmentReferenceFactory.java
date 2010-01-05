@@ -28,21 +28,22 @@ import org.xwiki.model.reference.EntityReferenceFactory;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceFactory} which can be considered a helper
- * component to create {@link AttachmentReference} objects from their string representation. This implementation
- * uses fixed default values when parts of the Reference are missing in the string representation. Default values
- * are retrieved from the {@link org.xwiki.model.ModelConfiguration} class. 
- *
+ * component to create {@link AttachmentReference} objects from their string representation. This implementation uses
+ * fixed default values when parts of the Reference are missing in the string representation. Default values are
+ * retrieved from the {@link org.xwiki.model.ModelConfiguration} class.
+ * 
  * @version $Id$
- * @since 2.2M1 
+ * @since 2.2M1
  */
 @Component
 public class DefaultAttachmentReferenceFactory implements AttachmentReferenceFactory<String>
 {
     @Requirement
-    private EntityReferenceFactory entityReferenceFactory;
+    private EntityReferenceFactory<String> entityReferenceFactory;
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.model.reference.AttachmentReferenceFactory#createAttachmentReference(Object)
      */
     public AttachmentReference createAttachmentReference(String attachmentReferenceRepresentation)

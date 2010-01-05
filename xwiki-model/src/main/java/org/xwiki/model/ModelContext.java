@@ -20,16 +20,13 @@
 package org.xwiki.model;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.SpaceReference;
-import org.xwiki.model.reference.WikiReference;
 
 /**
- * Allows accessing Model Objects for current objects (current document, current wiki, current space, etc) placed in
- * the Execution Context.
- *
- * @version $Id$ 
+ * Allows accessing Model Objects for current objects (current document, current wiki, current space, etc) placed in the
+ * Execution Context.
+ * 
+ * @version $Id$
  * @since 2.2M1
  */
 @ComponentRole

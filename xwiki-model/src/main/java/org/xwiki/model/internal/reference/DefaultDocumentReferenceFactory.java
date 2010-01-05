@@ -26,29 +26,29 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.model.reference.EntityReferenceFactory;
 
-
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceFactory} which can be considered a helper
- * component to create {@link DocumentReference} objects from their string representation.  This implementation
- * uses fixed default values when parts of the Reference are missing in the string representation. Default values
- * are retrieved from the {@link org.xwiki.model.ModelConfiguration} class. 
- *
+ * component to create {@link DocumentReference} objects from their string representation. This implementation uses
+ * fixed default values when parts of the Reference are missing in the string representation. Default values are
+ * retrieved from the {@link org.xwiki.model.ModelConfiguration} class.
+ * 
  * @version $Id$
  * @since 2.2M1
  */
 @Component
-public class  DefaultDocumentReferenceFactory implements DocumentReferenceFactory<String>
+public class DefaultDocumentReferenceFactory implements DocumentReferenceFactory<String>
 {
     @Requirement
-    private EntityReferenceFactory entityReferenceFactory;
+    private EntityReferenceFactory<String> entityReferenceFactory;
 
     /**
      * {@inheritDoc}
+     * 
      * @see DocumentReferenceFactory#createDocumentReference(Object)
      */
     public DocumentReference createDocumentReference(String documentReferenceRepresentation)
     {
-        return new DocumentReference(this.entityReferenceFactory.createEntityReference(
-            documentReferenceRepresentation, EntityType.DOCUMENT));
+        return new DocumentReference(this.entityReferenceFactory.createEntityReference(documentReferenceRepresentation,
+            EntityType.DOCUMENT));
     }
 }

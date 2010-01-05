@@ -25,11 +25,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
-import org.xwiki.model.AttachmentName;
-import org.xwiki.model.AttachmentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
@@ -57,17 +57,18 @@ public class XWikiImportService implements ImportService
     private OfficeImporter officeImporter;
 
     /**
-     * The component used to serialize {@link org.xwiki.bridge.DocumentName} instances. This component is needed only
-     * because OfficeImporter component uses String instead of {@link org.xwiki.bridge.DocumentName}.
+     * The component used to serialize {@link org.xwiki.model.reference.DocumentReference} instances. This component
+     * is needed only because OfficeImporter component uses String instead of
+     * {@link org.xwiki.model.reference.DocumentReference}.
      */
     @Requirement
-    private DocumentNameSerializer documentNameSerializer;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * The component used to parse attachment references.
      */
-    @Requirement
-    private AttachmentNameFactory attachmentNameFactory;
+    @Requirement("current")
+    private AttachmentReferenceFactory attachmentReferenceFactory;
 
     /**
      * The component manager. We need it because we have to access some components dynamically.
@@ -83,7 +84,7 @@ public class XWikiImportService implements ImportService
     public String cleanOfficeHTML(String htmlPaste, String cleanerHint, Map<String, String> cleaningParams)
     {
         try {
-            HTMLCleaner cleaner = componentManager.lookup(HTMLCleaner.class, cleanerHint);
+            HTMLCleaner cleaner = this.componentManager.lookup(HTMLCleaner.class, cleanerHint);
             HTMLCleanerConfiguration configuration = cleaner.getDefaultConfiguration();
             configuration.setParameters(cleaningParams);
             Document cleanedDocument = cleaner.clean(new StringReader(htmlPaste), configuration);
@@ -103,11 +104,13 @@ public class XWikiImportService implements ImportService
     public String officeToXHTML(Attachment attachment, Map<String, String> cleaningParams)
     {
         try {
-            AttachmentName attachmentName = attachmentNameFactory.createAttachmentName(attachment.getReference());
+            AttachmentReference attachmentReference =
+                this.attachmentReferenceFactory.createAttachmentReference(attachment.getReference());
             // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
             // DocumentNameSerializer.
-            return officeImporter.importAttachment(documentNameSerializer.serialize(attachmentName.getDocumentName()),
-                attachmentName.getFileName(), cleaningParams);
+            return officeImporter.importAttachment(
+                this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()),
+                attachmentReference.getName(), cleaningParams);
         } catch (Exception e) {
             LOG.error("Exception while importing office document.", e);
             throw new RuntimeException(e.getLocalizedMessage());

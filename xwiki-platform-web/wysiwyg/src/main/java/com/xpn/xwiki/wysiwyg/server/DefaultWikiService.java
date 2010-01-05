@@ -27,10 +27,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceNormalizer;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -60,10 +63,16 @@ public class DefaultWikiService implements WikiService
     private static final String VIEW_ACTION = "view";
 
     /**
-     * The component used to serialize XWiki document names.
+     * The component used to serialize XWiki document references.
      */
     @Requirement
-    private DocumentNameSerializer documentNameSerializer;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    /**
+     * Used to construct a default document reference.
+     */
+    @Requirement
+    private EntityReferenceNormalizer defaultEntityReferenceNormalizer;
 
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
@@ -284,23 +293,23 @@ public class DefaultWikiService implements WikiService
     public LinkConfig getPageLink(String wikiName, String spaceName, String pageName, String revision, String anchor)
     {
         String queryString = StringUtils.isEmpty(revision) ? null : "rev=" + revision;
-        DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
+        DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
         // get the url to the targeted document from the bridge
-        String pageReference = documentNameSerializer.serialize(docName);
-        String pageURL = documentAccessBridge.getURL(pageReference, VIEW_ACTION, queryString, anchor);
+        String documentReferenceAsString = this.entityReferenceSerializer.serialize(documentReference);
+        String pageURL = documentAccessBridge.getURL(documentReferenceAsString, VIEW_ACTION, queryString, anchor);
 
         // get a document name serializer to return the page reference
         if (queryString != null) {
-            pageReference += "?" + queryString;
+            documentReferenceAsString += "?" + queryString;
         }
         if (!StringUtils.isEmpty(anchor)) {
-            pageReference += "#" + anchor;
+            documentReferenceAsString += "#" + anchor;
         }
 
         // create the link reference
         LinkConfig linkConfig = new LinkConfig();
         linkConfig.setUrl(pageURL);
-        linkConfig.setReference(pageReference);
+        linkConfig.setReference(documentReferenceAsString);
 
         return linkConfig;
     }
@@ -317,11 +326,11 @@ public class DefaultWikiService implements WikiService
         XWikiContext context = getXWikiContext();
         // clean attachment filename to be synchronized with all attachment operations
         String cleanedFileName = context.getWiki().clearName(attachmentName, false, true, context);
-        DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-        String docReference = documentNameSerializer.serialize(docName);
+        DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
+        String documentReferenceAsString = this.entityReferenceSerializer.serialize(documentReference);
         XWikiDocument doc;
         try {
-            doc = context.getWiki().getDocument(docReference, context);
+            doc = context.getWiki().getDocument(documentReferenceAsString, context);
         } catch (XWikiException e) {
             // there was a problem with getting the document on the server
             return null;
@@ -336,61 +345,38 @@ public class DefaultWikiService implements WikiService
             return null;
         }
         // all right, now set the reference and url and return
-        String attachmentReference = getAttachmentReference(docReference, cleanedFileName);
-        attach.setReference(attachmentReference);
+        String attachmentReferenceAsString = this.entityReferenceSerializer.serialize(
+            new AttachmentReference(cleanedFileName, documentReference));
+        attach.setReference(attachmentReferenceAsString);
         attach.setURL(doc.getAttachmentURL(cleanedFileName, context));
 
         return attach;
     }
 
     /**
-     * Gets a document name from the passed parameters, handling the empty wiki, empty space or empty page name.
+     * Gets a document reference from the passed parameters, handling the empty wiki, empty space or empty page name.
      * 
      * @param wiki the wiki of the document
      * @param space the space of the document
      * @param page the page name of the targeted document
-     * @return the completed {@link DocumentName} corresponding to the passed parameters, with all the missing values
-     *         completed with defaults
+     * @return the completed {@link DocumentReference} corresponding to the passed parameters, with all the missing
+     *         values completed with defaults
      * @since 2.2M1
      */
-    protected DocumentName prepareDocumentName(String wiki, String space, String page)
+    protected DocumentReference prepareDocumentReference(String wiki, String space, String page)
     {
-        // We default on xwiki:Main.WebHome and not on the current document because the execution context in which this
-        // component is used doesn't have a current document. This component is used to respond to GWT-RPC requests
+        // Note: we use the default normalizer instead of the current normalizer because the execution context in which
+        // this component is used doesn't have a current document. This component is used to respond to GWT-RPC requests
         // which don't have the information required to detect the current document (e.g. these informations can't be
         // extracted from the request URL).
-        String newPageName = StringUtils.isEmpty(page) ? "WebHome" : clearXWikiName(page);
-        String newSpaceName = StringUtils.isEmpty(space) ? "Main" : clearXWikiName(space);
-        String newWikiName = StringUtils.isEmpty(wiki) ? getXWikiContext().getDatabase() : clearXWikiName(wiki);
-        return new DocumentName(newWikiName, newSpaceName, newPageName);
-    }
 
-    /**
-     * Clears forbidden characters out of the passed name, in a way which is consistent with the algorithm used in the
-     * create page panel. <br />
-     * FIXME: this function needs to be deleted when there will be a function to do this operation in a consistent
-     * manner across the whole xwiki, and all calls to this function should be replaced with calls to that function.
-     * 
-     * @param name the name to clear from forbidden characters and transform in a xwiki name.
-     * @return the cleared up xwiki name, ready to be used as a page or space name.
-     */
-    private String clearXWikiName(String name)
-    {
-        // remove all . since they're used as separators for space and page
-        return name.replaceAll("\\.", "");
-    }
-
-    /**
-     * Helper method to get the reference to an attachment. <br />
-     * FIXME: which should be removed when such a serializer will exist in the bridge.
-     * 
-     * @param docReference the reference of the document to which the file is attached
-     * @param attachName the name of the attached file to get the reference for
-     * @return the reference of a file attached to a document, in the form wiki:Space.Page@filename.ext
-     */
-    private String getAttachmentReference(String docReference, String attachName)
-    {
-        return docReference + "@" + attachName;
+        // TODO: Replace this by setting a current document in the context and use the Current Normalizer instead.
+        DocumentReference reference = new DocumentReference(wiki, space, page);
+        this.defaultEntityReferenceNormalizer.normalize(reference);
+        if (StringUtils.isEmpty(wiki)) {
+            reference.extractReference(EntityType.WIKI).setName(getXWikiContext().getDatabase());
+        }
+        return reference;
     }
 
     /**
@@ -420,14 +406,15 @@ public class DefaultWikiService implements WikiService
         try {
             XWikiContext context = getXWikiContext();
             List<Attachment> attachments = new ArrayList<Attachment>();
-            DocumentName docName = prepareDocumentName(wikiName, spaceName, pageName);
-            String docReference = documentNameSerializer.serialize(docName);
-            XWikiDocument doc = context.getWiki().getDocument(docReference, context);
+            DocumentReference documentReference = prepareDocumentReference(wikiName, spaceName, pageName);
+            String documentReferenceAsString = this.entityReferenceSerializer.serialize(documentReference);
+            XWikiDocument doc = context.getWiki().getDocument(documentReferenceAsString, context);
             for (XWikiAttachment attach : doc.getAttachmentList()) {
                 Attachment currentAttach = new Attachment();
                 currentAttach.setFileName(attach.getFilename());
                 currentAttach.setURL(doc.getAttachmentURL(attach.getFilename(), context));
-                currentAttach.setReference(getAttachmentReference(docReference, attach.getFilename()));
+                currentAttach.setReference(this.entityReferenceSerializer.serialize(
+                    new AttachmentReference(attach.getFilename(), documentReference)));
                 currentAttach.setMimeType(attach.getMimeType(context));
                 attachments.add(currentAttach);
             }

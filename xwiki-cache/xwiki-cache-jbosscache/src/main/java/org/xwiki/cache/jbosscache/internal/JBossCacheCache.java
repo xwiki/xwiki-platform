@@ -31,8 +31,10 @@ import org.apache.commons.logging.LogFactory;
 import org.jboss.cache.notifications.annotation.CacheListener;
 import org.jboss.cache.notifications.annotation.NodeEvicted;
 import org.jboss.cache.notifications.annotation.NodeModified;
+import org.jboss.cache.notifications.annotation.NodeRemoved;
 import org.jboss.cache.notifications.event.NodeEvictedEvent;
 import org.jboss.cache.notifications.event.NodeModifiedEvent;
+import org.jboss.cache.notifications.event.NodeRemovedEvent;
 import org.jboss.cache.Cache;
 import org.jboss.cache.CacheFactory;
 import org.jboss.cache.DefaultCacheFactory;
@@ -208,6 +210,33 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     }
 
     /**
+     * @param event the eviction event.
+     */
+    @NodeRemoved
+    public void nodeRemoved(NodeRemovedEvent event)
+    {
+        if (!event.getFqn().isChildOf(ROOT_FQN)) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info(MessageFormat.format("The node {0} should not has been removed", event.getFqn()));
+            }
+
+            return;
+        }
+
+        Map<String, T> data = event.getData();
+
+        String key = event.getFqn().getLastElementAsString();
+
+        if (event.isPre()) {
+            this.preEventData.put(key, data);
+        } else {
+            cacheEntryRemoved(key, this.preEventData.get(key).get(DATA_KEY));
+
+            this.preEventData.remove(key);
+        }
+    }
+
+    /**
      * @param event the modification event.
      */
     @NodeModified
@@ -249,7 +278,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     private void cacheEntryInserted(String key, T value)
     {
         JBossCacheCacheEntryEvent<T> event =
-            new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, value));
+                new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, value));
 
         Map<String, T> preMap = this.preEventData.get(key);
 
@@ -275,7 +304,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         }
 
         JBossCacheCacheEntryEvent<T> event =
-            new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, obj));
+                new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, obj));
 
         sendEntryRemovedEvent(event);
     }

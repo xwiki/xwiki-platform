@@ -26,7 +26,7 @@ import org.xwiki.model.EntityType;
  * Transforms an Entity reference defined in a given representation into an {@link EntityReference} object.
  *
  * @param <T> the object to transform into an Entity Reference
- * @version $Id:$
+ * @version $Id$
  * @since 2.2M1
  */
 @ComponentRole

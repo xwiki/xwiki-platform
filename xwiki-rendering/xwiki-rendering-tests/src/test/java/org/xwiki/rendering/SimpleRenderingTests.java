@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
@@ -35,7 +34,7 @@ import org.xwiki.test.ComponentManagerTestSetup;
  */
 public class SimpleRenderingTests extends TestCase
 {
-    public static Test suite() throws Exception
+    public static junit.framework.Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Rendering tests not requiring the wiki notion");
 

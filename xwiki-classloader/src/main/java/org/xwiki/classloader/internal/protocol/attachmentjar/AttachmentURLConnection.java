@@ -24,7 +24,7 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.xwiki.model.AttachmentName;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 
 /**
@@ -37,16 +37,16 @@ public class AttachmentURLConnection extends URLConnection
 {
     private DocumentAccessBridge documentAccessBridge;
     
-    private AttachmentName attachmentName;
+    private AttachmentReference attachmentReference;
 
     /**
      * @param url the URL to connect to
      * @since 2.2M1
      */
-    public AttachmentURLConnection(URL url, AttachmentName attachmentName, DocumentAccessBridge documentAccessBridge)
+    public AttachmentURLConnection(URL url, AttachmentReference attachmentReference, DocumentAccessBridge documentAccessBridge)
     {
         super(url);
-        this.attachmentName = attachmentName;
+        this.attachmentReference = attachmentReference;
         this.documentAccessBridge = documentAccessBridge;
     }
 
@@ -66,9 +66,9 @@ public class AttachmentURLConnection extends URLConnection
     public InputStream getInputStream()
     {
         try {
-            return this.documentAccessBridge.getAttachmentContent(this.attachmentName);
+            return this.documentAccessBridge.getAttachmentContent(this.attachmentReference);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get Attachment content for [" + this.attachmentName + "]", e);
+            throw new RuntimeException("Failed to get Attachment content for [" + this.attachmentReference + "]", e);
         }
     }
 }

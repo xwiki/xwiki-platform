@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
@@ -62,7 +62,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      * Map of wiki macros against document names. This is used to de-register wiki macros when corresponding documents
      * are deleted.
      */
-    private Map<DocumentName, WikiMacroData> wikiMacroMap = new HashMap<DocumentName, WikiMacroData>();
+    private Map<DocumentReference, WikiMacroData> wikiMacroMap = new HashMap<DocumentReference, WikiMacroData>();
 
     /**
      * Internal helper class to hold a wiki macro component role hint and the wiki Macro definition itself.
@@ -108,25 +108,25 @@ public class DefaultWikiMacroManager implements WikiMacroManager
     
     /**
      * {@inheritDoc}
-     * @see WikiMacroManager#hasWikiMacro(DocumentName)
+     * @see WikiMacroManager#hasWikiMacro(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
-    public boolean hasWikiMacro(DocumentName documentName)
+    public boolean hasWikiMacro(DocumentReference documentReference)
     {
-        return (null != wikiMacroMap.get(documentName));
+        return (null != wikiMacroMap.get(documentReference));
     }
 
     /**
      * {@inheritDoc}
-     * @see WikiMacroManager#registerWikiMacro(DocumentName, WikiMacro)
+     * @see WikiMacroManager#registerWikiMacro(org.xwiki.model.reference.DocumentReference , WikiMacro)
      * @since 2.2M1
      */
-    public void registerWikiMacro(DocumentName documentName, WikiMacro wikiMacro) throws WikiMacroException
+    public void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro) throws WikiMacroException
     {
         WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) wikiMacro.getDescriptor();
 
         // Verify that the user has the right to register this wiki macro the chosen visibility
-        if (isAllowed(documentName, macroDescriptor.getVisibility())) {
+        if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
 
             DefaultComponentDescriptor<Macro> componentDescriptor = new DefaultComponentDescriptor<Macro>();
             componentDescriptor.setRole(Macro.class);
@@ -135,52 +135,54 @@ public class DefaultWikiMacroManager implements WikiMacroManager
             try {
                 // Register the macro against the right Component Manager, depending on the defined macro visibility.
                 findComponentManager(macroDescriptor.getVisibility()).registerComponent(componentDescriptor, wikiMacro);
-                this.wikiMacroMap.put(documentName,
+                this.wikiMacroMap.put(documentReference,
                     new WikiMacroData(componentDescriptor.getRoleHint(), wikiMacro));
             } catch (Exception e) {
                 throw new WikiMacroException(String.format("Failed to register macro [%s] in [%s] for visibility [%s]",
-                    wikiMacro.getId(), documentName, macroDescriptor.getVisibility()), e);
+                    wikiMacro.getId(), documentReference, macroDescriptor.getVisibility()), e);
             }
         } else {
             throw new WikiMacroException(String.format("Unable to register macro [%s] in [%s] for visibility [%s] "
-                + "due to insufficient privileges", wikiMacro.getId(), documentName, macroDescriptor.getVisibility()));
+                + "due to insufficient privileges", wikiMacro.getId(), documentReference,
+                macroDescriptor.getVisibility()));
         }
     }
 
     /**
      * {@inheritDoc}
-     * @see WikiMacroManager#unregisterWikiMacro(DocumentName)  
+     * @see WikiMacroManager#unregisterWikiMacro(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
-    public void unregisterWikiMacro(DocumentName documentName) throws WikiMacroException
+    public void unregisterWikiMacro(DocumentReference documentReference) throws WikiMacroException
     {
-        WikiMacroData macroData = this.wikiMacroMap.get(documentName);
+        WikiMacroData macroData = this.wikiMacroMap.get(documentReference);
         if (macroData != null) {
             WikiMacroDescriptor macroDescriptor = (WikiMacroDescriptor) macroData.getWikiMacro().getDescriptor();
 
             // Verify that the user has the right to register this wiki macro the chosen visibility
-            if (isAllowed(documentName, macroDescriptor.getVisibility())) {
+            if (isAllowed(documentReference, macroDescriptor.getVisibility())) {
                 try {
                     findComponentManager(macroDescriptor.getVisibility()).unregisterComponent(Macro.class,
                         macroData.getHint());
-                    this.wikiMacroMap.remove(documentName);
+                    this.wikiMacroMap.remove(documentReference);
                 } catch (Exception e) {
                     throw new WikiMacroException(String.format("Failed to unregister macro [%s] in [%s] for "
-                        + "visibility [%s]", macroData.getHint(), documentName, macroDescriptor.getVisibility()), e);
+                        + "visibility [%s]", macroData.getHint(), documentReference, macroDescriptor.getVisibility()),
+                        e);
                 }
             } else {
                 throw new WikiMacroException(String.format("Unable to unregister macro [%s] in [%s] for visibility "
-                    + "[%s] due to insufficient privileges", macroData.getWikiMacro().getId(), documentName,
+                    + "[%s] due to insufficient privileges", macroData.getWikiMacro().getId(), documentReference,
                     macroDescriptor.getVisibility()));
             }
         } else {
             throw new WikiMacroException(String.format("Macro [%s] in [%s] isn't registered",
-                macroData.getWikiMacro().getId(), documentName));
+                macroData.getWikiMacro().getId(), documentReference));
         }
     }
 
     /**
-     * @param documentName the name of the document containing the wiki macro definition
+     * @param documentReference the name of the document containing the wiki macro definition
      * @param visibility the visibility required
      * @return true if the current user is allowed to register or unregister the wiki macro contained in the passed
      *         document name and with the passed visibility. Global visibility require programming rights on the
@@ -189,7 +191,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
      *         on the document.
      * @since 2.2M1
      */
-    private boolean isAllowed(DocumentName documentName, WikiMacroVisibility visibility)
+    private boolean isAllowed(DocumentReference documentReference, WikiMacroVisibility visibility)
     {
         boolean isAllowed = false;
 
@@ -203,7 +205,7 @@ public class DefaultWikiMacroManager implements WikiMacroManager
                 break;
             default:
                 // Verify the user has edit rights on the document containing the Wiki Macro definition
-                if (this.bridge.isDocumentEditable(documentName)) {
+                if (this.bridge.isDocumentEditable(documentReference)) {
                     isAllowed = true;
                 }
         }

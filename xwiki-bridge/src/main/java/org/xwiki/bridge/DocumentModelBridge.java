@@ -19,7 +19,7 @@
  */
 package org.xwiki.bridge;
 
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Exposes methods for accessing Documents. This is temporary until we remodel the Model classes and the Document
@@ -34,10 +34,10 @@ public interface DocumentModelBridge
     /**
      * Sets the parent document name attribute for this document.
      * 
-     * @param parentName name of the parent document.
+     * @param parentReference name of the parent document.
      * @since 2.2M1
      */
-    void setParent(DocumentName parentName);
+    void setParent(DocumentReference parentReference);
     
     /**
      * Sets the title of this document.
@@ -50,20 +50,20 @@ public interface DocumentModelBridge
      * Retrieve the full name of the document, in the <code>Space.Name</code> format, for example <tt>Main.WebHome</tt>.
      * 
      * @return A <code>String</code> representation of the document's full name.
-     * @deprecated use #getDocumentName instead
+     * @deprecated use {@link #getDocumentReference} instead
      */
     @Deprecated
     String getFullName();
 
     /**
-     * @return the full document's name, including Wiki, Space and Page
+     * @return the document's reference
      * @since 2.2M1
      */
-    DocumentName getModelDocumentName();
+    DocumentReference getDocumentReference();
 
     /**
      * @return the full document's name, including Wiki, Space and Page
-     * @deprecated replaced by {@link #getModelDocumentName()} since 2.2M1
+     * @deprecated replaced by {@link #getDocumentReference()} since 2.2M1
      */
     @Deprecated
     org.xwiki.bridge.DocumentName getDocumentName();

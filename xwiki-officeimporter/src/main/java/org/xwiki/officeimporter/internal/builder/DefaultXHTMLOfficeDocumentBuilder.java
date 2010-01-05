@@ -31,8 +31,8 @@ import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
@@ -51,7 +51,7 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
 public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implements XHTMLOfficeDocumentBuilder
 {
     /**
-     * Name of the output file as seen by {@link OpenOfficeConverter}.
+     * Name of the output file as seen by {@link org.xwiki.officeimporter.openoffice.OpenOfficeConverterException}.
      */
     private static final String OUTPUT_FILE_NAME = "output.html";
 
@@ -59,7 +59,7 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
      * Used to serialize the reference document name.
      */
     @Requirement
-    private DocumentNameSerializer nameSerializer;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * Used to obtain document converter.
@@ -76,7 +76,7 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
     /**
      * {@inheritDoc}
      */
-    public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentName reference,
+    public XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
         // Invoke openoffice document converter.
@@ -92,7 +92,7 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
 
         // Prepare the parameters for html cleaning.
         Map<String, String> params = new HashMap<String, String>();
-        params.put("targetDocument", nameSerializer.serialize(reference));
+        params.put("targetDocument", entityReferenceSerializer.serialize(reference));
         if (filterStyles) {
             params.put("filterStyles", "strict");
         }
@@ -119,12 +119,13 @@ public class DefaultXHTMLOfficeDocumentBuilder extends AbstractLogEnabled implem
 
     /**
      * {@inheritDoc}
+     * @deprecated use {@link #build(InputStream, String, DocumentReference, boolean)}  since 2.2M1
      */
     @Deprecated
     public XHTMLOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        return build(new ByteArrayInputStream(officeFileData), "input.tmp", new DocumentName(reference.getWiki(),
+        return build(new ByteArrayInputStream(officeFileData), "input.tmp", new DocumentReference(reference.getWiki(),
             reference.getSpace(), reference.getPage()), filterStyles);
     }
 }

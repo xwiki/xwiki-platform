@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.model.AttachmentName;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.syntax.Syntax;
@@ -141,8 +141,20 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
+     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, String, String)} instead
      */
     public Object getProperty(String documentName, String className, String propertyName)
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see DocumentAccessBridge#getProperty(String, String, String)
+     * @since 2.2M1
+     */
+    public Object getProperty(DocumentReference documentName, String className, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -200,7 +212,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * @since 2.2M1
      */
-    public InputStream getAttachmentContent(AttachmentName attachmentName) throws Exception
+    public InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -209,7 +221,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * @since 2.2M1
      */
-    public List<AttachmentName> getAttachmentNames(DocumentName documentName) throws Exception
+    public List<AttachmentReference> getAttachmentReferences(DocumentReference documentReference) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -289,10 +301,10 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      *
-     * @see DocumentAccessBridge#isDocumentEditable(org.xwiki.model.DocumentName) 
+     * @see DocumentAccessBridge#isDocumentEditable(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
-    public boolean isDocumentEditable(DocumentName documentName)
+    public boolean isDocumentEditable(DocumentReference documentReference)
     {
         return true;
     }
@@ -340,23 +352,12 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.model.DocumentName)
+     * @see org.xwiki.bridge.DocumentAccessBridge#getDocument(org.xwiki.model.reference.DocumentReference)
      * @since 2.2M1
      */
-    public DocumentModelBridge getDocument(DocumentName documentName) throws Exception
+    public DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception
     {
         throw new RuntimeException("Not implemented");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DocumentAccessBridge#getDocumentName(String)
-     * @since 2.2M1
-     */
-    public DocumentName getModelDocumentName(String documentName)
-    {
-        return new DocumentName("xwiki", "Space", "Page");
     }
 
     /**
@@ -382,10 +383,10 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see DocumentAccessBridge#getAttachmentURL(AttachmentName, boolean)
+     * @see DocumentAccessBridge#getAttachmentURL(org.xwiki.model.reference.AttachmentReference , boolean)
      * @since 2.2M1
      */
-    public String getAttachmentURL(AttachmentName attachmentName, boolean isFullURL)
+    public String getAttachmentURL(AttachmentReference attachmentReference, boolean isFullURL)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -393,10 +394,10 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      * 
-     * @see DocumentAccessBridge#getAttachmentURLs(DocumentName, boolean)
+     * @see DocumentAccessBridge#getAttachmentURLs(org.xwiki.model.reference.DocumentReference , boolean)
      * @since 2.2M1
      */
-    public List<String> getAttachmentURLs(DocumentName documentName, boolean isFullURL) throws Exception
+    public List<String> getAttachmentURLs(DocumentReference documentReference, boolean isFullURL) throws Exception
     {
         throw new RuntimeException("Not implemented");
     }
@@ -418,6 +419,17 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @deprecated
      */
     public org.xwiki.bridge.DocumentName getCurrentDocumentName()
+    {
+        throw new RuntimeException("Not implemented");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.bridge.DocumentAccessBridge#getCurrentDocumentReference()
+     * @since 2.2M1
+     */
+    public DocumentReference getCurrentDocumentReference()
     {
         throw new RuntimeException("Not implemented");
     }

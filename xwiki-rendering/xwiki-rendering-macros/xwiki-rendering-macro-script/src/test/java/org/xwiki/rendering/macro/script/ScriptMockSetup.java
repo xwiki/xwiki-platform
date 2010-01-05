@@ -21,11 +21,11 @@ package org.xwiki.rendering.macro.script;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
-import org.xwiki.model.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentNameFactory;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 
 /**
  * Dynamic mock setup for script macros.
@@ -39,9 +39,9 @@ public class ScriptMockSetup
     
     public DocumentAccessBridge bridge;
     
-    public AttachmentNameFactory attachmentNameFactory;
+    public AttachmentReferenceFactory attachmentReferenceFactory;
     
-    public DocumentNameFactory documentNameFactory;
+    public DocumentReferenceFactory documentReferenceFactory;
 
     public ScriptMockSetup(ComponentManager componentManager) throws Exception
     {
@@ -58,19 +58,20 @@ public class ScriptMockSetup
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, bridge);
 
-        // Use a mock for the AttachmentName Factory
-        attachmentNameFactory = mockery.mock(AttachmentNameFactory.class);
-        DefaultComponentDescriptor<AttachmentNameFactory> descriptorANF =
-            new DefaultComponentDescriptor<AttachmentNameFactory>();
-        descriptorANF.setRole(AttachmentNameFactory.class);
-        componentManager.registerComponent(descriptorANF, attachmentNameFactory);
+        // Use a mock for the AttachmentReference Factory
+        attachmentReferenceFactory = mockery.mock(AttachmentReferenceFactory.class);
+        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
+        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        descriptorARF.setRoleHint("current");
+        componentManager.registerComponent(descriptorARF, attachmentReferenceFactory);
 
-        // Use a mock for the DocumentName Factory
-        documentNameFactory = mockery.mock(DocumentNameFactory.class);
-        DefaultComponentDescriptor<DocumentNameFactory> descriptorDNF =
-            new DefaultComponentDescriptor<DocumentNameFactory>();
-        descriptorDNF.setRole(DocumentNameFactory.class);
-        descriptorDNF.setRoleHint("current");
-        componentManager.registerComponent(descriptorDNF, documentNameFactory);        
+        // Use a mock for the DocumentReference Factory
+        documentReferenceFactory = mockery.mock(DocumentReferenceFactory.class);
+        DefaultComponentDescriptor<DocumentReferenceFactory> descriptorDRF =
+            new DefaultComponentDescriptor<DocumentReferenceFactory>();
+        descriptorDRF.setRole(DocumentReferenceFactory.class);
+        descriptorDRF.setRoleHint("current");
+        componentManager.registerComponent(descriptorDRF, documentReferenceFactory);        
     }
 }

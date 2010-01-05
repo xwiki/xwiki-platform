@@ -24,7 +24,7 @@ package org.xwiki.bridge;
  * 
  * @version $Id$
  * @since 2.0M1
- * @deprecated use {@link org.xwiki.model.AttachmentName} instead since 2.2M1
+ * @deprecated use {@link org.xwiki.model.reference.AttachmentReference} instead since 2.2M1
  */
 @Deprecated
 public class AttachmentName

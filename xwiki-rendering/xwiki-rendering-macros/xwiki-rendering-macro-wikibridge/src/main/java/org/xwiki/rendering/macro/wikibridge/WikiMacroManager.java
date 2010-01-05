@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro.wikibridge;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Component interface responsible for managing wiki macro instances.
@@ -40,31 +40,31 @@ public interface WikiMacroManager
      * Note that the Execution Context must be set properly (the current user or the current wiki must be set) prior
      * to calling this API.
      *
-     * @param documentName the name of the document which contains the wiki macro
+     * @param documentReference the name of the document which contains the wiki macro
      * @param wikiMacro the {@link org.xwiki.rendering.macro.wikibridge.WikiMacro} instance
      * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist,
      *            not enough privilege, etc)
      * @since 2.2.M1
      */
-    void registerWikiMacro(DocumentName documentName, WikiMacro wikiMacro) throws WikiMacroException;
+    void registerWikiMacro(DocumentReference documentReference, WikiMacro wikiMacro) throws WikiMacroException;
 
     /**
      * Unregisters the wiki macro defined on the given document (if there is one).
      * 
-     * @param documentName the name of the document which contains the wiki macro
+     * @param documentReference the name of the document which contains the wiki macro
      * @exception WikiMacroException if a problem happened when registering the macro (document doesn't exist,
      *            not enough privilege, etc)
      * @since 2.2.M1
      */
-    void unregisterWikiMacro(DocumentName documentName) throws WikiMacroException;
+    void unregisterWikiMacro(DocumentReference documentReference) throws WikiMacroException;
 
     /**
      * Utility method for querying {@link WikiMacroManager} to see if there is a {@link WikiMacro} already registered
      * for the given document.
      * 
-     * @param documentName the name of the document which contains the wiki macro
+     * @param documentReference the name of the document which contains the wiki macro
      * @return true if there is already a macro registered under the given document name
      * @since 2.2.M1
      */
-    boolean hasWikiMacro(DocumentName documentName);
+    boolean hasWikiMacro(DocumentReference documentReference);
 }

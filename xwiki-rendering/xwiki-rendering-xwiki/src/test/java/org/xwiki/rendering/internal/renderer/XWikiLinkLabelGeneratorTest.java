@@ -19,11 +19,15 @@
  */
 package org.xwiki.rendering.internal.renderer;
 
-import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.junit.Assert;
+import org.junit.Before;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 
@@ -33,72 +37,100 @@ import org.xwiki.rendering.listener.Link;
  * @version $Id$
  * @since 2.0M1
  */
-public class XWikiLinkLabelGeneratorTest extends MockObjectTestCase
+public class XWikiLinkLabelGeneratorTest
 {
+    private Mockery mockery = new Mockery();
+
     private XWikiLinkLabelGenerator generator;
 
-    private Mock mockModelBridge;
+    private DocumentModelBridge mockDocumentModelBridge;
 
-    private Mock mockAccessBridge;
+    private DocumentAccessBridge mockDocumentAccessBridge;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see junit.framework.TestCase#setUp()
-     */
-    @Override
-    protected void setUp()
+    private DocumentReferenceFactory mockDocumentReferenceFactory;
+
+    @Before
+    public void setUp()
     {
         this.generator = new XWikiLinkLabelGenerator();
 
-        Mock mockConfiguration = mock(RenderingConfiguration.class);
-        mockConfiguration.stubs().method("getLinkLabelFormat").will(returnValue("[%w:%s.%p] %P (%t) [%w:%s.%p] %P (%t)"));
-        this.generator.setRenderingConfiguration((RenderingConfiguration) mockConfiguration.proxy());
+        this.mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
+        ReflectionUtils.setFieldValue(this.generator, "documentAccessBridge", this.mockDocumentAccessBridge);
 
-        this.mockModelBridge = mock(DocumentModelBridge.class);
+        final RenderingConfiguration mockRenderingConfiguration = mockery.mock(RenderingConfiguration.class);
+        ReflectionUtils.setFieldValue(this.generator, "renderingConfiguration", mockRenderingConfiguration);
 
-        this.mockAccessBridge = mock(DocumentAccessBridge.class);
-        this.mockAccessBridge.stubs().method("getModelDocumentName").will(
-            returnValue(new DocumentName("xwiki", "Main", "HelloWorld")));
-        this.generator.setDocumentAccessBridge((DocumentAccessBridge) mockAccessBridge.proxy());
+        this.mockDocumentReferenceFactory = mockery.mock(DocumentReferenceFactory.class);
+        ReflectionUtils.setFieldValue(this.generator, "documentReferenceFactory", this.mockDocumentReferenceFactory);
+
+        this.mockDocumentModelBridge = mockery.mock(DocumentModelBridge.class);
+
+        mockery.checking(new Expectations() {{
+            allowing(mockRenderingConfiguration).getLinkLabelFormat();
+                will(returnValue("[%w:%s.%p] %P (%t) [%w:%s.%p] %P (%t)"));
+        }});
     }
 
-    public void testGenerate()
+    @org.junit.Test
+    public void testGenerate() throws Exception
     {
         Link link = new Link();
         link.setReference("HelloWorld");
 
-        this.mockModelBridge.stubs().method("getTitle").will(returnValue("My title"));
-        this.mockAccessBridge.stubs().method("getDocument").will(returnValue(this.mockModelBridge.proxy()));
-        assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World (My title)",
-            this.generator.generate(link));
+        mockery.checking(new Expectations() {{
+            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+                will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
+            allowing(mockDocumentModelBridge).getTitle(); will(returnValue("My title"));
+            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+                will(returnValue(mockDocumentModelBridge));
+        }});
+
+        Assert.assertEquals("[xwiki:Main.HelloWorld] Hello World (My title) [xwiki:Main.HelloWorld] Hello World "
+            + "(My title)", this.generator.generate(link));
     }
 
-    public void testGenerateWhenDocumentFailsToLoad()
+    @org.junit.Test
+    public void testGenerateWhenDocumentFailsToLoad() throws Exception
     {
-        this.mockAccessBridge.stubs().method("getDocument").will(throwException(new Exception("error")));
+        mockery.checking(new Expectations() {{
+            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+                will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
+            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+                will(throwException(new Exception("error")));
+        }});
 
-        assertEquals("HelloWorld", this.generator.generate(new Link()));
+        Assert.assertEquals("HelloWorld", this.generator.generate(new Link()));
     }
 
-    public void testGenerateWhenDocumentTitleIsNull()
+    @org.junit.Test
+    public void testGenerateWhenDocumentTitleIsNull() throws Exception
     {
         Link link = new Link();
         link.setReference("HelloWorld");
 
-        this.mockModelBridge.stubs().method("getTitle").will(returnValue(null));
-        this.mockAccessBridge.stubs().method("getDocument").will(returnValue(this.mockModelBridge.proxy()));
+        mockery.checking(new Expectations() {{
+            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+                will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
+            allowing(mockDocumentModelBridge).getTitle(); will(returnValue(null));
+            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+                will(returnValue(mockDocumentModelBridge));
+        }});
 
-        assertEquals("HelloWorld", this.generator.generate(new Link()));
+        Assert.assertEquals("HelloWorld", this.generator.generate(new Link()));
     }
 
-    public void testGenerateWhithRegexpSyntax()
+    @org.junit.Test
+    public void testGenerateWhithRegexpSyntax() throws Exception
     {
-        this.mockModelBridge.stubs().method("getTitle").will(returnValue("$0"));
-        this.mockAccessBridge.stubs().method("getDocument").will(returnValue(this.mockModelBridge.proxy()));
+        mockery.checking(new Expectations() {{
+            allowing(mockDocumentModelBridge).getTitle(); will(returnValue("$0"));
+            allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
+                will(returnValue(mockDocumentModelBridge));
+            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+                will(returnValue(new DocumentReference("$0", "\\", "$0")));
 
-        this.mockAccessBridge.stubs().method("getModelDocumentName").will(returnValue(new DocumentName("$0", "\\", "$0")));
+        }});
 
-        assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new Link()));
+        Assert.assertEquals("[$0:\\.$0] $0 ($0) [$0:\\.$0] $0 ($0)", this.generator.generate(new Link()));
     }
 }

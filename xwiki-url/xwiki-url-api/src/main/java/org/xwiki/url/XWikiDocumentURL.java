@@ -22,7 +22,7 @@ package org.xwiki.url;
 
 import java.util.Locale;
 
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * 
@@ -33,16 +33,16 @@ public class XWikiDocumentURL extends AbstractXWikiURL
 {
     private String action;
 
-    private DocumentName documentName;
+    private DocumentReference documentReference;
 
     private Locale locale;
     
     private String revision;
 
-    public XWikiDocumentURL(DocumentName documentName)
+    public XWikiDocumentURL(DocumentReference documentReference)
     {
         super(XWikiURLType.DOCUMENT);
-        setDocumentName(documentName);
+        setDocumentReference(documentReference);
     }
 
     public String getAction()
@@ -55,14 +55,14 @@ public class XWikiDocumentURL extends AbstractXWikiURL
         this.action = action;
     }
 
-    public DocumentName getDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return this.documentName;
+        return this.documentReference;
     }
 
-    public void setDocumentName(DocumentName documentName)
+    public void setDocumentReference(DocumentReference documentReference)
     {
-        this.documentName = documentName;
+        this.documentReference = documentReference;
     }
     
     public void setLocale(Locale locale)

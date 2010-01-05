@@ -22,10 +22,9 @@ package org.xwiki.rendering;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.internal.macro.html.HTMLMacro;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
@@ -59,17 +58,17 @@ public class HTMLMacroTest extends AbstractComponentTestCase
         descriptorDAB.setRole(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
-        DocumentNameSerializer mockDocumentNameSerializer = this.context.mock(DocumentNameSerializer.class);
-        DefaultComponentDescriptor<DocumentNameSerializer> descriptorDNS =
-            new DefaultComponentDescriptor<DocumentNameSerializer>();
-        descriptorDNS.setRole(DocumentNameSerializer.class);
-        getComponentManager().registerComponent(descriptorDNS, mockDocumentNameSerializer);
+        EntityReferenceSerializer mockEntityReferenceSerializer = this.context.mock(EntityReferenceSerializer.class);
+        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorERS =
+            new DefaultComponentDescriptor<EntityReferenceSerializer>();
+        descriptorERS.setRole(EntityReferenceSerializer.class);
+        getComponentManager().registerComponent(descriptorERS, mockEntityReferenceSerializer);
     }
 
     /**
      * Verify that inline HTML macros with non inline content generate an exception.
      */
-    @Test(expected = MacroExecutionException.class)
+    @org.junit.Test(expected = MacroExecutionException.class)
     public void executeMacroWhenNonInlineContentInInlineContext() throws Exception
     {
         HTMLMacro macro = (HTMLMacro) getComponentManager().lookup(Macro.class, "html");
@@ -79,7 +78,7 @@ public class HTMLMacroTest extends AbstractComponentTestCase
         macro.execute(parameters, "<ul><li>item</li></ul>", context);
     }
 
-    @Test
+    @org.junit.Test
     public void macroDescriptor() throws Exception
     {
         HTMLMacro macro = (HTMLMacro) getComponentManager().lookup(Macro.class, "html");

@@ -46,7 +46,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
-     * @see OpenOfficeServerConfiguration#getServerPort();
+     * @see OpenOfficeConfiguration#getServerPort();
      */
     private static final int DEFAULT_SERVER_PORT = 8100;
 
@@ -76,7 +76,7 @@ public class DefaultOpenOfficeConfiguration implements OpenOfficeConfiguration
     private static final long DEFAULT_TASK_EXECUTION_TIMEOUT = 30000L;
     
     /**
-     * Defines from where to read the rendering configuration data. 
+     * Defines from where to read the rendering configuration data.
      */
     @Requirement
     private ConfigurationSource configuration;

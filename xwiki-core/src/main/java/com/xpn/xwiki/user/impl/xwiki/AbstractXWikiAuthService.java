@@ -21,16 +21,17 @@ package com.xpn.xwiki.user.impl.xwiki;
 
 import java.security.Principal;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 
 /**
  * Common methods useful to all Authentication services implementations.
@@ -57,8 +58,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
     {
         // FIXME: this method should probably use a XWikiRightService#isSuperadmin(String) method, see 
         // XWikiRightServiceImpl#isSuperadmin(String)
-        DocumentName documentName = Utils.getComponent(DocumentNameFactory.class).createDocumentName(username);
-        return documentName.getPage().equalsIgnoreCase(XWikiRightService.SUPERADMIN_USER);
+        DocumentReference documentReference =
+            Utils.getComponent(DocumentReferenceFactory.class).createDocumentReference(username);
+        return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);
     }
 
     /**

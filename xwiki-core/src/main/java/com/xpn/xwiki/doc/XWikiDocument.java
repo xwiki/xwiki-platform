@@ -73,13 +73,13 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -325,15 +325,29 @@ public class XWikiDocument implements DocumentModelBridge
     private XDOM xdom;
 
     /**
-     * Used to convert a string into a proper Document Name.
+     * Used to convert a string into a proper Document Reference.
      */
-    private DocumentNameFactory documentNameFactory = Utils.getComponent(DocumentNameFactory.class);
+    private DocumentReferenceFactory currentDocumentReferenceFactory =
+        Utils.getComponent(DocumentReferenceFactory.class, "current");
 
     /**
-     * Used to convert a proper Document Name to string.
+     * Used to convert a proper Document Reference to string (compact form)
      */
-    private DocumentNameSerializer compactDocumentNameSerializer =
-        Utils.getComponent(DocumentNameSerializer.class, "compact");
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compact");
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part). Used for serializing
+     * backlinks.
+     */
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+
+    /**
+     * Used to convert a proper Document Reference to string.
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
 
     /*
      * Used to emulate an inline parsing.
@@ -661,9 +675,9 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * {@inheritDoc}
      */
-    public void setParent(DocumentName parentName)
+    public void setParent(DocumentReference parentReference)
     {
-        this.parent = this.compactDocumentNameSerializer.serialize(parentName);
+        this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
     }
 
     public String getFullName()
@@ -691,19 +705,19 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.bridge.DocumentModelBridge#getModelDocumentName()
+     * @see org.xwiki.bridge.DocumentModelBridge#getDocumentReference()
      * @since 2.2M1
      */
-    public DocumentName getModelDocumentName()
+    public DocumentReference getDocumentReference()
     {
-        return new DocumentName(getWikiName(), getSpaceName(), getPageName());
+        return new DocumentReference(getWikiName(), getSpaceName(), getPageName());
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.bridge.DocumentModelBridge#getDocumentName()
-     * @deprecated replaced by {@link #getModelDocumentName()} since 2.2M1
+     * @deprecated replaced by {@link #getDocumentReference()} since 2.2M1
      */
     @Deprecated
     public org.xwiki.bridge.DocumentName getDocumentName()
@@ -3269,7 +3283,7 @@ public class XWikiDocument implements DocumentModelBridge
             List<String> list = context.getUtil().getUniqueMatches(getContent(), "\\[(.*?)\\]", 1);
             pageNames = new HashSet<String>(list.size());
 
-            DocumentName currentDocumentName = getModelDocumentName();
+            DocumentReference currentDocumentReference = getDocumentReference();
             for (String name : list) {
                 int i1 = name.indexOf(">");
                 if (i1 != -1) {
@@ -3316,11 +3330,11 @@ public class XWikiDocument implements DocumentModelBridge
                     // The reference may not have the space or even document specified (in case of an empty
                     // string)
                     // Thus we need to find the fully qualified document name
-                    DocumentName documentName = this.documentNameFactory.createDocumentName(name);
+                    DocumentReference documentReference = this.currentDocumentReferenceFactory.createDocumentReference(name);
 
                     // Verify that the link is not an autolink (i.e. a link to the current document)
-                    if (!documentName.equals(currentDocumentName)) {
-                        pageNames.add(this.compactDocumentNameSerializer.serialize(documentName));
+                    if (!documentReference.equals(currentDocumentReference)) {
+                        pageNames.add(this.compactEntityReferenceSerializer.serialize(documentReference));
                     }
                 }
             }
@@ -3363,7 +3377,7 @@ public class XWikiDocument implements DocumentModelBridge
                 List<LinkBlock> linkBlocks = dom.getChildrenByType(LinkBlock.class, true);
                 pageNames = new LinkedHashSet<String>(linkBlocks.size());
 
-                DocumentName currentDocumentName = getModelDocumentName();
+                DocumentReference currentDocumentReference = getDocumentReference();
 
                 for (LinkBlock linkBlock : linkBlocks) {
                     org.xwiki.rendering.listener.Link link = linkBlock.getLink();
@@ -3374,12 +3388,17 @@ public class XWikiDocument implements DocumentModelBridge
                             // The reference may not have the space or even document specified (in case of an empty
                             // string)
                             // Thus we need to find the fully qualified document name
-                            DocumentName documentName =
-                                this.documentNameFactory.createDocumentName(link.getReference());
+                            DocumentReference documentReference =
+                                this.currentDocumentReferenceFactory.createDocumentReference(link.getReference());
 
                             // Verify that the link is not an autolink (i.e. a link to the current document)
-                            if (!documentName.equals(currentDocumentName)) {
-                                pageNames.add(this.compactDocumentNameSerializer.serialize(documentName));
+                            if (!documentReference.equals(currentDocumentReference)) {
+                                // Since this method is used for saving backlinks and since backlinks must be
+                                // saved with the space and page name but without the wiki part, we remove the wiki
+                                // part before serializing.
+                                // This is a bit of a hack since the default serializer should theoretically fail
+                                // if it's passed an invalid reference.
+                                pageNames.add(this.compactWikiEntityReferenceSerializer.serialize(documentReference));
                             }
                         }
                     }
@@ -3830,10 +3849,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setFullName(String fullname, XWikiContext context)
     {
-        DocumentName documentName = this.documentNameFactory.createDocumentName(fullname);
-        setDatabase(documentName.getWiki());
-        setSpace(documentName.getSpace());
-        setName(documentName.getPage());
+        DocumentReference documentReference = this.currentDocumentReferenceFactory.createDocumentReference(fullname);
+        setDatabase(documentReference.getWikiReference().getName());
+        setSpace(documentReference.getLastSpaceReference().getName());
+        setName(documentReference.getName());
         setContentDirty(true);
     }
 
@@ -4304,10 +4323,11 @@ public class XWikiDocument implements DocumentModelBridge
         Link oldLink = new LinkParser().parse(getFullName());
         Link newLink = new LinkParser().parse(newDocumentName);
 
-        // Get the full unique form of the ol and new document names to easily compare them with links references in
+        // Get the full unique form of the old and new document names to easily compare them with links references in
         // XDOM
-        DocumentName oldDocName = getModelDocumentName();
-        DocumentName newDocName = this.documentNameFactory.createDocumentName(newDocumentName);
+        DocumentReference oldDocReference = getDocumentReference();
+        DocumentReference newDocReference =
+            this.currentDocumentReferenceFactory.createDocumentReference(newDocumentName);
 
         // Verify if the user is trying to rename to the same name... In that case, simply exits
         // for efficiency.
@@ -4323,11 +4343,13 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Step 2: For each child document, update parent.
         if (childDocumentNames != null) {
-            // Note: We're adding the fully qualified document name (i.e. including the wiki name).
-            String newParent = newDocName.getWiki() + ":" + newDocName.getSpace() + "." + newDocName.getPage();
+            String newParent = this.compactEntityReferenceSerializer.serialize(newDocReference);
 
             for (String childDocumentName : childDocumentNames) {
                 XWikiDocument childDocument = xwiki.getDocument(childDocumentName, context);
+                // TODO: use {@link XWikiDocument#setParent(DocumentReference)} instead when we save the parent
+                // as a document reference in XWikiDocument. For now setParent saves in compact form which is
+                // not what we want here.
                 childDocument.setParent(newParent);
                 xwiki.saveDocument(childDocument, context.getMessageTool().get("core.comment.renameParent",
                     Arrays.asList(new String[] {newDocumentName})), true, context);
@@ -4352,7 +4374,7 @@ public class XWikiDocument implements DocumentModelBridge
 
                 backlinkDocument.setContent((String) result.getModifiedContent());
             } else {
-                backlinkDocument.refactorDocumentLinks(oldDocName, newDocName, context);
+                backlinkDocument.refactorDocumentLinks(oldDocReference, newDocReference, context);
             }
 
             xwiki.saveDocument(backlinkDocument, context.getMessageTool().get("core.comment.renameLink",
@@ -4370,8 +4392,8 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * @since 2.2M1
      */
-    private void refactorDocumentLinks(DocumentName oldDocumentName, DocumentName newDocumentName, XWikiContext context)
-        throws XWikiException
+    private void refactorDocumentLinks(DocumentReference oldDocumentReference, DocumentReference newDocumentReference,
+        XWikiContext context) throws XWikiException
     {
         String contextWiki = context.getDatabase();
         XWikiDocument contextDoc = context.getDoc();
@@ -4387,10 +4409,11 @@ public class XWikiDocument implements DocumentModelBridge
             for (LinkBlock linkBlock : linkBlockList) {
                 org.xwiki.rendering.listener.Link link = linkBlock.getLink();
                 if (link.getType() == LinkType.DOCUMENT) {
-                    DocumentName documentName = this.documentNameFactory.createDocumentName(link.getReference());
+                    DocumentReference documentReference =
+                        this.currentDocumentReferenceFactory.createDocumentReference(link.getReference());
 
-                    if (documentName.equals(oldDocumentName)) {
-                        link.setReference(this.compactDocumentNameSerializer.serialize(newDocumentName));
+                    if (documentReference.equals(oldDocumentReference)) {
+                        link.setReference(this.compactEntityReferenceSerializer.serialize(newDocumentReference));
                     }
                 }
             }

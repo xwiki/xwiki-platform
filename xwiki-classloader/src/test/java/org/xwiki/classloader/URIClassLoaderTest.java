@@ -31,10 +31,11 @@ import junit.framework.Assert;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
-import org.xwiki.model.AttachmentName;
-import org.xwiki.model.AttachmentNameFactory;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -47,7 +48,7 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
 {
     private Mockery mockery = new Mockery();
 
-    private AttachmentNameFactory anf;
+    private AttachmentReferenceFactory arf;
 
     private DocumentAccessBridge dab;
 
@@ -56,11 +57,12 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
     {
         super.registerComponents();
 
-        this.anf = this.mockery.mock(AttachmentNameFactory.class);
-        DefaultComponentDescriptor<AttachmentNameFactory> descriptorANF =
-            new DefaultComponentDescriptor<AttachmentNameFactory>();
-        descriptorANF.setRole(AttachmentNameFactory.class);
-        getComponentManager().registerComponent(descriptorANF, this.anf);
+        this.arf = this.mockery.mock(AttachmentReferenceFactory.class);
+        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
+        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        descriptorARF.setRoleHint("current");
+        getComponentManager().registerComponent(descriptorARF, this.arf);
 
         this.dab = this.mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
@@ -84,15 +86,17 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
         Assert.assertEquals("http://some/url", cl.getURLs()[1].toString());
         Assert.assertEquals("attachmentjar://filename2", cl.getURLs()[2].toString());
 
-        final AttachmentName attachmentName1 = new AttachmentName("wiki", "space", "page", "filename1");
-        final AttachmentName attachmentName2 = new AttachmentName("wiki", "space", "page", "filename2");
+        final AttachmentReference attachmentName1 = new AttachmentReference("filename1",
+            new DocumentReference("wiki", "space", "page"));
+        final AttachmentReference attachmentName2 = new AttachmentReference("filename2",
+            new DocumentReference("wiki", "space", "page"));
 
         mockery.checking(new Expectations() {{
-            allowing(anf).createAttachmentName("page@filename1");
+            allowing(arf).createAttachmentReference("page@filename1");
             will(returnValue(attachmentName1));
             oneOf(dab).getAttachmentContent(attachmentName1);
             will(returnValue(new ByteArrayInputStream(createJarFile("/nomatch"))));
-            allowing(anf).createAttachmentName("filename2");
+            allowing(arf).createAttachmentReference("filename2");
             will(returnValue(attachmentName2));
             oneOf(dab).getAttachmentContent(attachmentName2);
             will(returnValue(new ByteArrayInputStream(createJarFile("/something"))));

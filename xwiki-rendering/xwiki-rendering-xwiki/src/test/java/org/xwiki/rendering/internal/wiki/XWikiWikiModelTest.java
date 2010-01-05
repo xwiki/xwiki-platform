@@ -22,10 +22,9 @@ package org.xwiki.rendering.internal.wiki;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.model.Model;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Unit tests for {@link XWikiWikiModel}.
@@ -41,19 +40,16 @@ public class XWikiWikiModelTest
         Mockery mockery = new Mockery();
         XWikiWikiModel wikiModel = new XWikiWikiModel();
 
-        final DocumentNameSerializer mockDocumentNameSerializer = mockery.mock(DocumentNameSerializer.class);
-        ReflectionUtils.setFieldValue(wikiModel, "documentNameSerializer", mockDocumentNameSerializer);
-
-        final Model mockModel = mockery.mock(Model.class);
-        ReflectionUtils.setFieldValue(wikiModel, "model", mockModel);
+        final EntityReferenceSerializer mockEntityReferenceSerializer = mockery.mock(EntityReferenceSerializer.class);
+        ReflectionUtils.setFieldValue(wikiModel, "entityReferenceSerializer", mockEntityReferenceSerializer);
 
         final DocumentAccessBridge mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
         ReflectionUtils.setFieldValue(wikiModel, "documentAccessBridge", mockDocumentAccessBridge);
 
-        final DocumentName docName = new DocumentName("wiki", "Space", "Page");
+        final DocumentReference docReference = new DocumentReference("wiki", "Space", "Page");
         mockery.checking(new Expectations() {{
-            oneOf(mockModel).getCurrentDocumentName(); will(returnValue(docName));
-            oneOf(mockDocumentNameSerializer).serialize(docName); will(returnValue("wiki:Space.Page\u20AC"));
+            oneOf(mockDocumentAccessBridge).getCurrentDocumentReference(); will(returnValue(docReference));
+            oneOf(mockEntityReferenceSerializer).serialize(docReference); will(returnValue("wiki:Space.Page\u20AC"));
 
             // The test is here: we verify that getURL is called with the query string already encoded since getURL()
             // doesn't encode it.

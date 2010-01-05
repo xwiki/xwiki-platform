@@ -38,7 +38,7 @@ import org.xwiki.component.annotation.Requirement;
 public class DefaultAttachmentNameSerializer implements AttachmentNameSerializer
 {
     /**
-     * Serializer to transform a DocumentName Object into a string. 
+     * Serializer to transform a DocumentReference Object into a string.
      */
     @Requirement
     private DocumentNameSerializer documentNameSerializer;
@@ -49,8 +49,8 @@ public class DefaultAttachmentNameSerializer implements AttachmentNameSerializer
      */
     public String serialize(AttachmentName attachmentName)
     {
-        // A valid AttachmentName must not have any null value and thus we don't need to check for nulls here.
-        // It's the responsibility of creators of AttachmentName factories to ensure it's valid.
+        // A valid AttachmentReference must not have any null value and thus we don't need to check for nulls here.
+        // It's the responsibility of creators of AttachmentReference factories to ensure it's valid.
         StringBuffer result = new StringBuffer();
 
         result.append(this.documentNameSerializer.serialize(attachmentName.getDocumentName()));

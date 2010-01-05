@@ -22,7 +22,7 @@ package org.xwiki.rendering.wiki;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Bridge between the Rendering module and a Wiki Model. Contains wiki APIs required by Rendering classes such as 
+ * Bridge between the Rendering module and a Wiki Model. Contains wiki APIs required by Rendering classes such as
  * Renderers. For example the XHTML Link Renderer needs to know if a wiki document exists in order to know how to 
  * generate the HTML (in order to display a question mark for non existing documents) and it also needs to get the
  * URL pointing the wiki document. 

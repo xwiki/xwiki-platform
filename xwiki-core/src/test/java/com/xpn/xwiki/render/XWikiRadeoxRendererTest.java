@@ -66,7 +66,8 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
 
         // This is required just to return the current space...
         Mock mockCurrentDocument = mock(XWikiDocument.class);
-        mockCurrentDocument.stubs().method("getSpace").will(returnValue("Main"));
+        mockCurrentDocument.stubs().method("getSpaceName").will(returnValue("Main"));
+        mockCurrentDocument.stubs().method("getWikiName").will(returnValue("xwiki"));
         mockCurrentDocument.stubs().method("getFullName").will(returnValue("Main.WebHome"));
         getContext().setDoc((XWikiDocument) mockCurrentDocument.proxy());
     }
@@ -117,7 +118,8 @@ public class XWikiRadeoxRendererTest extends AbstractBridgedXWikiComponentTestCa
         getContext().setURLFactory((XWikiURLFactory) mockUrlFactory.proxy());
 
         Mock mockCurrentDocument = mock(XWikiDocument.class);
-        mockCurrentDocument.stubs().method("getSpace").will(returnValue("A+ B"));
+        mockCurrentDocument.stubs().method("getSpaceName").will(returnValue("A+ B"));
+        mockCurrentDocument.stubs().method("getWikiName").will(returnValue("xwiki"));
         mockCurrentDocument.stubs().method("getName").will(returnValue("C# Examples & Libs? No, I prefer C++"));
         mockCurrentDocument.stubs().method("getFullName")
             .will(returnValue("A+ B.C# Examples & Libs? No, I prefer C++"));

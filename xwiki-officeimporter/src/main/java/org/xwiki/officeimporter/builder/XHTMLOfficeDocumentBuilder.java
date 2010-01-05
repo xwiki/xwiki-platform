@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.builder;
 import java.io.InputStream;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 
@@ -48,7 +48,7 @@ public interface XHTMLOfficeDocumentBuilder
      * @throws OfficeImporterException if an error occurs while performing the import operation.
      * @since 2.2M1
      */
-    XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentName reference,
+    XHTMLOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException;
 
     /**
@@ -62,7 +62,7 @@ public interface XHTMLOfficeDocumentBuilder
      * @return an {@link XHTMLOfficeDocument} corresponding to the office document.
      * @throws OfficeImporterException if an error occurs while performing the import operation.
      * @since 2.1M1
-     * @deprecated use {@link #build(InputStream, String, DocumentName, boolean)} since 2.2M1.
+     * @deprecated use {@link #build(InputStream, String, DocumentReference, boolean)} since 2.2M1.
      */
     @Deprecated
     XHTMLOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference, boolean filterStyles)

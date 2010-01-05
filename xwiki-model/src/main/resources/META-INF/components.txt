@@ -1,3 +1,7 @@
-org.xwiki.model.internal.DefaultAttachmentNameFactory
-org.xwiki.model.internal.DefaultAttachmentNameSerializer
-org.xwiki.model.internal.DefaultModel
+org.xwiki.model.internal.reference.DefaultEntityReferenceFactory
+org.xwiki.model.internal.reference.DefaultEntityReferenceNormalizer
+org.xwiki.model.internal.reference.DefaultEntityReferenceSerializer
+org.xwiki.model.internal.reference.DefaultDocumentReferenceFactory
+org.xwiki.model.internal.reference.DefaultAttachmentReferenceFactory
+org.xwiki.model.internal.DefaultModelConfiguration
+org.xwiki.model.internal.DefaultModelContext

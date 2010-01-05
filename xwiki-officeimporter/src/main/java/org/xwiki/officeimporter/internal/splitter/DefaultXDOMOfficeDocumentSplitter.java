@@ -24,15 +24,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
-import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.refactoring.WikiDocument;
 import org.xwiki.refactoring.splitter.DocumentSplitter;
@@ -69,13 +69,13 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * Document name serializer used for serializing document names into strings.
      */
     @Requirement
-    private DocumentNameSerializer nameSerializer;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * Requierd for converting string document names to {@link DocumentName} instances.
+     * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
      */
-    @Requirement
-    private DocumentNameFactory nameFactory;
+    @Requirement("current")
+    private DocumentReferenceFactory documentReferenceFactory;
 
     /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
@@ -84,7 +84,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     private DocumentSplitter documentSplitter;
 
     /**
-     * Used by {@link org.xwiki.officeimporter.splitter.TargetPageDescriptor}.
+     * Used by {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor}.
      */
     @Requirement
     private ComponentManager componentManager;
@@ -93,13 +93,13 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * {@inheritDoc}
      * @since 2.2M1
      */
-    public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, DocumentName baseDocumentName)
+    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument officeDocument,
+        int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
         throws OfficeImporterException
     {
         // TODO: This code needs to be refactored along with the xwiki-refactoring module code.
-        String strBaseDoc = nameSerializer.serialize(baseDocumentName);
-        Map<TargetPageDescriptor, XDOMOfficeDocument> result = new HashMap<TargetPageDescriptor, XDOMOfficeDocument>();
+        String strBaseDoc = this.entityReferenceSerializer.serialize(baseDocumentReference);
+        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result = new HashMap<TargetDocumentDescriptor, XDOMOfficeDocument>();
 
         // Create splitting and naming criterion for refactoring.
         SplittingCriterion splittingCriterion = new HeadingLevelSplittingCriterion(headingLevelsToSplit);
@@ -111,11 +111,14 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
-            DocumentName targetName = nameFactory.createDocumentName(doc.getFullName());
-            TargetPageDescriptor targetPageDescriptor = new TargetPageDescriptor(targetName, this.componentManager);
+            DocumentReference targetReference =
+                this.documentReferenceFactory.createDocumentReference(doc.getFullName());
+            TargetDocumentDescriptor targetDocumentDescriptor =
+                new TargetDocumentDescriptor(targetReference, this.componentManager);
             if (doc.getParent() != null) {
-                DocumentName targetParent = nameFactory.createDocumentName(doc.getParent().getFullName());
-                targetPageDescriptor.setParentName(targetParent);
+                DocumentReference targetParent =
+                    this.documentReferenceFactory.createDocumentReference(doc.getParent().getFullName());
+                targetDocumentDescriptor.setParentReference(targetParent);
             }
 
             // Rewire artifacts.
@@ -128,7 +131,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
             // Create the resulting XDOMOfficeDocument.
             XDOMOfficeDocument splitDocument = new XDOMOfficeDocument(doc.getXdom(), artifacts, this.componentManager);
-            result.put(targetPageDescriptor, splitDocument);
+            result.put(targetDocumentDescriptor, splitDocument);
         }
 
         return result;
@@ -159,14 +162,14 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
     /**
      * {@inheritDoc}
-     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.DocumentName)} since 2.2.M1
+     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.reference.DocumentReference)} since 2.2.M1
      */
     @Deprecated
-    public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, org.xwiki.bridge.DocumentName baseDocumentName)
         throws OfficeImporterException
     {
-        return split(xdomOfficeDocument, headingLevelsToSplit, namingCriterionHint, new DocumentName(
+        return split(xdomOfficeDocument, headingLevelsToSplit, namingCriterionHint, new DocumentReference(
             baseDocumentName.getWiki(), baseDocumentName.getSpace(), baseDocumentName.getPage()));
     }
 }

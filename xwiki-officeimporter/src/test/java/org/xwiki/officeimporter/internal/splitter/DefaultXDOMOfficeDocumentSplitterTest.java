@@ -26,12 +26,11 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.jmock.Expectations;
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.model.DocumentName;
+import org.junit.*;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
-import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -68,7 +67,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
     /**
      * Test basic document splitting.
      */
-    @Test
+    @org.junit.Test
     public void testDocumentSplitting() throws Exception
     {
         // Create xwiki/2.0 document.
@@ -86,38 +85,38 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
         // Create xdom office document.
         XDOMOfficeDocument officeDocument =
             new XDOMOfficeDocument(xdom, new HashMap<String, byte[]>(), getComponentManager());
-        final DocumentName baseDocument = new DocumentName("xwiki", "Test", "Test");
+        final DocumentReference baseDocument = new DocumentReference("xwiki", "Test", "Test");
 
         // Add expectations to mock document name serializer. 
-        this.context.checking(new Expectations() {{
-                allowing(mockDocumentNameSerializer).serialize(baseDocument);
-                will(returnValue("xwiki:Test.Test"));
-                allowing(mockDocumentNameSerializer).serialize(new DocumentName("xwiki", "Test", "Heading1"));
-                will(returnValue("xwiki:Test.Heading1"));
-                allowing(mockDocumentNameSerializer).serialize(new DocumentName("xwiki", "Test", "Heading11"));
-                will(returnValue("xwiki:Test.Heading11"));                
-                allowing(mockDocumentNameSerializer).serialize(new DocumentName("xwiki", "Test", "Heading12"));
-                will(returnValue("xwiki:Test.Heading12"));                
-                allowing(mockDocumentNameSerializer).serialize(new DocumentName("xwiki", "Test", "Heading2"));
-                will(returnValue("xwiki:Test.Heading2"));                
+        this.mockery.checking(new Expectations() {{
+            allowing(mockEntityReferenceSerializer).serialize(baseDocument);
+            will(returnValue("xwiki:Test.Test"));
+            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading1"));
+            will(returnValue("xwiki:Test.Heading1"));
+            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading11"));
+            will(returnValue("xwiki:Test.Heading11"));
+            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading12"));
+            will(returnValue("xwiki:Test.Heading12"));
+            allowing(mockEntityReferenceSerializer).serialize(new DocumentReference("xwiki", "Test", "Heading2"));
+            will(returnValue("xwiki:Test.Heading2"));
         }});
         
         // Add expectations to mock document name factory.         
-        this.context.checking(new Expectations() {{
-                allowing(mockDocumentNameFactory).createDocumentName("xwiki:Test.Test");
-                will(returnValue(new DocumentName("xwiki", "Test", "Test")));
-                allowing(mockDocumentNameFactory).createDocumentName("xwiki:Test.Heading1");
-                will(returnValue(new DocumentName("xwiki", "Test", "Heading1")));
-                allowing(mockDocumentNameFactory).createDocumentName("xwiki:Test.Heading11");
-                will(returnValue(new DocumentName("xwiki", "Test", "Heading11")));
-                allowing(mockDocumentNameFactory).createDocumentName("xwiki:Test.Heading12");
-                will(returnValue(new DocumentName("xwiki", "Test", "Heading12")));
-                allowing(mockDocumentNameFactory).createDocumentName("xwiki:Test.Heading2");
-                will(returnValue(new DocumentName("xwiki", "Test", "Heading2")));
+        this.mockery.checking(new Expectations() {{
+            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Test");
+            will(returnValue(new DocumentReference("xwiki", "Test", "Test")));
+            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading1");
+            will(returnValue(new DocumentReference("xwiki", "Test", "Heading1")));
+            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading11");
+            will(returnValue(new DocumentReference("xwiki", "Test", "Heading11")));
+            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading12");
+            will(returnValue(new DocumentReference("xwiki", "Test", "Heading12")));
+            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading2");
+            will(returnValue(new DocumentReference("xwiki", "Test", "Heading2")));
         }});
         
         // Add expectations to mock document access bridge.
-        this.context.checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).exists("xwiki:Test.Heading1");
             will(returnValue(false));
             allowing(mockDocumentAccessBridge).exists("xwiki:Test.Heading11");
@@ -129,7 +128,7 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
         }});
 
         // Perform the split operation.
-        Map<TargetPageDescriptor, XDOMOfficeDocument> result =
+        Map<TargetDocumentDescriptor, XDOMOfficeDocument> result =
             officeDocumentSplitter.split(officeDocument, new int[] {1, 2, 3, 4, 5, 6}, "headingNames", baseDocument);
         
         // There should be five xdom office documents.

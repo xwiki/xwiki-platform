@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
@@ -86,7 +86,7 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
     {
         if (event instanceof AbstractDocumentEvent) {
             DocumentModelBridge document = (DocumentModelBridge) source;
-            DocumentName documentName = document.getModelDocumentName();
+            DocumentReference documentReference = document.getDocumentReference();
 
             // We've decided not to log any exception raised in the XWiki logs since a failure to register or
             // unregister a macro isn't a failure of the XWiki software. It's something normal, same as, for example,
@@ -99,26 +99,26 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
 
             if (event instanceof DocumentSaveEvent || event instanceof DocumentUpdateEvent) {
                 // Unregister any existing macro registered under this document.
-                if (unregisterMacroInternal(documentName)) {
+                if (unregisterMacroInternal(documentReference)) {
 
                     // Check whether the given document has a wiki macro defined in it.
-                    if (macroFactory.containsWikiMacro(documentName)) {
+                    if (macroFactory.containsWikiMacro(documentReference)) {
 
                         // Attempt to create a wiki macro.
                         WikiMacro wikiMacro = null;
                         try {
-                            wikiMacro = macroFactory.createWikiMacro(documentName);
+                            wikiMacro = macroFactory.createWikiMacro(documentReference);
                         } catch (WikiMacroException e) {
-                            getLogger().debug(String.format("Failed to create wiki macro [%s]", documentName), e);
+                            getLogger().debug(String.format("Failed to create wiki macro [%s]", documentReference), e);
                             return;
                         }
 
                         // Register the macro.
-                        registerMacroInternal(documentName, wikiMacro);
+                        registerMacroInternal(documentReference, wikiMacro);
                     }
                 }
             } else if (event instanceof DocumentDeleteEvent) {
-                unregisterMacroInternal(documentName);
+                unregisterMacroInternal(documentReference);
             }
         }
     }
@@ -126,27 +126,27 @@ public class WikiMacroEventListener extends AbstractLogEnabled implements EventL
     /**
      * @since 2.2M1
      */
-    private void registerMacroInternal(DocumentName documentName, WikiMacro wikiMacro)
+    private void registerMacroInternal(DocumentReference documentReference, WikiMacro wikiMacro)
     {
         try {
-            this.wikiMacroManager.registerWikiMacro(documentName, wikiMacro);
+            this.wikiMacroManager.registerWikiMacro(documentReference, wikiMacro);
         } catch (WikiMacroException e) {
             getLogger().debug(String.format("Unable to register macro [%s] in document [%s]",
-                wikiMacro.getId(), documentName), e);
+                wikiMacro.getId(), documentReference), e);
         }
     }
 
     /**
      * @since 2.2M1
      */
-    private boolean unregisterMacroInternal(DocumentName documentName)
+    private boolean unregisterMacroInternal(DocumentReference documentReference)
     {
         boolean result = true;
-        if (this.wikiMacroManager.hasWikiMacro(documentName)) {
+        if (this.wikiMacroManager.hasWikiMacro(documentReference)) {
             try {
-                this.wikiMacroManager.unregisterWikiMacro(documentName);
+                this.wikiMacroManager.unregisterWikiMacro(documentReference);
             } catch (WikiMacroException e) {
-                getLogger().debug(String.format("Unable to unregister macro in document [%s]", documentName), e);
+                getLogger().debug(String.format("Unable to unregister macro in document [%s]", documentReference), e);
                 result = false;
             }
         }

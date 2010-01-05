@@ -25,7 +25,6 @@ import java.util.Collections;
 import org.jmock.Expectations;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,7 +49,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
         super.setUp();
 
         final DocumentAccessBridge mockDAB = getComponentManager().lookup(DocumentAccessBridge.class);
-        context.checking(new Expectations() {{
+        this.mockery.checking(new Expectations() {{
                 allowing(mockDAB).getAttachmentURL("Import.Test", "foo.png");
                 will(returnValue("/bridge/foo.png"));
         }});
@@ -60,7 +59,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * {@code <img/>} links should be wrapped in xwiki specific html elements so that they are recognized by the XHTML
      * parser.
      */
-    @Test
+    @org.junit.Test
     public void testImageWrapping() throws Exception
     {
         String html = header + "<img src=\"foo.png\"/>" + footer;
@@ -85,7 +84,7 @@ public class ImageOpenOfficeCleaningTest extends AbstractHTMLCleaningTest
      * Sometimes images are used inside links. In such cases, both the html link and the image need to be wrapped
      * properly.
      */
-    @Test
+    @org.junit.Test
     public void testCompoundImageLinkWrapping()
     {
         String html = header + "<a href=\"http://www.xwiki.org\"><img src=\"foo.png\"/></a>" + footer;

@@ -37,7 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-bridge</artifactId>
+      <artifactId>xwiki-core-model</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

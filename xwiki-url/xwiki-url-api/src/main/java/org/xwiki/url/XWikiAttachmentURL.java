@@ -20,7 +20,7 @@
  */
 package org.xwiki.url;
 
-import org.xwiki.model.AttachmentName;
+import org.xwiki.model.reference.AttachmentReference;
 
 /**
  * 
@@ -29,22 +29,22 @@ import org.xwiki.model.AttachmentName;
  */
 public class XWikiAttachmentURL extends XWikiDocumentURL
 {
-    private AttachmentName attachmentName;
-    
-    public XWikiAttachmentURL(AttachmentName attachmentName)
+    private AttachmentReference attachmentReference;
+
+    public XWikiAttachmentURL(AttachmentReference attachmentReference)
     {
-        super(attachmentName.getDocumentName());
+        super(attachmentReference.getDocumentReference());
         setType(XWikiURLType.ATTACHMENT);
-        setAttachmentName(attachmentName);
+        setAttachmentReference(attachmentReference);
     }
     
-    public void setAttachmentName(AttachmentName attachmentName)
+    public void setAttachmentReference(AttachmentReference attachmentReference)
     {
-        this.attachmentName = attachmentName;
+        this.attachmentReference = attachmentReference;
     }
     
-    public AttachmentName getAttachmentName()
+    public AttachmentReference getAttachmentReference()
     {
-        return this.attachmentName;
+        return this.attachmentReference;
     }
 }

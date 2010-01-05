@@ -25,7 +25,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.rendering.internal.macro.wikibridge.DefaultWikiMacro;
 import org.xwiki.rendering.macro.Macro;
@@ -153,8 +153,10 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
-            Assert.assertEquals("Unable to register macro [testwikimacro] in [wiki = [xwiki], space = [Main], "
-                + "page = [TestWikiMacro]] for visibility [GLOBAL] due to insufficient privileges", e.getMessage());
+            Assert.assertEquals("Unable to register macro [testwikimacro] in "
+                + "[name = [TestWikiMacro], type = [DOCUMENT], parent = [name = [Main], type = [SPACE], "
+                + "parent = [name = [xwiki], type = [WIKI], parent = [null]]]] for visibility [GLOBAL] due to "
+                + "insufficient privileges", e.getMessage());
         }
     }
 
@@ -173,8 +175,10 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
-            Assert.assertEquals("Unable to register macro [testwikimacro] in [wiki = [xwiki], space = [Main], "
-                + "page = [TestWikiMacro]] for visibility [WIKI] due to insufficient privileges", e.getMessage());
+            Assert.assertEquals("Unable to register macro [testwikimacro] in [name = [TestWikiMacro], "
+                + "type = [DOCUMENT], parent = [name = [Main], type = [SPACE], parent = [name = [xwiki], "
+                + "type = [WIKI], parent = [null]]]] for visibility [WIKI] due to insufficient privileges",
+                e.getMessage());
         }
     }
 
@@ -193,18 +197,20 @@ public class DefaultWikiMacroManagerTest extends AbstractComponentTestCase
             wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentName(), wikiMacro);
             Assert.fail("Should have raised an exception here");
         } catch (WikiMacroException e) {
-            Assert.assertEquals("Unable to register macro [testwikimacro] in [wiki = [xwiki], space = [Main], "
-                + "page = [TestWikiMacro]] for visibility [USER] due to insufficient privileges", e.getMessage());
+            Assert.assertEquals("Unable to register macro [testwikimacro] in [name = [TestWikiMacro], "
+                + "type = [DOCUMENT], parent = [name = [Main], type = [SPACE], parent = [name = [xwiki], "
+                + "type = [WIKI], parent = [null]]]] for visibility [USER] due to insufficient privileges",
+                e.getMessage());
         }
     }
 
     private DefaultWikiMacro generateWikiMacro(WikiMacroVisibility visibility) throws Exception
     {
-        DocumentName wikiMacroDocName = new DocumentName("xwiki", "Main", "TestWikiMacro");
+        DocumentReference wikiMacroDocReference = new DocumentReference("xwiki", "Main", "TestWikiMacro");
 
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Test Wiki Macro", "Description", "Test",
             visibility, new DefaultContentDescriptor(), new ArrayList<WikiMacroParameterDescriptor>());
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocName, "testwikimacro", true, descriptor,
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocReference, "testwikimacro", true, descriptor,
             "== Test ==", "xwiki/2.0", getComponentManager());
 
         return wikiMacro;

@@ -19,18 +19,16 @@
  */
 package org.xwiki.rendering;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.embed.EmbeddableComponentManager;
-import org.xwiki.model.Model;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 import org.xwiki.test.ComponentManagerTestSetup;
 
@@ -48,7 +46,7 @@ public class RenderingTests extends TestCase
      * @return a {@link ComponentManagerTestSetup}.
      * @throws Exception if an error occurs while building the test setup.
      */
-    public static Test suite() throws Exception
+    public static junit.framework.Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Test Chart Macro");
 
@@ -74,19 +72,12 @@ public class RenderingTests extends TestCase
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
-        // Model Mock
-        final Model mockModel = context.mock(Model.class);
-        DefaultComponentDescriptor<Model> descriptorModel =
-            new DefaultComponentDescriptor<Model>();
-        descriptorModel.setRole(Model.class);
-        componentManager.registerComponent(descriptorModel, mockModel);
-
-        final DocumentName documentName = new DocumentName(null, "Test", "Test");
+        final DocumentReference documentReference = new DocumentReference(null, "Test", "Test");
         
         context.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getURL(with(any(String.class)), with(any(String.class)), 
                 with(any(String.class)), with(any(String.class))); will(returnValue("http://localhost/charts"));
-            allowing(mockModel).getCurrentDocumentName(); will(returnValue(documentName));
+            allowing(mockDocumentAccessBridge).getCurrentDocumentReference(); will(returnValue(documentReference));
             allowing(mockDocumentAccessBridge).exists(with(any(String.class))); will(returnValue(true));
             allowing(mockDocumentAccessBridge).getDocumentSyntaxId(with(any(String.class))); will(returnValue("xwiki/2.0"));
             allowing(mockDocumentAccessBridge).getDocumentContent("Test.Test");
@@ -94,14 +85,14 @@ public class RenderingTests extends TestCase
         }});
         
         // Document Name Serializer Mock
-        final DocumentNameSerializer mockDocumentNameSerializer = context.mock(DocumentNameSerializer.class);
-        DefaultComponentDescriptor<DocumentNameSerializer> descriptorDNS =
-            new DefaultComponentDescriptor<DocumentNameSerializer>();
-        descriptorDNS.setRole(DocumentNameSerializer.class);
-        componentManager.registerComponent(descriptorDNS, mockDocumentNameSerializer);
+        final EntityReferenceSerializer mockEntityReferenceSerializer = context.mock(EntityReferenceSerializer.class);
+        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorERS =
+            new DefaultComponentDescriptor<EntityReferenceSerializer>();
+        descriptorERS.setRole(EntityReferenceSerializer.class);
+        componentManager.registerComponent(descriptorERS, mockEntityReferenceSerializer);
 
         context.checking(new Expectations() {{
-            allowing(mockDocumentNameSerializer).serialize(documentName); will(returnValue("Test.Test"));
+            allowing(mockEntityReferenceSerializer).serialize(documentReference); will(returnValue("Test.Test"));
         }});
     }    
 }

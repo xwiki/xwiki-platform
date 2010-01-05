@@ -35,9 +35,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,6 +48,8 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Default implementation of {@link XWikiRightService}.
@@ -66,14 +66,16 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static Map<String, String> actionMap;
 
     /**
-     * Used to convert a string into a proper Document Name.
+     * Used to convert a string into a proper Document Reference.
      */
-    private DocumentNameFactory documentNameFactory = Utils.getComponent(DocumentNameFactory.class);
+    private DocumentReferenceFactory documentReferenceFactory =
+        Utils.getComponent(DocumentReferenceFactory.class, "current");
 
     /**
      * Used to convert a proper Document Name to string.
      */
-    private DocumentNameSerializer documentNameSerializer = Utils.getComponent(DocumentNameSerializer.class);
+    private EntityReferenceSerializer<String> entityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
 
     protected void logAllow(String username, String page, String action, String info)
     {
@@ -319,8 +321,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean found = false;
 
         // Here entity is either a user or a group
-        DocumentName entityDocumentName = this.documentNameFactory.createDocumentName(name);
-        String prefixedFullName = this.documentNameSerializer.serialize(entityDocumentName);
+        DocumentReference entityDocumentReference = this.documentReferenceFactory.createDocumentReference(name);
+        String prefixedFullName = this.entityReferenceSerializer.serialize(entityDocumentReference);
         String shortname = name;
         int i0 = name.indexOf(":");
         if (i0 != -1) {
@@ -389,7 +391,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                         // In the case where the document database and the user database is the same
                         // then we allow the usage of the short name, otherwise the fully qualified
                         // name is requested
-                        if (context.getDatabase().equals(entityDocumentName.getWiki())) {
+                        if (context.getDatabase().equals(entityDocumentReference.getWikiReference().getName())) {
                             if (ArrayUtils.contains(userarray, shortname)) {
                                 if (LOG.isDebugEnabled()) {
                                     LOG.debug("Found matching right in " + users + " for " + shortname);
@@ -457,7 +459,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
                     tmpGroupList = new ArrayList<String>(glist.size());
                     for (String groupName : glist) {
-                        tmpGroupList.add(entityDocumentName.getWiki() + ":" + groupName);
+                        tmpGroupList.add(entityDocumentReference.getWikiReference().getName() + ":" + groupName);
                     }
                 } catch (Exception e) {
                     LOG.error("Failed to get groups for user or group [" + name + "]", e);
@@ -472,10 +474,12 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         // Get entity groups in entity wiki
-        if (context.getWiki().isVirtualMode() && !context.getDatabase().equalsIgnoreCase(entityDocumentName.getWiki())) {
+        if (context.getWiki().isVirtualMode() && !context.getDatabase().equalsIgnoreCase(
+            entityDocumentReference.getWikiReference().getName()))
+        {
             String database = context.getDatabase();
             try {
-                context.setDatabase(entityDocumentName.getWiki());
+                context.setDatabase(entityDocumentReference.getWikiReference().getName());
 
                 // the key is for the entity <code>prefixedFullName</code> in entity wiki
                 String key = context.getDatabase() + ":" + prefixedFullName;
@@ -785,8 +789,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
     // TODO: this method is a candidate for the the XWikiRightService API.
     private boolean isSuperAdmin(String username)
     {
-        DocumentName documentName = Utils.getComponent(DocumentNameFactory.class).createDocumentName(username);
-        return documentName.getPage().equalsIgnoreCase(SUPERADMIN_USER);
+        DocumentReference documentReference =
+            Utils.getComponent(DocumentReferenceFactory.class).createDocumentReference(username);
+        return documentReference.getName().equalsIgnoreCase(SUPERADMIN_USER);
     }
 
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,

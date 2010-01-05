@@ -35,9 +35,8 @@ public interface XWikiURLSerializer<T>
     /**
      * Transforms a XWiki URL instance into some other representation.
      * 
-     * @param <T> the output type
      * @param xwikiURL the XWiki URL to transform
      * @return the new representation
      */
-    <T> T serialize(XWikiURL xwikiURL);
+    T serialize(XWikiURL xwikiURL);
 }

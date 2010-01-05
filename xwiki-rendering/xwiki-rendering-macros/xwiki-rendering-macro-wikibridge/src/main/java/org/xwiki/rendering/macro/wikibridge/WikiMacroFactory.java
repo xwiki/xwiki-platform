@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro.wikibridge;
 
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
@@ -34,20 +34,20 @@ public interface WikiMacroFactory
     /**
      * Searches the given document for a wiki macro definition.
      * 
-     * @param documentName name of the document to search for a wiki macro definition.
+     * @param documentReference name of the document to search for a wiki macro definition.
      * @return true if the given document contains a wiki macro definition, false otherwise.
      * @since 2.2M1
      */
-    boolean containsWikiMacro(DocumentName documentName);
+    boolean containsWikiMacro(DocumentReference documentReference);
     
     /**
      * Tries to build a {@link WikiMacro} if a definition is found on the given document.
      * 
-     * @param documentName name of the document on which the macro is defined.
+     * @param documentReference name of the document on which the macro is defined.
      * @return a {@link WikiMacro} corresponding to the macro definition found.
      * @throws WikiMacroException if no macro definition is found or if an error is encountered while building
      *             the macro.
      * @since 2.2M1
      */
-    WikiMacro createWikiMacro(DocumentName documentName) throws WikiMacroException;
+    WikiMacro createWikiMacro(DocumentReference documentReference) throws WikiMacroException;
 }

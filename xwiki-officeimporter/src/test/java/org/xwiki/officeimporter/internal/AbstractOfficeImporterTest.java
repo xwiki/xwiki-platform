@@ -21,9 +21,9 @@ package org.xwiki.officeimporter.internal;
 
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -37,7 +37,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     /**
      * Mockery for creating mock objects.
      */
-    protected Mockery context = new Mockery();
+    protected Mockery mockery = new Mockery();
 
     /**
      * Mock document access bridge.
@@ -47,12 +47,12 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     /**
      * Mock document name serializer.
      */
-    protected DocumentNameSerializer mockDocumentNameSerializer;
+    protected EntityReferenceSerializer mockEntityReferenceSerializer;
     
     /**
      * Mock document name factory.
      */
-    protected DocumentNameFactory mockDocumentNameFactory;
+    protected DocumentReferenceFactory mockDocumentReferenceFactory;
 
     /**
      * {@inheritDoc}
@@ -62,24 +62,25 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         super.registerComponents();
 
         // Document Access Bridge Mock
-        mockDocumentAccessBridge = context.mock(DocumentAccessBridge.class);
+        mockDocumentAccessBridge = mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
         // Document name serializer.
-        mockDocumentNameSerializer = this.context.mock(DocumentNameSerializer.class);
-        DefaultComponentDescriptor<DocumentNameSerializer> descriptorDNS =
-            new DefaultComponentDescriptor<DocumentNameSerializer>();
-        descriptorDNS.setRole(DocumentNameSerializer.class);
-        getComponentManager().registerComponent(descriptorDNS, mockDocumentNameSerializer);
+        mockEntityReferenceSerializer = this.mockery.mock(EntityReferenceSerializer.class);
+        DefaultComponentDescriptor<EntityReferenceSerializer> descriptorRS =
+            new DefaultComponentDescriptor<EntityReferenceSerializer>();
+        descriptorRS.setRole(EntityReferenceSerializer.class);
+        getComponentManager().registerComponent(descriptorRS, mockEntityReferenceSerializer);
 
         // Document name factory.
-        mockDocumentNameFactory = this.context.mock(DocumentNameFactory.class);
-        DefaultComponentDescriptor<DocumentNameFactory> descriptorDNF =
-            new DefaultComponentDescriptor<DocumentNameFactory>();
-        descriptorDNF.setRole(DocumentNameFactory.class);
-        getComponentManager().registerComponent(descriptorDNF, mockDocumentNameFactory);
+        mockDocumentReferenceFactory = this.mockery.mock(DocumentReferenceFactory.class);
+        DefaultComponentDescriptor<DocumentReferenceFactory> descriptorDRF =
+            new DefaultComponentDescriptor<DocumentReferenceFactory>();
+        descriptorDRF.setRole(DocumentReferenceFactory.class);
+        descriptorDRF.setRoleHint("current");
+        getComponentManager().registerComponent(descriptorDRF, mockDocumentReferenceFactory);
     }
 }

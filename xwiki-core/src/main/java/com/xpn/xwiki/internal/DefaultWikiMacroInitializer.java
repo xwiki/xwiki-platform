@@ -24,12 +24,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
@@ -69,8 +69,8 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     @Requirement
     private Execution execution;
 
-    @Requirement
-    private DocumentNameFactory documentNameFactory;
+    @Requirement("current")
+    private DocumentReferenceFactory documentReferenceFactory;
     
     /**
      * Utility method for accessing XWikiContext.
@@ -117,11 +117,12 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
 
                 // Search for all those documents with macro definitions and for each register the macro
                 for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
-                    DocumentName wikiMacroDocumentName = this.documentNameFactory.createDocumentName(
-                        wikiName + ":" + wikiMacroDocumentData[0]);
+                    DocumentReference wikiMacroDocumentReference =
+                        this.documentReferenceFactory.createDocumentReference(
+                            wikiName + ":" + wikiMacroDocumentData[0]);
                     String wikiMacroDocumentAuthor = (String) wikiMacroDocumentData[1];
                     try {
-                        WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentName);
+                        WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
 
                         // Set the author in the context to be the author who last modified the document containing
                         // the wiki macro class definition, so that if the Macro has the "Current User" visibility
@@ -129,7 +130,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
                         String originalAuthor = xcontext.getUser();
                         try {
                             xcontext.setUser(wikiMacroDocumentAuthor);
-                            wikiMacroManager.registerWikiMacro(wikiMacroDocumentName, macro);
+                            wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
                         } finally {
                             xcontext.setUser(originalAuthor);
                         }

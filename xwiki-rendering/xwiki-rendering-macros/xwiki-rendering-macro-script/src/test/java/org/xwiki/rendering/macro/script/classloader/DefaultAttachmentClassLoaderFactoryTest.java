@@ -24,12 +24,11 @@ import java.net.URL;
 import junit.framework.Assert;
 
 import org.jmock.Mockery;
-import org.junit.Test;
-import org.xwiki.model.AttachmentNameFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.AttachmentReferenceFactory;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
 import org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -46,7 +45,7 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     
     private AttachmentClassLoaderFactory factory;
     
-    private AttachmentNameFactory anf;
+    private AttachmentReferenceFactory arf;
     
     private DocumentAccessBridge dab;
 
@@ -55,22 +54,25 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     {
         super.registerComponents();
 
-        this.anf = this.mockery.mock(AttachmentNameFactory.class);
-        DefaultComponentDescriptor<AttachmentNameFactory> descriptorANF =
-            new DefaultComponentDescriptor<AttachmentNameFactory>();
-        descriptorANF.setRole(AttachmentNameFactory.class);
-        getComponentManager().registerComponent(descriptorANF, this.anf);
+        this.arf = this.mockery.mock(AttachmentReferenceFactory.class);
+        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
+        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        descriptorARF.setRoleHint("current");
+        getComponentManager().registerComponent(descriptorARF, this.arf);
 
         this.dab = this.mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
             new DefaultComponentDescriptor<DocumentAccessBridge>();
         descriptorDAB.setRole(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, this.dab);
-        
+
+
+
         this.factory = getComponentManager().lookup(AttachmentClassLoaderFactory.class);
     }
     
-    @Test
+    @org.junit.Test
     public void testCreateAttachmentClassLoader() throws Exception
     {
         URIClassLoader cl = (URIClassLoader) factory.createAttachmentClassLoader(
@@ -82,7 +84,7 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
         Assert.assertEquals("attachmentjar://filename2", cl.getURLs()[2].toString());
     }
     
-    @Test
+    @org.junit.Test
     public void testExtendClassLoaderLoader() throws Exception
     {
         ExtendedURLClassLoader cl = new ExtendedURLClassLoader(new URL[0]);

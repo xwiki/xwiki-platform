@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 
 import org.w3c.dom.Document;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
@@ -68,7 +68,7 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
     /**
      * {@inheritDoc}
      */
-    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentName reference,
+    public XDOMOfficeDocument build(InputStream officeFileStream, String officeFileName, DocumentReference reference,
         boolean filterStyles) throws OfficeImporterException
     {
         return build(xhtmlOfficeDocumentBuilder.build(officeFileStream, officeFileName, reference, filterStyles));
@@ -92,12 +92,13 @@ public class DefaultXDOMOfficeDocumentBuilder implements XDOMOfficeDocumentBuild
 
     /**
      * {@inheritDoc}
+     * @deprecated use {@link #build(InputStream, String, DocumentReference, boolean)}  since 2.2M1
      */
     @Deprecated
     public XDOMOfficeDocument build(byte[] officeFileData, org.xwiki.bridge.DocumentName reference,
         boolean filterStyles) throws OfficeImporterException
     {
-        return build(new ByteArrayInputStream(officeFileData), "input.tmp", new DocumentName(reference.getWiki(),
-            reference.getSpace(), reference.getPage()), filterStyles);
+        return build(new ByteArrayInputStream(officeFileData), "input.tmp", new DocumentReference(
+            reference.getWiki(), reference.getSpace(), reference.getPage()), filterStyles);
     }
 }

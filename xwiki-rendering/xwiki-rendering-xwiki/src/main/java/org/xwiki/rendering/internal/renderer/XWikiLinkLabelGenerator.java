@@ -22,9 +22,10 @@ package org.xwiki.rendering.internal.renderer;
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.LinkLabelGenerator;
@@ -40,59 +41,53 @@ import org.xwiki.rendering.renderer.LinkLabelGenerator;
 public class XWikiLinkLabelGenerator implements LinkLabelGenerator
 {
     @Requirement
-    private RenderingConfiguration configuration;
-    
+    private RenderingConfiguration renderingConfiguration;
+
     @Requirement
-    private DocumentAccessBridge bridge;
-    
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Requirement("current")
+    private DocumentReferenceFactory documentReferenceFactory;
+
     public String generate(Link link)
     {
         String result;
 
-        String format = this.configuration.getLinkLabelFormat();
-        DocumentName documentName = this.bridge.getModelDocumentName(link.getReference());
-        
+        String format = this.renderingConfiguration.getLinkLabelFormat();
+        DocumentReference documentReference =
+            this.documentReferenceFactory.createDocumentReference(link.getReference());
+
         // Replace %w with the wiki name
-        result = format.replace("%w", documentName.getWiki()); 
-        
+        result = format.replace("%w", documentReference.getWikiReference().getName());
+
         // Replace %p with the page name
-        result = result.replace("%p", documentName.getPage()); 
+        result = result.replace("%p", documentReference.getName());
 
         // Replace %s with the space name
-        result = result.replace("%s", documentName.getSpace());
+        result = result.replace("%s", documentReference.getLastSpaceReference().getName());
 
         // Replace %P with the page name in camel case + space
         if (result.indexOf("%P") > -1) {
-            String normalizedPage = documentName.getPage().replaceAll("([a-z])([A-Z])", "$1 $2");
+            String normalizedPage = documentReference.getName().replaceAll("([a-z])([A-Z])", "$1 $2");
             result = result.replace("%P", normalizedPage);
         }
-        
+
         // Replace %t with the document title and fall back to %p if the title is null or empty
         if (result.indexOf("%t") > -1) {
             try {
-                DocumentModelBridge document = this.bridge.getDocument(link.getReference());
+                DocumentModelBridge document = this.documentAccessBridge.getDocument(documentReference);
                 if (!StringUtils.isBlank(document.getTitle())) {
                     result = result.replace("%t", document.getTitle());
                 } else {
-                    result = documentName.getPage();
+                    result = documentReference.getName();
                 }
             } catch (Exception e) {
                 // If there's an error (meaning the document cannot be retrieved from the database for some reason)
                 // the fall back to displaying %p
-                result = documentName.getPage();
+                result = documentReference.getName();
             }
         }
-        
+
         return result;
-    }
-    
-    public void setRenderingConfiguration(RenderingConfiguration configuration)
-    {
-        this.configuration = configuration;
-    }
-    
-    public void setDocumentAccessBridge(DocumentAccessBridge bridge)
-    {
-        this.bridge = bridge;
     }
 }

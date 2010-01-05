@@ -20,6 +20,8 @@
 package org.xwiki.configuration.internal;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Configuration source taking its data in the Space Preferences wiki document
@@ -42,8 +44,18 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
     }
 
     @Override
-    protected String getDocumentName()
+    protected DocumentReference getDocumentReference()
     {
-        return DOCUMENT_NAME;
+        DocumentReference documentReference = null;
+
+        DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
+        if (currentDocumentReference != null) {
+            // Add the current spaces and current wiki references to the Web Preferences document reference to form
+            // an absolute reference.
+            documentReference = new DocumentReference(DOCUMENT_NAME, null);
+            documentReference.setParent(currentDocumentReference.extractReference(EntityType.SPACE));
+        }
+
+        return documentReference;
     }
 }

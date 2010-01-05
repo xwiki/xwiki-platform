@@ -28,10 +28,9 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.util.ReflectionUtils;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
@@ -72,7 +71,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
      * 
      * @throws Exception
      */
-    @Test
+    @org.junit.Test
     public void testXHTMLOfficeDocumentBuilding() throws Exception
     {
         // Create & register a mock document converter to by-pass openoffice server.
@@ -82,24 +81,22 @@ public class DefaultXHTMLOfficeDocumentBuilderTest extends AbstractOfficeImporte
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put("output.html", "<html><head><title></tile></head><body></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = this.context.mock(OpenOfficeConverter.class);
-        this.context.checking(new Expectations() {{
-                allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
+        final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
+        this.mockery.checking(new Expectations() {{
+            allowing(mockDocumentConverter).convert(mockInput, "input.doc", "output.html");
                 will(returnValue(mockOutput));
         }});
         ReflectionUtils.setFieldValue(officeManager, "converter", mockDocumentConverter);
 
-        // Create & register a mock document name serializer.
-        final DocumentName mockDocumentName = new DocumentName("xwiki", "Main", "Test");
-        final DocumentNameSerializer nameSerializer = this.context.mock(DocumentNameSerializer.class, "test");
-        this.context.checking(new Expectations() {{
-                allowing(nameSerializer).serialize(mockDocumentName);                
+        // Create & register a mock entity reference serializer.
+        final DocumentReference documentReference = new DocumentReference("xwiki", "Main", "Test");
+        this.mockery.checking(new Expectations() {{
+            allowing(mockEntityReferenceSerializer).serialize(documentReference);
                 will(returnValue("xwiki:Main.Test"));
         }});
-        ReflectionUtils.setFieldValue(xhtmlDocumentBuilder, "nameSerializer", nameSerializer);
 
-        XHTMLOfficeDocument document = 
-            xhtmlDocumentBuilder.build(mockOfficeFileStream, "input.doc", mockDocumentName, true);
+        XHTMLOfficeDocument document =
+            xhtmlDocumentBuilder.build(mockOfficeFileStream, "input.doc", documentReference, true);
         Assert.assertNotNull(document.getContentDocument());
         Assert.assertEquals(0, document.getArtifacts().size());
     }

@@ -22,7 +22,6 @@ package org.xwiki.rendering;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 
 import org.xwiki.component.descriptor.ComponentDescriptor;
@@ -40,7 +39,7 @@ import org.xwiki.test.ComponentManagerTestSetup;
  */
 public class WikiRenderingTests extends TestCase
 {
-    public static Test suite() throws Exception
+    public static junit.framework.Test suite() throws Exception
     {
         RenderingTestSuite suite = new RenderingTestSuite("Rendering tests requiring the wiki notion");
 

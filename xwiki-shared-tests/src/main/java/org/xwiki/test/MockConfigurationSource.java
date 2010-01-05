@@ -29,7 +29,7 @@ import java.util.Properties;
 import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Mock {@link org.xwiki.configuration.ConfigurationSourceCollection} that returns an empty list of configuration
+ * Mock {@link ConfigurationSource} that returns an empty list of configuration
  * sources.
  * 
  * @version $Id$
@@ -44,7 +44,7 @@ public class MockConfigurationSource implements ConfigurationSource
         this.properties.put(key, value);
     }
 
-    public void remoteProperty(String key)
+    public void removeProperty(String key)
     {
         this.properties.remove(key);
     }

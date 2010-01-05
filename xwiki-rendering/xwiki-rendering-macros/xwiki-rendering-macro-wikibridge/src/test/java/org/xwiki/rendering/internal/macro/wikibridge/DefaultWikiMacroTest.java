@@ -23,7 +23,7 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.*;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.rendering.converter.Converter;
@@ -53,7 +53,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
     private DocumentAccessBridge mockDocumentAccessBridge;
 
-    private DocumentName wikiMacroDocumentName;
+    private DocumentReference wikiMacroDocumentReference;
 
     /**
      * The {@link org.xwiki.rendering.macro.wikibridge.WikiMacroManager} component.
@@ -72,7 +72,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         descriptorDAB.setRole(DocumentAccessBridge.class);
         getComponentManager().registerComponent(descriptorDAB, this.mockDocumentAccessBridge);
 
-        this.wikiMacroDocumentName = new DocumentName("wiki", "space", "macroPage");
+        this.wikiMacroDocumentReference = new DocumentReference("wiki", "space", "macroPage");
 
         mockery.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getCurrentWiki(); will(returnValue("wiki"));
@@ -81,7 +81,7 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
 
             // This is the document containing the wiki macro that will be put in the context available in the macro
             // Since we're not testing it here, it can be null.
-            allowing(mockDocumentAccessBridge).getDocument(wikiMacroDocumentName); will(returnValue(null));
+            allowing(mockDocumentAccessBridge).getDocument(wikiMacroDocumentReference); will(returnValue(null));
         }});
 
         this.wikiMacroManager = getComponentManager().lookup(WikiMacroManager.class);
@@ -136,9 +136,9 @@ public class DefaultWikiMacroTest extends AbstractComponentTestCase
         WikiMacroDescriptor descriptor = new WikiMacroDescriptor("Wiki Macro", "Description", "Test",
             WikiMacroVisibility.GLOBAL, new DefaultContentDescriptor(false), parameterDescriptors);
 
-        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocumentName, macroId, true, descriptor,
+        DefaultWikiMacro wikiMacro = new DefaultWikiMacro(wikiMacroDocumentReference, macroId, true, descriptor,
             macroContent, "xwiki/2.0", getComponentManager());
 
-        wikiMacroManager.registerWikiMacro(wikiMacroDocumentName, wikiMacro);
+        wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, wikiMacro);
     }
 }

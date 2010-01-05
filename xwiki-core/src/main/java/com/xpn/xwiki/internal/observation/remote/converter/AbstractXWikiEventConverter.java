@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -133,7 +133,7 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     {
         HashMap<String, Serializable> remoteDataMap = new HashMap<String, Serializable>();
 
-        remoteDataMap.put(DOC_NAME, new DocumentName(document.getWikiName(), document.getSpaceName(),
+        remoteDataMap.put(DOC_NAME, new DocumentReference(document.getWikiName(), document.getSpaceName(),
             document.getPageName()));
 
         if (!document.isNew()) {
@@ -159,28 +159,30 @@ public abstract class AbstractXWikiEventConverter extends AbstractEventConverter
     {
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;
 
-        DocumentName docName = (DocumentName) remoteDataMap.get(DOC_NAME);
+        DocumentReference docReference = (DocumentReference) remoteDataMap.get(DOC_NAME);
 
         XWikiDocument doc;
         if (remoteDataMap.get(DOC_VERSION) == null) {
-            doc = new XWikiDocument(docName.getWiki(), docName.getSpace(), docName.getPage());
+            doc = new XWikiDocument(docReference.getWikiReference().getName(),
+                docReference.getLastSpaceReference().getName(), docReference.getName());
         } else {
             doc = new LazyXWikiDocument();
-            doc.setDatabase(docName.getWiki());
-            doc.setSpace(docName.getSpace());
-            doc.setName(docName.getPage());
+            doc.setDatabase(docReference.getWikiReference().getName());
+            doc.setSpace(docReference.getLastSpaceReference().getName());
+            doc.setName(docReference.getName());
             doc.setLanguage((String) remoteDataMap.get(DOC_LANGUAGE));
             doc.setVersion((String) remoteDataMap.get(DOC_VERSION));
         }
 
         XWikiDocument origDoc;
         if (remoteDataMap.get(ORIGDOC_VERSION) == null) {
-            origDoc = new XWikiDocument(docName.getWiki(), docName.getSpace(), docName.getPage());
+            origDoc = new XWikiDocument(docReference.getWikiReference().getName(),
+                docReference.getLastSpaceReference().getName(), docReference.getName());
         } else {
             origDoc = new LazyXWikiDocument();
-            origDoc.setDatabase(docName.getWiki());
-            origDoc.setSpace(docName.getSpace());
-            origDoc.setName(docName.getPage());
+            origDoc.setDatabase(docReference.getWikiReference().getName());
+            origDoc.setSpace(docReference.getLastSpaceReference().getName());
+            origDoc.setName(docReference.getName());
             origDoc.setLanguage((String) remoteDataMap.get(ORIGDOC_LANGUAGE));
             origDoc.setVersion((String) remoteDataMap.get(ORIGDOC_VERSION));
         }

@@ -3,10 +3,12 @@ com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
-com.xpn.xwiki.doc.DefaultDocumentNameFactory
-com.xpn.xwiki.doc.CurrentDocumentNameFactory
-com.xpn.xwiki.doc.DefaultDocumentNameSerializer
-com.xpn.xwiki.doc.CompactDocumentNameSerializer
+com.xpn.xwiki.doc.CurrentEntityReferenceFactory
+com.xpn.xwiki.doc.CurrentEntityReferenceNormalizer
+com.xpn.xwiki.doc.CurrentDocumentReferenceFactory
+com.xpn.xwiki.doc.CurrentAttachmentReferenceFactory
+com.xpn.xwiki.doc.CompactEntityReferenceSerializer
+com.xpn.xwiki.doc.CompactWikiEntityReferenceSerializer
 com.xpn.xwiki.DefaultSkinAccessBridge
 com.xpn.xwiki.store.hibernate.DefaultHibernateSessionFactory
 com.xpn.xwiki.store.hibernate.query.HqlQueryExecutor

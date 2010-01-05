@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.AttachmentName;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterFilter;
@@ -42,7 +42,7 @@ import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
-import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xml.html.HTMLUtils;
@@ -83,8 +83,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * Used for parsing document name strings.
      */
-    @Requirement
-    private DocumentNameFactory nameFactory;
+    @Requirement("current")
+    private DocumentReferenceFactory documentReferenceFactory;
 
     /**
      * Used for importing office documents.
@@ -121,10 +121,10 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         String extension = documentFormat.substring(documentFormat.lastIndexOf('.') + 1);
         String officeFileName = "input." + extension;
 
-        DocumentName baseDocument = nameFactory.createDocumentName(targetWikiDocument);
+        DocumentReference baseDocument = this.documentReferenceFactory.createDocumentReference(targetWikiDocument);
         if (isPresentation(documentFormat)) {
             XDOMOfficeDocument presentation = presentationBuilder.build(documentStream, officeFileName);
-            saveDocument(presentation, new TargetPageDescriptor(baseDocument, this.componentManager), null,
+            saveDocument(presentation, new TargetDocumentDescriptor(baseDocument, this.componentManager), null,
                 isAppendRequest(params), false);
         } else {
             OfficeImporterFilter importerFilter = getImporterFilter(params);
@@ -135,15 +135,15 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             XDOMOfficeDocument xdomDoc = xdomOfficeDocumentBuilder.build(xhtmlDoc);
             importerFilter.filter(targetWikiDocument, xdomDoc.getContentDocument(), false);
             if (!isSplitRequest(params)) {
-                saveDocument(xdomDoc, new TargetPageDescriptor(baseDocument, this.componentManager), importerFilter,
+                saveDocument(xdomDoc, new TargetDocumentDescriptor(baseDocument, this.componentManager), importerFilter,
                     isAppendRequest(params), false);
             } else {
                 int[] headingLevels = getHeadingLevelsToSplit(params);
                 String namingCriterionHint = params.get("childPagesNamingMethod");
-                Map<TargetPageDescriptor, XDOMOfficeDocument> results =
+                Map<TargetDocumentDescriptor, XDOMOfficeDocument> results =
                     xdomOfficeDocumentSplitter.split(xdomDoc, headingLevels, namingCriterionHint, baseDocument);
-                for (Map.Entry<TargetPageDescriptor, XDOMOfficeDocument> result : results.entrySet()) {
-                    boolean append = result.getKey().getPageName().equals(baseDocument);
+                for (Map.Entry<TargetDocumentDescriptor, XDOMOfficeDocument> result : results.entrySet()) {
+                    boolean append = result.getKey().getDocumentReference().equals(baseDocument);
                     saveDocument(result.getValue(), result.getKey(), importerFilter, append, true);
                 }
             }
@@ -157,12 +157,12 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     public String importAttachment(String strDocumentName, String strAttachmentFileName, Map<String, String> params)
         throws OfficeImporterException
     {
-        DocumentName documentName = nameFactory.createDocumentName(strDocumentName);
-        AttachmentName attachmentName = new AttachmentName(documentName, strAttachmentFileName);
+        DocumentReference documentReference = this.documentReferenceFactory.createDocumentReference(strDocumentName);
+        AttachmentReference attachmentReference = new AttachmentReference(strAttachmentFileName, documentReference);
 
         InputStream attachmentStream;
         try {
-            attachmentStream = docBridge.getAttachmentContent(attachmentName);
+            attachmentStream = this.docBridge.getAttachmentContent(attachmentReference);
         } catch (Exception ex) {
             throw new OfficeImporterException("Error while reading attachment", ex);
         }
@@ -174,7 +174,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             attachArtifacts(strDocumentName, presentation.getArtifacts());
         } else {
             XHTMLOfficeDocument xhtmlDoc =
-                xhtmlOfficeDocumentBuilder.build(attachmentStream, strAttachmentFileName, documentName,
+                xhtmlOfficeDocumentBuilder.build(attachmentStream, strAttachmentFileName, documentReference,
                     shouldFilterStyles(params));
             HTMLUtils.stripHTMLEnvelope(xhtmlDoc.getContentDocument());
             result = xhtmlDoc.getContentAsString();
@@ -193,11 +193,11 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * @param isSplit if this document is a newly split one.
      * @throws OfficeImporterException if an error occurs while saving into the xwiki page.
      */
-    private void saveDocument(XDOMOfficeDocument document, TargetPageDescriptor targetDescriptor,
+    private void saveDocument(XDOMOfficeDocument document, TargetDocumentDescriptor targetDescriptor,
         OfficeImporterFilter importerFilter, boolean append, boolean isSplit) throws OfficeImporterException
     {
-        String target = targetDescriptor.getPageNameAsString();
-        String parent = targetDescriptor.getParentNameAsString();
+        String target = targetDescriptor.getDocumentReferenceAsString();
+        String parent = targetDescriptor.getParentReferenceAsString();
         String title = document.getTitle();
         String content = document.getContentAsString();
         content = (null != importerFilter) ? importerFilter.filter(target, content, isSplit) : content;
@@ -213,10 +213,10 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
             } else {
                 docBridge.setDocumentSyntaxId(target, Syntax.XWIKI_2_0.toIdString());
                 if (null != title) {
-                    docBridge.getDocument(targetDescriptor.getPageName()).setTitle(title);
+                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setTitle(title);
                 }
                 if (null != parent) {
-                    docBridge.getDocument(targetDescriptor.getPageName()).setParent(targetDescriptor.getParentName());
+                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setParent(targetDescriptor.getParentReference());
                 }
                 docBridge.setDocumentContent(target, content, "Created by office importer", false);
             }

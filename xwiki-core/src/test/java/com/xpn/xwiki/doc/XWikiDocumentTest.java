@@ -308,7 +308,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage")),
+        assertEquals(new HashSet<String>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")),
             new HashSet<String>(linkedPages));
     }
 
@@ -325,7 +325,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         Set<String> linkedPages = this.document.getUniqueLinkedPages(getContext());
 
         assertEquals(new LinkedHashSet<String>(Arrays.asList("Space.TargetPage", "TargetSpace.TargetPage",
-            "Space.WebHome", "targetwiki:TargetSpace.TargetPage")), linkedPages);
+            "targetwiki:TargetSpace.TargetPage")), linkedPages);
     }
 
     public void testGetSections10() throws XWikiException
@@ -720,17 +720,14 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // Possible ways to write parents, include documents, or make links:
         // "name"  -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
         // "space.name" -means----> DOCWIKI+":"+input
-        // "database:name" -means-> input.replace(":",":"+DOCSPACE+".") (Not likely to happen much, but it works so it must be supported throughout)
         // "database:space.name" (no change)
         XWikiDocument doc1 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page1");
         doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" 
                              + DOCSPACE + "." + DOCNAME + "]] [["
-                             + DOCNAME + "]] [["
-                             + DOCWIKI + ":" + DOCNAME + "]]");
+                             + DOCNAME + "]]");
         doc1.setSyntaxId("xwiki/2.0");
         XWikiDocument doc2 = new XWikiDocument("newwikiname", DOCSPACE, "Page2");
-        doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [["
-                             + DOCWIKI + ":" + DOCNAME + "]]");
+        doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc2.setSyntaxId("xwiki/2.0");
         XWikiDocument doc3 = new XWikiDocument("newwikiname", "newspace", "Page3");
         doc3.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
@@ -739,10 +736,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // Test to make sure it also drags children along.
         XWikiDocument doc4 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page4");
         doc4.setParent(DOCSPACE + "." + DOCNAME);
-        XWikiDocument doc5 = new XWikiDocument("newwikiname", DOCSPACE, "Page5");
-        doc5.setParent(DOCWIKI + ":" + DOCNAME);
-        XWikiDocument doc6 = new XWikiDocument("newwikiname", "newspace", "Page6");
-        doc6.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
+        XWikiDocument doc5 = new XWikiDocument("newwikiname", "newspace", "Page5");
+        doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
 
         this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
         this.mockXWiki.stubs().method("getDocument").with(eq("1"), ANYTHING).will(returnValue(doc1));
@@ -750,26 +745,22 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWiki.stubs().method("getDocument").with(eq("3"), ANYTHING).will(returnValue(doc3));
         this.mockXWiki.stubs().method("getDocument").with(eq("4"), ANYTHING).will(returnValue(doc4));
         this.mockXWiki.stubs().method("getDocument").with(eq("5"), ANYTHING).will(returnValue(doc5));
-        this.mockXWiki.stubs().method("getDocument").with(eq("6"), ANYTHING).will(returnValue(doc6));
         this.mockXWiki.stubs().method("saveDocument").isVoid();
         this.mockXWiki.stubs().method("deleteDocument").isVoid();
 
         this.document.rename("newwikiname:newspace.newpage", Arrays.asList("1", "2", "3"), 
-            Arrays.asList("4", "5", "6"), getContext());
+            Arrays.asList("4", "5"), getContext());
 
         // Test links
         assertEquals("[[newwikiname:newspace.newpage]] "
                    + "[[someName>>newwikiname:newspace.newpage]] "
-                   + "[[newwikiname:newspace.newpage]] "
                    + "[[newwikiname:newspace.newpage]]", doc1.getContent());
-        assertEquals("[[newspace.newpage]] "
-                   + "[[newspace.newpage]]", doc2.getContent());
-        assertEquals("[[newspace.newpage]]", doc3.getContent());
+        assertEquals("[[newspace.newpage]]", doc2.getContent());
+        assertEquals("[[newpage]]", doc3.getContent());
 
         // Test parents
         assertEquals("newwikiname:newspace.newpage", doc4.getParent());
         assertEquals("newwikiname:newspace.newpage", doc5.getParent());
-        assertEquals("newwikiname:newspace.newpage", doc6.getParent());
     }
 
     /**

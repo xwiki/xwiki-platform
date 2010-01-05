@@ -54,7 +54,7 @@ public class XWikiPropertiesConfigurationSource extends CommonsConfigurationSour
     {
         // Register the Commons Properties Configuration, looking for a xwiki.properties file
         // in the XWiki path somewhere.
-        URL xwikiPropertiesUrl = null;
+        URL xwikiPropertiesUrl;
         try {
             xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
             setConfiguration(new PropertiesConfiguration(xwikiPropertiesUrl));

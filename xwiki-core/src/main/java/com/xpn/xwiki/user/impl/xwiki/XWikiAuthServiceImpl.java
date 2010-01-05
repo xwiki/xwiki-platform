@@ -39,9 +39,7 @@ import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -53,6 +51,8 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
  * Default implementation of {@link XWikiAuthService}.
@@ -66,13 +66,14 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Used to convert a string into a proper Document Name.
      */
-    private DocumentNameFactory documentNameFactory = Utils.getComponent(DocumentNameFactory.class);
+    private DocumentReferenceFactory documentReferenceFactory =
+        Utils.getComponent(DocumentReferenceFactory.class, "current");
 
     /**
      * Used to convert a proper Document Name to string.
      */
-    private DocumentNameSerializer compactDocumentNameSerializer =
-            Utils.getComponent(DocumentNameSerializer.class, "compact");
+    private EntityReferenceSerializer<String> compactEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compact");
 
     /**
      * Each wiki has its own authenticator.
@@ -370,8 +371,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         String contextUserName;
 
         if (principal != null) {
-            DocumentName userDocumentName = this.documentNameFactory.createDocumentName(principal.getName());
-            contextUserName = this.compactDocumentNameSerializer.serialize(userDocumentName);
+            DocumentReference userDocumentReference =
+                this.documentReferenceFactory.createDocumentReference(principal.getName());
+            contextUserName = this.compactEntityReferenceSerializer.serialize(userDocumentReference);
         } else {
             contextUserName = null;
         }

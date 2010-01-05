@@ -88,6 +88,8 @@ import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
@@ -1409,6 +1411,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return newdoc;
     }
 
+    /**
+     * @since 2.2M1
+     */
+    public XWikiDocument getDocument(DocumentReference reference, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setDatabase(reference.getWikiReference().getName());
+        doc.setSpace(reference.getLastSpaceReference().getName());
+        doc.setName(reference.getName());
+        doc.setContentDirty(true);
+        return getDocument(doc, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
+     */
     public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
@@ -1416,6 +1434,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return getDocument(doc, context);
     }
 
+    /**
+     * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
+     */
     public XWikiDocument getDocument(String web, String fullname, XWikiContext context) throws XWikiException
     {
         int i1 = fullname.lastIndexOf(".");
@@ -5558,7 +5579,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @return the cache factory.
      * @since 1.5M2.
-     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(String)}.
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)}
      */
     @Deprecated
     public CacheFactory getCacheFactory()
@@ -5584,7 +5605,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @return the cache factory creating local caches.
      * @since 1.5M2.
-     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(String)}.
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)} 
      */
     @Deprecated
     public CacheFactory getLocalCacheFactory()
@@ -6035,7 +6056,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * Indicates whether deleted attachments are stored in a recycle bin or not. This can be configured using the key
      * <var>storage.attachment.recyclebin</var>.
      * 
-     * @see com.xpn.xwiki.api.XWiki#hasAttachmentRecycleBin()
      * @param context The current {@link XWikiContext context}, maybe will be useful.
      */
     public boolean hasAttachmentRecycleBin(XWikiContext context)

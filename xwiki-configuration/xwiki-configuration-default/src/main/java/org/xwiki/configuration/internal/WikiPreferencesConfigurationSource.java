@@ -20,6 +20,9 @@
 package org.xwiki.configuration.internal;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Configuration source taking its data in the Wiki Preferences wiki document
@@ -31,9 +34,11 @@ import org.xwiki.component.annotation.Component;
 @Component("wiki")
 public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    private static final String DOCUMENT_NAME = "XWiki.XWikiPreferences";
-    
-    private static final String CLASS_NAME = DOCUMENT_NAME;
+    private static final String SPACE_NAME = "XWiki";
+
+    private static final String PAGE_NAME = "XWikiPreferences";
+
+    private static final String CLASS_NAME = SPACE_NAME + "." + PAGE_NAME;
 
     @Override
     protected String getClassName()
@@ -42,8 +47,9 @@ public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigur
     }
 
     @Override
-    protected String getDocumentName()
+    protected DocumentReference getDocumentReference()
     {
-        return DOCUMENT_NAME;
+        return new DocumentReference(PAGE_NAME,
+            new SpaceReference(SPACE_NAME, new WikiReference(getDocumentAccessBridge().getCurrentWiki())));
     }
 }

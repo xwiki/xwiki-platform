@@ -20,7 +20,7 @@
 package com.xpn.xwiki.internal;
 
 import org.jmock.Mock;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
@@ -75,7 +75,7 @@ public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTe
     public void testCreateWikiMacro() throws Exception
     {
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentName("xwiki", "Macros", "Test"));
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
         assertNotNull(macro);
 
         // Check if the macro was built correctly.
@@ -94,7 +94,7 @@ public class DefaultWikiMacroFactoryTest extends AbstractBridgedXWikiComponentTe
         obj.setStringValue("name", "");
 
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentName("xwiki", "Macros", "Test"));
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
         assertNotNull(macro);
 
         // Check if the macro was built correctly.

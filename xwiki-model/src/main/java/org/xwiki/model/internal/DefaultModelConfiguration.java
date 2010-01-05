@@ -1,0 +1,83 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.model.internal;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Get configuration data from the XWiki configuration using a {@link ConfigurationSource}. If no
+ * {@link ConfigurationSource} component is found in the system then default to default values.  
+ *
+ * @version $Id$
+ * @since 2.2M1
+ */
+@Component
+public class DefaultModelConfiguration extends AbstractLogEnabled implements ModelConfiguration
+{
+    /**
+     * Prefix for configuration keys for the Model module.
+     */
+    private static final String PREFIX = "model.";
+
+    private static final Map<EntityType, String> DEFAULT_VALUES = new HashMap<EntityType, String>() {{
+        put(EntityType.WIKI, "xwiki");
+        put(EntityType.SPACE, "Main");
+        put(EntityType.DOCUMENT, "WebHome");
+        put(EntityType.ATTACHMENT, "");
+    }};
+
+    /**
+     * We want to make sure this component can be loaded and used even if there's no ConfigurationSource available
+     * in the system. This is why we lazy load the ConfigurationSource component.
+     */
+    @Requirement
+    private ComponentManager componentManager;
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.model.ModelConfiguration#getDefaultReferenceName(org.xwiki.model.EntityType)
+     */
+    public String getDefaultReferenceName(EntityType type)
+    {
+        String name;
+        try {
+            ConfigurationSource configuration = this.componentManager.lookup(ConfigurationSource.class);
+            name = configuration.getProperty(PREFIX + "reference.default." + type.toString().toLowerCase(),
+                DEFAULT_VALUES.get(type));
+        } catch (ComponentLookupException e) {
+            // Failed to load the component, use default values
+            getLogger().debug("Failed to load [" + ConfigurationSource.class.getName()
+                + "]. Using default Model values", e);
+            name = DEFAULT_VALUES.get(type);
+        }
+
+        return name;
+    }
+}

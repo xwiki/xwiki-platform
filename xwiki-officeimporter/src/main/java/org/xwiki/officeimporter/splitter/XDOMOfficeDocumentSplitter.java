@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.splitter;
 import java.util.Map;
 
 import org.xwiki.component.annotation.ComponentRole;
-import org.xwiki.model.DocumentName;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 
@@ -52,15 +52,15 @@ public interface XDOMOfficeDocumentSplitter
      *            <li>mainPageNameAndHeading - Base document name followed by heading name.</li>
      *            <li>mainPageNameAndNumbering - Base document name followed by index.</li>
      *            </ul>
-     * @param baseDocumentName base (root) page name to be used when generating target page names for child 
+     * @param baseDocumentReference base (root) page name to be used when generating target page names for child
      *            (newly split) documents.
      * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
      *         name for the corresponding xdom office document.
      * @throws OfficeImporterException if an error occurs while splitting.
      * @since 2.2M1
      */
-    Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
-        int[] headingLevelsToSplit, String namingCriterionHint, DocumentName baseDocumentName)
+    Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+        int[] headingLevelsToSplit, String namingCriterionHint, DocumentReference baseDocumentReference)
         throws OfficeImporterException;
 
     /**
@@ -85,10 +85,10 @@ public interface XDOMOfficeDocumentSplitter
      * @return a map of page descriptors vs xdom office documents. Each page descriptor describes the target wiki page
      *         name for the corresponding xdom office document.
      * @throws OfficeImporterException if an error occurs while splitting.
-     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.DocumentName)} since 2.2.M1
+     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.reference.DocumentReference)} since 2.2.M1
      */
     @Deprecated
-    Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
+    Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,
         int[] headingLevelsToSplit, String namingCriterionHint, org.xwiki.bridge.DocumentName baseDocumentName)
         throws OfficeImporterException;
 }

@@ -1,0 +1,151 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.model.reference;
+
+import junit.framework.Assert;
+import org.junit.Test;
+import org.xwiki.model.EntityType;
+
+/**
+ * Unit tests for {@link EntityReference}.
+ *
+ * @version $Id$
+ * @since 2.2M1
+ */
+public class EntityReferenceTest
+{
+    @Test
+    public void testExtractReference()
+    {
+        EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals("wiki", reference1.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("space", reference1.extractReference(EntityType.SPACE).getName());
+        Assert.assertEquals("page", reference1.extractReference(EntityType.DOCUMENT).getName());
+        Assert.assertNull(reference1.extractReference(EntityType.ATTACHMENT));
+    }
+
+    @Test
+    public void testGetRoot()
+    {
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals(new EntityReference("wiki", EntityType.WIKI), reference.getRoot());
+    }
+
+    @Test
+    public void testGetChild()
+    {
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertNull(reference.getChild());
+        Assert.assertEquals(reference, reference.getParent().getChild());
+        Assert.assertEquals(reference, reference.getParent().getParent().getChild().getChild());
+    }
+
+    @Test
+    public void testEquals()
+    {
+        EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals(reference1, reference1);
+
+        EntityReference reference2 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals(reference1, reference2);
+
+        EntityReference reference3 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki2", EntityType.WIKI)));
+        Assert.assertFalse(reference1.equals(reference3));
+
+        EntityReference reference4 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space2", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertFalse(reference1.equals(reference4));
+
+        EntityReference reference5 = new EntityReference("page2", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertFalse(reference1.equals(reference5));
+
+        EntityReference reference6 = new EntityReference(null, null, null);
+        Assert.assertFalse(reference1.equals(reference6));
+        Assert.assertEquals(reference6, new EntityReference(null, null, null)); 
+
+        EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT, null);
+        Assert.assertFalse(reference1.equals(reference7));
+    }
+
+    @Test
+    public void testHashCode()
+    {
+        EntityReference reference1 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals(reference1.hashCode(), reference1.hashCode());
+
+        EntityReference reference2 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertEquals(reference1.hashCode(), reference2.hashCode());
+
+        EntityReference reference3 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki2", EntityType.WIKI)));
+        Assert.assertFalse(reference1.hashCode() ==  reference3.hashCode());
+
+        EntityReference reference4 = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space2", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertFalse(reference1.hashCode() == reference4.hashCode());
+
+        EntityReference reference5 = new EntityReference("page2", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        Assert.assertFalse(reference1.hashCode() == reference5.hashCode());
+
+        EntityReference reference6 = new EntityReference(null, null, null);
+        Assert.assertFalse(reference1.hashCode() == reference6.hashCode());
+        Assert.assertEquals(reference6.hashCode(), new EntityReference(null, null, null).hashCode());
+
+        EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT, null);
+        Assert.assertFalse(reference1.hashCode() == reference7.hashCode());
+    }
+
+    @Test
+    public void testClone() throws Exception
+    {
+        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("space", EntityType.SPACE,
+                new EntityReference("wiki", EntityType.WIKI)));
+        EntityReference clonedReference = reference.clone();
+
+        Assert.assertNotSame(reference, clonedReference);
+        Assert.assertNotSame(reference.getParent(), clonedReference.getParent());
+        Assert.assertNotSame(reference.getParent().getParent(), clonedReference.getParent().getParent());
+        Assert.assertEquals(reference, clonedReference);
+    }
+}

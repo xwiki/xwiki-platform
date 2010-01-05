@@ -29,8 +29,8 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceFactory;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
@@ -38,7 +38,7 @@ import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager;
 import org.xwiki.officeimporter.openoffice.OpenOfficeManager.ManagerState;
-import org.xwiki.officeimporter.splitter.TargetPageDescriptor;
+import org.xwiki.officeimporter.splitter.TargetDocumentDescriptor;
 import org.xwiki.officeimporter.splitter.XDOMOfficeDocumentSplitter;
 
 /**
@@ -75,9 +75,9 @@ public class OfficeImporterVelocityBridge
     private DocumentAccessBridge docBridge;
 
     /**
-     * Used for converting string document names to {@link DocumentName} instances.
+     * Used for converting string document names to objects.
      */
-    private DocumentNameFactory nameFactory;
+    private DocumentReferenceFactory documentReferenceFactory;
 
     /**
      * Used to query openoffice server status.
@@ -124,7 +124,7 @@ public class OfficeImporterVelocityBridge
             this.execution = componentManager.lookup(Execution.class);
             this.importer = componentManager.lookup(OfficeImporter.class);
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
-            this.nameFactory = componentManager.lookup(DocumentNameFactory.class);
+            this.documentReferenceFactory = componentManager.lookup(DocumentReferenceFactory.class, "current");
             this.officeManager = componentManager.lookup(OpenOfficeManager.class);
             this.xhtmlBuilder = componentManager.lookup(XHTMLOfficeDocumentBuilder.class);
             this.xdomBuilder = componentManager.lookup(XDOMOfficeDocumentBuilder.class);
@@ -155,8 +155,8 @@ public class OfficeImporterVelocityBridge
     {
         try {
             connect();
-            return xhtmlBuilder.build(officeFileStream, officeFileName, nameFactory
-                .createDocumentName(referenceDocument), filterStyles);
+            return xhtmlBuilder.build(officeFileStream, officeFileName,
+                documentReferenceFactory.createDocumentReference(referenceDocument), filterStyles);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -170,8 +170,8 @@ public class OfficeImporterVelocityBridge
      * </p>
      * 
      * @param xhtmlOfficeDocument {@link XHTMLOfficeDocument} to be imported.
-     * @return {@link XDOMOfficeDocument} containing {@link XDOM} result of the import operation or null if an error
-     *         occurs.
+     * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
+     *         operation or null if an error occurs.
      * @since 2.2M1
      */
     public XDOMOfficeDocument xhtmlToXDOM(XHTMLOfficeDocument xhtmlOfficeDocument)
@@ -197,8 +197,8 @@ public class OfficeImporterVelocityBridge
      *            the attachment URLs generated during the import process where all references to attachments will be
      *            calculated assuming that the attachments are contained on the reference document.
      * @param filterStyles whether to filter styling information associated with the office document's content or not.
-     * @return {@link XDOMOfficeDocument} containing {@link XDOM} result of the import operation or null if an error
-     *         occurs.
+     * @return {@link XDOMOfficeDocument} containing {@link org.xwiki.rendering.block.XDOM} result of the import
+     *         operation or null if an error occurs.
      * @since 2.2M1
      */
     public XDOMOfficeDocument officeToXDOM(InputStream officeFileStream, String officeFileName,
@@ -209,8 +209,8 @@ public class OfficeImporterVelocityBridge
             if (isPresentation(officeFileName)) {
                 return presentationBuilder.build(officeFileStream, officeFileName);
             } else {
-                return xdomBuilder.build(officeFileStream, officeFileName, nameFactory
-                    .createDocumentName(referenceDocument), filterStyles);
+                return xdomBuilder.build(officeFileStream, officeFileName,
+                    documentReferenceFactory.createDocumentReference(referenceDocument), filterStyles);
             }
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
@@ -224,29 +224,29 @@ public class OfficeImporterVelocityBridge
      * Splits the given {@link XDOMOfficeDocument} into multiple {@link XDOMOfficeDocument} instances according to the
      * specified criterion. This method is useful when a single office document has to be imported and split into
      * multiple wiki pages. An auto generated TOC structure will be returned associated to <b>rootDocumentName</b>
-     * {@link TargetPageDescriptor} entry.
+     * {@link org.xwiki.officeimporter.splitter.TargetDocumentDescriptor} entry.
      * </p>
      * 
      * @param xdomDocument {@link XDOMOfficeDocument} to be split.
      * @param headingLevels heading levels defining the split points on the original document.
      * @param namingCriterionHint hint indicating the child pages naming criterion.
      * @param rootDocumentName name of the root document w.r.t which splitting will occur. In the results set the entry
-     *            corresponding to <b>rootDocumentName</b> {@link TargetPageDescriptor} will hold an auto-generated TOC
-     *            structure.
-     * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetPageDescriptor}
+     *        corresponding to <b>rootDocumentName</b> {@link TargetDocumentDescriptor} will hold an auto-generated TOC
+     *        structure.
+     * @return a map holding {@link XDOMOfficeDocument} fragments against corresponding {@link TargetDocumentDescriptor}
      *         instances or null if an error occurs.
      * @since 2.2M1
      */
-    public Map<TargetPageDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument, String[] headingLevels,
-        String namingCriterionHint, String rootDocumentName)
+    public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomDocument,
+        String[] headingLevels, String namingCriterionHint, String rootDocumentName)
     {
         int[] splitLevels = new int[headingLevels.length];
         for (int i = 0; i < headingLevels.length; i++) {
             splitLevels[i] = Integer.parseInt(headingLevels[i]);
         }
         try {
-            return xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint, nameFactory
-                .createDocumentName(rootDocumentName));
+            return xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint,
+                documentReferenceFactory.createDocumentReference(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -271,11 +271,11 @@ public class OfficeImporterVelocityBridge
         boolean append)
     {
         try {
-            DocumentName docName = nameFactory.createDocumentName(target);
-            DocumentName parentName = nameFactory.createDocumentName(parent);
+            DocumentReference docReference = documentReferenceFactory.createDocumentReference(target);
+            DocumentReference parentReference = documentReferenceFactory.createDocumentReference(parent);
 
             // First check if the user has edit rights on the target document.
-            if (!docBridge.isDocumentEditable(docName)) {
+            if (!docBridge.isDocumentEditable(docReference)) {
                 String message = "You do not have edit rights on [%s] document.";
                 throw new OfficeImporterException(String.format(message, target));
             }
@@ -283,7 +283,7 @@ public class OfficeImporterVelocityBridge
             // Save.
             if (docBridge.exists(target) && append) {
                 // Check whether existing document's syntax is same as target syntax.
-                String currentSyntaxId = docBridge.getDocument(docName).getSyntaxId();
+                String currentSyntaxId = docBridge.getDocument(docReference).getSyntaxId();
                 if (!currentSyntaxId.equals(syntaxId)) {
                     String message =
                         "Target document [%s] exists but it's sytax [%s] is different from specified syntax [%s]";
@@ -301,7 +301,7 @@ public class OfficeImporterVelocityBridge
 
                 // Set parent if provided.
                 if (null != parent) {
-                    docBridge.getDocument(docName).setParent(parentName);
+                    docBridge.getDocument(docReference).setParent(parentReference);
                 }
 
                 // If no title is specified, try to extract one.
@@ -309,7 +309,7 @@ public class OfficeImporterVelocityBridge
 
                 // Set title if applicable.
                 if (null != docTitle) {
-                    docBridge.getDocument(docName).setTitle(docTitle);
+                    docBridge.getDocument(docReference).setTitle(docTitle);
                 }
             }
 
@@ -429,7 +429,7 @@ public class OfficeImporterVelocityBridge
      */
     private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException
     {
-        if (!docBridge.isDocumentEditable(nameFactory.createDocumentName(targetDocument))) {
+        if (!docBridge.isDocumentEditable(documentReferenceFactory.createDocumentReference(targetDocument))) {
             throw new OfficeImporterException("Inadequate privileges.");
         } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
             throw new OfficeImporterException("The target document " + targetDocument + " already exists.");

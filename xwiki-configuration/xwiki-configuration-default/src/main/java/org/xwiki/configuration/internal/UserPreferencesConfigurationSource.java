@@ -20,6 +20,7 @@
 package org.xwiki.configuration.internal;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Configuration source taking its data in the User Preferences wiki document
@@ -41,8 +42,12 @@ public class UserPreferencesConfigurationSource  extends AbstractDocumentConfigu
     }
 
     @Override
-    protected String getDocumentName()
+    protected DocumentReference getDocumentReference()
     {
-        return getDocumentAccessBridge().getCurrentUser();
+        // TODO: Not enabled yet. In order to enable it we need to make modifications so that
+        // DAB.getCurrentUser() returns a DocumentReference and not a String as otherwise it will create
+        // a stackoverflow (circular dependency): in order to create a DocumentReference we would need to
+        // use a factory which would need to use this configuration source.
+        return null;
     }
 }

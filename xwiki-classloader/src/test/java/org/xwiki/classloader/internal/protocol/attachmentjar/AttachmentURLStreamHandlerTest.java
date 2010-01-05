@@ -30,11 +30,12 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.model.AttachmentName;
-import org.xwiki.model.AttachmentNameFactory;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -47,7 +48,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
 {
     private Mockery mockery = new Mockery();
     
-    private AttachmentNameFactory anf;
+    private AttachmentReferenceFactory arf;
     private DocumentAccessBridge dab;
     
     private ExtendedURLStreamHandler handler;
@@ -57,11 +58,12 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
     {
         super.registerComponents();
 
-        this.anf = this.mockery.mock(AttachmentNameFactory.class);
-        DefaultComponentDescriptor<AttachmentNameFactory> descriptorANF =
-            new DefaultComponentDescriptor<AttachmentNameFactory>();
-        descriptorANF.setRole(AttachmentNameFactory.class);
-        getComponentManager().registerComponent(descriptorANF, this.anf);
+        this.arf = this.mockery.mock(AttachmentReferenceFactory.class);
+        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
+        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        descriptorARF.setRoleHint("current");
+        getComponentManager().registerComponent(descriptorARF, this.arf);
 
         this.dab = this.mockery.mock(DocumentAccessBridge.class);
         DefaultComponentDescriptor<DocumentAccessBridge> descriptorDAB =
@@ -91,10 +93,11 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
     {
         URL url = new URL(null, "attachmentjar://Space.Page@filename", (URLStreamHandler) this.handler);
         
-        final AttachmentName attachmentName = new AttachmentName("wiki", "space", "page", "filename");
+        final AttachmentReference attachmentReference = new AttachmentReference("filename",
+            new DocumentReference("wiki", "space", "page"));
         mockery.checking(new Expectations() {{
-            oneOf(anf).createAttachmentName("Space.Page@filename"); will(returnValue(attachmentName));
-            oneOf(dab).getAttachmentContent(attachmentName); 
+            oneOf(arf).createAttachmentReference("Space.Page@filename"); will(returnValue(attachmentReference));
+            oneOf(dab).getAttachmentContent(attachmentReference);
                 will(returnValue(new ByteArrayInputStream("content".getBytes())));
         }});
         
@@ -120,7 +123,7 @@ public class AttachmentURLStreamHandlerTest extends AbstractComponentTestCase
         URL url = new URL(null, "attachmentjar://some%20page", (URLStreamHandler) this.handler);
         
         mockery.checking(new Expectations() {{
-            oneOf(anf).createAttachmentName("some page");
+            oneOf(arf).createAttachmentReference("some page");
         }});
         
         url.openConnection();

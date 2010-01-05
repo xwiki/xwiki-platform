@@ -28,7 +28,6 @@ import junit.framework.Assert;
 
 import org.jmock.Expectations;
 import org.junit.Before;
-import org.junit.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -70,7 +69,7 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
      * 
      * @throws Exception
      */
-    @Test
+    @org.junit.Test
     public void testPresentationBuilding() throws  Exception
     {
         // Create & register a mock document converter to by-pass openoffice server.
@@ -80,8 +79,8 @@ public class DefaultPresentationBuilderTest extends AbstractOfficeImporterTest
         final Map<String, byte[]> mockOutput = new HashMap<String, byte[]>();
         mockOutput.put("output.html", "<html><head><title></tile></head><body><p>Slide1</p></body></html>".getBytes());
 
-        final OpenOfficeConverter mockDocumentConverter = this.context.mock(OpenOfficeConverter.class);
-        this.context.checking(new Expectations() {{
+        final OpenOfficeConverter mockDocumentConverter = this.mockery.mock(OpenOfficeConverter.class);
+        this.mockery.checking(new Expectations() {{
                 allowing(mockDocumentConverter).convert(mockInput, "input.ppt", "output.html");
                 will(returnValue(mockOutput));
         }});

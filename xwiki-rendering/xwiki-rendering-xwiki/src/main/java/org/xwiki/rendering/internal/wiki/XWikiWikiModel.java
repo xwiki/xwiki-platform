@@ -24,11 +24,10 @@ import java.net.URLEncoder;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.DocumentName;
-import org.xwiki.model.DocumentNameSerializer;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.Model;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.wiki.WikiModel;
 
 /**
@@ -44,10 +43,7 @@ public class XWikiWikiModel implements WikiModel
     private DocumentAccessBridge documentAccessBridge;
 
     @Requirement
-    private DocumentNameSerializer documentNameSerializer;
-
-    @Requirement
-    private Model model;
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
      * {@inheritDoc}
@@ -86,20 +82,20 @@ public class XWikiWikiModel implements WikiModel
         // the new document is created with the current page as its parent.
         String modifiedQueryString = queryString;
         if (StringUtils.isBlank(queryString)) {
-            DocumentName name = this.model.getCurrentDocumentName();
-            if (name != null) {
+            DocumentReference reference = this.documentAccessBridge.getCurrentDocumentReference();
+            if (reference != null) {
                 try {
                     // Note: we encode using UTF8 since it's the W3C recommendation.
                     // See http://www.w3.org/TR/html40/appendix/notes.html#non-ascii-chars
                     // TODO: Once the xwiki-url module is usable, refactor this code to use it and remove the need to
                     // perform explicit encoding here.
                     modifiedQueryString = 
-                        "parent=" + URLEncoder.encode(this.documentNameSerializer.serialize(name), "UTF-8");
+                        "parent=" + URLEncoder.encode(this.entityReferenceSerializer.serialize(reference), "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     // Not supporting UTF-8 as a valid encoding for some reasons. We consider XWiki cannot work
                     // without that encoding.
-                    throw new RuntimeException("Failed to URL encode [" + this.documentNameSerializer.serialize(name) 
-                        + "] using UTF-8.", e);
+                    throw new RuntimeException("Failed to URL encode [" + this.entityReferenceSerializer.serialize(
+                        reference) + "] using UTF-8.", e);
                 }
             }
         }

@@ -90,10 +90,14 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             gcontext.put("xwiki", new XWiki(context.getWiki(), context));
             gcontext.put("request", context.getRequest());
             gcontext.put("response", context.getResponse());
-            gcontext.put("xcontext", new Context(context));
-            // We want to provide backward compatibility by supporting 'context'
-            // Everyone should be moving to xcontext
-            gcontext.put("context", new Context(context));
+
+            // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
+            // which is for internal use only. In this manner we control what the user can access.
+            // "context" binding is deprecated since 1.9.1
+            Context apiContext = new Context(context);
+            gcontext.put("context", apiContext);
+            gcontext.put("xcontext", apiContext);
+
             gcontext.put("util", new Util(context.getWiki(), context));
 
             // Put the Groovy Context in the context

@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceNormalizer;
+import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceFactory;
 
 /**
  * Transforms an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference
@@ -34,15 +34,15 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceNormalizer;
  * @version $Id$
  * @since 2.2M1
  */
-@Component("current")
-public class CurrentEntityReferenceNormalizer extends DefaultEntityReferenceNormalizer
+@Component("current/reference")
+public class CurrentReferenceEntityReferenceFactory extends DefaultReferenceEntityReferenceFactory
 {
     @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
-     * @see DefaultEntityReferenceNormalizer#getDefaultReferenceName(org.xwiki.model.EntityType)
+     * @see DefaultReferenceEntityReferenceFactory#getDefaultReferenceName(org.xwiki.model.EntityType)
      */
     @Override protected String getDefaultReferenceName(EntityType type)
     {

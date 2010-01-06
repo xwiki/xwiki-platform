@@ -25,10 +25,11 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceNormalizer;
+import org.xwiki.model.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +41,8 @@ import java.util.Map;
  * @version $Id$
  * @since 2.2M1
  */
-@Component
-public class DefaultEntityReferenceNormalizer implements EntityReferenceNormalizer
+@Component("default/reference")
+public class DefaultReferenceEntityReferenceFactory implements EntityReferenceFactory<EntityReference>
 {
     @Requirement
     private ModelConfiguration configuration;
@@ -50,39 +51,58 @@ public class DefaultEntityReferenceNormalizer implements EntityReferenceNormaliz
         put(EntityType.ATTACHMENT, Arrays.asList(EntityType.DOCUMENT));
         put(EntityType.DOCUMENT, Arrays.asList(EntityType.SPACE));
         put(EntityType.SPACE, Arrays.asList(EntityType.WIKI, EntityType.SPACE));
+        put(EntityType.WIKI, Collections.<EntityType>emptyList());
     }};
 
     /**
      * {@inheritDoc}
-     * @see EntityReferenceNormalizer#normalize(EntityReference)
+     * @see EntityReferenceFactory#createEntityReference(Object, org.xwiki.model.EntityType)
      * @throws InvalidEntityReferenceException if the passed reference to normalize is invalid (for example if the
-     *         parent references are out of order) 
+     *         parent references are out of order)
      */
-    public void normalize(EntityReference referenceToNormalize)
+    public EntityReference createEntityReference(EntityReference referenceToResolve, EntityType type)
     {
-        // Check all references and parent references which have a NULL name and replace them with default values
-        EntityReference reference = referenceToNormalize;
+        EntityReference normalizedReference;
+
+        // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
+        // reference.
+        if (type.ordinal() > referenceToResolve.getType().ordinal()) {
+            normalizedReference = new EntityReference(null, type, referenceToResolve.clone());
+        } else {
+            normalizedReference = referenceToResolve.clone();
+        }
+
+        // Check all references and parent references which have a NULL name and replace them with default values.
+        // In addition insert references where needed.
+        EntityReference reference = normalizedReference;
         while (reference != null) {
             if (StringUtils.isEmpty(reference.getName())) {
                 reference.setName(getDefaultReferenceName(reference.getType()));
             }
             // If the parent reference isn't the allowed parent then insert an allowed reference
-            List<EntityType> types = nextAllowedEntityTypes.get(reference.getType());
-            if (reference.getParent() != null && types != null && !types.contains(reference.getParent().getType())) {
+            List<EntityType> types = this.nextAllowedEntityTypes.get(reference.getType());
+            if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
                 EntityReference newReference = new EntityReference(
                     getDefaultReferenceName(types.get(0)), types.get(0), reference.getParent());
                 reference.setParent(newReference);
-            } else if (reference.getParent() == null && types != null) {
+            } else if (reference.getParent() == null && !types.isEmpty()) {
                 // The top reference isn't the allowed top level reference, add a parent reference
                 EntityReference newReference = new EntityReference(
                     getDefaultReferenceName(types.get(0)), types.get(0));
                 reference.setParent(newReference);
-            } else if (reference.getParent() != null && types == null) {
+            } else if (reference.getParent() != null && types.isEmpty()) {
                 // There's a parent but not of the correct type... it means the reference is invalid
-                throw new InvalidEntityReferenceException("Invalid reference [" + referenceToNormalize + "]");
+                throw new InvalidEntityReferenceException("Invalid reference [" + referenceToResolve + "]");
             }
             reference = reference.getParent();
         }
+
+        // If the passed type is a subtype of the reference to resolve's type then we extract the reference.
+        if (type.ordinal() < referenceToResolve.getType().ordinal()) {
+            normalizedReference = normalizedReference.extractReference(type);
+        }
+
+        return normalizedReference;
     }
 
     protected String getDefaultReferenceName(EntityType type)

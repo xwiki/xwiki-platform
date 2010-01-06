@@ -27,6 +27,9 @@ package org.xwiki.model;
  */
 public enum EntityType
 {
+    // Note that order below is important since it creates an order.
+    // For example: EntityType.WIKI.ordinal() < EntityType.SPACE.ordinal()
+
     /**
      * Represents a Wiki Entity.
      */

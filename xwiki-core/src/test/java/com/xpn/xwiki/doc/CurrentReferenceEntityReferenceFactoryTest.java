@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.doc;
 
 import com.xpn.xwiki.XWikiContext;
@@ -7,10 +26,16 @@ import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceNormalizer;
+import org.xwiki.model.reference.EntityReferenceFactory;
 import org.xwiki.test.AbstractComponentTestCase;
 
-public class CurrentEntityReferenceNormalizerTest extends AbstractComponentTestCase
+/**
+ * Unit tests for {@link com.xpn.xwiki.doc.CurrentReferenceEntityReferenceFactory}.
+ * 
+ * @version $Id$
+ * @since 2.2M1
+ */
+public class CurrentReferenceEntityReferenceFactoryTest extends AbstractComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -18,7 +43,7 @@ public class CurrentEntityReferenceNormalizerTest extends AbstractComponentTestC
 
     private static final String CURRENT_PAGE = "currentpage";
 
-    private EntityReferenceNormalizer normalizer;
+    private EntityReferenceFactory<EntityReference> factory;
 
     private XWikiContext context;
 
@@ -33,14 +58,14 @@ public class CurrentEntityReferenceNormalizerTest extends AbstractComponentTestC
         execution.getContext().setProperty("xwikicontext", this.context);
         Utils.setComponentManager(getComponentManager());
 
-        this.normalizer = getComponentManager().lookup(EntityReferenceNormalizer.class, "current");
+        this.factory = getComponentManager().lookup(EntityReferenceFactory.class, "current/reference");
     }
 
     @org.junit.Test
     public void testNormalizeAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
-        EntityReference reference = new EntityReference("filename", EntityType.ATTACHMENT);
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(
+            new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
         Assert.assertEquals("Main", reference.getParent().getParent().getName());
@@ -54,8 +79,8 @@ public class CurrentEntityReferenceNormalizerTest extends AbstractComponentTestC
     {
         this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
 
-        EntityReference reference = new EntityReference("filename", EntityType.ATTACHMENT);
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(
+            new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
         Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
         Assert.assertEquals(CURRENT_SPACE, reference.getParent().getParent().getName());

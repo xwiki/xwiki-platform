@@ -28,18 +28,18 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceNormalizer;
+import org.xwiki.model.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 /**
- * Unit tests for {@link DefaultEntityReferenceNormalizer}.
+ * Unit tests for {@link DefaultReferenceEntityReferenceFactory}.
  *
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultEntityReferenceNormalizerTest
+public class DefaultReferenceEntityReferenceFactoryTest
 {
-    private EntityReferenceNormalizer normalizer;
+    private EntityReferenceFactory<EntityReference> factory;
 
     private ModelConfiguration mockModelConfiguration;
 
@@ -48,9 +48,9 @@ public class DefaultEntityReferenceNormalizerTest
     @Before
     public void setUp()
     {
-        this.normalizer = new DefaultEntityReferenceNormalizer();
+        this.factory = new DefaultReferenceEntityReferenceFactory();
         this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.normalizer, "configuration", this.mockModelConfiguration);
+        ReflectionUtils.setFieldValue(this.factory, "configuration", this.mockModelConfiguration);
 
         this.mockery.checking(new Expectations() {{
             allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE); will(returnValue("defspace"));
@@ -60,10 +60,10 @@ public class DefaultEntityReferenceNormalizerTest
     }
 
     @Test
-    public void testNormalizeDocumentReferenceWhenMissingParents()
+    public void testCreateDocumentReferenceWhenMissingParents()
     {
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT);
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT),
+            EntityType.DOCUMENT);
         Assert.assertEquals("defspace", reference.getParent().getName());
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
         Assert.assertEquals("defwiki", reference.getParent().getParent().getName());
@@ -71,10 +71,10 @@ public class DefaultEntityReferenceNormalizerTest
     }
 
     @Test
-    public void testNormalizeAttachmentReferenceWhenMissingParents()
+    public void testCreateAttachmentReferenceWhenMissingParents()
     {
-        EntityReference reference = new EntityReference("filename", EntityType.ATTACHMENT);
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(
+            new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
         Assert.assertEquals("defpage", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
         Assert.assertEquals("defspace", reference.getParent().getParent().getName());
@@ -84,10 +84,10 @@ public class DefaultEntityReferenceNormalizerTest
     }
 
     @Test
-    public void testNormalizeDocumentReferenceWhenThereAreNullNames()
+    public void testCreateDocumentReferenceWhenThereAreNullNames()
     {
-        EntityReference reference = new EntityReference(null, EntityType.DOCUMENT);
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(new EntityReference(null, EntityType.DOCUMENT),
+            EntityType.DOCUMENT);
         Assert.assertEquals("defpage", reference.getName());
         Assert.assertEquals("defspace", reference.getParent().getName());
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
@@ -96,11 +96,10 @@ public class DefaultEntityReferenceNormalizerTest
     }
 
     @Test
-    public void testNormalizeDocumentReferenceWhenMissingParentBetweenReferences()
+    public void testCreateDocumentReferenceWhenMissingParentBetweenReferences()
     {
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("wiki", EntityType.WIKI));
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT,
+            new EntityReference("wiki", EntityType.WIKI)), EntityType.DOCUMENT);
         Assert.assertEquals("defspace", reference.getParent().getName());
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
         Assert.assertEquals("wiki", reference.getParent().getParent().getName());
@@ -108,11 +107,11 @@ public class DefaultEntityReferenceNormalizerTest
     }
 
     @Test
-    public void testNormalizeAttachmentReferenceWhenMissingParentBetweenReferences()
+    public void testCreateAttachmentReferenceWhenMissingParentBetweenReferences()
     {
-        EntityReference reference = new EntityReference("filename", EntityType.ATTACHMENT,
-            new EntityReference("wiki", EntityType.WIKI));
-        normalizer.normalize(reference);
+        EntityReference reference = factory.createEntityReference(
+            new EntityReference("filename", EntityType.ATTACHMENT, new EntityReference("wiki", EntityType.WIKI)),
+            EntityType.ATTACHMENT);
         Assert.assertEquals("defpage", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
         Assert.assertEquals("defspace", reference.getParent().getParent().getName());
@@ -122,18 +121,39 @@ public class DefaultEntityReferenceNormalizerTest
     }
 
     @Test
-    public void testNormalizeWhenInvalidReference()
+    public void testCreateDocumentReferenceWhenInvalidReference()
     {
-        EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
-            new EntityReference("filename", EntityType.ATTACHMENT));
         try {
-            normalizer.normalize(reference);
+            factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT,
+                new EntityReference("filename", EntityType.ATTACHMENT)), EntityType.DOCUMENT);
             Assert.fail("Should have thrown an exception here");
         } catch (InvalidEntityReferenceException expected) {
-            Assert.assertEquals("Invalid reference [name = [page], type = [DOCUMENT], parent = [name = [defspace], "
-                + "type = [SPACE], parent = [name = [defwiki], type = [WIKI], parent = [name = [filename], "
-                + "type = [ATTACHMENT], parent = [null]]]]]", expected.getMessage());            
+            Assert.assertEquals("Invalid reference [name = [page], type = [DOCUMENT], parent = [name = [filename], "
+                + "type = [ATTACHMENT], parent = [null]]]", expected.getMessage());            
         }
-        
+    }
+
+    @Test
+    public void testCreateDocumentReferenceWhenTypeIsSpace()
+    {
+        EntityReference reference = factory.createEntityReference(new EntityReference("space", EntityType.SPACE),
+            EntityType.DOCUMENT);
+        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
+        Assert.assertEquals("defpage", reference.getName());
+        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
+        Assert.assertEquals("space", reference.getParent().getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+        Assert.assertEquals("defwiki", reference.getParent().getParent().getName());
+    }
+
+    @Test
+    public void testCreateSpaceReferenceWhenTypeIsDocument()
+    {
+        EntityReference reference = factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT),
+            EntityType.SPACE);
+        Assert.assertEquals(EntityType.SPACE, reference.getType());
+        Assert.assertEquals("defspace", reference.getName());
+        Assert.assertEquals(EntityType.WIKI, reference.getParent().getType());
+        Assert.assertEquals("defwiki", reference.getParent().getName());
     }
 }

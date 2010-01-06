@@ -55,9 +55,10 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceFactory;
-import org.xwiki.model.reference.EntityReferenceNormalizer;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -118,8 +119,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
-    private EntityReferenceNormalizer currentEntityReferenceNormalizer =
-        Utils.getComponent(EntityReferenceNormalizer.class, "current");
+    private DocumentReferenceFactory<EntityReference> currentReferenceDocumentReferenceFactory =
+        Utils.getComponent(DocumentReferenceFactory.class, "current/reference");
 
     /**
      * QueryManager for this store.
@@ -2337,9 +2338,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Construct a reference, using the current wiki as the wiki reference name
             DocumentReference reference = new DocumentReference((String) result[1],
                 new SpaceReference((String) result[0], (WikiReference) null));
-            // Normalize it to make it a valid reference since it's missing the wiki part
-            this.currentEntityReferenceNormalizer.normalize(reference);
-            documentReferences.add(reference);
+            // Resolve it to make it a valid reference since it's missing the wiki part
+            documentReferences.add(this.currentReferenceDocumentReferenceFactory.createDocumentReference(reference));
         }
         return documentReferences;
     }

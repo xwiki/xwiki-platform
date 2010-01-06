@@ -173,9 +173,15 @@ public class EntityReference implements Serializable, Cloneable
      *
      * @see Object#clone() 
      */
-    @Override protected EntityReference clone() throws CloneNotSupportedException
+    @Override public EntityReference clone()
     {
-        EntityReference reference = (EntityReference) super.clone();
+        EntityReference reference;
+        try {
+            reference = (EntityReference) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // Should never happen
+            throw new RuntimeException("Failed to clone object", e);
+        }
         reference.setName(getName());
         reference.setType(getType());
         if (getParent() != null) {

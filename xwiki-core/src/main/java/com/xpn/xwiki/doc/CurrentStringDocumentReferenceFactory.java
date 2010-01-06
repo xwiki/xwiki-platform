@@ -17,33 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference;
+package com.xpn.xwiki.doc;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceFactory;
 
 /**
- * Generic implementation that create {@link org.xwiki.model.reference.EntityReference} objects from their string
- * representation. This implementation uses fixed default values when parts of the Reference are missing in the string
- * representation. Default values are retrieved from the {@link org.xwiki.model.ModelConfiguration} class.  
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceFactory} which can be considered a helper
+ * component to create {@link DocumentReference} objects from their string representation. This implementation
+ * uses values from the current document reference in the context when parts of the Reference are missing in the string
+ * representation. 
  *
  * @version $Id$
  * @since 2.2M1
  */
-@Component
-public class DefaultEntityReferenceFactory extends AbstractEntityReferenceFactory
+@Component("current")
+public class CurrentStringDocumentReferenceFactory implements DocumentReferenceFactory<String>
 {
-    @Requirement
-    private ModelConfiguration configuration;
+    @Requirement("current")
+    private EntityReferenceFactory entityReferenceFactory;
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractEntityReferenceFactory#getDefaultValuesForType(org.xwiki.model.EntityType) 
-     */
-    protected String getDefaultValuesForType(EntityType type)
+    public DocumentReference createDocumentReference(String documentReferenceRepresentation)
     {
-        return this.configuration.getDefaultReferenceName(type);
+        return new DocumentReference(this.entityReferenceFactory.createEntityReference(
+            documentReferenceRepresentation, EntityType.DOCUMENT));
     }
 }

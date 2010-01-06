@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.doc;
 
-import org.xwiki.model.internal.reference.DefaultEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReference;
  * @since 2.2M1
  */
 @Component("compact")
-public class CompactEntityReferenceSerializer extends DefaultEntityReferenceSerializer
+public class CompactStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
     /**
      * Execution context handler, needed for accessing the XWikiContext.
@@ -46,7 +46,7 @@ public class CompactEntityReferenceSerializer extends DefaultEntityReferenceSeri
 
     /**
      * {@inheritDoc}
-     * @see DefaultEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
+     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
      */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation)

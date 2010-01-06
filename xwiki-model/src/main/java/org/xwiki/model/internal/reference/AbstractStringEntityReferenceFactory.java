@@ -36,7 +36,7 @@ import java.util.Map;
  * @version $Id$
  * @since 2.2M1
  */
-public abstract class AbstractEntityReferenceFactory implements EntityReferenceFactory<String>
+public abstract class AbstractStringEntityReferenceFactory implements EntityReferenceFactory<String>
 {
     private Map<EntityType, List<Character>> separators = new HashMap<EntityType, List<Character>>() {{
         put(EntityType.DOCUMENT, Arrays.asList('.', ':'));

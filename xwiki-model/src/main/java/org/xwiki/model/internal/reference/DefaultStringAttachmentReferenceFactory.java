@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReferenceFactory;
  * @since 2.2M1
  */
 @Component
-public class DefaultAttachmentReferenceFactory implements AttachmentReferenceFactory<String>
+public class DefaultStringAttachmentReferenceFactory implements AttachmentReferenceFactory<String>
 {
     @Requirement
     private EntityReferenceFactory<String> entityReferenceFactory;

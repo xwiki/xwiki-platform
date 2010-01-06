@@ -32,12 +32,12 @@ import org.xwiki.model.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
- * Unit tests for {@link DefaultEntityReferenceSerializer}.
+ * Unit tests for {@link DefaultStringEntityReferenceSerializer}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultEntityReferenceSerializerTest
+public class DefaultStringEntityReferenceSerializerTest
 {
     private static final String DEFAULT_WIKI = "xwiki";
 
@@ -58,9 +58,9 @@ public class DefaultEntityReferenceSerializerTest
     @Before
     public void setUp()
     {
-        this.serializer = new DefaultEntityReferenceSerializer();
+        this.serializer = new DefaultStringEntityReferenceSerializer();
         
-        this.factory = new DefaultEntityReferenceFactory();
+        this.factory = new DefaultStringEntityReferenceFactory();
         this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
         ReflectionUtils.setFieldValue(this.factory, "configuration", this.mockModelConfiguration);
 

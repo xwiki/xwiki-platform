@@ -30,7 +30,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link CompactWikiEntityReferenceSerializer}.
+ * Unit tests for {@link CompactWikiStringEntityReferenceSerializer}.
  *
  * @version $Id$
  * @since 2.2M1

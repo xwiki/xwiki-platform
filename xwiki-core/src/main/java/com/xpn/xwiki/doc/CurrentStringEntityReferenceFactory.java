@@ -24,7 +24,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceFactory;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceFactory;
 
 /**
  * Generic implementation that create {@link org.xwiki.model.reference.EntityReference} objects from their string
@@ -35,14 +35,14 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceFactory;
  * @since 2.2M1
  */
 @Component("current")
-public class CurrentEntityReferenceFactory extends DefaultEntityReferenceFactory
+public class CurrentStringEntityReferenceFactory extends DefaultStringEntityReferenceFactory
 {
     @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
-     * @see DefaultEntityReferenceFactory#getDefaultValuesForType(org.xwiki.model.EntityType) 
+     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceFactory#getDefaultValuesForType(org.xwiki.model.EntityType)
      */
     protected String getDefaultValuesForType(EntityType type)
     {

@@ -36,7 +36,7 @@ import org.xwiki.model.reference.EntityReferenceFactory;
  * @since 2.2M1
  */
 @Component
-public class DefaultDocumentReferenceFactory implements DocumentReferenceFactory<String>
+public class DefaultStringDocumentReferenceFactory implements DocumentReferenceFactory<String>
 {
     @Requirement
     private EntityReferenceFactory<String> entityReferenceFactory;

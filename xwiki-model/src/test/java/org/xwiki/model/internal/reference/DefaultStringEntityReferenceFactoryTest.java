@@ -31,12 +31,12 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceFactory;
 
 /**
- * Unit tests for {@link DefaultEntityReferenceFactory}.
+ * Unit tests for {@link DefaultStringEntityReferenceFactory}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultEntityReferenceFactoryTest
+public class DefaultStringEntityReferenceFactoryTest
 {
     private static final String DEFAULT_WIKI = "xwiki";
     
@@ -55,7 +55,7 @@ public class DefaultEntityReferenceFactoryTest
     @Before
     public void setUp()
     {
-        this.factory = new DefaultEntityReferenceFactory();
+        this.factory = new DefaultStringEntityReferenceFactory();
         this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
         ReflectionUtils.setFieldValue(this.factory, "configuration", this.mockModelConfiguration);
         

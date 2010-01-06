@@ -31,7 +31,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.doc.CurrentEntityReferenceFactory}.
+ * Unit tests for {@link CurrentStringEntityReferenceFactory}.
  * 
  * @version $Id$
  * @since 2.2M1

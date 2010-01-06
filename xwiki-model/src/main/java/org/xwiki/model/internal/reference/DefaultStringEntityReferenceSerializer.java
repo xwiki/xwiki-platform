@@ -38,7 +38,7 @@ import java.util.Map;
  * @since 2.2M1
  */
 @Component
-public class DefaultEntityReferenceSerializer implements EntityReferenceSerializer<String>
+public class DefaultStringEntityReferenceSerializer implements EntityReferenceSerializer<String>
 {
     private Map<EntityType, List<String>> escapes = new HashMap<EntityType, List<String>>() {{
         put(EntityType.ATTACHMENT, Arrays.asList("@"));

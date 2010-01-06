@@ -34,8 +34,8 @@ public interface EntityReferenceFactory<T>
 {
     /**
      * @param entityReferenceRepresentation the representation of an entity reference (eg as a String)
-     * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc)
-     * @return the resolved object
+     * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc) to extract from the source
+     * @return the resolved reference as an Object
      */
     EntityReference createEntityReference(T entityReferenceRepresentation, EntityType type);
 }

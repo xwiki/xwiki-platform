@@ -23,7 +23,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceSerializer;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReference;
 
 /**
@@ -34,14 +34,14 @@ import org.xwiki.model.reference.EntityReference;
  * @since 2.2M1
  */
 @Component("compactwiki")
-public class CompactWikiEntityReferenceSerializer extends DefaultEntityReferenceSerializer
+public class CompactWikiStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
     @Requirement
     private ModelContext modelContext;
 
     /**
      * {@inheritDoc}
-     * @see DefaultEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
+     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
      */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation)

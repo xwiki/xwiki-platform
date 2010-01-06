@@ -17,25 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.reference;
+package org.xwiki.model.internal.reference;
 
-import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelConfiguration;
 
 /**
- * Transforms an Entity reference defined in a given representation into an {@link EntityReference} object.
+ * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
+ * representation. This implementation uses fixed default values when parts of the Reference are missing in the string
+ * representation. Default values are retrieved from the {@link org.xwiki.model.ModelConfiguration} class.  
  *
- * @param <T> the object to transform into an Entity Reference
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentRole
-public interface EntityReferenceFactory<T>
+@Component
+public class DefaultStringEntityReferenceResolver extends AbstractStringEntityReferenceResolver
 {
+    @Requirement
+    private ModelConfiguration configuration;
+
     /**
-     * @param entityReferenceRepresentation the representation of an entity reference (eg as a String)
-     * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc) to extract from the source
-     * @return the resolved reference as an Object
+     * {@inheritDoc}
+     * @see AbstractStringEntityReferenceResolver#getDefaultValuesForType(org.xwiki.model.EntityType)
      */
-    EntityReference createEntityReference(T entityReferenceRepresentation, EntityType type);
+    protected String getDefaultValuesForType(EntityType type)
+    {
+        return this.configuration.getDefaultReferenceName(type);
+    }
 }

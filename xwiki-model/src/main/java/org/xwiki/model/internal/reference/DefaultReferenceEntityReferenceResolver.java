@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 import java.util.Arrays;
@@ -35,14 +35,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Transforms an {@link EntityReference} into a valid and absolute reference (with all required parents filled in).
+ * Resolve an {@link EntityReference} into a valid and absolute reference (with all required parents filled in).
  * This implementation uses fixed default values when parts of the Reference are missing.
  *
  * @version $Id$
  * @since 2.2M1
  */
 @Component("default/reference")
-public class DefaultReferenceEntityReferenceFactory implements EntityReferenceFactory<EntityReference>
+public class DefaultReferenceEntityReferenceResolver implements EntityReferenceResolver<EntityReference>
 {
     @Requirement
     private ModelConfiguration configuration;
@@ -56,11 +56,11 @@ public class DefaultReferenceEntityReferenceFactory implements EntityReferenceFa
 
     /**
      * {@inheritDoc}
-     * @see EntityReferenceFactory#createEntityReference(Object, org.xwiki.model.EntityType)
+     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve(Object, org.xwiki.model.EntityType)
      * @throws InvalidEntityReferenceException if the passed reference to normalize is invalid (for example if the
      *         parent references are out of order)
      */
-    public EntityReference createEntityReference(EntityReference referenceToResolve, EntityType type)
+    public EntityReference resolve(EntityReference referenceToResolve, EntityType type)
     {
         EntityReference normalizedReference;
 

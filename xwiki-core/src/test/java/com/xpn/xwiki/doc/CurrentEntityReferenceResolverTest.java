@@ -25,16 +25,16 @@ import org.junit.*;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link CurrentStringEntityReferenceFactory}.
+ * Unit tests for {@link CurrentStringEntityReferenceResolver}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class CurrentEntityReferenceFactoryTest extends AbstractComponentTestCase
+public class CurrentEntityReferenceResolverTest extends AbstractComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -42,7 +42,7 @@ public class CurrentEntityReferenceFactoryTest extends AbstractComponentTestCase
 
     private static final String CURRENT_PAGE = "currentpage";
 
-    private EntityReferenceFactory factory;
+    private EntityReferenceResolver resolver;
 
     private XWikiContext context;
 
@@ -57,35 +57,35 @@ public class CurrentEntityReferenceFactoryTest extends AbstractComponentTestCase
         execution.getContext().setProperty("xwikicontext", this.context);
         Utils.setComponentManager(getComponentManager());
         
-        this.factory = getComponentManager().lookup(EntityReferenceFactory.class, "current");
+        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current");
     }
 
     @org.junit.Test
-    public void testCreateDocumentReferenceWhenNoContextDocument() throws Exception
+    public void testResolveDocumentReferenceWhenNoContextDocument() throws Exception
     {
-        EntityReference reference = factory.createEntityReference("", EntityType.DOCUMENT);
+        EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("Main", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("WebHome", reference.getName());
     }
 
     @org.junit.Test
-    public void testCreateDocumentReferenceWhenContextDocument() throws Exception
+    public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
         this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
 
-        EntityReference reference = factory.createEntityReference("", EntityType.DOCUMENT);
+        EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(CURRENT_PAGE, reference.getName());
     }
 
     @org.junit.Test
-    public void testCreateAttachmentReference() throws Exception
+    public void testResolveAttachmentReference() throws Exception
     {
         this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
 
-        EntityReference reference = factory.createEntityReference("", EntityType.ATTACHMENT);
+        EntityReference reference = resolver.resolve("", EntityType.ATTACHMENT);
         Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(CURRENT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());

@@ -28,7 +28,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLClassLoader;
 import org.xwiki.classloader.URIClassLoader;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.rendering.internal.macro.script.AttachmentClassLoaderFactory;
 import org.xwiki.rendering.internal.macro.script.DefaultAttachmentClassLoaderFactory;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -45,7 +45,7 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     
     private AttachmentClassLoaderFactory factory;
     
-    private AttachmentReferenceFactory arf;
+    private AttachmentReferenceResolver arf;
     
     private DocumentAccessBridge dab;
 
@@ -54,10 +54,10 @@ public class DefaultAttachmentClassLoaderFactoryTest extends AbstractComponentTe
     {
         super.registerComponents();
 
-        this.arf = this.mockery.mock(AttachmentReferenceFactory.class);
-        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
-        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        this.arf = this.mockery.mock(AttachmentReferenceResolver.class);
+        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
+        descriptorARF.setRole(AttachmentReferenceResolver.class);
         descriptorARF.setRoleHint("current");
         getComponentManager().registerComponent(descriptorARF, this.arf);
 

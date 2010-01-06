@@ -20,20 +20,24 @@
 package org.xwiki.model.reference;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.EntityType;
 
 /**
- * Transforms a Document reference defined in a given representation into a {@link DocumentReference} object.
+ * Resolve an Entity reference defined in a given representation into a validated {@link EntityReference} object,
+ * ie with valid values and a valid hierarchy (eg a Document reference must have a parent which is a space reference,
+ * reference values must not be null, etc).
  *
+ * @param <T> the object to resolve into an Entity Reference
  * @version $Id$
  * @since 2.2M1
- * @param <T> the type of the representation (eg a String)
  */
 @ComponentRole
-public interface DocumentReferenceFactory<T>
+public interface EntityReferenceResolver<T>
 {
     /**
-     * @param documentReferenceRepresentation the representation of a document reference (eg as a String)
-     * @return the resolved object
+     * @param entityReferenceRepresentation the representation of an entity reference (eg as a String)
+     * @param type the type of the Entity (Document, Space, Attachment, Wiki, etc) to resolve out of the representation
+     * @return the valid resolved reference as an Object
      */
-    DocumentReference createDocumentReference(T documentReferenceRepresentation);
+    EntityReference resolve(T entityReferenceRepresentation, EntityType type);
 }

@@ -75,7 +75,7 @@ public interface DocumentAccessBridge
      *
      * @param documentName the name of the document for which to return name information
      * @return the document name object containing the information
-     * @deprecated replaced by {@link org.xwiki.model.reference.DocumentReferenceFactory} since 2.2M1
+     * @deprecated replaced by {@link org.xwiki.model.reference.DocumentReferenceResolver} since 2.2M1
      */
     @Deprecated
     org.xwiki.bridge.DocumentName getDocumentName(String documentName);

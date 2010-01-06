@@ -24,25 +24,25 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceFactory;
+import org.xwiki.model.internal.reference.DefaultReferenceEntityReferenceResolver;
 
 /**
- * Transforms an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference
- * (with all required parents filled in). This implementation uses values from the current document reference in the
- * context when parts of the Reference are missing in the string representation.
+ * Resolve an {@link org.xwiki.model.reference.EntityReference} into a valid and absolute reference (with all required
+ * parents filled in). This implementation uses values from the current document reference in the context when parts of
+ * the Reference are missing in the string representation.
  *
  * @version $Id$
  * @since 2.2M1
  */
 @Component("current/reference")
-public class CurrentReferenceEntityReferenceFactory extends DefaultReferenceEntityReferenceFactory
+public class CurrentReferenceEntityReferenceResolver extends DefaultReferenceEntityReferenceResolver
 {
     @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
-     * @see DefaultReferenceEntityReferenceFactory#getDefaultReferenceName(org.xwiki.model.EntityType)
+     * @see DefaultReferenceEntityReferenceResolver#getDefaultReferenceName(org.xwiki.model.EntityType)
      */
     @Override protected String getDefaultReferenceName(EntityType type)
     {

@@ -55,9 +55,8 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -110,8 +109,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    private DocumentReferenceFactory currentDocumentReferenceFactory =
-        Utils.getComponent(DocumentReferenceFactory.class, "current");
+    private DocumentReferenceResolver currentDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part).
@@ -119,8 +118,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
-    private DocumentReferenceFactory<EntityReference> currentReferenceDocumentReferenceFactory =
-        Utils.getComponent(DocumentReferenceFactory.class, "current/reference");
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current/reference");
 
     /**
      * QueryManager for this store.
@@ -2339,7 +2338,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             DocumentReference reference = new DocumentReference((String) result[1],
                 new SpaceReference((String) result[0], (WikiReference) null));
             // Resolve it to make it a valid reference since it's missing the wiki part
-            documentReferences.add(this.currentReferenceDocumentReferenceFactory.createDocumentReference(reference));
+            documentReferences.add(this.currentReferenceDocumentReferenceResolver.resolve(reference));
         }
         return documentReferences;
     }

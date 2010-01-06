@@ -34,7 +34,7 @@ import org.junit.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -48,7 +48,7 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
 {
     private Mockery mockery = new Mockery();
 
-    private AttachmentReferenceFactory arf;
+    private AttachmentReferenceResolver arf;
 
     private DocumentAccessBridge dab;
 
@@ -57,10 +57,10 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
     {
         super.registerComponents();
 
-        this.arf = this.mockery.mock(AttachmentReferenceFactory.class);
-        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
-        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        this.arf = this.mockery.mock(AttachmentReferenceResolver.class);
+        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
+        descriptorARF.setRole(AttachmentReferenceResolver.class);
         descriptorARF.setRoleHint("current");
         getComponentManager().registerComponent(descriptorARF, this.arf);
 
@@ -92,14 +92,12 @@ public class URIClassLoaderTest extends AbstractComponentTestCase
             new DocumentReference("wiki", "space", "page"));
 
         mockery.checking(new Expectations() {{
-            allowing(arf).createAttachmentReference("page@filename1");
-            will(returnValue(attachmentName1));
+            allowing(arf).resolve("page@filename1"); will(returnValue(attachmentName1));
             oneOf(dab).getAttachmentContent(attachmentName1);
-            will(returnValue(new ByteArrayInputStream(createJarFile("/nomatch"))));
-            allowing(arf).createAttachmentReference("filename2");
-            will(returnValue(attachmentName2));
+                will(returnValue(new ByteArrayInputStream(createJarFile("/nomatch"))));
+            allowing(arf).resolve("filename2"); will(returnValue(attachmentName2));
             oneOf(dab).getAttachmentContent(attachmentName2);
-            will(returnValue(new ByteArrayInputStream(createJarFile("/something"))));
+                will(returnValue(new ByteArrayInputStream(createJarFile("/something"))));
         }});
 
         Assert.assertEquals("jar:attachmentjar://filename2!/something", cl.findResource("/something").toString());

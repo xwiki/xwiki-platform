@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
@@ -70,8 +70,8 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     private Execution execution;
 
     @Requirement("current")
-    private DocumentReferenceFactory documentReferenceFactory;
-    
+    private DocumentReferenceResolver documentReferenceResolver;
+
     /**
      * Utility method for accessing XWikiContext.
      * 
@@ -117,9 +117,8 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
 
                 // Search for all those documents with macro definitions and for each register the macro
                 for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
-                    DocumentReference wikiMacroDocumentReference =
-                        this.documentReferenceFactory.createDocumentReference(
-                            wikiName + ":" + wikiMacroDocumentData[0]);
+                    DocumentReference wikiMacroDocumentReference = this.documentReferenceResolver.resolve(
+                        wikiName + ":" + wikiMacroDocumentData[0]);
                     String wikiMacroDocumentAuthor = (String) wikiMacroDocumentData[1];
                     try {
                         WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);

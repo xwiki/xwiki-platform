@@ -27,7 +27,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 
@@ -47,7 +47,7 @@ public class XWikiLinkLabelGeneratorTest
 
     private DocumentAccessBridge mockDocumentAccessBridge;
 
-    private DocumentReferenceFactory mockDocumentReferenceFactory;
+    private DocumentReferenceResolver mockDocumentReferenceResolver;
 
     @Before
     public void setUp()
@@ -60,8 +60,8 @@ public class XWikiLinkLabelGeneratorTest
         final RenderingConfiguration mockRenderingConfiguration = mockery.mock(RenderingConfiguration.class);
         ReflectionUtils.setFieldValue(this.generator, "renderingConfiguration", mockRenderingConfiguration);
 
-        this.mockDocumentReferenceFactory = mockery.mock(DocumentReferenceFactory.class);
-        ReflectionUtils.setFieldValue(this.generator, "documentReferenceFactory", this.mockDocumentReferenceFactory);
+        this.mockDocumentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
+        ReflectionUtils.setFieldValue(this.generator, "documentReferenceResolver", this.mockDocumentReferenceResolver);
 
         this.mockDocumentModelBridge = mockery.mock(DocumentModelBridge.class);
 
@@ -78,7 +78,7 @@ public class XWikiLinkLabelGeneratorTest
         link.setReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue("My title"));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
@@ -93,7 +93,7 @@ public class XWikiLinkLabelGeneratorTest
     public void testGenerateWhenDocumentFailsToLoad() throws Exception
     {
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
                 will(throwException(new Exception("error")));
@@ -109,7 +109,7 @@ public class XWikiLinkLabelGeneratorTest
         link.setReference("HelloWorld");
 
         mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
                 will(returnValue(new DocumentReference("xwiki", "Main", "HelloWorld")));
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue(null));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
@@ -126,7 +126,7 @@ public class XWikiLinkLabelGeneratorTest
             allowing(mockDocumentModelBridge).getTitle(); will(returnValue("$0"));
             allowing(mockDocumentAccessBridge).getDocument(with(any(DocumentReference.class)));
                 will(returnValue(mockDocumentModelBridge));
-            allowing(mockDocumentReferenceFactory).createDocumentReference(with(any(String.class)));
+            allowing(mockDocumentReferenceResolver).resolve(with(any(String.class)));
                 will(returnValue(new DocumentReference("$0", "\\", "$0")));
 
         }});

@@ -17,33 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.model.internal.reference;
+package com.xpn.xwiki.doc;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Generic implementation that create {@link org.xwiki.model.reference.EntityReference} objects from their string
- * representation. This implementation uses fixed default values when parts of the Reference are missing in the string
- * representation. Default values are retrieved from the {@link org.xwiki.model.ModelConfiguration} class.  
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
+ * component to resolve {@link AttachmentReference} objects from their string representation. This implementation
+ * uses values from the current document reference in the context when parts of the Reference are missing in the string
+ * representation. 
  *
  * @version $Id$
  * @since 2.2M1
  */
-@Component
-public class DefaultStringEntityReferenceFactory extends AbstractStringEntityReferenceFactory
+@Component("current")
+public class CurrentStringAttachmentReferenceResolver implements AttachmentReferenceResolver<String>
 {
-    @Requirement
-    private ModelConfiguration configuration;
+    @Requirement("current")
+    private EntityReferenceResolver entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractStringEntityReferenceFactory#getDefaultValuesForType(org.xwiki.model.EntityType)
-     */
-    protected String getDefaultValuesForType(EntityType type)
+    public AttachmentReference resolve(String attachmentReferenceRepresentation)
     {
-        return this.configuration.getDefaultReferenceName(type);
+        return new AttachmentReference(this.entityReferenceResolver.resolve(
+            attachmentReferenceRepresentation, EntityType.ATTACHMENT));
     }
 }

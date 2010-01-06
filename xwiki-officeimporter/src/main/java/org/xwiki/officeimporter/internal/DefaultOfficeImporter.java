@@ -33,7 +33,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.OfficeImporterFilter;
@@ -84,7 +84,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
      * Used for parsing document name strings.
      */
     @Requirement("current")
-    private DocumentReferenceFactory documentReferenceFactory;
+    private DocumentReferenceResolver documentReferenceResolver;
 
     /**
      * Used for importing office documents.
@@ -121,7 +121,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         String extension = documentFormat.substring(documentFormat.lastIndexOf('.') + 1);
         String officeFileName = "input." + extension;
 
-        DocumentReference baseDocument = this.documentReferenceFactory.createDocumentReference(targetWikiDocument);
+        DocumentReference baseDocument = this.documentReferenceResolver.resolve(targetWikiDocument);
         if (isPresentation(documentFormat)) {
             XDOMOfficeDocument presentation = presentationBuilder.build(documentStream, officeFileName);
             saveDocument(presentation, new TargetDocumentDescriptor(baseDocument, this.componentManager), null,
@@ -157,7 +157,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     public String importAttachment(String strDocumentName, String strAttachmentFileName, Map<String, String> params)
         throws OfficeImporterException
     {
-        DocumentReference documentReference = this.documentReferenceFactory.createDocumentReference(strDocumentName);
+        DocumentReference documentReference = this.documentReferenceResolver.resolve(strDocumentName);
         AttachmentReference attachmentReference = new AttachmentReference(strAttachmentFileName, documentReference);
 
         InputStream attachmentStream;

@@ -22,13 +22,13 @@ package org.xwiki.model.internal.reference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceFactory;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceFactory} which can be considered a helper
- * component to create {@link DocumentReference} objects from their string representation. This implementation uses
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
+ * component to resolve {@link AttachmentReference} objects from their string representation. This implementation uses
  * fixed default values when parts of the Reference are missing in the string representation. Default values are
  * retrieved from the {@link org.xwiki.model.ModelConfiguration} class.
  * 
@@ -36,19 +36,19 @@ import org.xwiki.model.reference.EntityReferenceFactory;
  * @since 2.2M1
  */
 @Component
-public class DefaultStringDocumentReferenceFactory implements DocumentReferenceFactory<String>
+public class DefaultStringAttachmentReferenceResolver implements AttachmentReferenceResolver<String>
 {
     @Requirement
-    private EntityReferenceFactory<String> entityReferenceFactory;
+    private EntityReferenceResolver<String> entityReferenceResolver;
 
     /**
      * {@inheritDoc}
      * 
-     * @see DocumentReferenceFactory#createDocumentReference(Object)
+     * @see org.xwiki.model.reference.AttachmentReferenceResolver#resolve(Object)
      */
-    public DocumentReference createDocumentReference(String documentReferenceRepresentation)
+    public AttachmentReference resolve(String attachmentReferenceRepresentation)
     {
-        return new DocumentReference(this.entityReferenceFactory.createEntityReference(documentReferenceRepresentation,
-            EntityType.DOCUMENT));
+        return new AttachmentReference(this.entityReferenceResolver.resolve(
+            attachmentReferenceRepresentation, EntityType.ATTACHMENT));
     }
 }

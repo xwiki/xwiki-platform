@@ -22,13 +22,13 @@ package com.xpn.xwiki.doc;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceFactory;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceFactory} which can be considered a helper
- * component to create {@link AttachmentReference} objects from their string representation. This implementation
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
+ * component to resolve {@link DocumentReference} objects from their string representation. This implementation
  * uses values from the current document reference in the context when parts of the Reference are missing in the string
  * representation. 
  *
@@ -36,14 +36,14 @@ import org.xwiki.model.reference.EntityReferenceFactory;
  * @since 2.2M1
  */
 @Component("current")
-public class CurrentStringAttachmentReferenceFactory implements AttachmentReferenceFactory<String>
+public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
     @Requirement("current")
-    private EntityReferenceFactory entityReferenceFactory;
+    private EntityReferenceResolver entityReferenceResolver;
 
-    public AttachmentReference createAttachmentReference(String attachmentReferenceRepresentation)
+    public DocumentReference resolve(String documentReferenceRepresentation)
     {
-        return new AttachmentReference(this.entityReferenceFactory.createEntityReference(
-            attachmentReferenceRepresentation, EntityType.ATTACHMENT));
+        return new DocumentReference(this.entityReferenceResolver.resolve(
+            documentReferenceRepresentation, EntityType.DOCUMENT));
     }
 }

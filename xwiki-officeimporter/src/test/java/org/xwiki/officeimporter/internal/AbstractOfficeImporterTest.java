@@ -22,7 +22,7 @@ package org.xwiki.officeimporter.internal;
 import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.AbstractComponentTestCase;
 
@@ -52,7 +52,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
     /**
      * Mock document name factory.
      */
-    protected DocumentReferenceFactory mockDocumentReferenceFactory;
+    protected DocumentReferenceResolver mockDocumentReferenceResolver;
 
     /**
      * {@inheritDoc}
@@ -76,11 +76,11 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         getComponentManager().registerComponent(descriptorRS, mockEntityReferenceSerializer);
 
         // Document name factory.
-        mockDocumentReferenceFactory = this.mockery.mock(DocumentReferenceFactory.class);
-        DefaultComponentDescriptor<DocumentReferenceFactory> descriptorDRF =
-            new DefaultComponentDescriptor<DocumentReferenceFactory>();
-        descriptorDRF.setRole(DocumentReferenceFactory.class);
+        mockDocumentReferenceResolver = this.mockery.mock(DocumentReferenceResolver.class);
+        DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
+            new DefaultComponentDescriptor<DocumentReferenceResolver>();
+        descriptorDRF.setRole(DocumentReferenceResolver.class);
         descriptorDRF.setRoleHint("current");
-        getComponentManager().registerComponent(descriptorDRF, mockDocumentReferenceFactory);
+        getComponentManager().registerComponent(descriptorDRF, mockDocumentReferenceResolver);
     }
 }

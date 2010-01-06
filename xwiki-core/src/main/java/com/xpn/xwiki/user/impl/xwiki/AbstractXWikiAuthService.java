@@ -31,7 +31,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.Utils;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Common methods useful to all Authentication services implementations.
@@ -59,7 +59,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // FIXME: this method should probably use a XWikiRightService#isSuperadmin(String) method, see 
         // XWikiRightServiceImpl#isSuperadmin(String)
         DocumentReference documentReference =
-            Utils.getComponent(DocumentReferenceFactory.class).createDocumentReference(username);
+            Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
         return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);
     }
 

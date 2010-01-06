@@ -103,15 +103,15 @@ public class DefaultXDOMOfficeDocumentSplitterTest extends AbstractOfficeImporte
         
         // Add expectations to mock document name factory.         
         this.mockery.checking(new Expectations() {{
-            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Test");
+            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Test");
             will(returnValue(new DocumentReference("xwiki", "Test", "Test")));
-            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading1");
+            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading1");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading1")));
-            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading11");
+            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading11");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading11")));
-            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading12");
+            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading12");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading12")));
-            allowing(mockDocumentReferenceFactory).createDocumentReference("xwiki:Test.Heading2");
+            allowing(mockDocumentReferenceResolver).resolve("xwiki:Test.Heading2");
             will(returnValue(new DocumentReference("xwiki", "Test", "Heading2")));
         }});
         

@@ -31,7 +31,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.classloader.ExtendedURLStreamHandler;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
-import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 
 /**
  * Special handler that allows building URLs that have their contents in a wiki document's attachment.
@@ -45,7 +45,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
     private static final String ATTACHMENT_JAR_PROTOCOL = "attachmentjar";
 
     private static final String ATTACHMENT_JAR_PREFIX = ATTACHMENT_JAR_PROTOCOL + "://";
-    
+
     /**
      * {@inheritDoc}
      * @see ExtendedURLStreamHandler#getProtocol()
@@ -59,7 +59,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
      * Create attachment name from a string reference.
      */
     @Requirement("current")
-    private AttachmentReferenceFactory attachmentReferenceFactory;
+    private AttachmentReferenceResolver attachmentReferenceResolver;
 
     /**
      * Used to get the current document name and document URLs.
@@ -77,7 +77,7 @@ public class AttachmentURLStreamHandler extends URLStreamHandler implements Exte
     protected URLConnection openConnection(URL url) throws IOException
     {
         // Get the attachment reference from the URL and transform it into an AttachmentReference object
-        AttachmentReference attachmentReference = this.attachmentReferenceFactory.createAttachmentReference(
+        AttachmentReference attachmentReference = this.attachmentReferenceResolver.resolve(
             getAttachmentReference(url));
 
         return new AttachmentURLConnection(url, attachmentReference, this.documentAccessBridge);

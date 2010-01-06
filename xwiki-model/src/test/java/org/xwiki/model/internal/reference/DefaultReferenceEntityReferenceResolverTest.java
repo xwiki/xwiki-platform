@@ -28,18 +28,18 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.InvalidEntityReferenceException;
 
 /**
- * Unit tests for {@link DefaultReferenceEntityReferenceFactory}.
+ * Unit tests for {@link DefaultReferenceEntityReferenceResolver}.
  *
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultReferenceEntityReferenceFactoryTest
+public class DefaultReferenceEntityReferenceResolverTest
 {
-    private EntityReferenceFactory<EntityReference> factory;
+    private EntityReferenceResolver<EntityReference> resolver;
 
     private ModelConfiguration mockModelConfiguration;
 
@@ -48,9 +48,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     @Before
     public void setUp()
     {
-        this.factory = new DefaultReferenceEntityReferenceFactory();
+        this.resolver = new DefaultReferenceEntityReferenceResolver();
         this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.factory, "configuration", this.mockModelConfiguration);
+        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
 
         this.mockery.checking(new Expectations() {{
             allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.SPACE); will(returnValue("defspace"));
@@ -60,9 +60,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateDocumentReferenceWhenMissingParents()
+    public void testResolveDocumentReferenceWhenMissingParents()
     {
-        EntityReference reference = factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT),
+        EntityReference reference = resolver.resolve(new EntityReference("page", EntityType.DOCUMENT),
             EntityType.DOCUMENT);
         Assert.assertEquals("defspace", reference.getParent().getName());
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
@@ -71,9 +71,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateAttachmentReferenceWhenMissingParents()
+    public void testResolveAttachmentReferenceWhenMissingParents()
     {
-        EntityReference reference = factory.createEntityReference(
+        EntityReference reference = resolver.resolve(
             new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
         Assert.assertEquals("defpage", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
@@ -84,9 +84,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateDocumentReferenceWhenThereAreNullNames()
+    public void testResolveDocumentReferenceWhenThereAreNullNames()
     {
-        EntityReference reference = factory.createEntityReference(new EntityReference(null, EntityType.DOCUMENT),
+        EntityReference reference = resolver.resolve(new EntityReference(null, EntityType.DOCUMENT),
             EntityType.DOCUMENT);
         Assert.assertEquals("defpage", reference.getName());
         Assert.assertEquals("defspace", reference.getParent().getName());
@@ -96,9 +96,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateDocumentReferenceWhenMissingParentBetweenReferences()
+    public void testResolveDocumentReferenceWhenMissingParentBetweenReferences()
     {
-        EntityReference reference = factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT,
+        EntityReference reference = resolver.resolve(new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("wiki", EntityType.WIKI)), EntityType.DOCUMENT);
         Assert.assertEquals("defspace", reference.getParent().getName());
         Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
@@ -107,9 +107,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateAttachmentReferenceWhenMissingParentBetweenReferences()
+    public void testResolveAttachmentReferenceWhenMissingParentBetweenReferences()
     {
-        EntityReference reference = factory.createEntityReference(
+        EntityReference reference = resolver.resolve(
             new EntityReference("filename", EntityType.ATTACHMENT, new EntityReference("wiki", EntityType.WIKI)),
             EntityType.ATTACHMENT);
         Assert.assertEquals("defpage", reference.getParent().getName());
@@ -121,10 +121,10 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateDocumentReferenceWhenInvalidReference()
+    public void testResolveDocumentReferenceWhenInvalidReference()
     {
         try {
-            factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT,
+            resolver.resolve(new EntityReference("page", EntityType.DOCUMENT,
                 new EntityReference("filename", EntityType.ATTACHMENT)), EntityType.DOCUMENT);
             Assert.fail("Should have thrown an exception here");
         } catch (InvalidEntityReferenceException expected) {
@@ -134,9 +134,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateDocumentReferenceWhenTypeIsSpace()
+    public void testResolveDocumentReferenceWhenTypeIsSpace()
     {
-        EntityReference reference = factory.createEntityReference(new EntityReference("space", EntityType.SPACE),
+        EntityReference reference = resolver.resolve(new EntityReference("space", EntityType.SPACE),
             EntityType.DOCUMENT);
         Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
         Assert.assertEquals("defpage", reference.getName());
@@ -147,9 +147,9 @@ public class DefaultReferenceEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateSpaceReferenceWhenTypeIsDocument()
+    public void testResolveSpaceReferenceWhenTypeIsDocument()
     {
-        EntityReference reference = factory.createEntityReference(new EntityReference("page", EntityType.DOCUMENT),
+        EntityReference reference = resolver.resolve(new EntityReference("page", EntityType.DOCUMENT),
             EntityType.SPACE);
         Assert.assertEquals(EntityType.SPACE, reference.getType());
         Assert.assertEquals("defspace", reference.getName());

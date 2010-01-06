@@ -51,7 +51,7 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -66,8 +66,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Used to convert a string into a proper Document Name.
      */
-    private DocumentReferenceFactory documentReferenceFactory =
-        Utils.getComponent(DocumentReferenceFactory.class, "current");
+    private DocumentReferenceResolver documentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
      * Used to convert a Document Reference to a username to a string. Note that we must be careful not to include
@@ -376,7 +376,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         if (principal != null) {
             DocumentReference userDocumentReference =
-                this.documentReferenceFactory.createDocumentReference(principal.getName());
+                this.documentReferenceResolver.resolve(principal.getName());
             contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);
         } else {
             contextUserName = null;

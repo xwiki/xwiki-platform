@@ -78,7 +78,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -325,10 +325,10 @@ public class XWikiDocument implements DocumentModelBridge
     private XDOM xdom;
 
     /**
-     * Used to convert a string into a proper Document Reference.
+     * Used to resolve a string into a proper Document Reference.
      */
-    private DocumentReferenceFactory currentDocumentReferenceFactory =
-        Utils.getComponent(DocumentReferenceFactory.class, "current");
+    private DocumentReferenceResolver currentDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
      * Used to convert a proper Document Reference to string (compact form)
@@ -3330,7 +3330,7 @@ public class XWikiDocument implements DocumentModelBridge
                     // The reference may not have the space or even document specified (in case of an empty
                     // string)
                     // Thus we need to find the fully qualified document name
-                    DocumentReference documentReference = this.currentDocumentReferenceFactory.createDocumentReference(name);
+                    DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(name);
 
                     // Verify that the link is not an autolink (i.e. a link to the current document)
                     if (!documentReference.equals(currentDocumentReference)) {
@@ -3389,7 +3389,7 @@ public class XWikiDocument implements DocumentModelBridge
                             // string)
                             // Thus we need to find the fully qualified document name
                             DocumentReference documentReference =
-                                this.currentDocumentReferenceFactory.createDocumentReference(link.getReference());
+                                this.currentDocumentReferenceResolver.resolve(link.getReference());
 
                             // Verify that the link is not an autolink (i.e. a link to the current document)
                             if (!documentReference.equals(currentDocumentReference)) {
@@ -3849,7 +3849,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setFullName(String fullname, XWikiContext context)
     {
-        DocumentReference documentReference = this.currentDocumentReferenceFactory.createDocumentReference(fullname);
+        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(fullname);
         setDatabase(documentReference.getWikiReference().getName());
         setSpace(documentReference.getLastSpaceReference().getName());
         setName(documentReference.getName());
@@ -4326,8 +4326,7 @@ public class XWikiDocument implements DocumentModelBridge
         // Get the full unique form of the old and new document names to easily compare them with links references in
         // XDOM
         DocumentReference oldDocReference = getDocumentReference();
-        DocumentReference newDocReference =
-            this.currentDocumentReferenceFactory.createDocumentReference(newDocumentName);
+        DocumentReference newDocReference = this.currentDocumentReferenceResolver.resolve(newDocumentName);
 
         // Verify if the user is trying to rename to the same name... In that case, simply exits
         // for efficiency.
@@ -4410,7 +4409,7 @@ public class XWikiDocument implements DocumentModelBridge
                 org.xwiki.rendering.listener.Link link = linkBlock.getLink();
                 if (link.getType() == LinkType.DOCUMENT) {
                     DocumentReference documentReference =
-                        this.currentDocumentReferenceFactory.createDocumentReference(link.getReference());
+                        this.currentDocumentReferenceResolver.resolve(link.getReference());
 
                     if (documentReference.equals(oldDocumentReference)) {
                         link.setReference(this.compactEntityReferenceSerializer.serialize(newDocumentReference));

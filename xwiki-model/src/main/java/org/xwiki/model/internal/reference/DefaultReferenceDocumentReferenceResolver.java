@@ -17,39 +17,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package org.xwiki.model.internal.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Specialized version of {@link org.xwiki.model.reference.EntityReferenceFactory} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from Entity Reference (when they miss some parent references
- * or have NULL values). This implementation uses values from the current document reference in the context when parts
- * of the Reference are missing in the Entity Reference representation.
+ * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
+ * component to resolve {@link org.xwiki.model.reference.DocumentReference} objects from Entity Reference (when they
+ * miss some parent references or have NULL values). This implementation uses fixed default values when parts of the
+ * Reference are missing in the string representation. Default values are retrieved from the
+ * {@link org.xwiki.model.ModelConfiguration} class.
  *
  * @version $Id$
  * @since 2.2M1
  */
-@Component("current/reference")
-public class CurrentReferenceDocumentReferenceFactory implements DocumentReferenceFactory<EntityReference>
+@Component("default/reference")
+public class DefaultReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
 {
-    @Requirement("current/reference")
-    private EntityReferenceFactory<EntityReference> entityReferenceFactory;
+    @Requirement("default/reference")
+    private EntityReferenceResolver<EntityReference> entityReferenceResolver;
 
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.model.reference.DocumentReferenceFactory#createDocumentReference(Object)
+     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
      */
-    public DocumentReference createDocumentReference(EntityReference documentReferenceRepresentation)
+    public DocumentReference resolve(EntityReference documentReferenceRepresentation)
     {
-        return new DocumentReference(this.entityReferenceFactory.createEntityReference(documentReferenceRepresentation,
+        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
             EntityType.DOCUMENT));
     }
 }

@@ -22,18 +22,20 @@ package org.xwiki.model.reference;
 import org.xwiki.component.annotation.ComponentRole;
 
 /**
- * Transforms an Attachment reference defined in a given representation into a {@link AttachmentReference} object.
+ * Resolve a Document reference defined in a given representation into a validated {@link DocumentReference} object,
+ * ie with valid values and a valid hierarchy (eg a Document reference must have a parent which is a space reference,
+ * reference values must not be null, etc).
  *
  * @version $Id$
  * @since 2.2M1
  * @param <T> the type of the representation (eg a String)
  */
 @ComponentRole
-public interface AttachmentReferenceFactory<T>
+public interface DocumentReferenceResolver<T>
 {
     /**
-     * @param attachmentReferenceRepresentation the representation of an attachment reference (eg as a String)
-     * @return the resolved object
+     * @param documentReferenceRepresentation the representation of a document reference (eg as a String)
+     * @return the valid resolved document reference as an Object
      */
-    AttachmentReference createAttachmentReference(T attachmentReferenceRepresentation);
+    DocumentReference resolve(T documentReferenceRepresentation);
 }

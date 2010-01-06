@@ -24,8 +24,8 @@ import org.jmock.Mockery;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.AttachmentReferenceFactory;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 /**
  * Dynamic mock setup for script macros.
@@ -39,9 +39,9 @@ public class ScriptMockSetup
     
     public DocumentAccessBridge bridge;
     
-    public AttachmentReferenceFactory attachmentReferenceFactory;
+    public AttachmentReferenceResolver attachmentReferenceResolver;
     
-    public DocumentReferenceFactory documentReferenceFactory;
+    public DocumentReferenceResolver documentReferenceResolver;
 
     public ScriptMockSetup(ComponentManager componentManager) throws Exception
     {
@@ -59,19 +59,19 @@ public class ScriptMockSetup
         componentManager.registerComponent(descriptorDAB, bridge);
 
         // Use a mock for the AttachmentReference Factory
-        attachmentReferenceFactory = mockery.mock(AttachmentReferenceFactory.class);
-        DefaultComponentDescriptor<AttachmentReferenceFactory> descriptorARF =
-            new DefaultComponentDescriptor<AttachmentReferenceFactory>();
-        descriptorARF.setRole(AttachmentReferenceFactory.class);
+        attachmentReferenceResolver = mockery.mock(AttachmentReferenceResolver.class);
+        DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
+            new DefaultComponentDescriptor<AttachmentReferenceResolver>();
+        descriptorARF.setRole(AttachmentReferenceResolver.class);
         descriptorARF.setRoleHint("current");
-        componentManager.registerComponent(descriptorARF, attachmentReferenceFactory);
+        componentManager.registerComponent(descriptorARF, attachmentReferenceResolver);
 
         // Use a mock for the DocumentReference Factory
-        documentReferenceFactory = mockery.mock(DocumentReferenceFactory.class);
-        DefaultComponentDescriptor<DocumentReferenceFactory> descriptorDRF =
-            new DefaultComponentDescriptor<DocumentReferenceFactory>();
-        descriptorDRF.setRole(DocumentReferenceFactory.class);
+        documentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
+        DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
+            new DefaultComponentDescriptor<DocumentReferenceResolver>();
+        descriptorDRF.setRole(DocumentReferenceResolver.class);
         descriptorDRF.setRoleHint("current");
-        componentManager.registerComponent(descriptorDRF, documentReferenceFactory);        
+        componentManager.registerComponent(descriptorDRF, documentReferenceResolver);
     }
 }

@@ -24,10 +24,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceFactory;
+import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 
 /**
- * Generic implementation that create {@link org.xwiki.model.reference.EntityReference} objects from their string
+ * Generic implementation that resolve {@link org.xwiki.model.reference.EntityReference} objects from their string
  * representation. This implementation uses values from the current document reference in the context when parts of the
  * Reference are missing in the string representation.  
  *
@@ -35,14 +35,14 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceFactory;
  * @since 2.2M1
  */
 @Component("current")
-public class CurrentStringEntityReferenceFactory extends DefaultStringEntityReferenceFactory
+public class CurrentStringEntityReferenceResolver extends DefaultStringEntityReferenceResolver
 {
     @Requirement
     private Execution execution;
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceFactory#getDefaultValuesForType(org.xwiki.model.EntityType)
+     * @see DefaultStringEntityReferenceResolver#getDefaultValuesForType(org.xwiki.model.EntityType)
      */
     protected String getDefaultValuesForType(EntityType type)
     {

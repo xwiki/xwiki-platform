@@ -28,15 +28,15 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
- * Unit tests for {@link DefaultStringEntityReferenceFactory}.
+ * Unit tests for {@link DefaultStringEntityReferenceResolver}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class DefaultStringEntityReferenceFactoryTest
+public class DefaultStringEntityReferenceResolverTest
 {
     private static final String DEFAULT_WIKI = "xwiki";
     
@@ -46,7 +46,7 @@ public class DefaultStringEntityReferenceFactoryTest
         
     private static final String DEFAULT_ATTACHMENT = "";
 
-    private EntityReferenceFactory factory;
+    private EntityReferenceResolver resolver;
 
     private Mockery mockery = new Mockery();
 
@@ -55,9 +55,9 @@ public class DefaultStringEntityReferenceFactoryTest
     @Before
     public void setUp()
     {
-        this.factory = new DefaultStringEntityReferenceFactory();
+        this.resolver = new DefaultStringEntityReferenceResolver();
         this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.factory, "configuration", this.mockModelConfiguration);
+        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
         
         this.mockery.checking(new Expectations() {{
             allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI);
@@ -72,97 +72,97 @@ public class DefaultStringEntityReferenceFactoryTest
     }
 
     @Test
-    public void testCreateDocumentReference() throws Exception
+    public void testResolveDocumentReference() throws Exception
     {
-        EntityReference reference = factory.createEntityReference("wiki:space.page", EntityType.DOCUMENT);
+        EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
 
-        reference = factory.createEntityReference("wiki:space.", EntityType.DOCUMENT);
+        reference = resolver.resolve("wiki:space.", EntityType.DOCUMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.getName());
 
-        reference = factory.createEntityReference("space.", EntityType.DOCUMENT);
+        reference = resolver.resolve("space.", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.getName());
 
-        reference = factory.createEntityReference("page", EntityType.DOCUMENT);
+        reference = resolver.resolve("page", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
 
-        reference = factory.createEntityReference(".", EntityType.DOCUMENT);
+        reference = resolver.resolve(".", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.getName());
 
-        reference = factory.createEntityReference(null, EntityType.DOCUMENT);
+        reference = resolver.resolve(null, EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.getName());
 
-        reference = factory.createEntityReference("", EntityType.DOCUMENT);
+        reference = resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.getName());
 
-        reference = factory.createEntityReference("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
+        reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki1.wiki2:wiki3", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("some.space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
 
-        reference = factory.createEntityReference("some.space.page", EntityType.DOCUMENT);
+        reference = resolver.resolve("some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("some.space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
 
-        reference = factory.createEntityReference("wiki:page", EntityType.DOCUMENT);
+        reference = resolver.resolve("wiki:page", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("wiki:page", reference.getName());
 
         // Test escapes
 
-        reference = factory.createEntityReference("\\\\\\.:@\\.", EntityType.DOCUMENT);
+        reference = resolver.resolve("\\\\\\.:@\\.", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("\\.:@.", reference.getName());
 
-        reference = factory.createEntityReference("some\\.space.page", EntityType.DOCUMENT);
+        reference = resolver.resolve("some\\.space.page", EntityType.DOCUMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("some.space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.getName());
     }
 
     @Test
-    public void testCreateAttachmentReference() throws Exception
+    public void testResolveAttachmentReference() throws Exception
     {
         String DEFAULT_WIKI = "xwiki";
         String DEFAULT_SPACE = "XWiki";
         String DEFAULT_PAGE = "WebHome";
 
-        EntityReference reference = factory.createEntityReference("wiki:space.page@filename", EntityType.ATTACHMENT);
+        EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("filename", reference.getName());
 
-        reference = factory.createEntityReference("", EntityType.ATTACHMENT);
+        reference = resolver.resolve("", EntityType.ATTACHMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("", reference.getName());
 
-        reference = factory.createEntityReference("wiki:space.page@my.png", EntityType.ATTACHMENT);
+        reference = resolver.resolve("wiki:space.page@my.png", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
         Assert.assertEquals("my.png", reference.getName());
 
-        reference = factory.createEntityReference("some:file.name", EntityType.ATTACHMENT);
+        reference = resolver.resolve("some:file.name", EntityType.ATTACHMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
@@ -170,7 +170,7 @@ public class DefaultStringEntityReferenceFactoryTest
 
         // Test escapes
 
-        reference = factory.createEntityReference(":.\\@", EntityType.ATTACHMENT);
+        reference = resolver.resolve(":.\\@", EntityType.ATTACHMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());

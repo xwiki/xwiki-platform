@@ -28,7 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporterException;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
@@ -75,7 +75,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
      * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
      */
     @Requirement("current")
-    private DocumentReferenceFactory documentReferenceFactory;
+    private DocumentReferenceResolver documentReferenceResolver;
 
     /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
@@ -112,12 +112,12 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
             DocumentReference targetReference =
-                this.documentReferenceFactory.createDocumentReference(doc.getFullName());
+                this.documentReferenceResolver.resolve(doc.getFullName());
             TargetDocumentDescriptor targetDocumentDescriptor =
                 new TargetDocumentDescriptor(targetReference, this.componentManager);
             if (doc.getParent() != null) {
                 DocumentReference targetParent =
-                    this.documentReferenceFactory.createDocumentReference(doc.getParent().getFullName());
+                    this.documentReferenceResolver.resolve(doc.getParent().getFullName());
                 targetDocumentDescriptor.setParentReference(targetParent);
             }
 

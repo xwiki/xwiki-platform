@@ -30,7 +30,7 @@ import org.xwiki.component.logging.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.builder.XDOMOfficeDocumentBuilder;
 import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
@@ -77,7 +77,7 @@ public class OfficeImporterVelocityBridge
     /**
      * Used for converting string document names to objects.
      */
-    private DocumentReferenceFactory documentReferenceFactory;
+    private DocumentReferenceResolver documentReferenceResolver;
 
     /**
      * Used to query openoffice server status.
@@ -124,7 +124,7 @@ public class OfficeImporterVelocityBridge
             this.execution = componentManager.lookup(Execution.class);
             this.importer = componentManager.lookup(OfficeImporter.class);
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
-            this.documentReferenceFactory = componentManager.lookup(DocumentReferenceFactory.class, "current");
+            this.documentReferenceResolver = componentManager.lookup(DocumentReferenceResolver.class, "current");
             this.officeManager = componentManager.lookup(OpenOfficeManager.class);
             this.xhtmlBuilder = componentManager.lookup(XHTMLOfficeDocumentBuilder.class);
             this.xdomBuilder = componentManager.lookup(XDOMOfficeDocumentBuilder.class);
@@ -156,7 +156,7 @@ public class OfficeImporterVelocityBridge
         try {
             connect();
             return xhtmlBuilder.build(officeFileStream, officeFileName,
-                documentReferenceFactory.createDocumentReference(referenceDocument), filterStyles);
+                documentReferenceResolver.resolve(referenceDocument), filterStyles);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -210,7 +210,7 @@ public class OfficeImporterVelocityBridge
                 return presentationBuilder.build(officeFileStream, officeFileName);
             } else {
                 return xdomBuilder.build(officeFileStream, officeFileName,
-                    documentReferenceFactory.createDocumentReference(referenceDocument), filterStyles);
+                    documentReferenceResolver.resolve(referenceDocument), filterStyles);
             }
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
@@ -246,7 +246,7 @@ public class OfficeImporterVelocityBridge
         }
         try {
             return xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint,
-                documentReferenceFactory.createDocumentReference(rootDocumentName));
+                documentReferenceResolver.resolve(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -271,8 +271,8 @@ public class OfficeImporterVelocityBridge
         boolean append)
     {
         try {
-            DocumentReference docReference = documentReferenceFactory.createDocumentReference(target);
-            DocumentReference parentReference = documentReferenceFactory.createDocumentReference(parent);
+            DocumentReference docReference = documentReferenceResolver.resolve(target);
+            DocumentReference parentReference = documentReferenceResolver.resolve(parent);
 
             // First check if the user has edit rights on the target document.
             if (!docBridge.isDocumentEditable(docReference)) {
@@ -429,7 +429,7 @@ public class OfficeImporterVelocityBridge
      */
     private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException
     {
-        if (!docBridge.isDocumentEditable(documentReferenceFactory.createDocumentReference(targetDocument))) {
+        if (!docBridge.isDocumentEditable(documentReferenceResolver.resolve(targetDocument))) {
             throw new OfficeImporterException("Inadequate privileges.");
         } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
             throw new OfficeImporterException("The target document " + targetDocument + " already exists.");

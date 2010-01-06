@@ -40,7 +40,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.PropertyClass;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -62,7 +62,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Requirement("current")
-    private DocumentReferenceFactory documentReferenceFactory;
+    private DocumentReferenceResolver documentReferenceResolver;
 
     private XWikiContext getContext()
     {
@@ -114,12 +114,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getDocumentName(String)
-     * @deprecated use {@link DocumentReferenceFactory} since 2.2.M1
+     * @deprecated use {@link org.xwiki.model.reference.DocumentReferenceResolver} since 2.2.M1
      */
     @Deprecated
     public org.xwiki.bridge.DocumentName getDocumentName(String documentReference)
     {
-        DocumentReference docReference = this.documentReferenceFactory.createDocumentReference(documentReference);
+        DocumentReference docReference = this.documentReferenceResolver.resolve(documentReference);
         return new org.xwiki.bridge.DocumentName(docReference.getWikiReference().getName(),
             docReference.getLastSpaceReference().getName(), docReference.getName());
     }
@@ -468,7 +468,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         XWikiContext xcontext = getContext();
         DocumentReference resolvedReference = documentReference;
         if (documentReference == null) {
-            resolvedReference = this.documentReferenceFactory.createDocumentReference(xcontext.getDoc().getFullName());
+            resolvedReference = this.documentReferenceResolver.resolve(xcontext.getDoc().getFullName());
         }
         List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
             this.entityReferenceSerializer.serialize(resolvedReference), xcontext).getAttachmentList();

@@ -28,7 +28,7 @@ import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /**
@@ -49,7 +49,7 @@ public class DefaultStringEntityReferenceSerializerTest
 
     private EntityReferenceSerializer serializer;
 
-    private EntityReferenceFactory factory;
+    private EntityReferenceResolver resolver;
 
     private Mockery mockery = new Mockery();
 
@@ -60,9 +60,9 @@ public class DefaultStringEntityReferenceSerializerTest
     {
         this.serializer = new DefaultStringEntityReferenceSerializer();
         
-        this.factory = new DefaultStringEntityReferenceFactory();
+        this.resolver = new DefaultStringEntityReferenceResolver();
         this.mockModelConfiguration = this.mockery.mock(ModelConfiguration.class);
-        ReflectionUtils.setFieldValue(this.factory, "configuration", this.mockModelConfiguration);
+        ReflectionUtils.setFieldValue(this.resolver, "configuration", this.mockModelConfiguration);
 
         this.mockery.checking(new Expectations() {{
             allowing(mockModelConfiguration).getDefaultReferenceName(EntityType.WIKI);
@@ -79,67 +79,67 @@ public class DefaultStringEntityReferenceSerializerTest
     @Test
     public void testSerializeDocumentReference() throws Exception
     {
-        EntityReference reference = factory.createEntityReference("wiki:space.page", EntityType.DOCUMENT);
+        EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki:space.page", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("wiki:space.", EntityType.DOCUMENT);
+        reference = resolver.resolve("wiki:space.", EntityType.DOCUMENT);
         Assert.assertEquals("wiki:space.WebHome", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("space.", EntityType.DOCUMENT);
+        reference = resolver.resolve("space.", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:space.WebHome", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("page", EntityType.DOCUMENT);
+        reference = resolver.resolve("page", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.page", serializer.serialize(reference));
 
-        reference = factory.createEntityReference(".", EntityType.DOCUMENT);
+        reference = resolver.resolve(".", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome", serializer.serialize(reference));
 
-        reference = factory.createEntityReference(null, EntityType.DOCUMENT);
+        reference = resolver.resolve(null, EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("", EntityType.DOCUMENT);
+        reference = resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
+        reference = resolver.resolve("wiki1.wiki2:wiki3:some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals("wiki1.wiki2:wiki3:some\\.space.page", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("some.space.page", EntityType.DOCUMENT);
+        reference = resolver.resolve("some.space.page", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:some\\.space.page", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("wiki:page", EntityType.DOCUMENT);
+        reference = resolver.resolve("wiki:page", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.wiki:page", serializer.serialize(reference));
 
         // Test escapes
 
-        reference = factory.createEntityReference("\\.:@\\.", EntityType.DOCUMENT);
+        reference = resolver.resolve("\\.:@\\.", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.\\.:@\\.", serializer.serialize(reference));
     }
 
     @Test
     public void testSerializeSpaceReference() throws Exception
     {
-        EntityReference reference = factory.createEntityReference("wiki:space1.space2", EntityType.SPACE);
+        EntityReference reference = resolver.resolve("wiki:space1.space2", EntityType.SPACE);
         Assert.assertEquals("wiki:space1\\.space2", serializer.serialize(reference));
     }
 
     @Test
     public void testSerializeAttachmentReference() throws Exception
     {
-        EntityReference reference = factory.createEntityReference("wiki:space.page@filename", EntityType.ATTACHMENT);
+        EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki:space.page@filename", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("", EntityType.ATTACHMENT);
+        reference = resolver.resolve("", EntityType.ATTACHMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome@", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("wiki:space.page@my.png", EntityType.ATTACHMENT);
+        reference = resolver.resolve("wiki:space.page@my.png", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki:space.page@my.png", serializer.serialize(reference));
 
-        reference = factory.createEntityReference("some:file.name", EntityType.ATTACHMENT);
+        reference = resolver.resolve("some:file.name", EntityType.ATTACHMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome@some:file.name", serializer.serialize(reference));
 
         // Test escapes
 
-        reference = factory.createEntityReference(":.\\@", EntityType.ATTACHMENT);
+        reference = resolver.resolve(":.\\@", EntityType.ATTACHMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome@:.\\@", serializer.serialize(reference));
     }
 }

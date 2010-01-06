@@ -26,16 +26,16 @@ import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.doc.CurrentReferenceEntityReferenceFactory}.
+ * Unit tests for {@link CurrentReferenceEntityReferenceResolver}.
  * 
  * @version $Id$
  * @since 2.2M1
  */
-public class CurrentReferenceEntityReferenceFactoryTest extends AbstractComponentTestCase
+public class CurrentReferenceEntityReferenceResolverTest extends AbstractComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 
@@ -43,7 +43,7 @@ public class CurrentReferenceEntityReferenceFactoryTest extends AbstractComponen
 
     private static final String CURRENT_PAGE = "currentpage";
 
-    private EntityReferenceFactory<EntityReference> factory;
+    private EntityReferenceResolver<EntityReference> resolver;
 
     private XWikiContext context;
 
@@ -58,13 +58,13 @@ public class CurrentReferenceEntityReferenceFactoryTest extends AbstractComponen
         execution.getContext().setProperty("xwikicontext", this.context);
         Utils.setComponentManager(getComponentManager());
 
-        this.factory = getComponentManager().lookup(EntityReferenceFactory.class, "current/reference");
+        this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "current/reference");
     }
 
     @org.junit.Test
-    public void testNormalizeAttachmentReferenceWhenMissingParentsAndNoContextDocument()
+    public void testResolveAttachmentReferenceWhenMissingParentsAndNoContextDocument()
     {
-        EntityReference reference = factory.createEntityReference(
+        EntityReference reference = resolver.resolve(
             new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
         Assert.assertEquals("WebHome", reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());
@@ -75,11 +75,11 @@ public class CurrentReferenceEntityReferenceFactoryTest extends AbstractComponen
     }
 
     @org.junit.Test
-    public void testNormalizeAttachmentReferenceWhenMissingParentsAndContextDocument()
+    public void testResolveAttachmentReferenceWhenMissingParentsAndContextDocument()
     {
         this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
 
-        EntityReference reference = factory.createEntityReference(
+        EntityReference reference = resolver.resolve(
             new EntityReference("filename", EntityType.ATTACHMENT), EntityType.ATTACHMENT);
         Assert.assertEquals(CURRENT_PAGE, reference.getParent().getName());
         Assert.assertEquals(EntityType.DOCUMENT, reference.getParent().getType());

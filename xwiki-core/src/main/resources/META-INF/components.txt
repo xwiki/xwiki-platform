@@ -3,11 +3,11 @@ com.xpn.xwiki.render.DefaultVelocityManager
 com.xpn.xwiki.render.XWikiVelocityContextInitializer
 com.xpn.xwiki.render.XWikiScriptContextInitializer
 com.xpn.xwiki.doc.DefaultDocumentAccessBridge
-com.xpn.xwiki.doc.CurrentStringEntityReferenceFactory
-com.xpn.xwiki.doc.CurrentReferenceEntityReferenceFactory
-com.xpn.xwiki.doc.CurrentStringDocumentReferenceFactory
-com.xpn.xwiki.doc.CurrentReferenceDocumentReferenceFactory
-com.xpn.xwiki.doc.CurrentStringAttachmentReferenceFactory
+com.xpn.xwiki.doc.CurrentStringEntityReferenceResolver
+com.xpn.xwiki.doc.CurrentReferenceEntityReferenceResolver
+com.xpn.xwiki.doc.CurrentStringDocumentReferenceResolver
+com.xpn.xwiki.doc.CurrentReferenceDocumentReferenceResolver
+com.xpn.xwiki.doc.CurrentStringAttachmentReferenceResolver
 com.xpn.xwiki.doc.CompactStringEntityReferenceSerializer
 com.xpn.xwiki.doc.CompactWikiStringEntityReferenceSerializer
 com.xpn.xwiki.DefaultSkinAccessBridge

@@ -21,7 +21,7 @@ package org.xwiki.model.internal.reference;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.EntityReferenceResolver;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,13 +30,13 @@ import java.util.Map;
 
 /**
  * Generic implementation deferring default values for unspecified reference parts to extending classes. This allows
- * for example both the Current Entity Reference Factory and the Default Entity Reference Factory to share the code in
- * this class. 
+ * for example both the Current Entity Reference Resolver and the Default Entity Reference Resolver to share the code
+ * from this class. 
  *
  * @version $Id$
  * @since 2.2M1
  */
-public abstract class AbstractStringEntityReferenceFactory implements EntityReferenceFactory<String>
+public abstract class AbstractStringEntityReferenceResolver implements EntityReferenceResolver<String>
 {
     private Map<EntityType, List<Character>> separators = new HashMap<EntityType, List<Character>>() {{
         put(EntityType.DOCUMENT, Arrays.asList('.', ':'));
@@ -59,9 +59,9 @@ public abstract class AbstractStringEntityReferenceFactory implements EntityRefe
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.reference.EntityReferenceFactory#createEntityReference(Object, org.xwiki.model.EntityType)
+     * @see org.xwiki.model.reference.EntityReferenceResolver#resolve(Object, org.xwiki.model.EntityType)
      */
-    public EntityReference createEntityReference(String entityReferenceRepresentation, EntityType type)
+    public EntityReference resolve(String entityReferenceRepresentation, EntityType type)
     {
         // TODO: Once we support nested spaces, handle the possibility of having nested spaces. The format is still
         // to be defined but it could be for example: Wiki:Space1.Space2.Page

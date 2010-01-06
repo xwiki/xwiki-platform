@@ -28,7 +28,7 @@ import org.w3c.dom.Document;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.model.reference.AttachmentReferenceFactory;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.officeimporter.OfficeImporter;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -68,7 +68,7 @@ public class XWikiImportService implements ImportService
      * The component used to parse attachment references.
      */
     @Requirement("current")
-    private AttachmentReferenceFactory attachmentReferenceFactory;
+    private AttachmentReferenceResolver attachmentReferenceResolver;
 
     /**
      * The component manager. We need it because we have to access some components dynamically.
@@ -105,7 +105,7 @@ public class XWikiImportService implements ImportService
     {
         try {
             AttachmentReference attachmentReference =
-                this.attachmentReferenceFactory.createAttachmentReference(attachment.getReference());
+                this.attachmentReferenceResolver.resolve(attachment.getReference());
             // OfficeImporter should be improved to use DocumentName instead of String. This will remove the need for a
             // DocumentNameSerializer.
             return officeImporter.importAttachment(

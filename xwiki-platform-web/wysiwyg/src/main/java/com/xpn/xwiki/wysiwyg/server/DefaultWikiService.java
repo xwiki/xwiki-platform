@@ -32,7 +32,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
@@ -73,7 +73,7 @@ public class DefaultWikiService implements WikiService
      * Used to construct a valid document reference.
      */
     @Requirement("default/reference")
-    private DocumentReferenceFactory<EntityReference> defaultDocumentReferenceFactory;
+    private DocumentReferenceResolver<EntityReference> defaultDocumentReferenceResolver;
 
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
@@ -373,7 +373,7 @@ public class DefaultWikiService implements WikiService
 
         // TODO: Replace this by setting a current document in the context and use a Current Reference Factory.
         DocumentReference reference = new DocumentReference(wiki, space, page);
-        reference = this.defaultDocumentReferenceFactory.createDocumentReference(reference);
+        reference = this.defaultDocumentReferenceResolver.resolve(reference);
         if (StringUtils.isEmpty(wiki)) {
             reference.extractReference(EntityType.WIKI).setName(getXWikiContext().getDatabase());
         }

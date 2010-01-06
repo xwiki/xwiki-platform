@@ -32,7 +32,8 @@ import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceNormalizer;
+import org.xwiki.model.reference.DocumentReferenceFactory;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.syntax.Syntax;
 
@@ -69,10 +70,10 @@ public class DefaultWikiService implements WikiService
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     /**
-     * Used to construct a default document reference.
+     * Used to construct a valid document reference.
      */
-    @Requirement
-    private EntityReferenceNormalizer defaultEntityReferenceNormalizer;
+    @Requirement("default/reference")
+    private DocumentReferenceFactory<EntityReference> defaultDocumentReferenceFactory;
 
     /**
      * The component used to access documents. This is temporary till XWiki model is moved into components.
@@ -370,9 +371,9 @@ public class DefaultWikiService implements WikiService
         // which don't have the information required to detect the current document (e.g. these informations can't be
         // extracted from the request URL).
 
-        // TODO: Replace this by setting a current document in the context and use the Current Normalizer instead.
+        // TODO: Replace this by setting a current document in the context and use a Current Reference Factory.
         DocumentReference reference = new DocumentReference(wiki, space, page);
-        this.defaultEntityReferenceNormalizer.normalize(reference);
+        reference = this.defaultDocumentReferenceFactory.createDocumentReference(reference);
         if (StringUtils.isEmpty(wiki)) {
             reference.extractReference(EntityType.WIKI).setName(getXWikiContext().getDatabase());
         }

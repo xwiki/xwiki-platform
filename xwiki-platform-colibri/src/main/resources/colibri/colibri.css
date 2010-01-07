@@ -1122,6 +1122,7 @@ h1.xwikipaneltitle {
 /* --------------XWiki items types list -----------------*/
 ul.xlist {
   margin: 0 0 0 .5em !important;
+  overflow: hidden;
   padding: 0 !important;
 }
 
@@ -1134,6 +1135,7 @@ ul.xlist li.xhighlight:hover {
 }
 
 ul.xlist li {
+  float: right;
   height: 100%;
   list-style-type: none;
   padding-top: .2em;
@@ -1171,12 +1173,7 @@ ul.xlist li.xitem div.xitemcontainer ul.xlist {
 }
 
 .xspacer {
-  clear: both !important;
-  height: 0 !important;
-  line-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 0 !important;
+  display: none;
 }
 
 /* -----------------------Boxes--------------------------*/
@@ -1687,16 +1684,4 @@ body .listGrid {
 .ygtvitem td {
   border: none !important;
   padding: 0 !important;
-}
-
-/* ------------------------Dif---------------------------*/
-/* Should be in RecentChanges ssx*/
-table.recentChanges {
-  border-collapse: separate;
-}
-
-/* Overwrites RecentChanges ssx - added td*/
-td.recentChangesLeft {
-  background-color: $theme.backgroundSecondaryColor;
-  text-align: center;
 }

@@ -81,10 +81,17 @@ public final class NativeSelection extends JavaScriptObject
                 // Clear the reference to the saved range.
                 document.parentWindow.__xwe_savedRange = undefined;
                 try {
-                    // Restore the saved range.
+                    // Try to restore the saved range as it is, preserving its type.
                     range.select();
                 } catch (e) {
-                    // ignore
+                    try {
+                        // Try to restore the saved range as a text range since it may be a control range with an
+                        // invalid element. This can happen if an invalid control range is selected while the parent
+                        // window is not focused. See NativeRange#select() and ControlRange#add(Element).
+                        range.execCommand('SelectAll');
+                    } catch(e) {
+                        // ignore
+                    }
                 }
             }
         });

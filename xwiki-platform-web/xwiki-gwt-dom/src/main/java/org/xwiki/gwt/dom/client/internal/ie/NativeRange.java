@@ -69,6 +69,8 @@ public class NativeRange extends JavaScriptObject
             }
         } else {
             // Save this range till the owner document gains the focus.
+            // NOTE: This range might not be valid! We can't test its validity without selecting it first. If the saved
+            // range is not valid an exception will be thrown when it will be restored.
             wnd.__xwe_savedRange = this;
         }
     }-*/;

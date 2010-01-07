@@ -61,6 +61,14 @@ public final class ControlRange extends NativeRange
 
     /**
      * Adds an element to the control range.
+     * <p>
+     * Not all elements support control selection. If you try to add an element that doesn't support control selection
+     * to a control range you will get sooner or later an exception (e.g. "Invalid argument"):
+     * <ul>
+     * <li>in IE8 standards mode the exception is thrown when you try to select the range (so you can add any element to
+     * a control range but then you cannot select it)</li>
+     * <li>otherwise the exception is thrown when you add an invalid element to a control range (so by this method)</li>
+     * </ul>
      * 
      * @param element The element to include in this range.
      */

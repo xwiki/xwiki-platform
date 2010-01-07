@@ -533,4 +533,49 @@ public class RichTextAreaTest extends RichTextAreaTestCase
         // Verify the control selection.
         assertSelectionWrapsNode(getBody().getChildNodes().getItem(1));
     }
+
+    /**
+     * Tests if an anchor can be selected when the rich text area doesn't have the focus.
+     */
+    public void testSelectAnchorWithoutFocus()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                doTestSelectAnchorWithoutFocus();
+            }
+        });
+    }
+
+    /**
+     * Tests if an anchor can be selected when the rich text area doesn't have the focus.
+     */
+    private void doTestSelectAnchorWithoutFocus()
+    {
+        String anchorText = "inside";
+        rta.setHTML("before<a href=\"http://www.xwiki.org\">" + anchorText + "</a>after");
+
+        // We use a text input to move the focus out of the rich text area.
+        TextBox textBox = new TextBox();
+        RootPanel.get().add(textBox);
+        // Move the focus out of the rich text area.
+        textBox.setFocus(true);
+
+        // Select the anchor while the rich text area doesn't have the focus.
+        Node selectedNode = getBody().getChildNodes().getItem(1);
+        Range range = rta.getDocument().createRange();
+        range.selectNode(selectedNode);
+        select(range);
+
+        // Verify the selection when the rich text area doesn't have the focus.
+        assertEquals("blured", anchorText, rta.getDocument().getSelection().toString());
+
+        // Move the focus back and test the selection.
+        rta.setFocus(true);
+        assertEquals("focused", anchorText, rta.getDocument().getSelection().toString());
+
+        // Cleanup
+        textBox.removeFromParent();
+    }
 }

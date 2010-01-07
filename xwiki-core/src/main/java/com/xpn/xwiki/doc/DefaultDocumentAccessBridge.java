@@ -61,8 +61,12 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Requirement 
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    @Requirement("current")
-    private DocumentReferenceResolver documentReferenceResolver;
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead.
+     */
+    @Requirement("currentmixed")
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver;
 
     private XWikiContext getContext()
     {
@@ -119,7 +123,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Deprecated
     public org.xwiki.bridge.DocumentName getDocumentName(String documentReference)
     {
-        DocumentReference docReference = this.documentReferenceResolver.resolve(documentReference);
+        DocumentReference docReference = this.currentMixedDocumentReferenceResolver.resolve(documentReference);
         return new org.xwiki.bridge.DocumentName(docReference.getWikiReference().getName(),
             docReference.getLastSpaceReference().getName(), docReference.getName());
     }
@@ -467,9 +471,6 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<AttachmentReference> attachmentReferences = new ArrayList<AttachmentReference>();
         XWikiContext xcontext = getContext();
         DocumentReference resolvedReference = documentReference;
-        if (documentReference == null) {
-            resolvedReference = this.documentReferenceResolver.resolve(xcontext.getDoc().getFullName());
-        }
         List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
             this.entityReferenceSerializer.serialize(resolvedReference), xcontext).getAttachmentList();
         for (XWikiAttachment attachment : attachments) {
@@ -489,8 +490,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         throws Exception
     {
         List<org.xwiki.bridge.AttachmentName> results = new ArrayList<org.xwiki.bridge.AttachmentName>();
-        List<AttachmentReference> references = getAttachmentReferences(new DocumentReference(documentName.getWiki(),
-            documentName.getSpace(), documentName.getPage()));
+        DocumentReference documentReference;
+        if (documentName == null) {
+            documentReference = this.currentMixedDocumentReferenceResolver.resolve(getContext().getDoc().getFullName());
+        } else {
+            documentReference = new DocumentReference(documentName.getWiki(), documentName.getSpace(),
+                documentName.getPage());
+        }
+        List<AttachmentReference> references = getAttachmentReferences(documentReference);
         for (AttachmentReference reference : references) {
             results.add(new org.xwiki.bridge.AttachmentName(new org.xwiki.bridge.DocumentName(
                 reference.getDocumentReference().getWikiReference().getName(),

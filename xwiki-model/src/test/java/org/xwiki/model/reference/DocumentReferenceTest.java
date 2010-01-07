@@ -56,6 +56,14 @@ public class DocumentReferenceTest
     }
 
     @Test
+    public void testSetWikiReference()
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        reference.setWikiReference(new WikiReference("newwiki"));
+        Assert.assertEquals(new DocumentReference("newwiki", "space", "page"), reference);
+    }
+
+    @Test
     public void testGetLastSpaceReference()
     {
         DocumentReference reference1 = new DocumentReference("wiki", "space", "page");

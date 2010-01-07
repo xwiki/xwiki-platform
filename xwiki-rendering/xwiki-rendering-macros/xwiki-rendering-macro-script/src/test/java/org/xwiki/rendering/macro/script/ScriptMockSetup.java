@@ -58,7 +58,7 @@ public class ScriptMockSetup
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, bridge);
 
-        // Use a mock for the AttachmentReference Factory
+        // Use a mock for the AttachmentReference Resolver
         attachmentReferenceResolver = mockery.mock(AttachmentReferenceResolver.class);
         DefaultComponentDescriptor<AttachmentReferenceResolver> descriptorARF =
             new DefaultComponentDescriptor<AttachmentReferenceResolver>();
@@ -66,7 +66,7 @@ public class ScriptMockSetup
         descriptorARF.setRoleHint("current");
         componentManager.registerComponent(descriptorARF, attachmentReferenceResolver);
 
-        // Use a mock for the DocumentReference Factory
+        // Use a mock for the DocumentReference Resolver
         documentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
         DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
             new DefaultComponentDescriptor<DocumentReferenceResolver>();

@@ -61,7 +61,8 @@ public class XWikiLinkLabelGeneratorTest
         ReflectionUtils.setFieldValue(this.generator, "renderingConfiguration", mockRenderingConfiguration);
 
         this.mockDocumentReferenceResolver = mockery.mock(DocumentReferenceResolver.class);
-        ReflectionUtils.setFieldValue(this.generator, "documentReferenceResolver", this.mockDocumentReferenceResolver);
+        ReflectionUtils.setFieldValue(this.generator, "currentDocumentReferenceResolver",
+            this.mockDocumentReferenceResolver);
 
         this.mockDocumentModelBridge = mockery.mock(DocumentModelBridge.class);
 

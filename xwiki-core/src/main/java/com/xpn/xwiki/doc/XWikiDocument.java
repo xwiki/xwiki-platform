@@ -325,10 +325,18 @@ public class XWikiDocument implements DocumentModelBridge
     private XDOM xdom;
 
     /**
-     * Used to resolve a string into a proper Document Reference.
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks.
      */
     private DocumentReferenceResolver currentDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "current");
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used to convert a proper Document Reference to string (compact form)
@@ -3849,7 +3857,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     public void setFullName(String fullname, XWikiContext context)
     {
-        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(fullname);
+        // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
+        // specified in the passed string, rather than use the current document's page name.
+        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(fullname);
         setDatabase(documentReference.getWikiReference().getName());
         setSpace(documentReference.getLastSpaceReference().getName());
         setName(documentReference.getName());
@@ -4326,7 +4336,9 @@ public class XWikiDocument implements DocumentModelBridge
         // Get the full unique form of the old and new document names to easily compare them with links references in
         // XDOM
         DocumentReference oldDocReference = getDocumentReference();
-        DocumentReference newDocReference = this.currentDocumentReferenceResolver.resolve(newDocumentName);
+        // Note: we use the CurrentMixed resolver since we want to use the default page name if the page isn't
+        // specified in the string, rather than using the current document's page name.
+        DocumentReference newDocReference = this.currentMixedDocumentReferenceResolver.resolve(newDocumentName);
 
         // Verify if the user is trying to rename to the same name... In that case, simply exits
         // for efficiency.

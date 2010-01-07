@@ -66,7 +66,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
     /**
      * Used to convert a string into a proper Document Name.
      */
-    private DocumentReferenceResolver documentReferenceResolver =
+    private DocumentReferenceResolver currentDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "current");
 
     /**
@@ -375,8 +375,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         String contextUserName;
 
         if (principal != null) {
+            // Ensures that the wiki part is removed if specified in the Principal name and if it's not the same wiki
+            // as the current wiki.
+            // TODO: Warning the code below will fail if current doc's wiki != current wiki.
             DocumentReference userDocumentReference =
-                this.documentReferenceResolver.resolve(principal.getName());
+                this.currentDocumentReferenceResolver.resolve(principal.getName());
             contextUserName = this.compactWikiEntityReferenceSerializer.serialize(userDocumentReference);
         } else {
             contextUserName = null;

@@ -68,8 +68,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     /**
      * Used to convert a string into a proper Document Reference.
      */
-    private DocumentReferenceResolver<String> documentReferenceResolver =
-        Utils.getComponent(DocumentReferenceResolver.class, "current");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     /**
      * Used to convert a proper Document Name to string.
@@ -321,7 +321,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
         boolean found = false;
 
         // Here entity is either a user or a group
-        DocumentReference entityDocumentReference = this.documentReferenceResolver.resolve(name);
+        DocumentReference entityDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(name);
         String prefixedFullName = this.entityReferenceSerializer.serialize(entityDocumentReference);
         String shortname = name;
         int i0 = name.indexOf(":");
@@ -789,8 +789,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
     // TODO: this method is a candidate for the the XWikiRightService API.
     private boolean isSuperAdmin(String username)
     {
-        DocumentReference documentReference =
-            Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
+        DocumentReference documentReference = Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
         return documentReference.getName().equalsIgnoreCase(SUPERADMIN_USER);
     }
 

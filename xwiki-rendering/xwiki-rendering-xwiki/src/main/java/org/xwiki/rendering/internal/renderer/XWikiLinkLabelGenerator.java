@@ -47,15 +47,14 @@ public class XWikiLinkLabelGenerator implements LinkLabelGenerator
     private DocumentAccessBridge documentAccessBridge;
 
     @Requirement("current")
-    private DocumentReferenceResolver documentReferenceResolver;
+    private DocumentReferenceResolver currentDocumentReferenceResolver;
 
     public String generate(Link link)
     {
         String result;
 
         String format = this.renderingConfiguration.getLinkLabelFormat();
-        DocumentReference documentReference =
-            this.documentReferenceResolver.resolve(link.getReference());
+        DocumentReference documentReference = this.currentDocumentReferenceResolver.resolve(link.getReference());
 
         // Replace %w with the wiki name
         result = format.replace("%w", documentReference.getWikiReference().getName());

@@ -74,8 +74,8 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
     /**
      * Required for converting string document names to {@link org.xwiki.model.reference.DocumentReference} instances.
      */
-    @Requirement("current")
-    private DocumentReferenceResolver documentReferenceResolver;
+    @Requirement("currentmixed")
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver;
 
     /**
      * The {@link DocumentSplitter} used for splitting wiki documents.
@@ -112,12 +112,12 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
         for (WikiDocument doc : documents) {
             // Initialize a target page descriptor.
             DocumentReference targetReference =
-                this.documentReferenceResolver.resolve(doc.getFullName());
+                this.currentMixedDocumentReferenceResolver.resolve(doc.getFullName());
             TargetDocumentDescriptor targetDocumentDescriptor =
                 new TargetDocumentDescriptor(targetReference, this.componentManager);
             if (doc.getParent() != null) {
                 DocumentReference targetParent =
-                    this.documentReferenceResolver.resolve(doc.getParent().getFullName());
+                    this.currentMixedDocumentReferenceResolver.resolve(doc.getParent().getFullName());
                 targetDocumentDescriptor.setParentReference(targetParent);
             }
 
@@ -162,7 +162,7 @@ public class DefaultXDOMOfficeDocumentSplitter implements XDOMOfficeDocumentSpli
 
     /**
      * {@inheritDoc}
-     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, org.xwiki.model.reference.DocumentReference)} since 2.2.M1
+     * @deprecated use {@link #split(XDOMOfficeDocument, int[], String, DocumentReference)} since 2.2.M1
      */
     @Deprecated
     public Map<TargetDocumentDescriptor, XDOMOfficeDocument> split(XDOMOfficeDocument xdomOfficeDocument,

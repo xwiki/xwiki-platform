@@ -58,6 +58,12 @@ public class DocumentReference extends EntityReference
         return new WikiReference(extractReference(EntityType.WIKI));
     }
 
+    public void setWikiReference(WikiReference newWikiReference)
+    {
+        EntityReference wikiReference = extractReference(EntityType.WIKI);
+        wikiReference.getChild().setParent(newWikiReference);
+    }
+
     public SpaceReference getLastSpaceReference()
     {
         return new SpaceReference(extractReference(EntityType.SPACE));

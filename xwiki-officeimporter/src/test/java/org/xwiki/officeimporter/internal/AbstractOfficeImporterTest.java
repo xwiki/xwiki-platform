@@ -80,7 +80,7 @@ public abstract class AbstractOfficeImporterTest extends AbstractComponentTestCa
         DefaultComponentDescriptor<DocumentReferenceResolver> descriptorDRF =
             new DefaultComponentDescriptor<DocumentReferenceResolver>();
         descriptorDRF.setRole(DocumentReferenceResolver.class);
-        descriptorDRF.setRoleHint("current");
+        descriptorDRF.setRoleHint("currentmixed");
         getComponentManager().registerComponent(descriptorDRF, mockDocumentReferenceResolver);
     }
 }

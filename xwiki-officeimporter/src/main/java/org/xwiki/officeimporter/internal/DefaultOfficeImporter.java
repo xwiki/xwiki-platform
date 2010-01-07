@@ -83,8 +83,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     /**
      * Used for parsing document name strings.
      */
-    @Requirement("current")
-    private DocumentReferenceResolver documentReferenceResolver;
+    @Requirement("currentmixed")
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver;
 
     /**
      * Used for importing office documents.
@@ -121,7 +121,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
         String extension = documentFormat.substring(documentFormat.lastIndexOf('.') + 1);
         String officeFileName = "input." + extension;
 
-        DocumentReference baseDocument = this.documentReferenceResolver.resolve(targetWikiDocument);
+        DocumentReference baseDocument = this.currentMixedDocumentReferenceResolver.resolve(targetWikiDocument);
         if (isPresentation(documentFormat)) {
             XDOMOfficeDocument presentation = presentationBuilder.build(documentStream, officeFileName);
             saveDocument(presentation, new TargetDocumentDescriptor(baseDocument, this.componentManager), null,
@@ -157,7 +157,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
     public String importAttachment(String strDocumentName, String strAttachmentFileName, Map<String, String> params)
         throws OfficeImporterException
     {
-        DocumentReference documentReference = this.documentReferenceResolver.resolve(strDocumentName);
+        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(strDocumentName);
         AttachmentReference attachmentReference = new AttachmentReference(strAttachmentFileName, documentReference);
 
         InputStream attachmentStream;
@@ -216,7 +216,8 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                     docBridge.getDocument(targetDescriptor.getDocumentReference()).setTitle(title);
                 }
                 if (null != parent) {
-                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setParent(targetDescriptor.getParentReference());
+                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setParent(
+                        targetDescriptor.getParentReference());
                 }
                 docBridge.setDocumentContent(target, content, "Created by office importer", false);
             }

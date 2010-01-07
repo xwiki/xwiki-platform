@@ -77,7 +77,7 @@ public class OfficeImporterVelocityBridge
     /**
      * Used for converting string document names to objects.
      */
-    private DocumentReferenceResolver documentReferenceResolver;
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver;
 
     /**
      * Used to query openoffice server status.
@@ -124,7 +124,8 @@ public class OfficeImporterVelocityBridge
             this.execution = componentManager.lookup(Execution.class);
             this.importer = componentManager.lookup(OfficeImporter.class);
             this.docBridge = componentManager.lookup(DocumentAccessBridge.class);
-            this.documentReferenceResolver = componentManager.lookup(DocumentReferenceResolver.class, "current");
+            this.currentMixedDocumentReferenceResolver =
+                componentManager.lookup(DocumentReferenceResolver.class, "currentmixed");
             this.officeManager = componentManager.lookup(OpenOfficeManager.class);
             this.xhtmlBuilder = componentManager.lookup(XHTMLOfficeDocumentBuilder.class);
             this.xdomBuilder = componentManager.lookup(XDOMOfficeDocumentBuilder.class);
@@ -156,7 +157,7 @@ public class OfficeImporterVelocityBridge
         try {
             connect();
             return xhtmlBuilder.build(officeFileStream, officeFileName,
-                documentReferenceResolver.resolve(referenceDocument), filterStyles);
+                currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -210,7 +211,7 @@ public class OfficeImporterVelocityBridge
                 return presentationBuilder.build(officeFileStream, officeFileName);
             } else {
                 return xdomBuilder.build(officeFileStream, officeFileName,
-                    documentReferenceResolver.resolve(referenceDocument), filterStyles);
+                    currentMixedDocumentReferenceResolver.resolve(referenceDocument), filterStyles);
             }
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
@@ -246,7 +247,7 @@ public class OfficeImporterVelocityBridge
         }
         try {
             return xdomSplitter.split(xdomDocument, splitLevels, namingCriterionHint,
-                documentReferenceResolver.resolve(rootDocumentName));
+                currentMixedDocumentReferenceResolver.resolve(rootDocumentName));
         } catch (OfficeImporterException ex) {
             setErrorMessage(ex.getMessage());
             logger.error(ex.getMessage(), ex);
@@ -271,8 +272,8 @@ public class OfficeImporterVelocityBridge
         boolean append)
     {
         try {
-            DocumentReference docReference = documentReferenceResolver.resolve(target);
-            DocumentReference parentReference = documentReferenceResolver.resolve(parent);
+            DocumentReference docReference = currentMixedDocumentReferenceResolver.resolve(target);
+            DocumentReference parentReference = currentMixedDocumentReferenceResolver.resolve(parent);
 
             // First check if the user has edit rights on the target document.
             if (!docBridge.isDocumentEditable(docReference)) {
@@ -429,7 +430,7 @@ public class OfficeImporterVelocityBridge
      */
     private void validateRequest(String targetDocument, Map<String, String> options) throws OfficeImporterException
     {
-        if (!docBridge.isDocumentEditable(documentReferenceResolver.resolve(targetDocument))) {
+        if (!docBridge.isDocumentEditable(currentMixedDocumentReferenceResolver.resolve(targetDocument))) {
             throw new OfficeImporterException("Inadequate privileges.");
         } else if (docBridge.exists(targetDocument) && !isAppendRequest(options)) {
             throw new OfficeImporterException("The target document " + targetDocument + " already exists.");

@@ -94,17 +94,17 @@ public class ImageRadeoxMacroConverter extends AbstractRadeoxMacroConverter
         }
 
         // print the image itself
+        result.append("[[");
         if (parameters.size() == 1 || (parameters.size() == 2 && parameters.containsKey("document"))) {
             appendSimpleImage(result, parameters);
         } else {
-            result.append("[[");
             appendSimpleImage(result, parameters);
             parametersClone.remove("");
             parametersClone.remove("document");
             result.append("||");
             appendParameters(result, parametersClone);
-            result.append("]]");
         }
+        result.append("]]");
 
         // print link end
         if (link != null && link.getValue().indexOf("=") == -1 && !link.getValue().toLowerCase().startsWith("f")) {

@@ -80,6 +80,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.LinkBlock;
@@ -359,7 +360,9 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Used to create proper {@link Syntax} objects.
      */
-    SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+    private SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+
+    private Execution execution = Utils.getComponent(Execution.class);
 
     /**
      * @since 2.2M1
@@ -375,7 +378,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public XWikiDocument()
     {
-        this(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
+        // TODO: Replace this with the following when we find a way to not generate a cycle:
+        //       this(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
+        this(new DocumentReference("xwiki", "Main", "WebHome"));
     }
 
     /**
@@ -397,25 +402,18 @@ public class XWikiDocument implements DocumentModelBridge
      *
      * @param wiki The wiki this document belongs to.
      * @param space The space this document belongs to.
-     * @param name The name of the document.
+     * @param name The name of the document (can contain either the page name or the space and page name)
      * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
     @Deprecated
     public XWikiDocument(String wiki, String space, String name)
     {
-        String normalizedPage;
-        String normalizedSpace;
-        int i1 = name.indexOf(".");
-        if (i1 == -1) {
-            normalizedPage = name;
-            normalizedSpace = space;
-        } else {
-            normalizedSpace = name.substring(0, i1);
-            normalizedPage = name.substring(i1 + 1);
-        }
-
-        init(Utils.getComponent(DocumentReferenceResolver.class, "current/reference").resolve(
-            new DocumentReference(wiki, normalizedSpace, normalizedPage)));
+        // We allow to specify the space in the name (eg name = "space.page"). In this case the passed space is
+        // ignored.
+        DocumentReference reference = resolveReference(name, new DocumentReference(wiki, space, null));
+        // Replace the resolved wiki by the passed wiki
+        reference.setWikiReference(new WikiReference(wiki));
+        init(reference);
     }
 
     public XWikiStoreInterface getStore(XWikiContext context)
@@ -5845,5 +5843,22 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         return syntaxId;
+    }
+
+    private DocumentReference resolveReference(String referenceAsString, DocumentReference defaultReference)
+    {
+        XWikiContext xcontext = getXWikiContext();
+        XWikiDocument originalCurentDocument = xcontext.getDoc();
+        try {
+            xcontext.setDoc(new XWikiDocument(defaultReference));
+            return this.currentDocumentReferenceResolver.resolve(referenceAsString);
+        } finally {
+            xcontext.setDoc(originalCurentDocument);
+        }
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
     }
 }

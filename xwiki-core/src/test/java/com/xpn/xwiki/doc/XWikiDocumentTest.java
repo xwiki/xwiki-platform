@@ -155,6 +155,29 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
     }
 
+    public void testConstructor()
+    {
+        XWikiDocument doc = new XWikiDocument("notused", "space.page");
+        assertEquals("space", doc.getSpaceName());
+        assertEquals("page", doc.getPageName());
+        assertEquals("xwiki", doc.getWikiName());
+
+        doc = new XWikiDocument("space", "page");
+        assertEquals("space", doc.getSpaceName());
+        assertEquals("page", doc.getPageName());
+        assertEquals("xwiki", doc.getWikiName());
+
+        doc = new XWikiDocument("wiki", "space", "page");
+        assertEquals("space", doc.getSpaceName());
+        assertEquals("page", doc.getPageName());
+        assertEquals("wiki", doc.getWikiName());
+
+        doc = new XWikiDocument("wiki", "notused", "notused:space.page");
+        assertEquals("space", doc.getSpaceName());
+        assertEquals("page", doc.getPageName());
+        assertEquals("wiki", doc.getWikiName());
+    }
+
     public void testGetDisplayTitleWhenNoTitleAndNoContent()
     {
         this.document.setContent("Some content");

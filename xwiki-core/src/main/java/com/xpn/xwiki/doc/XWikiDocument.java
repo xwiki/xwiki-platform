@@ -378,9 +378,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public XWikiDocument()
     {
-        // TODO: Replace this with the following when we find a way to not generate a cycle:
-        //       this(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
-        this(new DocumentReference("xwiki", "Main", "WebHome"));
+        this(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
     }
 
     /**

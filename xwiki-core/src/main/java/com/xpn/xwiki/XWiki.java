@@ -1415,10 +1415,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public XWikiDocument getDocument(DocumentReference reference, XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setDatabase(reference.getWikiReference().getName());
-        doc.setSpace(reference.getLastSpaceReference().getName());
-        doc.setName(reference.getName());
+        XWikiDocument doc = new XWikiDocument(reference);
         doc.setContentDirty(true);
         return getDocument(doc, context);
     }

@@ -22,12 +22,17 @@ package com.xpn.xwiki.internal.model.reference;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
 import org.junit.Assert;
 import org.junit.Before;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
@@ -38,14 +43,16 @@ import org.xwiki.test.AbstractComponentTestCase;
  */
 public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractComponentTestCase
 {
-    private static final String CURRENT_WIKI = "currentwiki";
-
     private static final String CURRENT_SPACE = "currentspace";
 
+    private Mockery mockery = new Mockery();
+    
     private EntityReferenceResolver resolver;
 
     private XWikiContext context;
 
+    private ModelContext mockModelContext;
+    
     @Before
     public void setUp() throws Exception
     {
@@ -57,16 +64,25 @@ public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractCom
         execution.getContext().setProperty("xwikicontext", this.context);
         Utils.setComponentManager(getComponentManager());
 
+        this.mockModelContext = mockery.mock(ModelContext.class);
+        DefaultComponentDescriptor<ModelContext> descriptor = new DefaultComponentDescriptor<ModelContext>();
+        descriptor.setRole(ModelContext.class);
+        getComponentManager().registerComponent(descriptor, this.mockModelContext);
+        
         this.resolver = getComponentManager().lookup(EntityReferenceResolver.class, "currentmixed");
     }
 
     @org.junit.Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, "notused"));
+        this.context.setDoc(new XWikiDocument("not used", CURRENT_SPACE, "notused"));
+
+        mockery.checking(new Expectations() {{
+            allowing(mockModelContext).getCurrentEntityReference(); will(returnValue(new WikiReference("currentwiki")));
+        }});
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
-        Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
+        Assert.assertEquals("currentwiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("WebHome", reference.getName());
     }

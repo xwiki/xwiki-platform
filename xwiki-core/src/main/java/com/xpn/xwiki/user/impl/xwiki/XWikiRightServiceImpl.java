@@ -781,16 +781,19 @@ public class XWikiRightServiceImpl implements XWikiRightService
     }
 
     /**
-     * Check is the given user is a superadmin.
-     * 
      * @param username Any flavor of username. Examples: "xwiki:XWiki.superadmin", "XWiki.superAdmin", "superadmin", etc
-     * @return True if the user is a superadmin, false otherwise
+     * @return true if the username is that of the superadmin (whatever the case) or false otherwise
      */
     // TODO: this method is a candidate for the the XWikiRightService API.
     private boolean isSuperAdmin(String username)
     {
-        DocumentReference documentReference = Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
-        return documentReference.getName().equalsIgnoreCase(SUPERADMIN_USER);
+        // Note 1: we use the default document reference resolver here but it doesn't matter since we only care about
+        //         the resolved page name.
+        // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
+        //         to retrieve only the page name
+        DocumentReference documentReference =
+            Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
+        return StringUtils.equalsIgnoreCase(documentReference.getName(), SUPERADMIN_USER);
     }
 
     private boolean isSuperAdminOrProgramming(String name, String resourceKey, String accessLevel, boolean user,

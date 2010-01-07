@@ -25,15 +25,24 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.ModelContext;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 
 /**
  * This is an implementation for backward-compatibility. It's behavior is essentially similar to the
  * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} implementation except for
- * one detail: if the document reference doesn't have a name specified it defaults to the default name and not
- * the current document's page name. This is to behave similarly to the old code. However new code should use the
+ * two detail:
+ * <ul>
+ * <li>if the document reference doesn't have a name specified it defaults to the default name and not
+ * the current document's page name.</li>
+ * <li>if the wiki reference isn't specified then the current wiki reference is used (as opposed to the current
+ * document reference's wiki reference for
+ * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver}</li>
+ * </ul>
+ * This is to behave similarly to the old code. However new code should use the
  * {@link com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver} instead as much as possible
  * since this version will eventually be removed.
  *
@@ -44,6 +53,9 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 public class CurrentMixedStringDocumentReferenceResolver extends DefaultStringEntityReferenceResolver
     implements DocumentReferenceResolver<String>
 {
+    @Requirement
+    private ModelContext modelContext;
+
     @Requirement
     private Execution execution;
 
@@ -70,7 +82,9 @@ public class CurrentMixedStringDocumentReferenceResolver extends DefaultStringEn
         } else {
             switch (type) {
                 case WIKI:
-                    result = currentDoc.getWikiName();
+                    EntityReference wikiReference =
+                        this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
+                    result = wikiReference.getName();
                     break;
                 case SPACE:
                     result = currentDoc.getSpaceName();

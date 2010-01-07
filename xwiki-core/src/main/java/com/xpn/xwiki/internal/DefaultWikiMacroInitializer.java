@@ -29,7 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
@@ -69,9 +69,6 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
      */
     @Requirement
     private Execution execution;
-
-    @Requirement
-    private DocumentReferenceResolver defaultDocumentReferenceResolver;
 
     /**
      * Utility method for accessing XWikiContext.
@@ -117,14 +114,13 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
                 xcontext.setDatabase(wikiName);
 
                 // Search for all those documents with macro definitions and for each register the macro
-                for (Object[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
+                for (String[] wikiMacroDocumentData : getWikiMacroDocumentData(xcontext)) {
                     // In the database the space and page names are always specified for a document. However the wiki
                     // part isn't so we need to replace the wiki reference with the current wiki.
-                    DocumentReference wikiMacroDocumentReference =
-                        this.defaultDocumentReferenceResolver.resolve(wikiMacroDocumentData[0]);
-                    wikiMacroDocumentReference.setWikiReference(new WikiReference(wikiName));
+                    DocumentReference wikiMacroDocumentReference = new DocumentReference(wikiMacroDocumentData[1],
+                        new SpaceReference(wikiMacroDocumentData[0], new WikiReference(wikiName)));
 
-                    String wikiMacroDocumentAuthor = (String) wikiMacroDocumentData[1];
+                    String wikiMacroDocumentAuthor = wikiMacroDocumentData[1];
                     try {
                         WikiMacro macro = wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
 
@@ -152,7 +148,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
     private List<String[]> getWikiMacroDocumentData(XWikiContext xcontext) throws Exception
     {
         // TODO: Use the query manager instead
-        String sql = "select doc.fullName, doc.author from XWikiDocument doc, BaseObject obj where "
+        String sql = "select doc.space, doc.name, doc.author from XWikiDocument doc, BaseObject obj where "
             + "doc.fullName=obj.name and obj.className=?";
         List<String[]> wikiMacroDocumentData;
         try {

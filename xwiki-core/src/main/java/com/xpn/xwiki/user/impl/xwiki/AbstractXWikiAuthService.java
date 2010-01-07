@@ -51,13 +51,19 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
     private static final String SUPERADMIN_PASSWORD_CONFIG = "xwiki.superadminpassword";
 
     /**
-     * @param username the username to check for superadmin access
+     * @param username the username to check for superadmin access.
+     *        Examples: "xwiki:XWiki.superadmin", "XWiki.superAdmin", "superadmin", etc
      * @return true if the username is that of the superadmin (whatever the case) or false otherwise
      */
     protected boolean isSuperAdmin(String username)
     {
         // FIXME: this method should probably use a XWikiRightService#isSuperadmin(String) method, see 
         // XWikiRightServiceImpl#isSuperadmin(String)
+
+        // Note 1: we use the default document reference resolver here but it doesn't matter since we only care about
+        //         the resolved page name.
+        // Note 2: we use a resolver since the passed username could contain the wiki and/or space too and we want
+        //         to retrieve only the page name
         DocumentReference documentReference =
             Utils.getComponent(DocumentReferenceResolver.class).resolve(username);
         return StringUtils.equalsIgnoreCase(documentReference.getName(), XWikiRightService.SUPERADMIN_USER);

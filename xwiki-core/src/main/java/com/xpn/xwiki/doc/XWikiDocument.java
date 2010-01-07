@@ -351,12 +351,6 @@ public class XWikiDocument implements DocumentModelBridge
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
-    /**
-     * Used to convert a proper Document Reference to string.
-     */
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.class);
-
     /*
      * Used to emulate an inline parsing.
      */
@@ -366,6 +360,63 @@ public class XWikiDocument implements DocumentModelBridge
      * Used to create proper {@link Syntax} objects.
      */
     SyntaxFactory syntaxFactory = Utils.getComponent(SyntaxFactory.class);
+
+    /**
+     * @since 2.2M1
+     */
+    public XWikiDocument(DocumentReference reference)
+    {
+        init(reference);
+    }
+    
+    /**
+     * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
+    public XWikiDocument()
+    {
+        this(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
+    }
+
+    /**
+     * Constructor that specifies the local document identifier: space name, document name. {@link #setDatabase(String)}
+     * must be called afterwards to specify the wiki name.
+     *
+     * @param space the space this document belongs to
+     * @param name the name of the document
+     * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
+    public XWikiDocument(String space, String name)
+    {
+        this(null, space, name);
+    }
+
+    /**
+     * Constructor that specifies the full document identifier: wiki name, space name, document name.
+     *
+     * @param wiki The wiki this document belongs to.
+     * @param web The space this document belongs to.
+     * @param name The name of the document.
+     * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
+    public XWikiDocument(String wiki, String web, String name)
+    {
+        String normalizedPage;
+        String normalizedSpace;
+        int i1 = name.indexOf(".");
+        if (i1 == -1) {
+            normalizedPage = name;
+            normalizedSpace = web;
+        } else {
+            normalizedSpace = name.substring(0, i1);
+            normalizedPage = name.substring(i1 + 1);
+        }
+
+        init(Utils.getComponent(DocumentReferenceResolver.class, "current/reference").resolve(
+            new DocumentReference(wiki, normalizedSpace, normalizedPage)));
+    }
 
     public XWikiStoreInterface getStore(XWikiContext context)
     {
@@ -446,62 +497,6 @@ public class XWikiDocument implements DocumentModelBridge
     public void setRCSVersion(Version version)
     {
         this.version = version;
-    }
-
-    public XWikiDocument()
-    {
-        this("Main", "WebHome");
-    }
-
-    /**
-     * Constructor that specifies the local document identifier: space name, document name. {@link #setDatabase(String)}
-     * must be called afterwards to specify the wiki name.
-     * 
-     * @param space the space this document belongs to
-     * @param name the name of the document
-     */
-    public XWikiDocument(String space, String name)
-    {
-        this(null, space, name);
-    }
-
-    /**
-     * Constructor that specifies the full document identifier: wiki name, space name, document name.
-     * 
-     * @param wiki The wiki this document belongs to.
-     * @param web The space this document belongs to.
-     * @param name The name of the document.
-     */
-    public XWikiDocument(String wiki, String web, String name)
-    {
-        setDatabase(wiki);
-        setSpace(web);
-
-        int i1 = name.indexOf(".");
-        if (i1 == -1) {
-            setName(name);
-        } else {
-            setSpace(name.substring(0, i1));
-            setName(name.substring(i1 + 1));
-        }
-        this.updateDate = new Date();
-        this.updateDate.setTime((this.updateDate.getTime() / 1000) * 1000);
-        this.contentUpdateDate = new Date();
-        this.contentUpdateDate.setTime((this.contentUpdateDate.getTime() / 1000) * 1000);
-        this.creationDate = new Date();
-        this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
-        this.parent = "";
-        this.content = "\n";
-        this.format = "";
-        this.author = "";
-        this.language = "";
-        this.defaultLanguage = "";
-        this.attachmentList = new ArrayList<XWikiAttachment>();
-        this.customClass = "";
-        this.comment = "";
-
-        // Note: As there's no notion of an Empty document we don't set the original document
-        // field. Thus getOriginalDocument() may return null.
     }
 
     /**
@@ -5488,19 +5483,6 @@ public class XWikiDocument implements DocumentModelBridge
         return isValid;
     }
 
-    private boolean executeValidationScript(XWikiContext context, String validationScript) throws XWikiException
-    {
-        try {
-            XWikiValidationInterface validObject =
-                (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
-
-            return validObject.validateDocument(this, context);
-        } catch (Throwable e) {
-            XWikiValidationStatus.addExceptionToContext(getFullName(), "", e, context);
-            return false;
-        }
-    }
-
     public static void backupContext(Map<String, Object> backup, XWikiContext context)
     {
         backup.put("doc", context.getDoc());
@@ -5705,6 +5687,61 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @return true if the document has a xwiki/1.0 syntax content
+     */
+    public boolean is10Syntax()
+    {
+        return is10Syntax(getSyntaxId());
+    }
+
+    /**
+     * @return true if the document has a xwiki/1.0 syntax content
+     */
+    public boolean is10Syntax(String syntaxId)
+    {
+        return XWIKI10_SYNTAXID.equalsIgnoreCase(syntaxId);
+    }
+
+    private void init(DocumentReference reference)
+    {
+        setDatabase(reference.getWikiReference().getName());
+        setSpace(reference.getLastSpaceReference().getName());
+        setName(reference.getName());
+
+        this.updateDate = new Date();
+        this.updateDate.setTime((this.updateDate.getTime() / 1000) * 1000);
+        this.contentUpdateDate = new Date();
+        this.contentUpdateDate.setTime((this.contentUpdateDate.getTime() / 1000) * 1000);
+        this.creationDate = new Date();
+        this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
+        this.parent = "";
+        this.content = "\n";
+        this.format = "";
+        this.author = "";
+        this.language = "";
+        this.defaultLanguage = "";
+        this.attachmentList = new ArrayList<XWikiAttachment>();
+        this.customClass = "";
+        this.comment = "";
+
+        // Note: As there's no notion of an Empty document we don't set the original document
+        // field. Thus getOriginalDocument() may return null.
+    }
+
+    private boolean executeValidationScript(XWikiContext context, String validationScript) throws XWikiException
+    {
+        try {
+            XWikiValidationInterface validObject =
+                (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
+
+            return validObject.validateDocument(this, context);
+        } catch (Throwable e) {
+            XWikiValidationStatus.addExceptionToContext(getFullName(), "", e, context);
+            return false;
+        }
+    }
+    
+    /**
      * Convert the passed content from the passed syntax to the passed new syntax.
      * 
      * @param content the content to convert
@@ -5808,21 +5845,5 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         return syntaxId;
-    }
-
-    /**
-     * @return true if the document has a xwiki/1.0 syntax content
-     */
-    public boolean is10Syntax()
-    {
-        return is10Syntax(getSyntaxId());
-    }
-
-    /**
-     * @return true if the document has a xwiki/1.0 syntax content
-     */
-    public boolean is10Syntax(String syntaxId)
-    {
-        return XWIKI10_SYNTAXID.equalsIgnoreCase(syntaxId);
     }
 }

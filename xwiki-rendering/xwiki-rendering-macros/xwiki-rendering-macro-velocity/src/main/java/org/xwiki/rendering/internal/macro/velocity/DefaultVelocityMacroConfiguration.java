@@ -36,7 +36,7 @@ public class DefaultVelocityMacroConfiguration implements VelocityMacroConfigura
     /**
      * Prefix for configuration keys for the Velocity Macro module.
      */
-    private static final String PREFIX = "macro.velocity";
+    private static final String PREFIX = "rendering.macro.velocity.";
 
     /**
      * @see #getFilter()

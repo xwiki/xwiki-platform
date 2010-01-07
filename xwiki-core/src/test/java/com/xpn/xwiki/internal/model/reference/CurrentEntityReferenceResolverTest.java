@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package com.xpn.xwiki.internal.model.reference;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 import org.junit.*;
 import org.xwiki.context.Execution;
@@ -29,7 +30,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link CurrentStringEntityReferenceResolver}.
+ * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
  * 
  * @version $Id$
  * @since 2.2M1

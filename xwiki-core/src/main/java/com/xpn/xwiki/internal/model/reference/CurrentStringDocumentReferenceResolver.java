@@ -17,39 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package com.xpn.xwiki.internal.model.reference;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 
 /**
  * Specialized version of {@link org.xwiki.model.reference.EntityReferenceResolver} which can be considered a helper
- * component to resolve {@link DocumentReference} objects from Entity Reference (when they miss some parent references
- * or have NULL values). This implementation uses values from the current document reference in the context when parts
- * of the Reference are missing in the Entity Reference representation.
+ * component to resolve {@link DocumentReference} objects from their string representation. This implementation
+ * uses values from the current document reference in the context when parts of the Reference are missing in the string
+ * representation. 
  *
  * @version $Id$
  * @since 2.2M1
  */
-@Component("current/reference")
-public class CurrentReferenceDocumentReferenceResolver implements DocumentReferenceResolver<EntityReference>
+@Component("current")
+public class CurrentStringDocumentReferenceResolver implements DocumentReferenceResolver<String>
 {
-    @Requirement("current/reference")
-    private EntityReferenceResolver<EntityReference> entityReferenceResolver;
+    @Requirement("current")
+    private EntityReferenceResolver entityReferenceResolver;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.model.reference.DocumentReferenceResolver#resolve(Object)
-     */
-    public DocumentReference resolve(EntityReference documentReferenceRepresentation)
+    public DocumentReference resolve(String documentReferenceRepresentation)
     {
-        return new DocumentReference(this.entityReferenceResolver.resolve(documentReferenceRepresentation,
-            EntityType.DOCUMENT));
+        return new DocumentReference(this.entityReferenceResolver.resolve(
+            documentReferenceRepresentation, EntityType.DOCUMENT));
     }
 }

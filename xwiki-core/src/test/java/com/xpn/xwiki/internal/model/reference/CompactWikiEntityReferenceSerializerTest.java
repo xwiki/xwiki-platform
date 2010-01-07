@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.doc;
+package com.xpn.xwiki.internal.model.reference;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -30,7 +30,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.AbstractComponentTestCase;
 
 /**
- * Unit tests for {@link CompactWikiStringEntityReferenceSerializer}.
+ * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CompactWikiStringEntityReferenceSerializer}.
  *
  * @version $Id$
  * @since 2.2M1

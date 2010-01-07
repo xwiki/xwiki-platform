@@ -396,19 +396,19 @@ public class XWikiDocument implements DocumentModelBridge
      * Constructor that specifies the full document identifier: wiki name, space name, document name.
      *
      * @param wiki The wiki this document belongs to.
-     * @param web The space this document belongs to.
+     * @param space The space this document belongs to.
      * @param name The name of the document.
      * @deprecated since 2.2M1 use {@link #XWikiDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
     @Deprecated
-    public XWikiDocument(String wiki, String web, String name)
+    public XWikiDocument(String wiki, String space, String name)
     {
         String normalizedPage;
         String normalizedSpace;
         int i1 = name.indexOf(".");
         if (i1 == -1) {
             normalizedPage = name;
-            normalizedSpace = web;
+            normalizedSpace = space;
         } else {
             normalizedSpace = name.substring(0, i1);
             normalizedPage = name.substring(i1 + 1);

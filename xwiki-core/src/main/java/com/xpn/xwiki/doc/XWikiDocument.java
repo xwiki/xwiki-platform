@@ -145,9 +145,6 @@ public class XWikiDocument implements DocumentModelBridge
 {
     private static final Log LOG = LogFactory.getLog(XWikiDocument.class);
 
-    /** The default wiki name to use when one isn't specified. */
-    private static final String DEFAULT_WIKI_NAME = "xwiki";
-
     /**
      * Regex Pattern to recognize if there's HTML code in a XWiki page.
      */
@@ -340,10 +337,22 @@ public class XWikiDocument implements DocumentModelBridge
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     /**
-     * Used to convert a proper Document Reference to string (compact form)
+     * Used to normalize references.
+     */
+    private DocumentReferenceResolver currentReferenceDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "current/reference");
+
+    /**
+     * Used to convert a proper Document Reference to string (compact form).
      */
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compact");
+
+    /**
+     * Used to convert a proper Document Reference to string (standard form).
+     */
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part). Used for serializing
@@ -351,6 +360,12 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     /*
      * Used to emulate an inline parsing.
@@ -408,9 +423,13 @@ public class XWikiDocument implements DocumentModelBridge
     {
         // We allow to specify the space in the name (eg name = "space.page"). In this case the passed space is
         // ignored.
-        DocumentReference reference = resolveReference(name, new DocumentReference(wiki, space, null));
-        // Replace the resolved wiki by the passed wiki
-        reference.setWikiReference(new WikiReference(wiki));
+        // Note that we need to normalize the default reference since it could be invalid
+        DocumentReference reference = resolveReference(name,
+            this.currentReferenceDocumentReferenceResolver.resolve(new DocumentReference(wiki, space, null)));
+        // Replace the resolved wiki by the passed wiki if not empty/null
+        if (!StringUtils.isEmpty(wiki)) {
+            reference.setWikiReference(new WikiReference(wiki));
+        }
         init(reference);
     }
 
@@ -447,8 +466,6 @@ public class XWikiDocument implements DocumentModelBridge
             this.id = (getFullName() + ":" + this.language).hashCode();
         }
 
-        // if (log.isDebugEnabled())
-        // log.debug("ID: " + getFullName() + " " + language + ": " + id);
         return this.id;
     }
 
@@ -679,37 +696,66 @@ public class XWikiDocument implements DocumentModelBridge
         this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
     }
 
-    public String getFullName()
-    {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getSpace()).append(".");
-        buf.append(getName());
-        return buf.toString();
-    }
-
-    public String getPrefixedFullName()
-    {
-        StringBuffer buf = new StringBuffer();
-        buf.append(getDatabase()).append(":");
-        buf.append(getSpace()).append(".");
-        buf.append(getName());
-        return buf.toString();
-    }
-
-    public void setFullName(String name)
-    {
-        setFullName(name, null);
-    }
-
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.xwiki.bridge.DocumentModelBridge#getDocumentReference()
      * @since 2.2M1
      */
     public DocumentReference getDocumentReference()
     {
         return new DocumentReference(getWikiName(), getSpaceName(), getPageName());
+    }
+
+    /**
+     * @return the docoument's space + page name (eg "space.page")
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     */
+    @Deprecated
+    public String getFullName()
+    {
+        return this.localEntityReferenceSerializer.serialize(getDocumentReference());
+    }
+
+    /**
+     * @return the docoument's wiki + space + page name (eg "wiki:space.page")
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     */
+    @Deprecated
+    public String getPrefixedFullName()
+    {
+        return this.defaultEntityReferenceSerializer.serialize(getDocumentReference());
+    }
+
+    /**
+     * @since 2.2M1
+     */
+    public void setDocumentReference(DocumentReference reference)
+    {
+        setDatabase(reference.getWikiReference().getName());
+        setSpace(reference.getLastSpaceReference().getName());
+        setName(reference.getName());
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
+    public void setFullName(String name)
+    {
+        setFullName(name, null);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
+    public void setFullName(String fullname, XWikiContext context)
+    {
+        // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
+        // specified in the passed string, rather than use the current document's page name.
+        setDocumentReference(this.currentMixedDocumentReferenceResolver.resolve(fullname));
+        setContentDirty(true);
     }
 
     /**
@@ -728,17 +774,21 @@ public class XWikiDocument implements DocumentModelBridge
      * {@inheritDoc}
      * 
      * @see DocumentModelBridge#getWikiName()
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public String getWikiName()
     {
-        return StringUtils.isEmpty(getDatabase()) ? DEFAULT_WIKI_NAME : getDatabase();
+        return getDatabase();
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see DocumentModelBridge#getSpaceName()
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public String getSpaceName()
     {
         return this.getSpace();
@@ -748,7 +798,9 @@ public class XWikiDocument implements DocumentModelBridge
      * {@inheritDoc}
      * 
      * @see DocumentModelBridge#getSpaceName()
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public String getPageName()
     {
         return this.getName();
@@ -3836,25 +3888,22 @@ public class XWikiDocument implements DocumentModelBridge
         setContentDirty(true);
     }
 
+    /**
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
+     */
+    @Deprecated
     public String getDatabase()
     {
         return this.database;
     }
 
+    /**
+     * @deprecated since 2.2M1 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
+     */
+    @Deprecated
     public void setDatabase(String database)
     {
         this.database = database;
-    }
-
-    public void setFullName(String fullname, XWikiContext context)
-    {
-        // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
-        // specified in the passed string, rather than use the current document's page name.
-        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(fullname);
-        setDatabase(documentReference.getWikiReference().getName());
-        setSpace(documentReference.getLastSpaceReference().getName());
-        setName(documentReference.getName());
-        setContentDirty(true);
     }
 
     public String getLanguage()
@@ -5700,9 +5749,7 @@ public class XWikiDocument implements DocumentModelBridge
 
     private void init(DocumentReference reference)
     {
-        setDatabase(reference.getWikiReference().getName());
-        setSpace(reference.getLastSpaceReference().getName());
-        setName(reference.getName());
+        setDocumentReference(reference);
 
         this.updateDate = new Date();
         this.updateDate.setTime((this.updateDate.getTime() / 1000) * 1000);

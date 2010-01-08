@@ -41,7 +41,7 @@ public class CompactWikiStringEntityReferenceSerializer extends DefaultStringEnt
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
+     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
      */
     @Override
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation)

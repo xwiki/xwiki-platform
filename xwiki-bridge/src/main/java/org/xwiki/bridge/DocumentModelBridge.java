@@ -69,13 +69,6 @@ public interface DocumentModelBridge
     org.xwiki.bridge.DocumentName getDocumentName();
 
     /**
-     * Retrieve the name of the virtual wiki this document belongs to.
-     * 
-     * @return A <code>String</code> representation of the document's wiki name.
-     */
-    String getWikiName();
-
-    /**
      * Retrieve the actual language of the document variant. If this is a translation, then it is the language of the
      * translation. If this is the original variant of the document, then it it is the default language of the document.
      * 
@@ -105,14 +98,27 @@ public interface DocumentModelBridge
     
     /**
      * @return the page to which the document belongs to (eg "WebHome")
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
      */
+    @Deprecated
     String getPageName();
     
     /**
      * @return the space to which the document belongs to (eg "Main")
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
      */
+    @Deprecated
     String getSpaceName();
-    
+
+    /**
+     * Retrieve the name of the virtual wiki this document belongs to.
+     *
+     * @return A <code>String</code> representation of the document's wiki name.
+     * @deprecated since 2.2M1 use {@link #getDocumentReference()}  instead
+     */
+    @Deprecated
+    String getWikiName();
+
     /**
      * @return the document's title or null if not set
      */

@@ -196,7 +196,7 @@ public class XWikiExecutor
             method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
                 new DefaultHttpMethodRetryHandler(0, false));
             // Set a socket timeout to ensure the server has no chance of not ansering to our request...
-            method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, new Integer(2000));
+            method.getParams().setParameter(HttpMethodParams.SO_TIMEOUT, new Integer(10000));
             
             try {
                 // Execute the method.

@@ -56,33 +56,29 @@ public class DeleteAction extends XWikiAction
             return true;
         }
 
-        // If the document doesn't exist then delete it from the recycle bin.
-        if (doc.isNew() && xwiki.hasRecycleBin(context)) {
-            String sindex = request.getParameter("id");
-            if (sindex != null) {
-                long index = Long.parseLong(sindex);
-                XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
-                // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
-                // don't try to delete it and instead redirect to the view page.
-                if (dd != null) {
-                    DeletedDocument ddapi = new DeletedDocument(dd, context);
-                    if (!ddapi.canDelete()) {
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                            "You can't delete from recycle bin before some time has passed");
-                    }
-                    xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+        String sindex = request.getParameter("id");
+        if (sindex != null && xwiki.hasRecycleBin(context)) {
+            long index = Long.parseLong(sindex);
+            XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
+            // If the document hasn't been previously deleted (i.e. it's not in the deleted document store) then
+            // don't try to delete it and instead redirect to the view page.
+            if (dd != null) {
+                DeletedDocument ddapi = new DeletedDocument(dd, context);
+                if (!ddapi.canDelete()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "You can't delete from recycle bin before some time has passed");
                 }
-                sendRedirect(response, Utils.getRedirect("view", context));
-                redirected = true;
-            } else {
-                // No index parameter passed, redirect the user to the view template so that he gets the document
-                // don't exist dialog box.
-                sendRedirect(response, Utils.getRedirect("view", context));
-                redirected = true;
+                xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
             }
+            sendRedirect(response, Utils.getRedirect("view", context));
+            redirected = true;
+        } else if (doc.isNew()) {
+            // Redirect the user to the view template so that he gets the "document doesn't exist" dialog box.
+            sendRedirect(response, Utils.getRedirect("view", context));
+            redirected = true;
         } else {
-            // delete to recycle bin
+            // Delete to recycle bin
             String language = xwiki.getLanguagePreference(context);
             if (StringUtils.isEmpty(language) || language.equals(doc.getDefaultLanguage())) {
                 xwiki.deleteAllDocuments(doc, context);

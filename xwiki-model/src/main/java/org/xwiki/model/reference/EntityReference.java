@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.reference;
 
+import org.apache.commons.lang.builder.CompareToBuilder;
 import org.xwiki.model.EntityType;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ import java.io.Serializable;
  * @version $Id$
  * @since 2.2M1
  */
-public class EntityReference implements Serializable, Cloneable
+public class EntityReference implements Serializable, Cloneable, Comparable<EntityReference>
 {
     /**
      * The version identifier for this Serializable class. Increment only if the <i>serialized</i> form of the class
@@ -188,5 +189,14 @@ public class EntityReference implements Serializable, Cloneable
             reference.setParent(getParent().clone());
         }
         return reference;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see Comparable#compareTo(Object)
+     */
+    public int compareTo(EntityReference reference)
+    {
+        return new CompareToBuilder().append(toString(), reference.toString()).toComparison();
     }
 }

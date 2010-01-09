@@ -23,6 +23,12 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.xwiki.model.EntityType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 /**
  * Unit tests for {@link EntityReference}.
  *
@@ -136,7 +142,7 @@ public class EntityReferenceTest
     }
 
     @Test
-    public void testClone() throws Exception
+    public void testClone()
     {
         EntityReference reference = new EntityReference("page", EntityType.DOCUMENT,
             new EntityReference("space", EntityType.SPACE,
@@ -147,5 +153,35 @@ public class EntityReferenceTest
         Assert.assertNotSame(reference.getParent(), clonedReference.getParent());
         Assert.assertNotSame(reference.getParent().getParent(), clonedReference.getParent().getParent());
         Assert.assertEquals(reference, clonedReference);
+    }
+
+    @Test
+    public void testCompareTo()
+    {
+        EntityReference reference = new EntityReference("f", EntityType.DOCUMENT,
+            new EntityReference("e", EntityType.SPACE,
+                new EntityReference("d", EntityType.WIKI)));
+
+        EntityReference reference2  = new EntityReference("c", EntityType.DOCUMENT,
+            new EntityReference("b", EntityType.SPACE,
+                new EntityReference("a", EntityType.WIKI)));
+
+        EntityReference reference3  = new EntityReference("c", EntityType.DOCUMENT,
+            new EntityReference("a", EntityType.SPACE,
+                new EntityReference("a", EntityType.WIKI)));
+
+
+        Assert.assertEquals(0, reference.compareTo(reference));
+
+        List<EntityReference> list = new ArrayList<EntityReference>();
+        list.add(reference);
+        list.add(reference2);
+        list.add(reference3);
+        Collections.sort(list);
+
+        // Reference3 is first since it serializes as a:a:c which comes before a:b:c and d:e:f
+        Assert.assertSame(reference, list.get(2));
+        Assert.assertSame(reference2, list.get(1));
+        Assert.assertSame(reference3, list.get(0));
     }
 }

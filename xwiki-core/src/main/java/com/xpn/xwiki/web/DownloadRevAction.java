@@ -1,5 +1,7 @@
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -7,36 +9,35 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.util.Util;
 
-import java.io.IOException;
-
-public class DownloadRevAction extends XWikiAction {
-    public String render(XWikiContext context) throws XWikiException {
+public class DownloadRevAction extends XWikiAction
+{
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String rev = request.getParameter("rev");
         String path = request.getRequestURI();
-        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/")+1),context);
+        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
         XWikiAttachment attachment = null;
 
-        if (context.getWiki().hasAttachmentRecycleBin(context)
-            && request.getParameter("rid") != null) {
+        if (context.getWiki().hasAttachmentRecycleBin(context) && request.getParameter("rid") != null) {
             int recycleId = Integer.parseInt(request.getParameter("rid"));
             attachment = new XWikiAttachment(doc, filename);
             attachment =
-                (XWikiAttachment) context.getWiki().getAttachmentRecycleBinStore()
-                    .restoreFromRecycleBin(attachment, recycleId, context, true);
-        } else if (request.getParameter("id")!=null) {
+                context.getWiki().getAttachmentRecycleBinStore().restoreFromRecycleBin(attachment, recycleId, context,
+                    true);
+        } else if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
-            attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+            attachment = doc.getAttachmentList().get(id);
         } else {
             attachment = doc.getAttachment(filename);
         }
-        if (attachment==null) {
-            Object[] args = { filename };
+        if (attachment == null) {
+            Object[] args = {filename};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                    "Attachment {0} not found", null, args);
+                XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment {0} not found", null, args);
         }
 
         synchronized (attachment) {
@@ -45,7 +46,7 @@ public class DownloadRevAction extends XWikiAction {
                 if (attachment == null) {
                     throw new XWikiException();
                 }
-            } catch(XWikiException e){
+            } catch (XWikiException e) {
                 String url = context.getDoc().getURL("viewattachrev", true, context);
                 url += "/" + filename;
                 if (request.getParameter("rid") != null) {
@@ -75,9 +76,8 @@ public class DownloadRevAction extends XWikiAction {
             response.getOutputStream().write(data);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                    "Exception while sending response", e);
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
         }
         return null;
-	}
+    }
 }

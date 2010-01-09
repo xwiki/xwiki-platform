@@ -145,9 +145,7 @@
 }
 .xproperty-title h2 {
   display: block;
-  padding: 2px;
-  padding-left: 32px;
-  padding-right: 20px;
+  padding: 2px 20px 2px 32px;
   margin: 0;
   font-size: 1em;
   font-weight: 100;

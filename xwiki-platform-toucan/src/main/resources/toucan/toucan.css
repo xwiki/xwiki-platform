@@ -1057,6 +1057,12 @@ body.content #contentcolumn .main {
     position: relative;
 }
 
+.wiki-code {
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+}
+
 html > body .minwidth, html > body .minwidthb, html > body .minwidthc {
     display: none;
 }

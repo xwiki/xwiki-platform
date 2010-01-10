@@ -2,9 +2,12 @@
 ### Code page in the "view" mode
 ###
 ###
+$xwiki.jsfx.use('js/xwiki/editors/fullScreenEdit.js', true)##
+$xwiki.ssfx.use('js/xwiki/editors/fullScreenEdit.css', true)##
 <h1><span>$msg.get('core.viewers.code.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</span></h1>
 #set($escapedcontent = $xwiki.getXMLEncoded($tdoc.translatedContent))
 #set($ln = "$!request.getParameter('showlinenumbers')")
+<div>
 #if($ln != '0')
   <a href="$doc.getURL('view', "viewer=code&showlinenumbers=0&$!docvariant")" id="toggleLineNumbers">$msg.get('core.viewers.code.hideLineNumbers')</a>
   #set($contentLines = $escapedcontent.split($util.newline))
@@ -25,3 +28,4 @@ $doc.name.format("%${positions}d:", $velocityCount) $line
   <a href="$doc.getURL('view', "viewer=code&showlinenumbers=1&$!docvariant")" id="toggleLineNumbers">$msg.get('core.viewers.code.showLineNumbers')</a>
   <textarea readonly="readonly" class="wiki-code">$escapedcontent</textarea>
 #end
+</div>

@@ -6,14 +6,22 @@
 #set($escapedcontent = $xwiki.getXMLEncoded($tdoc.translatedContent))
 #set($ln = "$!request.getParameter('showlinenumbers')")
 #if($ln != '0')
-  <a href="$doc.getURL('view', "viewer=code&showlinenumbers=0&$docvariant")">$msg.get('core.viewers.code.hideLineNumbers')</a>
+  <a href="$doc.getURL('view', "viewer=code&showlinenumbers=0&$!docvariant")" id="toggleLineNumbers">$msg.get('core.viewers.code.hideLineNumbers')</a>
   #set($contentLines = $escapedcontent.split($util.newline))
+  #set($lineCount = $contentLines.size())
+  #set($p = 1)
+  #foreach($i in [0..5])
+    #if($p > $lineCount)
+      #set($positions = $i)
+      #break
+    #end
+    #set($p = $p * 10)
+  #end
   <textarea readonly="readonly" class="wiki-code">
 #foreach($line in $contentLines)
-$velocityCount: $line
-#end
-  </textarea>
+$doc.name.format("%${positions}d:", $velocityCount) $line
+#end</textarea>
 #else
-  <a href="$doc.getURL('view', "viewer=code&showlinenumbers=1&$docvariant")">$msg.get('core.viewers.code.showLineNumbers')</a>
+  <a href="$doc.getURL('view', "viewer=code&showlinenumbers=1&$!docvariant")" id="toggleLineNumbers">$msg.get('core.viewers.code.showLineNumbers')</a>
   <textarea readonly="readonly" class="wiki-code">$escapedcontent</textarea>
 #end

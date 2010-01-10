@@ -368,6 +368,12 @@ body.content #contentcolumn .main {
   width: 100%;
 }
 
+.wiki-code {
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+}
+
 /* -----------------Top Doc Information------------------*/
 #hierarchy {
   font-size: 90%;

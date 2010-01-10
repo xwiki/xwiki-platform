@@ -8,12 +8,12 @@
 #if($ln != '0')
   <a href="$doc.getURL('view', "viewer=code&showlinenumbers=0&$docvariant")">$msg.get('core.viewers.code.hideLineNumbers')</a>
   #set($contentLines = $escapedcontent.split($util.newline))
-  <textarea readonly="readonly" style="width: 100%; height: 300px;">
+  <textarea readonly="readonly" class="wiki-code">
 #foreach($line in $contentLines)
 $velocityCount: $line
 #end
   </textarea>
 #else
   <a href="$doc.getURL('view', "viewer=code&showlinenumbers=1&$docvariant")">$msg.get('core.viewers.code.showLineNumbers')</a>
-  <textarea readonly="readonly" style="width: 100%; height: 300px;">$escapedcontent</textarea>
+  <textarea readonly="readonly" class="wiki-code">$escapedcontent</textarea>
 #end

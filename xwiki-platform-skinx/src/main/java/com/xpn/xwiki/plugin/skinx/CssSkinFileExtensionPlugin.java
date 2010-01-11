@@ -81,7 +81,7 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see SkinExtensionPlugin#getLink(String, XWikiContext)
+     * @see AbstractSkinExtensionPlugin#getLink(String, XWikiContext)
      */
     @Override
     public String getLink(String filename, XWikiContext context)
@@ -126,5 +126,19 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     public Set<String> getAlwaysUsedExtensions(XWikiContext context)
     {
         return Collections.emptySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Not supported for skinfile-based extensions.
+     * </p>
+     * 
+     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean hasPageExtensions(XWikiContext context)
+    {
+        return false;
     }
 }

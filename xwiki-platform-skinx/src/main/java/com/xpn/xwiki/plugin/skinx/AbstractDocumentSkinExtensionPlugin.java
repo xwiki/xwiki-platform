@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collection;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Abstract SX plugin for wiki-document-based extensions (Extensions written as object of a XWiki Extension class).
@@ -174,6 +176,26 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
 
     /**
      * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean hasPageExtensions(XWikiContext context)
+    {
+        XWikiDocument doc = context.getDoc();
+        Collection<BaseObject> objects = doc.getObjects(getExtensionClassName());
+        if (objects != null) {
+            for (BaseObject obj : objects) {
+                if (obj.getStringValue(USE_FIELDNAME).equals("currentPage")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
      * <p>
      * We must override this method since the plugin manager only calls it for classes that provide their own
      * implementation, and not an inherited one.
@@ -199,6 +221,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
         try {
             XWikiDocument doc = context.getWiki().getDocument(getExtensionClassName(), context);
             boolean needsUpdate = false;
+            String useOptions = "currentPage=Always on this page|onDemand=On demand|always=Always on this wiki";
 
             BaseClass bclass = doc.getxWikiClass();
             if (context.get("initdone") != null) {
@@ -210,7 +233,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             needsUpdate |= bclass.addTextField("name", "Name", 30);
             needsUpdate |= bclass.addTextAreaField("code", "Code", 50, 20);
             needsUpdate |=
-                bclass.addStaticListField(USE_FIELDNAME, "Use this extension", "onDemand=On demand|always=Always");
+                bclass.addStaticListField(USE_FIELDNAME, "Use this extension", useOptions);
             needsUpdate |= bclass.addBooleanField("parse", "Parse content", "yesno");
             needsUpdate |= bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
 

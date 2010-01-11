@@ -127,4 +127,18 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     {
         return Collections.emptySet();
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Not supported for skinfile-based extensions.
+     * </p>
+     * 
+     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean hasPageExtensions(XWikiContext context)
+    {
+        return false;
+    }
 }

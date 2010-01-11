@@ -72,6 +72,20 @@ public class LinkExtensionPlugin extends AbstractSkinExtensionPlugin
     /**
      * {@inheritDoc}
      * <p>
+     * Not supported for link extensions.
+     * </p>
+     * 
+     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean hasPageExtensions(XWikiContext context)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
      * We must override this method since the plugin manager only calls it for classes that provide their own
      * implementation, and not an inherited one.
      * </p>

@@ -103,6 +103,15 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     public abstract Set<String> getAlwaysUsedExtensions(XWikiContext context);
 
     /**
+     * Determines if the requested document contains on page skin extension objects of this type. True if at least one
+     * of the extension objects has the <tt>currentPage</tt> value for the <tt>use</tt> property.
+     * 
+     * @param context the current request context
+     * @return a boolean specifying if the current document contains on page skin extensions
+     */
+    public abstract boolean hasPageExtensions(XWikiContext context);
+
+    /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
@@ -210,18 +219,22 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin
     public String getImportString(XWikiContext context)
     {
         StringBuilder result = new StringBuilder();
+        // Using LinkedHashSet to preserve the extensions order.
+        Set<String> extensions = new LinkedHashSet();
         // First, we add to the import string the extensions that should always be used.
         // TODO Global extensions should be able to select a set of actions for which they are enabled.
-        for (String docName : getAlwaysUsedExtensions(context)) {
-            result.append(getLink(docName, context));
+        extensions.addAll(getAlwaysUsedExtensions(context));
+
+        // Then, we add On-Demand extensions for this request.
+        extensions.addAll(getPulledResources(context));
+
+        // Add On-Page extensions
+        if (hasPageExtensions(context)) {
+            extensions.add(context.getDoc().getFullName());
         }
-        // Then, we add On-Demand extensions for this request, from which we remove the
-        // extensions that were already in the "always use".
-        Set<String> requestList = getPulledResources(context);
-        // Remove all extensions already requested through "use always".
-        requestList.removeAll(getAlwaysUsedExtensions(context));
-        for (String docName : requestList) {
-            result.append(getLink(docName, context));
+
+        for (String documentName : extensions) {
+            result.append(getLink(documentName, context));
         }
         return result.toString();
     }

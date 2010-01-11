@@ -100,4 +100,18 @@ public abstract class AbstractResourceSkinExtensionPlugin extends AbstractSkinEx
         // extensions.
         return Collections.emptySet();
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Not supported for resource extensions.
+     * </p>
+     * 
+     * @see com.xpn.xwiki.plugin.skinx.AbstractSkinExtensionPlugin#hasPageExtensions(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public boolean hasPageExtensions(XWikiContext context)
+    {
+        return false;
+    }
 }

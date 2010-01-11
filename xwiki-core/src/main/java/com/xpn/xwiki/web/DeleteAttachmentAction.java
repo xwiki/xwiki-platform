@@ -21,21 +21,58 @@ package com.xpn.xwiki.web;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 
 public class DeleteAttachmentAction extends XWikiAction
 {
+    private static final Log LOG = LogFactory.getLog(DeleteAttachmentAction.class);
+
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         XWikiAttachment attachment = null;
+        XWiki xwiki = context.getWiki();
         String filename;
+
+        // Delete from the trash
+        if (request.getParameter("trashId") != null) {
+            long trashId = NumberUtils.toLong(request.getParameter("trashId"));
+            DeletedAttachment da = xwiki.getAttachmentRecycleBinStore().getDeletedAttachment(trashId, context, true);
+            // If the attachment hasn't been previously deleted (i.e. it's not in the deleted attachment store) then
+            // don't try to delete it and instead redirect to the attachment list.
+            if (da != null) {
+                com.xpn.xwiki.api.DeletedAttachment daapi = new com.xpn.xwiki.api.DeletedAttachment(da, context);
+                if (!daapi.canDelete()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "You are not allowed to delete an attachment from the trash "
+                            + "immediately after it has been deleted from the wiki");
+                }
+                if (!da.getDocName().equals(doc.getFullName())) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
+                        "The specified trash entry does not match the current document");
+                }
+                // TODO: Add a confirmation check
+                xwiki.getAttachmentRecycleBinStore().deleteFromRecycleBin(trashId, context, true);
+            }
+            sendRedirect(response, Utils.getRedirect("attach", context));
+            return false;
+        }
+
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
             filename = request.getParameter("filename");
         } else {
@@ -49,7 +86,7 @@ public class DeleteAttachmentAction extends XWikiAction
 
         // An attachment can be indicated either using an id, or using the filename.
         if (request.getParameter("id") != null) {
-            int id = Integer.parseInt(request.getParameter("id"));
+            int id = NumberUtils.toInt(request.getParameter("id"));
             attachment = newdoc.getAttachmentList().get(id);
         } else {
             attachment = newdoc.getAttachment(filename);

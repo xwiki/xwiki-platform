@@ -158,7 +158,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /**
      * Setter for {@link #filename}.
      * 
-     * @param filename The attachment filename. Used only by hibernate.
+     * @param filename The attachment filename to set. Used only by hibernate.
      */
     protected void setFilename(String filename)
     {
@@ -178,7 +178,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /**
      * Setter for {@link #date}.
      * 
-     * @param date The date of delete action to set. Used only by Hibernate.
+     * @param date The date of the delete action to set. Used only by Hibernate.
      */
     protected void setDate(Date date)
     {
@@ -188,7 +188,7 @@ public class DeletedAttachment extends AbstractSimpleClass
     /**
      * Getter for {@link #deleter}.
      * 
-     * @return The user which has removed the document.
+     * @return the user who deleted the attachment, as its document name (e.g. {@code XWiki.Admin})
      */
     public String getDeleter()
     {
@@ -228,9 +228,9 @@ public class DeletedAttachment extends AbstractSimpleClass
     /**
      * Export {@link XWikiAttachment} to {@link DeletedAttachment}.
      * 
-     * @param doc Deleted attachment.
-     * @param context The current context. Used in the XML export.
-     * @throws XWikiException If an exception occurs during the XML export.
+     * @param attachment the deleted attachment
+     * @param context the current context, used in the XML export
+     * @throws XWikiException if an exception occurs during the XML export
      */
     protected void setAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
@@ -238,11 +238,13 @@ public class DeletedAttachment extends AbstractSimpleClass
     }
 
     /**
-     * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}.
+     * Restore a {@link XWikiAttachment} from a {@link DeletedAttachment}. Note that this method does not actually
+     * restore the attachment to its owner document, it simply recomposes an {@link XWikiAttachment} object from the
+     * saved data.
      * 
-     * @return Restored attachment
-     * @param attachment Optional attachment object to restore, if not <code>null</code>.
-     * @param context The current {@link XWikiContext context}.
+     * @return restored attachment
+     * @param attachment optional object where to put the attachment data, if not <code>null</code>
+     * @param context the current {@link XWikiContext context}
      * @throws XWikiException If an exception occurs while the Attachment is restored from the XML. See
      *             {@link XWikiAttachment#fromXML(String)}.
      */

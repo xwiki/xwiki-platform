@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.xwiki.query.QueryManager;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 
 import com.xpn.xwiki.XWikiContext;
@@ -41,14 +42,16 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.util.Programming;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
-import org.xwiki.rendering.renderer.PrintRendererFactory;
 
 public class XWiki extends Api
 {
+    /** Logging helper object. */
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
 
+    /** The internal object wrapped by this API. */
     private com.xpn.xwiki.XWiki xwiki;
 
     /**
@@ -77,10 +80,11 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledge API allowing to access the underlying main XWiki Object
+     * Privileged API allowing to access the underlying main XWiki Object
      * 
-     * @return Priviledged Main XWiki Object
+     * @return Privileged Main XWiki Object
      */
+    @Programming
     public com.xpn.xwiki.XWiki getXWiki()
     {
         if (hasProgrammingRights()) {
@@ -165,7 +169,86 @@ public class XWiki extends Api
     }
 
     /**
-     * Returns wether a document exists or not
+     * Retrieve all the deleted attachments that belonged to a certain document. Note that this does not distinguish
+     * between different incarnations of a document name, and it does not require that the document still exists, it
+     * returns all the attachments that at the time of their deletion had a document with the specified name as their
+     * owner.
+     * 
+     * @param docName the {@link XWikiDocument#getFullName() name} of the owner document
+     * @return A list with all the deleted attachments which belonged to the specified document. If no such attachments
+     *         are found in the trash, an empty list is returned.
+     */
+    public List<DeletedAttachment> getDeletedAttachments(String docName)
+    {
+        try {
+            List<com.xpn.xwiki.doc.DeletedAttachment> attachments =
+                this.xwiki.getDeletedAttachments(docName, this.context);
+            if (attachments == null || attachments.isEmpty()) {
+                attachments = Collections.emptyList();
+            }
+            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
+                result.add(new DeletedAttachment(attachment, this.context));
+            }
+            return result;
+        } catch (Exception ex) {
+            LOG.warn("Failed to retrieve deleted attachments", ex);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Retrieve all the deleted attachments that belonged to a certain document and had the specified name. Multiple
+     * versions can be returned since the same file can be uploaded and deleted several times, creating different
+     * instances in the trash. Note that this does not distinguish between different incarnations of a document name,
+     * and it does not require that the document still exists, it returns all the attachments that at the time of their
+     * deletion had a document with the specified name as their owner.
+     * 
+     * @param docName the {@link DeletedAttachment#getDocName() name of the document} the attachment belonged to
+     * @param filename the {@link DeletedAttachment#getFilename() name} of the attachment to search for
+     * @return A list with all the deleted attachments which belonged to the specified document and had the specified
+     *         filename. If no such attachments are found in the trash, an empty list is returned.
+     */
+    public List<DeletedAttachment> getDeletedAttachments(String docName, String filename)
+    {
+        try {
+            List<com.xpn.xwiki.doc.DeletedAttachment> attachments =
+                this.xwiki.getDeletedAttachments(docName, filename, this.context);
+            if (attachments == null) {
+                attachments = Collections.emptyList();
+            }
+            List<DeletedAttachment> result = new ArrayList<DeletedAttachment>(attachments.size());
+            for (com.xpn.xwiki.doc.DeletedAttachment attachment : attachments) {
+                result.add(new DeletedAttachment(attachment, this.context));
+            }
+            return result;
+        } catch (Exception ex) {
+            LOG.warn("Failed to retrieve deleted attachments", ex);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Retrieve a specific attachment from the trash.
+     * 
+     * @param id the unique identifier of the entry in the trash
+     * @return specified attachment from the trash, {@code null} if not found
+     */
+    public DeletedAttachment getDeletedAttachment(String id)
+    {
+        try {
+            com.xpn.xwiki.doc.DeletedAttachment attachment = this.xwiki.getDeletedAttachment(id, this.context);
+            if (attachment != null) {
+                return new DeletedAttachment(attachment, this.context);
+            }
+        } catch (Exception ex) {
+            LOG.warn("Failed to retrieve deleted attachment", ex);
+        }
+        return null;
+    }
+
+    /**
+     * Returns whether a document exists or not
      * 
      * @param fullname Fullname of the XWiki document to be loaded
      * @return true if the document exists, false if not
@@ -2643,7 +2726,7 @@ public class XWiki extends Api
      */
     public QueryManager getQueryManager()
     {
-        return (QueryManager) Utils.getComponent(QueryManager.class, "secure");
+        return Utils.getComponent(QueryManager.class, "secure");
     }
 
     /**

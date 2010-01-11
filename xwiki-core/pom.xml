@@ -888,7 +888,9 @@
         <configuration>
           <includes>
               **/api/Api.java,
+              **/api/DeletedAttachment.java,
               **/api/User.java,
+              **/doc/DeletedAttachment.jave,
               **/xmlrpc/ConfluenceRpcInterface,
               **/xmlrpc/Attachment.java,
               **/xmlrpc/SpaceSummary.java,
@@ -912,7 +914,9 @@
               **/*AttachmentVersioningStore.java,
               **/api/StatsService.java,
               **/stats/**/*.java,
-              **/store/hibernate/query/*.java
+              **/store/hibernate/query/*.java,
+              **/store/AttachmentRecycleBinStore.java,
+              **/store/hibernate/HibernateAttachmentRecycleBinStore.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,

@@ -67,7 +67,13 @@ public class DeleteAction extends XWikiAction
                 if (!ddapi.canDelete()) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "You can't delete from recycle bin before some time has passed");
+                        "You are not allowed to delete a document from the trash "
+                            + "immediately after it has been deleted from the wiki");
+                }
+                if (!dd.getFullName().equals(doc.getFullName())) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
+                        "The specified trash entry does not match the current document");
                 }
                 xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
             }

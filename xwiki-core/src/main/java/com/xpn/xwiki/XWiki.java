@@ -69,6 +69,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.net.smtp.SMTPClient;
@@ -100,6 +101,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
+import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -1423,6 +1425,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
+    @Deprecated
     public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
@@ -1433,6 +1436,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @deprecated since 2.2M1 use {@link #getDocument(DocumentReference, XWikiContext)} instead
      */
+    @Deprecated
     public XWikiDocument getDocument(String web, String fullname, XWikiContext context) throws XWikiException
     {
         int i1 = fullname.lastIndexOf(".");
@@ -1526,6 +1530,69 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } else {
             return null;
         }
+    }
+
+    /**
+     * Retrieve all the deleted attachments that belonged to a certain document. Note that this does not distinguish
+     * between different incarnations of a document name, and it does not require that the document still exists, it
+     * returns all the attachments that at the time of their deletion had a document with the specified name as their
+     * owner.
+     * 
+     * @param docName the {@link XWikiDocument#getFullName() name} of the owner document
+     * @param context the current request context
+     * @return A list with all the deleted attachments which belonged to the specified document. If no such attachments
+     *         are found in the trash, an empty list is returned.
+     * @throws XWikiException if an error occurs while loading the attachments
+     */
+    public List<DeletedAttachment> getDeletedAttachments(String docName, XWikiContext context) throws XWikiException
+    {
+        if (hasAttachmentRecycleBin(context)) {
+            XWikiDocument doc = new XWikiDocument();
+            doc.setFullName(docName, context);
+            return getAttachmentRecycleBinStore().getAllDeletedAttachments(doc, context, true);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve all the deleted attachments that belonged to a certain document and had the specified name. Multiple
+     * versions can be returned since the same file can be uploaded and deleted several times, creating different
+     * instances in the trash. Note that this does not distinguish between different incarnations of a document name,
+     * and it does not require that the document still exists, it returns all the attachments that at the time of their
+     * deletion had a document with the specified name as their owner.
+     * 
+     * @param docName the {@link DeletedAttachment#getDocName() name of the document} the attachment belonged to
+     * @param filename the {@link DeletedAttachment#getFilename() name} of the attachment to search for
+     * @param context the current request context
+     * @return A list with all the deleted attachments which belonged to the specified document and had the specified
+     *         filename. If no such attachments are found in the trash, an empty list is returned.
+     * @throws XWikiException if an error occurs while loading the attachments
+     */
+    public List<DeletedAttachment> getDeletedAttachments(String docName, String filename, XWikiContext context)
+        throws XWikiException
+    {
+        if (hasAttachmentRecycleBin(context)) {
+            XWikiDocument doc = new XWikiDocument();
+            doc.setFullName(docName, context);
+            XWikiAttachment attachment = new XWikiAttachment(doc, filename);
+            return getAttachmentRecycleBinStore().getAllDeletedAttachments(attachment, context, true);
+        }
+        return null;
+    }
+
+    /**
+     * Retrieve a specific attachment from the trash.
+     * 
+     * @param id the unique identifier of the entry in the trash
+     * @return specified attachment from the trash, {@code null} if not found
+     * @throws XWikiException if an error occurs while loading the attachments
+     */
+    public DeletedAttachment getDeletedAttachment(String id, XWikiContext context) throws XWikiException
+    {
+        if (hasAttachmentRecycleBin(context)) {
+            return getAttachmentRecycleBinStore().getDeletedAttachment(NumberUtils.toInt(id), context, true);
+        }
+        return null;
     }
 
     public XWikiRenderingEngine getRenderingEngine()
@@ -5601,7 +5668,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /**
      * @return the cache factory creating local caches.
      * @since 1.5M2.
-     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)} 
+     * @deprecated Since 1.7M1, use {@link CacheManager} component instead using {@link Utils#getComponent(Class)}
      */
     @Deprecated
     public CacheFactory getLocalCacheFactory()

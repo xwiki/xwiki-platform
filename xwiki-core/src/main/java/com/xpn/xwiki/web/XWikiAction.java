@@ -269,14 +269,9 @@ public abstract class XWikiAction extends Action
                     if (LOG.isWarnEnabled()) {
                         LOG.warn("Uncaught exception: " + e.getMessage(), e);
                     }
-                    if (ajax) {
-                        // If the request is an AJAX request, we don't the whole HTML page
-                        // but just the exception inline.
-                        Utils.parseTemplate(Utils.getPage(context.getRequest(), "exceptioninline"), context);    
-                    }
-                    else {
-                        Utils.parseTemplate(Utils.getPage(context.getRequest(), "exception"), context);    
-                    }
+                    // If the request is an AJAX request, we don't return a whole HTML page, but just the exception inline.
+                    String exceptionTemplate = ajax ? "exceptioninline" : "exception";
+                    Utils.parseTemplate(Utils.getPage(context.getRequest(), exceptionTemplate), context);
                     return null;
                 } catch (XWikiException ex) {
                     if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {

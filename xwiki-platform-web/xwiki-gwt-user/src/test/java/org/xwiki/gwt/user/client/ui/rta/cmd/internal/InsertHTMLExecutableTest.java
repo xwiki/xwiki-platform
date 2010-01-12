@@ -19,6 +19,7 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
+import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.ui.rta.RichTextAreaTestCase;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
@@ -180,5 +181,202 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
         assertEquals(getBody(), range.getEndContainer());
         assertEquals(1, range.getStartOffset());
         assertEquals(2, range.getEndOffset());
+    }
+
+    /**
+     * Tests if an anchor is properly replaced. What is important is that the caret doesn't move inside a sibling node
+     * after the selected anchor is deleted. The caret must remain between nodes so that the HTML fragment is inserted
+     * in the right place.
+     */
+    public void testReplaceAnchor()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<ul><li><a href=\"http://www.xwiki.com\">XWiki</a><sup>tm</sup></li></ul>");
+
+                Range range = rta.getDocument().createRange();
+                range.selectNode(getBody().getFirstChild().getFirstChild().getFirstChild());
+                select(range);
+
+                assertEquals("XWiki", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "x"));
+                assertEquals("x<sup>tm</sup>", Element.as(getBody().getFirstChild().getFirstChild()).getInnerHTML()
+                    .toLowerCase());
+            }
+        });
+    }
+
+    /**
+     * Tests if a button is properly replaced. What is important is that the caret doesn't move inside a sibling node
+     * after the selected button is deleted. The caret must remain between nodes so that the HTML fragment is inserted
+     * in the right place.
+     * <p>
+     * NOTE: We need a special test for replacing a button because buttons support control selection, unlike anchors, so
+     * they are deleted in another way.
+     */
+    public void testReplaceButton()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p>before</p><button>albatross</button><p>after</p>");
+
+                Range range = rta.getDocument().createRange();
+                range.selectNode(getBody().getChildNodes().getItem(1));
+                select(range);
+
+                assertEquals("albatross", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "<button>toucan</button>"));
+                assertEquals("toucan", getBody().getChildNodes().getItem(1).getFirstChild().getNodeValue());
+            }
+        });
+    }
+
+    /**
+     * Selects the first characters of a text node and replaces them.
+     */
+    public void testReplaceTextStart()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p>123</p><p><em>#</em>456</p>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getLastChild().getLastChild(), 0);
+                range.setEnd(getBody().getLastChild().getLastChild(), 2);
+                select(range);
+
+                assertEquals("45", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "87"));
+                assertEquals("<em>#</em>876", Element.as(getBody().getLastChild()).getInnerHTML().toLowerCase());
+            }
+        });
+    }
+
+    /**
+     * Selects the last characters of a text node and replaces them.
+     */
+    public void testReplaceTextEnd()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p>123<em>#</em></p><p>456</p>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild(), 1);
+                range.setEnd(getBody().getFirstChild().getFirstChild(), 3);
+                select(range);
+
+                assertEquals("23", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "xx"));
+                assertEquals("1xx<em>#</em>", Element.as(getBody().getFirstChild()).getInnerHTML().toLowerCase());
+            }
+        });
+    }
+
+    /**
+     * Tests if an in-line HTML element is properly replaced when its parent element contains unnormalized text.
+     */
+    public void testReplaceInlineElementWhenUnnormalizedTextIsPresent()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p>2<em>3</em></p>");
+                getBody().getFirstChild().insertBefore(rta.getDocument().createTextNode(""),
+                    getBody().getFirstChild().getFirstChild());
+                getBody().getFirstChild().insertBefore(rta.getDocument().createTextNode("1"),
+                    getBody().getFirstChild().getFirstChild());
+
+                Range range = rta.getDocument().createRange();
+                range.selectNode(getBody().getFirstChild().getLastChild());
+                select(range);
+
+                assertEquals("3", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "4"));
+                assertEquals("124", Element.as(getBody().getFirstChild()).getInnerHTML().toLowerCase());
+            }
+        });
+    }
+
+    /**
+     * Replaces a selection that starts in a text node which isn't modified after the selected content is deleted. This
+     * is possible if the part that isn't deleted from the text where the selection ends matches the part that is
+     * deleted from the text where the selection starts.
+     */
+    public void testReplaceSelectionThatStartsInATextNodeWhichIsntModifiedByTheDelete()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p>abc<em>de</em>fbc<strong>#</strong></p>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild(), 1);
+                range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2), 1);
+                select(range);
+
+                assertEquals("bcdef", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "?"));
+                assertEquals("a?bc<strong>#</strong>", getBody().getFirstChildElement().getInnerHTML().toLowerCase());
+            }
+        });
+    }
+
+    /**
+     * Replaces a selection that crosses two in-line elements.
+     */
+    public void testReplaceCrossInlineElementSelection()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                // We added an image to the selection to be sure that at least one DOM node is deleted.
+                rta.setHTML("<p><em>123</em><img/><strong>456</strong></p>");
+
+                Range range = rta.getDocument().createRange();
+                range.setStart(getBody().getFirstChild().getFirstChild().getFirstChild(), 2);
+                range.setEnd(getBody().getFirstChild().getLastChild().getFirstChild(), 1);
+                select(range);
+
+                assertEquals("34", rta.getDocument().getSelection().toString());
+                assertTrue(executable.execute(rta, "+"));
+                assertEquals("<em>12+</em><strong>56</strong>", getBody().getFirstChildElement().getInnerHTML()
+                    .toLowerCase());
+            }
+        });
+    }
+
+    /**
+     * Replaces the entire text of a paragraph.
+     */
+    public void testReplaceParagraphText()
+    {
+        deferTest(new Command()
+        {
+            public void execute()
+            {
+                rta.setHTML("<p>alice</p><p>bob</p><p>carol</p>");
+
+                Range range = rta.getDocument().createRange();
+                range.selectNodeContents(getBody().getChildNodes().getItem(1));
+                select(range);
+
+                assertEquals("bob", rta.getDocument().getSelection().toString());
+                String insertedText = "*";
+                assertTrue(executable.execute(rta, insertedText));
+                assertEquals(insertedText, Element.as(getBody().getChildNodes().getItem(1)).getInnerHTML());
+            }
+        });
     }
 }

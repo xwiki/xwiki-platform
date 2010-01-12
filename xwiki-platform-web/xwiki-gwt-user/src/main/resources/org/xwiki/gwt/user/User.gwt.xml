@@ -119,4 +119,17 @@
       <when-property-is name="user.agent" value="ie8"/>
     </any>
   </replace-with>
+
+  <!-- InsertHTMLExecutableImpl -->
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl"/>
+  </replace-with>
+
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImplIE">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutableImpl"/>
+    <any>
+      <when-property-is name="user.agent" value="ie6"/>
+      <when-property-is name="user.agent" value="ie8"/>
+    </any>
+  </replace-with>
 </module>

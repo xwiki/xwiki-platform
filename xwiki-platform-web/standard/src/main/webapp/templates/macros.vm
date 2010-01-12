@@ -1446,6 +1446,11 @@ $html
 #submitButton("action_${action}", $msg.get("core.shortcuts.edit.${resourceIdentifier}"), $msg.get($resourceIdentifier))
 #end
 
+#**
+ * Display a human-readable file size
+ *
+ * @param $size the size in bytes to display in a human readable format
+ *#
 #macro(dynamicsize $sz)
 #if($sz < 1024)
 $sz bytes##

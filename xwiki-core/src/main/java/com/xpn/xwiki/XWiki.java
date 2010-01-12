@@ -4015,11 +4015,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // This is the new notification mechanism, implemented as a Component.
             // For the moment we're sending the XWiki context as the data, but this will be
             // changed in the future, when the whole platform will be written using components
-            // and there won't be a need for the context. The old version is available using
+            // and there won't be a need for the context. The source document is a new empty XWikiDocument to follow
+            // DocumentUpdateEvent policy: source document in new document and the old version is available using
             // doc.getOriginalDocument()
             ObservationManager om = Utils.getComponent(ObservationManager.class);
             if (om != null) {
                 XWikiDocument blankDoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
+                // Again to follow general event policy new document author the user how modified the document (here teh
+                // modification is delete)
                 blankDoc.setOriginalDocument(doc);
                 blankDoc.setAuthor(context.getUser());
                 blankDoc.setContentAuthor(context.getUser());

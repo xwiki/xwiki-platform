@@ -4105,8 +4105,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             ObservationManager om = Utils.getComponent(ObservationManager.class);
             if (om != null) {
                 XWikiDocument blankDoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
-                // Again to follow general event policy new document author the user how modified the document (here teh
-                // modification is delete)
+                // Again to follow general event policy, new document author is the user who modified the document (here
+                // the modification is delete)
                 blankDoc.setOriginalDocument(doc);
                 blankDoc.setAuthor(context.getUser());
                 blankDoc.setContentAuthor(context.getUser());

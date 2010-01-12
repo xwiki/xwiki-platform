@@ -4021,6 +4021,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (om != null) {
                 XWikiDocument blankDoc = new XWikiDocument(doc.getWikiName(), doc.getSpace(), doc.getName());
                 blankDoc.setOriginalDocument(doc);
+                blankDoc.setAuthor(context.getUser());
+                blankDoc.setContentAuthor(context.getUser());
                 om.notify(new DocumentDeleteEvent(doc.getWikiName() + ":" + doc.getFullName()), blankDoc, context);
             }
         } catch (Exception ex) {

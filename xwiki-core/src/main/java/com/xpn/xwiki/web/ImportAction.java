@@ -35,6 +35,8 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
  * 
  * @version $Id$
  */
+import org.apache.commons.lang.StringUtils;
+
 public class ImportAction extends XWikiAction
 {
     /**
@@ -91,12 +93,12 @@ public class ImportAction extends XWikiAction
                         for (String pageName : pages) {
                             String language = request.get("language_" + pageName);
                             String actionName = "action_" + pageName;
-                            if (language != null) {
-                                actionName = "_" + language;
+                            if (!StringUtils.isBlank(language)) {
+                                actionName += ("_" + language);
                             }
                             String defaultAction = request.get(actionName);
                             int iAction;
-                            if ((defaultAction == null) || (defaultAction.equals(""))) {
+                            if (StringUtils.isBlank(defaultAction)) {
                                 iAction = DocumentInfo.ACTION_OVERWRITE;
                             } else {
                                 try {
@@ -113,12 +115,31 @@ public class ImportAction extends XWikiAction
                                 importer.setDocumentAction(docName, language, iAction);
                             }
                         }
+                    }                    
+                    // Set the appropriate strategy to handle versions
+                    if (StringUtils.equals(request.getParameter("historyStrategy"), "reset")) {
+                    	importer.setPreserveVersion(false);
+                    	importer.setWithVersions(false);
+                    }
+                    else if(StringUtils.equals(request.getParameter("historyStrategy"), "replace")) {
+                    	importer.setPreserveVersion(false);
+                    	importer.setWithVersions(true);
+                    }
+                    else {
+                    	importer.setPreserveVersion(true);
+                    	importer.setWithVersions(false);
                     }
                     // Import files
-                    String withVersions = request.get("withversions");
-                    importer.setWithVersions("1".equals(withVersions));
                     importer.install();
-                    return "admin";
+                    if (!StringUtils.isBlank(request.getParameter("ajax"))) {
+                    	// If the import is done from an AJAX request we don't want to return a whole HTML page,
+                    	// instead we return "inline" the list of imported documents, 
+                    	// evaluating imported.vm template.
+                    	return "imported";
+                    }
+                    else {
+                        return "admin";    
+                    }
                 }
             }
         } catch (Exception e) {

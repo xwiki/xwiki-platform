@@ -59,9 +59,19 @@ public class DocumentInfoAPI extends Api
 
     public String getFullName()
     {
-        return (doc.getFullName());
+        return doc.getFullName();
     }
 
+    /**
+     * @return the language of the described document
+     * 
+     * @since 2.2M1
+     */
+    public String getLanguage()
+    {
+        return doc.getLanguage();
+    }
+    
     public int isInstallable()
     {
         return doc.isInstallable();

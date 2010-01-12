@@ -30,10 +30,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+
+import net.sf.json.JSONObject;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,7 +72,7 @@ public class Package
     public static final String DefaultPluginName = "package";
 
     private static final Log LOG = LogFactory.getLog(Package.class);
-
+    
     private String name = "My package";
 
     private String description = "";
@@ -87,9 +92,9 @@ public class Package
     private boolean backupPack = false;
 
     private boolean preserveVersion = false;
-
+    
     private boolean withVersions = true;
-
+    
     private List<DocumentFilter> documentFilters = new ArrayList<DocumentFilter>();
 
     public String getName()
@@ -146,7 +151,7 @@ public class Package
      * If true, the package will preserve the original author during import, rather than updating the author to the
      * current (importing) user.
      * 
-     * @see #isWithVersions()
+     * @see #isWithVersions() 
      * @see #isVersionPreserved()
      */
     public boolean isBackupPack()
@@ -158,7 +163,7 @@ public class Package
     {
         this.backupPack = backupPack;
     }
-
+    
     /**
      * If true, the package will preserve the current document version during import, regardless of whether or not the
      * document history is included.
@@ -192,17 +197,11 @@ public class Package
     }
 
     /**
-     * If set to true, Package will include the change history for the document when exporting the package. This implies
-     * that the old version is preserved.
-     * 
-     * @see #isVersionPreserved(boolean)
+     * If set to true, history revisions in the archive will be imported when importing documents.
      */
     public void setWithVersions(boolean withVersions)
     {
         this.withVersions = withVersions;
-        if (withVersions) {
-            this.preserveVersion = true;
-        }
     }
 
     public void addDocumentFilter(Object filter) throws PackageException
@@ -505,7 +504,7 @@ public class Package
     public int install(XWikiContext context) throws XWikiException
     {
         boolean isAdmin = context.getWiki().getRightService().hasAdminRights(context);
-
+        
         if (testInstall(isAdmin, context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
@@ -543,9 +542,18 @@ public class Package
 
         return status;
     }
-
+    
     private int installDocument(DocumentInfo doc, boolean isAdmin, XWikiContext context) throws XWikiException
     {
+    	if (this.preserveVersion && this.withVersions)
+    	{
+    		// Right now importing an archive and the history revisions it contains
+    		// without overriding the existing document is not supported.
+    		// We fallback on adding a new version to the existing history without importing the
+    		// archive's revisions.
+    		this.withVersions = false;
+    	}
+    	
         int result = DocumentInfo.INSTALL_OK;
 
         if (LOG.isDebugEnabled()) {
@@ -564,41 +572,74 @@ public class Package
         }
         if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST
             && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
+            XWikiDocument previousdoc = null;
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST) {
-                XWikiDocument deleteddoc = context.getWiki().getDocument(doc.getFullName(), context);
+                previousdoc = context.getWiki().getDocument(doc.getFullName(), context);
                 // if this document is a translation: we should only delete the translation
                 if (doc.getDoc().getTranslation() != 0) {
-                    deleteddoc = deleteddoc.getTranslatedDocument(doc.getLanguage(), context);
+                    previousdoc = previousdoc.getTranslatedDocument(doc.getLanguage(), context);
                 }
-                try {
-                    // This is not a real document delete, it's a upgrade. To be sure to not
-                    // generate DELETE notification we directly use {@link XWikiStoreInterface}
-                    context.getWiki().getStore().deleteXWikiDoc(deleteddoc, context);
-                } catch (Exception e) {
-                    // let's log the error but not stop
-                    result = DocumentInfo.INSTALL_ERROR;
-                    addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
-                    if (LOG.isErrorEnabled()) {
-                        LOG.error("Failed to delete document " + deleteddoc.getFullName());
-                    }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Failed to delete document " + deleteddoc.getFullName(), e);
+                // we should only delete the previous document
+                // if we are overridding the versions and/or if this is a backup pack
+                if (!this.preserveVersion || this.withVersions) {
+                    try {
+                        // This is not a real document delete, it's a upgrade. To be sure to not
+                        // generate DELETE notification we directly use {@link XWikiStoreInterface}
+                        context.getWiki().getStore().deleteXWikiDoc(previousdoc, context);
+                    } catch (Exception e) {
+                        // let's log the error but not stop
+                        result = DocumentInfo.INSTALL_ERROR;
+                        addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
+                        if (LOG.isErrorEnabled()) {
+                            LOG.error("Failed to delete document " + previousdoc.getFullName());
+                        }
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("Failed to delete document " + previousdoc.getFullName(), e);
+                        }
                     }
                 }
             }
             try {
-                if (!this.backupPack) {
+            	// Determine if the user performing the installation is a farm admin.
+            	// Right now, check for programming rights, which is the closer we can get to the notion
+            	// of farm admin.
+            	boolean isFarmAdmin = context.getWiki().getRightService().hasProgrammingRights(context);
+            	
+                if (!this.backupPack || !isFarmAdmin) {
+                	// We allow author preservation from the package only to farm admins,
+                	// In order to prevent sub-wiki admins to take control of a farm with forged packages
                     doc.getDoc().setAuthor(context.getUser());
+                    doc.getDoc().setContentAuthor(context.getUser());
+                    // if the import is not a backup pack we set the date to now
+                    Date date = new Date();
+                    doc.getDoc().setDate(date);
+                    doc.getDoc().setContentUpdateDate(date);
                 }
 
-                if ((!this.preserveVersion) && (!this.withVersions)) {
+                if (!this.withVersions) {
                     doc.getDoc().setVersion("1.1");
                 }
+                
+                if (this.preserveVersion && previousdoc != null) {                	
+                    // If it is not a backup pack and we are not overriding the versions
+                    // then we want to insert the archive from the original doc
+                    doc.getDoc().setDocumentArchive(previousdoc.getDocumentArchive(context));
+                } 
+                
+                else {
+                	// Reset or replace history
+                	// if there was not history in the source package then we should reset the version number to 1.1
+                	if (!this.documentContainsHistory(doc) || !this.withVersions) {
+                		doc.getDoc().setVersion("1.1");
+                	}
 
-                // We don't want date and version to change
-                // So we need to cancel the dirty status
-                doc.getDoc().setContentDirty(false);
-                doc.getDoc().setMetaDataDirty(false);
+                	// We don't want date and version to change
+                	// So we need to cancel the dirty status
+                	doc.getDoc().setContentDirty(false);
+                	doc.getDoc().setMetaDataDirty(false);
+                }
+
+                // Attachment saving should not generate additional saving
                 for (XWikiAttachment xa : doc.getDoc().getAttachmentList()) {
                     xa.setMetaDataDirty(false);
                     xa.getAttachment_content().setContentDirty(false);
@@ -608,20 +649,20 @@ public class Package
                 doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
-                if (this.withVersions) {
+                if (this.withVersions || this.preserveVersion) {
                     // we need to force the saving the document archive.
                     if (doc.getDoc().getDocumentArchive() != null) {
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(
                             doc.getDoc().getDocumentArchive(context), true, context);
                     }
                 }
-                // if there is no archive in xml and content&metaData Dirty is not set
-                // then archive was not saved
-                // so we need save it via resetArchive
-                if ((doc.getDoc().getDocumentArchive() == null)
-                    || (doc.getDoc().getDocumentArchive().getNodes() == null) || (!this.withVersions)) {
-                    doc.getDoc().resetArchive(context);
+
+                if (!this.preserveVersion && !this.withVersions) {
+                	// If we override and do not import version, (meaning reset document to 1.1)
+                	// We need manually reset possible existing revision for the document
+                	doc.getDoc().resetArchive(context);
                 }
+
             } catch (XWikiException e) {
                 addToErrors(doc.getFullName() + ":" + doc.getLanguage(), context);
                 if (LOG.isErrorEnabled()) {
@@ -636,6 +677,20 @@ public class Package
         return result;
     }
 
+    /**
+     * @return true if the passed document contains a (not-empty) history of previous versions, false otherwise
+     */
+    private boolean documentContainsHistory(DocumentInfo doc)
+    {
+    	if ((doc.getDoc().getDocumentArchive() == null)
+                || (doc.getDoc().getDocumentArchive().getNodes() == null)
+                || (doc.getDoc().getDocumentArchive().getNodes().size() == 0)) {
+            return false;
+        }
+    	return true;
+    }
+    
+    
     private List<String> getStringList(String name, XWikiContext context)
     {
         List<String> list = (List<String>) context.get(name);
@@ -979,7 +1034,7 @@ public class Package
         this.version = getElementText(infosEl, "version");
         this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
-
+        
         return domdoc;
     }
 
@@ -1105,5 +1160,57 @@ public class Package
         LOG.info("Package read " + count + " documents");
 
         return "";
+    }
+
+    /**
+     * Outputs the content of this package in the JSON format
+     * 
+     * @param wikiContext the XWiki context
+     * @return a representation of this package under the JSON format
+     * 
+     * @since 2.2M1
+     */
+    public JSONObject toJSON(XWikiContext wikiContext)
+    {
+        Map<String, Object> json = new HashMap<String, Object>();
+
+        Map<String, Object> infos = new HashMap<String, Object>();
+        infos.put("name", this.name);
+        infos.put("description", this.description);
+        infos.put("licence", this.licence);
+        infos.put("author", this.authorName);
+        infos.put("version", this.version);
+
+        Map<String, Map<String, List<Map<String, String>>>> files =
+            new HashMap<String, Map<String, List<Map<String, String>>>>();
+
+        for (DocumentInfo docInfo : this.files) {
+            Map<String, String> fileInfos = new HashMap<String, String>();
+            fileInfos.put("defaultAction", String.valueOf(docInfo.getAction()));
+            fileInfos.put("language", String.valueOf(docInfo.getLanguage()));
+            fileInfos.put("fullName", docInfo.getFullName());
+
+            // If the space does not exist in the map of spaces, we create it.
+            if (files.get(docInfo.getDoc().getSpace()) == null) {
+                files.put(docInfo.getDoc().getSpace(), new HashMap<String, List<Map<String, String>>>());
+            }
+            
+            // If the document name does not exists in the space map of docs, we create it.
+            if (files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
+                files.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
+                    new ArrayList<Map<String, String>>());
+            }
+            
+            // Finally we add the file infos (language, fullname and action) to the list of translations
+            // for that document.
+            files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
+        }
+
+        json.put("infos", infos);
+        json.put("files", files);
+        
+        JSONObject jsonObject = JSONObject.fromObject(json);
+        
+        return jsonObject;
     }
 }

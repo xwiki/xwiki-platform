@@ -361,6 +361,14 @@
       <version>1.1</version>
     </dependency>
 
+    <!-- JSON -->
+    <dependency>
+      <groupId>net.sf.json-lib</groupId>
+      <artifactId>json-lib</artifactId>
+      <version>2.3</version>
+      <classifier>jdk15</classifier>
+    </dependency>
+
     <!-- XmlRpc -->
     <dependency>
       <groupId>org.apache.xmlrpc</groupId>

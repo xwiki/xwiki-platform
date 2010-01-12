@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.json.JSONObject;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -33,7 +35,7 @@ import com.xpn.xwiki.util.Util;
 public class PackageAPI extends Api
 {
     Package plugin;
-
+    
     public PackageAPI(Package plugin, XWikiContext context) throws PackageException
     {
         super(context);
@@ -124,6 +126,13 @@ public class PackageAPI extends Api
         return this.plugin.isVersionPreserved();
     }
 
+    /**
+     * Sets the flag for the packager to preserve or not existing versions of documents when installing 
+     * with {@link #install()}. If set to true, the existing history revisions of documents will be preserve,
+     * if not, the history will be overridden. 
+     * 
+     * @param preserveVersion
+     */
     public void setPreserveVersion(boolean preserveVersion)
     {
         this.plugin.setPreserveVersion(preserveVersion);
@@ -134,6 +143,15 @@ public class PackageAPI extends Api
         return this.plugin.isWithVersions();
     }
 
+    /**
+     * Sets the flag for the packager to import or not history revisions included in the archive
+     * when installing with {@link #install()}.
+     * This flag will be ignored if {@link #isWithVersions()} flag is set to true. This means it's not possible
+     * to import with versions, preserving the existing document history. The behavior of the packager in this case
+     * fall backs on just adding a new version to the exsting history (ignoring the history from the package).  
+     * 
+     * @param withVersions should the versions contained in the archive (if any) be imported when installing.
+     */
     public void setWithVersions(boolean withVersions)
     {
         this.plugin.setWithVersions(withVersions);
@@ -194,6 +212,34 @@ public class PackageAPI extends Api
         return this.plugin.export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
     }
 
+
+    /** 
+     * Similar to {@link #Import(byte[])}, except expected errors are catch. This version should be privileged
+     * when using the packager API from velocity scripts since it will not display stack-trace in case of error
+     * (for example if the passed file is not a valid package).
+     * 
+     * @param data the file to create the package from, as a byte array.
+     * 
+     * @return true if the package creation succeeded, false otherwise. If the package creation failed, 
+     * the error message is placed in the velocity context under the <code>import_error</code> key,
+     * 
+     * @since 2.2M1
+     */
+    public boolean importPackageFromByteArray(byte data[]) {
+        try {
+            this.plugin.Import(data, getXWikiContext());
+            return true;
+        }
+        catch (XWikiException e) {
+            getXWikiContext().put("import_error", e.getMessage());
+            return false;
+        }
+        catch (IOException e) {
+            getXWikiContext().put("import_error", e.getMessage());
+            return false;            
+        }
+    }
+    
     public String Import(byte file[]) throws IOException, XWikiException
     {
         return this.plugin.Import(file, getXWikiContext());
@@ -218,6 +264,16 @@ public class PackageAPI extends Api
     public String toXml()
     {
         return this.plugin.toXml(getXWikiContext());
+    }
+    
+    /**
+     * @return a representation of this package under the JSON format
+     * 
+     * @since 2.2M1
+     */
+    public JSONObject toJSON()
+    {
+        return this.plugin.toJSON(getXWikiContext());
     }
 
     public int install() throws XWikiException
@@ -244,4 +300,5 @@ public class PackageAPI extends Api
     {
         return this.plugin.getStatus(getXWikiContext());
     }
+    
 }

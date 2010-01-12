@@ -35,6 +35,7 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.resources.objects.ObjectResource;
 import org.xwiki.rest.resources.pages.PageResource;
+import org.xwiki.rest.resources.pages.PageTranslationResource;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -122,9 +123,10 @@ public class BaseSearchResult extends XWikiResource
             Formatter f = new Formatter();
 
             if (space != null) {
-                f.format("select doc.space, doc.name from XWikiDocument as doc where doc.space = :space and ( ");
+                f
+                    .format("select distinct doc.space, doc.name, doc.language from XWikiDocument as doc where doc.space = :space and ( ");
             } else {
-                f.format("select doc.space, doc.name from XWikiDocument as doc where ( ");
+                f.format("select distinct doc.space, doc.name, doc.language from XWikiDocument as doc where ( ");
             }
 
             int acceptedScopes = 0;
@@ -156,10 +158,10 @@ public class BaseSearchResult extends XWikiResource
             }
 
             if (hasProgrammingRights) {
-                f.format(") order by doc.date desc");
+                f.format(") order by doc.space, doc.name asc");
             } else {
                 f
-                    .format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.date desc");
+                    .format(") and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.space, doc.name asc");
             }
 
             String query = f.toString();
@@ -183,6 +185,7 @@ public class BaseSearchResult extends XWikiResource
 
                 String spaceName = (String) fields[0];
                 String pageName = (String) fields[1];
+                String language = (String) fields[2];
 
                 String pageId = Utils.getPageId(wikiName, spaceName, pageName);
 
@@ -195,9 +198,18 @@ public class BaseSearchResult extends XWikiResource
                     searchResult.setSpace(spaceName);
                     searchResult.setPageName(pageName);
 
-                    String pageUri =
-                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName, spaceName,
-                            pageName).toString();
+                    String pageUri;
+                    if ("".equals(language)) {
+                        pageUri =
+                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName,
+                                spaceName, pageName).toString();
+                    } else {
+                        searchResult.setLanguage(language);
+                        pageUri =
+                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageTranslationResource.class).build(
+                                wikiName, spaceName, pageName, language).toString();
+                    }
+
                     Link pageLink = new Link();
                     pageLink.setHref(pageUri);
                     pageLink.setRel(Relations.PAGE);
@@ -235,7 +247,6 @@ public class BaseSearchResult extends XWikiResource
 
         /* This try is just needed for executing the finally clause. */
         try {
-            List<String> addedIds = new ArrayList<String>();
             List<SearchResult> result = new ArrayList<SearchResult>();
 
             if (keywords == null) {
@@ -246,17 +257,17 @@ public class BaseSearchResult extends XWikiResource
 
             if (space != null) {
                 f
-                    .format("select doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where doc.space = :space and obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
+                    .format("select distinct doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where doc.space = :space and obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             } else {
                 f
-                    .format("select doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
+                    .format("select distinct doc.space, doc.name, obj.className, obj.number from XWikiDocument as doc, BaseObject as obj, StringProperty as sp, LargeStringProperty as lsp where obj.name=doc.fullName and sp.id.id = obj.id and lsp.id.id = obj.id and (upper(sp.value) like :keywords or upper(lsp.value) like :keywords) ");
             }
 
             if (hasProgrammingRights) {
-                f.format(" order by doc.date desc");
+                f.format(" order by doc.space, doc.name asc");
             } else {
                 f
-                    .format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.date desc");
+                    .format(" and doc.space<>'XWiki' and doc.space<>'Admin' and doc.space<>'Panels' and doc.name<>'WebPreferences' order by doc.space, doc.name asc");
             }
 
             String query = f.toString();
@@ -284,40 +295,36 @@ public class BaseSearchResult extends XWikiResource
                 int objectNumber = (Integer) fields[3];
 
                 String id = Utils.getObjectId(wikiName, spaceName, pageName, className, objectNumber);
-                /* Avoid duplicates */
-                if (!addedIds.contains(id)) {
-                    String pageId = Utils.getPageId(wikiName, spaceName, pageName);
-                    if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
-                        SearchResult searchResult = objectFactory.createSearchResult();
-                        searchResult.setType("object");
-                        searchResult.setId(id);
-                        searchResult.setPageFullName(Utils.getPageFullName(wikiName, spaceName, pageName));
-                        searchResult.setWiki(wikiName);
-                        searchResult.setSpace(spaceName);
-                        searchResult.setPageName(pageName);
-                        searchResult.setClassName(className);
-                        searchResult.setObjectNumber(objectNumber);
 
-                        String pageUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName,
-                                spaceName, pageName).toString();
-                        Link pageLink = new Link();
-                        pageLink.setHref(pageUri);
-                        pageLink.setRel(Relations.PAGE);
-                        searchResult.getLinks().add(pageLink);
+                String pageId = Utils.getPageId(wikiName, spaceName, pageName);
+                if (Utils.getXWikiApi(componentManager).hasAccessLevel("view", pageId)) {
+                    SearchResult searchResult = objectFactory.createSearchResult();
+                    searchResult.setType("object");
+                    searchResult.setId(id);
+                    searchResult.setPageFullName(Utils.getPageFullName(wikiName, spaceName, pageName));
+                    searchResult.setWiki(wikiName);
+                    searchResult.setSpace(spaceName);
+                    searchResult.setPageName(pageName);
+                    searchResult.setClassName(className);
+                    searchResult.setObjectNumber(objectNumber);
 
-                        String objectUri =
-                            UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName,
-                                spaceName, pageName, className, objectNumber).toString();
-                        Link objectLink = new Link();
-                        objectLink.setHref(objectUri);
-                        objectLink.setRel(Relations.OBJECT);
-                        searchResult.getLinks().add(objectLink);
+                    String pageUri =
+                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(PageResource.class).build(wikiName, spaceName,
+                            pageName).toString();
+                    Link pageLink = new Link();
+                    pageLink.setHref(pageUri);
+                    pageLink.setRel(Relations.PAGE);
+                    searchResult.getLinks().add(pageLink);
 
-                        result.add(searchResult);
+                    String objectUri =
+                        UriBuilder.fromUri(uriInfo.getBaseUri()).path(ObjectResource.class).build(wikiName, spaceName,
+                            pageName, className, objectNumber).toString();
+                    Link objectLink = new Link();
+                    objectLink.setHref(objectUri);
+                    objectLink.setRel(Relations.OBJECT);
+                    searchResult.getLinks().add(objectLink);
 
-                        addedIds.add(id);
-                    }
+                    result.add(searchResult);
                 }
             }
 

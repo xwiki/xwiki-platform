@@ -264,7 +264,7 @@ public abstract class AbstractDocumentSkinExtensionPlugin extends AbstractSkinEx
             }
             return bclass;
         } catch (Exception ex) {
-            LOG.error("Cannot initialize skin extenstion class [" + getExtensionClassName() + "]", ex);
+            LOG.error("Cannot initialize skin extension class [" + getExtensionClassName() + "]", ex);
         }
         return null;
     }

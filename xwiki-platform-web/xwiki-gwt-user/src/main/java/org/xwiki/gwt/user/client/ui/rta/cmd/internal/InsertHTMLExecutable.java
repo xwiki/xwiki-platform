@@ -23,8 +23,8 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
+import com.google.gwt.core.client.GWT;
 
 /**
  * Inserts an HTML fragment in place of the current selection. We overwrite the default implementation provided by the
@@ -41,6 +41,11 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 public class InsertHTMLExecutable extends AbstractExecutable
 {
     /**
+     * Browser specific implementation required by this executable.
+     */
+    private InsertHTMLExecutableImpl impl = GWT.create(InsertHTMLExecutableImpl.class);
+
+    /**
      * {@inheritDoc}
      * 
      * @see AbstractExecutable#execute(RichTextArea, String)
@@ -51,16 +56,7 @@ public class InsertHTMLExecutable extends AbstractExecutable
         container.xSetInnerHTML(param);
 
         Selection selection = rta.getDocument().getSelection();
-        if (!selection.isCollapsed()) {
-            // Delete the selected contents. The given HTML fragment will be inserted in place of the deleted text.
-            // NOTE: We cannot use Range#deleteContents because it may lead to DTD-invalid HTML. That's because it
-            // operates on any DOM tree without taking care of the underlying XML syntax, (X)HTML in our case. Let's use
-            // the Delete command instead which is HTML-aware. Moreover, others could listen to this command and adjust
-            // the DOM before we insert the HTML.
-            rta.getCommandManager().execute(Command.DELETE);
-        }
-        // At this point the selection should be collapsed.
-        Range range = selection.getRangeAt(0);
+        Range range = selection.isCollapsed() ? selection.getRangeAt(0) : impl.deleteSelection(rta);
         // NOTE: Range#insertNode(Node) is not allowed to change the start point of the target range. This means that if
         // the range starts inside a text node then it will start in the same text node after the insertion, but at the
         // end (of course, the text node would have been split).

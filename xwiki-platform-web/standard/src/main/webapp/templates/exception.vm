@@ -1,20 +1,6 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
-#set($message = $xwiki.parseMessage())
-#if($message)
-  #xwikimessageboxstart($msg.get('notice') $message)
-  #xwikimessageboxend()
-#else
-  #xwikimessageboxstart($msg.get('notice') $msg.get('problemoccured'))
-  #xwikimessageboxend()
-#end
-<br/><br/>
-#if($exp)
-  $msg.get("detailedinformation"):<br/>
-  <pre class="xwikierror">
-    $exp.getFullMessage()
-  </pre>
-#end
+#template("exceptioninline.vm")
 <div class="clearfloats"></div>
 </div>
 #template("endpage.vm")

@@ -1,0 +1,19 @@
+$response.setContentType("application/x-json")
+#if("$!request.document" == "")
+ #set($packageDoc = $doc)
+#else 
+ #set($packageDoc = $xwiki.getDocument($request.document))
+#end
+#if("$!request.package" == "")
+ #set($error = "No package name was given")
+#else
+ #set($package = $packageDoc.getAttachment($request.package))
+ #if($package)
+  #set($packager = $xwiki.package)
+  #set($ok = $packager.importPackageFromByteArray($package.content))
+  $packager.toJSON()
+ #else
+  #set($error = "Package not found")
+ #end
+#end
+#if("$!error" != "") {"error":  "$error"} #end

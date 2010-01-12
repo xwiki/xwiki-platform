@@ -1446,6 +1446,22 @@ $html
 #submitButton("action_${action}", $msg.get("core.shortcuts.edit.${resourceIdentifier}"), $msg.get($resourceIdentifier))
 #end
 
+#macro(dynamicsize $sz)
+#if($sz < 1024)
+$sz bytes##
+#else
+#set($ksz = $mathtool.div($sz, 1024))
+#set($ksz = $mathtool.roundTo(1, $ksz))
+#if($ksz < 1024)
+${ksz}kb##
+#else
+#set($Msz = $mathtool.div($sz, 1048576))
+#set($Msz = $mathtool.roundTo(1, $Msz))
+${Msz}Mb##
+#end##
+#end##
+#end
+
 #**
  * AJAX Live table that displays XWiki data.
  *

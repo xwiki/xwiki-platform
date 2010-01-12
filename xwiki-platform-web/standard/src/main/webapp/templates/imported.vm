@@ -1,0 +1,20 @@
+#macro(showfilelist $list $text)
+  #if($list.size()>0)
+    <h4 class="legend">$msg.get("import_listof${text}files")</h4>
+    <ul>
+      #foreach($item in $list)
+        <li><a href="$xwiki.getURL($item)">$item</a></li>
+      #end
+    </ul>
+  #end
+#end
+#set($status = $msg.get("import_install_${xwiki.package.status}"))
+#info("$msg.get('importing') $!request.name: $status")
+<ul>
+  <li>$xwiki.package.installed.size() $msg.get("import_documentinstalled")</li>
+  <li>$xwiki.package.skipped.size() $msg.get("import_documentskipped")</li>
+  <li>$xwiki.package.errors.size() $msg.get("import_documenterrors")</li>
+</ul>
+#showfilelist($xwiki.package.installed "installed")
+#showfilelist($xwiki.package.skipped "skipped")
+#showfilelist($xwiki.package.errors "errors")

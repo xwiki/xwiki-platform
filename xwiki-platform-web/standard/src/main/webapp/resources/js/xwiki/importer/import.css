@@ -1,0 +1,272 @@
+/* Package explorer styles */
+
+div#package {
+  border:10px solid #FCFCFC;
+  border-width: 0px 10px;
+}
+
+div#package ul {
+  list-style-position:outside;
+}
+
+div#package ul.package {
+  margin: 0 !important;
+  border: 1px dotted #D6E1E7;
+  padding:3px !important;
+}
+
+div#packagecontainer div.packageinfos span.filename { 
+  font-weight:bold;
+}
+
+div#packagecontainer div.packageinfos {
+  font-style:italic;
+  background-color:#FCFCFC;
+  margin:0px;
+  font-size:0.9em;
+  padding:10px;
+}
+
+#packageDescription {
+   border: 1px dotted #D6E1E7;
+   overflow:visible;
+   width:100%;
+}
+
+ul.xlist li.xunderline {
+  border:0 !important;
+}
+
+div.packagesubmit {
+  background-color:#FCFCFC;
+  margin:0px;
+  padding:10px;	
+}
+
+div.packagesubmit div.historyStrategyOption {
+  font-size:0.8em;
+}
+
+div#packagecontainer div.packageinfos span {
+  font-style:normal;
+  margin-left:1em;
+}
+
+ul.package li.xitem div.xpagecontainer {
+  background:none;
+}
+
+ul.package li.xitem div.xitemcontainer span.checkbox,
+ul.package li.xitem div.xitemcontainer input.space {
+  float:right;
+}
+
+
+ul.package li.xitem div.xitemcontainer span.documentName {
+  float:left;
+}
+
+ul.package li.xitem div.xitemcontainer div.spacename,
+ul.package li.xitem div.xitemcontainer img {
+  float:left;	
+}
+
+ul.package li.xitem div.xitemcontainer div.spacename {
+  background:url($xwiki.getSkinFile('icons/silk/folder.gif')) no-repeat scroll 0 0 transparent;
+  color:#4D4D4D;
+  font-weight:bold;
+  margin-right:15px;
+  cursor:pointer;
+}
+
+ul.package li.xitem div.xitemcontainer div.spacename:hover {
+  backgroun:url($xwiki.getSkinFile('icons/silk/folder_magnify.gif')) no-repeat scroll 0 0 transparent;
+}
+
+ul.package li.xitem div.xitemcontainer div.selection {
+  float:right;
+  color:grey;
+  font-size:0.8em;
+}
+
+ul.pages {
+  margin: 0 !important;
+}
+
+ul.pages li.xitem {
+	background:url($xwiki.getSkinFile('icons/silk/page_white_text.gif')) no-repeat scroll 20px 0 transparent;
+  padding-left: 20px;
+	text-indent:1px;
+}
+
+ul.package li.xitem div.xitemcontainer div.pages {
+  margin-left:20px;
+}
+
+/* Package list styles */
+
+div#packagelist {
+	width:51%;
+	float:left;
+}
+
+div#packagelist h4.legend {
+  margin-bottom:10px;
+}
+
+#packagelistcontainer,
+div#packagelist form {
+  margin-top:5px;
+}
+
+form#AddAttachment {
+  border: 0;
+}
+
+div#packagelist form fieldset {
+  background-color:#EFEFEF;
+  padding:5px;
+  margin-top: 10px;
+}
+
+div#packagelist form div.buttons {
+	text-align:right;
+	margin-top:8px;
+}
+
+div.package-upload {
+  background: transparent url($xwiki.getSkinFile('icons/silk/package_add.gif')) no-repeat scroll 0px 5px;
+  padding-left:20px;
+}
+
+div#packagecontainer {
+	width:46%;
+	float:left;
+	margin-left:2%;
+}
+
+div#packagecontainer h4 {
+	margin-bottom:10px;
+}
+#AddAttachment {
+	border:none;
+}
+
+div#packagelist input.search {
+	font-size:1.1em;
+	color:#999;
+	width:100%;
+	margin-bottom:5px;
+}
+
+div#import div#packagelistcontainer {
+}
+
+div#packagelist ul.xlist {
+	width:100%;
+	padding-top:10px;
+    margin: 0 0 0 0 !important;
+    list-style-position:outside;
+}
+
+div#packagelist ul.xlist li.xitem {
+}
+
+div#packagelist ul.xlist li.xitem div.xitemcontainer {
+	background: transparent url($xwiki.getSkinFile('icons/silk/package.gif')) no-repeat scroll 10px 3px;
+	font-size:0.85em;
+	color:#4d4d4d;
+	margin-bottom:8px;
+  padding-left: 5px;
+}
+
+div#packagelist ul.xlist li.xitem div.active {
+ border: 1px dotted #D6E1E7;
+  background-color: #FCFCFC;
+}
+
+div#packagelist ul.xlist li.uploaded {
+	background-color:red;
+	border:1px solid red;
+}
+
+div#packagelist ul.xlist li.xitem div.xitemcontainer div.name {
+	font-size:1.4em;
+	margin-left:10px;
+}
+
+div#packagelist ul.xlist li.xitem div.xitemcontainer div.name .version {
+  font-size: 0.7em;
+  margin-left: 5px;
+}
+
+div#packagelist ul.xlist li.xitem div.xitemcontainer div.info{
+  margin-left:10px;
+}
+
+div#packagelist ul.xlist li.xitem div.xitemcontainer div.info .size {
+  color: #888;
+}
+
+.xwikibuttonlinks{
+  float: right;
+}
+
+div#packagelist ul.xlist li.xitem div.xitemcontainer .deletelink {
+	background: url($xwiki.getSkinFile('icons/silk/cross.gif')) no-repeat left 3px;
+	padding-left:14px;
+  padding-right: 5px;
+}
+
+.clearfloats {
+	clear:both;
+}
+
+form.static-importer {
+	margin-bottom:20px;
+}
+
+form.static-importer ul.xlist {
+	margin-bottom:15px;
+}
+
+ul.package ul.pages li.xitem div.xpagecontainer input {
+  position:relative;
+  right:20px;
+}
+
+.packageinfos div {
+  margin: 0;
+  display: table-row;
+}
+
+div#packagecontainer div.packageinfos span{
+ margin: 0 5px 0;
+ color:#888888;
+}
+
+div#packagecontainer .packageinfos div span.label {
+  font-weight: 700;
+  color: #4d4d4d;
+  text-transform: uppercase;
+  font-size: 0.85em;
+
+}
+
+div#packagecontainer fieldset.xwikimessage {
+  margin:1em auto;	
+  padding:0px;
+}
+
+div.selectLinks {
+  font-size:0.8em;
+  text-align:right;
+  margin-right:1.2em;
+  background-color:#FCFCFC;
+}
+
+div.selectLinks span {
+  margin-left:0.2em;
+  color:darkBlue;
+  cursor:pointer;
+}

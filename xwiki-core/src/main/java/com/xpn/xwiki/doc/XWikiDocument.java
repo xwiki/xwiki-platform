@@ -208,6 +208,10 @@ public class XWikiDocument implements DocumentModelBridge
 
     private boolean isNew = true;
 
+    /**
+     * The reference to the document that is the template for the current document.
+     * @todo this field is not used yet since it's not currently saved in the database.
+     */
     private String template;
 
     protected String language;
@@ -594,7 +598,9 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setParentReference(DocumentReference parentReference)
     {
-        this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
+        if (parentReference != null) {
+            this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
+        }
     }
 
     /**
@@ -2057,15 +2063,50 @@ public class XWikiDocument implements DocumentModelBridge
         cloneXObjects(templatedoc);
     }
 
-    public String getTemplate()
+    /**
+     * @since 2.2M1
+     */
+    public DocumentReference getTemplateDocumentReference()
     {
-        return StringUtils.defaultString(this.template);
+        DocumentReference templateDocumentReference = null;
+        if (this.template != null) {
+            templateDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(this.template);
+        }
+        return templateDocumentReference;
     }
 
+    /**
+     * @deprecated since 2.2M1 use {@link #getTemplateDocumentReference()} instead
+     */
+    @Deprecated
+    public String getTemplate()
+    {
+        String templateReferenceAsString;
+        DocumentReference templateDocumentReference = getTemplateDocumentReference();
+        if (templateDocumentReference != null) {
+            templateReferenceAsString = this.localEntityReferenceSerializer.serialize(templateDocumentReference);
+        } else {
+            templateReferenceAsString = "";
+        }
+        return templateReferenceAsString;
+    }
+
+    /**
+     * @since 2.2M1
+     */
+    public void setTemplateDocumentReference(DocumentReference templateDocumentReference)
+    {
+        this.template = this.localEntityReferenceSerializer.serialize(templateDocumentReference);
+        setMetaDataDirty(true);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #setTemplateDocumentReference(DocumentReference)} instead
+     */
+    @Deprecated
     public void setTemplate(String template)
     {
-        this.template = template;
-        setMetaDataDirty(true);
+        setTemplateDocumentReference(this.currentMixedDocumentReferenceResolver.resolve(template));
     }
 
     public String displayPrettyName(String fieldname, XWikiContext context)
@@ -2709,39 +2750,39 @@ public class XWikiDocument implements DocumentModelBridge
         readFromTemplate(template, context);
     }
 
-    public void readFromTemplate(String template, XWikiContext context) throws XWikiException
+    /**
+     * @since 2.2M1
+     */
+    public void readFromTemplate(DocumentReference templateDocumentReference, XWikiContext context)
+        throws XWikiException
     {
-        if ((template != null) && (!template.equals(""))) {
+        if (templateDocumentReference != null) {
             String content = getContent();
             if ((!content.equals("\n")) && (!content.equals("")) && !isNew()) {
-                Object[] args = {getFullName()};
+                Object[] args = {this.compactEntityReferenceSerializer.serialize(getDocumentReference())};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                     "Cannot add a template to document {0} because it already has content", null, args);
             } else {
-                if (template.indexOf('.') == -1) {
-                    template = getSpace() + "." + template;
-                }
                 XWiki xwiki = context.getWiki();
-                XWikiDocument templatedoc = xwiki.getDocument(template, context);
+                XWikiDocument templatedoc = xwiki.getDocument(templateDocumentReference, context);
                 if (templatedoc.isNew()) {
-                    Object[] args = {template, getFullName()};
+                    Object[] args = {this.compactEntityReferenceSerializer.serialize(templateDocumentReference),
+                        this.compactEntityReferenceSerializer.serialize(getDocumentReference())};
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
                         "Template document {0} does not exist when adding to document {1}", null, args);
                 } else {
-                    setTemplate(template);
+                    setTemplateDocumentReference(templateDocumentReference);
                     setContent(templatedoc.getContent());
 
                     // Set the new document syntax as the syntax of the template since the template content
                     // is copied into the new document
                     setSyntaxId(templatedoc.getSyntaxId());
 
-                    if ((getParent() == null) || (getParent().equals(""))) {
-                        String tparent = templatedoc.getParent();
-                        if (tparent != null) {
-                            setParent(tparent);
-                        }
+                    //ÊIf the parent is not set in the current document set the template parent as the parent.
+                    if (getParentReference() == null) {
+                        setParentReference(templatedoc.getParentReference());
                     }
 
                     if (isNew()) {
@@ -2759,6 +2800,20 @@ public class XWikiDocument implements DocumentModelBridge
             }
         }
         setContentDirty(true);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #readFromTemplate(DocumentReference, XWikiContext)} instead
+     */
+    @Deprecated
+    public void readFromTemplate(String template, XWikiContext context) throws XWikiException
+    {
+        // Keep the same behavior for backward compatibility
+        DocumentReference templateDocumentReference = null;
+        if (StringUtils.isNotEmpty(template)) {
+            templateDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(template);
+        }
+        readFromTemplate(templateDocumentReference, context);
     }
 
     /**
@@ -2790,7 +2845,7 @@ public class XWikiDocument implements DocumentModelBridge
         setMostRecent(document.isMostRecent());
         setNew(document.isNew());
         setStore(document.getStore());
-        setTemplate(document.getTemplate());
+        setTemplateDocumentReference(document.getTemplateDocumentReference());
         setParentReference(document.getParentReference());
         setCreator(document.getCreator());
         setDefaultLanguage(document.getDefaultLanguage());
@@ -2841,7 +2896,7 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setMostRecent(isMostRecent());
             doc.setNew(isNew());
             doc.setStore(getStore());
-            doc.setTemplate(getTemplate());
+            doc.setTemplateDocumentReference(getTemplateDocumentReference());
             doc.setParentReference(getParentReference());
             doc.setCreator(getCreator());
             doc.setDefaultLanguage(getDefaultLanguage());
@@ -2965,7 +3020,9 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getTemplate().equals(doc.getTemplate())) {
+        if ((getTemplateDocumentReference() != null
+            && !getTemplateDocumentReference().equals(doc.getTemplateDocumentReference()))
+            || (getTemplateDocumentReference() == null && doc.getTemplateDocumentReference() != null)) {
             return false;
         }
 

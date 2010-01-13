@@ -1488,7 +1488,7 @@ public class XWikiDocument implements DocumentModelBridge
         Version[] revisions = getRevisions(context);
 
         XWikiRCSNodeInfo nextNodeinfo = null;
-        XWikiRCSNodeInfo nodeinfo = null;
+        XWikiRCSNodeInfo nodeinfo;
         for (int i = 0; i < revisions.length; i++) {
             nodeinfo = nextNodeinfo;
             nextNodeinfo = getRevisionInfo(revisions[i].toString(), context);
@@ -1595,7 +1595,9 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObjects()} instead
+     * @deprecated since 2.2M1 use {@link #getXObjects()} instead. Warning: if you used to modify the returned Map
+     *             note that since 2.2M1 this will no longer work and you'll need to call the setXObject methods
+     *             instead (or setxWikiObjects()). Obviously the best is to move to the new API.
      */
     @Deprecated
     public Map<String, Vector<BaseObject>> getxWikiObjects()
@@ -1723,7 +1725,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * @since 2.2M1
      */
-    public int getXObjectNumbers(DocumentReference classReference)
+    public int getXObjectSize(DocumentReference classReference)
     {
         try {
             return getXObjects().get(classReference).size();
@@ -1733,12 +1735,12 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 use {@link #getXObjectNumbers(DocumentReference)} instead
+     * @deprecated since 2.2M1 use {@link #getXObjectSize(DocumentReference)} instead
      */
     @Deprecated
     public int getObjectNumbers(String classname)
     {
-        return getXObjectNumbers(this.currentMixedDocumentReferenceResolver.resolve(classname));
+        return getXObjectSize(this.currentMixedDocumentReferenceResolver.resolve(classname));
     }
 
     /**

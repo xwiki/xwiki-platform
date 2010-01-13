@@ -758,11 +758,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference getDocumentReference()
     {
+        // Note: A DocumentReference must always be valid. We don't check for validity here since all XWikiDocument's
+        // constructors ensure that the database/space/name are always valid.
         return new DocumentReference(this.database, this.space, this.name);
     }
 
     /**
-     * @return the docoument's space + page name (eg "space.page")
+     * @return the document's space + page name (eg "space.page")
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
     @Deprecated
@@ -786,9 +788,9 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setDocumentReference(DocumentReference reference)
     {
-        setDatabase(reference.getWikiReference().getName());
-        setSpace(reference.getLastSpaceReference().getName());
-        setName(reference.getName());
+        this.database = reference.getWikiReference().getName();
+        this.space = reference.getLastSpaceReference().getName();
+        this.name = reference.getName();
     }
 
     /**

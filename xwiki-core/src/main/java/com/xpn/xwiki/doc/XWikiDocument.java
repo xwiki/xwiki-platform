@@ -558,14 +558,20 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * @return the parent reference or null if the parent is not set
      * @since 2.2M1
      */
     public DocumentReference getParentReference()
     {
-        return this.currentMixedDocumentReferenceResolver.resolve(this.parent);
+        DocumentReference parentReference = null;
+        if (this.parent != null) {
+            parentReference = this.currentMixedDocumentReferenceResolver.resolve(this.parent);
+        }
+        return parentReference;
     }
 
     /**
+     * @return the parent reference or an empty string ("") if the parent is not set
      * @deprecated since 2.2M1 used {@link #getParentReference()} instead
      */
     @Deprecated

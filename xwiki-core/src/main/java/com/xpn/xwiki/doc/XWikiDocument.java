@@ -81,6 +81,7 @@ import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -3425,9 +3426,21 @@ public class XWikiDocument implements DocumentModelBridge
     public void fromXML(Document domdoc, boolean withArchive) throws XWikiException
     {
         Element docel = domdoc.getRootElement();
-        setName(getElement(docel, "name"));
-        setSpace(getElement(docel, "web"));
-        setParent(getElement(docel, "parent"));
+
+        // If, for some reason, the document name or space are not set in the XML input, we still ensure that the
+        // constructed XWikiDocument object has a valid name or space (by using current document values if they are
+        // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
+        // instance.
+        DocumentReference reference = new DocumentReference(getElement(docel, "name"),
+            new SpaceReference(getElement(docel, "web"), (WikiReference) null));
+        reference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
+        setDocumentReference(reference);
+
+        String parent = getElement(docel, "parent");
+        if (parent != null) {
+            setParentReference(this.currentMixedDocumentReferenceResolver.resolve(parent));
+        }
+
         setCreator(getElement(docel, "creator"));
         setAuthor(getElement(docel, "author"));
         setCustomClass(getElement(docel, "customClass"));
@@ -3558,8 +3571,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String database = context.getDatabase();
         try {
-            // We might need to switch database to
-            // get the translated content
+            // We might need to switch database to get the translated content
             if (getDatabase() != null) {
                 context.setDatabase(getDatabase());
             }

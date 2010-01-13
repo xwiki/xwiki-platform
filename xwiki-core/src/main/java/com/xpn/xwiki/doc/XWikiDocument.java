@@ -2769,7 +2769,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     private void clone(XWikiDocument document) throws XWikiException
     {
-        setDatabase(document.getDatabase());
+        setDocumentReference(document.getDocumentReference());
         setRCSVersion(document.getRCSVersion());
         setDocumentArchive(document.getDocumentArchive());
         setAuthor(document.getAuthor());
@@ -2788,12 +2788,10 @@ public class XWikiDocument implements DocumentModelBridge
         setMeta(document.getMeta());
         setMetaDataDirty(document.isMetaDataDirty());
         setMostRecent(document.isMostRecent());
-        setName(document.getName());
         setNew(document.isNew());
         setStore(document.getStore());
         setTemplate(document.getTemplate());
-        setSpace(document.getSpace());
-        setParent(document.getParent());
+        setParentReference(document.getParentReference());
         setCreator(document.getCreator());
         setDefaultLanguage(document.getDefaultLanguage());
         setDefaultTemplate(document.getDefaultTemplate());
@@ -2821,7 +2819,7 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             doc = getClass().newInstance();
 
-            doc.setDatabase(getDatabase());
+            doc.setDocumentReference(getDocumentReference());
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
             doc.setDocumentArchive(getDocumentArchive());
@@ -2841,12 +2839,10 @@ public class XWikiDocument implements DocumentModelBridge
             doc.setMeta(getMeta());
             doc.setMetaDataDirty(isMetaDataDirty());
             doc.setMostRecent(isMostRecent());
-            doc.setName(getName());
             doc.setNew(isNew());
             doc.setStore(getStore());
             doc.setTemplate(getTemplate());
-            doc.setSpace(getSpace());
-            doc.setParent(getParent());
+            doc.setParentReference(getParentReference());
             doc.setCreator(getCreator());
             doc.setDefaultLanguage(getDefaultLanguage());
             doc.setDefaultTemplate(getDefaultTemplate());

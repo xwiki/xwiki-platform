@@ -257,7 +257,7 @@ public final class WikiManager
             context.setDatabase(context.getMainXWiki());
 
             List<XWikiDocument> documents =
-                context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
+                    context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
 
             for (XWikiDocument document : documents) {
                 wikiList.add(new Wiki(document, context));
@@ -284,7 +284,8 @@ public final class WikiManager
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
+                (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME,
+                    context);
 
         if (appmanager == null) {
             return null;
@@ -520,11 +521,14 @@ public final class WikiManager
             // Check owner
             if (getDocument(xwiki.getDatabase(), wikiSuperDocToSave.getOwner(), context).isNew()) {
                 LOG.warn(msg.get(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, wikiSuperDocToSave.getOwner()));
-                wikiSuperDocToSave.setOwner("");
+                wikiSuperDocToSave.setOwner(XWikiRightService.SUPERADMIN_USER);
             }
 
             // Create wiki database/schema
             createWikiDatabase(newWikiName, context);
+
+            // Save new wiki descriptor document.
+            wikiSuperDocToSave.save(comment);
 
             String language = userWikiSuperDoc.getLanguage();
             if (language.length() == 0) {
@@ -543,9 +547,6 @@ public final class WikiManager
 
             // Return to root database
             context.setDatabase(context.getMainXWiki());
-
-            // Save new wiki descriptor document.
-            wikiSuperDocToSave.save(comment);
 
             return wikiSuperDocToSave;
         } finally {

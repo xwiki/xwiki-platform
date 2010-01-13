@@ -311,9 +311,7 @@ public class XWikiDocument implements DocumentModelBridge
     private XWikiStoreInterface store;
 
     /**
-     * This is a copy of this XWikiDocument before any modification was made to it. It is reset to the actual values
-     * when the document is saved in the database. This copy is used for finding out differences made to this document
-     * (useful for example to send the correct notifications to document change listeners).
+     * @see #getOriginalDocument() 
      */
     private XWikiDocument originalDocument;
 
@@ -473,10 +471,10 @@ public class XWikiDocument implements DocumentModelBridge
         // produce distinct integer results.". This needs to be fixed to produce a real unique id since otherwise we
         // can have clashes in the database.
 
+        // Note: We don't use the wiki name in the document id's computation. The main historical reason is so
+        // that all things saved in a given wiki's database are always stored relative to that wiki so that
+        // changing that wiki's name is simpler.
         if ((this.language == null) || this.language.trim().equals("")) {
-            // Note: We don't use the wiki name in the document id's computation. The main historical reason is so
-            // that all things saved in a given wiki's database are always stored relative to that wiki so that
-            // changing that wiki's name is simpler.
             this.id = this.localEntityReferenceSerializer.serialize(getDocumentReference()).hashCode();
         } else {
             this.id = (this.localEntityReferenceSerializer.serialize(getDocumentReference()) + ":"
@@ -539,8 +537,10 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @return the copy of this XWikiDocument instance before any modification was made to it.
-     * @see #originalDocument
+     * @return the copy of this XWikiDocument instance before any modification was made to it. It is reset to the
+     *         actual values when the document is saved in the database. This copy is used for finding out differences
+     *         made to this document (useful for example to send the correct notifications to document change
+     *         listeners).
      */
     public XWikiDocument getOriginalDocument()
     {
@@ -550,20 +550,11 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * @param originalDocument the original document representing this document instance before any change was made to
      *            it, prior to the last time it was saved
-     * @see #originalDocument
+     * @see #getOriginalDocument() 
      */
     public void setOriginalDocument(XWikiDocument originalDocument)
     {
         this.originalDocument = originalDocument;
-    }
-
-    /**
-     * @deprecated since 2.2M1 used {@link #getParentReference()} instead
-     */
-    @Deprecated
-    public XWikiDocument getParentDoc()
-    {
-        return new XWikiDocument(getSpace(), getParent());
     }
 
     /**
@@ -581,6 +572,23 @@ public class XWikiDocument implements DocumentModelBridge
     public String getParent()
     {
         return this.parent != null ? this.parent : "";
+    }
+
+    /**
+     * @deprecated since 2.2M1 used {@link #getParentReference()} instead
+     */
+    @Deprecated
+    public XWikiDocument getParentDoc()
+    {
+        return new XWikiDocument(getSpace(), getParent());
+    }
+    
+    /**
+     * @since 2.2M1
+     */
+    public void setParentReference(DocumentReference parentReference)
+    {
+        this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
     }
 
     /**
@@ -740,14 +748,6 @@ public class XWikiDocument implements DocumentModelBridge
     public void setName(String name)
     {
         this.name = name;
-    }
-
-    /**
-     * @since 2.2M1
-     */
-    public void setParentReference(DocumentReference parentReference)
-    {
-        this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
     }
 
     /**

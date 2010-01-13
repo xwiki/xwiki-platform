@@ -2386,14 +2386,30 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * @since 2.2M1
+     */
+    public String displayForm(DocumentReference classReference, String header, String format, XWikiContext context)
+    {
+        return displayForm(classReference, header, format, true, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1, use {@link #displayForm(DocumentReference, String, String, XWikiContext)} instead
+     */
+    @Deprecated
     public String displayForm(String className, String header, String format, XWikiContext context)
     {
         return displayForm(className, header, format, true, context);
     }
 
-    public String displayForm(String className, String header, String format, boolean linebreak, XWikiContext context)
+    /**
+     * @since 2.2M1
+     */
+    public String displayForm(DocumentReference classReference, String header, String format, boolean linebreak,
+        XWikiContext context)
     {
-        Vector<BaseObject> objects = getObjects(className);
+        List<BaseObject> objects = getXObjects(classReference);
         if (format.endsWith("\\n")) {
             linebreak = true;
         }
@@ -2442,9 +2458,22 @@ public class XWikiDocument implements DocumentModelBridge
         return result.toString();
     }
 
-    public String displayForm(String className, XWikiContext context)
+    /**
+     * @deprecated since 2.2M1, use {@link #displayForm(DocumentReference, String, String, boolean, XWikiContext)} instead
+     */
+    @Deprecated
+    public String displayForm(String className, String header, String format, boolean linebreak, XWikiContext context)
     {
-        Vector<BaseObject> objects = getObjects(className);
+        return displayForm(this.currentMixedDocumentReferenceResolver.resolve(className), header, format, linebreak,
+            context);
+    }
+
+    /**
+     * @since 2.2M1
+     */
+    public String displayForm(DocumentReference classReference, XWikiContext context)
+    {
+        List<BaseObject> objects = getXObjects(classReference);
         if (objects == null) {
             return "";
         }
@@ -2501,6 +2530,15 @@ public class XWikiDocument implements DocumentModelBridge
         }
         result.append("{table}\n");
         return result.toString();
+    }
+
+    /**
+     * @deprecated since 2.2M1, use {@link #displayForm(DocumentReference, XWikiContext)} instead
+     */
+    @Deprecated
+    public String displayForm(String className, XWikiContext context)
+    {
+        return displayForm(this.currentMixedDocumentReferenceResolver.resolve(className), context);
     }
 
     public boolean isFromCache()

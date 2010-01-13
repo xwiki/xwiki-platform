@@ -37,6 +37,9 @@ import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxFactory;
@@ -82,6 +85,19 @@ public class Document extends Api
      */
     protected Object currentObj;
 
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    
     /**
      * Document constructor.
      * 
@@ -655,7 +671,7 @@ public class Document extends Api
 
     public Class getxWikiClass()
     {
-        BaseClass bclass = this.doc.getxWikiClass();
+        BaseClass bclass = this.doc.getXClass();
         if (bclass == null) {
             return null;
         } else {
@@ -665,7 +681,7 @@ public class Document extends Api
 
     public Class[] getxWikiClasses()
     {
-        List<BaseClass> list = this.doc.getxWikiClasses(getXWikiContext());
+        List<BaseClass> list = this.doc.getXClasses(getXWikiContext());
         if (list == null) {
             return null;
         }
@@ -699,18 +715,18 @@ public class Document extends Api
 
     public Map<String, Vector<Object>> getxWikiObjects()
     {
-        Map<String, Vector<BaseObject>> map = this.doc.getxWikiObjects();
+        Map<DocumentReference, List<BaseObject>> map = this.doc.getXObjects();
         Map<String, Vector<Object>> resultmap = new HashMap<String, Vector<Object>>();
-        for (String name : map.keySet()) {
-            Vector<BaseObject> objects = map.get(name);
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : map.entrySet()) {
+            List<BaseObject> objects = entry.getValue();
             if (objects != null) {
-                resultmap.put(name, getObjects(objects));
+                resultmap.put(this.localEntityReferenceSerializer.serialize(entry.getKey()), getXObjects(objects));
             }
         }
         return resultmap;
     }
 
-    protected Vector<Object> getObjects(Vector<BaseObject> objects)
+    protected Vector<Object> getXObjects(List<BaseObject> objects)
     {
         Vector<Object> result = new Vector<Object>();
         if (objects == null) {
@@ -726,8 +742,8 @@ public class Document extends Api
 
     public Vector<Object> getObjects(String classname)
     {
-        Vector<BaseObject> objects = this.doc.getObjects(classname);
-        return getObjects(objects);
+        List<BaseObject> objects = this.doc.getXObjects(this.currentMixedDocumentReferenceResolver.resolve(classname));
+        return getXObjects(objects);
     }
 
     public Object getFirstObject(String fieldname)
@@ -932,7 +948,7 @@ public class Document extends Api
 
     public Vector<Object> getComments(boolean asc)
     {
-        return getObjects(this.doc.getComments(asc));
+        return getXObjects(this.doc.getComments(asc));
     }
 
     public void use(Object object)
@@ -2010,7 +2026,7 @@ public class Document extends Api
     /**
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent. See
-     * {@link #renameDocument(String, java.util.List, java.util.List)} for more details.
+     * {@link #rename(String, java.util.List, java.util.List)} for more details.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @throws XWikiException in case of an error
@@ -2063,7 +2079,7 @@ public class Document extends Api
     }
 
     /**
-     * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document as
+     * Same as {@link #rename(String, List)} but the list of documents having the current document as
      * their parent is passed in parameter.
      * 
      * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.

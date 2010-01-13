@@ -199,7 +199,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
 
         // Install or Upgrade XWiki.WikiMacroClass
         XWikiDocument doc = xcontext.getWiki().getDocument(WIKI_MACRO_CLASS, xcontext);
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         bclass.setName(WIKI_MACRO_CLASS);
 
         boolean needsUpdate = false;
@@ -224,7 +224,7 @@ public class DefaultWikiMacroInitializer extends AbstractLogEnabled implements W
 
         // Install or Upgrade XWiki.WikiMacroParameterClass
         doc = xcontext.getWiki().getDocument(WIKI_MACRO_PARAMETER_CLASS, xcontext);
-        bclass = doc.getxWikiClass();
+        bclass = doc.getXClass();
         bclass.setName(WIKI_MACRO_PARAMETER_CLASS);
 
         needsUpdate = false;

@@ -68,7 +68,11 @@ public class DefaultModelConfiguration extends AbstractLogEnabled implements Mod
     {
         String name;
         try {
-            ConfigurationSource configuration = this.componentManager.lookup(ConfigurationSource.class);
+            // TODO: For the moment we only look in the XWiki properties file since otherwise looking into
+            // Wiki, Space and User preferences cause some cyclic dependencies (we'll be able to do that when all
+            // code has been migrated to use References instead of Strings).
+            ConfigurationSource configuration =
+                this.componentManager.lookup(ConfigurationSource.class, "xwikiproperties");
             name = configuration.getProperty(PREFIX + "reference.default." + type.toString().toLowerCase(),
                 DEFAULT_VALUES.get(type));
         } catch (ComponentLookupException e) {

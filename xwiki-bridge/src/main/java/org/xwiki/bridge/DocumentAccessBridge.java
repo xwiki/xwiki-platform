@@ -190,7 +190,7 @@ public interface DocumentAccessBridge
      * @param propertyName The name of the property to retrieve.
      * @return the property value or null if it doesn't exist or an error occurred while looking for the property
      *         (the document doesn't exist for example)
-     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, String, String)} instead 
+     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
      */
     @Deprecated
     Object getProperty(String documentReference, String className, String propertyName);
@@ -199,13 +199,13 @@ public interface DocumentAccessBridge
      * Retrieves the value for an object property, from the first object of the given class.
      *
      * @param documentReference the reference of the document to access
-     * @param className The name of the class.
+     * @param classReference the reference to the XWiki Class
      * @param propertyName The name of the property to retrieve.
      * @return the property value or null if it doesn't exist or an error occurred while looking for the property
      *         (the document doesn't exist for example)
      * @since 2.2M1
      */
-    Object getProperty(DocumentReference documentReference, String className, String propertyName);
+    Object getProperty(DocumentReference documentReference, DocumentReference classReference, String propertyName);
     
     /**
      * Retrieves the value for an object property, from the first object of any class that has a property with that

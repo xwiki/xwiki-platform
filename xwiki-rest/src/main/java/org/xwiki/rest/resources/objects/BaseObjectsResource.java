@@ -22,8 +22,9 @@ package org.xwiki.rest.resources.objects;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rest.Utils;
 import org.xwiki.rest.XWikiResource;
 
@@ -34,6 +35,9 @@ import com.xpn.xwiki.objects.BaseObject;
 
 public class BaseObjectsResource extends XWikiResource
 {
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        com.xpn.xwiki.web.Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
     protected BaseObject getBaseObject(Document doc, String className, int objectNumber) throws XWikiException
     {
         XWikiDocument xwikiDocument =
@@ -51,9 +55,9 @@ public class BaseObjectsResource extends XWikiResource
             Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
                 Utils.getXWikiContext(componentManager));
 
-        Map<String, Vector<BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
-        for (String className : classToObjectsMap.keySet()) {
-            Vector<BaseObject> xwikiObjects = classToObjectsMap.get(className);
+        Map<DocumentReference, List<BaseObject>> classToObjectsMap = xwikiDocument.getXObjects();
+        for (DocumentReference classReference : classToObjectsMap.keySet()) {
+            List<BaseObject> xwikiObjects = classToObjectsMap.get(classReference);
             for (BaseObject object : xwikiObjects) {
                 objectList.add(object);
             }
@@ -66,13 +70,13 @@ public class BaseObjectsResource extends XWikiResource
     {
         List<BaseObject> objectList = new ArrayList<BaseObject>();
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
-                Utils.getXWikiContext(componentManager));
+        XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getPrefixedFullName(),
+            Utils.getXWikiContext(componentManager));
 
-        Map<String, Vector<BaseObject>> classToObjectsMap = xwikiDocument.getxWikiObjects();
+        Map<DocumentReference, List<BaseObject>> classToObjectsMap = xwikiDocument.getXObjects();
 
-        Vector<BaseObject> xwikiObjects = classToObjectsMap.get(className);
+        List<BaseObject> xwikiObjects =
+            classToObjectsMap.get(this.currentMixedDocumentReferenceResolver.resolve(className));
         for (BaseObject object : xwikiObjects) {
             objectList.add(object);
         }

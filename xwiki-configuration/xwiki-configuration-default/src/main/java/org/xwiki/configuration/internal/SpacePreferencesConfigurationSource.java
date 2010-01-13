@@ -22,6 +22,8 @@ package org.xwiki.configuration.internal;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 
 /**
  * Configuration source taking its data in the Space Preferences wiki document
@@ -35,12 +37,25 @@ public class SpacePreferencesConfigurationSource extends AbstractDocumentConfigu
 {
     private static final String DOCUMENT_NAME = "WebPreferences";
     
-    private static final String CLASS_NAME = "XWiki.XWikiPreferences";
+    private static final String CLASS_SPACE_NAME = "XWiki";
+
+    private static final String CLASS_PAGE_NAME = "XWikiPreferences";
 
     @Override
-    protected String getClassName()
+    protected DocumentReference getClassReference()
     {
-        return CLASS_NAME;
+        DocumentReference classReference = null;
+
+        DocumentReference currentDocumentReference = getDocumentAccessBridge().getCurrentDocumentReference();
+        if (currentDocumentReference != null) {
+            // Add the current current wiki references to the XWiki Preferences class reference to form
+            // an absolute reference.
+            SpaceReference spaceReference = new SpaceReference(CLASS_SPACE_NAME, (WikiReference) null);
+            classReference = new DocumentReference(CLASS_PAGE_NAME, spaceReference);
+            spaceReference.setParent(currentDocumentReference.extractReference(EntityType.WIKI));
+        }
+
+        return classReference;
     }
 
     @Override

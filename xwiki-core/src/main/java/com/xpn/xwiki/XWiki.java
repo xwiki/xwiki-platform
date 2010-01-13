@@ -90,6 +90,8 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
@@ -2138,10 +2140,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
         try {
-            XWikiDocument doc = getDocument("XWiki.XWikiPreferences", context);
+            DocumentReference xwikiPreferencesReference = new DocumentReference("XWikiPreferences",
+                new SpaceReference("XWiki", new WikiReference(context.getDatabase())));
+            XWikiDocument doc = getDocument(xwikiPreferencesReference, context);
             // First we try to get a translated preference object
             BaseObject object =
-                doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
+                doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
             String result = "";
 
             if (object != null) {
@@ -2153,9 +2157,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
             // If empty we take it from the default pref object
             if (result.equals("")) {
-                object = doc.getxWikiObject();
+                object = doc.getXObject();
                 if (object != null) {
-                    result = doc.getxWikiObject().getStringValue(prefname);
+                    result = object.getStringValue(prefname);
                 }
             }
 
@@ -2186,26 +2190,32 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String getWebPreference(String prefname, String space, String default_value, XWikiContext context)
     {
-        try {
-            XWikiDocument doc = getDocument(space + ".WebPreferences", context);
+        // If there's no space defined then don't return web preferences (since it'll usually mean that the current
+        // doc is not set).
+        if (space != null) {
+            try {
+                XWikiDocument doc = getDocument(space + ".WebPreferences", context);
 
-            // First we try to get a translated preference object
-            BaseObject object =
-                doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
-            String result = "";
-            if (object != null) {
-                try {
-                    result = object.getStringValue(prefname);
-                } catch (Exception e) {
-                    LOG.warn("Exception while getting space preference [" + prefname + "]", e);
+                // First we try to get a translated preference object
+                DocumentReference xwikiPreferencesReference = new DocumentReference("XWikiPreferences",
+                    new SpaceReference("XWiki", new WikiReference(context.getDatabase())));
+                BaseObject object =
+                    doc.getXObject(xwikiPreferencesReference, "default_language", context.getLanguage(), true);
+                String result = "";
+                if (object != null) {
+                    try {
+                        result = object.getStringValue(prefname);
+                    } catch (Exception e) {
+                        LOG.warn("Exception while getting space preference [" + prefname + "]", e);
+                    }
                 }
-            }
 
-            if (!result.equals("")) {
-                return result;
+                if (!result.equals("")) {
+                    return result;
+                }
+            } catch (Exception e) {
+                LOG.warn("Exception while getting space preference [" + prefname + "]", e);
             }
-        } catch (Exception e) {
-            LOG.warn("Exception while getting space preference [" + prefname + "]", e);
         }
         return getXWikiPreference(prefname, default_value, context);
     }
@@ -2853,7 +2863,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         doc = getDocument(XWikiConstant.TAG_CLASS, context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -2890,7 +2900,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiDocument doc = getDocument(XWikiConstant.SHEET_CLASS, context);
         boolean needsUpdate = doc.isNew();
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -2929,7 +2939,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         doc = getDocument("XWiki.XWikiUsers", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -2981,7 +2991,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         doc = getDocument("XWiki.GlobalRedirect", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -3013,7 +3023,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         doc = getDocument("XWiki.XWikiPreferences", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -3162,7 +3172,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             doc.setSpace("XWiki");
             doc.setName("XWikiGroups");
         }
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -3216,7 +3226,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             doc.setSpace("XWiki");
             doc.setName(pagename);
         }
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -3288,7 +3298,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         doc = getDocument("XWiki.XWikiComments", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -3314,7 +3324,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         doc = getDocument("XWiki.XWikiSkins", context);
 
-        BaseClass bclass = doc.getxWikiClass();
+        BaseClass bclass = doc.getXClass();
         if (context.get("initdone") != null) {
             return bclass;
         }
@@ -6167,7 +6177,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return bclass;
         }
 
-        return getDocument(fullName, context).getxWikiClass();
+        return getDocument(fullName, context).getXClass();
     }
 
     public String getEditorPreference(XWikiContext context)
@@ -6453,7 +6463,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String displaySearch(String fieldname, String className, String prefix, XWikiCriteria criteria,
         XWikiContext context) throws XWikiException
     {
-        BaseClass bclass = getDocument(className, context).getxWikiClass();
+        BaseClass bclass = getDocument(className, context).getXClass();
         PropertyClass pclass = (PropertyClass) bclass.get(fieldname);
         if (criteria == null) {
             criteria = new XWikiCriteria();
@@ -6474,7 +6484,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String displaySearchColumns(String className, String prefix, XWikiQuery query, XWikiContext context)
         throws XWikiException
     {
-        BaseClass bclass = getDocument(className, context).getxWikiClass();
+        BaseClass bclass = getDocument(className, context).getXClass();
 
         if (query == null) {
             query = new XWikiQuery();
@@ -6491,7 +6501,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String displaySearchOrder(String className, String prefix, XWikiQuery query, XWikiContext context)
         throws XWikiException
     {
-        BaseClass bclass = getDocument(className, context).getxWikiClass();
+        BaseClass bclass = getDocument(className, context).getXClass();
 
         if (query == null) {
             query = new XWikiQuery();
@@ -6575,7 +6585,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             String className = propPath.substring(0, i1);
             String propName = propPath.substring(i1 + 1);
             try {
-                return (PropertyClass) getDocument(className, context).getxWikiClass().get(propName);
+                return (PropertyClass) getDocument(className, context).getXClass().get(propName);
             } catch (XWikiException e) {
                 return null;
             }

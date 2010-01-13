@@ -111,9 +111,6 @@ public class Utils
      * <p>
      * Get the page id given its components.
      * </p>
-     * 
-     * @param wikiName
-     * @param fullName
      * @return The page id.
      */
     public static String getPageId(String wikiName, String pageFullName)
@@ -160,7 +157,7 @@ public class Utils
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki context.
-     * @throws RuntimException If there was an error retrieving the context.
+     * @throws RuntimeException If there was an error retrieving the context.
      */
     public static XWikiContext getXWikiContext(ComponentManager componentManager)
     {
@@ -195,7 +192,7 @@ public class Utils
      * 
      * @param componentManager The component manager to be used to retrieve the execution context.
      * @return The XWiki public API object.
-     * @throws RuntimException If there was an error while initializing the XWiki public API object.
+     * @throws RuntimeException If there was an error while initializing the XWiki public API object.
      */
     public static com.xpn.xwiki.api.XWiki getXWikiApi(ComponentManager componentManager)
     {

@@ -754,10 +754,10 @@ public class BaseClass extends BaseCollection implements ClassInterface
         return isCustomMappingValid(getCustomMapping(), context);
     }
 
-    public boolean isCustomMappingValid(String custommapping1, XWikiContext context) throws XWikiException
+    public boolean isCustomMappingValid(String custommapping, XWikiContext context) throws XWikiException
     {
-        if ((custommapping1 != null) && (custommapping1.trim().length() > 0)) {
-            return context.getWiki().getStore().isCustomMappingValid(this, custommapping1, context);
+        if ((custommapping != null) && (custommapping.trim().length() > 0)) {
+            return context.getWiki().getStore().isCustomMappingValid(this, custommapping, context);
         } else {
             return true;
         }

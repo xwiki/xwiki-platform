@@ -37,7 +37,7 @@ public interface DocumentModelBridge
      * @param parentReference name of the parent document.
      * @since 2.2M1
      */
-    void setParent(DocumentReference parentReference);
+    void setParentReference(DocumentReference parentReference);
     
     /**
      * Sets the title of this document.

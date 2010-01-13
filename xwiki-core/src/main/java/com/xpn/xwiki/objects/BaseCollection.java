@@ -165,11 +165,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
+     * @since 2.2M1
      */
-    public BaseClass getxWikiClass(XWikiContext context)
+    public BaseClass getXClass(XWikiContext context)
     {
         BaseClass baseClass = null;
 
@@ -195,6 +193,18 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
 
         return baseClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
+     * @deprecated since 2.2M1 use {}
+     */
+    @Deprecated
+    public BaseClass getxWikiClass(XWikiContext context)
+    {
+        return getXClass(context);
     }
 
     public String getStringValue(String name)

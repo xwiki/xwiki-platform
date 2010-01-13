@@ -141,7 +141,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
-     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, String, String)} instead
+     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
      */
     public Object getProperty(String documentName, String className, String propertyName)
     {
@@ -154,7 +154,7 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getProperty(String, String, String)
      * @since 2.2M1
      */
-    public Object getProperty(DocumentReference documentName, String className, String propertyName)
+    public Object getProperty(DocumentReference documentName, DocumentReference classReference, String propertyName)
     {
         throw new RuntimeException("Not implemented");
     }
@@ -343,7 +343,9 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getDocument(String)
+     * @deprecated use {@link #getDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
+    @Deprecated
     public DocumentModelBridge getDocument(String documentName) throws Exception
     {
         throw new RuntimeException("Not implemented");

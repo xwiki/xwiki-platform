@@ -78,7 +78,9 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getDocument(String)
+     * @deprecated use {@link #getDocument(org.xwiki.model.reference.DocumentReference)} instead
      */
+    @Deprecated
     public DocumentModelBridge getDocument(String documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
@@ -94,12 +96,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public DocumentModelBridge getDocument(DocumentReference documentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
-        XWikiDocument doc = new XWikiDocument();
-        doc.setDatabase(documentReference.getWikiReference().getName());
-        doc.setSpace(documentReference.getLastSpaceReference().getName());
-        doc.setName(documentReference.getName());
-
-        return xcontext.getWiki().getDocument(doc, xcontext);
+        return xcontext.getWiki().getDocument(documentReference, xcontext);
     }
 
     /**
@@ -111,7 +108,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Deprecated
     public DocumentModelBridge getDocument(org.xwiki.bridge.DocumentName documentName) throws Exception
     {
-        return getDocument(new DocumentReference(documentName.getWiki(), documentName.getSpace(), documentName.getPage()));
+        return getDocument(
+            new DocumentReference(documentName.getWiki(), documentName.getSpace(), documentName.getPage()));
     }
 
     /**
@@ -157,8 +155,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
             currentDocument = context.getDoc();
         }
 
-        return currentDocument == null ? null : new DocumentReference(currentDocument.getWikiName(),
-            currentDocument.getSpaceName(), currentDocument.getPageName());
+        return currentDocument == null ? null : currentDocument.getDocumentReference();
     }
 
     /**
@@ -273,7 +270,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * {@inheritDoc}
      * 
      * @see DocumentAccessBridge#getProperty(String, String, String)
-     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, String, String)} instead
+     * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
      */
     public Object getProperty(String documentReference, String className, String propertyName)
     {
@@ -294,17 +291,18 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     /**
      * {@inheritDoc}
      *
-     * @see DocumentAccessBridge#getProperty(String, String, String)
+     * @see DocumentAccessBridge#getProperty(DocumentReference, DocumentReference, String)
      * @since 2.2M1 
      */
-    public Object getProperty(DocumentReference documentReference, String className, String propertyName)
+    public Object getProperty(DocumentReference documentReference, DocumentReference classReference,
+        String propertyName)
     {
         Object value;
 
         try {
             XWikiContext xcontext = getContext();
             XWikiDocument doc = xcontext.getWiki().getDocument(documentReference, xcontext);
-            BaseObject object = doc.getObject(className);
+            BaseObject object = doc.getXObject(classReference);
             BaseProperty property = (BaseProperty) object.get(propertyName);
             value = property.getValue();
         } catch (Exception ex) {
@@ -411,8 +409,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public InputStream getAttachmentContent(AttachmentReference attachmentReference) throws Exception
     {
         XWikiContext xcontext = getContext();
-        XWikiDocument attachmentDocument = xcontext.getWiki().getDocument(
-            this.entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()), xcontext);
+        XWikiDocument attachmentDocument = xcontext.getWiki().getDocument(attachmentReference.getDocumentReference(),
+            xcontext);
         return new ByteArrayInputStream(
             attachmentDocument.getAttachment(attachmentReference.getName()).getContent(xcontext));
     }
@@ -471,8 +469,8 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         List<AttachmentReference> attachmentReferences = new ArrayList<AttachmentReference>();
         XWikiContext xcontext = getContext();
         DocumentReference resolvedReference = documentReference;
-        List<XWikiAttachment> attachments = xcontext.getWiki().getDocument(
-            this.entityReferenceSerializer.serialize(resolvedReference), xcontext).getAttachmentList();
+        List<XWikiAttachment> attachments =
+            xcontext.getWiki().getDocument(resolvedReference, xcontext).getAttachmentList();
         for (XWikiAttachment attachment : attachments) {
             attachmentReferences.add(new AttachmentReference(attachment.getFilename(), resolvedReference));
         }

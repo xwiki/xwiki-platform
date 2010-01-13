@@ -219,9 +219,9 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 
                     ses.removeObject(baseDocNode.getPath() + "/obj");
                     if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-                        Iterator it = doc.getxWikiObjects().values().iterator();
+                        Iterator it = doc.getXObjects().values().iterator();
                         while (it.hasNext()) {
-                            Vector objects = (Vector) it.next();
+                            List objects = (List) it.next();
                             for (int i = 0; i < objects.size(); i++) {
                                 BaseCollection obj = (BaseCollection) objects.get(i);
                                 if (obj != null) {

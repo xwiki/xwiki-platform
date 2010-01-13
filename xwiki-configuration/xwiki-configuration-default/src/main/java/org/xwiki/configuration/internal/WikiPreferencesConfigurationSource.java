@@ -38,12 +38,12 @@ public class WikiPreferencesConfigurationSource extends AbstractDocumentConfigur
 
     private static final String PAGE_NAME = "XWikiPreferences";
 
-    private static final String CLASS_NAME = SPACE_NAME + "." + PAGE_NAME;
-
     @Override
-    protected String getClassName()
+    protected DocumentReference getClassReference()
     {
-        return CLASS_NAME;
+        // The Class reference is the same as the document refernece for XWiki.XWikiPreferences since the class is
+        // stored in the document of the same name.
+        return getDocumentReference();
     }
 
     @Override

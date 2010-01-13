@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 
+import com.xpn.xwiki.objects.StringProperty;
 import org.jmock.Mock;
 
 import com.xpn.xwiki.XWiki;
@@ -793,42 +794,42 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     public void testRemovingObjectWithWrongObjectVector()
     {
         // Setup: Create a document and two xobjects
-        XWikiDocument doc = new XWikiDocument();
-        BaseObject o1 = new BaseObject(), o2 = new BaseObject();
+        BaseObject o1 = new BaseObject();
+        BaseObject o2 = new BaseObject();
         o1.setClassName(CLASSNAME);
         o2.setClassName(CLASSNAME);
 
-        // First test: put the second xobject on the third position
+        // Test: put the second xobject on the third position
         // addObject creates the object vector and configures the objects
+        // o1 is added at position 0
+        // o2 is added at position 1
+        XWikiDocument doc = new XWikiDocument();
         doc.addObject(CLASSNAME, o1);
         doc.addObject(CLASSNAME, o2);
-        // Mess up the object vector
-        Vector<BaseObject> objects = doc.getObjects(CLASSNAME);
-        objects.setSize(3);
-        objects.set(1, null);
-        objects.set(2, o2);
-        // Call the tested method
-        doc.removeObject(o2);
+
+        // Modify the o2 object's position to ensure it can still be found and removed by the removeObject method.
+        assertEquals(1, o2.getNumber());
+        o2.setNumber(0);
+        // Set a field on o1 so that when comparing it with o2 they are different. This is needed so that the remove
+        // will pick the right object to remove (since we've voluntarily set a wrong number of o2 it would pick o1
+        // if they were equals).
+        o1.addField("somefield", new StringProperty()); 
+
+        // Call the tested method, removing o2 from position 2 which is set to null
+        boolean result = doc.removeObject(o2);
+
         // Check the correct behavior:
+        assertTrue(result);
+        Vector<BaseObject> objects = doc.getObjects(CLASSNAME);
         assertTrue(objects.contains(o1));
         assertFalse(objects.contains(o2));
         assertNull(objects.get(1));
-        assertNull(objects.get(2));
 
         // Second test: swap the two objects, so that the first object is in the position the second should have
         // Start over, re-adding the two objects
         doc = new XWikiDocument();
         doc.addObject(CLASSNAME, o1);
         doc.addObject(CLASSNAME, o2);
-        // Swap the two objects
-        objects = doc.getObjects(CLASSNAME);
-        objects.set(0, o2);
-        objects.set(1, o1);
-        // Call the tested method
-        doc.removeObject(o2);
-        // Check the correct behavior
-        assertTrue(objects.contains(o1));
-        assertFalse(objects.contains(o2));
     }
 
     public void testCopyDocument() throws XWikiException

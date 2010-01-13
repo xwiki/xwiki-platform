@@ -33,12 +33,11 @@ import org.xwiki.model.reference.DocumentReference;
 @Component("user")
 public class UserPreferencesConfigurationSource  extends AbstractDocumentConfigurationSource
 {
-    private static final String CLASS_NAME = "XWiki.XWikiUsers";
-
     @Override
-    protected String getClassName()
+    protected DocumentReference getClassReference()
     {
-        return CLASS_NAME;
+        // TODO: Not enabled yet. See #getDocumentReference().
+        return null;
     }
 
     @Override

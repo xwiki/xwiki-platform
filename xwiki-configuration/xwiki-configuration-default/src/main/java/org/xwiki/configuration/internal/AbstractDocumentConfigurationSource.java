@@ -49,9 +49,9 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     protected abstract DocumentReference getDocumentReference();
     
     /**
-     * @return the XWiki Class name of the XWiki Object containing the configuration properties
+     * @return the XWiki Class reference of the XWiki Object containing the configuration properties
      */
-    protected abstract String getClassName();
+    protected abstract DocumentReference getClassReference();
 
     /**
      * @return the bridge used to access Object properties
@@ -68,8 +68,9 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     public boolean containsKey(String key)
     {
         DocumentReference documentReference = getFailsafeDocumentReference();
-        return (documentReference != null)
-            && getDocumentAccessBridge().getProperty(documentReference, getClassName(), key) != null;
+        DocumentReference classReference = getFailsafeClassReference();
+        return (documentReference != null && classReference != null)
+            && getDocumentAccessBridge().getProperty(documentReference, classReference, key) != null;
     }
 
     /**
@@ -100,8 +101,9 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
         T result = null;
 
         DocumentReference documentReference = getFailsafeDocumentReference();
-        if (documentReference != null) {
-            result = (T) getDocumentAccessBridge().getProperty(documentReference, getClassName(), key);
+        DocumentReference classReference = getFailsafeClassReference();
+        if (documentReference != null && classReference != null) {
+            result = (T) getDocumentAccessBridge().getProperty(documentReference, classReference, key);
         
             // Make sure we don't return null values for List and Properties (they must return empty elements
             // when using the typed API).
@@ -125,8 +127,9 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
     {
         T result = null;
         DocumentReference documentReference = getFailsafeDocumentReference();
-        if (documentReference != null) {
-            result = (T) getDocumentAccessBridge().getProperty(documentReference, getClassName(), key);
+        DocumentReference classReference = getFailsafeClassReference();
+        if (documentReference != null && classReference != null) {
+            result = (T) getDocumentAccessBridge().getProperty(documentReference, classReference, key);
         }
 
         return result; 
@@ -161,5 +164,18 @@ public abstract class AbstractDocumentConfigurationSource implements Configurati
             documentReference = null;
         }
         return documentReference;
+    }
+
+    private DocumentReference getFailsafeClassReference()
+    {
+        DocumentReference classReference;
+        try {
+            classReference = getDocumentReference();
+        } catch (Exception e) {
+            // We verify that no error has happened and if one happened then we skip this configuration source. This
+            // ensures the system will continue to work even if this source has a problem.
+            classReference = null;
+        }
+        return classReference;
     }
 }

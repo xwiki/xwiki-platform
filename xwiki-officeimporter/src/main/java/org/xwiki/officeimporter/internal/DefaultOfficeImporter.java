@@ -216,7 +216,7 @@ public class DefaultOfficeImporter extends AbstractLogEnabled implements OfficeI
                     docBridge.getDocument(targetDescriptor.getDocumentReference()).setTitle(title);
                 }
                 if (null != parent) {
-                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setParent(
+                    docBridge.getDocument(targetDescriptor.getDocumentReference()).setParentReference(
                         targetDescriptor.getParentReference());
                 }
                 docBridge.setDocumentContent(target, content, "Created by office importer", false);

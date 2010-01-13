@@ -2628,7 +2628,7 @@ public class XWiki extends Api
      * Get the XWiki Class object defined in the passed Document name.
      * <p>
      * Note: This method doesn't require any rights for accessing the passed Document (as opposed to the
-     * {@link com.xpn.xwiki.api.Document#getxWikiClass()} method which does require to get a Document object first. This
+     * {@link com.xpn.xwiki.api.Document#getXClass()} method which does require to get a Document object first. This
      * is thus useful in cases where the calling code doesn't have the access right to the specified Document. It is
      * safe because there are no sensitive data stored in a Class definition.
      * </p>
@@ -2644,7 +2644,7 @@ public class XWiki extends Api
     {
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
-        return new Class(this.xwiki.getDocument(documentName, this.context).getxWikiClass(), this.context);
+        return new Class(this.xwiki.getDocument(documentName, this.context).getXClass(), this.context);
     }
 
     /**

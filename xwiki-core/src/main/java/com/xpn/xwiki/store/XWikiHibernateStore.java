@@ -428,13 +428,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             // These informations will allow to not look for attachments and objects on loading
             doc.setElement(XWikiDocument.HAS_ATTACHMENTS, (doc.getAttachmentList().size() != 0));
-            doc.setElement(XWikiDocument.HAS_OBJECTS, (doc.getxWikiObjects().size() != 0));
+            doc.setElement(XWikiDocument.HAS_OBJECTS, (doc.getXObjects().size() != 0));
 
             // Let's update the class XML since this is the new way to store it
             // TODO If all the properties are removed, the old xml stays?
-            BaseClass bclass = doc.getxWikiClass();
+            BaseClass bclass = doc.getXClass();
             if ((bclass != null) && (bclass.getFieldList().size() > 0)) {
-                doc.setxWikiClassXML(bclass.toXMLString());
+                doc.setXClassXML(bclass.toXMLString());
             }
 
             if (doc.hasElement(XWikiDocument.HAS_ATTACHMENTS)) {
@@ -593,7 +593,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
                 // TODO: Delete all objects for which we don't have a name in the Map
-                for (Vector<BaseObject> objects : doc.getxWikiObjects().values()) {
+                for (List<BaseObject> objects : doc.getXObjects().values()) {
                     for (BaseObject obj : objects) {
                         if (obj != null) {
                             obj.setName(doc.getFullName());
@@ -689,15 +689,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             // TODO: handle the case where there are no xWikiClass and xWikiObject in the Database
             BaseClass bclass = new BaseClass();
-            String cxml = doc.getxWikiClassXML();
+            String cxml = doc.getXClassXML();
             if (cxml != null) {
                 bclass.fromXML(cxml);
                 bclass.setName(doc.getFullName());
-                doc.setxWikiClass(bclass);
+                doc.setXClass(bclass);
             } else if (useClassesTable(false, context)) {
                 bclass.setName(doc.getFullName());
                 bclass = loadXWikiClass(bclass, context, false);
-                doc.setxWikiClass(bclass);
+                doc.setXClass(bclass);
             }
 
             // Store this XWikiClass in the context so that we can use it in case of recursive usage
@@ -705,10 +705,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             context.addBaseClass(bclass);
 
             if (doc.hasElement(XWikiDocument.HAS_OBJECTS)) {
-                Query query;
-                query =
-                    session
-                        .createQuery("from BaseObject as bobject where bobject.name = :name order by bobject.number");
+                Query query = session.createQuery("from BaseObject as bobject where bobject.name = :name order by "
+                    + "bobject.number");
                 query.setText("name", doc.getFullName());
                 Iterator it = query.list().iterator();
 
@@ -755,10 +753,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
 
                 if (hasGroups) {
-                    Query query2;
-                    query2 =
-                        session
-                            .createQuery("select bobject.number, prop.value from StringProperty as prop, BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' and bobject.id=prop.id.id and prop.id.name='member' order by bobject.number");
+                    Query query2 = session.createQuery("select bobject.number, prop.value from StringProperty as prop, "
+                        + "BaseObject as bobject where bobject.name = :name and bobject.className='XWiki.XWikiGroups' "
+                        + "and bobject.id=prop.id.id and prop.id.name='member' order by bobject.number");
                     query2.setText("name", doc.getFullName());
                     Iterator it2 = query2.list().iterator();
                     while (it2.hasNext()) {
@@ -835,7 +832,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 deleteLinks(doc.getId(), context, true);
             }
 
-            BaseClass bclass = doc.getxWikiClass();
+            BaseClass bclass = doc.getXClass();
             if ((bclass.getFieldList().size() > 0) && (useClassesTable(true, context))) {
                 deleteXWikiClass(bclass, context, false);
             }
@@ -851,7 +848,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
                 doc.setObjectsToRemove(new ArrayList<BaseObject>());
             }
-            for (Vector<BaseObject> objects : doc.getxWikiObjects().values()) {
+            for (List<BaseObject> objects : doc.getXObjects().values()) {
                 for (BaseObject obj : objects) {
                     if (obj != null) {
                         deleteXWikiObject(obj, context, false);
@@ -936,7 +933,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
              * if (stats) session.saveOrUpdate(object); else
              * session.saveOrUpdate((String)"com.xpn.xwiki.objects.BaseObject", (Object)object);
              */
-            BaseClass bclass = object.getxWikiClass(context);
+            BaseClass bclass = object.getXClass(context);
             List<String> handledProps = new ArrayList<String>();
             if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                 // save object using the custom mapping
@@ -1046,12 +1043,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             BaseClass bclass = null;
             if (!className.equals(object.getName())) {
                 // Let's check if the class has a custom mapping
-                bclass = object.getxWikiClass(context);
+                bclass = object.getXClass(context);
             } else {
                 // We need to get it from the document otherwise
                 // we will go in an endless loop
                 if (doc != null) {
-                    bclass = doc.getxWikiClass();
+                    bclass = doc.getXClass();
                 }
             }
 
@@ -1076,9 +1073,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Load strings, integers, dates all at once
 
             if (!className.equals("internal")) {
-                Query query =
-                    session
-                        .createQuery("select prop.name, prop.classType from BaseProperty as prop where prop.id.id = :id");
+                Query query = session.createQuery("select prop.name, prop.classType from BaseProperty as prop where "
+                    + "prop.id.id = :id");
                 query.setInteger("id", object.getId());
                 List list = query.list();
                 Iterator it = list.iterator();
@@ -1183,7 +1179,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // Let's check if the class has a custom mapping
-            BaseClass bclass = object.getxWikiClass(context);
+            BaseClass bclass = object.getXClass(context);
             List handledProps = new ArrayList();
             if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
                 handledProps = bclass.getCustomMappingPropertyList(context);
@@ -2675,8 +2671,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         for (int i = 0; i < list.size(); i++) {
             XWikiDocument doc = (XWikiDocument) list.get(i);
-            if (doc.getxWikiClass().getFieldList().size() > 0) {
-                result |= injectCustomMapping(doc.getxWikiClass(), context);
+            if (doc.getXClass().getFieldList().size() > 0) {
+                result |= injectCustomMapping(doc.getXClass(), context);
             }
         }
 
@@ -2696,13 +2692,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         boolean result = false;
-        Iterator it = doc.getxWikiObjects().values().iterator();
+        Iterator it = doc.getXObjects().values().iterator();
         while (it.hasNext()) {
-            Vector objects = (Vector) it.next();
+            List objects = (List) it.next();
             for (int i = 0; i < objects.size(); i++) {
                 BaseObject obj = (BaseObject) objects.get(i);
                 if (obj != null) {
-                    result |= injectCustomMapping(obj.getxWikiClass(context), context);
+                    result |= injectCustomMapping(obj.getXClass(context), context);
                 }
             }
         }

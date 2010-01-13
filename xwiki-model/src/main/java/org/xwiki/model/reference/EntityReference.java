@@ -91,8 +91,14 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         return this.child;
     }
 
+    /**
+     * @exception IllegalArgumentException if the passed type is null
+     */
     public void setType(EntityType type)
     {
+        if (type == null) {
+            throw new IllegalArgumentException("An Entity Reference type cannot be null");
+        }
         this.type = type;
     }
 

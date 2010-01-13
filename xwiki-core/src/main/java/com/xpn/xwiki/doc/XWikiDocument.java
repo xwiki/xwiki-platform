@@ -74,12 +74,14 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
@@ -163,11 +165,9 @@ public class XWikiDocument implements DocumentModelBridge
 
     private String title;
 
-    private String parent;
+    private DocumentReference parentReference;
 
-    private String space;
-
-    private String name;
+    private DocumentReference documentReference;
 
     private String content;
 
@@ -213,15 +213,13 @@ public class XWikiDocument implements DocumentModelBridge
      * The reference to the document that is the template for the current document.
      * @todo this field is not used yet since it's not currently saved in the database.
      */
-    private String template;
+    private DocumentReference templateDocumentReference;
 
     protected String language;
 
     private String defaultLanguage;
 
     private int translation;
-
-    private String database;
 
     private BaseObject tags;
 
@@ -498,22 +496,28 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
      * @return the name of the space of the document
      * @deprecated since 2.2M1 used {@link #getDocumentReference()} instead
      */
     @Deprecated
     public String getSpace()
     {
-        return this.space;
+        return getDocumentReference().getLastSpaceReference().getName();
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
      * @deprecated since 2.2M1 used {@link #setDocumentReference(DocumentReference)} instead
      */
     @Deprecated
     public void setSpace(String space)
     {
-        this.space = space;
+        if (space != null) {
+            getDocumentReference().getLastSpaceReference().setName(space);
+        }
     }
 
     public String getVersion()
@@ -568,21 +572,25 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference getParentReference()
     {
-        DocumentReference parentReference = null;
-        if (this.parent != null) {
-            parentReference = this.currentMixedDocumentReferenceResolver.resolve(this.parent);
-        }
-        return parentReference;
+        return this.parentReference;
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
      * @return the parent reference or an empty string ("") if the parent is not set
      * @deprecated since 2.2M1 used {@link #getParentReference()} instead
      */
     @Deprecated
     public String getParent()
     {
-        return this.parent != null ? this.parent : "";
+        String parentReferenceAsString;
+        if (getParentReference() != null) {
+            parentReferenceAsString = this.compactEntityReferenceSerializer.serialize(getParentReference());
+        } else {
+            parentReferenceAsString = "";
+        }
+        return parentReferenceAsString;
     }
 
     /**
@@ -591,7 +599,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public XWikiDocument getParentDoc()
     {
-        return new XWikiDocument(getSpace(), getParent());
+        return new XWikiDocument(getParentReference());
     }
     
     /**
@@ -599,21 +607,29 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setParentReference(DocumentReference parentReference)
     {
-        if (parentReference != null) {
-            this.parent = this.compactEntityReferenceSerializer.serialize(parentReference);
+        if ((parentReference == null && getParentReference() != null)
+            || (parentReference != null && !parentReference.equals(getParentReference()))) {
+            this.parentReference = parentReference;
+            setMetaDataDirty(true);
         }
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
      * @deprecated since 2.2M1 used {@link #setParentReference(DocumentReference)}  instead
      */
     @Deprecated
     public void setParent(String parent)
     {
-        if (parent != null && !parent.equals(this.parent)) {
-            setMetaDataDirty(true);
+        // If the passed parent is an empty string we also need to set the reference to null. The reason is that
+        // in the database we store "" when the parent is empty and thus when Hibernate loads this class it'll call
+        // setParent with "" if the parent had not been set when saved.
+        if (StringUtils.isEmpty(parent)) {
+            setParentReference(null);
+        } else {
+            setParentReference(this.currentMixedDocumentReferenceResolver.resolve(parent));
         }
-        this.parent = parent;
     }
 
     public String getContent()
@@ -746,21 +762,27 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * @deprecated since 2.2M1 used {@link #getDocumentReference()}  instead
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @deprecated since 2.2M1 used {@link #getDocumentReference()} instead
      */
     @Deprecated
     public String getName()
     {
-        return this.name;
+        return getDocumentReference().getName();
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     *
      * @deprecated since 2.2M1 used {@link #setDocumentReference(DocumentReference)}  instead
      */
     @Deprecated
     public void setName(String name)
     {
-        this.name = name;
+        if (name != null) {
+            getDocumentReference().setName(name);
+        }
     }
 
     /**
@@ -771,9 +793,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference getDocumentReference()
     {
-        // Note: A DocumentReference must always be valid. We don't check for validity here since all XWikiDocument's
-        // constructors ensure that the database/space/name are always valid.
-        return new DocumentReference(this.database, this.space, this.name);
+        return this.documentReference;
     }
 
     /**
@@ -801,9 +821,11 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setDocumentReference(DocumentReference reference)
     {
-        this.database = reference.getWikiReference().getName();
-        this.space = reference.getLastSpaceReference().getName();
-        this.name = reference.getName();
+        if ((reference == null && getDocumentReference() != null)
+            || (reference != null && !reference.equals(getDocumentReference()))) {
+            this.documentReference = reference;
+            setMetaDataDirty(true);
+        }
     }
 
     /**
@@ -824,7 +846,6 @@ public class XWikiDocument implements DocumentModelBridge
         // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
         // specified in the passed string, rather than use the current document's page name.
         setDocumentReference(this.currentMixedDocumentReferenceResolver.resolve(fullname));
-        setContentDirty(true);
     }
 
     /**
@@ -2005,12 +2026,12 @@ public class XWikiDocument implements DocumentModelBridge
     {
         // TODO: look for each object if it already exist and add it if it doesn't
         for (DocumentReference reference : templatedoc.getXObjects().keySet()) {
-            List<BaseObject> myObjects = getXObjects().get(name);
+            List<BaseObject> myObjects = getXObjects().get(reference);
 
             if (myObjects == null) {
                 myObjects = new ArrayList<BaseObject>();
             }
-            for (BaseObject otherObject : templatedoc.getXObjects().get(name)) {
+            for (BaseObject otherObject : templatedoc.getXObjects().get(reference)) {
                 if (otherObject != null) {
                     BaseObject myObject = (BaseObject) otherObject.clone();
                     // BaseObject.clone copies the GUID, so randomize it for the copied object.
@@ -2069,11 +2090,7 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public DocumentReference getTemplateDocumentReference()
     {
-        DocumentReference templateDocumentReference = null;
-        if (this.template != null) {
-            templateDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(this.template);
-        }
-        return templateDocumentReference;
+        return this.templateDocumentReference;
     }
 
     /**
@@ -2097,8 +2114,12 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setTemplateDocumentReference(DocumentReference templateDocumentReference)
     {
-        this.template = this.localEntityReferenceSerializer.serialize(templateDocumentReference);
-        setMetaDataDirty(true);
+        if ((templateDocumentReference == null && getTemplateDocumentReference() != null)
+            || (templateDocumentReference != null
+            && !templateDocumentReference.equals(getTemplateDocumentReference()))) {
+            this.templateDocumentReference = templateDocumentReference;
+            setMetaDataDirty(true);
+        }
     }
 
     /**
@@ -2107,7 +2128,11 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setTemplate(String template)
     {
-        setTemplateDocumentReference(this.currentMixedDocumentReferenceResolver.resolve(template));
+        DocumentReference templateReference = null;
+        if (!StringUtils.isEmpty(template)) {
+            templateReference = this.currentMixedDocumentReferenceResolver.resolve(template);
+        }
+        setTemplateDocumentReference(templateReference);
     }
 
     public String displayPrettyName(String fieldname, XWikiContext context)
@@ -3431,10 +3456,10 @@ public class XWikiDocument implements DocumentModelBridge
         // constructed XWikiDocument object has a valid name or space (by using current document values if they are
         // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
         // instance.
-        DocumentReference reference = new DocumentReference(getElement(docel, "name"),
-            new SpaceReference(getElement(docel, "web"), (WikiReference) null));
+        EntityReference reference = new EntityReference(getElement(docel, "name"), EntityType.DOCUMENT,
+            new EntityReference(getElement(docel, "web"), EntityType.SPACE, null));
         reference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
-        setDocumentReference(reference);
+        setDocumentReference(new DocumentReference(reference));
 
         String parent = getElement(docel, "parent");
         if (parent != null) {
@@ -4294,21 +4319,27 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
      * @deprecated since 2.2M1 use {@link #getDocumentReference()} instead
      */
     @Deprecated
     public String getDatabase()
     {
-        return this.database;
+        return getDocumentReference().getWikiReference().getName();
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
      * @deprecated since 2.2M1 use {@link #setDocumentReference(DocumentReference)} instead
      */
     @Deprecated
     public void setDatabase(String database)
     {
-        this.database = database;
+        if (database != null) {
+            getDocumentReference().getWikiReference().setName(database);
+        }
     }
 
     public String getLanguage()
@@ -4383,7 +4414,7 @@ public class XWikiDocument implements DocumentModelBridge
         XWikiDocument tdoc = this;
 
         if (!((language == null) || (language.equals("")) || language.equals(this.defaultLanguage))) {
-            tdoc = new XWikiDocument(getDatabase(), getSpace(), getName());
+            tdoc = new XWikiDocument(getDocumentReference());
             tdoc.setLanguage(language);
             String database = context.getDatabase();
             try {
@@ -6239,7 +6270,6 @@ public class XWikiDocument implements DocumentModelBridge
         this.contentUpdateDate.setTime((this.contentUpdateDate.getTime() / 1000) * 1000);
         this.creationDate = new Date();
         this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
-        this.parent = "";
         this.content = "\n";
         this.format = "";
         this.author = "";

@@ -29,14 +29,36 @@ import org.xwiki.model.EntityType;
  */
 public class WikiReference extends EntityReference
 {
+    /**
+     * Special constructor that transforms a generic entity reference into a {@link WikiReference}. It checks the
+     * validity of the passed reference (ie correct type).
+     *
+     * @exception IllegalArgumentException if the passed reference is not a valid wiki reference
+     */
     public WikiReference(EntityReference reference)
     {
-        this(reference.getName());    
+        super(reference.getName(), reference.getType());    
     }
 
     public WikiReference(String wikiName)
     {
-        super(wikiName, null);
-        setType(EntityType.WIKI);
+        super(wikiName, EntityType.WIKI);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden in order to verify the validity of the passed type
+     *
+     * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
+     * @exception IllegalArgumentException if the passed type is not a wiki type
+     */
+    @Override public void setType(EntityType type)
+    {
+        if (type != EntityType.WIKI) {
+            throw new IllegalArgumentException("Invalid type [" + type + "] for a wiki reference");
+        }
+
+        super.setType(EntityType.WIKI);
     }
 }

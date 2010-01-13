@@ -33,9 +33,15 @@ import java.util.List;
  */
 public class DocumentReference extends EntityReference
 {
+    /**
+     * Special constructor that transforms a generic entity reference into a {@link DocumentReference}. It checks the
+     * validity of the passed reference (ie correct type and correct parent).
+     *
+     * @exception IllegalArgumentException if the passed reference is not a valid document reference
+     */
     public DocumentReference(EntityReference reference)
     {
-        super(reference.getName(), EntityType.DOCUMENT, reference.getParent());
+        super(reference.getName(), reference.getType(), reference.getParent());
     }
 
     public DocumentReference(String wikiName, String spaceName, String pageName)
@@ -53,9 +59,44 @@ public class DocumentReference extends EntityReference
         super(pageName, EntityType.DOCUMENT, parent);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden in order to verify the validity of the passed parent
+     *
+     * @see org.xwiki.model.reference.EntityReference#setParent(EntityReference)
+     * @exception IllegalArgumentException if the passed parent is not a valid document reference parent (ie a space
+     *            reference)
+     */
+    @Override public void setParent(EntityReference parent)
+    {
+        if (parent == null || parent.getType() != EntityType.SPACE) {
+            throw new IllegalArgumentException("Invalid parent reference [" + parent + "] for a document reference");
+        }
+
+        super.setParent(new SpaceReference(parent));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Overridden in order to verify the validity of the passed type
+     *
+     * @see org.xwiki.model.reference.EntityReference#setType(org.xwiki.model.EntityType)
+     * @exception IllegalArgumentException if the passed type is not a document type
+     */
+    @Override public void setType(EntityType type)
+    {
+        if (type != EntityType.DOCUMENT) {
+            throw new IllegalArgumentException("Invalid type [" + type + "] for a document reference");
+        }
+
+        super.setType(EntityType.DOCUMENT);
+    }
+
     public WikiReference getWikiReference()
     {
-        return new WikiReference(extractReference(EntityType.WIKI));
+        return (WikiReference) extractReference(EntityType.WIKI);
     }
 
     public void setWikiReference(WikiReference newWikiReference)
@@ -66,7 +107,7 @@ public class DocumentReference extends EntityReference
 
     public SpaceReference getLastSpaceReference()
     {
-        return new SpaceReference(extractReference(EntityType.SPACE));
+        return (SpaceReference) extractReference(EntityType.SPACE);
     }
 
     public List<SpaceReference> getSpaceReferences()
@@ -76,7 +117,7 @@ public class DocumentReference extends EntityReference
         EntityReference reference = this;
         while (reference != null) {
             if (reference.getType() == EntityType.SPACE) {
-                references.add(new SpaceReference(reference));
+                references.add((SpaceReference) reference);
             }
             reference = reference.getParent();
         }
@@ -89,7 +130,7 @@ public class DocumentReference extends EntityReference
     private static final EntityReference constructSpaceReference(String wikiName, List<String> spaceNames)
     {
         EntityReference spaceReference = null;
-        EntityReference parent = new WikiReference(wikiName);
+        EntityReference parent = new EntityReference(wikiName, EntityType.WIKI);
         for (String spaceName : spaceNames) {
             spaceReference = new EntityReference(spaceName, EntityType.SPACE, parent);
             parent = spaceReference;

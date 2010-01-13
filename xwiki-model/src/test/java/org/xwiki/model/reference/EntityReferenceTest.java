@@ -97,9 +97,9 @@ public class EntityReferenceTest
                 new EntityReference("wiki", EntityType.WIKI)));
         Assert.assertFalse(reference1.equals(reference5));
 
-        EntityReference reference6 = new EntityReference(null, null, null);
+        EntityReference reference6 = new EntityReference(null, EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.equals(reference6));
-        Assert.assertEquals(reference6, new EntityReference(null, null, null)); 
+        Assert.assertEquals(reference6, new EntityReference(null, EntityType.DOCUMENT, null));
 
         EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.equals(reference7));
@@ -133,9 +133,9 @@ public class EntityReferenceTest
                 new EntityReference("wiki", EntityType.WIKI)));
         Assert.assertFalse(reference1.hashCode() == reference5.hashCode());
 
-        EntityReference reference6 = new EntityReference(null, null, null);
+        EntityReference reference6 = new EntityReference(null, EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.hashCode() == reference6.hashCode());
-        Assert.assertEquals(reference6.hashCode(), new EntityReference(null, null, null).hashCode());
+        Assert.assertEquals(reference6.hashCode(), new EntityReference(null, EntityType.DOCUMENT, null).hashCode());
 
         EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.hashCode() == reference7.hashCode());
@@ -183,5 +183,16 @@ public class EntityReferenceTest
         Assert.assertSame(reference, list.get(2));
         Assert.assertSame(reference2, list.get(1));
         Assert.assertSame(reference3, list.get(0));
+    }
+
+    @Test
+    public void testNullType()
+    {
+        try {
+            new EntityReference("name", null);
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("An Entity Reference type cannot be null", expected.getMessage());
+        }
     }
 }

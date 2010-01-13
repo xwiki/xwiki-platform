@@ -49,6 +49,55 @@ public class DocumentReferenceTest
     }
 
     @Test
+    public void testInvalidType()
+    {
+        try {
+            new DocumentReference(new EntityReference("page", EntityType.SPACE));
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("Invalid type [SPACE] for a document reference", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testInvalidNullParent()
+    {
+        try {
+            new DocumentReference("page", null);
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("Invalid parent reference [null] for a document reference", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testInvalidParentType()
+    {
+        try {
+            new DocumentReference(new EntityReference("page", EntityType.DOCUMENT, new WikiReference("wiki")));
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("Invalid parent reference [name = [wiki], type = [WIKI], parent = [null]] for a "
+                + "document reference", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testConstructorIsolation()
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+        EntityReference spaceReference = reference.getParent();
+
+        // Verify that create a new reference based on an existing one doesn't modify the existing one in any manner.
+        new DocumentReference(
+            reference.getWikiReference().getName(), reference.getLastSpaceReference().getName(), reference.getName());
+
+        // Verify parent/child relationships
+        Assert.assertSame(reference, reference.getParent().getChild());
+        Assert.assertSame(spaceReference, reference.getParent().getParent().getChild());
+    }
+
+    @Test
     public void testGetWikiReference()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "page");
@@ -64,14 +113,19 @@ public class DocumentReferenceTest
     }
 
     @Test
-    public void testGetLastSpaceReference()
+    public void testGetLastSpaceReferenceWhenOneSpace()
     {
-        DocumentReference reference1 = new DocumentReference("wiki", "space", "page");
-        Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")), reference1.getLastSpaceReference());
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        SpaceReference spaceReference = documentReference.getLastSpaceReference();
+        Assert.assertEquals(new SpaceReference("space", new WikiReference("wiki")), spaceReference);
+    }
 
-        DocumentReference reference2 = new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page");
+    @Test
+    public void testGetLastSpaceReferenceWhenMultipleSpaces()
+    {
+        DocumentReference reference = new DocumentReference("wiki", Arrays.asList("space1", "space2"), "page");
         Assert.assertEquals(new SpaceReference("space2", new SpaceReference("space1", new WikiReference("wiki"))),
-            reference2.getLastSpaceReference());
+            reference.getLastSpaceReference());
     }
 
     @Test

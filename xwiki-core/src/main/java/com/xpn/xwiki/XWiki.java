@@ -1305,7 +1305,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 context.setDatabase(server);
             }
 
-            // Setting comment & minoredit before saving
+            // Setting comment & minor edit before saving
             doc.setComment(StringUtils.defaultString(comment));
             doc.setMinorEdit(isMinorEdit);
 

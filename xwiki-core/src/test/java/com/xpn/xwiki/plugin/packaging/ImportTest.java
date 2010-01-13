@@ -175,6 +175,7 @@ public class ImportTest extends AbstractBridgedXWikiComponentTestCase
         this.mockRightService = mock(XWikiRightService.class);
         this.mockRightService.stubs().method("checkAccess").will(returnValue(true));
         this.mockRightService.stubs().method("hasAdminRights").will(returnValue(true));
+        this.mockRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
         this.xwiki.setRightService((XWikiRightService) this.mockRightService.proxy());
     }
 

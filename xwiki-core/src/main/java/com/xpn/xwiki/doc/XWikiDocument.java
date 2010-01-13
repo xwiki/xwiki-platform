@@ -459,9 +459,24 @@ public class XWikiDocument implements DocumentModelBridge
         this.store = store;
     }
 
+    /**
+     * @return the unique id used to represent the document, as a number. This id is technical and is equivalent to
+     *         the Document Reference + the language of the Document. This technical id should only be used for the
+     *         storage layer and all user APIs should instead use Document Reference and language as they are
+     *         model-related while the id isn't (it's purely technical). 
+     */
     public long getId()
     {
+        // TODO: The implemented below doesn't guarantee a unique id since it uses the hashCode() method which doesn't
+        // guarantee unicity. From the JDK's javadoc: "It is not required that if two objects are unequal according to
+        // the equals(java.lang.Object) method, then calling the hashCode method on each of the two objects must
+        // produce distinct integer results.". This needs to be fixed to produce a real unique id since otherwise we
+        // can have clashes in the database.
+
         if ((this.language == null) || this.language.trim().equals("")) {
+            // Note: We don't use the wiki name in the document id's computation. The main historical reason is so
+            // that all things saved in a given wiki's database are always stored relative to that wiki so that
+            // changing that wiki's name is simpler.
             this.id = this.localEntityReferenceSerializer.serialize(getDocumentReference()).hashCode();
         } else {
             this.id = (this.localEntityReferenceSerializer.serialize(getDocumentReference()) + ":"
@@ -471,6 +486,9 @@ public class XWikiDocument implements DocumentModelBridge
         return this.id;
     }
 
+    /**
+     * @see #getId()
+     */
     public void setId(long id)
     {
         this.id = id;

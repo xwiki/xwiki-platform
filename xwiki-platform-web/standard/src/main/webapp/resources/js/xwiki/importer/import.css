@@ -79,10 +79,6 @@ ul.package li.xitem div.xitemcontainer div.spacename {
   cursor:pointer;
 }
 
-ul.package li.xitem div.xitemcontainer div.spacename:hover {
-  backgroun:url($xwiki.getSkinFile('icons/silk/folder_magnify.gif')) no-repeat scroll 0 0 transparent;
-}
-
 ul.package li.xitem div.xitemcontainer div.selection {
   float:right;
   color:grey;

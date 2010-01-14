@@ -30,7 +30,7 @@
 ## to import from that XAR.
 ##---------------------------------------------------------------------------
 #else
-  #set($baseQueryString="editor=$!{request.editor}&section=$!{request.section}")
+  #set($baseQueryString="editor=$!{request.editor}&amp;section=$!{request.section}")
   #set($ok = $xwiki.jsfx.use('js/xwiki/importer/import.js', true))
   #set($ok = $xwiki.ssfx.use('js/xwiki/importer/import.css', true))
   #set($attachments = $sorttool.sort($doc.attachmentList, ["date:desc"]))
@@ -59,11 +59,10 @@
       </form>
     <h4 class="legend">$msg.get('core.importer.availablePackages')</h4>
     <div id="packagelistcontainer">
-      ##<input type="text" class="withTip search" value="Filter..." />
       #if($attachments.size() > 0)
       <ul class="xlist" style="text-indent:0px">
         #foreach ($attach in $attachments)
-          #set($url = $doc.getURL("import", "${baseQueryString}&file=${attach.filename}"))
+          #set($url = $doc.getURL("import", "${baseQueryString}&amp;file=${attach.filename}"))
           #if("$!request.file" == "$!attach.filename") #set($extra = "active") #else #set($extra = "") #end
           <li class="xitem xhighlight" style="text-indent:0px">
             <div class="xitemcontainer package $!extra">
@@ -74,8 +73,8 @@
                 </a>
                 <span class="version">$attach.version</span>
                 <span class="xwikibuttonlinks">
-                    ##set($redirect="$!{redirect}".replaceAll("&", "&amp;"))
-                    #set($attachurl = $doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$redirect"))
+                    #if("$!{redirect}" != "") #set($redirect=$redirect.replaceAll("&", "&amp;")) #end
+                    #set($attachurl = $doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=$!{redirect}"))
                     <a class="deletelink" href="${attachurl}" 
                          onclick="return confirm('$msg.get("core.viewers.attachments.delete.confirm")');"           
                          title="$msg.get("core.viewers.attachments.delete.title")"></a>
@@ -91,11 +90,11 @@
           </li>
         #end    
         </ul>
-      </div> ## packagelistcontainer
     #else
       #warning($msg.get("core.viewers.attachments.noAttachments"))
     #end
-    </div> ## attachmentsleft
+    </div> ## packagelistcontainer
+    </div> ## packagelist
     <div id="packagecontainer">
       #if("$!request.file" != "")
         ##

@@ -394,7 +394,7 @@ h1#admin-header {
   list-style-type: none;
   width: 124px;
   float: left;
-  margin: 20px;
+  margin: 15px;
   text-align: center;
 }
 
@@ -409,6 +409,8 @@ h1#admin-header {
 }
 
 #admin-icons li a img {
+  display: block;
+  height: 85px;
   text-decoration: none;
   border: 0;
 }

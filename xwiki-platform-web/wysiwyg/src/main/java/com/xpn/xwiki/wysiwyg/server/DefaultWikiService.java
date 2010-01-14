@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Requirement;
 import org.xwiki.context.Execution;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -371,13 +372,22 @@ public class DefaultWikiService implements WikiService
         // which don't have the information required to detect the current document (e.g. these informations can't be
         // extracted from the request URL).
 
-        // TODO: Replace this by setting a current document in the context and use a Current Reference Factory.
-        DocumentReference reference = new DocumentReference(wiki, space, page);
-        reference = this.defaultReferenceDocumentReferenceResolver.resolve(reference);
-        if (StringUtils.isEmpty(wiki)) {
-            reference.setWikiReference(new WikiReference(getXWikiContext().getDatabase()));
+        EntityReference reference = null;
+        if (!StringUtils.isEmpty(wiki)) {
+            reference = new EntityReference(wiki, EntityType.WIKI);
         }
-        return reference;
+        if (!StringUtils.isEmpty(space)) {
+            reference = new EntityReference(space, EntityType.SPACE, reference);
+        }
+        if (!StringUtils.isEmpty(page)) {
+            reference = new EntityReference(page, EntityType.DOCUMENT, reference);
+        }
+        
+        DocumentReference resolvedReference = this.defaultReferenceDocumentReferenceResolver.resolve(reference);
+        if (StringUtils.isEmpty(wiki)) {
+            resolvedReference.setWikiReference(new WikiReference(getXWikiContext().getDatabase()));
+        }
+        return resolvedReference;
     }
 
     /**

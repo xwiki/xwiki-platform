@@ -160,7 +160,6 @@ public abstract class AbstractStringEntityReferenceResolver implements EntityRef
         // If not found then the full buffer is the current reference segment
         if (!found) {
             name = representation.toString();
-//            if (name.length() )
             representation.setLength(0);
         }
 

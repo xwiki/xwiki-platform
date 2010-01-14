@@ -97,12 +97,9 @@ public class EntityReferenceTest
                 new EntityReference("wiki", EntityType.WIKI)));
         Assert.assertFalse(reference1.equals(reference5));
 
-        EntityReference reference6 = new EntityReference(null, EntityType.DOCUMENT, null);
+        EntityReference reference6 = new EntityReference("page", EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.equals(reference6));
-        Assert.assertEquals(reference6, new EntityReference(null, EntityType.DOCUMENT, null));
-
-        EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT, null);
-        Assert.assertFalse(reference1.equals(reference7));
+        Assert.assertEquals(reference6, new EntityReference("page", EntityType.DOCUMENT, null));
     }
 
     @Test
@@ -133,12 +130,9 @@ public class EntityReferenceTest
                 new EntityReference("wiki", EntityType.WIKI)));
         Assert.assertFalse(reference1.hashCode() == reference5.hashCode());
 
-        EntityReference reference6 = new EntityReference(null, EntityType.DOCUMENT, null);
+        EntityReference reference6 = new EntityReference("page", EntityType.DOCUMENT, null);
         Assert.assertFalse(reference1.hashCode() == reference6.hashCode());
-        Assert.assertEquals(reference6.hashCode(), new EntityReference(null, EntityType.DOCUMENT, null).hashCode());
-
-        EntityReference reference7 = new EntityReference("page", EntityType.DOCUMENT, null);
-        Assert.assertFalse(reference1.hashCode() == reference7.hashCode());
+        Assert.assertEquals(reference6.hashCode(), new EntityReference("page", EntityType.DOCUMENT, null).hashCode());
     }
 
     @Test
@@ -193,6 +187,28 @@ public class EntityReferenceTest
             Assert.fail("Should have thrown an exception here");
         } catch (IllegalArgumentException expected) {
             Assert.assertEquals("An Entity Reference type cannot be null", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testNullName()
+    {
+        try {
+            new EntityReference(null, EntityType.WIKI);
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void testEmptyName()
+    {
+        try {
+            new EntityReference("", EntityType.WIKI);
+            Assert.fail("Should have thrown an exception here");
+        } catch (IllegalArgumentException expected) {
+            Assert.assertEquals("An Entity Reference name cannot be null or empty", expected.getMessage());
         }
     }
 }

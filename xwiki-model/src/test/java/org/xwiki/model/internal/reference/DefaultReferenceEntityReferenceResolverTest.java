@@ -84,18 +84,6 @@ public class DefaultReferenceEntityReferenceResolverTest
     }
 
     @Test
-    public void testResolveDocumentReferenceWhenThereAreNullNames()
-    {
-        EntityReference reference = resolver.resolve(new EntityReference(null, EntityType.DOCUMENT),
-            EntityType.DOCUMENT);
-        Assert.assertEquals("defpage", reference.getName());
-        Assert.assertEquals("defspace", reference.getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
-        Assert.assertEquals("defwiki", reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
-    }
-
-    @Test
     public void testResolveDocumentReferenceWhenMissingParentBetweenReferences()
     {
         EntityReference reference = resolver.resolve(new EntityReference("page", EntityType.DOCUMENT,

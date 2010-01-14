@@ -83,7 +83,6 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
@@ -425,13 +424,32 @@ public class XWikiDocument implements DocumentModelBridge
     {
         // We allow to specify the space in the name (eg name = "space.page"). In this case the passed space is
         // ignored.
-        // Note that we need to normalize the default reference since it could be invalid
-        DocumentReference reference = resolveReference(name,
-            this.currentReferenceDocumentReferenceResolver.resolve(new DocumentReference(wiki, space, null)));
-        // Replace the resolved wiki by the passed wiki if not empty/null
-        if (!StringUtils.isEmpty(wiki)) {
-            reference.setWikiReference(new WikiReference(wiki));
+
+        // Build an entity reference that will serve as a current context reference against which to resolve if the
+        // passed name doesn't contain a space. 
+        EntityReference contextReference = null;
+        if (!StringUtils.isEmpty(space)) {
+            contextReference = new EntityReference(space, EntityType.SPACE);
+            if (!StringUtils.isEmpty(wiki)) {
+                contextReference.setParent(new WikiReference(wiki));
+            }
+        } else if (!StringUtils.isEmpty(wiki)) {
+            contextReference = new WikiReference(wiki);
         }
+
+        DocumentReference reference;
+        if (contextReference != null) {
+            reference = resolveReference(name,
+                this.currentReferenceDocumentReferenceResolver.resolve(contextReference));
+            // Replace the resolved wiki by the passed wiki if not empty/null
+            if (!StringUtils.isEmpty(wiki)) {
+                reference.setWikiReference(new WikiReference(wiki));
+            }
+        } else {
+            // Both the wiki and space params are empty/null, thus don't use a context reference.
+            reference = this.currentDocumentReferenceResolver.resolve(name);
+        }
+
         init(reference);
     }
 
@@ -1018,7 +1036,7 @@ public class XWikiDocument implements DocumentModelBridge
                 return title;
             }
         } catch (Exception e) {
-            LOG.warn("Failed to inerpret title of document [" + this.getPrefixedFullName() + "]", e);
+            LOG.warn("Failed to interpret title of document [" + this.getPrefixedFullName() + "]", e);
         }
 
         try {
@@ -3456,8 +3474,16 @@ public class XWikiDocument implements DocumentModelBridge
         // constructed XWikiDocument object has a valid name or space (by using current document values if they are
         // missing). This is important since document name, space and wiki must always be set in a XWikiDocument
         // instance.
-        EntityReference reference = new EntityReference(getElement(docel, "name"), EntityType.DOCUMENT,
-            new EntityReference(getElement(docel, "web"), EntityType.SPACE, null));
+        String name = getElement(docel, "name");
+        String space = getElement(docel, "web");
+
+        if (StringUtils.isEmpty(name) || StringUtils.isEmpty(space)) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Invalid XML: \"name\" and \"web\" cannot be empty");
+        }
+
+        EntityReference reference = new EntityReference(name, EntityType.DOCUMENT,
+            new EntityReference(space, EntityType.SPACE));
         reference = this.currentReferenceDocumentReferenceResolver.resolve(reference);
         setDocumentReference(new DocumentReference(reference));
 

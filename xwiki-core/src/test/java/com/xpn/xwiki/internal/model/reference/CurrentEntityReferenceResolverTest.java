@@ -25,6 +25,7 @@ import com.xpn.xwiki.web.Utils;
 import org.junit.*;
 import org.xwiki.context.Execution;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.AbstractComponentTestCase;
@@ -43,7 +44,7 @@ public class CurrentEntityReferenceResolverTest extends AbstractComponentTestCas
 
     private static final String CURRENT_PAGE = "currentpage";
 
-    private EntityReferenceResolver resolver;
+    private EntityReferenceResolver<String> resolver;
 
     private XWikiContext context;
 
@@ -73,7 +74,7 @@ public class CurrentEntityReferenceResolverTest extends AbstractComponentTestCas
     @org.junit.Test
     public void testResolveDocumentReferenceWhenContextDocument() throws Exception
     {
-        this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
+        this.context.setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference = resolver.resolve("", EntityType.DOCUMENT);
         Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
@@ -84,12 +85,12 @@ public class CurrentEntityReferenceResolverTest extends AbstractComponentTestCas
     @org.junit.Test
     public void testResolveAttachmentReference() throws Exception
     {
-        this.context.setDoc(new XWikiDocument(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE));
+        this.context.setDoc(new XWikiDocument(new DocumentReference(CURRENT_WIKI, CURRENT_SPACE, CURRENT_PAGE)));
 
         EntityReference reference = resolver.resolve("", EntityType.ATTACHMENT);
         Assert.assertEquals(CURRENT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(CURRENT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(CURRENT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert.assertEquals("", reference.getName());
+        Assert.assertEquals("filename", reference.getName());
     }
 }

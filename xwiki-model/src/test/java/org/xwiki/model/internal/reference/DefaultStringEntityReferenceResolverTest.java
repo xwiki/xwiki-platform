@@ -44,7 +44,7 @@ public class DefaultStringEntityReferenceResolverTest
     
     private static final String DEFAULT_PAGE = "WebHome";
         
-    private static final String DEFAULT_ATTACHMENT = "";
+    private static final String DEFAULT_ATTACHMENT = "filename";
 
     private EntityReferenceResolver resolver;
 
@@ -144,17 +144,17 @@ public class DefaultStringEntityReferenceResolverTest
         String DEFAULT_SPACE = "XWiki";
         String DEFAULT_PAGE = "WebHome";
 
-        EntityReference reference = resolver.resolve("wiki:space.page@filename", EntityType.ATTACHMENT);
+        EntityReference reference = resolver.resolve("wiki:space.page@filename.ext", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals("page", reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert.assertEquals("filename", reference.getName());
+        Assert.assertEquals("filename.ext", reference.getName());
 
         reference = resolver.resolve("", EntityType.ATTACHMENT);
         Assert.assertEquals(DEFAULT_WIKI, reference.extractReference(EntityType.WIKI).getName());
         Assert.assertEquals(DEFAULT_SPACE, reference.extractReference(EntityType.SPACE).getName());
         Assert.assertEquals(DEFAULT_PAGE, reference.extractReference(EntityType.DOCUMENT).getName());
-        Assert.assertEquals("", reference.getName());
+        Assert.assertEquals(DEFAULT_ATTACHMENT, reference.getName());
 
         reference = resolver.resolve("wiki:space.page@my.png", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());

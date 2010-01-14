@@ -20,10 +20,14 @@
  */
 package org.xwiki.url.internal;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.model.EntityType;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.url.InvalidURLException;
 import org.xwiki.url.XWikiDocumentURL;
 import org.xwiki.url.XWikiURL;
@@ -51,6 +55,9 @@ public class RegexXWikiURLFactory implements XWikiURLFactory<String>, Initializa
     private Map<String, String> regexMappings;
     
     private Pattern regexPattern;
+
+    @Requirement("current/reference")
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentRefernceResolver; 
 
     /**
      * For performance reason compile the regex pattern.
@@ -82,16 +89,27 @@ public class RegexXWikiURLFactory implements XWikiURLFactory<String>, Initializa
         Matcher matcher = this.regexPattern.matcher(urlAsString);
         if (matcher.matches()) {
 
+            EntityReference reference = null;
+
             // Find the wiki part in the URL
             String wiki = matcher.group(Integer.parseInt(this.regexMappings.get("wiki")));
-            
+            if (!StringUtils.isEmpty(wiki)) {
+                reference = new EntityReference(wiki, EntityType.WIKI);
+            }
+
             // Find the space part in the URL
             String space = matcher.group(Integer.parseInt(this.regexMappings.get("space")));
+            if (!StringUtils.isEmpty(space)) {
+                reference = new EntityReference(space, EntityType.SPACE, reference);
+            }
 
             // Find the document part in the URL
             String page = matcher.group(Integer.parseInt(this.regexMappings.get("page")));
+            if (!StringUtils.isEmpty(page)) {
+                reference = new EntityReference(page, EntityType.DOCUMENT, reference);
+            }
 
-            url = new XWikiDocumentURL(new DocumentReference(wiki, space, page));
+            url = new XWikiDocumentURL(this.currentReferenceDocumentRefernceResolver.resolve(reference));
             
             // Find the action part in the URL
             String action = matcher.group(Integer.parseInt(this.regexMappings.get("action")));

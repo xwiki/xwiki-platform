@@ -68,13 +68,13 @@ public class DefaultModelConfigurationTest
             oneOf(mockSource).getProperty(with(equal("model.reference.default.space")), with(any(String.class)));
                 will(returnValue("defaultSpace"));
             oneOf(mockSource).getProperty(with(equal("model.reference.default.attachment")), with(any(String.class)));
-                will(returnValue("defaultAttachment"));
+                will(returnValue("defaultFilename"));
         }});
         
         Assert.assertEquals("defaultWiki", this.configuration.getDefaultReferenceName(EntityType.WIKI));
         Assert.assertEquals("defaultDocument", this.configuration.getDefaultReferenceName(EntityType.DOCUMENT));
         Assert.assertEquals("defaultSpace", this.configuration.getDefaultReferenceName(EntityType.SPACE));
-        Assert.assertEquals("defaultAttachment", this.configuration.getDefaultReferenceName(EntityType.ATTACHMENT));
+        Assert.assertEquals("defaultFilename", this.configuration.getDefaultReferenceName(EntityType.ATTACHMENT));
     }
 
     @Test
@@ -84,12 +84,13 @@ public class DefaultModelConfigurationTest
             oneOf(mockSource).getProperty("model.reference.default.wiki", "xwiki"); will(returnValue("xwiki"));
             oneOf(mockSource).getProperty("model.reference.default.document", "WebHome"); will(returnValue("WebHome"));
             oneOf(mockSource).getProperty("model.reference.default.space", "Main"); will(returnValue("Main"));
-            oneOf(mockSource).getProperty("model.reference.default.attachment", ""); will(returnValue(""));
+            oneOf(mockSource).getProperty("model.reference.default.attachment", "filename");
+                will(returnValue("filename"));
         }});
 
         Assert.assertEquals("xwiki", this.configuration.getDefaultReferenceName(EntityType.WIKI));
         Assert.assertEquals("WebHome", this.configuration.getDefaultReferenceName(EntityType.DOCUMENT));
         Assert.assertEquals("Main", this.configuration.getDefaultReferenceName(EntityType.SPACE));
-        Assert.assertEquals("", this.configuration.getDefaultReferenceName(EntityType.ATTACHMENT));
+        Assert.assertEquals("filename", this.configuration.getDefaultReferenceName(EntityType.ATTACHMENT));
     }
 }

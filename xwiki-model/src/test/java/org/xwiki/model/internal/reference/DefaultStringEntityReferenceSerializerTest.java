@@ -45,7 +45,7 @@ public class DefaultStringEntityReferenceSerializerTest
 
     private static final String DEFAULT_PAGE = "WebHome";
 
-    private static final String DEFAULT_ATTACHMENT = "";
+    private static final String DEFAULT_ATTACHMENT = "filename";
 
     private EntityReferenceSerializer serializer;
 
@@ -129,7 +129,7 @@ public class DefaultStringEntityReferenceSerializerTest
         Assert.assertEquals("wiki:space.page@filename", serializer.serialize(reference));
 
         reference = resolver.resolve("", EntityType.ATTACHMENT);
-        Assert.assertEquals("xwiki:XWiki.WebHome@", serializer.serialize(reference));
+        Assert.assertEquals("xwiki:XWiki.WebHome@filename", serializer.serialize(reference));
 
         reference = resolver.resolve("wiki:space.page@my.png", EntityType.ATTACHMENT);
         Assert.assertEquals("wiki:space.page@my.png", serializer.serialize(reference));

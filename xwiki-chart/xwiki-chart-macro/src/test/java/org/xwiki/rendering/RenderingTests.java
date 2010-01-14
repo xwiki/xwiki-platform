@@ -72,7 +72,7 @@ public class RenderingTests extends TestCase
         descriptorDAB.setRole(DocumentAccessBridge.class);
         componentManager.registerComponent(descriptorDAB, mockDocumentAccessBridge);
 
-        final DocumentReference documentReference = new DocumentReference(null, "Test", "Test");
+        final DocumentReference documentReference = new DocumentReference("xwiki", "Test", "Test");
         
         context.checking(new Expectations() {{
             allowing(mockDocumentAccessBridge).getURL(with(any(String.class)), with(any(String.class)), 

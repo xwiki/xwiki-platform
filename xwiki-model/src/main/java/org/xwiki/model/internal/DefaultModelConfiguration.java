@@ -50,7 +50,7 @@ public class DefaultModelConfiguration extends AbstractLogEnabled implements Mod
         put(EntityType.WIKI, "xwiki");
         put(EntityType.SPACE, "Main");
         put(EntityType.DOCUMENT, "WebHome");
-        put(EntityType.ATTACHMENT, "");
+        put(EntityType.ATTACHMENT, "filename");
     }};
 
     /**

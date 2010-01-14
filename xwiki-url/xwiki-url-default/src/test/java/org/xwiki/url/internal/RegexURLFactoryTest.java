@@ -20,7 +20,16 @@
  */
 package org.xwiki.url.internal;
 
-import org.xwiki.test.AbstractXWikiComponentTestCase;
+import org.jmock.Expectations;
+import org.jmock.Mockery;
+import org.junit.Assert;
+import org.junit.Test;
+import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.test.AbstractComponentTestCase;
 import org.xwiki.url.XWikiDocumentURL;
 import org.xwiki.url.XWikiURLFactory;
 
@@ -30,32 +39,57 @@ import org.xwiki.url.XWikiURLFactory;
  * @version $Id$
  * @since 1.6M1
  */
-public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
+public class RegexURLFactoryTest extends AbstractComponentTestCase
 {
     private XWikiURLFactory<String> factory;
 
+    private Mockery mockery = new Mockery();
+
+    private DocumentReferenceResolver<EntityReference> resolver;
+
     @Override
-    protected void setUp() throws Exception
+    protected void registerComponents() throws Exception
     {
+        super.registerComponents();
+
+        this.resolver = this.mockery.mock(DocumentReferenceResolver.class);
+        DefaultComponentDescriptor<DocumentReferenceResolver> cd = 
+        	new DefaultComponentDescriptor<DocumentReferenceResolver>();
+        cd.setRole(DocumentReferenceResolver.class);
+        cd.setRoleHint("current/reference");
+        getComponentManager().registerComponent(cd, this.resolver);
+
         this.factory = (XWikiURLFactory<String>) getComponentManager().lookup(XWikiURLFactory.class);
     }
 
+    @Test
     public void testCreateURL() throws Exception
     {
+        final DocumentReference expected = new DocumentReference("wiki", "Main", "WebHome");
+
+        mockery.checking(new Expectations() {{
+            oneOf(resolver).resolve(expected); will(returnValue(expected));
+        }});
+
         XWikiDocumentURL url = (XWikiDocumentURL) this.factory.createURL(
             "http://wiki.domain.com:8080/xwiki/bin/view/Main/WebHome?language=fr");
-        assertEquals("view", url.getAction());
-        assertEquals("WebHome", url.getDocumentReference().getName());
-        assertEquals("Main", url.getDocumentReference().getLastSpaceReference().getName());
-        assertEquals("wiki", url.getDocumentReference().getWikiReference().getName());
-        assertEquals("fr", url.getParameterValue("language"));
+        Assert.assertEquals("view", url.getAction());
+        Assert.assertEquals("fr", url.getParameterValue("language"));
+        Assert.assertEquals(expected, url.getDocumentReference());
     }
 
+    @Test
     public void testCreateURLFromPath() throws Exception
     {
+        final DocumentReference expected = new DocumentReference("wiki", "Main", "WebHome");
+
+        mockery.checking(new Expectations() {{
+            oneOf(resolver).resolve(new EntityReference("WebHome", EntityType.DOCUMENT,
+                new EntityReference("Main", EntityType.SPACE))); will(returnValue(expected));
+        }});
+
         XWikiDocumentURL url = (XWikiDocumentURL) this.factory.createURL("/xwiki/bin/view/Main/WebHome");
-        assertEquals("view", url.getAction());
-        assertEquals("WebHome", url.getDocumentReference().getName());
-        assertEquals("Main", url.getDocumentReference().getLastSpaceReference().getName());
+        Assert.assertEquals("view", url.getAction());
+        Assert.assertEquals(expected, url.getDocumentReference());
     }
 }

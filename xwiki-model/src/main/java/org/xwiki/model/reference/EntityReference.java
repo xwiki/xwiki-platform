@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.reference;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.xwiki.model.EntityType;
 
@@ -58,8 +59,14 @@ public class EntityReference implements Serializable, Cloneable, Comparable<Enti
         setParent(parent);
     }
 
+    /**
+     * @exception IllegalArgumentException if the passed name is null or empty
+     */
     public void setName(String name)
     {
+        if (StringUtils.isEmpty(name)) {
+            throw new IllegalArgumentException("An Entity Reference name cannot be null or empty");
+        }
         this.name = name;
     }
 

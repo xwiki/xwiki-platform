@@ -67,7 +67,7 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
         // If the passed type is a supertype of the reference to resolve's type then we need to insert a top level
         // reference.
         if (type.ordinal() > referenceToResolve.getType().ordinal()) {
-            normalizedReference = new EntityReference(null, type, referenceToResolve.clone());
+            normalizedReference = new EntityReference(getDefaultReferenceName(type), type, referenceToResolve.clone());
         } else {
             normalizedReference = referenceToResolve.clone();
         }
@@ -76,12 +76,9 @@ public class DefaultReferenceEntityReferenceResolver implements EntityReferenceR
         // In addition insert references where needed.
         EntityReference reference = normalizedReference;
         while (reference != null) {
-            if (StringUtils.isEmpty(reference.getName())) {
-                reference.setName(getDefaultReferenceName(reference.getType()));
-            }
-            // If the parent reference isn't the allowed parent then insert an allowed reference
             List<EntityType> types = this.nextAllowedEntityTypes.get(reference.getType());
             if (reference.getParent() != null && !types.isEmpty() && !types.contains(reference.getParent().getType())) {
+                // The parent reference isn't the allowed parent: insert an allowed reference
                 EntityReference newReference = new EntityReference(
                     getDefaultReferenceName(types.get(0)), types.get(0), reference.getParent());
                 reference.setParent(newReference);

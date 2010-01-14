@@ -48,7 +48,7 @@ public class ParameterDescriptor implements IsSerializable
     /**
      * @see #getType()
      */
-    private String type;
+    private ParameterType type;
 
     /**
      * The {@link String} representation of this parameter's default value.
@@ -119,12 +119,9 @@ public class ParameterDescriptor implements IsSerializable
     }
 
     /**
-     * The parameter type is a fully qualified Java class name or the name of a primitive Java type. Common types are
-     * {@code java.lang.String} or {@code int}.
-     * 
      * @return the parameter type
      */
-    public String getType()
+    public ParameterType getType()
     {
         return type;
     }
@@ -134,7 +131,7 @@ public class ParameterDescriptor implements IsSerializable
      * 
      * @param type the type of this parameter
      */
-    public void setType(String type)
+    public void setType(ParameterType type)
     {
         this.type = type;
     }

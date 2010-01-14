@@ -1,5 +1,4 @@
-<!--
- *
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,14 +16,26 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
--->
-<module rename-to="xwe">
-  <inherits name="com.xpn.xwiki.wysiwyg.Wysiwyg" />
-  <!-- user.agent from {gecko, gecko1_8, ie6, ie8, safari, opera} -->
-  <set-property name="user.agent" value="gecko1_8" />
-  <!-- gecko1_9 from {no, yes} -->
-  <set-property name="gecko1_9" value="yes" />
-  <!-- locale from {default, fr, de, ...} -->
-  <set-property name="locale" value="default" />
-</module>
+ */
+package com.xpn.xwiki.wysiwyg.server.plugin.macro;
+
+import org.xwiki.component.annotation.ComponentRole;
+
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
+
+/**
+ * Translates a {@link MacroDescriptor} into the execution context language.
+ * 
+ * @version $Id$
+ */
+@ComponentRole
+public interface MacroDescriptorTranslator
+{
+    /**
+     * Translates the given macro descriptor into the execution context language.
+     * 
+     * @param macroDescriptor a macro descriptor
+     * @return the given macro descriptor translated into the execution context language
+     */
+    MacroDescriptor translate(MacroDescriptor macroDescriptor);
+}

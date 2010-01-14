@@ -165,7 +165,7 @@
               <!-- GWTTestCase derived tests need the hosted browser which in turn needs a 32-bit JRE. -->
               <!-- <jvm>/usr/lib/jvm/ia32-java-6-sun/bin/java</jvm> -->
               <!-- We can run the tests manually in any browser. -->
-              <!-- <extraJvmArgs>-Dgwt.args="-manual -port 54321"</extraJvmArgs> -->
+              <!-- <extraJvmArgs>-Dgwt.args="-manual -port 54321 -style DETAILED"</extraJvmArgs> -->
               <testTimeOut>120</testTimeOut>
               <includes>com/xpn/xwiki/wysiwyg/WysiwygClientTestSuite.java</includes>
             </configuration>

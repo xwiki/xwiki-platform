@@ -19,11 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.input;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.editor.Strings;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterType;
 
 /**
  * Creates input controls for specific data types.
@@ -44,19 +48,20 @@ public final class InputFactory
      * Creates a new input control that collects user data of the specified type. Common types are {@code
      * java.lang.String} and {@code boolean}.
      * 
-     * @param type a fully qualified class name or the name of a primitive type
+     * @param type the type of a macro parameter
      * @return the newly created input control
      */
-    public static Widget createInput(String type)
+    public static Widget createInput(ParameterType type)
     {
         // TODO: This needs to be improved!
-        if (StringBuffer.class.getName().equals(type)) {
+        String className = type.getName();
+        if (StringBuffer.class.getName().equals(className)) {
             // Large string, let's use a text area.
             return new TextInput(new TextArea());
-        } else if (boolean.class.getName().equals(type) || Boolean.class.getName().equals(type)) {
+        } else if (boolean.class.getName().equals(className) || Boolean.class.getName().equals(className)) {
             return createBooleanInput();
-        } else if (type.startsWith("enum[")) {
-            return createChoiceInput(type.substring(5, type.length() - 1).split("\\s*,\\s*"));
+        } else if (type.isEnum()) {
+            return createChoiceInput(type.getEnumConstants());
         } else {
             // By default we use an input box.
             Widget input = new TextInput(new TextBox());
@@ -71,11 +76,11 @@ public final class InputFactory
      * @param options the options the user has to choose from
      * @return the newly created choice input
      */
-    protected static ChoiceInput createChoiceInput(String[] options)
+    protected static ChoiceInput createChoiceInput(Map<String, String> options)
     {
         ListBox list = new ListBox();
-        for (int i = 0; i < options.length; i++) {
-            list.addItem(options[i].toLowerCase());
+        for (Entry<String, String> option : options.entrySet()) {
+            list.addItem(option.getValue(), option.getKey());
         }
         return new ChoiceInput(list);
     }

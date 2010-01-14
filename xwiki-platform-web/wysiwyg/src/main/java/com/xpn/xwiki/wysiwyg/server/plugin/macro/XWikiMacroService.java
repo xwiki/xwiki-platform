@@ -20,7 +20,6 @@
 package com.xpn.xwiki.wysiwyg.server.plugin.macro;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -40,6 +39,7 @@ import org.xwiki.rendering.syntax.SyntaxFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroDescriptor;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroService;
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterDescriptor;
+import com.xpn.xwiki.wysiwyg.client.plugin.macro.ParameterType;
 
 /**
  * XWiki specific implementation of {@link MacroService}.
@@ -72,11 +72,27 @@ public class XWikiMacroService implements MacroService
     private MacroCategoryManager categoryManager;
 
     /**
+     * The component used to translate macro descriptors into the execution context language.
+     */
+    @Requirement
+    private MacroDescriptorTranslator macroDescriptorTranslator;
+
+    /**
      * {@inheritDoc}
      * 
      * @see MacroService#getMacroDescriptor(String, String)
      */
     public MacroDescriptor getMacroDescriptor(String macroId, String syntaxId)
+    {
+        return macroDescriptorTranslator.translate(getUntranslatedMacroDescriptor(macroId, syntaxId));
+    }
+
+    /**
+     * @param macroId the macro identifier
+     * @param syntaxId the syntax identifier
+     * @return the untranslated macro descriptor for the specified macro
+     */
+    private MacroDescriptor getUntranslatedMacroDescriptor(String macroId, String syntaxId)
     {
         try {
             MacroId macroIdObject = new MacroId(macroId, syntaxFactory.createSyntaxFromIdString(syntaxId));
@@ -87,11 +103,10 @@ public class XWikiMacroService implements MacroService
             if (descriptor.getContentDescriptor() != null) {
                 contentDescriptor = new ParameterDescriptor();
                 contentDescriptor.setId("content");
-                // TODO: internationalize content display name
                 contentDescriptor.setName("Content");
                 contentDescriptor.setDescription(descriptor.getContentDescriptor().getDescription());
                 // Just a hack to distinguish between regular strings and large strings.
-                contentDescriptor.setType(StringBuffer.class.getName());
+                contentDescriptor.setType(createMacroParameterType(StringBuffer.class));
                 contentDescriptor.setMandatory(descriptor.getContentDescriptor().isMandatory());
             }
 
@@ -130,7 +145,7 @@ public class XWikiMacroService implements MacroService
         result.setId(descriptor.getId());
         result.setName(descriptor.getName());
         result.setDescription(descriptor.getDescription());
-        result.setType(getMacroParameterType(descriptor.getType()));
+        result.setType(createMacroParameterType(descriptor.getType()));
         Object defaultValue = descriptor.getDefaultValue();
         if (defaultValue != null) {
             result.setDefaultValue(String.valueOf(defaultValue));
@@ -140,20 +155,27 @@ public class XWikiMacroService implements MacroService
     }
 
     /**
-     * NOTE: We can't send the {@link Class} instance to the client side because it isn't serializable, its source file
-     * is not available at build time and currently GWT doesn't support reflection.
+     * NOTE: We can't send a {@link Class} instance to the client side because GWT can't serialize it so we have to
+     * convert it to a {@link ParameterType} instance.
      * 
      * @param parameterClass a {@link Class} that defines the values a macro parameter can have
-     * @return a {@link String} representation of the specified class that can be used on the client side to assert that
-     *         a value is of this type
+     * @return the parameter type associated with the given {@link Class} instance
      */
-    private String getMacroParameterType(Class< ? > parameterClass)
+    private ParameterType createMacroParameterType(Class< ? > parameterClass)
     {
+        ParameterType parameterType = new ParameterType();
+        parameterType.setName(parameterClass.getName());
         if (parameterClass.isEnum()) {
-            return "enum" + Arrays.asList(parameterClass.getEnumConstants());
-        } else {
-            return parameterClass.getName();
+            Object[] parameterClassConstants = parameterClass.getEnumConstants();
+            Map<String, String> parameterTypeConstants = new LinkedHashMap<String, String>();
+            for (int i = 0; i < parameterClassConstants.length; i++) {
+                String constant = String.valueOf(parameterClassConstants[i]);
+                // We leave the constant unlocalized for now.
+                parameterTypeConstants.put(constant, constant);
+            }
+            parameterType.setEnumConstants(parameterTypeConstants);
         }
+        return parameterType;
     }
 
     /**
@@ -168,9 +190,9 @@ public class XWikiMacroService implements MacroService
             List<MacroDescriptor> descriptors = new ArrayList<MacroDescriptor>();
             for (String category : categoryManager.getMacroCategories(syntax)) {
                 for (MacroId macroId : categoryManager.getMacroIds(category, syntax)) {
-                    MacroDescriptor descriptor = getMacroDescriptor(macroId.getId(), syntaxId);
+                    MacroDescriptor descriptor = getUntranslatedMacroDescriptor(macroId.getId(), syntaxId);
                     descriptor.setCategory(category);
-                    descriptors.add(descriptor);
+                    descriptors.add(macroDescriptorTranslator.translate(descriptor));
                 }
             }
 

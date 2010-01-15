@@ -61,13 +61,12 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>clirr-maven-plugin</artifactId>
-            <configuration>
+            <!-- <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <!-- The excludes below need to be removed when 2.1 is released -->
                 <exclude>org/xwiki/component/manager/ComponentManager</exclude>
               </excludes>
-            </configuration>
+            </configuration> -->
           </plugin>
         </plugins>
       </build>

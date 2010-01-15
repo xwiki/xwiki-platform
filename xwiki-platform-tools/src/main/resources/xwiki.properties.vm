@@ -115,6 +115,7 @@
 #-# velocity.property.<Velocity property name> = <value>
 #-# Default values (no need to add them)
 #-#   velocity.properties = resource.loader = webapp
+#-#   velocity.properties = directive.set.null.allowed = true
 #-#   velocity.properties = webapp.resource.loader.class = org.apache.velocity.tools.view.servlet.WebappLoader
 #-#   velocity.properties = velocimacro.messages.on = false
 #-#   velocity.properties = resource.manager.logwhenfound = false

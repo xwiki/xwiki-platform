@@ -57,7 +57,7 @@ public class RegexXWikiURLFactory implements XWikiURLFactory<String>, Initializa
     private Pattern regexPattern;
 
     @Requirement("current/reference")
-    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentRefernceResolver; 
+    private DocumentReferenceResolver<EntityReference> currentReferenceDocumentReferenceResolver;
 
     /**
      * For performance reason compile the regex pattern.
@@ -109,7 +109,7 @@ public class RegexXWikiURLFactory implements XWikiURLFactory<String>, Initializa
                 reference = new EntityReference(page, EntityType.DOCUMENT, reference);
             }
 
-            url = new XWikiDocumentURL(this.currentReferenceDocumentRefernceResolver.resolve(reference));
+            url = new XWikiDocumentURL(this.currentReferenceDocumentReferenceResolver.resolve(reference));
             
             // Find the action part in the URL
             String action = matcher.group(Integer.parseInt(this.regexMappings.get("action")));

@@ -21,15 +21,15 @@
 package org.xwiki.url.internal;
 
 import org.jmock.Expectations;
-import org.jmock.Mockery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.test.AbstractComponentTestCase;
+import org.xwiki.test.AbstractMockingComponentTest;
+import org.xwiki.test.annotation.ComponentTest;
 import org.xwiki.url.XWikiDocumentURL;
 import org.xwiki.url.XWikiURLFactory;
 
@@ -39,27 +39,20 @@ import org.xwiki.url.XWikiURLFactory;
  * @version $Id$
  * @since 1.6M1
  */
-public class RegexURLFactoryTest extends AbstractComponentTestCase
+@ComponentTest(RegexXWikiURLFactory.class)
+public class RegexURLFactoryTest extends AbstractMockingComponentTest
 {
     private XWikiURLFactory<String> factory;
 
-    private Mockery mockery = new Mockery();
-
     private DocumentReferenceResolver<EntityReference> resolver;
 
-    @Override
-    protected void registerComponents() throws Exception
+    @Before
+    public void setUp() throws Exception
     {
-        super.registerComponents();
+        super.setUp();
 
-        this.resolver = this.mockery.mock(DocumentReferenceResolver.class);
-        DefaultComponentDescriptor<DocumentReferenceResolver> cd = 
-        	new DefaultComponentDescriptor<DocumentReferenceResolver>();
-        cd.setRole(DocumentReferenceResolver.class);
-        cd.setRoleHint("current/reference");
-        getComponentManager().registerComponent(cd, this.resolver);
-
-        this.factory = (XWikiURLFactory<String>) getComponentManager().lookup(XWikiURLFactory.class);
+        this.factory = getComponentManager().lookup(XWikiURLFactory.class);
+        this.resolver = getComponentManager().lookup(DocumentReferenceResolver.class, "current/reference");
     }
 
     @Test
@@ -67,7 +60,7 @@ public class RegexURLFactoryTest extends AbstractComponentTestCase
     {
         final DocumentReference expected = new DocumentReference("wiki", "Main", "WebHome");
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(resolver).resolve(expected); will(returnValue(expected));
         }});
 
@@ -83,7 +76,7 @@ public class RegexURLFactoryTest extends AbstractComponentTestCase
     {
         final DocumentReference expected = new DocumentReference("wiki", "Main", "WebHome");
 
-        mockery.checking(new Expectations() {{
+        getMockery().checking(new Expectations() {{
             oneOf(resolver).resolve(new EntityReference("WebHome", EntityType.DOCUMENT,
                 new EntityReference("Main", EntityType.SPACE))); will(returnValue(expected));
         }});

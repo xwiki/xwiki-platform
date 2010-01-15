@@ -145,7 +145,7 @@ public class ComponentAnnotationLoader extends AbstractLogEnabled
      * @param componentClass the component implementation class for which to find the component roles it implements
      * @return the list of component role classes implemented
      */
-    protected Set<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
+    public Set<Class< ? >> findComponentRoleClasses(Class< ? > componentClass)
     {
         // Note: We use a Set to ensure that we don't register duplicate roles.
         Set<Class< ? >> classes = new LinkedHashSet<Class< ? >>();

@@ -120,7 +120,7 @@
   ## build annotations js array to pass to the js functions toggling annotation display
   #set ($annArray="[")
   #foreach ($annotation in $annotations)
-    #if($annotation.get('state') == 'SAFE')
+    #if($annotation.get('state') == 'SAFE' || $annotation.get('state') == 'UPDATED')
       ## default this color on yellow if nothing else is found
       ## todo: should be set in the config document
       #set($color = '#FFFF00')
@@ -460,7 +460,7 @@ XWiki.Annotation.prototype = {
             XWiki.Annotation.getInstance().addGlobalActionButtons();
         } else {
             var anno = items.shift();
-            if(anno.state != 'SAFE')
+            if(anno.state != 'SAFE' || anno.state != 'UPDATED')
             {
               XWiki.Annotation.getInstance().updateAnnotationResumeAux(items);
               return;

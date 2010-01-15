@@ -64,7 +64,7 @@
             <!-- <configuration>
               <excludes>
                 <exclude>**/internal/**</exclude>
-                <exclude>org/xwiki/component/manager/ComponentManager</exclude>
+                <exclude>org/xwiki/component/</exclude>
               </excludes>
             </configuration> -->
           </plugin>

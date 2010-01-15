@@ -2776,7 +2776,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName(XWikiConstant.TAG_CLASS);
 
-        needsUpdate |= bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
+        needsUpdate |= bclass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, true, "", "input", null);
         StaticListClass tagClass = (StaticListClass) bclass.get(XWikiConstant.TAG_CLASS_PROP_TAGS);
         if (tagClass.isRelationalStorage() == false) {
             tagClass.setRelationalStorage(true);

@@ -460,7 +460,7 @@ XWiki.Annotation.prototype = {
             XWiki.Annotation.getInstance().addGlobalActionButtons();
         } else {
             var anno = items.shift();
-            if(anno.state != 'SAFE' || anno.state != 'UPDATED')
+            if(anno.state != 'SAFE' &amp;&amp; anno.state != 'UPDATED')
             {
               XWiki.Annotation.getInstance().updateAnnotationResumeAux(items);
               return;

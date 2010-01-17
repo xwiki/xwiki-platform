@@ -45,8 +45,3 @@ fieldset.xwikimessage {
 table.xwikilogintable input#j_password , table.xwikilogintable input#j_username{
   width: 160px;
 }
-
-/* Should be in dataeditors.css */
-#body .collapsed .xobject-title h3, #body .collapsed .xclass-title, #body .collapsed .xproperty-title {
-  display: inline;
-}

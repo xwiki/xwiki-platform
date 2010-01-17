@@ -23,15 +23,18 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.util.Util;
 
-public class PropAddAction extends XWikiAction {
-	public boolean action(XWikiContext context) throws XWikiException {
+public class PropAddAction extends XWikiAction
+{
+    @Override
+    public boolean action(XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
@@ -39,20 +42,20 @@ public class PropAddAction extends XWikiAction {
 
         String propName = ((PropAddForm) form).getPropName();
 
-        if (!Util.isValidXMLElementName(propName)){
-            context.put("message","propertynamenotcorrect");
+        if (!Util.isValidXMLElementName(propName)) {
+            context.put("message", "propertynamenotcorrect");
             return true;
         }
 
         String propType = ((PropAddForm) form).getPropType();
         BaseClass bclass = doc.getxWikiClass();
         bclass.setName(doc.getFullName());
-        if (bclass.get(propName)!=null) {
+        if (bclass.get(propName) != null) {
             // TODO: handle the error of the property already existing when we want to add a class property
         } else {
             MetaClass mclass = xwiki.getMetaclass();
             PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(propType);
-            if (pmclass!=null) {
+            if (pmclass != null) {
                 PropertyClass pclass = (PropertyClass) pmclass.newObject(context);
                 pclass.setObject(bclass);
                 pclass.setName(propName);
@@ -71,9 +74,11 @@ public class PropAddAction extends XWikiAction {
         String redirect = Utils.getRedirect("edit", context);
         sendRedirect(response, redirect);
         return false;
-	}
+    }
 
-     public String render(XWikiContext context) throws XWikiException{
-         return "exception";
-     }
+    @Override
+    public String render(XWikiContext context) throws XWikiException
+    {
+        return "exception";
+    }
 }

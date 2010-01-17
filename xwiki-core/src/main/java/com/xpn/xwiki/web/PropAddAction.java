@@ -71,7 +71,7 @@ public class PropAddAction extends XWikiAction
             }
         }
         // forward to edit
-        String redirect = Utils.getRedirect("edit", context);
+        String redirect = Utils.getRedirect("edit", "editor=class", context);
         sendRedirect(response, redirect);
         return false;
     }

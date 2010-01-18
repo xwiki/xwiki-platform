@@ -32,6 +32,7 @@ import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
@@ -325,11 +326,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         return this.store.getClassList(context);
     }
 
-    public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
-    {
-        return this.store.searchDocumentsNames(wheresql, context);
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -340,16 +336,98 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         return this.store.countDocuments(wheresql, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context)
+        throws XWikiException
+    {
+        return this.store.searchDocumentReferences(wheresql, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
+    {
+        return this.store.searchDocumentsNames(wheresql, context);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
+        return this.store.searchDocumentReferences(wheresql, nb, start, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)} 
+     */
+    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         return this.store.searchDocumentsNames(wheresql, nb, start, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.searchDocumentReferences(wheresql, nb, start, selectColumns, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}  
+     */
+    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(wheresql, nb, start, selectColumns, context);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
+    {
+        return this.store.searchDocumentReferences(parametrizedSqlClause, nb, start, parameterValues, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List< ? > parameterValues, XWikiContext context) throws XWikiException
+    {
+        return this.store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List< ? > parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.searchDocumentReferences(parametrizedSqlClause, parameterValues, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
     }
 
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context)
@@ -512,18 +590,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
             parameterValues, context);
     }
 
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
-        List< ? > parameterValues, XWikiContext context) throws XWikiException
-    {
-        return this.store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
-    }
-
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List< ? > parameterValues,
-        XWikiContext context) throws XWikiException
-    {
-        return this.store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -555,6 +621,19 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface, EventListener
         return this.store.loadLinks(docId, context, bTransaction);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        return this.store.loadBacklinks(documentReference, bTransaction, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     */
+    @Deprecated
     public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {

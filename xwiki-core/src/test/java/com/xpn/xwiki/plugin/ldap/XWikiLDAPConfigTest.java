@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -41,7 +41,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
  * 
  * @version $Id$
  */
-public class XWikiLDAPConfigTest extends TestCase
+public class XWikiLDAPConfigTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiContext prefContext;
 
@@ -153,8 +153,10 @@ public class XWikiLDAPConfigTest extends TestCase
      * @see junit.framework.TestCase#setUp()
      */
     @Override
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
+        super.setUp();
+
         this.prefContext = new XWikiContext();
 
         new XWiki(new XWikiConfig(), this.prefContext)

@@ -31,7 +31,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 public abstract class XWikiDefaultStore implements XWikiStoreInterface
 {
-
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
     {
         return searchDocumentsNames(wheresql, 0, 0, "", context);

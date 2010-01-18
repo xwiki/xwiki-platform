@@ -292,7 +292,7 @@ public class XWikiDocument implements DocumentModelBridge
     // Caching
     private boolean fromCache = false;
 
-    private ArrayList<BaseObject> objectsToRemove = new ArrayList<BaseObject>();
+    private List<BaseObject> xObjectsToRemove = new ArrayList<BaseObject>();
 
     /**
      * The view template (vm file) to use. When not set the default view template is used.
@@ -332,7 +332,8 @@ public class XWikiDocument implements DocumentModelBridge
 
     /**
      * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
-     * blanks, except for the page name for which the default page name is used instead.
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki. 
      */
     private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
@@ -604,7 +605,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String parentReferenceAsString;
         if (getParentReference() != null) {
-            parentReferenceAsString = this.compactEntityReferenceSerializer.serialize(getParentReference());
+            parentReferenceAsString = this.compactWikiEntityReferenceSerializer.serialize(getParentReference());
         } else {
             parentReferenceAsString = "";
         }
@@ -3000,11 +3001,7 @@ public class XWikiDocument implements DocumentModelBridge
         }
 
         XWikiDocument doc = (XWikiDocument) object;
-        if (!getName().equals(doc.getName())) {
-            return false;
-        }
-
-        if (!getSpace().equals(doc.getSpace())) {
+        if (!getDocumentReference().equals(doc.getDocumentReference())) {
             return false;
         }
 
@@ -3016,7 +3013,9 @@ public class XWikiDocument implements DocumentModelBridge
             return false;
         }
 
-        if (!getParent().equals(doc.getParent())) {
+        if ((getParentReference() != null
+            && !getParentReference().equals(doc.getParentReference()))
+            || (getParentReference() == null && doc.getParentReference() != null)) {
             return false;
         }
 
@@ -3175,9 +3174,10 @@ public class XWikiDocument implements DocumentModelBridge
     public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException
     {
         try {
-            String zipname = getSpace() + "/" + getName();
+            String zipname = getDocumentReference().getLastSpaceReference().getName() + "/"
+                + getDocumentReference().getName(); 
             String language = getLanguage();
-            if ((language != null) && (!language.equals(""))) {
+            if (!StringUtils.isEmpty(language)) {
                 zipname += "." + language;
             }
             ZipEntry zipentry = new ZipEntry(zipname);
@@ -3215,11 +3215,11 @@ public class XWikiDocument implements DocumentModelBridge
         doc.setRootElement(docel);
 
         Element el = new DOMElement("web");
-        el.addText(getSpace());
+        el.addText(getDocumentReference().getLastSpaceReference().getName());
         docel.add(el);
 
         el = new DOMElement("name");
-        el.addText(getName());
+        el.addText(getDocumentReference().getName());
         docel.add(el);
 
         el = new DOMElement("language");
@@ -3235,7 +3235,12 @@ public class XWikiDocument implements DocumentModelBridge
         docel.add(el);
 
         el = new DOMElement("parent");
-        el.addText(getParent());
+        if (getParentReference() == null) {
+            // No parent have been specified
+            el.addText("");
+        } else {
+            el.addText(this.localEntityReferenceSerializer.serialize(getParentReference()));
+        }
         docel.add(el);
 
         el = new DOMElement("creator");
@@ -3278,7 +3283,12 @@ public class XWikiDocument implements DocumentModelBridge
         docel.add(el);
 
         el = new DOMElement("template");
-        el.addText(getTemplate());
+        if (getTemplateDocumentReference() == null) {
+            // No template doc have been specified
+            el.addText("");
+        } else {
+            el.addText(this.localEntityReferenceSerializer.serialize(getTemplateDocumentReference()));
+        }
         docel.add(el);
 
         el = new DOMElement("defaultTemplate");
@@ -3359,7 +3369,8 @@ public class XWikiDocument implements DocumentModelBridge
                 el.addText(getDocumentArchive(context).getArchive(context));
                 docel.add(el);
             } catch (XWikiException e) {
-                LOG.error("Document [" + this.getFullName() + "] has malformed history");
+                LOG.error("Document [" + this.localEntityReferenceSerializer.serialize(getDocumentReference())
+                    + "] has malformed history");
             }
         }
 
@@ -3722,15 +3733,25 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Get the wiki pages pointing to this page.
+     * Get the wiki document references pointing to this document.
      * <p>
      * Theses links are stored to the database when documents are saved. You can use "backlinks" in XWikiPreferences or
      * "xwiki.backlinks" in xwiki.cfg file to enable links storage in the database.
      * 
      * @param context the XWiki context.
-     * @return the found wiki pages names.
+     * @return the found wiki document references
      * @throws XWikiException error when getting pages names from database.
+     * @since 2.2M2
      */
+    public List<DocumentReference> getBackLinkedReferences(XWikiContext context) throws XWikiException
+    {
+        return getStore(context).loadBacklinks(getDocumentReference(), true, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getBackLinkedReferences(XWikiContext)}
+     */
+    @Deprecated
     public List<String> getBackLinkedPages(XWikiContext context) throws XWikiException
     {
         return getStore(context).loadBacklinks(getFullName(), context, true);
@@ -3920,41 +3941,75 @@ public class XWikiDocument implements DocumentModelBridge
     }
 
     /**
-     * Returns a list of fullNames of all documents which list this document as their parent
+     * Returns a list of references of all documents which list this document as their parent
      * {@link #getChildren(int, int, com.xpn.xwiki.XWikiContext)}
+     * @since 2.2M2
      */
+    public List<DocumentReference> getChildrenReferences(XWikiContext context) throws XWikiException
+    {
+        return getChildrenReferences(0, 0, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getChildrenReferences(XWikiContext)}
+     */
+    @Deprecated
     public List<String> getChildren(XWikiContext context) throws XWikiException
     {
         return getChildren(0, 0, context);
     }
 
     /**
-     * Returns a list of fullNames of all documents which list this document as their parent
+     * Returns a list of references of all documents which list this document as their parent
      * 
      * @param nb The number of results to return.
      * @param start The number of results to skip before we begin returning results.
      * @param context The {@link com.xpn.xwiki.XWikiContext context}.
-     * @return List of fullNames of documents
+     * @return the list of document references
      * @throws XWikiException If there's an error querying the database.
+     * @since 2.2M2
      */
-    public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
+    public List<DocumentReference> getChildrenReferences(int nb, int start, XWikiContext context) throws XWikiException
     {
-        String[] whereParams = {
-            this.getWikiName() + ":" + this.getFullName(), 
-            this.getFullName(), 
-            this.getName(), 
-            this.getWikiName() + ":" + this.getName(), 
-            this.getSpace()
-        };
+        // Use cases:
+        // - the parent document reference saved in the database matches the reference of this document, in its fully
+        //   serialized form (eg "wiki:space.page"). Note that this is normally not required since the wiki part
+        //   isn't saved in the database when it matches the current wiki.
+        // - the parent document reference saved in the database matches the reference of this document, in its
+        //   serialized form without the wiki part (eg "space.page"). The reason we don't need to specify the wiki
+        //   part is because document parents saved in the database don't have the wiki part specified when it matches
+        //   the current wiki.
+        // - the parent document reference saved in the database matches the page name part of this document's
+        //   reference (eg "page") and the parent document's space is the same as this document's space.
+        List<String> whereParams = Arrays.asList(
+            this.defaultEntityReferenceSerializer.serialize(getDocumentReference()),
+            this.localEntityReferenceSerializer.serialize(getDocumentReference()),
+            getDocumentReference().getName(),
+            getDocumentReference().getLastSpaceReference().getName());
 
-        String whereStatement = "doc.parent=? or doc.parent=? or ((doc.parent=? or doc.parent=?) and doc.space=?)";
-        return context.getWiki().getStore().searchDocumentsNames(whereStatement, nb, start, Arrays.asList(whereParams),
-            context);
+        String whereStatement = "doc.parent=? or doc.parent=? or (doc.parent=? and doc.space=?)";
+        return context.getWiki().getStore().searchDocumentReferences(whereStatement, nb, start, whereParams, context);
     }
 
-    public void renameProperties(String className, Map<String, String> fieldsToRename)
+    /**
+     * @deprecated since 2.2M2 use {@link #getChildrenReferences(XWikiContext)}
+     */
+    @Deprecated
+    public List<String> getChildren(int nb, int start, XWikiContext context) throws XWikiException
     {
-        Vector<BaseObject> objects = getObjects(className);
+        List<String> childrenNames = new ArrayList<String>();
+        for (DocumentReference reference : getChildrenReferences(nb, start, context)) {
+            childrenNames.add(this.localEntityReferenceSerializer.serialize(reference));
+        }
+        return childrenNames;
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public void renameProperties(DocumentReference classReference, Map<String, String> fieldsToRename)
+    {
+        List<BaseObject> objects = getXObjects(classReference);
         if (objects == null) {
             return;
         }
@@ -3979,22 +4034,66 @@ public class XWikiDocument implements DocumentModelBridge
         setContentDirty(true);
     }
 
+    /**
+     * @deprecated since 2.2M2 use {@link #renameProperties(DocumentReference, Map)} instead
+     */
+    @Deprecated
+    public void renameProperties(String className, Map<String, String> fieldsToRename)
+    {
+        renameProperties(this.currentMixedDocumentReferenceResolver.resolve(className), fieldsToRename);
+    }
+
+    /**
+     * @since 2.2M1
+     */
+    public void addXObjectToRemove(BaseObject object)
+    {
+        getXObjectsToRemove().add(object);
+        setContentDirty(true);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectToRemove(BaseObject)} )} instead
+     */
+    @Deprecated
     public void addObjectsToRemove(BaseObject object)
     {
-        getObjectsToRemove().add(object);
-        setContentDirty(true);
+        addXObjectToRemove(object);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public List<BaseObject> getXObjectsToRemove()
+    {
+        return this.xObjectsToRemove;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getObjectsToRemove()} instead
+     */
+    @Deprecated
     public ArrayList<BaseObject> getObjectsToRemove()
     {
-        return this.objectsToRemove;
+        return (ArrayList<BaseObject>) getXObjectsToRemove();
     }
 
+    /**
+     * @since 2.2M1
+     */
+    public void setXObjectsToRemove(List<BaseObject> objectsToRemove)
+    {
+        this.xObjectsToRemove = objectsToRemove;
+        setContentDirty(true);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #setXObjectsToRemove(List)} instead
+     */
+    @Deprecated
     public void setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
     {
-        this.objectsToRemove = objectsToRemove;
-
-        setContentDirty(true);
+        setXObjectsToRemove(objectsToRemove);
     }
 
     public List<String> getIncludedPages(XWikiContext context)
@@ -4176,22 +4275,37 @@ public class XWikiDocument implements DocumentModelBridge
         return null;
     }
 
-    public void setProperty(String className, String fieldName, BaseProperty value)
+    /**
+     * @since 2.2M2
+     */
+    public void setProperty(DocumentReference classReference, String fieldName, BaseProperty value)
     {
-        BaseObject bobject = getObject(className);
+        BaseObject bobject = getXObject(classReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addObject(className, bobject);
+            addXObject(classReference, bobject);
         }
         bobject.setName(getFullName());
-        bobject.setClassName(className);
+        bobject.setXClassReference(classReference);
         bobject.safeput(fieldName, value);
         setContentDirty(true);
     }
 
-    public int getIntValue(String className, String fieldName)
+    /**
+     * @deprecated since 2.2M2 use {@link #setProperty(DocumentReference, String, BaseProperty)} instead
+     */
+    @Deprecated
+    public void setProperty(String className, String fieldName, BaseProperty value)
     {
-        BaseObject obj = getObject(className, 0);
+        setProperty(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public int getIntValue(DocumentReference classReference, String fieldName)
+    {
+        BaseObject obj = getXObject(classReference, 0);
         if (obj == null) {
             return 0;
         }
@@ -4199,9 +4313,21 @@ public class XWikiDocument implements DocumentModelBridge
         return obj.getIntValue(fieldName);
     }
 
-    public long getLongValue(String className, String fieldName)
+    /**
+     * @deprecated since 2.2M2 use {@link #getIntValue(DocumentReference, String)} instead
+     */
+    @Deprecated
+    public int getIntValue(String className, String fieldName)
     {
-        BaseObject obj = getObject(className, 0);
+        return getIntValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public long getLongValue(DocumentReference classReference, String fieldName)
+    {
+        BaseObject obj = getXObject(classReference, 0);
         if (obj == null) {
             return 0;
         }
@@ -4209,9 +4335,21 @@ public class XWikiDocument implements DocumentModelBridge
         return obj.getLongValue(fieldName);
     }
 
-    public String getStringValue(String className, String fieldName)
+    /**
+     * @deprecated since 2.2M2 use {@link #getLongValue(DocumentReference, String)} instead
+     */
+    @Deprecated
+    public long getLongValue(String className, String fieldName)
     {
-        BaseObject obj = getObject(className);
+        return getLongValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public String getStringValue(DocumentReference classReference, String fieldName)
+    {
+        BaseObject obj = getXObject(classReference);
         if (obj == null) {
             return "";
         }
@@ -4222,6 +4360,15 @@ public class XWikiDocument implements DocumentModelBridge
         } else {
             return result;
         }
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getStringValue(DocumentReference, String)} instead
+     */
+    @Deprecated
+    public String getStringValue(String className, String fieldName)
+    {
+        return getStringValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName);
     }
 
     public int getIntValue(String fieldName)
@@ -4259,27 +4406,51 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    public void setStringValue(String className, String fieldName, String value)
+    /**
+     * @since 2.2M2
+     */
+    public void setStringValue(DocumentReference classReference, String fieldName, String value)
     {
-        BaseObject bobject = getObject(className);
+        BaseObject bobject = getXObject(classReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addObject(className, bobject);
+            addXObject(classReference, bobject);
         }
         bobject.setName(getFullName());
-        bobject.setClassName(className);
+        bobject.setXClassReference(classReference);
         bobject.setStringValue(fieldName, value);
         setContentDirty(true);
     }
 
-    public List getListValue(String className, String fieldName)
+    /**
+     * @deprecated since 2.2M2 use {@link #setStringValue(DocumentReference, String, String)} instead
+     */
+    @Deprecated
+    public void setStringValue(String className, String fieldName, String value)
     {
-        BaseObject obj = getObject(className);
+        setStringValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List getListValue(DocumentReference classReference, String fieldName)
+    {
+        BaseObject obj = getXObject(classReference);
         if (obj == null) {
             return new ArrayList();
         }
 
         return obj.getListValue(fieldName);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getListValue(DocumentReference, String)} instead
+     */
+    @Deprecated
+    public List getListValue(String className, String fieldName)
+    {
+        return getListValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName); 
     }
 
     public List getListValue(String fieldName)
@@ -4292,56 +4463,104 @@ public class XWikiDocument implements DocumentModelBridge
         return object.getListValue(fieldName);
     }
 
-    public void setStringListValue(String className, String fieldName, List value)
+    /**
+     * @since 2.2M2
+     */
+    public void setStringListValue(DocumentReference classReference, String fieldName, List value)
     {
-        BaseObject bobject = getObject(className);
+        BaseObject bobject = getXObject(classReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addObject(className, bobject);
+            addXObject(classReference, bobject);
         }
         bobject.setName(getFullName());
-        bobject.setClassName(className);
+        bobject.setXClassReference(classReference);
         bobject.setStringListValue(fieldName, value);
         setContentDirty(true);
     }
 
-    public void setDBStringListValue(String className, String fieldName, List value)
+    /**
+     * @deprecated since 2.2M2 use {@link #setStringListValue(DocumentReference, String, List)} instead
+     */
+    @Deprecated
+    public void setStringListValue(String className, String fieldName, List value)
     {
-        BaseObject bobject = getObject(className);
+        setStringListValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public void setDBStringListValue(DocumentReference classReference, String fieldName, List value)
+    {
+        BaseObject bobject = getXObject(classReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addObject(className, bobject);
+            addXObject(classReference, bobject);
         }
         bobject.setName(getFullName());
-        bobject.setClassName(className);
+        bobject.setXClassReference(classReference);
         bobject.setDBStringListValue(fieldName, value);
         setContentDirty(true);
     }
 
-    public void setLargeStringValue(String className, String fieldName, String value)
+    /**
+     * @deprecated since 2.2M2 use {@link #setDBStringListValue(DocumentReference, String, List)} instead
+     */
+    @Deprecated
+    public void setDBStringListValue(String className, String fieldName, List value)
     {
-        BaseObject bobject = getObject(className);
+        setDBStringListValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public void setLargeStringValue(DocumentReference classReference, String fieldName, String value)
+    {
+        BaseObject bobject = getXObject(classReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addObject(className, bobject);
+            addXObject(classReference, bobject);
         }
         bobject.setName(getFullName());
-        bobject.setClassName(className);
+        bobject.setXClassReference(classReference);
         bobject.setLargeStringValue(fieldName, value);
         setContentDirty(true);
     }
 
-    public void setIntValue(String className, String fieldName, int value)
+    /**
+     * @deprecated since 2.2M2 use {@link #setLargeStringValue(DocumentReference, String, String)} instead
+     */
+    @Deprecated
+    public void setLargeStringValue(String className, String fieldName, String value)
     {
-        BaseObject bobject = getObject(className);
+        setLargeStringValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public void setIntValue(DocumentReference classReference, String fieldName, int value)
+    {
+        BaseObject bobject = getXObject(classReference);
         if (bobject == null) {
             bobject = new BaseObject();
-            addObject(className, bobject);
+            addXObject(classReference, bobject);
         }
         bobject.setName(getFullName());
-        bobject.setClassName(className);
+        bobject.setXClassReference(classReference);
         bobject.setIntValue(fieldName, value);
         setContentDirty(true);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #setIntValue(DocumentReference, String, int)} instead
+     */
+    @Deprecated
+    public void setIntValue(String className, String fieldName, int value)
+    {
+        setIntValue(this.currentMixedDocumentReferenceResolver.resolve(className), fieldName, value);
     }
 
     /**
@@ -4661,7 +4880,7 @@ public class XWikiDocument implements DocumentModelBridge
                 // This happens when objects are deleted, and the document is still in the cache
                 // storage.
                 if (originalObj != null) {
-                    BaseObject newObj = toDoc.getObject(originalObj.getClassName(), originalObj.getNumber());
+                    BaseObject newObj = toDoc.getXObject(originalObj.getXClassReference(), originalObj.getNumber());
                     List<ObjectDiff> dlist;
                     if (newObj == null) {
                         // The object was deleted.
@@ -4687,11 +4906,11 @@ public class XWikiDocument implements DocumentModelBridge
                 // This happens when objects are deleted, and the document is still in the cache
                 // storage.
                 if (newObj != null) {
-                    BaseObject originalObj = fromDoc.getObject(newObj.getClassName(), newObj.getNumber());
+                    BaseObject originalObj = fromDoc.getXObject(newObj.getXClassReference(), newObj.getNumber());
                     if (originalObj == null) {
                         // Only consider added objects, the other case was treated above.
                         originalObj = new BaseObject();
-                        originalObj.setClassName(newObj.getClassName());
+                        originalObj.setXClassReference(newObj.getXClassReference());
                         originalObj.setNumber(newObj.getNumber());
                         originalObj.setGuid(newObj.getGuid());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
@@ -4767,11 +4986,21 @@ public class XWikiDocument implements DocumentModelBridge
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent.
      * See {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
-     * 
-     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
+     *
+     * @param newDocumentReference the new document reference
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
+     * @since 2.2M2
      */
+    public void rename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+    {
+        rename(newDocumentReference, getBackLinkedReferences(context), context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
     public void rename(String newDocumentName, XWikiContext context) throws XWikiException
     {
         rename(newDocumentName, getBackLinkedPages(context), context);
@@ -4792,13 +5021,24 @@ public class XWikiDocument implements DocumentModelBridge
      * Note: links without a space are renamed with the space added and all documents which have the document being
      * renamed as parent have their parent field set to "currentwiki:CurrentSpace.Page".
      * </p>
-     * 
-     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
-     * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
-     *            new renamed document.
+     *
+     * @param newDocumentReference the new document reference
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *        modified to point to the new document reference
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
+     * @since 2.2M2
      */
+    public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
+        XWikiContext context) throws XWikiException
+    {
+        rename(newDocumentReference, backlinkDocumentReferences, getChildrenReferences(context), context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, java.util.List, com.xpn.xwiki.XWikiContext)} 
+     */
+    @Deprecated
     public void rename(String newDocumentName, List<String> backlinkDocumentNames, XWikiContext context)
         throws XWikiException
     {
@@ -4808,64 +5048,42 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Same as {@link #rename(String, List, XWikiContext)} but the list of documents having the current document as
      * their parent is passed in parameter.
-     * 
-     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
-     * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
-     *            new renamed document.
-     * @param childDocumentNames the list of documents whose parent field will be set to the new document name.
+     *
+     * @param newDocumentReference the new document reference
+     * @param backlinkDocumentReferences the list of references of documents to parse and for which links will be
+     *        modified to point to the new document reference
+     * @param childDocumentReferences the list of references of document whose parent field will be set to the new
+     *        document reference
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
+     * @since 2.2M2
      */
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames,
-        XWikiContext context) throws XWikiException
+    public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
+        List<DocumentReference> childDocumentReferences, XWikiContext context) throws XWikiException
     {
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
         // something fails in the middle...
 
-        if (isNew()) {
-            return;
-        }
-
-        // This link handler recognizes that 2 links are the same when they point to the same
-        // document (regardless of query string, target or alias). It keeps the query string,
-        // target and alias from the link being replaced.
-        RenamePageReplaceLinkHandler linkHandler = new RenamePageReplaceLinkHandler();
-
-        // Transform string representation of old and new links so that they can be manipulated.
-        Link oldLink = new LinkParser().parse(getFullName());
-        Link newLink = new LinkParser().parse(newDocumentName);
-
-        // Get the full unique form of the old and new document names to easily compare them with links references in
-        // XDOM
-        DocumentReference oldDocReference = getDocumentReference();
-        // Note: we use the CurrentMixed resolver since we want to use the default page name if the page isn't
-        // specified in the string, rather than using the current document's page name.
-        DocumentReference newDocReference = this.currentMixedDocumentReferenceResolver.resolve(newDocumentName);
-
-        // Verify if the user is trying to rename to the same name... In that case, simply exits
-        // for efficiency.
-        if (linkHandler.compare(newLink, oldLink)) {
+        // TODO: Why do we verify if the document has just been created and not been saved.
+        // If the user is trying to rename to the same name... In that case, simply exits for efficiency.
+        if (isNew() || getDocumentReference().equals(newDocumentReference)) {
             return;
         }
 
         // Grab the xwiki object, it gets used a few times.
-        com.xpn.xwiki.XWiki xwiki = context.getWiki();
+        XWiki xwiki = context.getWiki();
 
-        // Step 1: Copy the document and all its translations under a new name
-        xwiki.copyDocument(getFullName(), newDocumentName, false, context);
+        // Step 1: Copy the document and all its translations under a new document with the new reference.
+        xwiki.copyDocument(getDocumentReference(), newDocumentReference, false, context);
 
-        // Step 2: For each child document, update parent.
-        if (childDocumentNames != null) {
-            String newParent = this.compactEntityReferenceSerializer.serialize(newDocReference);
-
-            for (String childDocumentName : childDocumentNames) {
-                XWikiDocument childDocument = xwiki.getDocument(childDocumentName, context);
-                // TODO: use {@link XWikiDocument#setParentReference(DocumentReference)} instead when we save the parent
-                // as a document reference in XWikiDocument. For now setParentReference saves in compact form which is
-                // not what we want here.
-                childDocument.setParent(newParent);
-                xwiki.saveDocument(childDocument, context.getMessageTool().get("core.comment.renameParent",
-                    Arrays.asList(new String[] {newDocumentName})), true, context);
+        // Step 2: For each child document, update its parent reference.
+        if (childDocumentReferences != null) {
+            for (DocumentReference childDocumentReference : childDocumentReferences) {
+                XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
+                childDocument.setParentReference(newDocumentReference);
+                String saveMessage = context.getMessageTool().get("core.comment.renameParent",
+                    Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+                xwiki.saveDocument(childDocument, saveMessage, true, context);
             }
         }
 
@@ -4874,24 +5092,34 @@ public class XWikiDocument implements DocumentModelBridge
         // that they fix them but the rename feature ignores them.
         DocumentParser documentParser = new DocumentParser();
 
-        for (String backlinkDocumentName : backlinkDocumentNames) {
-            XWikiDocument backlinkDocument = xwiki.getDocument(backlinkDocumentName, context);
+        // This link handler recognizes that 2 links are the same when they point to the same
+        // document (regardless of query string, target or alias). It keeps the query string,
+        // target and alias from the link being replaced.
+        RenamePageReplaceLinkHandler linkHandler = new RenamePageReplaceLinkHandler();
+
+        // Used for replacing links in XWiki Syntax 1.0
+        Link oldLink = new LinkParser().parse(this.localEntityReferenceSerializer.serialize(getDocumentReference()));
+        Link newLink = new LinkParser().parse(this.localEntityReferenceSerializer.serialize(newDocumentReference));
+
+        for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
+            XWikiDocument backlinkDocument = xwiki.getDocument(backlinkDocumentReference, context);
 
             if (backlinkDocument.is10Syntax()) {
                 // Note: Here we cannot do a simple search/replace as there are several ways to point
                 // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
                 // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
                 // to recognize them and do the replace.
-                ReplacementResultCollection result = documentParser.parseLinksAndReplace(backlinkDocument.getContent(), 
-                    oldLink, newLink, linkHandler, getSpace());
+                ReplacementResultCollection result = documentParser.parseLinksAndReplace(backlinkDocument.getContent(),
+                    oldLink, newLink, linkHandler, getDocumentReference().getLastSpaceReference().getName());
 
                 backlinkDocument.setContent((String) result.getModifiedContent());
             } else {
-                backlinkDocument.refactorDocumentLinks(oldDocReference, newDocReference, context);
+                backlinkDocument.refactorDocumentLinks(getDocumentReference(), newDocumentReference, context);
             }
 
-            xwiki.saveDocument(backlinkDocument, context.getMessageTool().get("core.comment.renameLink",
-                Arrays.asList(new String[] {newDocumentName})), true, context);
+            String saveMessage = context.getMessageTool().get("core.comment.renameLink",
+                Arrays.asList(this.compactEntityReferenceSerializer.serialize(newDocumentReference)));
+            xwiki.saveDocument(backlinkDocument, saveMessage, true, context);
         }
 
         // Step 4: Delete the old document
@@ -4899,7 +5127,28 @@ public class XWikiDocument implements DocumentModelBridge
 
         // Step 5: The current document needs to point to the renamed document as otherwise it's pointing to an
         // invalid XWikiDocument object as it's been deleted...
-        clone(xwiki.getDocument(newDocumentName, context));
+        clone(xwiki.getDocument(newDocumentReference, context));
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, List, List, com.xpn.xwiki.XWikiContext)} 
+     */
+    @Deprecated
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames,
+        XWikiContext context) throws XWikiException
+    {
+        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
+        for (String backlinkDocumentName : backlinkDocumentNames) {
+            backlinkDocumentReferences.add(this.currentMixedDocumentReferenceResolver.resolve(backlinkDocumentName));
+        }
+
+        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
+        for (String childDocumentName : childDocumentNames) {
+            childDocumentReferences.add(this.currentMixedDocumentReferenceResolver.resolve(childDocumentName));
+        }
+
+        rename(this.currentMixedDocumentReferenceResolver.resolve(newDocumentName), backlinkDocumentReferences,
+            childDocumentReferences, context);
     }
 
     /**
@@ -4912,7 +5161,7 @@ public class XWikiDocument implements DocumentModelBridge
         XWikiDocument contextDoc = context.getDoc();
 
         try {
-            context.setDatabase(getDatabase());
+            context.setDatabase(getDocumentReference().getWikiReference().getName());
             context.setDoc(this);
 
             XDOM xdom = getXDOM();

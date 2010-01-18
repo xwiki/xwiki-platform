@@ -34,6 +34,9 @@ public class Link implements Cloneable
 
     /**
      * @see #getReference()
+     *
+     * Note that the reason we store the reference as a String and not as an Entity Reference is because we want the
+     * Rendering module indpendent of the XWiki Model so that it can be used independently of XWiki.
      */
     private String reference;
 

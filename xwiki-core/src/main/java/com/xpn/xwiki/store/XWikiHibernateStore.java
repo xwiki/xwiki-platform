@@ -34,7 +34,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.UUID;
-import java.util.Vector;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -106,11 +105,25 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
     /**
+     * QueryManager for this store.
+     */
+    @Requirement
+    private QueryManager queryManager;
+    
+    /**
      * Used to convert a string into a proper Document Reference.
      */
     private DocumentReferenceResolver currentDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.class, "current");
 
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    
     /**
      * Used to convert a Document Reference to string (compact form without the wiki part).
      */
@@ -118,10 +131,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
 
     /**
-     * QueryManager for this store.
+     * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    @Requirement
-    private QueryManager queryManager;
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -1821,10 +1834,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return links;
     }
 
-    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
-        throws XWikiException
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
     {
-        List<String> backlinks = new ArrayList<String>();
+        List<DocumentReference> backlinkReferences = new ArrayList<DocumentReference>();
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1833,12 +1849,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // the select clause is compulsory to reach the fullName i.e. the page pointed
-            Query query =
-                session
-                    .createQuery("select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink");
-            query.setString("backlink", fullName);
+            Query query = session.createQuery("select backlink.fullName from XWikiLink as backlink where "
+                + "backlink.id.link = :backlink");
+            query.setString("backlink", this.localEntityReferenceSerializer.serialize(documentReference));
 
-            backlinks = query.list();
+            List<String> backlinkNames = query.list();
+
+            // Convert strings into references
+            for (String backlinkName : backlinkNames) {
+                backlinkReferences.add(this.currentMixedDocumentReferenceResolver.resolve(backlinkName));
+            }
 
             if (bTransaction) {
                 endTransaction(context, false, false);
@@ -1854,7 +1874,23 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
             }
         }
-        return backlinks;
+        return backlinkReferences;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
+        throws XWikiException
+    {
+        List<String> backlinkNames = new ArrayList<String>();
+        List<DocumentReference> backlinkReferences = loadBacklinks(
+            this.currentMixedDocumentReferenceResolver.resolve(fullName), bTransaction, context);
+        for (DocumentReference backlinkReference : backlinkReferences) {
+            backlinkNames.add(this.localEntityReferenceSerializer.serialize(backlinkReference));
+        }
+        return backlinkNames;
     }
 
     public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException
@@ -2058,10 +2094,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         query.setParameter(parameterId, parameterValue);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return searchDocumentReferences(parametrizedSqlClause, 0, 0, parameterValues, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, com.xpn.xwiki.XWikiContext)} 
+     */
+    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
         throws XWikiException
     {
         return searchDocumentsNames(parametrizedSqlClause, 0, 0, parameterValues, context);
+    }
+
+    /**
+     * @since 2.2M1
+     */
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
+        return searchDocumentReferencesInternal(sql, nb, start, parameterValues, context);
     }
 
     /**
@@ -2076,13 +2135,61 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @since 2.2M1
+     * @since 2.2M2
      */
-    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
-        List parameterValues, XWikiContext context) throws XWikiException
+    public List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context)
+        throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
-        return searchDocumentReferencesInternal(sql, nb, start, parameterValues, context);
+        return searchDocumentReferences(wheresql, 0, 0, "", context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #searchDocumentReferences(String, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
+    {
+        return searchDocumentsNames(wheresql, 0, 0, "", context);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
+        return searchDocumentReferences(wheresql, nb, start, "", context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #searchDocumentReferences(String, int, int, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
+        return searchDocumentsNames(wheresql, nb, start, "", context);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
+        XWikiContext context) throws XWikiException
+    {
+        String sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
+        return searchDocumentReferencesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+    }
+
+    /**
+     * @deprecated since 2.2M1 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
+        XWikiContext context) throws XWikiException
+    {
+        String sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
+        return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
     /**
@@ -2295,13 +2402,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         String sql = createSQLQuery("select count(*)", parametrizedSqlClause);
         List l = searchGenericInternal(sql, 0, 0, parameterValues, context);
         return ((Number) ((Object[]) l.get(0))[0]).intValue();
-    }
-
-    public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
-        XWikiContext context) throws XWikiException
-    {
-        String sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
-        return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
     /**
@@ -2804,17 +2904,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void resetBatcherStats()
     {
         // XWikiBatcher.getSQLStats().resetStats();
-    }
-
-    public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
-    {
-        return searchDocumentsNames(wheresql, 0, 0, "", context);
-    }
-
-    public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
-        throws XWikiException
-    {
-        return searchDocumentsNames(wheresql, nb, start, "", context);
     }
 
     /**

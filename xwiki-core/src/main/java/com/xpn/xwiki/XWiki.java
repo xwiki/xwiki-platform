@@ -90,6 +90,7 @@ import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -284,6 +285,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     private List<String> configuredSyntaxes;
 
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    
     public static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
@@ -4171,72 +4179,153 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return strwriter.toString();
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        XWikiContext context) throws XWikiException
+    {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, null, true, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String targetdocname, XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean reset, XWikiContext context) throws XWikiException
+    {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, null, reset, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, boolean, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
         throws XWikiException
     {
         return copyDocument(docname, targetdocname, null, null, null, reset, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        boolean reset, boolean force, boolean resetCreationData, XWikiContext context) throws XWikiException
+    {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, null, reset, force,
+            resetCreationData, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, boolean, boolean, boolean, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String targetdocname, boolean reset, boolean force,
         boolean resetCreationData, XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, targetdocname, null, null, null, reset, force, resetCreationData, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        String wikilanguage, XWikiContext context) throws XWikiException
+    {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, true, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage, XWikiContext context)
         throws XWikiException
     {
         return copyDocument(docname, targetdocname, null, null, wikilanguage, true, context);
     }
 
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki, String wikilanguage,
         XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        String wikilanguage, boolean reset, XWikiContext context) throws XWikiException
+    {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, false, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
         String wikilanguage, boolean reset, XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, false, context);
     }
 
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
+        String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException
+    {
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force, false,
+            context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, XWikiContext)}
+     */
+    @Deprecated
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
         String wikilanguage, boolean reset, boolean force, XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force, false, context);
     }
 
-    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
+    /**
+     * @since 2.2M2
+     */
+    public boolean copyDocument(DocumentReference sourceDocumentReference, DocumentReference targetDocumentReference,
         String wikilanguage, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
         throws XWikiException
     {
         String db = context.getDatabase();
-        if (sourceWiki == null) {
-            sourceWiki = db;
-        }
+        String sourceWiki = sourceDocumentReference.getWikiReference().getName();
+        String targetWiki = targetDocumentReference.getWikiReference().getName();
 
         try {
-            if (sourceWiki != null) {
-                context.setDatabase(sourceWiki);
-            }
-            XWikiDocument sdoc = getDocument(docname, context);
+            context.setDatabase(sourceWiki);
+            XWikiDocument sdoc = getDocument(sourceDocumentReference, context);
             if (!sdoc.isNew()) {
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Copying document: " + docname + " (default) to " + targetdocname + " on wiki "
-                        + targetWiki);
+                    LOG.info("Copying document [" + sourceDocumentReference + "] to [" + targetDocumentReference + "]");
                 }
 
                 // Let's switch to the other database to verify if the document already exists
-                if (targetWiki != null) {
-                    context.setDatabase(targetWiki);
-                }
-                XWikiDocument tdoc = getDocument(targetdocname, context);
+                context.setDatabase(targetWiki);
+                XWikiDocument tdoc = getDocument(targetDocumentReference, context);
                 // There is already an existing document
                 if (!tdoc.isNew()) {
                     if (force) {
@@ -4248,12 +4337,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
 
                 // Let's switch back again to the original db
-                if (sourceWiki != null) {
-                    context.setDatabase(sourceWiki);
-                }
+                context.setDatabase(sourceWiki);
 
                 if (wikilanguage == null) {
-                    tdoc = sdoc.copyDocument(targetdocname, context);
+                    tdoc = sdoc.copyDocument(targetDocumentReference, context);
                     // forget past versions
                     if (reset) {
                         tdoc.setNew(true);
@@ -4267,53 +4354,39 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         tdoc.setCreator(context.getUser());
                         tdoc.setAuthor(context.getUser());
                     }
-                    if (targetWiki != null) {
-                        tdoc.setDatabase(targetWiki);
-                    }
 
-                    // we don't want to trigger a new version
-                    // otherwise the version number will be wrong
+                    // We don't want to trigger a new version otherwise the version number will be wrong
                     tdoc.setMetaDataDirty(false);
                     tdoc.setContentDirty(false);
 
                     saveDocument(tdoc, context);
 
                     if (!reset) {
-                        if (sourceWiki != null) {
-                            context.setDatabase(sourceWiki);
-                        }
+                        context.setDatabase(sourceWiki);
                         XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                        if (targetWiki != null) {
-                            context.setDatabase(targetWiki);
-                        }
+                        context.setDatabase(targetWiki);
                         txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
-                    if (targetWiki != null) {
-                        context.setDatabase(targetWiki);
-                    }
+                    context.setDatabase(targetWiki);
                     for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
                         getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                     }
 
                     // Now we need to copy the translations
-                    if (sourceWiki != null) {
-                        context.setDatabase(sourceWiki);
-                    }
+                    context.setDatabase(sourceWiki);
                     List<String> tlist = sdoc.getTranslationList(context);
                     for (String clanguage : tlist) {
                         XWikiDocument stdoc = sdoc.getTranslatedDocument(clanguage, context);
                         if (LOG.isInfoEnabled()) {
-                            LOG.info("Copying document: " + docname + "(" + clanguage + ") to " + targetdocname
-                                + " on wiki " + targetWiki);
+                            LOG.info("Copying document [" + sourceWiki + "], language [" + clanguage + "] to ["
+                                + targetDocumentReference + "]");
                         }
 
-                        if (targetWiki != null) {
-                            context.setDatabase(targetWiki);
-                        }
+                        context.setDatabase(targetWiki);
                         XWikiDocument ttdoc = tdoc.getTranslatedDocument(clanguage, context);
 
                         // There is already an existing document
@@ -4322,11 +4395,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         }
 
                         // Let's switch back again to the original db
-                        if (sourceWiki != null) {
-                            context.setDatabase(sourceWiki);
-                        }
+                        context.setDatabase(sourceWiki);
 
-                        ttdoc = stdoc.copyDocument(targetdocname, context);
+                        ttdoc = stdoc.copyDocument(targetDocumentReference, context);
 
                         // forget past versions
                         if (reset) {
@@ -4341,9 +4412,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                             ttdoc.setCreator(context.getUser());
                             ttdoc.setAuthor(context.getUser());
                         }
-                        if (targetWiki != null) {
-                            ttdoc.setDatabase(targetWiki);
-                        }
 
                         // we don't want to trigger a new version
                         // otherwise the version number will be wrong
@@ -4353,13 +4421,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         saveDocument(ttdoc, context);
 
                         if (!reset) {
-                            if (sourceWiki != null) {
-                                context.setDatabase(sourceWiki);
-                            }
+                            context.setDatabase(sourceWiki);
                             XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                            if (targetWiki != null) {
-                                context.setDatabase(targetWiki);
-                            }
+                            context.setDatabase(targetWiki);
                             txda = txda.clone(tdoc.getId(), context);
                             getVersioningStore().saveXWikiDocArchive(txda, true, context);
                         } else {
@@ -4370,7 +4434,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // We want only one language in the end
                     XWikiDocument stdoc = sdoc.getTranslatedDocument(wikilanguage, context);
 
-                    tdoc = stdoc.copyDocument(targetdocname, context);
+                    tdoc = stdoc.copyDocument(targetDocumentReference, context);
 
                     // forget language
                     tdoc.setDefaultLanguage(wikilanguage);
@@ -4389,10 +4453,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         tdoc.setAuthor(context.getUser());
                     }
 
-                    if (targetWiki != null) {
-                        tdoc.setDatabase(targetWiki);
-                    }
-
                     // we don't want to trigger a new version
                     // otherwise the version number will be wrong
                     tdoc.setMetaDataDirty(false);
@@ -4401,22 +4461,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     saveDocument(tdoc, context);
 
                     if (!reset) {
-                        if (sourceWiki != null) {
-                            context.setDatabase(sourceWiki);
-                        }
+                        context.setDatabase(sourceWiki);
                         XWikiDocumentArchive txda = getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                        if (targetWiki != null) {
-                            context.setDatabase(targetWiki);
-                        }
+                        context.setDatabase(targetWiki);
                         txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
-                    if (targetWiki != null) {
-                        context.setDatabase(targetWiki);
-                    }
+                    context.setDatabase(targetWiki);
                     for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
                         getAttachmentStore().saveAttachmentContent(attachment, false, context, true);
                     }
@@ -4426,6 +4480,28 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } finally {
             context.setDatabase(db);
         }
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #copyDocument(DocumentReference, DocumentReference, String, boolean, boolean, boolean, XWikiContext)}
+     */
+    @Deprecated
+    public boolean copyDocument(String docname, String targetdocname, String sourceWiki, String targetWiki,
+        String wikilanguage, boolean reset, boolean force, boolean resetCreationData, XWikiContext context)
+        throws XWikiException
+    {
+        DocumentReference sourceDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(docname);
+        if (!StringUtils.isEmpty(sourceWiki)) {
+            sourceDocumentReference.setWikiReference(new WikiReference(sourceWiki));
+        }
+
+        DocumentReference targetDocumentReference = this.currentMixedDocumentReferenceResolver.resolve(targetdocname);
+        if (!StringUtils.isEmpty(targetWiki)) {
+            targetDocumentReference.setWikiReference(new WikiReference(targetWiki));
+        }
+
+        return copyDocument(sourceDocumentReference, targetDocumentReference, wikilanguage, reset, force,
+            resetCreationData, context);
     }
 
     public int copyWikiWeb(String web, String sourceWiki, String targetWiki, String wikilanguage, XWikiContext context)

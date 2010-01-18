@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.image;
 
 import java.io.File;
 
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import org.jmock.Mock;
 import org.xwiki.cache.CacheFactory;
 
@@ -33,22 +34,22 @@ import com.xpn.xwiki.doc.XWikiAttachment;
  * 
  * @version $Id$
  */
-public class ImagePluginTest extends org.jmock.cglib.MockObjectTestCase
+public class ImagePluginTest extends AbstractBridgedXWikiComponentTestCase
 {
-
     private ImagePlugin plugin;
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
-        XWikiContext context = new XWikiContext();
+        super.setUp();
+
         Mock mockXWiki = mock(XWiki.class);
         mockXWiki.stubs().method("getTempDirectory").will(returnValue(new File(System.getProperty("java.io.tmpdir"))));
         mockXWiki.stubs().method("Param").will(returnValue("10"));
         Mock mockCacheFactory = mock(CacheFactory.class);
         mockCacheFactory.expects(once()).method("newCache");
         mockXWiki.stubs().method("getLocalCacheFactory").will(returnValue(mockCacheFactory.proxy()));
-        context.setWiki((XWiki) mockXWiki.proxy());
-        this.plugin = new ImagePlugin("image", ImagePlugin.class.getName(), context);
+        getContext().setWiki((XWiki) mockXWiki.proxy());
+        this.plugin = new ImagePlugin("image", ImagePlugin.class.getName(), getContext());
     }
 
     public void testIsSuportedImageFormat()

@@ -19,8 +19,8 @@
  */
 package com.xpn.xwiki.plugin.captcha;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.jmock.Mock;
 
@@ -29,28 +29,26 @@ import org.jmock.Mock;
  * 
  * @version $Id$
  */
-public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
+public class CaptchaPluginTest extends AbstractBridgedXWikiComponentTestCase
 {
     private Mock mockRequest;
-
-    private XWikiContext context;
 
     private CaptchaPlugin plugin;
 
     private Mock mockXWiki;
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
+        super.setUp();
 
         this.mockRequest = mock(XWikiRequest.class);
 
         this.mockXWiki = mock(XWiki.class);
 
-        this.context.setWiki((XWiki) mockXWiki.proxy());
-        this.context.setRequest((XWikiRequest) this.mockRequest.proxy());
+        getContext().setWiki((XWiki) mockXWiki.proxy());
+        getContext().setRequest((XWikiRequest) this.mockRequest.proxy());
 
-        this.plugin = new CaptchaPlugin("captcha", "captcha", this.context);
+        this.plugin = new CaptchaPlugin("captcha", "captcha", getContext());
     }
 
     public void testVerifyCaptchaUsingTextWithValidAnswerAndAnonymousUser() throws Exception
@@ -60,7 +58,7 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
         this.mockRequest.stubs().method("getParameter").with(eq("sum_answer")).will(returnValue("2"));
         this.mockRequest.stubs().method("getParameter").with(eq("sum_result")).will(returnValue("2"));
 
-        Boolean isValid = plugin.verifyCaptcha("register", this.context);
+        Boolean isValid = plugin.verifyCaptcha("register", getContext());
 
         assertTrue(isValid.booleanValue());
     }
@@ -72,7 +70,7 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
         this.mockRequest.stubs().method("getParameter").with(eq("sum_answer")).will(returnValue("2"));
         this.mockRequest.stubs().method("getParameter").with(eq("sum_result")).will(returnValue("1"));
 
-        Boolean isValid = plugin.verifyCaptcha("register", this.context);
+        Boolean isValid = plugin.verifyCaptcha("register", getContext());
 
         assertFalse(isValid.booleanValue());
     }

@@ -232,7 +232,7 @@ public class PasswordClass extends StringClass
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException ex) {
-            log.error("Wrong hash algorithm '" + algorithmName + "' in '" + this.className + "'",
+            log.error("Wrong hash algorithm [" + algorithmName + "] in [" + getXClassReference() + "]",
                 ex);
         } catch (NullPointerException ex) {
             log.error("Error hashing password", ex);

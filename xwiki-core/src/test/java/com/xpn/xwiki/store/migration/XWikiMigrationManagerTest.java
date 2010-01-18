@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -35,18 +35,15 @@ import com.xpn.xwiki.XWikiException;
  * 
  * @version $Id$
  */
-public class XWikiMigrationManagerTest extends TestCase
+public class XWikiMigrationManagerTest extends AbstractBridgedXWikiComponentTestCase
 {
-    XWikiContext context;
-
     /** {@inheritDoc} */
     protected void setUp() throws Exception
     {
         super.setUp();
-        context = new XWikiContext();
         XWikiConfig config = new XWikiConfig();
-        context.setWiki(new XWiki());
-        context.getWiki().setConfig(config);
+        getContext().setWiki(new XWiki());
+        getContext().getWiki().setConfig(config);
     }
 
     /** mocked migration manager */
@@ -109,10 +106,10 @@ public class XWikiMigrationManagerTest extends TestCase
     /** test migration if there are no data version */
     public void testMigrationWhenNoVersion() throws Exception
     {
-        TestMigrationManager mm = new TestMigrationManager(context);
-        Collection neededMigration = mm.getNeededMigrations(context);
+        TestMigrationManager mm = new TestMigrationManager(getContext());
+        Collection neededMigration = mm.getNeededMigrations(getContext());
         assertEquals(4, neededMigration.size());
-        mm.startMigrations(context);
+        mm.startMigrations(getContext());
         assertEquals(457, mm.curversion.getVersion());
     }
 
@@ -121,11 +118,11 @@ public class XWikiMigrationManagerTest extends TestCase
      */
     public void testMigrationOrderAndIgnore() throws Exception
     {
-        XWikiConfig config = context.getWiki().getConfig();
+        XWikiConfig config = getContext().getWiki().getConfig();
         config.setProperty("xwiki.store.migration.version", "234");
         config.setProperty("xwiki.store.migration.ignored", "345");
-        TestMigrationManager mm = new TestMigrationManager(context);
-        Collection neededMigration = mm.getNeededMigrations(context);
+        TestMigrationManager mm = new TestMigrationManager(getContext());
+        Collection neededMigration = mm.getNeededMigrations(getContext());
         assertEquals(2, neededMigration.size());
         AbstractXWikiMigrationManager.XWikiMigration[] actual = new AbstractXWikiMigrationManager.XWikiMigration[2];
         neededMigration.toArray(actual);
@@ -163,11 +160,11 @@ public class XWikiMigrationManagerTest extends TestCase
     /** test "xwiki.store.migration.force" parameter */
     public void testMigrationForce() throws Exception
     {
-        XWikiConfig config = context.getWiki().getConfig();
+        XWikiConfig config = getContext().getWiki().getConfig();
         config.setProperty("xwiki.store.migration.version", "234");
         config.setProperty("xwiki.store.migration.force", TestForceMigratior.class.getName());
-        TestMigrationManager mm = new TestMigrationManager(context);
-        Collection neededMigration = mm.getNeededMigrations(context);
+        TestMigrationManager mm = new TestMigrationManager(getContext());
+        Collection neededMigration = mm.getNeededMigrations(getContext());
         assertEquals(1, neededMigration.size());
         assertEquals(
             567,

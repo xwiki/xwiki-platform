@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,18 +50,34 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Cloneable
 {
     protected static final Log LOG = LogFactory.getLog(BaseCollection.class);
 
-    protected String className;
+    protected DocumentReference xClassReference;
 
     protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
 
     protected List fieldsToRemove = new ArrayList();
 
     protected int number;
+
+    /**
+     * Used to convert a proper Class Reference to a string but without the wiki name.
+     */
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
+
+    /**
+     * Used to resolve a string into a proper Class Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
 
     public int getId()
     {
@@ -97,14 +114,48 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         getFieldsToRemove().add(field);
     }
 
-    public String getClassName()
+    /**
+     * @since 2.2M2
+     */
+    public DocumentReference getXClassReference()
     {
-        return (this.className == null) ? "" : this.className;
+        return this.xClassReference;
     }
 
+    /**
+     * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
+     */
+    @Deprecated
+    public String getClassName()
+    {
+        String xClassAsString;
+        if (getXClassReference() != null) {
+            xClassAsString = this.localEntityReferenceSerializer.serialize(getXClassReference());
+        } else {
+            xClassAsString = "";
+        }
+        return xClassAsString;
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public void setXClassReference(DocumentReference xClassReference)
+    {
+        this.xClassReference = xClassReference;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #setXClassReference(DocumentReference)} ()} instead
+     */
+    @Deprecated
     public void setClassName(String name)
     {
-        this.className = name;
+        DocumentReference xClassReference = null;
+        if (!StringUtils.isEmpty(name)) {
+            xClassReference = this.currentMixedDocumentReferenceResolver.resolve(name);
+        }
+        setXClassReference(xClassReference);
     }
 
     public void checkField(String name) throws XWikiException
@@ -199,7 +250,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
-     * @deprecated since 2.2M1 use {}
+     * @deprecated since 2.2M1 use {@link #getXClass(com.xpn.xwiki.XWikiContext)}
      */
     @Deprecated
     public BaseClass getxWikiClass(XWikiContext context)
@@ -499,11 +550,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             return false;
         }
         BaseCollection collection = (BaseCollection) coll;
-        if (collection.getClassName() == null) {
-            if (getClassName() != null) {
+        if (collection.getXClassReference() == null) {
+            if (getXClassReference() != null) {
                 return false;
             }
-        } else if (!collection.getClassName().equals(getClassName())) {
+        } else if (!collection.getXClassReference().equals(getXClassReference())) {
             return false;
         }
 
@@ -531,7 +582,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public Object clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
-        collection.setClassName(getClassName());
+        collection.setXClassReference(getXClassReference());
         collection.setNumber(getNumber());
         Map fields = getFields();
         Map cfields = new HashMap();
@@ -566,7 +617,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             String propertyName = (String) key;
             BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
-            BaseClass bclass = getxWikiClass(context);
+            BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");                
 
@@ -575,7 +626,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(propertyName,
+                            : ((PropertyClass) getXClass(context).getField(propertyName)).displayView(propertyName,
                                 this, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "", "added", propertyName, propertyType, 
                         "", newPropertyValue));
@@ -605,7 +656,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             String propertyName = (String) key;
             BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
             BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
-            BaseClass bclass = getxWikiClass(context);
+            BaseClass bclass = getXClass(context);
             PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
             String propertyType = (pclass == null) ? "" : StringUtils.substringAfterLast(pclass.getClassType(), ".");
             

@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 
 import javax.jcr.ItemExistsException;
 import javax.jcr.Node;
@@ -48,6 +47,7 @@ import javax.jcr.query.RowIterator;
 import javax.jcr.version.VersionException;
 import javax.transaction.NotSupportedException;
 
+import com.xpn.xwiki.web.Utils;
 import org.apache.portals.graffito.jcr.query.Filter;
 import org.apache.portals.graffito.jcr.query.QueryManager;
 
@@ -77,6 +77,9 @@ import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 
 /** XWikiJCRStore - XWiki Store System backend to JCR */
 public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterface
@@ -85,6 +88,20 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
      * QueryManager for this store. Injected via component manager.
      */
     org.xwiki.query.QueryManager queryManager;
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     public XWikiJcrStore(XWiki xwiki, XWikiContext context) throws SecurityException, IllegalArgumentException,
         NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException,
@@ -724,22 +741,26 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return links;
     }
 
-    public List loadBacklinks(final String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> loadBacklinks(final DocumentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException
     {
-        final List backlinks = new ArrayList();
+        final List<DocumentReference> backlinkReferences = new ArrayList<DocumentReference>();
         try {
             executeRead(context, new JcrCallBack()
             {
                 public Object doInJcr(XWikiJcrSession ses) throws Exception
                 {
-                    Query q =
-                        ses.getWorkspace().getQueryManager().createQuery(
-                            "//element(" + fullName + ",xwiki:link)/@fullName", Query.XPATH);
+                    Query q = ses.getWorkspace().getQueryManager().createQuery("//element("
+                        + localEntityReferenceSerializer.serialize(documentReference) + ",xwiki:link)/@fullName",
+                        Query.XPATH);
                     RowIterator ri = q.execute().getRows();
                     while (ri.hasNext()) {
                         Row row = ri.nextRow();
                         String s = row.getValues()[0].getString();
-                        backlinks.add(s);
+                        backlinkReferences.add(currentMixedDocumentReferenceResolver.resolve(s));
                     }
                     return null;
                 }
@@ -748,7 +769,22 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_JCR_LOADING_BACKLINKS, "Exception while loading backlinks", e);
         }
-        return backlinks;
+        return backlinkReferences;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     */
+    @Deprecated
+    public List loadBacklinks(final String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    {
+        List<String> backlinkNames = new ArrayList<String>();
+        List<DocumentReference> backlinkReferences = loadBacklinks(
+            this.currentMixedDocumentReferenceResolver.resolve(fullName), bTransaction, context);
+        for (DocumentReference backlinkReference : backlinkReferences) {
+            backlinkNames.add(this.localEntityReferenceSerializer.serialize(backlinkReference));
+        }
+        return backlinkNames;
     }
 
     public void saveLinks(final XWikiDocument doc, final XWikiContext context, boolean bTransaction)
@@ -1204,12 +1240,6 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return null;
     }
 
-    public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
-    {
-        notSupportedCall();
-        return null;
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -1233,7 +1263,105 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return 0;
     }
 
-    public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}
+     */
+    @Deprecated
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
+        throws XWikiException
     {
         notSupportedCall();
         return null;
@@ -1248,27 +1376,6 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
         boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException
-    {
-        notSupportedCall();
-        return null;
-    }
-
-    public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context)
-        throws XWikiException
-    {
-        notSupportedCall();
-        return null;
-    }
-
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues,
-        XWikiContext context) throws XWikiException
-    {
-        notSupportedCall();
-        return null;
-    }
-
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context)
-        throws XWikiException
     {
         notSupportedCall();
         return null;

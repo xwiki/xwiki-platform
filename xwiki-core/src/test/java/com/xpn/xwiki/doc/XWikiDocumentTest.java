@@ -46,6 +46,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiMessageTool;
+import org.xwiki.model.reference.DocumentReference;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -745,35 +746,45 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         // "name"  -----means-----> DOCWIKI+":"+DOCSPACE+"."+input
         // "space.name" -means----> DOCWIKI+":"+input
         // "database:space.name" (no change)
-        XWikiDocument doc1 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page1");
+
+        DocumentReference reference1 = new DocumentReference(DOCWIKI, DOCSPACE, "Page1");
+        XWikiDocument doc1 = new XWikiDocument(reference1);
         doc1.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]] [[someName>>" 
                              + DOCSPACE + "." + DOCNAME + "]] [["
                              + DOCNAME + "]]");
         doc1.setSyntaxId("xwiki/2.0");
-        XWikiDocument doc2 = new XWikiDocument("newwikiname", DOCSPACE, "Page2");
+
+        DocumentReference reference2 = new DocumentReference("newwikiname", DOCSPACE, "Page2");
+        XWikiDocument doc2 = new XWikiDocument(reference2);
         doc2.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc2.setSyntaxId("xwiki/2.0");
-        XWikiDocument doc3 = new XWikiDocument("newwikiname", "newspace", "Page3");
+
+        DocumentReference reference3 = new DocumentReference("newwikiname", "newspace", "Page3");
+        XWikiDocument doc3 = new XWikiDocument(reference3);
         doc3.setContent("[[" + DOCWIKI + ":" + DOCSPACE + "." + DOCNAME + "]]");
         doc3.setSyntaxId("xwiki/2.0");
 
         // Test to make sure it also drags children along.
-        XWikiDocument doc4 = new XWikiDocument(DOCWIKI, DOCSPACE, "Page4");
+        DocumentReference reference4 = new DocumentReference(DOCWIKI, DOCSPACE, "Page4");
+        XWikiDocument doc4 = new XWikiDocument(reference4);
         doc4.setParent(DOCSPACE + "." + DOCNAME);
-        XWikiDocument doc5 = new XWikiDocument("newwikiname", "newspace", "Page5");
+
+        DocumentReference reference5 = new DocumentReference("newwikiname", "newspace", "Page5");
+        XWikiDocument doc5 = new XWikiDocument(reference5);
         doc5.setParent(DOCWIKI + ":" + DOCSPACE + "." + DOCNAME);
 
         this.mockXWiki.stubs().method("copyDocument").will(returnValue(true));
-        this.mockXWiki.stubs().method("getDocument").with(eq("1"), ANYTHING).will(returnValue(doc1));
-        this.mockXWiki.stubs().method("getDocument").with(eq("2"), ANYTHING).will(returnValue(doc2));
-        this.mockXWiki.stubs().method("getDocument").with(eq("3"), ANYTHING).will(returnValue(doc3));
-        this.mockXWiki.stubs().method("getDocument").with(eq("4"), ANYTHING).will(returnValue(doc4));
-        this.mockXWiki.stubs().method("getDocument").with(eq("5"), ANYTHING).will(returnValue(doc5));
+        this.mockXWiki.stubs().method("getDocument").with(eq(reference1), ANYTHING).will(returnValue(doc1));
+        this.mockXWiki.stubs().method("getDocument").with(eq(reference2), ANYTHING).will(returnValue(doc2));
+        this.mockXWiki.stubs().method("getDocument").with(eq(reference3), ANYTHING).will(returnValue(doc3));
+        this.mockXWiki.stubs().method("getDocument").with(eq(reference4), ANYTHING).will(returnValue(doc4));
+        this.mockXWiki.stubs().method("getDocument").with(eq(reference5), ANYTHING).will(returnValue(doc5));
         this.mockXWiki.stubs().method("saveDocument").isVoid();
         this.mockXWiki.stubs().method("deleteDocument").isVoid();
 
-        this.document.rename("newwikiname:newspace.newpage", Arrays.asList("1", "2", "3"), 
-            Arrays.asList("4", "5"), getContext());
+        this.document.rename("newwikiname:newspace.newpage", Arrays.asList(DOCWIKI + ":" + DOCSPACE + ".Page1",
+            "newwikiname:" + DOCSPACE + ".Page2", "newwikiname:newspace.Page3"), Arrays.asList(
+            DOCWIKI + ":" + DOCSPACE + ".Page4", "newwikiname:newspace.Page5"), getContext());
 
         // Test links
         assertEquals("[[newwikiname:newspace.newpage]] "

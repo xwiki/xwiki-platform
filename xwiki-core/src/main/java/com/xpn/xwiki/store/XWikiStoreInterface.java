@@ -24,6 +24,7 @@ package com.xpn.xwiki.store;
 import java.util.List;
 
 import org.xwiki.component.annotation.ComponentRole;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -46,8 +47,6 @@ public interface XWikiStoreInterface
 
     List<String> getClassList(XWikiContext context) throws XWikiException;
 
-    List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
-
     /**
      * API allowing to count the total number of documents that would be returned by a query.
      * 
@@ -60,8 +59,39 @@ public interface XWikiStoreInterface
      */
     int countDocuments(String wheresql, XWikiContext context) throws XWikiException;
 
+    /**
+     * @since 2.2M2
+     */
+    List<DocumentReference> searchDocumentReferences(String wheresql, XWikiContext context) throws XWikiException;
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, com.xpn.xwiki.XWikiContext)} 
+     */
+    @Deprecated
+    List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
+
+    /**
+     * @since 2.2M2
+     */
+    List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException;
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, com.xpn.xwiki.XWikiContext)}
+     */
+    @Deprecated
     List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
 
+    /**
+     * @since 2.2M2
+     */
+    List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
+        XWikiContext context) throws XWikiException;
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, String, XWikiContext)}
+     */
+    @Deprecated
     List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context)
         throws XWikiException;
 
@@ -88,17 +118,33 @@ public interface XWikiStoreInterface
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
      * @param context the XWiki context required for getting information about the execution context
-     * @return a list of document names
+     * @return a list of document references
      * @throws XWikiException in case of error while performing the query
+     * @since 2.2M1
      */
+    List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
+        List<?> parameterValues, XWikiContext context) throws XWikiException;
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, int, int, List, XWikiContext)}  
+     */
+    @Deprecated
     List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
-     * Same as {@link #searchDocumentsNames(String, int, int, List, XWikiContext)} but returns all rows.
+     * Same as {@link #searchDocumentReferences(String, int, int, List, XWikiContext)} but returns all rows.
      * 
-     * @see #searchDocumentsNames(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     * @see #searchDocumentReferences(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     * @since 2.2M2
      */
+    List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
+        XWikiContext context) throws XWikiException;
+
+    /**
+     * @deprecated since 2.2M2 use {@link #searchDocumentReferences(String, List, XWikiContext)}    
+     */
+    @Deprecated
     List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -334,6 +380,16 @@ public interface XWikiStoreInterface
 
     List<XWikiLink> loadLinks(long docId, XWikiContext context, boolean bTransaction) throws XWikiException;
 
+    /**
+     * @since 2.2M2
+     */
+    List<DocumentReference> loadBacklinks(DocumentReference documentReference, boolean bTransaction,
+        XWikiContext context) throws XWikiException;
+
+    /**
+     * @deprecated since 2.2M2 use {@link #loadBacklinks(DocumentReference, boolean, XWikiContext)}
+     */
+    @Deprecated
     List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;

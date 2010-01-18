@@ -56,55 +56,55 @@ Object.extend(XWiki, {
      */
     docextraInformationAnchor: "Information"
   },
-  
-  resource: {  
-    
+
+  resource: {
+
     /**
-     * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome", 
+     * Extract the name of the wiki from a resource name. Examples: returns "xwiki" with "xwiki:Main.WebHome",
      * returns null with "Main.WebHome".
      */
     getWikiFromResourceName: function(name) {
       if (name.include(XWiki.constants.wikiSpaceSeparator)) {
         return name.substring(0, name.indexOf(XWiki.constants.wikiSpaceSeparator));
       }
-      return null;    
+      return null;
     },
-  
+
     /**
-     * Extract the name of the space from a resource name. Examples: returns "Main" with "xwiki:Main.WebHome", 
+     * Extract the name of the space from a resource name. Examples: returns "Main" with "xwiki:Main.WebHome",
      * returns "Main" with "Main.WebHome", returns null with "WebHome".
      */
-    getSpaceFromResourceName: function(name) {  
+    getSpaceFromResourceName: function(name) {
       var originalName = name;
       // Remove wiki if any.
       if (name.include(XWiki.constants.wikiSpaceSeparator)) {
-        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);        
+        name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
       }
       // If the resource contains an attachment, make sure the dot is not part of the attachment name.
-      if (name.include(XWiki.constants.spacePageSeparator)) {        
-        if (name.include(XWiki.constants.pageAttachmentSeparator) && name.indexOf(XWiki.constants.spacePageSeparator) 
+      if (name.include(XWiki.constants.spacePageSeparator)) {
+        if (name.include(XWiki.constants.pageAttachmentSeparator) && name.indexOf(XWiki.constants.spacePageSeparator)
               > name.indexOf(XWiki.constants.pageAttachmentSeparator)) {
           return null;
         }
         return name.substring(0, name.indexOf(XWiki.constants.spacePageSeparator));
-      }             
+      }
       // If the resource name looks like "xwiki:Main" we return "Main".
-      if (originalName.include(XWiki.constants.wikiSpaceSeparator) 
+      if (originalName.include(XWiki.constants.wikiSpaceSeparator)
             && !originalName.include(XWiki.constants.pageAttachmentSeparator)
-            && !originalName.include(XWiki.constants.anchorSeparator)) {        
+            && !originalName.include(XWiki.constants.anchorSeparator)) {
         return name;
       }
       return null;
     },
-  
+
     /**
-     * Extract the name of the page from a resource name. Examples: returns "WebHome" with "xwiki:Main.WebHome", 
+     * Extract the name of the page from a resource name. Examples: returns "WebHome" with "xwiki:Main.WebHome",
      * returns "WebHome" with "Main.WebHome", returns null with "xwiki:Main".
      */
     getNameFromResourceName: function(name) {
       var originalName = name;
       // Remove wiki if any.
-      if (name.include(XWiki.constants.wikiSpaceSeparator)) {        
+      if (name.include(XWiki.constants.wikiSpaceSeparator)) {
         name = name.substring(name.indexOf(XWiki.constants.wikiSpaceSeparator) + 1, name.length);
       }
       // remove attachment if any.
@@ -118,17 +118,17 @@ Object.extend(XWiki, {
       if (name.include(XWiki.constants.spacePageSeparator)) {
         return name.substring(name.indexOf(XWiki.constants.spacePageSeparator) + 1, name.length);
       } else {
-        if (originalName.include(XWiki.constants.wikiSpaceSeparator)) {          
+        if (originalName.include(XWiki.constants.wikiSpaceSeparator)) {
           // If the resource name looks like "xwiki:Main" it does not contain page info.
           return null;
         } else {
           return name;
         }
-      }      
+      }
     },
-      
+
     /**
-     * Extract the name of the attachment from a resource name. Examples: returns "test.zip" with 
+     * Extract the name of the attachment from a resource name. Examples: returns "test.zip" with
      * "Main.WebHome@test.zip", returns null with "Main.WebHome".
      */
     getAttachmentFromResourceName: function(name) {
@@ -137,29 +137,29 @@ Object.extend(XWiki, {
       }
       return null;
     },
-  
+
     /**
-     * Extract the name of the anchor from a resource name. Examples: returns "Comments" with 
+     * Extract the name of the anchor from a resource name. Examples: returns "Comments" with
      * "Main.WebHome#Comments", returns null with "Main.WebHome".
      */
     getAnchorFromResourceName: function(name) {
       if (name.include(XWiki.constants.anchorSeparator)) {
         return name.substring(name.indexOf(XWiki.constants.anchorSeparator) + 1, name.length);
-      }      
+      }
       return null;
     },
-    
+
     /**
      * Build a resource object from a wiki resource name (aka fullName). Example with "Main.WebHome":
-     * { 
-     *   wiki: "xwiki", 
-     *   space: "Main", 
+     * {
+     *   wiki: "xwiki",
+     *   space: "Main",
      *   prefixedSpace: "xwiki:Main",
-     *   fullName: "Main.WebHome", 
+     *   fullName: "Main.WebHome",
      *   prefixedFullName: "xwiki:Main.WebHome",
-     *   name: "WebHome", 
-     *   attachment: "" 
-     *  }   
+     *   name: "WebHome",
+     *   attachment: ""
+     *  }
      *
      * @param name name of the resource to create (examples: xwiki:Main.WebHome, xwiki:Main.WebHome@Archive.tgz).
      * @return the newly created resource object.
@@ -170,17 +170,17 @@ Object.extend(XWiki, {
       var pageName = this.getNameFromResourceName(name);
       var attachment = this.getAttachmentFromResourceName(name);
       var anchor = this.getAnchorFromResourceName(name);
-      
+
       if (!wiki) { wiki = XWiki.currentWiki; }
       if (!space) { space = XWiki.currentSpace; }
       if (!pageName) { pageName = "WebHome"; }
       if (!attachment) { attachment = ""; }
       if (!anchor) { anchor = ""; }
-            
+
       var fullName = space + XWiki.constants.spacePageSeparator + pageName;
-      var prefixedSpace = wiki + XWiki.constants.wikiSpaceSeparator + space;      
-      var prefixedFullName = wiki + XWiki.constants.wikiSpaceSeparator + fullName;           
-      
+      var prefixedSpace = wiki + XWiki.constants.wikiSpaceSeparator + space;
+      var prefixedFullName = wiki + XWiki.constants.wikiSpaceSeparator + fullName;
+
       return {
           wiki: wiki,
           space: space,
@@ -190,10 +190,10 @@ Object.extend(XWiki, {
           name: pageName,
           attachment: attachment,
           anchor: anchor
-       };        
-    }    
+       };
+    }
   },
-  
+
   /**
    * Deprecated. See XWiki.resource.get(String).
    */
@@ -304,8 +304,8 @@ Object.extend(XWiki, {
    * Apply this on links found in the passed content if any, or on the document's all body otherwise.
    */
   fixLinksTargetAttribute: function(content) {
-    // apply this transformation only in the view mode, to not apply transformation on the content in edit mode to 
-    // avoid having it saved by the wysiwyg afterwards. Actually it should be anything different from edit or inline, 
+    // apply this transformation only in the view mode, to not apply transformation on the content in edit mode to
+    // avoid having it saved by the wysiwyg afterwards. Actually it should be anything different from edit or inline,
     // but like this is consistent with the next function, for section editing.
     if (XWiki.contextaction == "view" || XWiki.contextaction == "preview") {
       if (typeof content == "undefined") {
@@ -331,7 +331,7 @@ Object.extend(XWiki, {
       }
     }
   },
-  
+
   /**
    * Insert a link for editing sections.
    */
@@ -349,14 +349,14 @@ Object.extend(XWiki, {
           }
           nodes = nodes.childNodes;
 
-          // Only allow section editing for the specified depth level (2 by default)              
+          // Only allow section editing for the specified depth level (2 by default)
           var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
 
           // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
           for (var i = 0; i < nodes.length; i++) {
 
               var node = $(nodes[i]);
-              
+
               if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
                   var editspan = document.createElement("SPAN");
                   var editlink = document.createElement("A");
@@ -373,12 +373,12 @@ Object.extend(XWiki, {
           }
       }
   },
-  
+
   /**
    * Watchlist methods.
    */
   watchlist : {
-      
+
     /**
      * Update the given menu (menuview or contentmenu). Allows to update the menu icon without page reload.
      */
@@ -391,10 +391,10 @@ Object.extend(XWiki, {
                 onComplete: XWiki.watchlist.initialize
               });
     },
-    
+
     /**
      * Add or remove the current document from the current user's watchlist.
-     * 
+     *
      * @param add True to add the document to the user's watchlist, false to remove it.
      */
     toggleDocument : function(add) {
@@ -410,11 +410,11 @@ Object.extend(XWiki, {
           onComplete: function() { XWiki.watchlist.updateMenu("contentmenu"); }
         });
     },
-    
+
     /**
      * Add or remove the current space from the current user's watchlist.
-     * 
-     * @param add True to add the space to the user's watchlist, false to remove it. 
+     *
+     * @param add True to add the space to the user's watchlist, false to remove it.
      */
     toggleSpace : function(add) {
         var action = "removespace";
@@ -429,10 +429,10 @@ Object.extend(XWiki, {
             onComplete: function() { XWiki.watchlist.updateMenu("menuview"); }
           });
     },
-    
+
     /**
      * Add or remove the current wiki from the current user's watchlist.
-     * 
+     *
      * @param add True to add the wiki to the user's watchlist, false to remove it.
      */
     toggleWiki : function(add) {
@@ -448,7 +448,7 @@ Object.extend(XWiki, {
             onComplete: function() { XWiki.watchlist.updateMenu("menuview"); }
           });
     },
-    
+
     /**
      * Buttons mapping for watchlist UI.
      */
@@ -460,28 +460,28 @@ Object.extend(XWiki, {
         'tmWatchWiki' : function() { XWiki.watchlist.toggleWiki(true); },
         'tmUnwatchWiki' : function() { XWiki.watchlist.toggleWiki(false); }
     },
-    
+
     /**
-     * Initialize watchlist UI. 
+     * Initialize watchlist UI.
      */
     initialize: function() {
         for (button in XWiki.watchlist.buttonMapping) {
           if ($(button) != null) {
             var element = $(button);
             var self = this;
-            
+
             if (element.nodeName != 'A') {
               element = $(button).firstChild;
-            }            
-            
+            }
+
             // unregister previously registered handler if any
             element.stopObserving('click');
-            element.observe('click', function(event) { 
-                var element = event.element();                
+            element.observe('click', function(event) {
+                var element = event.element();
                 while (element.id == '') {
                     element = element.parentNode;
-                }   
-                XWiki.watchlist.buttonMapping[element.id](); Event.stop(event); 
+                }
+                XWiki.watchlist.buttonMapping[element.id](); Event.stop(event);
               });
           }
         }
@@ -504,7 +504,7 @@ Object.extend(XWiki, {
       this.fixLinksTargetAttribute();
       this.insertSectionEditLinks();
       this.watchlist.initialize();
-      
+
       document.fire("xwiki:dom:loaded");
     }
   }
@@ -1208,7 +1208,7 @@ var browser = new BrowserDetect();
 
 /*
  * Small JS improvement, which automatically hides and reinserts the default text for input fields, acting as a tip.
- * 
+ *
  * To activate this behavior on an input element, add the "withTip" classname to it.
  */
 document.observe('dom:loaded', function() {

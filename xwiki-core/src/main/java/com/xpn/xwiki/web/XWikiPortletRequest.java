@@ -374,6 +374,7 @@ public class XWikiPortletRequest implements XWikiRequest {
     /**
      * @deprecated
      */
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         if (request instanceof HttpServletRequest)
             return getHttpServletRequest().isRequestedSessionIdFromUrl();
@@ -395,6 +396,7 @@ public class XWikiPortletRequest implements XWikiRequest {
     /**
      * @deprecated
      */
+    @Deprecated
     public String getRealPath(String s) {
         if (request instanceof HttpServletRequest)
             return getHttpServletRequest().getRealPath(s);

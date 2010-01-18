@@ -203,6 +203,7 @@ public class XWikiPortletResponse implements XWikiResponse {
     /**
      * @deprecated
      */
+    @Deprecated
     public String encodeUrl(String s) {
         if (response instanceof HttpServletResponse)
             return getHttpServletResponse().encodeUrl(s);
@@ -212,6 +213,7 @@ public class XWikiPortletResponse implements XWikiResponse {
     /**
      * @deprecated
      */
+    @Deprecated
     public String encodeRedirectUrl(String s) {
         if (response instanceof HttpServletResponse)
             return getHttpServletResponse().encodeRedirectUrl(s);
@@ -301,6 +303,7 @@ public class XWikiPortletResponse implements XWikiResponse {
     /**
      * @deprecated
      */
+    @Deprecated
     public void setStatus(int i, String s) {
         if (response instanceof HttpServletResponse)
             getHttpServletResponse().setStatus(i, s);

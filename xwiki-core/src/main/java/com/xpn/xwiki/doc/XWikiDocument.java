@@ -5836,6 +5836,7 @@ public class XWikiDocument implements DocumentModelBridge
      *         was in the current document.
      * @deprecated since 2.2M1 use {@link #removeXObjects(org.xwiki.model.reference.DocumentReference)} instead
      */
+    @Deprecated
     public boolean removeObjects(String className)
     {
         return removeXObjects(this.currentMixedDocumentReferenceResolver.resolve(className));

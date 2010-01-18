@@ -272,6 +272,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
      * @see DocumentAccessBridge#getProperty(String, String, String)
      * @deprecated since 2.2M1 use {@link #getProperty(DocumentReference, DocumentReference, String)} instead
      */
+    @Deprecated
     public Object getProperty(String documentReference, String className, String propertyName)
     {
         Object value;

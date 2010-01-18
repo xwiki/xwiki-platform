@@ -118,6 +118,7 @@ public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
      * @return The contents of the file.
      * @throws XWikiException Exception is thrown if the data could not be read.
      */
+    @Deprecated
     public String getFileItem(String formfieldName) throws XWikiException
     {
         return getProtectedPlugin().getFileItemAsString(formfieldName, getXWikiContext());

@@ -42,8 +42,9 @@ public interface XWikiPluginInterface {
 
     /**
      * @deprecated use flushCache(XWikiContext context) instead
-     * @see flushCache(XWikiContext context)
+     * @see #flushCache(XWikiContext)
      */
+    @Deprecated
     void flushCache();
     void beginRendering(XWikiContext context);
     void endRendering(XWikiContext context);

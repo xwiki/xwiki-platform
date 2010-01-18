@@ -553,13 +553,15 @@ function toggleForm(form){
  * @param form  {element} The panel element.
  * @return
  */
-function togglePanelVisibility(element){
-    if(element.className.indexOf("expanded") >= 0){
-        element.className = element.className.replace('expanded', 'collapsed');
+function togglePanelVisibility(element, cookieName){
+  element.toggleClassName("collapsed");
+  if (cookieName) {
+    if (element.hasClassName("collapsed")) {
+      createCookie(cookieName, "collapsed", '');
+    } else {
+      eraseCookie(cookieName);
     }
-    else{
-        element.className = element.className.replace('collapsed', 'expanded');
-    }
+  }
 }
 
 /**

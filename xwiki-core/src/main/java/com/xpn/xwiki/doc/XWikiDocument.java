@@ -1009,7 +1009,7 @@ public class XWikiDocument implements DocumentModelBridge
     /**
      * Get the rendered version of the title of the document.
      * <ul>
-     * <li>if document <code>title</code> field is not empty: its returned after a call to
+     * <li>if document <code>title</code> field is not empty: it's returned after a call to
      * {@link XWikiRenderingEngine#interpretText(String, XWikiDocument, XWikiContext)}</li>
      * <li>if document <code>title</code> field is empty: see {@link #getRenderedContentTitle(Syntax, XWikiContext)}</li>
      * <li>if after the two first step the title is still empty, the page name is returned</li>
@@ -1037,19 +1037,21 @@ public class XWikiDocument implements DocumentModelBridge
                 return title;
             }
         } catch (Exception e) {
-            LOG.warn("Failed to interpret title of document [" + this.getPrefixedFullName() + "]", e);
+            LOG.warn("Failed to interpret title of document ["
+                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         try {
             // 2) If not, then try to extract the title from the first document section title
             title = getRenderedContentTitle(outputSyntax, context);
         } catch (Exception e) {
-            LOG.warn("Failed to extract title from content of document [" + this.getPrefixedFullName() + "]", e);
+            LOG.warn("Failed to extract title from content of document ["
+                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         // 3) No title has been found, return the page name as the title
         if (StringUtils.isEmpty(title)) {
-            title = getName();
+            title = getDocumentReference().getName();
         }
 
         return title;
@@ -1379,18 +1381,16 @@ public class XWikiDocument implements DocumentModelBridge
 
     public String getExternalURL(String action, String querystring, XWikiContext context)
     {
-        URL url =
-            context.getURLFactory().createExternalURL(getSpace(), getName(), action, querystring, null, getDatabase(),
-                context);
+        URL url = context.getURLFactory().createExternalURL(getSpace(), getName(), action, querystring, null,
+            getDatabase(), context);
         return url.toString();
     }
 
     public String getParentURL(XWikiContext context) throws XWikiException
     {
-        XWikiDocument doc = new XWikiDocument();
-        doc.setFullName(getParent(), context);
-        URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(), context);
+        XWikiDocument doc = new XWikiDocument(getParentReference());
+        URL url = context.getURLFactory().createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(),
+            context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -1747,7 +1747,7 @@ public class XWikiDocument implements DocumentModelBridge
         // TODO: Replace with object.setDocumentReference() when the API is there
         object.setWiki(getDocumentReference().getWikiReference().getName());
         object.setName(this.localEntityReferenceSerializer.serialize(getDocumentReference()));
-        object.setClassName(classname);
+        object.setXClassReference(classReference);
         List<BaseObject> objects = getXObjects(classReference);
         if (objects == null) {
             objects = new ArrayList<BaseObject>();
@@ -2256,7 +2256,8 @@ public class XWikiDocument implements DocumentModelBridge
 
             result = display(fieldname, object, context);
         } catch (Exception e) {
-            LOG.error("Failed to display field " + fieldname + " of document " + getFullName(), e);
+            LOG.error("Failed to display field [" + fieldname + "] of document ["
+                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         return result;
@@ -3582,7 +3583,7 @@ public class XWikiDocument implements DocumentModelBridge
         for (Element objel : objels) {
             BaseObject bobject = new BaseObject();
             bobject.fromXML(objel);
-            setObject(bobject.getClassName(), bobject.getNumber(), bobject);
+            setXObject(bobject.getXClassReference(), bobject.getNumber(), bobject);
         }
 
         // We have been reading from XML so the document does not need a new version when saved
@@ -5359,7 +5360,10 @@ public class XWikiDocument implements DocumentModelBridge
                 if ("include".equals(macroBlock.getId())) {
                     String documentName = macroBlock.getParameter("document");
                     if (documentName != null) {
-                        XWikiDocument includedDocument = xwiki.getDocument(documentName, context);
+                        // Resolve the document name into a valid Reference
+                        DocumentReference documentReference = this.currentMixedDocumentReferenceResolver.resolve(
+                            documentName);
+                        XWikiDocument includedDocument = xwiki.getDocument(documentReference, context);
                         if (!includedDocument.isNew()) {
                             BaseObject sheetClassObject = includedDocument.getObject(XWikiConstant.SHEET_CLASS);
                             if (sheetClassObject != null) {
@@ -5473,14 +5477,14 @@ public class XWikiDocument implements DocumentModelBridge
         try {
             syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
-            LOG.error("Failed to generate Syntax object for syntax identifier [" + syntaxId + "] in page ["
-                + getDocumentName() + "]", e);
+            LOG.error("Failed to generate Syntax object for syntax identifier [" + syntaxId + "] in document ["
+                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
 
             syntaxId = getDefaultDocumentSyntax();
             try {
                 syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
             } catch (ParseException e1) {
-                LOG.error("Failed to generate default Syntax object. The defautlt syntax id in [" + syntaxId + "]", e);
+                LOG.error("Failed to generate default Syntax object. The default syntax id is [" + syntaxId + "]", e);
             }
         }
 

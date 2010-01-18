@@ -58,6 +58,10 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
      */
     public String serialize(EntityReference reference)
     {
+        if (reference == null) {
+            return null;
+        }
+
         EntityReference currentReference = reference.getRoot();
         StringBuilder representation = new StringBuilder();
         while (currentReference != null) {

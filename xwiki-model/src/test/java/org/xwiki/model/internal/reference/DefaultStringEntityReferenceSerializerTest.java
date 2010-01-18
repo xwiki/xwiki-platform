@@ -109,6 +109,9 @@ public class DefaultStringEntityReferenceSerializerTest
         reference = resolver.resolve("wiki:page", EntityType.DOCUMENT);
         Assert.assertEquals("xwiki:XWiki.wiki:page", serializer.serialize(reference));
 
+        // Verify that passing null doesn't throw a NPE
+        Assert.assertNull(serializer.serialize(null));
+        
         // Test escapes
 
         reference = resolver.resolve("\\.:@\\.", EntityType.DOCUMENT);

@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1240502446000</creationDate>
-<date>1260811068000</date>
-<contentUpdateDate>1260811068000</contentUpdateDate>
+<date>1263856414000</date>
+<contentUpdateDate>1263856414000</contentUpdateDate>
 <version>1.0</version>
 <title></title>
 <template></template>
@@ -116,23 +116,23 @@
   ## the annotations panel
   &lt;div id="annotationResume" style="display:block"&gt;
   #panelheader('Annotations')
-  #set ($annotations = $doc.getObjects('XWiki.AnnotationClass'))
+  #set ($annotations = $annotations.getAnnotations($doc.fullName))
   ## build annotations js array to pass to the js functions toggling annotation display
   #set ($annArray="[")
   #foreach ($annotation in $annotations)
-    #if($annotation.get('state') == 'SAFE' || $annotation.get('state') == 'UPDATED')
+    #if($annotation.state == 'SAFE' || $annotation.state == 'UPDATED')
       ## default this color on yellow if nothing else is found
       ## todo: should be set in the config document
       #set($color = '#FFFF00')
       #set($color = $xwiki.getDocument($annotation.author).getObject('XWiki.XWikiUsers').annotationColor)
       ## add the annotation text in a div, which toggles annotation display on hover and a delete button
-      &lt;div onClick="XWiki.Annotation.getInstance().toggleMode($annotation.get('annotationID'))" onMouseOut="XWiki.Annotation.getInstance().hideAnnotation($annotation.get('annotationID'))" onMouseOver="XWiki.Annotation.getInstance().showAnnotation($annotation.get('annotationID'), '$color')"&gt;
-        &lt;div id="annotext_ID$annotation.get('annotationID')" class="truncate"&gt;*$annotation.get('annotation')*&lt;/div&gt;
-        *...* by &lt;span style="background: $color"&gt;[$annotation.get('author')]&lt;/span&gt;
-        &lt;img src="$xwiki.getSkinFile('icons/silk/delete.gif')" onClick="XWiki.Annotation.getInstance().removeAnnotation($annotation.get('annotationID'))"/&gt;
+      &lt;div onClick="XWiki.Annotation.getInstance().toggleMode($annotation.id)" onMouseOut="XWiki.Annotation.getInstance().hideAnnotation($annotation.id)" onMouseOver="XWiki.Annotation.getInstance().showAnnotation($annotation.id, '$color')"&gt;
+        &lt;div id="annotext_ID$annotation.id" class="truncate"&gt;*${annotation.annotation}*&lt;/div&gt;
+        *...* by &lt;span style="background: $color"&gt;[$annotation.author]&lt;/span&gt;
+        &lt;img src="$xwiki.getSkinFile('icons/silk/delete.gif')" onClick="XWiki.Annotation.getInstance().removeAnnotation($annotation.id)"/&gt;
       &lt;/div&gt;
       ## append this annotation to the annotation array
-      #set($annJSON = '{\"id\" : \"' + $annotation.annotationID + '\", \"color\" : \"' + $color + '\"}')
+      #set($annJSON = '{\"id\" : \"' + $annotation.id + '\", \"color\" : \"' + $color + '\"}')
       ## if it's not the first annotation, add a comma
       #if($annArray != "[")
         #set ($annArray = $annArray + ",")

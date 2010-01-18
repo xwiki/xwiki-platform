@@ -177,6 +177,9 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
       this.form.template.value = "";
     }
     this.savingBox.replace(this.savedBox);
+    // Announce that the document has been saved
+    // TODO: We should send the new version as a memo field
+    document.fire("xwiki:document:saved");
   },
   onFailure : function(response) {
     this.savingBox.replace(this.failedBox);
@@ -185,6 +188,8 @@ XWiki.actionButtons.AjaxSaveAndContinue = Class.create({
     } else {
       $('ajaxRequestFailureReason').update(response.statusText);
     }
+    // Announce that a document save attempt has failed
+    document.fire("xwiki:document:saveFailed", {'response' : response});
   }
 });
 document.observe('dom:loaded', function() {

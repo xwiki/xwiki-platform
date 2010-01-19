@@ -18,10 +18,8 @@
     <dd><input id="xwikipassword2" type="password" name="password2" value="" size="20"/></dd>
 </dl>
     <div class="padded">
-    <input type="submit" value="$msg.get("platform.core.profile.passwd.submit")" class="button"/>
-    </div>
-    <div class="padded">
-    <a href="$doc.getURL("view")">$msg.get("platform.core.profile.passwd.cancel")</a>
+      <input type="submit" value="$msg.get("platform.core.profile.passwd.submit")" class="button"/>
+      <span class="buttonwrapper"><a href="$doc.getURL("view")">$msg.get("platform.core.profile.passwd.cancel")</a></span>
     </div>
   </form>
 #else

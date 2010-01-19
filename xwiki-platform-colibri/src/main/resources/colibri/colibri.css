@@ -972,6 +972,10 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url($xwiki.getSkinFile('icons/silk/vcard.gif'));
 }
 
+.actionmenu #tmUserPreferences {
+  background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
+}
+
 .actionmenu #tmWatchlistManager {
   background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }

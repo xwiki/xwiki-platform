@@ -509,13 +509,19 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             if (searchAttributeList == null) {
                 // didn't get attributes before, so do it now
                 searchAttributeList =
-                    ldapUtils.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
-                        LDAPConnection.SCOPE_BASE);
+                        ldapUtils.getConnection().searchLDAP(ldapDn, null, getAttributeNameTable(context),
+                            LDAPConnection.SCOPE_BASE);
+
+                if (searchAttributeList == null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.error("Can't find any attributes for user [" + ldapDn + "]");
+                    }
+                }
             }
 
             if (userProfile.isNew()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Creating new XWiki user based on LDAP attribues located at " + ldapDn);
+                    LOG.debug("Creating new XWiki user based on LDAP attribues located at [" + ldapDn + "]");
                 }
 
                 userProfile = createUserFromLDAP(userProfile, searchAttributeList, ldapDn, ldapUid, context);
@@ -586,7 +592,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         Collection<String> xwikiUserGroupList =
-            context.getWiki().getGroupService(context).getAllGroupsNamesForMember(xwikiUserName, 0, 0, context);
+                context.getWiki().getGroupService(context).getAllGroupsNamesForMember(xwikiUserName, 0, 0, context);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("The user belongs to following XWiki groups: ");
@@ -642,9 +648,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             context.getWiki().saveDocument(groupDoc, context);
 
             if (LOG.isDebugEnabled()) {
-                LOG
-                    .debug(MessageFormat
-                        .format("Finished adding user {0} to xwiki group {1}", xwikiUserName, groupName));
+                LOG.debug(MessageFormat.format("Finished adding user {0} to xwiki group {1}", xwikiUserName, groupName));
             }
 
         } catch (Exception e) {
@@ -704,16 +708,18 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         Map<String, String> map = new HashMap<String, String>();
-        for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
-            String key = userMappings.get(lattr.name.toLowerCase());
-            if (key == null || userClass.get(key) == null) {
-                continue;
-            }
-            String value = lattr.value;
+        if (searchAttributes != null) {
+            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
+                String key = userMappings.get(lattr.name.toLowerCase());
+                if (key == null || userClass.get(key) == null) {
+                    continue;
+                }
+                String value = lattr.value;
 
-            String objValue = userObj.getStringValue(key);
-            if (objValue == null || !objValue.equals(value)) {
-                map.put(key, value);
+                String objValue = userObj.getStringValue(key);
+                if (objValue == null || !objValue.equals(value)) {
+                    map.put(key, value);
+                }
             }
         }
 
@@ -759,15 +765,17 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         Map<String, String> map = new HashMap<String, String>();
-        for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
-            String lval = lattr.value;
-            String xattr = userMappings.get(lattr.name.toLowerCase());
+        if (searchAttributes != null) {
+            for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
+                String lval = lattr.value;
+                String xattr = userMappings.get(lattr.name.toLowerCase());
 
-            if (xattr == null) {
-                continue;
+                if (xattr == null) {
+                    continue;
+                }
+
+                map.put(xattr, lval);
             }
-
-            map.put(xattr, lval);
         }
 
         // Mark user active
@@ -804,7 +812,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         // Try default profile name (generally in the cache)
         XWikiDocument userProfile =
-            context.getWiki().getDocument(XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + validXWikiUserName, context);
+                context.getWiki().getDocument(XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + validXWikiUserName, context);
 
         if (!ldapUid.equalsIgnoreCase(ldapXClass.getUid(userProfile))) {
             // Search for existing profile with provided uid

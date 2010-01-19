@@ -15,10 +15,9 @@
       <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get('uploadavatarfile'):</label></div>
       <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
       <div class="padded">
-      <span class="buttonwrapper"><input type="submit" value="$msg.get('setthisavatar')" class="button"/></span>
-      ##<input type="reset" value="$msg.get('cancel')" onclick="hideForm(this.form);" class="button"/>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get('setthisavatar')" class="button"/></span>
+        <a href="$doc.getURL("view")">$msg.get('platform.core.profile.changePhoto.cancel')</a>
       </div>
-      <a href="$doc.getURL("view")">$msg.get('cancelpwd')</a>
     </div></form>
   #else
     $response.setStatus(403)

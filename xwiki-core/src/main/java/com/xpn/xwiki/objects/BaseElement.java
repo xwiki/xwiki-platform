@@ -90,11 +90,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
     {
         DocumentReference reference = this.reference;
 
-        // If both the reference and the name are not null issue a warning to help debugging since it's not normal.
-        if (this.reference != null && this.name != null) {
-            LOG.warn("Reference and name cannot be both non null");
-        }
-
         // If the reference is null then parse the name as a reference.
         if (reference == null && this.name != null) {
             reference = this.currentMixedDocumentReferenceResolver.resolve(this.name);
@@ -114,11 +109,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
     {
         String name = this.name;
 
-        // If both the reference and the name are not null issue a warning to help debugging since it's not normal.
-        if (this.reference != null && this.name != null) {
-            LOG.warn("Reference and name cannot be both non null");
-        }
-        
+        // If the name is null then serialize the reference as a string.
         if (name == null && this.reference != null) {
             name = this.localEntityReferenceSerializer.serialize(this.reference);
         }
@@ -151,7 +142,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
         // If the reference is already set, then continue using it. Ideally code calling setName should be modified to
         // call setReference in this case.
         if (this.reference != null) {
-            this.reference = this.currentMixedDocumentReferenceResolver.resolve(this.name); 
+            this.reference = this.currentMixedDocumentReferenceResolver.resolve(name); 
         } else {
             this.name = name;
         }

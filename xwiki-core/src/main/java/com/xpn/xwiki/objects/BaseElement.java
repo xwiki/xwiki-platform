@@ -23,41 +23,138 @@ package com.xpn.xwiki.objects;
 
 import java.io.Serializable;
 
+import com.xpn.xwiki.web.Utils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
+/**
+ * Base class for representing an element having a name (either a reference of a free form name) and a pretty name.
+ *
+ * @version $Id$
+ */
 public abstract class BaseElement implements ElementInterface, Serializable
 {
     private static final Log LOG = LogFactory.getLog(BaseElement.class);
 
+    /**
+     * Reference to the document in which this element is defined (for elements where this make sense, for example
+     * for an XClass or a XObject).
+     */
+    private DocumentReference reference;
+
+    /**
+     * Free form name (for elements which don't point to a reference, for example for instances of
+     * {@link BaseProperty}).
+     */
     private String name;
 
     private String prettyName;
 
-    private String wiki;
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+
+    /**
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
+     */
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
+
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.class, "local");
 
     /**
      * {@inheritDoc}
-     * 
+     *
+     * @see com.xpn.xwiki.objects.ElementInterface#getDocumentReference()
+     * @since 2.2M2
+     */
+    public DocumentReference getDocumentReference()
+    {
+        DocumentReference reference = this.reference;
+
+        // If both the reference and the name are not null issue a warning to help debugging since it's not normal.
+        if (this.reference != null && this.name != null) {
+            LOG.warn("Reference and name cannot be both non null");
+        }
+
+        // If the reference is null then parse the name as a reference.
+        if (reference == null && this.name != null) {
+            reference = this.currentMixedDocumentReferenceResolver.resolve(this.name);
+        }
+
+        return reference;
+    }
+
+    /**
+     * Note that this method is used by Hibernate for saving an element.
+     *
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.objects.ElementInterface#getName()
      */
     public String getName()
     {
-        return this.name;
+        String name = this.name;
+
+        // If both the reference and the name are not null issue a warning to help debugging since it's not normal.
+        if (this.reference != null && this.name != null) {
+            LOG.warn("Reference and name cannot be both non null");
+        }
+        
+        if (name == null && this.reference != null) {
+            name = this.localEntityReferenceSerializer.serialize(this.reference);
+        }
+
+        return name;
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
+     * @see com.xpn.xwiki.objects.ElementInterface#setDocumentReference(DocumentReference)
+     * @since 2.2M2
+     */
+    public void setDocumentReference(DocumentReference reference)
+    {
+        // If the name is already set then reset is since we're now using a reference
+        this.reference = reference;
+        this.name = null;
+    }
+
+    /**
+     * Note that this method is used by Hibernate for loading an element.
+     *
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.objects.ElementInterface#setName(java.lang.String)
      */
     public void setName(String name)
     {
-        this.name = name;
+        // If the reference is already set, then continue using it. Ideally code calling setName should be modified to
+        // call setReference in this case.
+        if (this.reference != null) {
+            this.reference = this.currentMixedDocumentReferenceResolver.resolve(this.name); 
+        } else {
+            this.name = name;
+        }
     }
 
     public String getPrettyName()
@@ -72,23 +169,30 @@ public abstract class BaseElement implements ElementInterface, Serializable
 
     /**
      * @return the name of the wiki where this element is stored. If null, the context's wiki is used.
+     * @deprecated since 2.2M2 use {@link #getDocumentReference()} and
+     *             {@link org.xwiki.model.reference.DocumentReference#getWikiReference()}
      */
+    @Deprecated
     public String getWiki()
     {
-        return this.wiki;
+        return getDocumentReference().getWikiReference().getName();
     }
 
     /**
      * @param wiki the name of the wiki where this element is stored. If null, the context's wiki is used.
+     * @deprecated since 2.2M2 use {@link #setDocumentReference(DocumentReference)}
      */
+    @Deprecated
     public void setWiki(String wiki)
     {
-        this.wiki = wiki;
+        if (!StringUtils.isEmpty(wiki)) {
+            getDocumentReference().setWikiReference(new WikiReference(wiki));
+        }
     }
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -99,17 +203,18 @@ public abstract class BaseElement implements ElementInterface, Serializable
             return true;
         }
 
-        if (el == null) {
+        if (el == null || !(el instanceof BaseElement)) {
             return false;
         }
 
         BaseElement element = (BaseElement) el;
 
-        if (element.getName() == null) {
-            if (getName() != null) {
+        DocumentReference elementReference = element.getDocumentReference();
+        if (elementReference == null) {
+            if (getDocumentReference() != null) {
                 return false;
             }
-        } else if (!element.getName().equals(getName())) {
+        } else if (!elementReference.equals(getDocumentReference())) {
             return false;
         }
 
@@ -118,14 +223,6 @@ public abstract class BaseElement implements ElementInterface, Serializable
                 return false;
             }
         } else if (!element.getPrettyName().equals(getPrettyName())) {
-            return false;
-        }
-
-        if (element.getWiki() == null) {
-            if (getWiki() != null) {
-                return false;
-            }
-        } else if (!element.getWiki().equalsIgnoreCase(getWiki())) {
             return false;
         }
 
@@ -138,58 +235,53 @@ public abstract class BaseElement implements ElementInterface, Serializable
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Object#clone()
      */
     @Override
     public Object clone()
     {
-        BaseElement element = null;
+        BaseElement element;
         try {
             element = getClass().newInstance();
+            element.setDocumentReference(getDocumentReference());
             element.setName(getName());
             element.setPrettyName(getPrettyName());
-            element.setWiki(getWiki());
-            return element;
         } catch (Exception e) {
             // This should not happen
+            element = null;
         }
 
-        return null;
+        return element;
     }
 
     /**
      * Return the document where this element is stored.
-     * 
+     *
      * @param context the XWiki context
      * @return the document
+     * @deprecated since 2.2M2 use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public XWikiDocument getDocument(XWikiContext context) throws XWikiException
     {
-        String database = context.getDatabase();
-
-        try {
-            if (getWiki() != null) {
-                context.setDatabase(getWiki());
-            }
-
-            return context.getWiki().getDocument(getName(), context);
-        } finally {
-            context.setDatabase(database);
-        }
+        return context.getWiki().getDocument(getDocumentReference(), context);
     }
 
     /**
      * @return the syntax id of the document containing this element. If an error occurs while retrieving the document a
      *         syntax id of "xwiki/1.0" is assumed.
+     * @deprecated since 2.2M2 use {@link #getDocumentReference()} instead
      */
+    @Deprecated
     public String getDocumentSyntaxId(XWikiContext context)
     {
         String syntaxId;
         try {
             syntaxId = getDocument(context).getSyntaxId();
         } catch (Exception e) {
-            LOG.warn("Error while getting the syntax corresponding to object [" + getName()
+            LOG.warn("Error while getting the syntax corresponding to object ["
+                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference())
                 + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
             syntaxId = "xwiki/1.0";
         }

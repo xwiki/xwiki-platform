@@ -53,6 +53,12 @@ import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 
+/**
+ * Represents an XClass, and contains XClass properties. Each field from {@link BaseCollection} is of type
+ * {@link PropertyClass} and defines a single XClass property.
+ *
+ * @version $Id$
+ */
 public class BaseClass extends BaseCollection implements ClassInterface
 {
     private String customMapping;

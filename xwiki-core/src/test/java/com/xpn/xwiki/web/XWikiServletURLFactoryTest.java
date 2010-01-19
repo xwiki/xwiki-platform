@@ -14,6 +14,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTestCase
 {
@@ -27,14 +29,6 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
 
     private Map<String, XWikiDocument> getDocuments(String database, boolean create) throws XWikiException
     {
-        if (database == null) {
-            database = getContext().getDatabase();
-        }
-
-        if (database == null || database.length() == 0) {
-            database = MAIN_WIKI_NAME;
-        }
-
         if (!this.databases.containsKey(database)) {
             if (create) {
                 this.databases.put(database, new HashMap<String, XWikiDocument>());
@@ -47,10 +41,9 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         return this.databases.get(database);
     }
 
-    private XWikiDocument getDocument(String documentFullName) throws XWikiException
+    private XWikiDocument getDocument(DocumentReference documentReference) throws XWikiException
     {
-        XWikiDocument document = new XWikiDocument();
-        document.setFullName(documentFullName);
+        XWikiDocument document = new XWikiDocument(documentReference);
 
         Map<String, XWikiDocument> docs = getDocuments(document.getDatabase(), false);
 
@@ -85,7 +78,14 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         {
             public XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException
             {
-                return XWikiServletURLFactoryTest.this.getDocument(fullname);
+                return XWikiServletURLFactoryTest.this.getDocument(
+                    Utils.getComponent(DocumentReferenceResolver.class, "currentmixed").resolve(fullname));
+            }
+
+            public XWikiDocument getDocument(DocumentReference documentReference, XWikiContext context)
+                throws XWikiException
+            {
+                return XWikiServletURLFactoryTest.this.getDocument(documentReference);
             }
 
             public String getXWikiPreference(String prefname, String defaultValue, XWikiContext context)
@@ -108,7 +108,7 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
         getContext().setWiki(xwiki);
         getContext().setRequest((XWikiRequest) mockXWikiResquest.proxy());
 
-        XWikiDocument wiki1Doc = getDocument("XWiki.XWikiServerWiki1");
+        XWikiDocument wiki1Doc = getDocument(new DocumentReference(MAIN_WIKI_NAME, "XWiki", "XWikiServerWiki1"));
         BaseObject wiki1Obj = wiki1Doc.newObject("XWiki.XWikiServerClass", getContext());
         wiki1Obj.setStringValue("server", "wiki1server");
         saveDocument(wiki1Doc);

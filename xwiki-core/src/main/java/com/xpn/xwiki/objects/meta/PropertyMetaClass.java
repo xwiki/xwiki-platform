@@ -29,6 +29,9 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
+/**
+ * @version $Id$
+ */
 public class PropertyMetaClass extends BaseClass implements PropertyInterface
 {
     public PropertyMetaClass()
@@ -41,6 +44,7 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface
         type_class.setUnmodifiable(true);
         // This should not be touched
         // safeput("classType", type_class);
+
         StringClass name_class = new StringClass(this);
         name_class.setName("name");
         name_class.setPrettyName("Name");

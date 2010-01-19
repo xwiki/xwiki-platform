@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.model.reference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -33,7 +34,6 @@ import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link CurrentMixedStringDocumentReferenceResolver}.
@@ -41,7 +41,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.2M1
  */
-public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractComponentTestCase
+public class CurrentMixedStringDocumentReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String CURRENT_SPACE = "currentspace";
 

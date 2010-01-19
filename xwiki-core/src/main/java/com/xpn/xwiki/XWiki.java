@@ -6247,15 +6247,31 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return renamePage(doc, newFullName, context);
     }
 
-    public BaseClass getClass(String fullName, XWikiContext context) throws XWikiException
+    /**
+     * @since 2.2M2
+     */
+    public BaseClass getXClass(DocumentReference documentReference, XWikiContext context) throws XWikiException
     {
         // Used to avoid recursive loading of documents if there are recursives usage of classes
-        BaseClass bclass = context.getBaseClass(fullName);
+        BaseClass bclass = context.getBaseClass(documentReference);
         if (bclass != null) {
             return bclass;
         }
 
-        return getDocument(fullName, context).getXClass();
+        return getDocument(documentReference, context).getXClass();
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getXClass(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
+    public BaseClass getClass(String fullName, XWikiContext context) throws XWikiException
+    {
+        DocumentReference reference = null;
+        if (!StringUtils.isEmpty(fullName)) {
+            reference = this.currentMixedDocumentReferenceResolver.resolve(fullName);
+        }
+        return getXClass(reference, context);
     }
 
     public String getEditorPreference(XWikiContext context)

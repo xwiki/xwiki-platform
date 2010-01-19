@@ -104,8 +104,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
         XWikiDocument userDoc = new XWikiDocument("XWiki", "SomeUser");
         // Mock the XWikiUsers object, since a real objects requires more mocking on the XWiki object
         Mock mockUserObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
-        mockUserObj.stubs().method("setWiki");
-        mockUserObj.stubs().method("setName");
+        mockUserObj.stubs().method("setDocumentReference");
         mockUserObj.stubs().method("setNumber");
         mockUserObj.stubs().method("getStringValue").with(eq("password")).will(returnValue("pass"));
         userDoc.addObject("XWiki.XWikiUsers", (BaseObject) mockUserObj.proxy());
@@ -146,8 +145,7 @@ public class XWikiAuthServiceImplTest extends AbstractBridgedXWikiComponentTestC
 
         // Mock the XWikiUsers object, since a real objects requires more mocking on the XWiki object
         Mock mockUserObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
-        mockUserObj.stubs().method("setWiki");
-        mockUserObj.stubs().method("setName");
+        mockUserObj.stubs().method("setDocumentReference");
         mockUserObj.stubs().method("setNumber");
         mockUserObj.stubs().method("getStringValue").with(eq("password")).will(returnValue("admin"));
         userDocLocal.addObject("XWiki.XWikiUsers", (BaseObject) mockUserObj.proxy());

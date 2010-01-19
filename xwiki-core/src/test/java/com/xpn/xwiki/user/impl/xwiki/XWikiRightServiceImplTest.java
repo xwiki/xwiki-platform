@@ -113,8 +113,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue(""));
         mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
         mockGlobalRightObj.stubs().method("setNumber");
-        mockGlobalRightObj.stubs().method("setName");
-        mockGlobalRightObj.stubs().method("setWiki");
+        mockGlobalRightObj.stubs().method("setDocumentReference");
 
         doc.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
 
@@ -135,8 +134,7 @@ public class XWikiRightServiceImplTest extends AbstractBridgedXWikiComponentTest
         mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue("XWiki.Programmer"));
         mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
         mockGlobalRightObj.stubs().method("setNumber");
-        mockGlobalRightObj.stubs().method("setName");
-        mockGlobalRightObj.stubs().method("setWiki");
+        mockGlobalRightObj.stubs().method("setDocumentReference");
         prefs.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
         this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.XWikiPreferences"), eq(this.context)).will(
             returnValue(prefs));

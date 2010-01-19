@@ -28,7 +28,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import com.xpn.xwiki.web.Utils;
 import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.xmlrpc.server.XmlRpcServer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -44,6 +46,8 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 
 public class XWikiContext extends Hashtable<Object, Object>
 {
@@ -114,7 +118,7 @@ public class XWikiContext extends Hashtable<Object, Object>
     private int archiveCacheSize = 20;
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    private Map<String, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
+    private Map<DocumentReference, BaseClass> classCache = Collections.synchronizedMap(new LRUMap(this.classCacheSize));
 
     // Used to avoid reloading archives in the same request
     private Map<String, XWikiDocumentArchive> archiveCache =
@@ -122,6 +126,14 @@ public class XWikiContext extends Hashtable<Object, Object>
 
     private List<String> displayedFields = Collections.synchronizedList(new ArrayList<String>());
 
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
+     * the current wiki is used instead of the current document reference's wiki.
+     */
+    private DocumentReferenceResolver currentMixedDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.class, "currentmixed");
+    
     public XWikiContext()
     {
     }
@@ -419,13 +431,30 @@ public class XWikiContext extends Hashtable<Object, Object>
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public void addBaseClass(BaseClass bclass)
     {
-        this.classCache.put(bclass.getName(), bclass);
+        this.classCache.put(bclass.getDocumentReference(), bclass);
     }
 
+    /**
+     * @since 2.2M2
+     */
     // Used to avoid recursive loading of documents if there are recursives usage of classes
+    public BaseClass getBaseClass(DocumentReference documentReference)
+    {
+        return this.classCache.get(documentReference);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getBaseClass(DocumentReference)}
+     */
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    @Deprecated
     public BaseClass getBaseClass(String name)
     {
-        return this.classCache.get(name);
+        BaseClass baseClass = null;
+        if (!StringUtils.isEmpty(name)) {
+            baseClass = this.classCache.get(this.currentMixedDocumentReferenceResolver.resolve(name));
+        }
+        return baseClass;
     }
 
     /**

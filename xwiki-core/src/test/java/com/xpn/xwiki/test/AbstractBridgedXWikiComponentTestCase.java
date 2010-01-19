@@ -47,6 +47,10 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
     {
         super.setUp();
 
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
+        Utils.setComponentManager(getComponentManager());
+        
         this.context = new XWikiContext();
 
         this.context.setDatabase("xwiki");
@@ -54,10 +58,6 @@ public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWik
 
         // We need to initialize the Component Manager so that the components can be looked up
         getContext().put(ComponentManager.class.getName(), getComponentManager());
-
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        Utils.setComponentManager(getComponentManager());
 
         // Bridge with old XWiki Context, required for old code.
         Execution execution = getComponentManager().lookup(Execution.class);

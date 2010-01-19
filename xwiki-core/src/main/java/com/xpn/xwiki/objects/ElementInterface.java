@@ -18,11 +18,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.objects;
 
-public interface ElementInterface {
-    public String toString();
-    public String getName();
-    public void setName(String name);
+import org.xwiki.model.reference.DocumentReference;
+
+public interface ElementInterface
+{
+    String toString();
+
+    /**
+     * @return the reference to the document in which this element is defined (for elements where this make sense,
+     *         for example for an XClass or a XObject).
+     * @since 2.2M2
+     */
+    DocumentReference getDocumentReference();
+
+    /**
+     * @return the free form name (for elements which don't point to a reference, for example for instances of
+     *         {@link BaseProperty}).
+     */
+    String getName();
+
+    /**
+     * @since 2.2M2
+     */
+    void setDocumentReference(DocumentReference reference);
+
+    void setName(String name);
 }

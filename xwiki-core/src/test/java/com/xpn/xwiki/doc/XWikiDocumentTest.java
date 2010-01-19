@@ -298,7 +298,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         object = BaseClass.newCustomClassInstance(classname, getContext());
         doc.addObject(classname, object);
 
-        doc.getObjects(classname).set(1, null);
+        doc.setObject(classname, 1, null);
 
         String docXML = doc.toXML(getContext());
         XWikiDocument docFromXML = new XWikiDocument();

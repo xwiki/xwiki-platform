@@ -54,16 +54,45 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 
+/**
+ * Base class for representing an element having a collection of properties. For example:
+ * <ul>
+ *   <li>an XClass definition (composed of XClass properties)</li>
+ *   <li>an XObject definition (composed of XObject properties)</li>
+ *   <li>an XWikiStats object (composed of stats properties)</li>
+ * </ul>
+ *
+ * @version $Id$
+ */
 public abstract class BaseCollection extends BaseElement implements ObjectInterface, Cloneable
 {
     protected static final Log LOG = LogFactory.getLog(BaseCollection.class);
 
+    /**
+     * The meaning of this reference fields depends on the element represented. Examples:
+     * <ul>
+     *   <li>If this BaseCollection instance represents an XObject then refers to the document where the XObject's 
+     *       XClass is defined.</li>
+     *   <li>If this BaseCollection instance represents an XClass then it's not used.</li>
+     * </ul>
+     */
     protected DocumentReference xClassReference;
 
+    /**
+     * List of properties (eg XClass properties, XObject properties, etc).
+     */
     protected Map<String, Object> fields = new LinkedHashMap<String, Object>();
 
     protected List fieldsToRemove = new ArrayList();
 
+    /**
+     * The meaning of this reference fields depends on the element represented. Examples:
+     * <ul>
+     *   <li>When the BaseCollection represents an XObject, this number is the position of this XObject in the document
+     *       where it's located. The first XObject of a given XClass type is at position 0, and other XObject of the
+     *       same XClass type are at position 1, etc.</li>
+     * </ul>
+     */
     protected int number;
 
     /**
@@ -123,6 +152,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving an XObject.
+     *
      * @deprecated since 2.2M2 use {@link #getXClassReference()} instead
      */
     @Deprecated
@@ -146,6 +177,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading an XObject.
+     *
      * @deprecated since 2.2M2 use {@link #setXClassReference(DocumentReference)} ()} instead
      */
     @Deprecated

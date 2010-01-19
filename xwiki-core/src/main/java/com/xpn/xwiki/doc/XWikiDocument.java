@@ -357,8 +357,8 @@ public class XWikiDocument implements DocumentModelBridge
         Utils.getComponent(EntityReferenceSerializer.class);
 
     /**
-     * Used to convert a Document Reference to string (compact form without the wiki part). Used for serializing
-     * backlinks.
+     * Used to convert a Document Reference to string (compact form without the wiki part if it matches the current
+     * wiki).
      */
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.class, "compactwiki");
@@ -1744,9 +1744,7 @@ public class XWikiDocument implements DocumentModelBridge
     {
         String classname = this.compactWikiEntityReferenceSerializer.serialize(classReference);
         BaseObject object = BaseClass.newCustomClassInstance(classname, context);
-        // TODO: Replace with object.setDocumentReference() when the API is there
-        object.setWiki(getDocumentReference().getWikiReference().getName());
-        object.setName(this.localEntityReferenceSerializer.serialize(getDocumentReference()));
+        object.setDocumentReference(getDocumentReference());
         object.setXClassReference(classReference);
         List<BaseObject> objects = getXObjects(classReference);
         if (objects == null) {
@@ -1974,8 +1972,7 @@ public class XWikiDocument implements DocumentModelBridge
     public void setXObject(DocumentReference classReference, int nb, BaseObject object)
     {
         if (object != null) {
-            object.setWiki(getDocumentReference().getWikiReference().getName());
-            object.setName(this.localEntityReferenceSerializer.serialize(getDocumentReference()));
+            object.setDocumentReference(getDocumentReference());
             object.setNumber(nb);
         }
         List<BaseObject> objects = getXObjects(classReference);
@@ -6280,8 +6277,7 @@ public class XWikiDocument implements DocumentModelBridge
         boolean isValid = true;
         if ((classNames == null) || (classNames.length == 0)) {
             for (DocumentReference classReference : getXObjects().keySet()) {
-                BaseClass bclass = context.getWiki().getClass(
-                    this.localEntityReferenceSerializer.serialize(classReference), context);
+                BaseClass bclass = context.getWiki().getXClass(classReference, context);
                 List<BaseObject> objects = getXObjects(classReference);
                 for (BaseObject obj : objects) {
                     if (obj != null) {

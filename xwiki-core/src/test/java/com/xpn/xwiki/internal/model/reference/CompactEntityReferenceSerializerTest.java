@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.model.reference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +30,6 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
@@ -37,7 +37,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.2M1
  */
-public class CompactEntityReferenceSerializerTest extends AbstractComponentTestCase
+public class CompactEntityReferenceSerializerTest extends AbstractBridgedXWikiComponentTestCase
 {
     private EntityReferenceSerializer serializer;
 

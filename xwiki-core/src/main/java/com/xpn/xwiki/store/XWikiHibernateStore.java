@@ -753,15 +753,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                         if (newobject != null) {
                             newobject.setId(object.getId());
-                            newobject.setClassName(object.getClassName());
-                            newobject.setName(object.getName());
+                            newobject.setXClassReference(object.getXClassReference());
+                            newobject.setDocumentReference(object.getDocumentReference());
                             newobject.setNumber(object.getNumber());
                             newobject.setGuid(object.getGuid());
                             object = newobject;
                         }
                         loadXWikiCollection(object, doc, context, false, true);
                         doc.setObject(className, object.getNumber(), object);
-                        object.setWiki(context.getDatabase());
                     }
                 }
 

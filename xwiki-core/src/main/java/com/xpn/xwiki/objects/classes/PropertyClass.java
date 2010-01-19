@@ -43,6 +43,12 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 
+/**
+ * Represents an XClass property and contains property definitions (eg "relational storage", "display type",
+ * "separator", "multi select", etc). Each property definition is of type {@link BaseProperty}.
+ *
+ * @version $Id$
+ */
 public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface
 {
     private BaseClass object;

@@ -21,6 +21,7 @@ package com.xpn.xwiki.internal.model.reference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
 import org.junit.*;
 import org.xwiki.context.Execution;
@@ -28,7 +29,6 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.test.AbstractComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver}.
@@ -36,7 +36,7 @@ import org.xwiki.test.AbstractComponentTestCase;
  * @version $Id$
  * @since 2.2M1
  */
-public class CurrentEntityReferenceResolverTest extends AbstractComponentTestCase
+public class CurrentEntityReferenceResolverTest extends AbstractBridgedXWikiComponentTestCase
 {
     private static final String CURRENT_WIKI = "currentwiki";
 

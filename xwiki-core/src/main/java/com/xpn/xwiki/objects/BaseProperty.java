@@ -34,6 +34,9 @@ import org.dom4j.io.XMLWriter;
 
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * @version $Id$
+ */
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
 public class BaseProperty extends BaseElement implements PropertyInterface, Serializable, Cloneable

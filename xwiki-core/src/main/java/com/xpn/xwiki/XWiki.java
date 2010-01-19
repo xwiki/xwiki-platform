@@ -2974,6 +2974,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("skin", "skin", 30);
         needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
+        needsUpdate |= bclass.addTextField("phone", "Phone", 30);
+        needsUpdate |= bclass.addTextAreaField("address", "Address", 40, 3);
         needsUpdate |= setClassDocumentFields(doc, "XWiki User Class");
 
         if (needsUpdate) {

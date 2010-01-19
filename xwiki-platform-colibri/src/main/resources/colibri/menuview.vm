@@ -26,6 +26,7 @@
 #else
   #xwikitopmenuentrystart($xwiki.getURL($context.user, 'view') $!xwiki.getUserName($context.user, false) 'tmUser' 'hasIcon')
   #submenuitem($xwiki.getURL($context.user, 'view') $msg.get('core.menu.profile') 'tmProfile', '')
+  #submenuitem($xwiki.getURL($context.user, 'view', 'category=preferences') $msg.get('core.menu.userPreferences') 'tmUserPreferences', '')
   #submenuitem($xwiki.getURL('XWiki.WatchListManager', 'view') $msg.get('core.menu.watchlist.management') 'tmWatchlistManager', '')
   #xwikitopmenuentryend()
 #end

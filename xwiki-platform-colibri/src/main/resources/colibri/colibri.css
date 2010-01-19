@@ -358,7 +358,7 @@ body.content #contentcolumn .main {
   margin: 0 200px;
 }
 
-#mainContentArea, .alleditcontent  {
+#mainContentArea, #mainEditArea  {
   background: $theme.pageContentBackgroundColor;
   padding: 10px 25px;
 }
@@ -745,33 +745,28 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   * Action Menu elements
 -------------------------------------------------------------- */
 
+/* Menus z-indexes */
+#mainmenu, #mainmenu.submenu, #maineditmenu, #maineditmenu.submenu {
+  z-index: 1000;
+}
+
+#contentmenu, #contentmenu.submenu, #contenteditmenu, #contenteditmenu.submenu {
+  z-index: 999;
+}
+
 /* Main menu */
 #mainmenu {
   min-width: 970px;
   overflow: visible;
-  z-index: 1000;
 }
 
-#mainmenu .submenu {
-  z-index: 1000;
-}
-
-/* Content menu */
-#contentmenu {
-  z-index: 999;
-}
-
-#contentmenu .submenu {
-  z-index: 999;
-}
-
-/* Edit menu */
-#editmenu {
+/* Main edit menu */
+#maineditmenu {
   color: $theme.menuLinkColor;
   text-align: center;
 }
 
-#editmenu a {
+#maineditmenu a {
   display: inline;
   float: none;
 }
@@ -912,11 +907,11 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_code.gif'));
 }
 
-.actionmenu #tmEditVisual {
+.actionmenu #tmEditWysiwyg {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
 }
 
-.actionmenu #tmEditForm {
+.actionmenu #tmEditInline {
   background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
 }
 
@@ -924,7 +919,7 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
   background-image: url($xwiki.getSkinFile('icons/silk/lock.gif'));
 }
 
-.actionmenu #tmEditObjects {
+.actionmenu #tmEditObject {
   background-image: url($xwiki.getSkinFile('icons/silk/brick.gif'));
 }
 

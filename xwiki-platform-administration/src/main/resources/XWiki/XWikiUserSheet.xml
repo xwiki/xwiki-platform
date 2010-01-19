@@ -427,7 +427,7 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
     ##
     &lt;div id="vertical-tabs"&gt;
       &lt;div id="avatar"&gt;
-        &lt;a href="$doc.getURL("edit", "xpage=changemyavatar")" &gt;&lt;img class="photo" id="xwikiuseravatar" alt="$doc.display("first_name", "view", $obj)" src="$avatarURL"/&gt;&lt;span id="avatarUpload" class="hidden"&gt;$msg.get('platform.core.profile.changePhoto')&lt;/span&gt;&lt;/a&gt;
+        &lt;a href="$doc.getURL('edit', 'xpage=changemyavatar')" &gt;&lt;img class="photo" id="xwikiuseravatar" alt="$doc.display('first_name', 'view', $obj)" src="$avatarURL"/&gt;&lt;span id="avatarUpload" class="hidden"&gt;$msg.get('platform.core.profile.changePhoto')&lt;/span&gt;&lt;/a&gt;
       &lt;/div&gt;
       &lt;div class="clearfloats"&gt;&lt;/div&gt;
       &lt;div&gt;

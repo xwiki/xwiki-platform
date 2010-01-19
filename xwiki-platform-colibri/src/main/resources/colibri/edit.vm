@@ -65,6 +65,10 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   <div class="leftsidecolumns">
   <div id="editcolumn" class="editor">
   <div class="alleditcontent">
+  <div id="editmenu" class="actionmenu">
+  #template("editmenu.vm")
+  </div>
+  <div id="mainEditArea">
   #template("hierarchy.vm")
   #if($editor == "wiki" || $editor == "wysiwyg")
     #set($docTitle = $request.getParameter("title"))
@@ -76,7 +80,8 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #end
   #template("editmodes.vm")
   #template("edit${editor}.vm")
-  </div> ## alleditcontent
+  </div> ## mainEditArea
+  </div> ## alleditcontent  
   </div> ## editcolumn
   <div class="clearfloats"></div>
   </div> ## leftsidecolumns

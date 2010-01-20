@@ -19,49 +19,17 @@
  */
 package org.xwiki.gwt.user.client;
 
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.DeferredCommand;
-
 /**
  * Schedules updates for an {@link Updatable} object and ensures that only the most recent update is actually executed.
  * 
  * @version $Id$
  */
-public class DeferredUpdater
+public class DeferredUpdater implements TimerListener
 {
     /**
-     * A deferred command that executes only the most recent update.
+     * The default number of milliseconds to wait before executing an update.
      */
-    private final class UpdateCommand implements Command
-    {
-        /**
-         * The index of this update.
-         */
-        private final long index;
-
-        /**
-         * Creates a new update command.
-         */
-        public UpdateCommand()
-        {
-            index = DeferredUpdater.this.incUpdateIndex();
-        }
-
-        /**
-         * Executes the update only if it's the most recent one.
-         */
-        public void execute()
-        {
-            if (index == DeferredUpdater.this.getUpdateIndex()) {
-                DeferredUpdater.this.onUpdate();
-            }
-        }
-    }
-
-    /**
-     * The index of the last update.
-     */
-    private long updateIndex = -1;
+    public static final int DEFAULT_DELAY = 500;
 
     /**
      * The underlying object whose update is being deferred.
@@ -69,50 +37,62 @@ public class DeferredUpdater
     private final Updatable updatable;
 
     /**
-     * Creates a new deferred updater for the specified {@link Updatable} object.
+     * The timer used to defer the updates.
+     */
+    private final Timer timer = new Timer();
+
+    /**
+     * The number of milliseconds to wait before executing an update.
+     */
+    private final int delay;
+
+    /**
+     * Creates a new deferred updater for the specified {@link Updatable} object. The updates are delayed with the
+     * default number of milliseconds, {@value #DEFAULT_DELAY}. Only the most recent update is executed.
      * 
-     * @param updatable {@link #updatable}
+     * @param updatable the object whose updates are going to be deferred
      */
     public DeferredUpdater(Updatable updatable)
     {
+        this(updatable, DEFAULT_DELAY);
+    }
+
+    /**
+     * Creates a new deferred updater for the specified {@link Updatable} object. The updates are delayed with the
+     * specified number of milliseconds. Only the most recent update is executed.
+     * 
+     * @param updatable the object whose updates are going to be deferred
+     * @param delay the number of milliseconds to wait before executing an update
+     */
+    public DeferredUpdater(Updatable updatable, int delay)
+    {
         this.updatable = updatable;
+        this.delay = delay;
+        this.timer.addTimerListener(this);
     }
 
     /**
-     * @return {@link #updateIndex}
+     * Cancels any pending updates and schedule a new update for the underlying object.
      */
-    private long getUpdateIndex()
+    public void deferUpdate()
     {
-        return updateIndex;
+        // The pending update is canceled automatically when we schedule a new update.
+        timer.schedule(delay);
     }
 
     /**
-     * @return the update index after it was incremented
+     * {@inheritDoc}
+     * 
+     * @see TimerListener#onElapsed(Timer)
      */
-    private long incUpdateIndex()
-    {
-        return ++updateIndex;
-    }
-
-    /**
-     * Executes the most recent update.
-     */
-    private void onUpdate()
+    public void onElapsed(Timer sender)
     {
         try {
             if (updatable.canUpdate()) {
                 updatable.update();
             }
         } catch (Throwable t) {
-            Console.getInstance().error(t, DeferredUpdater.class.getName(), updatable.getClass().getName());
+            Console.getInstance().error(t, "Failed to update: " + updatable.getClass().getName());
         }
-    }
-
-    /**
-     * Schedule an update for the underlying object.
-     */
-    public void deferUpdate()
-    {
-        DeferredCommand.addCommand(new UpdateCommand());
     }
 }

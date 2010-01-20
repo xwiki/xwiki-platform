@@ -41,16 +41,31 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public abstract class AbstractBlockExecutable extends AbstractExecutable
+public abstract class AbstractBlockExecutable extends AbstractSelectionExecutable
 {
+    /**
+     * The object used to preserve the selection in the underlying rich text area.
+     */
+    private final SelectionPreserver preserver;
+
+    /**
+     * Creates a new block executable to be executed on the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public AbstractBlockExecutable(RichTextArea rta)
+    {
+        super(rta);
+        preserver = new SelectionPreserver(rta);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
-        SelectionPreserver preserver = new SelectionPreserver(rta);
         preserver.saveSelection();
 
         Selection selection = rta.getDocument().getSelection();
@@ -120,9 +135,9 @@ public abstract class AbstractBlockExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#getParameter(RichTextArea)
+     * @see AbstractSelectionExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         Selection selection = rta.getDocument().getSelection();
         String selectionParameter = null;

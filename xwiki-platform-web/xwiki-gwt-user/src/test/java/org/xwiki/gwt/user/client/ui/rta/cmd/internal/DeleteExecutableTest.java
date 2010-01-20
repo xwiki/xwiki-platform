@@ -65,7 +65,7 @@ public class DeleteExecutableTest extends RichTextAreaTestCase
                 range.selectNode(getBody().getFirstChild().getChildNodes().getItem(1));
                 select(range);
 
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.execute(null));
 
                 range = rta.getDocument().getSelection().getRangeAt(0);
                 assertTrue(range.isCollapsed());

@@ -21,10 +21,9 @@ package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 /**
- * Overwrites {@link DeleteExecutable} with a custom implementation for Internet Explorer to overcome a bug in the
+ * Overwrites {@link DeleteExecutableImpl} with a custom implementation for Internet Explorer to overcome a bug in the
  * native delete command which leaves the selection object in an invalid state if we execute it on a control selection
  * that includes a button while the document is rendered in standards mode. Trying to create a range after the button is
  * deleted results in a "Unspecified error" exception being thrown. Strangely, the delete command works fine when an
@@ -32,16 +31,15 @@ import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
  * 
  * @version $Id$
  */
-public class IEDeleteExecutable extends DeleteExecutable
+public class DeleteExecutableImplIE extends DeleteExecutableImpl
 {
     /**
      * {@inheritDoc}
      * 
-     * @see DeleteExecutable#execute(RichTextArea, String)
+     * @see DeleteExecutableImpl#deleteSelection(Selection)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean deleteSelection(Selection selection)
     {
-        Selection selection = rta.getDocument().getSelection();
         if (isControlSelection(selection)) {
             Range range = selection.getRangeAt(0);
             // Delete the selected control object (e.g. image, button).
@@ -52,7 +50,7 @@ public class IEDeleteExecutable extends DeleteExecutable
             selection.addRange(range);
             return true;
         } else {
-            return super.execute(rta, parameter);
+            return super.deleteSelection(selection);
         }
     }
 

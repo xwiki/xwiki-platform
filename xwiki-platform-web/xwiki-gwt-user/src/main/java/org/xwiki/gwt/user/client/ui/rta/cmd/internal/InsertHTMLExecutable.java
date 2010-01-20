@@ -38,7 +38,7 @@ import com.google.gwt.core.client.GWT;
  * 
  * @version $Id$
  */
-public class InsertHTMLExecutable extends AbstractExecutable
+public class InsertHTMLExecutable extends AbstractSelectionExecutable
 {
     /**
      * Browser specific implementation required by this executable.
@@ -46,11 +46,21 @@ public class InsertHTMLExecutable extends AbstractExecutable
     private InsertHTMLExecutableImpl impl = GWT.create(InsertHTMLExecutableImpl.class);
 
     /**
+     * Creates a new instance that can be used to insert HTML fragments in the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public InsertHTMLExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         Element container = rta.getDocument().createDivElement().cast();
         container.xSetInnerHTML(param);

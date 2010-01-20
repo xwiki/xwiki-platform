@@ -21,6 +21,7 @@ package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Property;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
 
@@ -38,12 +39,14 @@ public class BlockStyleExecutable extends AbstractBlockExecutable
 
     /**
      * Creates a new instance that applies the given style property to the nearest block-level elements from the current
-     * selection.
+     * selection in the specified rich text area.
      * 
+     * @param rta the execution target
      * @param property the style property to be applied
      */
-    public BlockStyleExecutable(Property property)
+    public BlockStyleExecutable(RichTextArea rta, Property property)
     {
+        super(rta);
         this.property = property;
     }
 

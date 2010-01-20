@@ -19,7 +19,6 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 /**
@@ -27,7 +26,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class ToggleExecutable extends AbstractExecutable
+public class ToggleExecutable implements Executable
 {
     /**
      * The underlying executable that is being toggled.
@@ -61,41 +60,51 @@ public class ToggleExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see Executable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
-        return executable.execute(rta, isExecuted(rta) ? offParameter : onParameter);
+        return executable.execute(isExecuted() ? offParameter : onParameter);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isEnabled(RichTextArea)
+     * @see Executable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return executable.isEnabled(rta);
+        return executable.isEnabled();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isExecuted(RichTextArea)
+     * @see Executable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
-        String parameter = executable.getParameter(rta);
+        String parameter = executable.getParameter();
         return onParameter == parameter || (onParameter != null && onParameter.equals(parameter));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isSupported(RichTextArea)
+     * @see Executable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
-        return executable.isSupported(rta);
+        return executable.isSupported();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Executable#getParameter()
+     */
+    public String getParameter()
+    {
+        return null;
     }
 }

@@ -19,40 +19,23 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-
-import com.google.gwt.core.client.GWT;
+import org.xwiki.gwt.dom.client.Selection;
 
 /**
- * Deletes the current selection.
+ * Base class for browser specific implementations of {@link DeleteExecutable}.
  * 
  * @version $Id$
  */
-public class DeleteExecutable extends DefaultExecutable
+public class DeleteExecutableImpl
 {
     /**
-     * Browser specific implementation required by this executable.
-     */
-    private DeleteExecutableImpl impl = GWT.create(DeleteExecutableImpl.class);
-
-    /**
-     * Creates a new executable that can be used to delete the current selection in the specified rich text area.
+     * Deletes the specified selection.
      * 
-     * @param rta the execution target
+     * @param selection the selection to be deleted
+     * @return {@code true} if the delete succeeded, {@code false} otherwise
      */
-    public DeleteExecutable(RichTextArea rta)
+    public boolean deleteSelection(Selection selection)
     {
-        super(rta, Command.DELETE.toString());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see DefaultExecutable#execute(String)
-     */
-    public boolean execute(String parameter)
-    {
-        return impl.deleteSelection(rta.getDocument().getSelection()) || super.execute(parameter);
+        return false;
     }
 }

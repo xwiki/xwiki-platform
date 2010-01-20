@@ -108,12 +108,12 @@
   </replace-with>
 
   <!-- DeleteExecutable -->
-  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutable">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutable"/>
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl"/>
   </replace-with>
 
-  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.IEDeleteExecutable">
-    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutable"/>
+  <replace-with class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImplIE">
+    <when-type-is class="org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutableImpl"/>
     <any>
       <when-property-is name="user.agent" value="ie6"/>
       <when-property-is name="user.agent" value="ie8"/>

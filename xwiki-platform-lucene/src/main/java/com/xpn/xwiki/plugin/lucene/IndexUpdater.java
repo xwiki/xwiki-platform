@@ -61,9 +61,8 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
     /** The maximum number of milliseconds we have to wait before this thread is safely closed. */
     private static final int EXIT_INTERVAL = 3000;
 
-    private static final List<Event> EVENTS =
-            Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(), new DocumentDeleteEvent(),
-                new ActionExecutionEvent("upload"));
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new DocumentUpdateEvent(), new DocumentSaveEvent(),
+        new DocumentDeleteEvent(), new ActionExecutionEvent("upload"));
 
     /** Milliseconds of sleep between checks for changed documents. */
     private final int indexingInterval;
@@ -200,7 +199,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                         this.plugin.handleCorruptIndex(context);
                     }
                 } catch (IOException e) {
-                    LOG.error("Failed to open index");
+                    LOG.error("Failed to open index", e);
 
                     throw new RuntimeException(e);
                 }
@@ -242,7 +241,7 @@ public class IndexUpdater extends AbstractXWikiRunnable implements EventListener
                     writer.optimize();
                     writer.close();
                 } catch (IOException e) {
-                    LOG.warn("Failed to close writer.");
+                    LOG.warn("Failed to close writer.", e);
                 }
             }
 

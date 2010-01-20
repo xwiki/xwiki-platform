@@ -151,8 +151,7 @@ public class DocumentData extends IndexData
         }
     }
 
-    private void indexProperty(Document luceneDoc, BaseObject baseObject,
-        String propertyName, XWikiContext context)
+    private void indexProperty(Document luceneDoc, BaseObject baseObject, String propertyName, XWikiContext context)
     {
         String fieldFullName = baseObject.getClassName() + "." + propertyName;
         BaseClass bClass = baseObject.getxWikiClass(context);
@@ -169,8 +168,8 @@ public class DocumentData extends IndexData
         }
     }
 
-    private void indexStaticList(Document luceneDoc, BaseObject baseObject,
-        StaticListClass prop, String propertyName, XWikiContext context)
+    private void indexStaticList(Document luceneDoc, BaseObject baseObject, StaticListClass prop, String propertyName,
+        XWikiContext context)
     {
         Map<String, ListItem> possibleValues = prop.getMap(context);
         String fieldFullName = baseObject.getClassName() + "." + propertyName;
@@ -193,5 +192,4 @@ public class DocumentData extends IndexData
             luceneDoc.add(new Field(fieldFullName, value, Field.Store.YES, Field.Index.ANALYZED));
         }
     }
-
 }

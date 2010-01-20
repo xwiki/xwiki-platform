@@ -70,14 +70,14 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(IndexRebuilder.class);
 
+    /** Amount of time (milliseconds) to sleep while waiting for the indexing queue to empty. */
+    private static final int RETRYINTERVAL = 30000;
+
     /** The actual object/thread that indexes data. */
     private final IndexUpdater indexUpdater;
 
     /** The XWiki context. */
     private XWikiContext context;
-
-    /** Amount of time (milliseconds) to sleep while waiting for the indexing queue to empty. */
-    private static int retryInterval = 30000;
 
     /** Variable used for indicating that a rebuild is already in progress. */
     private volatile boolean rebuildInProgress = false;
@@ -85,6 +85,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context, boolean needInitialBuild)
     {
         this.indexUpdater = indexUpdater;
+
         if (needInitialBuild) {
             this.startRebuildIndex(context);
             LOG.info("Launched initial lucene indexing");
@@ -237,17 +238,18 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             Collection<String> docNames = null;
             try {
                 docNames = xwiki.getStore().searchDocumentsNames("", context);
-            } catch (XWikiException ex) {
-                LOG.warn(String.format("Error getting document names for wiki [%s]. Internal error is: $s", wikiName,
-                    ex.getMessage()));
+            } catch (XWikiException e) {
+                LOG.warn(String.format("Error getting document names for wiki [%s].", wikiName), e);
+
                 return -1;
             }
+
             for (String docName : docNames) {
                 XWikiDocument document;
                 try {
                     document = xwiki.getDocument(docName, context);
-                } catch (XWikiException e2) {
-                    LOG.error("error fetching document " + wikiName + ":" + docName, e2);
+                } catch (XWikiException e) {
+                    LOG.error("error fetching document " + wikiName + ":" + docName, e);
 
                     continue;
                 }
@@ -264,7 +266,7 @@ public class IndexRebuilder extends AbstractXWikiRunnable
                             // Don't leave any database connections open while sleeping
                             // This shouldn't be needed, but we never know what bugs might be there
                             context.getWiki().getStore().cleanUp(context);
-                            Thread.sleep(retryInterval);
+                            Thread.sleep(RETRYINTERVAL);
                         } catch (InterruptedException e) {
                             return -2;
                         }
@@ -303,9 +305,9 @@ public class IndexRebuilder extends AbstractXWikiRunnable
             try {
                 this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext), wikiContext);
                 retval++;
-            } catch (XWikiException e1) {
+            } catch (XWikiException e) {
                 LOG.error("Error getting translated document for document " + document.getFullName() + " and language "
-                    + lang, e1);
+                    + lang, e);
             }
         }
 

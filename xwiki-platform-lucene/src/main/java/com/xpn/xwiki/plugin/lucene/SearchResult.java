@@ -29,7 +29,7 @@ import com.xpn.xwiki.api.Document;
 
 /**
  * Result of a search. The Plugin will return a collection of these for display on the search page.
- *
+ * 
  * @version $Id$
  */
 public class SearchResult
@@ -93,16 +93,15 @@ public class SearchResult
             this.filename = doc.get(IndexFields.FILENAME);
             Document document;
             final String fullDocName =
-                new StringBuffer(this.wiki).append(":").append(this.space).append(".").append(this.name).toString();
+                    new StringBuffer(this.wiki).append(":").append(this.space).append(".").append(this.name).toString();
             try {
                 document = xwiki.getDocument(fullDocName);
                 this.url = document.getAttachmentURL(this.filename, "download");
             } catch (XWikiException e) {
-                LOG.error("error retrieving url for attachment " + this.filename + " of document " + fullDocName);
-                e.printStackTrace();
+                LOG.error("error retrieving url for attachment " + this.filename + " of document " + fullDocName, e);
             }
         } else {
-            objects = doc.getValues("object");
+            this.objects = doc.getValues("object");
         }
     }
 
@@ -163,8 +162,8 @@ public class SearchResult
     }
 
     /**
-     * @return Returns the type of the document, atm this can be either <code>wikipage</code> or
-     *         <code>attachment</code>.
+     * @return Returns the type of the document, atm this can be either <code>wikipage</code> or <code>attachment</code>
+     *         .
      */
     public String getType()
     {
@@ -198,8 +197,8 @@ public class SearchResult
     }
 
     /**
-     * @return the language of the Document, i.e. <code>de</code> or <code>en</code>,<code>default</code> if no
-     *         language was set at indexing time.
+     * @return the language of the Document, i.e. <code>de</code> or <code>en</code>,<code>default</code> if no language
+     *         was set at indexing time.
      */
     public String getLanguage()
     {
@@ -237,7 +236,8 @@ public class SearchResult
         return this.fullName;
     }
 
-    public String[] getObjects() {
+    public String[] getObjects()
+    {
         return this.objects;
     }
 

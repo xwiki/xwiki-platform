@@ -42,4 +42,17 @@ public class IFrameElement extends com.google.gwt.dom.client.IFrameElement
     /*-{
         return this.contentWindow;
     }-*/;
+
+    /**
+     * This is a utility method for accessing the content document of an in-line frame in a static way. This method is
+     * solely useful when called from native code. As we know, only static references to overlay types are allowed from
+     * JSNI.
+     * 
+     * @param iframe an in-line frame element
+     * @return the content document of the given in-line element
+     */
+    public static Document getContentDocument(IFrameElement iframe)
+    {
+        return (Document) iframe.getContentDocument();
+    }
 }

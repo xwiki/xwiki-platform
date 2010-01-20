@@ -23,29 +23,46 @@ import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.Cache;
+import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 import com.google.gwt.dom.client.Node;
 
 /**
- * Base class for all {@link Executable}s that manipulate a DOM document using the selection and range APIs.
+ * Base class for all executables that manipulate a DOM document using the selection and range APIs.
  * 
  * @version $Id$
  */
-public abstract class AbstractExecutable implements Executable
+public abstract class AbstractSelectionExecutable extends AbstractRichTextAreaExecutable
 {
     /**
      * Collection of DOM utility methods.
      */
-    protected DOMUtils domUtils = DOMUtils.getInstance();
+    protected final DOMUtils domUtils = DOMUtils.getInstance();
+
+    /**
+     * The object used to cache some of the evaluations done in this class.
+     */
+    protected final Cache cache;
+
+    /**
+     * Creates a new executable to be executed on the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public AbstractSelectionExecutable(RichTextArea rta)
+    {
+        super(rta);
+        cache = new Cache(rta.getElement());
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         return null;
     }
@@ -53,18 +70,23 @@ public abstract class AbstractExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return isSupported(rta) && rta.isEnabled() && hasValidSelection(rta);
+        return cache.get(AbstractSelectionExecutable.class.getName() + "#enabled", new CacheCallback<Boolean>()
+        {
+            public Boolean get()
+            {
+                return AbstractSelectionExecutable.super.isEnabled() && hasValidSelection();
+            }
+        });
     }
 
     /**
-     * @param rta a rich text area
-     * @return {@code true} if the given rich text area has a valid selection, {@code false} otherwise
+     * @return {@code true} if the underlying rich text area has a valid selection, {@code false} otherwise
      */
-    protected boolean hasValidSelection(RichTextArea rta)
+    protected boolean hasValidSelection()
     {
         Document document = rta.getDocument();
         Selection selection = document.getSelection();
@@ -85,20 +107,10 @@ public abstract class AbstractExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
-        return getParameter(rta) != null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isSupported(RichTextArea)
-     */
-    public boolean isSupported(RichTextArea rta)
-    {
-        return rta.isAttached() && rta.getDocument() != null;
+        return getParameter() != null;
     }
 }

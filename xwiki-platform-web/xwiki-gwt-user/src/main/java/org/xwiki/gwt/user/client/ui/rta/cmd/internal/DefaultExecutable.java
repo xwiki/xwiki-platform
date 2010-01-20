@@ -19,17 +19,14 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
-
 
 /**
  * Executes a predefined command on a specific document.
  * 
  * @version $Id$
  */
-public class DefaultExecutable implements Executable
+public class DefaultExecutable extends AbstractRichTextAreaExecutable
 {
     /**
      * The predefined command executed by this executable.
@@ -39,19 +36,21 @@ public class DefaultExecutable implements Executable
     /**
      * Creates a new instance that will execute the specified command.
      * 
+     * @param rta the execution target
      * @param command A predefined command to be executed by this executable.
      */
-    public DefaultExecutable(String command)
+    public DefaultExecutable(RichTextArea rta, String command)
     {
+        super(rta);
         this.command = command;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractRichTextAreaExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         return rta.getDocument().execCommand(command, parameter);
     }
@@ -59,9 +58,9 @@ public class DefaultExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         return rta.getDocument().queryCommandValue(command);
     }
@@ -69,19 +68,19 @@ public class DefaultExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return rta.getDocument().queryCommandEnabled(command);
+        return super.isEnabled() && rta.getDocument().queryCommandEnabled(command);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         return rta.getDocument().queryCommandState(command);
     }
@@ -89,11 +88,10 @@ public class DefaultExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
-        Document doc = rta.getDocument();
-        return doc != null && doc.queryCommandSupported(command);
+        return super.isSupported() && rta.getDocument().queryCommandSupported(command);
     }
 }

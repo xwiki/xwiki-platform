@@ -19,15 +19,8 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
-
-import com.google.gwt.core.client.GWT;
-
 
 /**
  * Default command manager.
@@ -36,62 +29,6 @@ import com.google.gwt.core.client.GWT;
  */
 public class DefaultCommandManager extends AbstractCommandManager
 {
-    /**
-     * The map of predefined executable provided by the rich text area.
-     */
-    public static final Map<Command, Executable> EXECUTABLES;
-
-    /**
-     * The underlying rich text area on which this command manager operates. All the commands are execute on this rich
-     * text area.
-     */
-    private final RichTextArea rta;
-
-    static {
-        Command[] defaultCommands =
-            new Command[] {Command.BACK_COLOR, Command.BOLD, Command.CREATE_LINK, Command.FONT_NAME,
-                Command.FONT_SIZE, Command.FORE_COLOR, Command.FORMAT_BLOCK, Command.INDENT,
-                Command.INSERT_HORIZONTAL_RULE, Command.INSERT_IMAGE, Command.INSERT_ORDERED_LIST,
-                Command.INSERT_PARAGRAPH, Command.INSERT_UNORDERED_LIST, Command.ITALIC, Command.JUSTIFY_CENTER,
-                Command.JUSTIFY_FULL, Command.JUSTIFY_LEFT, Command.JUSTIFY_RIGHT, Command.OUTDENT, Command.REDO,
-                Command.REMOVE_FORMAT, Command.STRIKE_THROUGH, Command.SUB_SCRIPT, Command.SUPER_SCRIPT,
-                Command.TELETYPE, Command.UNDERLINE, Command.UNDO, Command.UNLINK};
-        EXECUTABLES = new HashMap<Command, Executable>();
-        for (int i = 0; i < defaultCommands.length; i++) {
-            EXECUTABLES.put(defaultCommands[i], new DefaultExecutable(defaultCommands[i].toString()));
-        }
-
-        // Register custom executables.
-        EXECUTABLES.put(Command.DELETE, (Executable) GWT.create(DeleteExecutable.class));
-        EXECUTABLES.put(Command.INSERT_HTML, new InsertHTMLExecutable());
-        EXECUTABLES.put(new Command("update"), new UpdateExecutable());
-    }
-
-    /**
-     * Creates a new command manager for the given rich text area.
-     * 
-     * @param rta The rich text area on which this manager will operate.
-     */
-    public DefaultCommandManager(RichTextArea rta)
-    {
-        this(rta, EXECUTABLES);
-    }
-
-    /**
-     * Creates a new command manager for the given rich text area, initializing its executables map with the one
-     * specified.
-     * 
-     * @param rta The rich text area on which this manager will operate.
-     * @param executables The initial executables this manager will know.
-     */
-    public DefaultCommandManager(RichTextArea rta, Map<Command, Executable> executables)
-    {
-        this.rta = rta;
-        for (Map.Entry<Command, Executable> entry : executables.entrySet()) {
-            registerCommand(entry.getKey(), entry.getValue());
-        }
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -106,7 +43,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (commandListeners.fireBeforeCommand(this, cmd, param)) {
             return false;
         }
-        boolean success = executable.execute(rta, param);
+        boolean success = executable.execute(param);
         if (success) {
             commandListeners.fireCommand(this, cmd, param);
         }
@@ -124,7 +61,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        return executable.isEnabled(rta);
+        return executable.isEnabled();
     }
 
     /**
@@ -138,7 +75,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        return executable.isExecuted(rta);
+        return executable.isExecuted();
     }
 
     /**
@@ -152,7 +89,7 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return false;
         }
-        return executable.isSupported(rta);
+        return executable.isSupported();
     }
 
     /**
@@ -166,6 +103,6 @@ public class DefaultCommandManager extends AbstractCommandManager
         if (executable == null) {
             return null;
         }
-        return executable.getParameter(rta);
+        return executable.getParameter();
     }
 }

@@ -21,12 +21,17 @@ package org.xwiki.gwt.user.client.ui.rta;
 
 import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.Event;
+import org.xwiki.gwt.dom.client.JavaScriptObject;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultCommandManager;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DeleteExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.UpdateExecutable;
 import org.xwiki.gwt.user.client.ui.rta.internal.BehaviorAdjuster;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.IFrameElement;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.HasDoubleClickHandlers;
@@ -72,25 +77,46 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
     private final BehaviorAdjuster adjuster = GWT.create(BehaviorAdjuster.class);
 
     /**
+     * The JavaScript function used to retrieve the edited document.
+     */
+    @SuppressWarnings("unused")
+    private final JavaScriptObject documentGetter;
+
+    /**
      * Creates a new rich text area.
      */
     public RichTextArea()
     {
-        addLoadHandler(this);
-        cm = new DefaultCommandManager(this);
-        adjuster.setTextArea(this);
+        this(new DefaultCommandManager());
+
+        // Register default executables.
+        Command[] defaultCommands = new Command[] {Command.BACK_COLOR, Command.BOLD, Command.CREATE_LINK,
+            Command.FONT_NAME, Command.FONT_SIZE, Command.FORE_COLOR, Command.FORMAT_BLOCK, Command.INDENT,
+            Command.INSERT_HORIZONTAL_RULE, Command.INSERT_IMAGE, Command.INSERT_ORDERED_LIST, Command.INSERT_PARAGRAPH,
+            Command.INSERT_UNORDERED_LIST, Command.ITALIC, Command.JUSTIFY_CENTER, Command.JUSTIFY_FULL,
+            Command.JUSTIFY_LEFT, Command.JUSTIFY_RIGHT, Command.OUTDENT, Command.REDO, Command.REMOVE_FORMAT,
+            Command.STRIKE_THROUGH, Command.SUB_SCRIPT, Command.SUPER_SCRIPT, Command.TELETYPE, Command.UNDERLINE,
+            Command.UNDO, Command.UNLINK};
+        for (int i = 0; i < defaultCommands.length; i++) {
+            cm.registerCommand(defaultCommands[i], new DefaultExecutable(this, defaultCommands[i].toString()));
+        }
+
+        // Register custom executables.
+        cm.registerCommand(Command.DELETE, new DeleteExecutable(this));
+        cm.registerCommand(Command.INSERT_HTML, new InsertHTMLExecutable(this));
+        cm.registerCommand(new Command("update"), new UpdateExecutable());
     }
 
     /**
-     * Custom constructor allowing us to inject a mock command manager and a mock history. It was mainly added to be
-     * used in unit tests.
+     * Custom constructor allowing us to inject a mock command manager. It was mainly added to be used in unit tests.
      * 
-     * @param cm Custom command manager
+     * @param cm custom command manager
      */
     public RichTextArea(CommandManager cm)
     {
         addLoadHandler(this);
         this.cm = cm;
+        this.documentGetter = createDocumentGetter();
         adjuster.setTextArea(this);
     }
 
@@ -105,14 +131,31 @@ public class RichTextArea extends com.google.gwt.user.client.ui.RichTextArea imp
      * 
      * @return The DOM document being edited with this rich text area.
      */
-    public Document getDocument()
-    {
-        if (getElement().getTagName().equalsIgnoreCase("iframe")) {
-            return IFrameElement.as(getElement()).getContentDocument().cast();
-        } else {
+    public native Document getDocument()
+    /*-{
+        return (this.@org.xwiki.gwt.user.client.ui.rta.RichTextArea::documentGetter)();
+    }-*/;
+
+    /**
+     * NOTE: This method was added to optimize the access to the edited document. Ideally the document getter should be
+     * placed in the implementation class which is browser specific but we can't add methods to the implementation base
+     * class and placing it in a derived class would force us to make a test which we want to avoid.
+     * 
+     * @return a JavaScript function that can be used to retrieve the edited document
+     */
+    private native JavaScriptObject createDocumentGetter()
+    /*-{
+        var element = this.@com.google.gwt.user.client.ui.UIObject::getElement()();
+        var contentDocumentGetter = function() {
+            // We access the content document in a static way because only static references to overlay types are
+            // allowed from JSNI.
+            return @org.xwiki.gwt.dom.client.IFrameElement::getContentDocument(Lorg/xwiki/gwt/dom/client/IFrameElement;)(element);
+        }
+        var nullDocumentGetter = function() {
             return null;
         }
-    }
+        return 'iframe' == element.nodeName.toLowerCase() ? contentDocumentGetter : nullDocumentGetter;
+    }-*/;
 
     /**
      * @return the {@link CommandManager} associated with this instance.

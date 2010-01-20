@@ -48,7 +48,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new InsertHTMLExecutable();
+            executable = new InsertHTMLExecutable(rta);
         }
     }
 
@@ -70,7 +70,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("cd", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "<!--x-->y<del>z</del>"));
+                assertTrue(executable.execute("<!--x-->y<del>z</del>"));
                 assertEquals("<em>ab</em><!--x-->y<del>z</del><ins>ef</ins>", clean(rta.getHTML()));
             }
         });
@@ -93,7 +93,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("ij", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "#"));
+                assertTrue(executable.execute("#"));
                 assertEquals("<em>ab</em>#", clean(rta.getHTML()));
             }
         });
@@ -116,7 +116,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("y", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "*2<em>=</em>1+"));
+                assertTrue(executable.execute("*2<em>=</em>1+"));
                 assertEquals("x*2<em>=</em>1+z", clean(rta.getHTML()));
             }
         });
@@ -139,7 +139,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("oob", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "<img/>"));
+                assertTrue(executable.execute("<img/>"));
                 assertEquals("<ul><li>f<img>ar</li></ul>", clean(rta.getHTML()));
             }
         });
@@ -172,7 +172,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
         select(range);
 
         assertEquals("00", rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, "<img title=\"march 11th\"/>"));
+        assertTrue(executable.execute("<img title=\"march 11th\"/>"));
         assertEquals("2<img title=\"march 11th\">9", clean(rta.getHTML()));
 
         // Lets test if the selection wraps the inserted image.
@@ -201,7 +201,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("XWiki", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "x"));
+                assertTrue(executable.execute("x"));
                 assertEquals("x<sup>tm</sup>", Element.as(getBody().getFirstChild().getFirstChild()).getInnerHTML()
                     .toLowerCase());
             }
@@ -229,7 +229,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("albatross", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "<button>toucan</button>"));
+                assertTrue(executable.execute("<button>toucan</button>"));
                 assertEquals("toucan", getBody().getChildNodes().getItem(1).getFirstChild().getNodeValue());
             }
         });
@@ -252,7 +252,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("45", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "87"));
+                assertTrue(executable.execute("87"));
                 assertEquals("<em>#</em>876", Element.as(getBody().getLastChild()).getInnerHTML().toLowerCase());
             }
         });
@@ -275,7 +275,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("23", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "xx"));
+                assertTrue(executable.execute("xx"));
                 assertEquals("1xx<em>#</em>", Element.as(getBody().getFirstChild()).getInnerHTML().toLowerCase());
             }
         });
@@ -301,7 +301,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("3", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "4"));
+                assertTrue(executable.execute("4"));
                 assertEquals("124", Element.as(getBody().getFirstChild()).getInnerHTML().toLowerCase());
             }
         });
@@ -326,7 +326,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("bcdef", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "?"));
+                assertTrue(executable.execute("?"));
                 assertEquals("a?bc<strong>#</strong>", getBody().getFirstChildElement().getInnerHTML().toLowerCase());
             }
         });
@@ -350,7 +350,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 assertEquals("34", rta.getDocument().getSelection().toString());
-                assertTrue(executable.execute(rta, "+"));
+                assertTrue(executable.execute("+"));
                 assertEquals("<em>12+</em><strong>56</strong>", getBody().getFirstChildElement().getInnerHTML()
                     .toLowerCase());
             }
@@ -374,7 +374,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
 
                 assertEquals("bob", rta.getDocument().getSelection().toString());
                 String insertedText = "*";
-                assertTrue(executable.execute(rta, insertedText));
+                assertTrue(executable.execute(insertedText));
                 assertEquals(insertedText, Element.as(getBody().getChildNodes().getItem(1)).getInnerHTML());
             }
         });

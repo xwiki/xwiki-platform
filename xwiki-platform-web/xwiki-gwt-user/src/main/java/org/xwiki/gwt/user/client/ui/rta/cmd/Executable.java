@@ -19,8 +19,6 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-
 /**
  * The code associated with a {@link Command}.
  * 
@@ -29,40 +27,36 @@ import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 public interface Executable
 {
     /**
-     * Executes the associated {@link Command} on the specified rich text area with the given parameter.
+     * Runs this executable with the given parameter.
      * 
-     * @param rta Execution target.
-     * @param param Execution parameter.
-     * @return true if execution succeeds.
+     * @param param the execution parameter
+     * @return {@code true} if the execution succeeds, {@code false} otherwise
      * @see CommandManager#execute(Command, String)
      */
-    boolean execute(RichTextArea rta, String param);
+    boolean execute(String param);
 
     /**
-     * @param rta Execution target.
-     * @return true if the associated {@link Command} is supported by the specified rich text area.
+     * @return {@code true} if this executable is supported by its underlying execution target, {@code false} otherwise
      * @see CommandManager#isSupported(Command)
      */
-    boolean isSupported(RichTextArea rta);
+    boolean isSupported();
 
     /**
-     * @param rta Execution target.
-     * @return true if the associated {@link Command} can be executed on the current state of the given rich text area.
+     * @return {@code true} if this executable can be executed on its underlying execution target, {@code false}
+     *         otherwise
      * @see CommandManager#isEnabled(Command)
      */
-    boolean isEnabled(RichTextArea rta);
+    boolean isEnabled();
 
     /**
-     * @param rta Execution target.
-     * @return true if the associated {@link Command} has been executed on the current state of the given rich text
-     *         area.
+     * @return {@code true} if this executable has been executed on its underlying execution target, {@code false}
+     *         otherwise area.
      * @see CommandManager#isExecuted(Command)
      */
-    boolean isExecuted(RichTextArea rta);
+    boolean isExecuted();
 
     /**
-     * @param rta Execution target.
-     * @return the previous execution parameter, if {@link #isExecuted(RichTextArea)} returns true, null otherwise.
+     * @return the previous execution parameter, if {@link #isExecuted()} returns {@code true}, {@code null} otherwise
      */
-    String getParameter(RichTextArea rta);
+    String getParameter();
 }

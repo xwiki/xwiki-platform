@@ -38,7 +38,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class InlineStyleExecutable extends AbstractExecutable
+public class InlineStyleExecutable extends AbstractSelectionExecutable
 {
     /**
      * The style property used when applying style.
@@ -46,12 +46,14 @@ public class InlineStyleExecutable extends AbstractExecutable
     private final Property property;
 
     /**
-     * Creates a new instance that used the given style property.
+     * Creates a new instance that uses the given style property.
      * 
+     * @param rta the execution target
      * @param property the style property used when applying style
      */
-    public InlineStyleExecutable(Property property)
+    public InlineStyleExecutable(RichTextArea rta, Property property)
     {
+        super(rta);
         this.property = property;
     }
 
@@ -66,9 +68,9 @@ public class InlineStyleExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         Selection selection = rta.getDocument().getSelection();
         List<Range> ranges = new ArrayList<Range>();
@@ -215,9 +217,9 @@ public class InlineStyleExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#getParameter(RichTextArea)
+     * @see AbstractSelectionExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         Selection selection = rta.getDocument().getSelection();
         String selectionParameter = null;

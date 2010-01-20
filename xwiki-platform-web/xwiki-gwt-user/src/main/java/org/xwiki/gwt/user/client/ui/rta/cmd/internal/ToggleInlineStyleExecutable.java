@@ -65,13 +65,14 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
      * Creates a new executable that toggles the given style property on the current selection using the specified tag
      * name.
      * 
+     * @param rta the execution target
      * @param property the style property used when detecting style
      * @param value the value of the style property when the style is applied
      * @param tagName the tag used to toggle the style
      */
-    public ToggleInlineStyleExecutable(Property property, String value, String tagName)
+    public ToggleInlineStyleExecutable(RichTextArea rta, Property property, String value, String tagName)
     {
-        super(property);
+        super(rta, property);
 
         this.value = value;
         this.tagName = tagName;
@@ -80,12 +81,12 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see InlineStyleExecutable#execute(RichTextArea, String)
+     * @see InlineStyleExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
-        executed = isExecuted(rta);
-        return super.execute(rta, parameter);
+        executed = isExecuted();
+        return super.execute(parameter);
     }
 
     /**
@@ -231,9 +232,9 @@ public class ToggleInlineStyleExecutable extends InlineStyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isExecuted(RichTextArea)
+     * @see AbstractSelectionExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         Selection selection = rta.getDocument().getSelection();
         for (int i = 0; i < selection.getRangeCount(); i++) {

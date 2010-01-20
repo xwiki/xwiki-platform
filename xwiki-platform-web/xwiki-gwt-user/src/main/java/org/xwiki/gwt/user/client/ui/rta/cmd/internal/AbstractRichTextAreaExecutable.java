@@ -19,35 +19,29 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
 /**
- * An executable that only notifies the command listeners that they should update their states.
+ * Abstract {@link Executable} whose execution target is a rich text area.
  * 
  * @version $Id$
  */
-public class UpdateExecutable implements Executable
+public abstract class AbstractRichTextAreaExecutable implements Executable
 {
     /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#execute(String)
+     * The execution target.
      */
-    public boolean execute(String param)
-    {
-        // Always return true. Just notify all the command listeners that they need to update their state.
-        return true;
-    }
+    protected final RichTextArea rta;
 
     /**
-     * {@inheritDoc}
+     * Creates a new executable to be executed on the specified rich text area.
      * 
-     * @see Executable#getParameter()
+     * @param rta the execution target
      */
-    public String getParameter()
+    public AbstractRichTextAreaExecutable(RichTextArea rta)
     {
-        // Always return null, because this executable has no parameter.
-        return null;
+        this.rta = rta;
     }
 
     /**
@@ -57,19 +51,7 @@ public class UpdateExecutable implements Executable
      */
     public boolean isEnabled()
     {
-        // Always enabled.
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Executable#isExecuted()
-     */
-    public boolean isExecuted()
-    {
-        // Never executed, because this executable has no state.
-        return false;
+        return isSupported() && rta.isEnabled();
     }
 
     /**
@@ -79,7 +61,6 @@ public class UpdateExecutable implements Executable
      */
     public boolean isSupported()
     {
-        // Always supported.
-        return true;
+        return rta.isAttached() && rta.getDocument() != null;
     }
 }

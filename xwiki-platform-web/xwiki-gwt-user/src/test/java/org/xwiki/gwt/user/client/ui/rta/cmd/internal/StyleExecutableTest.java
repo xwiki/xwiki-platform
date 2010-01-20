@@ -49,7 +49,7 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new ToggleInlineStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em");
+            executable = new ToggleInlineStyleExecutable(rta, Style.FONT_STYLE, Style.FontStyle.ITALIC, "em");
         }
     }
 
@@ -63,14 +63,14 @@ public class StyleExecutableTest extends RichTextAreaTestCase
             public void execute()
             {
                 rta.setHTML("");
-                assertFalse(executable.isExecuted(rta));
-                assertTrue(executable.execute(rta, null));
-                assertTrue(executable.isExecuted(rta));
+                assertFalse(executable.isExecuted());
+                assertTrue(executable.execute(null));
+                assertTrue(executable.isExecuted());
                 insertHTML("a");
-                assertTrue(executable.isExecuted(rta));
+                assertTrue(executable.isExecuted());
                 assertEquals("<em>a</em>", rta.getHTML().toLowerCase());
-                assertTrue(executable.execute(rta, null));
-                assertFalse(executable.isExecuted(rta));
+                assertTrue(executable.execute(null));
+                assertFalse(executable.isExecuted());
                 assertEquals("<em></em>a<em></em>", rta.getHTML().toLowerCase());
             }
         });
@@ -102,14 +102,14 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         range.collapse(true);
         select(range);
 
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
         insertHTML("b");
-        assertTrue(executable.isExecuted(rta));
+        assertTrue(executable.isExecuted());
         assertEquals("a<em>b</em>c", rta.getHTML().toLowerCase());
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         assertEquals("a<em></em>b<em></em>c", rta.getHTML().toLowerCase());
     }
 
@@ -139,13 +139,13 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         range.collapse(true);
         select(range);
 
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         insertHTML("c");
-        assertFalse(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
         assertEquals("cd", rta.getHTML().toLowerCase());
     }
 
@@ -175,14 +175,14 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         range.collapse(true);
         select(range);
 
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
         insertHTML("f");
-        assertTrue(executable.isExecuted(rta));
+        assertTrue(executable.isExecuted());
         assertEquals("e<em>f</em>", rta.getHTML().toLowerCase());
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         assertEquals("e<em></em>f<em></em>", rta.getHTML().toLowerCase());
     }
 
@@ -214,13 +214,13 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         range.collapse(true);
         select(range);
 
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         insertHTML("x");
-        assertFalse(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
         assertEquals("#<img>x<em>$</em>", rta.getHTML().toLowerCase());
     }
 
@@ -250,14 +250,14 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         range.collapse(true);
         select(range);
 
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
         insertHTML("y");
-        assertTrue(executable.isExecuted(rta));
+        assertTrue(executable.isExecuted());
         assertEquals("<em>y</em><img>*", rta.getHTML().toLowerCase());
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         assertEquals("<em></em>y<em></em><img>*", rta.getHTML().toLowerCase());
     }
 
@@ -288,12 +288,12 @@ public class StyleExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild(), 2);
         select(range);
 
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
         assertEquals("1<em>2</em>3", rta.getHTML().toLowerCase());
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         assertEquals(text, rta.getHTML().toLowerCase());
     }
 
@@ -316,9 +316,9 @@ public class StyleExecutableTest extends RichTextAreaTestCase
                 range.setEnd(getBody().getLastChild(), 0);
                 select(range);
 
-                assertTrue(executable.isExecuted(rta));
-                assertTrue(executable.execute(rta, null));
-                assertFalse(executable.isExecuted(rta));
+                assertTrue(executable.isExecuted());
+                assertTrue(executable.execute(null));
+                assertFalse(executable.isExecuted());
                 assertEquals("xyz", rta.getHTML());
             }
         });
@@ -353,12 +353,12 @@ public class StyleExecutableTest extends RichTextAreaTestCase
 
         String selectedText = "cxy";
         assertEquals(selectedText, rta.getDocument().getSelection().toString());
-        assertFalse(executable.isExecuted(rta));
-        assertTrue(executable.execute(rta, null));
-        assertTrue(executable.isExecuted(rta));
+        assertFalse(executable.isExecuted());
+        assertTrue(executable.execute(null));
+        assertTrue(executable.isExecuted());
         assertEquals(selectedText, rta.getDocument().getSelection().toString());
-        assertTrue(executable.execute(rta, null));
-        assertFalse(executable.isExecuted(rta));
+        assertTrue(executable.execute(null));
+        assertFalse(executable.isExecuted());
         assertEquals(selectedText, rta.getDocument().getSelection().toString());
         assertEquals(html, clean(rta.getHTML()));
     }

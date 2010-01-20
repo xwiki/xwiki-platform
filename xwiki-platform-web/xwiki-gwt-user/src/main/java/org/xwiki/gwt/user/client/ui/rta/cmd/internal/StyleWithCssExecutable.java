@@ -19,11 +19,8 @@
  */
 package org.xwiki.gwt.user.client.ui.rta.cmd.internal;
 
-import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
-
 
 /**
  * Specifies whether the target document should be styled using the style attributes in markup or using formatting
@@ -33,7 +30,7 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class StyleWithCssExecutable implements Executable
+public class StyleWithCssExecutable extends AbstractRichTextAreaExecutable
 {
     /**
      * The deprecated command for switching between styling with the style attribute and styling with formatting tags.
@@ -41,11 +38,21 @@ public class StyleWithCssExecutable implements Executable
     public static final Command USE_CSS = new Command("useCSS");
 
     /**
+     * Creates a new executable to be executed on the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public StyleWithCssExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractRichTextAreaExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         boolean styleWithCSS = Boolean.valueOf(parameter);
         boolean success =
@@ -58,9 +65,9 @@ public class StyleWithCssExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         String parameter = rta.getDocument().queryCommandValue(Command.STYLE_WITH_CSS.toString());
         if (parameter == null) {
@@ -75,20 +82,20 @@ public class StyleWithCssExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return rta.getDocument().queryCommandEnabled(Command.STYLE_WITH_CSS.toString())
+        return super.isEnabled() && rta.getDocument().queryCommandEnabled(Command.STYLE_WITH_CSS.toString())
             || rta.getDocument().queryCommandEnabled(USE_CSS.toString());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         return rta.getDocument().queryCommandState(Command.STYLE_WITH_CSS.toString())
             || rta.getDocument().queryCommandState(USE_CSS.toString());
@@ -97,13 +104,12 @@ public class StyleWithCssExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
-        Document doc = rta.getDocument();
-        return doc != null
-            && (doc.queryCommandSupported(Command.STYLE_WITH_CSS.toString()) || doc.queryCommandSupported(USE_CSS
-                .toString()));
+        return super.isSupported()
+            && (rta.getDocument().queryCommandSupported(Command.STYLE_WITH_CSS.toString()) || rta.getDocument()
+                .queryCommandSupported(USE_CSS.toString()));
     }
 }

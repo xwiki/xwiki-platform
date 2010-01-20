@@ -1084,7 +1084,7 @@ $doc.display("content", $obj)
 ### @param linktext The menu item text
 ###
 #macro(xwikitopmenuentrystart $actionurl $linktext $id $class)
-<div class="topmenuentry dropdownmenuentry #if($actionurl == '')dropdownnolink#end $!class" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);" id="$id">
+<div id="$id" class="$id topmenuentry dropdownmenuentry #if($actionurl == '')dropdownnolink#end $!class" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);">
 <span class="tme-extensible"><a class="tme"#if ($actionurl != '') href="$actionurl"#end><strong>$linktext</strong></a><span class="menuarrow">&#9660;</span><span class="hidden menucolon">: </span></span><span class="submenu hidden">
 #end
 

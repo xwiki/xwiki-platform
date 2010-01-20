@@ -102,7 +102,7 @@ public class ImagePlugin extends AbstractPlugin implements ClickHandler, WizardL
         super.init(textArea, config);
 
         // register the custom command
-        textArea.getCommandManager().registerCommand(Command.INSERT_IMAGE, new InsertImageExecutable());
+        textArea.getCommandManager().registerCommand(Command.INSERT_IMAGE, new InsertImageExecutable(textArea));
 
         // add the toolbar extension
         if (getTextArea().getCommandManager().isSupported(Command.INSERT_IMAGE)) {

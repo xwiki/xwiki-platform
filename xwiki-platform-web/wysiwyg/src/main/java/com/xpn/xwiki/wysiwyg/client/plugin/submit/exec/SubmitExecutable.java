@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractRichTextAreaExecutable;
 
 import com.google.gwt.dom.client.Document;
 
@@ -30,7 +30,7 @@ import com.google.gwt.dom.client.Document;
  * 
  * @version $Id$
  */
-public class SubmitExecutable implements Executable
+public class SubmitExecutable extends AbstractRichTextAreaExecutable
 {
     /**
      * The name of the property holding the submitted value.
@@ -45,19 +45,21 @@ public class SubmitExecutable implements Executable
     /**
      * Creates a new submit executable that bind a rich text area to the specified form field.
      * 
+     * @param rta the rich text area whose content is submitted
      * @param fieldId the form field identifier
      */
-    public SubmitExecutable(String fieldId)
+    public SubmitExecutable(RichTextArea rta, String fieldId)
     {
+        super(rta);
         this.fieldId = fieldId;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractRichTextAreaExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         Element field = (Element) Document.get().getElementById(fieldId);
         if (field != null) {
@@ -71,9 +73,9 @@ public class SubmitExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         Element field = (Element) Document.get().getElementById(fieldId);
         return field != null ? field.getPropertyString(VALUE) : null;
@@ -82,19 +84,19 @@ public class SubmitExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return isSupported(rta);
+        return isSupported();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         return false;
     }
@@ -102,9 +104,9 @@ public class SubmitExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
         return rta != null && fieldId != null && Document.get().getElementById(fieldId) != null;
     }

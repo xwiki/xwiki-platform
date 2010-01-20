@@ -66,7 +66,8 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickHandler
         super.init(textArea, config);
 
         // Register custom executables.
-        getTextArea().getCommandManager().registerCommand(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.INSERT_HORIZONTAL_RULE,
+            new InsertHRExecutable(textArea));
 
         // User interface extension that provides ways of separating tool bar entries.
         toolBarExtension.addUIExtension(new ToolBarSeparator());

@@ -71,8 +71,10 @@ public class ListPlugin extends AbstractStatefulPlugin implements ClickHandler
         super.init(textArea, config);
 
         // Register custom executables in order to handle valid HTML lists.
-        getTextArea().getCommandManager().registerCommand(Command.INSERT_ORDERED_LIST, new ListExecutable(true));
-        getTextArea().getCommandManager().registerCommand(Command.INSERT_UNORDERED_LIST, new ListExecutable(false));
+        getTextArea().getCommandManager().registerCommand(Command.INSERT_ORDERED_LIST,
+            new ListExecutable(textArea, true));
+        getTextArea().getCommandManager().registerCommand(Command.INSERT_UNORDERED_LIST,
+            new ListExecutable(textArea, false));
 
         addFeature("orderedlist", Command.INSERT_ORDERED_LIST, Images.INSTANCE.ol().createImage(), Strings.INSTANCE
             .ol());

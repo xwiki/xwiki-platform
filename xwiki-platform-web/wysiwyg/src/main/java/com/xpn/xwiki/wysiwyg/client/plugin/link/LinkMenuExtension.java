@@ -44,9 +44,10 @@ import com.xpn.xwiki.wysiwyg.client.plugin.link.LinkConfig.LinkType;
 public class LinkMenuExtension extends MenuItemUIExtension implements Updatable, MenuListener
 {
     /**
-     * Schedules menu updates and executes only the most recent one.
+     * Schedules menu updates and executes only the most recent one. We use the minimum delay because we want the menu
+     * to be update as soon as possible.
      */
-    private final DeferredUpdater updater = new DeferredUpdater(this);
+    private final DeferredUpdater updater = new DeferredUpdater(this, 1);
 
     /**
      * The link plug-in associated with this menu extension.

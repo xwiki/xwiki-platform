@@ -43,7 +43,7 @@ public class InsertHRExecutableTest extends RichTextAreaTestCase
     {
         super.gwtSetUp();
 
-        rta.getCommandManager().registerCommand(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable());
+        rta.getCommandManager().registerCommand(Command.INSERT_HORIZONTAL_RULE, new InsertHRExecutable(rta));
         rta.getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(new DefaultHistory(rta, 10)));
     }
 

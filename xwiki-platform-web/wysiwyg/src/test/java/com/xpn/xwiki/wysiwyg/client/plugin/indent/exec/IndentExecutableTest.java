@@ -47,7 +47,7 @@ public class IndentExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new IndentExecutable();
+            executable = new IndentExecutable(rta);
         }
     }
 
@@ -68,8 +68,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>two</li></ul></li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -106,9 +106,9 @@ public class IndentExecutableTest extends RichTextAreaTestCase
         select(range);
 
         // is not enabled
-        assertFalse(executable.isEnabled(rta));
+        assertFalse(executable.isEnabled());
         // does not execute
-        assertFalse(executable.execute(rta, null));
+        assertFalse(executable.execute(null));
         // doesn't change HTML at all
         assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
 
@@ -120,9 +120,9 @@ public class IndentExecutableTest extends RichTextAreaTestCase
         select(range);
 
         // is not enabled
-        assertFalse(executable.isEnabled(rta));
+        assertFalse(executable.isEnabled());
         // does not execute
-        assertFalse(executable.execute(rta, null));
+        assertFalse(executable.execute(null));
         // doesn't change HTML at all
         assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
     }
@@ -146,9 +146,9 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 select(range);
 
                 // is not enabled
-                assertFalse(executable.isEnabled(rta));
+                assertFalse(executable.isEnabled());
                 // does not execute
-                assertFalse(executable.execute(rta, null));
+                assertFalse(executable.execute(null));
                 // doesn't change HTML at all
                 assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -187,9 +187,9 @@ public class IndentExecutableTest extends RichTextAreaTestCase
         select(range);
 
         // is not enabled
-        assertFalse(executable.isEnabled(rta));
+        assertFalse(executable.isEnabled());
         // does not execute
-        assertFalse(executable.execute(rta, null));
+        assertFalse(executable.execute(null));
         // doesn't change HTML at all
         assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
     }
@@ -218,8 +218,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                     .getChildNodes().getItem(2).getFirstChild(), 5);
                 select(range);
 
-                assertFalse(executable.isEnabled(rta));
-                assertFalse(executable.execute(rta, null));
+                assertFalse(executable.isEnabled());
+                assertFalse(executable.execute(null));
                 assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
             }
         });
@@ -242,8 +242,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>two<ul><li>three</li></ul></li></ul></li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -269,8 +269,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>foo<ul><li>bar<ul><li>foobar</li></ul></li></ul></li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -295,8 +295,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>one plus one</li><li>two</li></ul></li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -320,8 +320,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
 
                 assertEquals("<ol><li>one<ol><li>two</li><li>three</li></ol></li><li>four</li></ol>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
@@ -348,8 +348,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 5);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
 
                 assertEquals("<ol><li>one<ul><li>under 1</li><li>under 2</li><li>two</li><li>three</li></ul>"
                     + "</li><li>four</li></ol>", removeNonBreakingSpaces(clean(rta.getHTML())));
@@ -378,8 +378,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
                 range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 3);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
 
                 assertEquals("<ol><li>one<ul><li>under</li><li>two</li></ul></li><li>three</li><li>four</li></ol>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
@@ -419,8 +419,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild().getChildNodes().getItem(3).getFirstChild(), 8);
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isEnabled());
+        assertTrue(executable.execute(null));
 
         assertEquals("<ul><li>one one</li><li>one two<ul><li>two one<ul><li>two two</li></ul></li><li>one three</li>"
             + "<li>one four</li></ul></li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
@@ -459,8 +459,8 @@ public class IndentExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild().getChildNodes().getItem(3).getFirstChild(), 8);
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isEnabled());
+        assertTrue(executable.execute(null));
 
         assertEquals("<ul><li>one one<ul><li>one two<ul><li>two one<ul><li>two two</li></ul></li></ul>"
             + "after</li><li>one three</li><li>one four</li></ul></li><li>one five</li></ul>",

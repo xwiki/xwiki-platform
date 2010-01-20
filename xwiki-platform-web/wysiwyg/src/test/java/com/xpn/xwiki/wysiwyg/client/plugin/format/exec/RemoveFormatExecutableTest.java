@@ -47,7 +47,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new RemoveFormatExecutable();
+            executable = new RemoveFormatExecutable(rta);
         }
     }
 
@@ -75,7 +75,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.selectNodeContents(getBody());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("abc", clean(rta.getHTML()));
 
         // Selection is inside the formatting tag.
@@ -83,7 +83,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range = rta.getDocument().createRange();
         range.selectNodeContents(getBody().getChildNodes().getItem(1));
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("123", clean(rta.getHTML()));
 
         // Selection includes the end of a formatting tag.
@@ -92,7 +92,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
         range.setEndAfter(getBody().getLastChild());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("1<em>2</em>34", clean(rta.getHTML()));
 
         // Selection includes the start of a formatting tag.
@@ -101,7 +101,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStartBefore(getBody().getFirstChild());
         range.setEnd(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("43<em>2</em>1", clean(rta.getHTML()));
     }
 
@@ -129,7 +129,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.selectNodeContents(getBody());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("abcdefg", clean(rta.getHTML()));
 
         // Selection is inside the formatting tags.
@@ -138,7 +138,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.selectNodeContents(getBody().getChildNodes().getItem(1).getChildNodes().getItem(1).getChildNodes()
             .getItem(1));
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("1<em>2</em><em><strong>3</strong></em>4<em><strong>5</strong></em><em>6</em>7", clean(rta
             .getHTML()));
 
@@ -148,7 +148,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStartBefore(getBody().getFirstChild());
         range.setEndAfter(getBody().getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("765<em><strong><ins>4</ins>3</strong></em><em>2</em>1", clean(rta.getHTML()));
     }
 
@@ -176,7 +176,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.selectNodeContents(getBody());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("321", clean(rta.getHTML()));
 
         // Selection is inside the element with in-line style.
@@ -185,7 +185,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
         range.setEnd(getBody().getChildNodes().getItem(1).getFirstChild(), 2);
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("a<span style=\"color: red\">b</span>c<span style=\"color: red\">d</span>e", clean(rta.getHTML())
             .replace(String.valueOf(';'), ""));
 
@@ -195,7 +195,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
         range.setEndAfter(getBody().getLastChild());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("a<span style=\"color: red\">b</span>cd", clean(rta.getHTML()).replace(";", ""));
     }
 
@@ -223,7 +223,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.selectNodeContents(getBody());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("12345", clean(rta.getHTML()));
 
         // Selection is inside the elements with in-line style.
@@ -232,7 +232,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStart(getBody().getChildNodes().getItem(1).getFirstChild(), 1);
         range.setEnd(getBody().getLastChild().getLastChild().getFirstChild(), 1);
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("1<span style=\"color: red\">2</span>34<span style=\"color: red\">"
             + "<span style=\"font-size: 14pt\">5</span></span>", clean(rta.getHTML()).replace(String.valueOf(';'), ""));
 
@@ -242,7 +242,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStartBefore(getBody().getFirstChild());
         range.setEnd(getBody().getLastChild().getLastChild().getFirstChild(), 1);
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("123<span style=\"color: red\"><span style=\"font-size: 14pt\">4</span></span>", clean(
             rta.getHTML()).replace(String.valueOf(';'), ""));
     }
@@ -271,7 +271,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.selectNodeContents(getBody());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("edcba", clean(rta.getHTML()));
 
         // Selection is inside the mixed style.
@@ -280,7 +280,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStart(getBody().getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild(), 1);
         range.setEnd(getBody().getChildNodes().getItem(1).getChildNodes().getItem(1).getFirstChild(), 2);
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("a<span style=\"color: red\">b</span>"
             + "<span style=\"color: red\"><em style=\"font-size: 10pt\">c</em></span>"
             + "d<span style=\"color: red\"><em style=\"font-size: 10pt\">e</em></span>"
@@ -292,7 +292,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStartBefore(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild());
         range.setEndAfter(getBody().getLastChild());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("<em style=\"font-size: 10pt\">a</em>bcd", clean(rta.getHTML()).replace(String.valueOf(';'), ""));
     }
 
@@ -320,7 +320,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         Range range = rta.getDocument().createRange();
         range.selectNodeContents(getBody());
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("x1<a href=\"about:blank\">y#</a>z", clean(rta.getHTML()));
 
         // Selection is inside the link.
@@ -330,7 +330,7 @@ public class RemoveFormatExecutableTest extends RichTextAreaTestCase
         range.setStart(getBody().getLastChild().getFirstChild().getFirstChild(), 1);
         range.setEnd(getBody().getLastChild().getFirstChild().getLastChild().getFirstChild(), 1);
         select(range);
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.execute(null));
         assertEquals("1<a href=\"about:blank\"><strong style=\"font-size: 18pt\"><span style=\"color: red\">2</span>"
             + "</strong>34<strong style=\"font-size: 18pt\"><span style=\"color: red\"><em>5</em></span></strong></a>"
             + "<strong style=\"font-size: 18pt\">6</strong>", clean(rta.getHTML()).replace(String.valueOf(';'), ""));

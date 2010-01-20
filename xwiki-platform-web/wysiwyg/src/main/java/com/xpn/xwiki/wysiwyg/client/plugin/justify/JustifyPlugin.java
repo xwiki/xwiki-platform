@@ -97,7 +97,7 @@ public class JustifyPlugin extends AbstractStatefulPlugin implements ClickHandle
     {
         getTextArea().getCommandManager().registerCommand(
             command,
-            new ToggleExecutable(new BlockStyleExecutable(Style.TEXT_ALIGN), alignment, Style.TEXT_ALIGN
+            new ToggleExecutable(new BlockStyleExecutable(getTextArea(), Style.TEXT_ALIGN), alignment, Style.TEXT_ALIGN
                 .getDefaultValue()));
     }
 

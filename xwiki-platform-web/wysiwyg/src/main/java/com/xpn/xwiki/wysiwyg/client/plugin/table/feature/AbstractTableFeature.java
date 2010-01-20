@@ -20,7 +20,7 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TableFeature;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
@@ -30,7 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
  * 
  * @version $Id$
  */
-public abstract class AbstractTableFeature extends AbstractExecutable implements TableFeature
+public abstract class AbstractTableFeature extends AbstractSelectionExecutable implements TableFeature
 {
     /**
      * Feature name (examples: inserttable, insertrowbefore).
@@ -57,6 +57,7 @@ public abstract class AbstractTableFeature extends AbstractExecutable implements
      */
     public AbstractTableFeature(String name, Command command, String title, TablePlugin plugin)
     {
+        super(plugin.getTextArea());
         this.name = name;
         this.command = command;
         this.plugin = plugin;

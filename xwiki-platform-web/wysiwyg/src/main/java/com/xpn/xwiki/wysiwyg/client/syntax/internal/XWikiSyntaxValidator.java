@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableIndentOutsideList;
-
 /**
  * Validator for the <em>xwiki/2.0</em> syntax.
  * 
@@ -35,7 +33,6 @@ public class XWikiSyntaxValidator extends DefaultSyntaxValidator
     {
         super("xwiki/2.0");
 
-        // add XWiki specific validation rules
-        addValidationRule(new DisableIndentOutsideList());
+        // Add XWiki specific validation rules.
     }
 }

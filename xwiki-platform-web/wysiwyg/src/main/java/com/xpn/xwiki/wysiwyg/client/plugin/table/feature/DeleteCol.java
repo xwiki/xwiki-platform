@@ -19,16 +19,15 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.TableCellElement;
 import com.google.gwt.dom.client.TableElement;
 import com.google.gwt.dom.client.TableRowElement;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.TablePlugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.table.util.TableUtils;
-import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
  * Feature allowing to remove a column from a table. Before removal the caret is moved to the previous cell in the row.
@@ -57,9 +56,9 @@ public class DeleteCol extends AbstractTableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractTableFeature#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         TableCellElement caretCell =
             TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
@@ -88,11 +87,11 @@ public class DeleteCol extends AbstractTableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractTableFeature#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return super.isEnabled(rta)
+        return super.isEnabled()
             && TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

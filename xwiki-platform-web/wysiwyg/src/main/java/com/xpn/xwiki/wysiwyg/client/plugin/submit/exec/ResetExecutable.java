@@ -21,8 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
-
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractRichTextAreaExecutable;
 
 /**
  * Resets the content of the rich text area. This executable should be used, instead of setting the content of the rich
@@ -34,14 +33,24 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
  * 
  * @version $Id$
  */
-public class ResetExecutable implements Executable
+public class ResetExecutable extends AbstractRichTextAreaExecutable
 {
+    /**
+     * Creates a new executable that can reset the HTML of the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public ResetExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractRichTextAreaExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         if (parameter != null) {
             rta.setHTML(parameter);
@@ -56,9 +65,9 @@ public class ResetExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         return rta.getHTML();
     }
@@ -66,19 +75,19 @@ public class ResetExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return isSupported(rta);
+        return isSupported();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         return rta.isEnabled();
     }
@@ -86,9 +95,9 @@ public class ResetExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
         return rta != null;
     }

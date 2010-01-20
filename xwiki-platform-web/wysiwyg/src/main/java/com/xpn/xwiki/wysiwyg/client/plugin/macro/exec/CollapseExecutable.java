@@ -23,8 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroSelector;
 
@@ -33,7 +32,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroSelector;
  * 
  * @version $Id$
  */
-public class CollapseExecutable extends AbstractExecutable
+public class CollapseExecutable extends AbstractSelectionExecutable
 {
     /**
      * The selector used to query for the currently selected macros. It also holds the displayer used to collapse and
@@ -54,6 +53,7 @@ public class CollapseExecutable extends AbstractExecutable
      */
     public CollapseExecutable(MacroSelector selector, boolean collapse)
     {
+        super(selector.getDisplayer().getTextArea());
         this.selector = selector;
         this.collapse = collapse;
     }
@@ -79,9 +79,9 @@ public class CollapseExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         for (Element macro : getMacros()) {
             selector.getDisplayer().setCollapsed(macro, collapse);
@@ -92,9 +92,9 @@ public class CollapseExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isExecuted(RichTextArea)
+     * @see AbstractSelectionExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         for (Element macro : getMacros()) {
             if (selector.getDisplayer().isCollapsed(macro) != collapse) {

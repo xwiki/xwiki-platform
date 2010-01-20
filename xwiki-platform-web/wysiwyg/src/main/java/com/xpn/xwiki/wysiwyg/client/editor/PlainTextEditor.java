@@ -21,7 +21,7 @@
 package com.xpn.xwiki.wysiwyg.client.editor;
 
 import org.xwiki.gwt.dom.client.Element;
-import org.xwiki.gwt.user.client.Cache;
+import org.xwiki.gwt.user.client.BackForwardCache;
 
 import com.google.gwt.event.dom.client.BlurEvent;
 import com.google.gwt.event.dom.client.BlurHandler;
@@ -77,7 +77,7 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
     /**
      * The object used to cache the content of the plain text editor.
      */
-    private final Cache cache;
+    private final BackForwardCache cache;
 
     /**
      * Flag indicating if this editor is in loading state.
@@ -90,7 +90,7 @@ public class PlainTextEditor extends Composite implements BlurHandler, ClosingHa
      * @param hook the element replaced by the newly created plain text editor
      * @param cache the object used to cache the content of the plain text editor
      */
-    public PlainTextEditor(Element hook, Cache cache)
+    public PlainTextEditor(Element hook, BackForwardCache cache)
     {
         this.hook = hook;
         this.cache = cache;

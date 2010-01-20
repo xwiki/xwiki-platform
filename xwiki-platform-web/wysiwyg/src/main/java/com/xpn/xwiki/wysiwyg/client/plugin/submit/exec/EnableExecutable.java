@@ -20,21 +20,31 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.submit.exec;
 
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractRichTextAreaExecutable;
 
 /**
  * Enables or disables the rich text area. When the rich text area is disabled its content is not submitted.
  * 
  * @version $Id$
  */
-public class EnableExecutable implements Executable
+public class EnableExecutable extends AbstractRichTextAreaExecutable
 {
+    /**
+     * Creates a new executable that can be used to enable and disable the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public EnableExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractRichTextAreaExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         rta.setEnabled(Boolean.parseBoolean(parameter));
         return true;
@@ -43,9 +53,9 @@ public class EnableExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#getParameter(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         return Boolean.toString(rta.isEnabled());
     }
@@ -53,9 +63,9 @@ public class EnableExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
         // Always enabled.
         return true;
@@ -64,9 +74,9 @@ public class EnableExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isExecuted(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         return rta.isEnabled();
     }
@@ -74,9 +84,9 @@ public class EnableExecutable implements Executable
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isSupported(RichTextArea)
+     * @see AbstractRichTextAreaExecutable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
         // Always supported.
         return true;

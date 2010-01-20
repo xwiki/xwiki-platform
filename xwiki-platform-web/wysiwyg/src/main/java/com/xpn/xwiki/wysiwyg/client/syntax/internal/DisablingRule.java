@@ -64,7 +64,7 @@ public class DisablingRule implements ValidationRule
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#areValid(SubmittableRichTextArea)
+     * @see ValidationRule#areValid(RichTextArea)
      */
     public boolean areValid(RichTextArea textArea)
     {

@@ -103,12 +103,19 @@ public class MacroSelector implements Updatable, MouseDownHandler, KeyUpHandler,
     public void onMouseDown(MouseDownEvent event)
     {
         if (event.getSource() == displayer.getTextArea()) {
-            // See if the target is a selected macro.
+            // See if the target is a macro.
             Element target = (Element) event.getNativeEvent().getEventTarget().cast();
-            if (displayer.isMacroContainer(target) && displayer.isSelected(target)) {
-                // If already selected then toggle the collapsed state.
-                displayer.setCollapsed(target, !displayer.isCollapsed(target));
+            if (displayer.isMacroContainer(target)) {
+                // See if the macro is already selected.
+                if (displayer.isSelected(target)) {
+                    // If already selected then toggle the collapsed state.
+                    displayer.setCollapsed(target, !displayer.isCollapsed(target));
+                } else {
+                    // Select the macro immediately.
+                    update();
+                }
             } else {
+                // Otherwise just schedule an update for the list of selected macros.
                 updater.deferUpdate();
             }
         }

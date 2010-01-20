@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
 
@@ -32,6 +33,16 @@ import com.google.gwt.dom.client.Node;
  */
 public class IndentExecutable extends AbstractListExecutable
 {
+    /**
+     * Creates a new executable that can be used to indent list items inside the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public IndentExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
     /**
      * {@inheritDoc}
      */

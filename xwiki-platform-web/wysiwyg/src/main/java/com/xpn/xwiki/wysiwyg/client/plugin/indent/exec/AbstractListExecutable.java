@@ -21,8 +21,10 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.dom.client.Selection;
+import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
 import com.google.gwt.dom.client.Node;
 
@@ -31,7 +33,7 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public abstract class AbstractListExecutable extends AbstractExecutable
+public abstract class AbstractListExecutable extends AbstractSelectionExecutable
 {
     /**
      * List item element name.
@@ -49,12 +51,21 @@ public abstract class AbstractListExecutable extends AbstractExecutable
     protected static final String ORDERED_LIST_TAG = "ol";
 
     /**
-     * @param rta the {@link RichTextArea} for which the selection is checked
-     * @return the list item in which the selection is positioned currently, or null if no such thing exists.
+     * Creates a new executable to be executed on the specified rich text area.
+     * 
+     * @param rta the execution target
      */
-    protected Element getListItem(RichTextArea rta)
+    public AbstractListExecutable(RichTextArea rta)
     {
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        super(rta);
+    }
+
+    /**
+     * @param range a DOM range
+     * @return the list item in which the given range is positioned, or {@code null} if no such thing exists
+     */
+    protected Element getListItem(Range range)
+    {
         return (Element) domUtils.getFirstAncestor(range.getCommonAncestorContainer(), LIST_ITEM_TAG);
     }
 
@@ -75,12 +86,13 @@ public abstract class AbstractListExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         boolean executionResult = false;
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        Selection selection = rta.getDocument().getSelection();
+        Range range = selection.getRangeAt(0);
         if (range.isCollapsed()) {
-            Element listItem = getListItem(rta);
+            Element listItem = getListItem(range);
             if (canExecute(listItem)) {
                 execute(listItem);
                 executionResult = true;
@@ -89,8 +101,8 @@ public abstract class AbstractListExecutable extends AbstractExecutable
             executionResult = executeOnMultipleItems(range, true);
         }
         // try to restore selection, hope it all stays well
-        rta.getDocument().getSelection().removeAllRanges();
-        rta.getDocument().getSelection().addRange(range);
+        selection.removeAllRanges();
+        selection.addRange(range);
 
         return executionResult;
     }
@@ -129,23 +141,29 @@ public abstract class AbstractListExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListExecutable#isEnabled(RichTextArea)
+     * @see AbstractListExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        if (!super.isEnabled(rta)) {
-            return false;
-        }
+        return cache.get(AbstractListExecutable.class.getName() + "#enabled", new CacheCallback<Boolean>()
+        {
+            public Boolean get()
+            {
+                if (!AbstractListExecutable.super.isEnabled()) {
+                    return false;
+                }
 
-        // get the range and check if execution is possible: if it's collapsed, it's the common list item ancestor to
-        // perform operation on, if it's expanded, it's each "touched" list item
-        Range range = rta.getDocument().getSelection().getRangeAt(0);
-        if (range.isCollapsed()) {
-            Element listItem = getListItem(rta);
-            return canExecute(listItem);
-        } else {
-            // check the execution is possible on multiple items, without actually performing it
-            return executeOnMultipleItems(range, false);
-        }
+                // Get the range and check if execution is possible: if it's collapsed, it's the common list item
+                // ancestor to perform operation on, if it's expanded, it's each "touched" list item.
+                Range range = rta.getDocument().getSelection().getRangeAt(0);
+                if (range.isCollapsed()) {
+                    Element listItem = getListItem(range);
+                    return canExecute(listItem);
+                } else {
+                    // Check the execution is possible on multiple items, without actually performing it.
+                    return executeOnMultipleItems(range, false);
+                }
+            }
+        });
     }
 }

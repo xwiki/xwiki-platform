@@ -24,6 +24,7 @@ import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.StringUtils;
+import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 
@@ -39,6 +40,16 @@ import com.xpn.xwiki.wysiwyg.client.plugin.image.ImageConfig.ImageAlignment;
 public class InsertImageExecutable extends InsertHTMLExecutable
 {
     /**
+     * Creates a new executable that can be used to insert images in the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public InsertImageExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
+    /**
      * Gets the image element in the current selection.
      * 
      * @param rta the rich text area to get the selection from.
@@ -46,11 +57,8 @@ public class InsertImageExecutable extends InsertHTMLExecutable
      */
     private Element getSelectedImage(RichTextArea rta)
     {
-        // First, let's check if we have a selection.
-        if (rta.getDocument().getSelection().getRangeCount() == 0) {
-            return null;
-        }
-        // Second, let's check if the current selection perfectly wraps an image.
+        // Check if the current selection perfectly wraps an image.
+        // We expect the selection to have at least one range, otherwise this executable wouldn't be enabled.
         Range currentRange = rta.getDocument().getSelection().getRangeAt(0);
         Node startContainer = currentRange.getStartContainer();
         Node endContainer = currentRange.getEndContainer();
@@ -69,19 +77,25 @@ public class InsertImageExecutable extends InsertHTMLExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#isExecuted(RichTextArea)
+     * @see InsertHTMLExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
-        return getSelectedImage(rta) != null;
+        return cache.get(InsertImageExecutable.class.getName() + "#executed", new CacheCallback<Boolean>()
+        {
+            public Boolean get()
+            {
+                return getSelectedImage(rta) != null;
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#getParameter(RichTextArea)
+     * @see InsertHTMLExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         Element selectedImageElement = getSelectedImage(rta);
         if (selectedImageElement == null) {

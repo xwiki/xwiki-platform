@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.macro.exec;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.InsertHTMLExecutable;
 
 import com.xpn.xwiki.wysiwyg.client.plugin.macro.MacroPlugin;
@@ -44,27 +43,28 @@ public class InsertExecutable extends InsertHTMLExecutable
      */
     public InsertExecutable(MacroSelector selector)
     {
+        super(selector.getDisplayer().getTextArea());
         this.selector = selector;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#execute(RichTextArea, String)
+     * @see InsertHTMLExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         // We don't go through the command manager because we don't want to trigger the history mechanism.
-        return super.execute(rta, "<!--" + param + "--><!--stopmacro-->")
-            && rta.getCommandManager().getExecutable(MacroPlugin.REFRESH).execute(rta, null);
+        return super.execute("<!--" + param + "--><!--stopmacro-->")
+            && rta.getCommandManager().getExecutable(MacroPlugin.REFRESH).execute(null);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#getParameter(RichTextArea)
+     * @see InsertHTMLExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         if (selector.getMacroCount() > 0) {
             return selector.getDisplayer().getSerializedMacroCall(selector.getMacro(0));

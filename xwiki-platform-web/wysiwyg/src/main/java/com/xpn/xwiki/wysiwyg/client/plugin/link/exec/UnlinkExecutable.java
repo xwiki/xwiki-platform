@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.link.exec;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
 
 /**
@@ -31,14 +31,24 @@ import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
  * 
  * @version $Id$
  */
-public class UnlinkExecutable extends AbstractExecutable
+public class UnlinkExecutable extends AbstractSelectionExecutable
 {
+    /**
+     * Creates a new executable that can be used to remove links from the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public UnlinkExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         // Get the selected anchor
         Element selectedAnchor = LinkExecutableUtils.getSelectedAnchor(rta);
@@ -94,11 +104,11 @@ public class UnlinkExecutable extends AbstractExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#isEnabled(RichTextArea)
+     * @see AbstractSelectionExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
         // check that there is a selected anchor
-        return LinkExecutableUtils.getSelectedAnchor(rta) != null;
+        return super.isEnabled() && LinkExecutableUtils.getSelectedAnchor(rta) != null;
     }
 }

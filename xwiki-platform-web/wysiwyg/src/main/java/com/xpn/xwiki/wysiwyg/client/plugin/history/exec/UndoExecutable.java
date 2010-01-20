@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.history.exec;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-
 import com.xpn.xwiki.wysiwyg.client.plugin.history.History;
 
 /**
@@ -43,9 +41,9 @@ public class UndoExecutable extends AbstractHistoryExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractHistoryExecutable#execute(RichTextArea, String)
+     * @see AbstractHistoryExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         if (getHistory().canUndo()) {
             getHistory().undo();
@@ -58,9 +56,9 @@ public class UndoExecutable extends AbstractHistoryExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractHistoryExecutable#getParameter(RichTextArea)
+     * @see AbstractHistoryExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         return null;
     }
@@ -68,9 +66,9 @@ public class UndoExecutable extends AbstractHistoryExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractHistoryExecutable#isEnabled(RichTextArea)
+     * @see AbstractHistoryExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
         return getHistory().canUndo();
     }
@@ -78,9 +76,9 @@ public class UndoExecutable extends AbstractHistoryExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractHistoryExecutable#isExecuted(RichTextArea)
+     * @see AbstractHistoryExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         return getHistory().canRedo();
     }
@@ -88,9 +86,9 @@ public class UndoExecutable extends AbstractHistoryExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractHistoryExecutable#isSupported(RichTextArea)
+     * @see AbstractHistoryExecutable#isSupported()
      */
-    public boolean isSupported(RichTextArea rta)
+    public boolean isSupported()
     {
         return true;
     }

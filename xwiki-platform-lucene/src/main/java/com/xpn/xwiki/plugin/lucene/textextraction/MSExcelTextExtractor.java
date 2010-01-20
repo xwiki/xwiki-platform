@@ -180,9 +180,8 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
                 if (fmtText != null) {
                     fmtText = fmtText.toLowerCase();
 
-                    if (fmtText.indexOf("d") >= 0 || fmtText.indexOf("m") >= 0
-                        || fmtText.indexOf("y") >= 0 || fmtText.indexOf("h") >= 0
-                        || fmtText.indexOf("s") >= 0) {
+                    if (fmtText.indexOf("d") >= 0 || fmtText.indexOf("m") >= 0 || fmtText.indexOf("y") >= 0
+                        || fmtText.indexOf("h") >= 0 || fmtText.indexOf("s") >= 0) {
                         return true;
                     }
                 }

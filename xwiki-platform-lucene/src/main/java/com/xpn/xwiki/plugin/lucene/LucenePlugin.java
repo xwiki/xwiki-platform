@@ -445,6 +445,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         if (LOG.isDebugEnabled()) {
             LOG.debug("lucene plugin: in init");
         }
+
         this.config = context.getWiki().getConfig();
 
         this.indexDirs = this.config.getProperty(PROP_INDEX_DIR);
@@ -462,7 +463,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             }
             directory = FSDirectory.open(f);
         } catch (IOException e) {
-            LOG.error("Failed to open the index directory: " + e);
+            LOG.error("Failed to open the index directory: ", e);
             throw new RuntimeException(e);
         }
 
@@ -479,6 +480,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
             LOG.warn("Invalid indexing interval in configuration.");
             indexingInterval = 30000;
         }
+
         int maxQueueSize;
         try {
             maxQueueSize = Integer.parseInt(this.config.getProperty(LucenePlugin.PROP_MAX_QUEUE_SIZE, "1000"));
@@ -552,13 +554,16 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
     public void flushCache(XWikiContext context)
     {
-        Utils.getComponent(ObservationManager.class).removeListener(this.indexUpdater.getName());
+        if (this.indexUpdater != null) {
+            Utils.getComponent(ObservationManager.class).removeListener(this.indexUpdater.getName());
+
+            // set the thread to exit
+            this.indexUpdater.doExit();
+        }
 
         this.indexRebuilder = null;
 
         try {
-            // set the thread to exit
-            this.indexUpdater.doExit();
             // wait for the thread to finish
             this.indexUpdaterThread.join();
         } catch (InterruptedException ex) {
@@ -607,7 +612,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
                     }
                     IndexReader reader = IndexReader.open(dirs[i], true);
                     searchersList.add(new IndexSearcher(reader));
-                    break ;
+                    break;
                 } catch (CorruptIndexException e) {
                     handleCorruptIndex(context);
                 }
@@ -625,10 +630,10 @@ public class LucenePlugin extends XWikiDefaultPlugin
         try {
             closeSearchers(this.searchers);
             this.searchers = createSearchers(this.indexDirs, context);
-        } catch (Exception e1) {
-            LOG.error("error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e1);
+        } catch (Exception e) {
+            LOG.error("error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e);
             throw new RuntimeException("error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR),
-                e1);
+                e);
         }
     }
 
@@ -678,14 +683,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
     {
         return this.indexUpdater.getLuceneDocCount();
     }
-
-    /**
-     * @return the number of documents in the second queue gave to Lucene.
-     */
-    // public long getActiveQueueSize()
-    // {
-    // return indexUpdater.getActiveQueueSize();
-    // }
 
     /**
      * Handle a corrupt index by clearing it and rebuilding from scratch.

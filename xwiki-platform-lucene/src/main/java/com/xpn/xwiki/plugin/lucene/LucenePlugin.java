@@ -549,7 +549,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
         Utils.getComponent(ObservationManager.class).addListener(indexUpdater);
 
-        LOG.info("lucene plugin initialized.");
+        LOG.debug("lucene plugin initialized.");
     }
 
     public void flushCache(XWikiContext context)
@@ -559,16 +559,19 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
             // set the thread to exit
             this.indexUpdater.doExit();
+
+            try {
+                // wait for the thread to finish
+                this.indexUpdaterThread.join();
+            } catch (InterruptedException ex) {
+                LOG.warn("Error while waiting for indexUpdaterThread to die.", ex);
+            }
+
+            this.indexUpdater = null;
+            this.indexUpdaterThread = null;
         }
 
         this.indexRebuilder = null;
-
-        try {
-            // wait for the thread to finish
-            this.indexUpdaterThread.join();
-        } catch (InterruptedException ex) {
-            LOG.warn("Error while waiting for indexUpdaterThread to die.", ex);
-        }
 
         try {
             closeSearchers(this.searchers);
@@ -576,7 +579,6 @@ public class LucenePlugin extends XWikiDefaultPlugin
             LOG.warn("cannot close searchers", e);
         }
 
-        this.indexUpdater = null;
         this.analyzer = null;
 
         init(context);

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.dom.client.TableCellElement;
@@ -56,9 +55,9 @@ public class DeleteRow extends AbstractTableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractTableFeature#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         TableCellElement caretCell =
             TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
@@ -83,11 +82,11 @@ public class DeleteRow extends AbstractTableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractTableFeature#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return super.isEnabled(rta)
+        return super.isEnabled()
             && TableUtils.getInstance().getRow(TableUtils.getInstance().getCaretNode(rta.getDocument())) != null;
     }
 }

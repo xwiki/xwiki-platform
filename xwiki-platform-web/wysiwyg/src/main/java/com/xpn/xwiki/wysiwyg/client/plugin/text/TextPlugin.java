@@ -81,15 +81,15 @@ public class TextPlugin extends AbstractStatefulPlugin implements ClickHandler
         super.init(textArea, config);
 
         // Register custom executables.
-        getTextArea().getCommandManager().registerCommand(Command.BOLD, new BoldExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.BOLD, new BoldExecutable(textArea));
         getTextArea().getCommandManager().registerCommand(Command.ITALIC,
-            new ToggleInlineStyleExecutable(Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
+            new ToggleInlineStyleExecutable(textArea, Style.FONT_STYLE, Style.FontStyle.ITALIC, "em"));
         getTextArea().getCommandManager().registerCommand(Command.UNDERLINE,
-            new ToggleInlineStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.UNDERLINE, "ins"));
+            new ToggleInlineStyleExecutable(textArea, Style.TEXT_DECORATION, Style.TextDecoration.UNDERLINE, "ins"));
         getTextArea().getCommandManager().registerCommand(Command.STRIKE_THROUGH,
-            new ToggleInlineStyleExecutable(Style.TEXT_DECORATION, Style.TextDecoration.LINE_THROUGH, "del"));
+            new ToggleInlineStyleExecutable(textArea, Style.TEXT_DECORATION, Style.TextDecoration.LINE_THROUGH, "del"));
         getTextArea().getCommandManager().registerCommand(Command.TELETYPE,
-            new ToggleInlineStyleExecutable(Style.FONT_FAMILY, "monospace", "tt"));
+            new ToggleInlineStyleExecutable(textArea, Style.FONT_FAMILY, "monospace", "tt"));
 
         shortcutKeyManager = new ShortcutKeyManager();
 

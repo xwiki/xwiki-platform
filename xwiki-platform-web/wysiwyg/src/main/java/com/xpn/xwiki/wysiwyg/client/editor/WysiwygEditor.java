@@ -20,10 +20,10 @@
 package com.xpn.xwiki.wysiwyg.client.editor;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.xwiki.gwt.dom.client.Element;
+import org.xwiki.gwt.user.client.BackForwardCache;
 import org.xwiki.gwt.user.client.Cache;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.Console;
@@ -44,8 +44,6 @@ import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.DeferredCommand;
-import com.google.gwt.user.client.IncrementalCommand;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,49 +62,6 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
  */
 public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, CommandListener, LoadHandler
 {
-    /**
-     * Iterates through the features placed on the tool bar and enables or disables them by following the syntax
-     * validation rules.
-     */
-    private class SyntaxValidationCommand implements IncrementalCommand
-    {
-        /**
-         * Iterator for the features placed on the tool bar. For each entry the key is the feature name and the value is
-         * the widget present on the tool bar.
-         */
-        private final Iterator<Map.Entry<String, UIExtension>> iterator;
-
-        /**
-         * Default constructor. Initializes the iterator for the tool bar features.
-         */
-        public SyntaxValidationCommand()
-        {
-            iterator = toolBarFeatures.entrySet().iterator();
-        }
-
-        /**
-         * {@inheritDoc}
-         * 
-         * @see IncrementalCommand#execute()
-         */
-        public boolean execute()
-        {
-            try {
-                if (canUpdate() && iterator.hasNext()) {
-                    Map.Entry<String, UIExtension> entry = iterator.next();
-                    entry.getValue().setEnabled(entry.getKey(),
-                        sv.isValid(entry.getKey(), richTextEditor.getTextArea()));
-                    return true;
-                } else {
-                    return false;
-                }
-            } catch (Exception e) {
-                Console.getInstance().error(e, WysiwygEditor.class.getName(), SyntaxValidationCommand.class.getName());
-                return false;
-            }
-        }
-    }
-
     /**
      * The default storage syntax.
      */
@@ -215,6 +170,11 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      * edited document is reloaded.
      */
     private boolean loaded;
+
+    /**
+     * The object used to cache some of the evaluations made for the current rich text area selection.
+     */
+    private Cache selectionCache;
 
     /**
      * Creates a new WYSIWYG editor.
@@ -347,7 +307,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
         for (int i = 0; i < rootExtensionNames.length; i++) {
             UIExtension rootExtension = pm.getUIExtension("root", rootExtensionNames[i]);
             if (rootExtension != null) {
-                getRichTextEditor().getContainer().add((Widget) rootExtension.getUIObject(rootExtensionNames[i]));
+                richTextEditor.getContainer().add((Widget) rootExtension.getUIObject(rootExtensionNames[i]));
             }
         }
     }
@@ -360,7 +320,8 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     private TabPanel createTabPanel()
     {
-        final Cache cache = new Cache((Element) DOM.getElementById(config.getParameter("cacheId", "")).cast());
+        Element cacheableElement = (Element) DOM.getElementById(config.getParameter("cacheId", "")).cast();
+        final BackForwardCache cache = new BackForwardCache(cacheableElement);
         PlainTextEditor plainTextEditor = new PlainTextEditor(getHook(), cache);
 
         TabPanel tabs = new TabPanel();
@@ -409,7 +370,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
         for (int i = 0; i < entries.length; i++) {
             UIExtension uie = pm.getUIExtension(MENU_ROLE, entries[i]);
             if (uie != null) {
-                getRichTextEditor().getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
+                richTextEditor.getMenu().addItem((MenuItem) uie.getUIObject(entries[i]));
             }
         }
     }
@@ -433,12 +394,12 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
                         continue;
                     } else {
                         if (verticalBar != null) {
-                            getRichTextEditor().getToolbar().add(
+                            richTextEditor.getToolbar().add(
                                 (Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
                             toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         } else if (lineBreak != null) {
-                            getRichTextEditor().getToolbar().add(
-                                (Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                            richTextEditor.getToolbar()
+                                .add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
                             toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                             lineBreak = null;
                         }
@@ -451,8 +412,8 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
                         continue;
                     } else {
                         if (lineBreak != null) {
-                            getRichTextEditor().getToolbar().add(
-                                (Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                            richTextEditor.getToolbar()
+                                .add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
                             toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         }
                         lineBreak = uie;
@@ -463,17 +424,16 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
                     }
                 } else {
                     if (verticalBar != null) {
-                        getRichTextEditor().getToolbar().add(
-                            (Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
+                        richTextEditor.getToolbar()
+                            .add((Widget) verticalBar.getUIObject(ToolBarSeparator.VERTICAL_BAR));
                         toolBarFeatures.put(ToolBarSeparator.VERTICAL_BAR, verticalBar);
                         verticalBar = null;
                     } else if (lineBreak != null) {
-                        getRichTextEditor().getToolbar().add(
-                            (Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
+                        richTextEditor.getToolbar().add((Widget) lineBreak.getUIObject(ToolBarSeparator.LINE_BREAK));
                         toolBarFeatures.put(ToolBarSeparator.LINE_BREAK, lineBreak);
                         lineBreak = null;
                     }
-                    getRichTextEditor().getToolbar().add((Widget) uie.getUIObject(toolBarFeatureNames[i]));
+                    richTextEditor.getToolbar().add((Widget) uie.getUIObject(toolBarFeatureNames[i]));
                     toolBarFeatures.put(toolBarFeatureNames[i], uie);
                     emptyGroup = false;
                     emptyLine = false;
@@ -491,7 +451,15 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
      */
     public void update()
     {
-        DeferredCommand.addCommand(new SyntaxValidationCommand());
+        selectionCache.clear(false);
+        for (Map.Entry<String, UIExtension> entry : toolBarFeatures.entrySet()) {
+            try {
+                entry.getValue().setEnabled(entry.getKey(), sv.isValid(entry.getKey(), richTextEditor.getTextArea()));
+            } catch (Exception e) {
+                Console.getInstance().error(e, "Failed to update tool bar: " + entry.getKey());
+            }
+        }
+        selectionCache.clear(true);
     }
 
     /**
@@ -502,7 +470,7 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
     public boolean canUpdate()
     {
         // NOTE: Currently only the rich text area triggers updates.
-        return getRichTextEditor().getTextArea().isAttached() && getRichTextEditor().getTextArea().isEnabled();
+        return richTextEditor.getTextArea().isAttached() && richTextEditor.getTextArea().isEnabled();
     }
 
     /**
@@ -537,6 +505,8 @@ public class WysiwygEditor implements Updatable, MouseUpHandler, KeyUpHandler, C
 
             pm = new DefaultPluginManager(richTextEditor.getTextArea(), config);
             pm.setPluginFactoryManager(pfm);
+
+            selectionCache = new Cache(richTextEditor.getTextArea().getElement());
         }
         return richTextEditor;
     }

@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color.exec;
 
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultExecutable;
 
@@ -33,9 +34,11 @@ public class BackColorExecutable extends DefaultExecutable
 {
     /**
      * Creates a new executable of this type.
+     * 
+     * @param rta the execution target
      */
-    public BackColorExecutable()
+    public BackColorExecutable(RichTextArea rta)
     {
-        super(Command.BACK_COLOR.toString());
+        super(rta, Command.BACK_COLOR.toString());
     }
 }

@@ -27,7 +27,6 @@ import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.CloseEvent;
@@ -99,8 +98,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
         super.init(textArea, config);
 
         // Register custom executables.
-        getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR,
-            (Executable) GWT.create(BackColorExecutable.class));
+        getTextArea().getCommandManager().registerCommand(Command.BACK_COLOR, getBackColorExecutable());
 
         addFeature("forecolor", Command.FORE_COLOR, Images.INSTANCE.foreColor().createImage(), Strings.INSTANCE
             .foreColor());
@@ -210,5 +208,13 @@ public class ColorPlugin extends AbstractPlugin implements ClickHandler, CloseHa
             saveRegistration(colorPicker.addCloseHandler(this));
         }
         return colorPicker;
+    }
+
+    /**
+     * @return the executable used to change the background color of the selected text
+     */
+    protected Executable getBackColorExecutable()
+    {
+        return new BackColorExecutable(getTextArea());
     }
 }

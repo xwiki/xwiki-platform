@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
+import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.wysiwyg.client.plugin.Plugin;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPluginFactory;
 
@@ -60,6 +61,6 @@ public final class ColorPluginFactory extends AbstractPluginFactory
      */
     public Plugin newInstance()
     {
-        return new ColorPlugin();
+        return GWT.create(ColorPlugin.class);
     }
 }

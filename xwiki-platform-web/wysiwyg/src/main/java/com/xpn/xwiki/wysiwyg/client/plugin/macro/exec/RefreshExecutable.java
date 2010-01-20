@@ -28,7 +28,7 @@ import org.xwiki.gwt.user.client.ui.rta.Reloader;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.rta.cmd.CommandManager;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -37,7 +37,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * 
  * @version $Id$
  */
-public class RefreshExecutable extends AbstractExecutable
+public class RefreshExecutable extends AbstractSelectionExecutable
 {
     /**
      * The command used to notify all the plug-ins that the content of the rich text area is about to be submitted.
@@ -55,11 +55,21 @@ public class RefreshExecutable extends AbstractExecutable
     private final LoadingPanel waiting = new LoadingPanel();
 
     /**
+     * Creates a new executable that can be used to refresh the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public RefreshExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(final RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         // Check if there is a refresh in progress.
         if (waiting.isLoading()) {
@@ -72,7 +82,7 @@ public class RefreshExecutable extends AbstractExecutable
 
         // Request the updated content.
         CommandManager cmdManager = rta.getCommandManager();
-        refresh(rta, cmdManager.execute(SUBMIT) ? cmdManager.getStringValue(SUBMIT) : rta.getHTML());
+        refresh(cmdManager.execute(SUBMIT) ? cmdManager.getStringValue(SUBMIT) : rta.getHTML());
 
         return true;
     }
@@ -80,10 +90,9 @@ public class RefreshExecutable extends AbstractExecutable
     /**
      * Sends a request to the server to parse and re-render the content of the given rich text area.
      * 
-     * @param rta the rich text area whose content will be refreshed
      * @param html the HTML content of the rich text area
      */
-    private void refresh(final RichTextArea rta, String html)
+    private void refresh(String html)
     {
         Map<String, String> params = new HashMap<String, String>();
         params.put("html", html);

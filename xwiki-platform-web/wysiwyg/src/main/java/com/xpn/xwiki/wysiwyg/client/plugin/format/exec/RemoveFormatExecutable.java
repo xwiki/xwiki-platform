@@ -52,12 +52,14 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
 
     /**
      * Creates a new executable that can be used to remove the in-line style from the current text selection.
+     * 
+     * @param rta the execution target
      */
-    public RemoveFormatExecutable()
+    public RemoveFormatExecutable(RichTextArea rta)
     {
         // We remove all the in-line CSS properties and all the formatting tags so there's no need for a specific
         // property or a specific tag name.
-        super(null, null, null);
+        super(rta, null, null, null);
     }
 
     /**
@@ -229,9 +231,9 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see ToggleInlineStyleExecutable#isExecuted(RichTextArea)
+     * @see ToggleInlineStyleExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         // NOTE: This is just a trick that forces removeStyle to be called each time execute is called. Returning false
         // all the time is not better so we keep it like this for now.
@@ -241,9 +243,9 @@ public class RemoveFormatExecutable extends ToggleInlineStyleExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see ToggleInlineStyleExecutable#getParameter(RichTextArea)
+     * @see ToggleInlineStyleExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         // No parameter.
         return null;

@@ -23,7 +23,7 @@ import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
 import com.google.gwt.dom.client.Node;
 
@@ -34,14 +34,24 @@ import com.google.gwt.dom.client.Node;
  * 
  * @version $Id$
  */
-public class InsertHRExecutable extends AbstractExecutable
+public class InsertHRExecutable extends AbstractSelectionExecutable
 {
+    /**
+     * Creates a new executable that can be used to insert a horizontal rule in the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public InsertHRExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractExecutable#execute(RichTextArea, String)
+     * @see AbstractSelectionExecutable#execute(String)
      */
-    public boolean execute(RichTextArea rta, String param)
+    public boolean execute(String param)
     {
         Selection selection = rta.getDocument().getSelection();
         if (!selection.isCollapsed()) {

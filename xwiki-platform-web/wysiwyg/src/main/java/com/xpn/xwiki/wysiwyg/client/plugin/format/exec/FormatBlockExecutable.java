@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.format.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractBlockExecutable;
 
 import com.google.gwt.dom.client.Node;
@@ -32,6 +33,16 @@ import com.google.gwt.dom.client.Node;
  */
 public class FormatBlockExecutable extends AbstractBlockExecutable
 {
+    /**
+     * Create a new executable to be executed on the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public FormatBlockExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
     /**
      * {@inheritDoc}
      * <p>

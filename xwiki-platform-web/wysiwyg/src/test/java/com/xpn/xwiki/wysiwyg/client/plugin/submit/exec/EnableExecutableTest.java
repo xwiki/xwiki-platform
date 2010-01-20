@@ -44,7 +44,7 @@ public class EnableExecutableTest extends RichTextAreaTestCase
     {
         super.gwtSetUp();
 
-        rta.getCommandManager().registerCommand(ENABLE, new EnableExecutable());
+        rta.getCommandManager().registerCommand(ENABLE, new EnableExecutable(rta));
     }
 
     /**

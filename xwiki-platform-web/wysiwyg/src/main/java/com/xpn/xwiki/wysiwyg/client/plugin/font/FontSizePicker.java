@@ -27,12 +27,12 @@ import org.xwiki.gwt.dom.client.Style;
  * 
  * @version $Id$
  */
-public class FontSizePicker extends AbstractListBoxPicker
+public class FontSizePicker extends CachedListBoxPicker
 {
     /**
      * The object used to compare font sizes.
      */
-    private final FontSizeComparator comparator = new FontSizeComparator();
+    private final Matcher<String> matcher = new FontSizeComparator();
 
     /**
      * Creates a new empty font size picker.
@@ -45,7 +45,7 @@ public class FontSizePicker extends AbstractListBoxPicker
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setValue(int, String)
+     * @see CachedListBoxPicker#setValue(int, String)
      */
     public void setValue(int index, String value)
     {
@@ -57,14 +57,14 @@ public class FontSizePicker extends AbstractListBoxPicker
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setSelectedValue(String)
+     * @see CachedListBoxPicker#setSelectedValue(String)
      */
     public void setSelectedValue(String value)
     {
         if (isRelative(value)) {
             super.setSelectedValue(value);
         } else {
-            setSelectedValue(value, comparator);
+            setSelectedValue(value, matcher);
         }
     }
 

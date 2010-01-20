@@ -27,7 +27,6 @@ import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
 import org.xwiki.gwt.user.client.StringUtils;
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 import org.xwiki.gwt.user.client.ui.wizard.Wizard;
 import org.xwiki.gwt.user.client.ui.wizard.WizardListener;
@@ -150,10 +149,9 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
     /**
      * Insert a HTML table in the editor.
      * 
-     * @param rta WYSIWYG RichTextArea
      * @param config creation parameters.
      */
-    public void insertTable(RichTextArea rta, TableConfig config)
+    public void insertTable(TableConfig config)
     {
         Selection selection = rta.getDocument().getSelection();
         if (!selection.isCollapsed()) {
@@ -193,16 +191,16 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractTableFeature#execute(RichTextArea, String)
+     * @see AbstractTableFeature#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         if (StringUtils.isEmpty(parameter)) {
             // The command has been executed without insertion configuration, start the insert table wizard.
             getWizard().start(CONFIG_STEP_NAME, null);
         } else {
             // Insert the table element.
-            insertTable(rta, (TableConfig) TableConfig.fromJson(parameter));
+            insertTable((TableConfig) TableConfig.fromJson(parameter));
         }
 
         return true;
@@ -211,11 +209,11 @@ public class InsertTable extends AbstractTableFeature implements WizardListener
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractTableFeature#isEnabled(RichTextArea)
+     * @see AbstractTableFeature#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        return super.isEnabled(rta)
+        return super.isEnabled()
             && TableUtils.getInstance().getTable(TableUtils.getInstance().getCaretNode(rta.getDocument())) == null;
     }
 

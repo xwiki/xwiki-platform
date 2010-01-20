@@ -74,8 +74,8 @@ public class FormatPlugin extends AbstractStatefulPlugin implements ChangeHandle
         super.init(textArea, config);
 
         // Register custom executables.
-        getTextArea().getCommandManager().registerCommand(Command.FORMAT_BLOCK, new FormatBlockExecutable());
-        getTextArea().getCommandManager().registerCommand(Command.REMOVE_FORMAT, new RemoveFormatExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.FORMAT_BLOCK, new FormatBlockExecutable(textArea));
+        getTextArea().getCommandManager().registerCommand(Command.REMOVE_FORMAT, new RemoveFormatExecutable(textArea));
 
         addFeature("removeformat", Command.REMOVE_FORMAT, Images.INSTANCE.removeFormat().createImage(),
             Strings.INSTANCE.removeFormat());

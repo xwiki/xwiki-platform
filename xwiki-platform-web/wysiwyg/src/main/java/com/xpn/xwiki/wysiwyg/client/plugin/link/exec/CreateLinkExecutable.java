@@ -46,13 +46,23 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
     private static final String HREF_ATTRIBUTE_NAME = "href";
 
     /**
+     * Creates a new executable that can be used to insert links in the specified rich text area.
+     * 
+     * @param rta the execution target
+     */
+    public CreateLinkExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
+
+    /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#isEnabled(RichTextArea)
+     * @see InsertHTMLExecutable#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        if (!super.isEnabled(rta)) {
+        if (!super.isEnabled()) {
             return false;
         }
 
@@ -100,9 +110,9 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#isExecuted(RichTextArea)
+     * @see InsertHTMLExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         // if the whole selection is inside an anchor, the command is executed
         return LinkExecutableUtils.getSelectedAnchor(rta) != null;
@@ -111,9 +121,9 @@ public class CreateLinkExecutable extends InsertHTMLExecutable
     /**
      * {@inheritDoc}
      * 
-     * @see InsertHTMLExecutable#getParameter(RichTextArea)
+     * @see InsertHTMLExecutable#getParameter()
      */
-    public String getParameter(RichTextArea rta)
+    public String getParameter()
     {
         LinkConfig linkConfig = new LinkConfig();
         Element wrappingAnchor = LinkExecutableUtils.getSelectedAnchor(rta);

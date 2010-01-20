@@ -140,7 +140,7 @@ public class DefaultSyntaxValidator implements SyntaxValidator
     /**
      * {@inheritDoc}
      * 
-     * @see SyntaxValidator#isValid(String, SubmittableRichTextArea)
+     * @see SyntaxValidator#isValid(String, RichTextArea)
      */
     public boolean isValid(String feature, RichTextArea textArea)
     {

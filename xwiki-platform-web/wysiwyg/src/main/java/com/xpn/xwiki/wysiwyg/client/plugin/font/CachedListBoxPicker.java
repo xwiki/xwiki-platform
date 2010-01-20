@@ -17,40 +17,47 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.syntax.rule;
+package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
-
-import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Validation rule for disabling the indent and outdent features when the selection is outside a list item. These two
- * features behave differently according to the context in which they are called. For the moment we use them only to
- * indent and outdent list items. We'll drop this constraint when we'll add support for block-quotes in the editor.
+ * Caches the index of selected values.
  * 
  * @version $Id$
  */
-public class DisableIndentOutsideList implements ValidationRule
+public class CachedListBoxPicker extends AbstractListBoxPicker
 {
+    /**
+     * The cache maps values to their index in the list.
+     */
+    private Map<String, Integer> cache = new HashMap<String, Integer>();
+
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#areValid(SubmittableRichTextArea)
+     * @see AbstractListBoxPicker#setValue(int, String)
      */
-    public boolean areValid(RichTextArea textArea)
+    public void setValue(int index, String value)
     {
-        return textArea.getCommandManager().isExecuted(Command.INSERT_UNORDERED_LIST)
-            || textArea.getCommandManager().isExecuted(Command.INSERT_ORDERED_LIST);
+        cache.clear();
+        super.setValue(index, value);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see ValidationRule#getFeatures()
+     * @see AbstractListBoxPicker#setSelectedValue(String, Matcher)
      */
-    public String[] getFeatures()
+    protected void setSelectedValue(String value, Matcher<String> matcher)
     {
-        return new String[] {"indent", "outdent"};
+        Integer index = cache.get(value);
+        if (index != null) {
+            setSelectedIndex(index);
+        } else {
+            super.setSelectedValue(value, matcher);
+            cache.put(value, getSelectedIndex());
+        }
     }
 }

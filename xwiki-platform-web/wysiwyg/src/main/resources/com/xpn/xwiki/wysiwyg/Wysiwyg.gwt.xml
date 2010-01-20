@@ -28,13 +28,13 @@
 
   <extend-property name="locale" values="fr,de"/>
 
-  <!-- BackColorExecutable -->
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable"/>
+  <!-- ColorPlugin -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPlugin"/>
   </replace-with>
 
-  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.HiliteColorExecutable">
-    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.exec.BackColorExecutable"/>
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.MozillaColorPlugin">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPlugin"/>
     <any>
       <when-property-is name="user.agent" value="gecko1_8"/>
       <when-property-is name="user.agent" value="gecko"/>

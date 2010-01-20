@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.table.feature;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.Command;
 
 import com.google.gwt.dom.client.Node;
@@ -57,9 +56,9 @@ public class InsertRowBefore extends AbstractTableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#execute(RichTextArea, String)
+     * @see AbstractTableFeature#execute(String)
      */
-    public boolean execute(RichTextArea rta, String parameter)
+    public boolean execute(String parameter)
     {
         TableCellElement currentCell =
             TableUtils.getInstance().getCell(TableUtils.getInstance().getCaretNode(rta.getDocument()));
@@ -71,11 +70,11 @@ public class InsertRowBefore extends AbstractTableFeature
     /**
      * {@inheritDoc}
      * 
-     * @see Executable#isEnabled(RichTextArea)
+     * @see AbstractTableFeature#isEnabled()
      */
-    public boolean isEnabled(RichTextArea rta)
+    public boolean isEnabled()
     {
-        if (!super.isEnabled(rta)) {
+        if (!super.isEnabled()) {
             return false;
         }
         Node node = TableUtils.getInstance().getCaretNode(rta.getDocument());

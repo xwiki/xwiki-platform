@@ -21,6 +21,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.text.exec;
 
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.ToggleInlineStyleExecutable;
 
 
@@ -35,10 +36,12 @@ public class BoldExecutable extends ToggleInlineStyleExecutable
 {
     /**
      * Creates a new executable of this type.
+     * 
+     * @param rta the execution target
      */
-    public BoldExecutable()
+    public BoldExecutable(RichTextArea rta)
     {
-        super(Style.FONT_WEIGHT, Style.FontWeight.BOLD, "strong");
+        super(rta, Style.FONT_WEIGHT, Style.FontWeight.BOLD, "strong");
     }
 
     /**

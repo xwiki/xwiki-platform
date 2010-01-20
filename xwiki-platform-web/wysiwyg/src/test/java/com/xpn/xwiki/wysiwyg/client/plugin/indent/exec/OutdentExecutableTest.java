@@ -47,7 +47,7 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new OutdentExecutable();
+            executable = new OutdentExecutable(rta);
         }
     }
 
@@ -81,9 +81,9 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
         select(range);
 
         // is not enabled
-        assertFalse(executable.isEnabled(rta));
+        assertFalse(executable.isEnabled());
         // does not execute
-        assertFalse(executable.execute(rta, null));
+        assertFalse(executable.execute(null));
         // doesn't change HTML at all
         assertEquals(rtaInnerHTML, removeNonBreakingSpaces(clean(rta.getHTML())));
     }
@@ -107,8 +107,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.setEnd(getBody().getFirstChild().getChildNodes().getItem(1).getFirstChild(), 3);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<p>foo</p><p>bar</p>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
         });
@@ -132,8 +132,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three</li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -158,8 +158,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul></li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -185,8 +185,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>three plus one"
                     + "</li></ul></li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -213,8 +213,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>one<ul><li>two</li></ul></li><li>three<ul><li>four</li><li>three plus "
                     + "one</li></ul></li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -253,8 +253,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
             .getChildNodes().getItem(1).getFirstChild().getFirstChild(), 4);
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isEnabled());
+        assertTrue(executable.execute(null));
         assertEquals("<ol><li>one<ol><li>two</li></ol></li><li>three<ol><li>four</li><li>three plus "
             + "one</li></ol></li></ol>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
@@ -277,8 +277,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
 
                 assertEquals("<ul><li>one<br>before<ul><li>two</li></ul></li><li>three<ul><li>four</li></ul>"
                     + "after</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
@@ -303,8 +303,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<p>one</p><ul><li>two</li><li>three</li></ul>", removeNonBreakingSpaces(clean(rta
                     .getHTML())));
             }
@@ -328,8 +328,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta
                     .getHTML())));
             }
@@ -353,8 +353,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li><li>far</li></ul>",
                     removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -380,8 +380,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>foo</li></ul><p>bar</p><ul><li>bar plus one</li></ul><p>after</p>"
                     + "<ul><li>far</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
             }
@@ -405,8 +405,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
                 range.collapse(true);
                 select(range);
 
-                assertTrue(executable.isEnabled(rta));
-                assertTrue(executable.execute(rta, null));
+                assertTrue(executable.isEnabled());
+                assertTrue(executable.execute(null));
                 assertEquals("<ul><li>first</li><li>second</li></ul><p>third</p>", removeNonBreakingSpaces(clean(rta
                     .getHTML())));
             }
@@ -443,8 +443,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
             .getItem(2).getFirstChild(), 5);
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isEnabled());
+        assertTrue(executable.execute(null));
         assertEquals("<ul><li>foo</li><li>bar</li><li>one</li><li>two</li><li>three</li><li>boo</li></ul>",
             removeNonBreakingSpaces(clean(rta.getHTML())));
     }
@@ -481,8 +481,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
 
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isEnabled());
+        assertTrue(executable.execute(null));
         assertEquals("<ul><li>foo<ul><li>one</li><li>two</li><li>three</li></ul></li><li>two plus one</li>"
             + "<li>bar</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));
     }
@@ -520,8 +520,8 @@ public class OutdentExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getFirstChild().getChildNodes().getItem(2).getFirstChild(), 9);
         select(range);
 
-        assertTrue(executable.isEnabled(rta));
-        assertTrue(executable.execute(rta, null));
+        assertTrue(executable.isEnabled());
+        assertTrue(executable.execute(null));
 
         assertEquals("<ul><li>one one</li></ul><p>one two</p><ul><li>two one</li><li>two twoafter</li></ul><p>one "
             + "three</p><ul><li>one four</li><li>one five</li></ul>", removeNonBreakingSpaces(clean(rta.getHTML())));

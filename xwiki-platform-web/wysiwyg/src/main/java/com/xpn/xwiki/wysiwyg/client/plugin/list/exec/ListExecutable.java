@@ -44,21 +44,24 @@ public class ListExecutable extends DefaultExecutable
     /**
      * Create a list executable to handle lists as specified by the parameter.
      * 
+     * @param rta the execution target
      * @param ordered specified whether this executable handles ordered or unordered lists.
      */
-    public ListExecutable(boolean ordered)
+    public ListExecutable(RichTextArea rta, boolean ordered)
     {
-        super(ordered ? Command.INSERT_ORDERED_LIST.toString() : Command.INSERT_UNORDERED_LIST.toString());
+        super(rta, ordered ? Command.INSERT_ORDERED_LIST.toString() : Command.INSERT_UNORDERED_LIST.toString());
         this.ordered = ordered;
     }
 
     /**
-     * {@inheritDoc} Overwrite the default function to handle situations of valid HTML lists which are not detected
-     * correctly by the browsers.
+     * {@inheritDoc}
+     * <p>
+     * Overwrite the default function to handle situations of valid HTML lists which are not detected correctly by the
+     * browsers.
      * 
-     * @see DefaultExecutable#isExecuted(RichTextArea)
+     * @see DefaultExecutable#isExecuted()
      */
-    public boolean isExecuted(RichTextArea rta)
+    public boolean isExecuted()
     {
         if (rta.getDocument().getSelection().getRangeCount() > 0) {
             Range range = rta.getDocument().getSelection().getRangeAt(0);

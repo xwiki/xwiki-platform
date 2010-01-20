@@ -27,6 +27,7 @@ import org.xwiki.gwt.dom.client.Document;
 import org.xwiki.gwt.dom.client.DocumentFragment;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
+import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 
 import com.google.gwt.dom.client.Node;
 
@@ -42,6 +43,17 @@ public class OutdentExecutable extends AbstractListExecutable
      * Line break tag, to help manage empty list items after outdenting sublists.
      */
     protected static final String LINE_BREAK_TAG = "br";
+
+    /**
+     * Creates a new executable that can be used to decrease the identation of list items inside the specified rich text
+     * area.
+     * 
+     * @param rta the execution target
+     */
+    public OutdentExecutable(RichTextArea rta)
+    {
+        super(rta);
+    }
 
     /**
      * {@inheritDoc}

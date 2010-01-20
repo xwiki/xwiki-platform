@@ -27,7 +27,7 @@ import org.xwiki.gwt.dom.client.Style;
  * 
  * @version $Id$
  */
-public class FontFamilyPicker extends AbstractListBoxPicker
+public class FontFamilyPicker extends CachedListBoxPicker
 {
     /**
      * The object used to match font families.
@@ -45,7 +45,7 @@ public class FontFamilyPicker extends AbstractListBoxPicker
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setValue(int, String)
+     * @see CachedListBoxPicker#setValue(int, String)
      */
     public void setValue(int index, String value)
     {
@@ -57,7 +57,7 @@ public class FontFamilyPicker extends AbstractListBoxPicker
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setSelectedValue(String)
+     * @see CachedListBoxPicker#setSelectedValue(String)
      */
     public void setSelectedValue(String value)
     {

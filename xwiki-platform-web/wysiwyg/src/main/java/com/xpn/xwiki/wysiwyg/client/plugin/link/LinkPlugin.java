@@ -100,9 +100,9 @@ public class LinkPlugin extends AbstractPlugin implements WizardListener
 
         // add the custom executables
         Executable createLinkExec =
-            getTextArea().getCommandManager().registerCommand(Command.CREATE_LINK, new CreateLinkExecutable());
+            getTextArea().getCommandManager().registerCommand(Command.CREATE_LINK, new CreateLinkExecutable(textArea));
         Executable unlinkExec =
-            getTextArea().getCommandManager().registerCommand(Command.UNLINK, new UnlinkExecutable());
+            getTextArea().getCommandManager().registerCommand(Command.UNLINK, new UnlinkExecutable(textArea));
         if (createLinkExec != null || unlinkExec != null) {
             originalExecutables = new HashMap<Command, Executable>();
         }

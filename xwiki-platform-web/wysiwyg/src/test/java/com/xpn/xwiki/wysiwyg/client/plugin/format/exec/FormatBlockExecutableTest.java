@@ -62,7 +62,7 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         super.gwtSetUp();
 
         if (executable == null) {
-            executable = new FormatBlockExecutable();
+            executable = new FormatBlockExecutable(rta);
         }
     }
 
@@ -77,11 +77,11 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
             {
                 rta.setHTML("");
                 assertEquals("", rta.getHTML());
-                assertTrue(executable.execute(rta, H1));
+                assertTrue(executable.execute(H1));
                 assertEquals("<h1></h1>", clean(rta.getHTML()));
-                assertTrue(new InsertHTMLExecutable().execute(rta, "title 1"));
+                assertTrue(new InsertHTMLExecutable(rta).execute("title 1"));
                 assertEquals("<h1>title 1</h1>", clean(rta.getHTML()));
-                assertEquals(H1, executable.getParameter(rta));
+                assertEquals(H1, executable.getParameter());
             }
         });
     }
@@ -113,9 +113,9 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getChildNodes().getItem(1).getFirstChild().getFirstChild(), 1);
         range.collapse(false);
         select(range);
-        assertTrue(executable.execute(rta, H1));
+        assertTrue(executable.execute(H1));
         assertEquals("<h1>xwiki <span><em>is</em> the</span> </h1><p>best</p>", clean(rta.getHTML()));
-        assertEquals(H1, executable.getParameter(rta));
+        assertEquals(H1, executable.getParameter());
 
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertEquals(1, range.getStartOffset());
@@ -123,11 +123,11 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
 
         range.selectNodeContents(xwiki);
         select(range);
-        assertEquals(H1, executable.getParameter(rta));
+        assertEquals(H1, executable.getParameter());
 
         range.selectNodeContents(best);
         select(range);
-        assertEquals(P, executable.getParameter(rta));
+        assertEquals(P, executable.getParameter());
     }
 
     /**
@@ -158,16 +158,16 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         select(range);
         String selectedText = "can is fa";
         assertEquals(selectedText, range.toString());
-        assertTrue(executable.execute(rta, H1));
+        assertTrue(executable.execute(H1));
         assertEquals("<h1><strong>toucan</strong> is <!--my--><em>favorite</em> skin</h1>", clean(rta.getHTML()));
-        assertEquals(H1, executable.getParameter(rta));
+        assertEquals(H1, executable.getParameter());
 
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertEquals(selectedText, range.toString());
 
         range.selectNodeContents(toucan);
         select(range);
-        assertEquals(H1, executable.getParameter(rta));
+        assertEquals(H1, executable.getParameter());
     }
 
     /**
@@ -198,9 +198,9 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         range.setEnd(getBody().getChildNodes().getItem(1).getLastChild().getFirstChild(), 3);
         range.setStart(getBody().getFirstChild(), 1);
         select(range);
-        assertTrue(executable.execute(rta, ""));
+        assertTrue(executable.execute(""));
         assertEquals("once upon a <ins>time</ins> there..", clean(rta.getHTML()));
-        assertEquals("", executable.getParameter(rta));
+        assertEquals("", executable.getParameter());
 
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertEquals("nce upon a tim", range.toString());
@@ -238,10 +238,10 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         assertEquals(selectedText, clean(range.toString()));
 
         select(range);
-        assertNull(executable.getParameter(rta));
-        assertTrue(executable.execute(rta, P));
+        assertNull(executable.getParameter());
+        assertTrue(executable.execute(P));
         assertEquals("a <p>b</p><p> c </p><p>d</p> e", clean(rta.getHTML()));
-        assertEquals(P, executable.getParameter(rta));
+        assertEquals(P, executable.getParameter());
 
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertEquals(selectedText, clean(range.toString()));
@@ -277,10 +277,10 @@ public class FormatBlockExecutableTest extends RichTextAreaTestCase
         range.collapse(true);
         select(range);
 
-        assertEquals(H1, executable.getParameter(rta));
-        assertTrue(executable.execute(rta, P));
+        assertEquals(H1, executable.getParameter());
+        assertTrue(executable.execute(P));
         assertEquals("<p><span style=\"display: block\">header</span></p>", clean(rta.getHTML()).replace(";", ""));
-        assertEquals(P, executable.getParameter(rta));
+        assertEquals(P, executable.getParameter());
 
         range = rta.getDocument().getSelection().getRangeAt(0);
         assertTrue(range.isCollapsed());

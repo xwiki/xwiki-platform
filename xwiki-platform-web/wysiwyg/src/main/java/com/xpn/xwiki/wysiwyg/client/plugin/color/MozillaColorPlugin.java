@@ -17,28 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.plugin.color.exec;
+package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
-import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
-import org.xwiki.gwt.user.client.ui.rta.cmd.internal.DefaultExecutable;
+import org.xwiki.gwt.user.client.ui.rta.cmd.Executable;
+
+import com.xpn.xwiki.wysiwyg.client.plugin.color.exec.HiliteColorExecutable;
 
 /**
- * Changes the background color of the current selection in Mozilla. It executes the built-in command "hilitecolor". We
- * created this class solely because in Mozilla the "backcolor" command sets the background color of the entire rich
- * text area. The implementation for the other browsers is in {@link BackColorExecutable}. We use deferred binding to
- * load the proper class.
+ * Mozilla specific implementation of {@link ColorPlugin}.
  * 
  * @version $Id$
  */
-public class HiliteColorExecutable extends DefaultExecutable
+public class MozillaColorPlugin extends ColorPlugin
 {
     /**
-     * Creates a new executable of this type.
+     * {@inheritDoc}
      * 
-     * @param rta the execution target
+     * @see ColorPlugin#getBackColorExecutable()
      */
-    public HiliteColorExecutable(RichTextArea rta)
+    protected Executable getBackColorExecutable()
     {
-        super(rta, "hilitecolor");
+        return new HiliteColorExecutable(getTextArea());
     }
 }

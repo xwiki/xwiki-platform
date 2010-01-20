@@ -66,8 +66,8 @@ public class IndentPlugin extends AbstractPlugin implements ClickHandler
         super.init(textArea, config);
 
         // Register custom executables.
-        getTextArea().getCommandManager().registerCommand(Command.INDENT, new IndentExecutable());
-        getTextArea().getCommandManager().registerCommand(Command.OUTDENT, new OutdentExecutable());
+        getTextArea().getCommandManager().registerCommand(Command.INDENT, new IndentExecutable(textArea));
+        getTextArea().getCommandManager().registerCommand(Command.OUTDENT, new OutdentExecutable(textArea));
 
         addFeature("indent", Command.INDENT, Images.INSTANCE.indent().createImage(), Strings.INSTANCE.indent());
         addFeature("outdent", Command.OUTDENT, Images.INSTANCE.outdent().createImage(), Strings.INSTANCE.outdent());

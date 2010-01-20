@@ -78,9 +78,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
 
         // Register custom executables.
         getTextArea().getCommandManager().registerCommand(Command.FONT_NAME,
-            new InlineStyleExecutable(Style.FONT_FAMILY));
-        getTextArea().getCommandManager()
-            .registerCommand(Command.FONT_SIZE, new InlineStyleExecutable(Style.FONT_SIZE));
+            new InlineStyleExecutable(textArea, Style.FONT_FAMILY));
+        getTextArea().getCommandManager().registerCommand(Command.FONT_SIZE,
+            new InlineStyleExecutable(textArea, Style.FONT_SIZE));
 
         addFeature("fontname", Command.FONT_NAME, new FontFamilyPicker(), Strings.INSTANCE.font(), "fontNames",
             DEFAULT_FONT_NAMES);

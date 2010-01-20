@@ -230,7 +230,7 @@ public class TableMenuExtension extends MenuItemUIExtension implements Updatable
             List<TableFeature> features = plugin.getFeatures();
             for (TableFeature feature : features) {
                 if (editMenuItems.containsKey(feature.getName())) {
-                    editMenuItems.get(feature.getName()).setEnabled(feature.isEnabled(plugin.getTextArea()));
+                    editMenuItems.get(feature.getName()).setEnabled(feature.isEnabled());
                 }
             }
         } else {

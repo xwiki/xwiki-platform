@@ -89,9 +89,10 @@ public class MacroMenuExtension implements Updatable, MenuListener
     private final MenuItemUIExtension menuExtension = new MenuItemUIExtension("menu");
 
     /**
-     * Schedules menu updates and executes only the most recent one.
+     * Schedules menu updates and executes only the most recent one. We use the minimum delay because we want the menu
+     * to be update as soon as possible.
      */
-    private final DeferredUpdater updater = new DeferredUpdater(this);
+    private final DeferredUpdater updater = new DeferredUpdater(this, 1);
 
     /**
      * The macro plug-in associated with this menu extension.

@@ -47,7 +47,7 @@ public class HistoryTest extends RichTextAreaTestCase
         History history = new DefaultHistory(rta, 10);
         rta.getCommandManager().registerCommand(Command.UNDO, new UndoExecutable(history));
         rta.getCommandManager().registerCommand(Command.REDO, new RedoExecutable(history));
-        rta.getCommandManager().registerCommand(Command.BOLD, new BoldExecutable());
+        rta.getCommandManager().registerCommand(Command.BOLD, new BoldExecutable(rta));
     }
 
     /**

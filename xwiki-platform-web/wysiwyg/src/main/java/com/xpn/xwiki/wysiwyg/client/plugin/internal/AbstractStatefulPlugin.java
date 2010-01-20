@@ -99,7 +99,8 @@ public abstract class AbstractStatefulPlugin extends AbstractPlugin implements U
      */
     public boolean canUpdate()
     {
-        return getTextArea().isAttached() && getTextArea().isEnabled();
+        // Always return true. Derived classes should check if their UI is enabled before updating it.
+        return true;
     }
 
     /**

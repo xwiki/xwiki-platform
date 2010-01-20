@@ -22,7 +22,7 @@ package com.xpn.xwiki.wysiwyg.client.plugin.submit;
 import org.xwiki.gwt.dom.client.DOMUtils;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.JavaScriptObject;
-import org.xwiki.gwt.user.client.Cache;
+import org.xwiki.gwt.user.client.BackForwardCache;
 import org.xwiki.gwt.user.client.Config;
 import org.xwiki.gwt.user.client.StringUtils;
 import org.xwiki.gwt.user.client.ui.HiddenConfig;
@@ -117,7 +117,7 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
     /**
      * The object used to cache the submitted value.
      */
-    private Cache cache;
+    private BackForwardCache cache;
 
     /**
      * {@inheritDoc}
@@ -129,9 +129,9 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
         super.init(textArea, config);
 
         String hookId = getConfig().getParameter("hookId");
-        getTextArea().getCommandManager().registerCommand(SUBMIT, new SubmitExecutable(hookId));
-        getTextArea().getCommandManager().registerCommand(ENABLE, new EnableExecutable());
-        getTextArea().getCommandManager().registerCommand(RESET, new ResetExecutable());
+        getTextArea().getCommandManager().registerCommand(SUBMIT, new SubmitExecutable(textArea, hookId));
+        getTextArea().getCommandManager().registerCommand(ENABLE, new EnableExecutable(textArea));
+        getTextArea().getCommandManager().registerCommand(RESET, new ResetExecutable(textArea));
 
         if (getTextArea().getCommandManager().isSupported(SUBMIT)) {
             Element hook = (Element) Document.get().getElementById(hookId);
@@ -159,7 +159,8 @@ public class SubmitPlugin extends AbstractPlugin implements BlurHandler, Command
             }
 
             // Try to restore the content of the rich text area from the cache.
-            cache = new Cache((Element) Document.get().getElementById(getConfig().getParameter("cacheId", "")));
+            Element cacheableElement = (Element) Document.get().getElementById(getConfig().getParameter("cacheId", ""));
+            cache = new BackForwardCache(cacheableElement);
             String content = cache.get(CACHE_KEY_CONTENT);
             if (content != null) {
                 getTextArea().getCommandManager().execute(RESET, content);

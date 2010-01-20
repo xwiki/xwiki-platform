@@ -875,111 +875,111 @@ div#xwikiobjects input[type="checkbox"], div#xwikiclassproperties input[type="ch
 }
 
 /* Icons */
-.actionmenu #tmWiki {
+.actionmenu .tmWiki {
   background-image: url($xwiki.getSkinFile('icons/silk/world.gif'));
 }
 
-.actionmenu #tmAdminWiki {
+.actionmenu .tmAdminWiki {
   background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
-.actionmenu #tmCreateSpace {
+.actionmenu .tmCreateSpace {
   background-image: url($xwiki.getSkinFile('icons/silk/folder_add.gif'));
 }
 
-.actionmenu #tmSpace {
+.actionmenu .tmSpace {
   background-image: url($xwiki.getSkinFile('icons/silk/folder.gif'));
 }
 
-.actionmenu #tmAdminSpace {
+.actionmenu .tmAdminSpace {
   background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
-.actionmenu #tmCreatePage, .actionmenu #tmCreatePageFromOffice {
+.actionmenu .tmCreatePage, .actionmenu .tmCreatePageFromOffice {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_add.gif'));
 }
 
-.actionmenu #tmEdit {
+.actionmenu .tmEdit {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
 }
 
-.actionmenu #tmEditWiki, .actionmenu #tmViewSource {
+.actionmenu .tmEditWiki, .actionmenu .tmViewSource {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_code.gif'));
 }
 
-.actionmenu #tmEditWysiwyg {
+.actionmenu .tmEditWysiwyg {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_edit.gif'));
 }
 
-.actionmenu #tmEditInline {
+.actionmenu .tmEditInline {
   background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
 }
 
-.actionmenu #tmEditRights {
+.actionmenu .tmEditRights {
   background-image: url($xwiki.getSkinFile('icons/silk/lock.gif'));
 }
 
-.actionmenu #tmEditObject {
+.actionmenu .tmEditObject {
   background-image: url($xwiki.getSkinFile('icons/silk/brick.gif'));
 }
 
-.actionmenu #tmEditClass {
+.actionmenu .tmEditClass {
   background-image: url($xwiki.getSkinFile('icons/silk/box.gif'));
 }
 
-.actionmenu #tmExportPdf {
+.actionmenu .tmExportPdf {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_acrobat.gif'));
 }
 
-.actionmenu #tmExportRtf {
+.actionmenu .tmExportRtf {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_word.gif'));
 }
 
-.actionmenu #tmExportHtml {
+.actionmenu .tmExportHtml {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_world.gif'));
 }
 
-.actionmenu #tmExportXar {
+.actionmenu .tmExportXar {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_compressed.gif'));
 }
 
-.actionmenu #tmPrintPreview {
+.actionmenu .tmPrintPreview {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_magnify.gif'));
 }
 
-.actionmenu #tmActionDelete {
+.actionmenu .tmActionDelete {
   background-image: url($xwiki.getSkinFile('icons/silk/cross.gif'));
 }
 
-.actionmenu #tmActionRename {
+.actionmenu .tmActionRename {
   background-image: url($xwiki.getSkinFile('icons/silk/textfield_rename.gif'));
 }
 
-.actionmenu #tmActionCopy {
+.actionmenu .tmActionCopy {
   background-image: url($xwiki.getSkinFile('icons/silk/page_white_copy.gif'));
 }
 
-.actionmenu #tmUser {
+.actionmenu .tmUser {
   background-image: url($xwiki.getSkinFile('icons/silk/user.gif'));
 }
 
-.actionmenu #tmProfile {
+.actionmenu .tmProfile {
   background-image: url($xwiki.getSkinFile('icons/silk/vcard.gif'));
 }
 
-.actionmenu #tmUserPreferences {
+.actionmenu .tmUserPreferences {
   background-image: url($xwiki.getSkinFile('icons/silk/application_form.gif'));
 }
 
-.actionmenu #tmWatchlistManager {
+.actionmenu .tmWatchlistManager {
   background-image: url($xwiki.getSkinFile('icons/silk/wrench.gif'));
 }
 
-.actionmenu #tmWatchWiki, .actionmenu #tmWatchSpace, .actionmenu #tmWatchDocument {
+.actionmenu .tmWatchWiki, .actionmenu .tmWatchSpace, .actionmenu .tmWatchDocument {
   background-image: url($xwiki.getSkinFile('icons/xwiki/star-gray.png'));
 }
 
-.actionmenu #tmUnwatchWiki, .actionmenu #tmUnwatchSpace, .actionmenu #tmUnwatchDocument {
+.actionmenu .tmUnwatchWiki, .actionmenu .tmUnwatchSpace, .actionmenu .tmUnwatchDocument {
   background-image: url($xwiki.getSkinFile('icons/xwiki/star-yellow.png'));  
 }
 

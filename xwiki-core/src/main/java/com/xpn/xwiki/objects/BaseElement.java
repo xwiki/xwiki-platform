@@ -125,9 +125,13 @@ public abstract class BaseElement implements ElementInterface, Serializable
      */
     public void setDocumentReference(DocumentReference reference)
     {
-        // If the name is already set then reset is since we're now using a reference
+        // If the name is already set then reset it since we're now using a reference
         this.reference = reference;
-        this.name = null;
+        if (this.name != null) {
+            LOG.warn("Element was stored as name [" + this.name + "]. Will now be stored as a reference ["
+                + reference + "]");
+            this.name = null;
+        }
     }
 
     /**
@@ -235,8 +239,14 @@ public abstract class BaseElement implements ElementInterface, Serializable
         BaseElement element;
         try {
             element = getClass().newInstance();
-            element.setDocumentReference(getDocumentReference());
-            element.setName(getName());
+
+            // Make sure we clone either the reference or the name depending on which one is used.
+            if (this.reference != null) {
+                element.setDocumentReference(getDocumentReference());
+            } else if (this.name != null) {
+                element.setName(getName());
+            }
+
             element.setPrettyName(getPrettyName());
         } catch (Exception e) {
             // This should not happen

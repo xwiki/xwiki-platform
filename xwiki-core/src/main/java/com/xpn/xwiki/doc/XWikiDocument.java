@@ -395,7 +395,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public XWikiDocument()
     {
-        this(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
+        this(null);
     }
 
     /**
@@ -840,10 +840,13 @@ public class XWikiDocument implements DocumentModelBridge
      */
     public void setDocumentReference(DocumentReference reference)
     {
-        if ((reference == null && getDocumentReference() != null)
-            || (reference != null && !reference.equals(getDocumentReference()))) {
-            this.documentReference = reference;
-            setMetaDataDirty(true);
+        // Don't allow setting a null reference for now, ie. don't do anything to preserve backward compatibility
+        // with previous behavior (i.e. {@link #setFullName}.
+        if (reference != null) {
+            if (!reference.equals(getDocumentReference())) {
+                this.documentReference = reference;
+                setMetaDataDirty(true);
+            }
         }
     }
 
@@ -860,11 +863,15 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated since 2.2M1 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)} instead
      */
     @Deprecated
-    public void setFullName(String fullname, XWikiContext context)
+    public void setFullName(String fullName, XWikiContext context)
     {
-        // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
-        // specified in the passed string, rather than use the current document's page name.
-        setDocumentReference(this.currentMixedDocumentReferenceResolver.resolve(fullname));
+        // We ignore the passed full name if it's null to be backward compatible with previous behaviors and to be
+        // consistent with {@link #setName} and {@link #setSpace}.
+        if (fullName != null) {
+            // Note: We use the CurrentMixed Resolver since we want to use the default page name if the page isn't
+            // specified in the passed string, rather than use the current document's page name.
+            setDocumentReference(this.currentMixedDocumentReferenceResolver.resolve(fullName));
+        }
     }
 
     /**
@@ -3329,7 +3336,7 @@ public class XWikiDocument implements DocumentModelBridge
             for (List<BaseObject> objects : getXObjects().values()) {
                 for (BaseObject obj : objects) {
                     if (obj != null) {
-                        BaseClass objclass = null;
+                        BaseClass objclass;
                         if (StringUtils.equals(getFullName(), obj.getClassName())) {
                             objclass = bclass;
                         } else {
@@ -6538,7 +6545,12 @@ public class XWikiDocument implements DocumentModelBridge
 
     private void init(DocumentReference reference)
     {
-        setDocumentReference(reference);
+        // if the passed reference is null consider it points to the default reference
+        if (reference == null) {
+            setDocumentReference(Utils.getComponent(DocumentReferenceResolver.class).resolve(""));
+        } else {
+            setDocumentReference(reference);
+        }
 
         this.updateDate = new Date();
         this.updateDate.setTime((this.updateDate.getTime() / 1000) * 1000);

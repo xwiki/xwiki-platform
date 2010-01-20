@@ -145,6 +145,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         this.baseClass.addStaticListField("stringlist", "StringList", "value1, value2");
 
         this.mockXWiki.stubs().method("getClass").will(returnValue(this.baseClass));
+        this.mockXWiki.stubs().method("getXClass").will(returnValue(this.baseClass));
 
         this.baseObject = this.document.newObject(CLASSNAME, getContext());
         this.baseObject.setStringValue("string", "string");
@@ -159,7 +160,15 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testConstructor()
     {
-        XWikiDocument doc = new XWikiDocument("notused", "space.page");
+        DocumentReference defaultReference = new DocumentReference("xwiki", "Main", "WebHome");
+
+        XWikiDocument doc = new XWikiDocument(null);
+        assertEquals(defaultReference, doc.getDocumentReference());
+
+        doc = new XWikiDocument();
+        assertEquals(defaultReference, doc.getDocumentReference());
+
+        doc = new XWikiDocument("notused", "space.page");
         assertEquals("space", doc.getSpaceName());
         assertEquals("page", doc.getPageName());
         assertEquals("xwiki", doc.getWikiName());
@@ -286,7 +295,7 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         tagClass.addStaticListField(XWikiConstant.TAG_CLASS_PROP_TAGS, "Tags", 30, true, "", "checkbox");
 
         XWikiDocument doc = new XWikiDocument("test", "document");
-        this.mockXWiki.stubs().method("getClass").will(returnValue(tagClass));
+        this.mockXWiki.stubs().method("getXClass").will(returnValue(tagClass));
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("iso-8859-1"));
 
         BaseObject object = BaseClass.newCustomClassInstance(classname, getContext());

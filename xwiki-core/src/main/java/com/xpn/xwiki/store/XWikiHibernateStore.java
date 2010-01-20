@@ -723,45 +723,45 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 query.setText("name", doc.getFullName());
                 Iterator it = query.list().iterator();
 
+                DocumentReference groupsDocumentReference = new DocumentReference(context.getDatabase(), "XWiki",
+                    "XWikiGroups");
+
                 boolean hasGroups = false;
                 while (it.hasNext()) {
                     BaseObject object = (BaseObject) it.next();
-                    String className = object.getClassName();
-                    // We use the internal class to store the statistics
-                    if (className.equals("internal")) {
+                    DocumentReference classReference = object.getXClassReference();
+
+                    if (classReference == null) {
                         continue;
                     }
 
-                    if (className.equals("XWiki.XWikiGroups")) {
+                    if (classReference.equals(groupsDocumentReference)) {
                         hasGroups = true;
                         continue;
                     }
 
-                    // It seems to search before is case insensitive
-                    // And this would break the loading if we get an
+                    // It seems to search before is case insensitive. And this would break the loading if we get an
                     // object which doesn't really belong to this document
-                    if (!object.getName().equals(doc.getFullName())) {
+                    if (!object.getDocumentReference().equals(doc.getDocumentReference())) {
                         continue;
                     }
 
-                    if (!className.equals("")) {
-                        BaseObject newobject;
-                        if (className.equals(doc.getFullName())) {
-                            newobject = bclass.newCustomClassInstance(context);
-                        } else {
-                            newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
-                        }
-                        if (newobject != null) {
-                            newobject.setId(object.getId());
-                            newobject.setXClassReference(object.getXClassReference());
-                            newobject.setDocumentReference(object.getDocumentReference());
-                            newobject.setNumber(object.getNumber());
-                            newobject.setGuid(object.getGuid());
-                            object = newobject;
-                        }
-                        loadXWikiCollection(object, doc, context, false, true);
-                        doc.setObject(className, object.getNumber(), object);
+                    BaseObject newobject;
+                    if (classReference.equals(doc.getDocumentReference())) {
+                        newobject = bclass.newCustomClassInstance(context);
+                    } else {
+                        newobject = BaseClass.newCustomClassInstance(object.getClassName(), context);
                     }
+                    if (newobject != null) {
+                        newobject.setId(object.getId());
+                        newobject.setXClassReference(object.getXClassReference());
+                        newobject.setDocumentReference(object.getDocumentReference());
+                        newobject.setNumber(object.getNumber());
+                        newobject.setGuid(object.getGuid());
+                        object = newobject;
+                    }
+                    loadXWikiCollection(object, doc, context, false, true);
+                    doc.setXObject(classReference, object.getNumber(), object);
                 }
 
                 if (hasGroups) {
@@ -775,11 +775,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         Integer number = (Integer) result[0];
                         String member = (String) result[1];
                         BaseObject obj = BaseClass.newCustomClassInstance("XWiki.XWikiGroups", context);
-                        obj.setName(doc.getFullName());
-                        obj.setClassName("XWiki.XWikiGroups");
+                        obj.setDocumentReference(doc.getDocumentReference());
+                        obj.setXClassReference(groupsDocumentReference);
                         obj.setNumber(number.intValue());
                         obj.setStringValue("member", member);
-                        doc.setObject("XWiki.XWikiGroups", obj.getNumber(), obj);
+                        doc.setXObject(groupsDocumentReference, obj.getNumber(), obj);
                     }
                 }
             }
@@ -963,7 +963,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // dynamicSession.saveOrUpdate((String) bclass.getName(), objmap);
             }
 
-            if (!object.getClassName().equals("internal")) {
+            if (object.getXClassReference() != null) {
                 // Remove all existing properties
                 if (object.getFieldsToRemove().size() > 0) {
                     for (int i = 0; i < object.getFieldsToRemove().size(); i++) {
@@ -1051,40 +1051,43 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            String className = object.getClassName();
-            BaseClass bclass = null;
-            if (!className.equals(object.getName())) {
-                // Let's check if the class has a custom mapping
-                bclass = object.getXClass(context);
-            } else {
-                // We need to get it from the document otherwise
-                // we will go in an endless loop
-                if (doc != null) {
-                    bclass = doc.getXClass();
-                }
-            }
+            DocumentReference classReference = object.getXClassReference();
 
-            List handledProps = new ArrayList();
-            try {
-                if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
-                    Session dynamicSession = session.getSession(EntityMode.MAP);
-                    Object map = dynamicSession.load(bclass.getName(), new Integer(object.getId()));
-                    // Let's make sure to look for null fields in the dynamic mapping
-                    bclass.fromValueMap((Map) map, object);
-                    handledProps = bclass.getCustomMappingPropertyList(context);
-                    for (Iterator it = handledProps.iterator(); it.hasNext();) {
-                        String prop = (String) it.next();
-                        if (((Map) map).get(prop) == null) {
-                            handledProps.remove(prop);
-                        }
+            // If the class reference is null in the loaded object then skip loading properties
+            if (classReference != null) {
+
+                BaseClass bclass = null;
+                if (!classReference.equals(object.getDocumentReference())) {
+                    // Let's check if the class has a custom mapping
+                    bclass = object.getXClass(context);
+                } else {
+                    // We need to get it from the document otherwise
+                    // we will go in an endless loop
+                    if (doc != null) {
+                        bclass = doc.getXClass();
                     }
                 }
-            } catch (Exception e) {
-            }
 
-            // Load strings, integers, dates all at once
+                List handledProps = new ArrayList();
+                try {
+                    if ((bclass != null) && (bclass.hasCustomMapping()) && context.getWiki().hasCustomMappings()) {
+                        Session dynamicSession = session.getSession(EntityMode.MAP);
+                        Object map = dynamicSession.load(bclass.getName(), new Integer(object.getId()));
+                        // Let's make sure to look for null fields in the dynamic mapping
+                        bclass.fromValueMap((Map) map, object);
+                        handledProps = bclass.getCustomMappingPropertyList(context);
+                        for (Iterator it = handledProps.iterator(); it.hasNext();) {
+                            String prop = (String) it.next();
+                            if (((Map) map).get(prop) == null) {
+                                handledProps.remove(prop);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                }
 
-            if (!className.equals("internal")) {
+                // Load strings, integers, dates all at once
+
                 Query query = session.createQuery("select prop.name, prop.classType from BaseProperty as prop where "
                     + "prop.id.id = :id");
                 query.setInteger("id", object.getId());
@@ -1151,6 +1154,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     object.addField(name, property);
                 }
             }
+            
             if (bTransaction) {
                 endTransaction(context, false, false);
             }
@@ -1205,7 +1209,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            if (!object.getClassName().equals("internal")) {
+            if (object.getXClassReference() != null) {
                 for (Iterator it = object.getFieldList().iterator(); it.hasNext();) {
                     BaseElement property = (BaseElement) it.next();
                     if (!handledProps.contains(property.getName())) {
@@ -1219,12 +1223,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            // In case of custom class we need to force it as BaseObject
-            // to delete the xwikiobject row
+            // In case of custom class we need to force it as BaseObject to delete the xwikiobject row
             if (!"".equals(bclass.getCustomClass())) {
                 BaseObject cobject = new BaseObject();
                 cobject.setName(object.getName());
-                cobject.setClassName(object.getClassName());
+                cobject.setXClassReference(object.getXClassReference());
                 cobject.setNumber(object.getNumber());
                 if (object instanceof BaseObject) {
                     cobject.setGuid(((BaseObject) object).getGuid());

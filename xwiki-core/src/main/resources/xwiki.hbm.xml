@@ -562,6 +562,10 @@
         <property name="name" type="string">
             <column name="XWS_NAME" not-null="true" length="255"/>
         </property>
+        <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
+             implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
+             name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
+             (new stats) -->
         <property name="className" type="string">
             <column name="XWS_CLASSNAME" not-null="true" length="255"/>
         </property>
@@ -599,6 +603,10 @@
         <property name="name" type="string">
             <column name="XWR_NAME" not-null="true" length="255"/>
         </property>
+      <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
+           implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
+           name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
+           (new stats) -->
         <property name="className" type="string">
             <column name="XWR_CLASSNAME" not-null="true" length="255"/>
         </property>
@@ -629,6 +637,10 @@
         <property name="name" type="string">
             <column name="XWV_NAME" not-null="true" length="255"/>
         </property>
+      <!-- Before XWiki 2.2M2 this column was always containing the "internal" string to tell the storage
+           implementation Stats objects were special. Starting with XWiki 2.2M2 the check is now on whether the class
+           name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
+           (new stats) -->
         <property name="className" type="string">
             <column name="XWV_CLASSNAME" not-null="true" length="255"/>
         </property>

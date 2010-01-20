@@ -186,7 +186,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         DocumentReference xClassReference = null;
         if (!StringUtils.isEmpty(name)) {
-            xClassReference = this.currentMixedDocumentReferenceResolver.resolve(name);
+            // Handle backward compatibility: In the past, for statistics objects we used to use a special class name
+            // of "internal". We now check for a null Class Reference instead wherever we were previously checking for
+            // "internal".
+            if (!"internal".equals(name)) {
+                xClassReference = this.currentMixedDocumentReferenceResolver.resolve(name);
+            }
         }
         setXClassReference(xClassReference);
     }
@@ -259,21 +264,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             return baseClass;
         }
 
-        String name = getClassName();
-        String wiki = getWiki();
-        if (wiki == null) {
-            wiki = context.getDatabase();
-        }
-
-        String database = context.getDatabase();
+        DocumentReference classReference = getXClassReference();
         try {
-            context.setDatabase(wiki);
-
-            baseClass = context.getWiki().getClass(name, context);
+            baseClass = context.getWiki().getXClass(classReference, context);
         } catch (Exception e) {
-            LOG.error("Failed to get class [" + name + "] from wiki [" + wiki + "]", e);
-        } finally {
-            context.setDatabase(database);
+            LOG.error("Failed to get class [" + classReference + "]", e);
         }
 
         return baseClass;

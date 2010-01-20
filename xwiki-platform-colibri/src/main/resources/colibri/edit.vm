@@ -80,6 +80,28 @@ $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   #end
   #template("editmodes.vm")
   #template("edit${editor}.vm")
+  ## This javascript must be placed here since it uses velocity variables set in the template above.
+  <script type="text/javascript">
+    //<![CDATA[
+      // Manage switch from wiki to wysiwyg, content must be preserved between those editors.
+      Event.observe($('tmEditWysiwyg'), "click", function(event) {
+        if (checkAdvancedContent('$msg.get("checkadvancedcontent")') == false) { 
+          Event.stop(event); 
+          return;
+        }
+        document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&$languageparams")'; 
+        document.forms.${formname}.submit(); 
+        Event.stop(event);       
+      });
+      
+      // Manage switch from wiki to wysiwyg, content must be preserved between those editors. 
+      Event.observe($('tmEditWiki'), "click", function(event) {
+        document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&$languageparams")';
+        document.forms.${formname}.submit(); 
+        Event.stop(event);
+      });
+    //]]>      
+  </script>
   </div> ## mainEditArea
   </div> ## alleditcontent  
   </div> ## editcolumn

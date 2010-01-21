@@ -69,11 +69,6 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
     private static final String PROPS_EXT = ".xml";
 
     /**
-     * The default value of the wakeup interval to set to {@link EvictionConfig}.
-     */
-    private static final int DEFAULT_WAKEUPINTERVAL = 5;
-
-    /**
      * The JBossCache configuration.
      */
     private Configuration jbossConfiguration;
@@ -136,8 +131,6 @@ public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoad
                 // handle eviction thread timer
                 if (eec.containsKey(CONFX_EVICTION_WAKEUPINTERVAL)) {
                     ec.setWakeupInterval(((Number) eec.get(CONFX_EVICTION_WAKEUPINTERVAL)).longValue());
-                } else {
-                    ec.setWakeupInterval(DEFAULT_WAKEUPINTERVAL, TimeUnit.SECONDS);
                 }
 
                 setLRUConfiguration(ec.getDefaultEvictionRegionConfig(), eec);

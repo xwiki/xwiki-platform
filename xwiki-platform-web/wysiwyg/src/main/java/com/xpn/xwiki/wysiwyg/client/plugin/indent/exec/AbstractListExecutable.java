@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.plugin.indent.exec;
 import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Range;
 import org.xwiki.gwt.dom.client.Selection;
-import org.xwiki.gwt.user.client.Cache.CacheCallback;
 import org.xwiki.gwt.user.client.ui.rta.RichTextArea;
 import org.xwiki.gwt.user.client.ui.rta.cmd.internal.AbstractSelectionExecutable;
 
@@ -145,25 +144,19 @@ public abstract class AbstractListExecutable extends AbstractSelectionExecutable
      */
     public boolean isEnabled()
     {
-        return cache.get(AbstractListExecutable.class.getName() + "#enabled", new CacheCallback<Boolean>()
-        {
-            public Boolean get()
-            {
-                if (!AbstractListExecutable.super.isEnabled()) {
-                    return false;
-                }
+        if (!super.isEnabled()) {
+            return false;
+        }
 
-                // Get the range and check if execution is possible: if it's collapsed, it's the common list item
-                // ancestor to perform operation on, if it's expanded, it's each "touched" list item.
-                Range range = rta.getDocument().getSelection().getRangeAt(0);
-                if (range.isCollapsed()) {
-                    Element listItem = getListItem(range);
-                    return canExecute(listItem);
-                } else {
-                    // Check the execution is possible on multiple items, without actually performing it.
-                    return executeOnMultipleItems(range, false);
-                }
-            }
-        });
+        // Get the range and check if execution is possible: if it's collapsed, it's the common list item ancestor to
+        // perform operation on, if it's expanded, it's each "touched" list item.
+        Range range = rta.getDocument().getSelection().getRangeAt(0);
+        if (range.isCollapsed()) {
+            Element listItem = getListItem(range);
+            return canExecute(listItem);
+        } else {
+            // Check the execution is possible on multiple items, without actually performing it.
+            return executeOnMultipleItems(range, false);
+        }
     }
 }

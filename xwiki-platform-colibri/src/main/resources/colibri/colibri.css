@@ -1316,7 +1316,7 @@ div.panellayoutcontainer-1col .panellayoutcol {
 }
 
 div.panellayoutcontainer-2col .panellayoutcol {
-  width: 50%;
+  width: 49%;
 }
 
 div.panellayoutcontainer-3col .panellayoutcol {
@@ -1324,11 +1324,11 @@ div.panellayoutcontainer-3col .panellayoutcol {
 }
 
 div.panellayoutcontainer-4col .panellayoutcol {
-  width: 25%;
+  width: 24%;
 }
 
 div.panellayoutcontainer-5col .panellayoutcol {
-  width: 20%;
+  width: 19%;
 }
 
 div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcontainer-3col, div.panellayoutcontainer-4col, div.panellayoutcontainer-5col {
@@ -1339,15 +1339,13 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 .panellayoutcol {
   float: left;
   height: 1%;
-  overflow: auto;
-
 }
 
 .panellayoutcol .panel {
-  border: 1px solid #ddd;
-  margin: 0 0 20px 5%;
+  border: 1px solid $theme.borderColor;
+  margin: 0 0 5% 5%;
+  overflow-x: auto;
   width: 90%;
-
 }
 
 #xwikicontent .panel ul {

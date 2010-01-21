@@ -26,9 +26,9 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents a Macro (standalone or inline) defined in a page.
  * <p>
- * You can get macro parameters using {@link #getParameters()} for example. Macro block is reusing Block standard custom
- * parameters API since macro by definition already have parameters and don't need also block parameters. So in this
- * case MacroBlock parameters and Block parameters are the same thing.
+ * Note: You can get macro parameters using {@link #getParameters()} for example. Macro block is reusing Block standard
+ * custom parameters API since macro by definition already have parameters and don't need also block parameters. So in
+ * this case MacroBlock parameters and Block parameters are the same thing.
  * 
  * @version $Id$
  * @since 1.8M2

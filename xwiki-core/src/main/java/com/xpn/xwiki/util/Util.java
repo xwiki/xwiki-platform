@@ -211,7 +211,7 @@ public class Util
 
     public static <T> Map<String, T> getSubMap(Map<String, T> map, String prefix)
     {
-        HashMap<String, T> result = new HashMap<String, T>();
+        Map<String, T> result = new HashMap<String, T>();
         for (String name : map.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
@@ -750,7 +750,7 @@ public class Util
     /**
      * Translates a string into <code>application/x-www-form-urlencoded</code> format, so that it can be safely used in
      * URIs, as a parameter value in a query string or as a segment in the URI path. This uses the UTF-8 encoding, the
-     * default encoding for URIs, as stated in {@link http://tools.ietf.org/html/rfc3986#section-2.5 RFC 3986}.
+     * default encoding for URIs, as stated in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
      * 
      * @param text the non encoded text
      * @param context the current context
@@ -767,9 +767,9 @@ public class Util
     }
 
     /**
-     * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of {@link #encodeURI(String)}. This
-     * uses the UTF-8 encoding, the default encoding for URIs, as stated in {@link http
-     * ://tools.ietf.org/html/rfc3986#section-2.5 RFC 3986}.
+     * Decodes a <code>application/x-www-form-urlencoded</code> string, the reverse of
+     * {@link #encodeURI(String, XWikiContext)}. This uses the UTF-8 encoding, the default encoding for URIs, as
+     * stated in <a href="http://tools.ietf.org/html/rfc3986#section-2.5">RFC 3986</a>.
      * 
      * @param text the encoded text
      * @param context the current context

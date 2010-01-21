@@ -145,7 +145,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
     public BaseCollection newObject(XWikiContext context) throws XWikiException
     {
         BaseObject bobj = newCustomClassInstance(context);
-        bobj.setClassName(getName());
+        bobj.setXClassReference(getDocumentReference());
 
         return bobj;
     }
@@ -159,7 +159,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public BaseCollection fromMap(Map<String, ? extends Object> map, BaseCollection object)
     {
-        object.setClassName(getName());
+        object.setXClassReference(getDocumentReference());
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
             Object formvalues = map.get(name);
@@ -183,7 +183,7 @@ public class BaseClass extends BaseCollection implements ClassInterface
 
     public BaseCollection fromValueMap(Map map, BaseCollection object)
     {
-        object.setClassName(getName());
+        object.setXClassReference(getDocumentReference());
         for (PropertyClass property : (Collection<PropertyClass>) getFieldList()) {
             String name = property.getName();
             Object formvalue = map.get(name);

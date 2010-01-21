@@ -16,11 +16,8 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-
 package com.xpn.xwiki.web;
-
 
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionMapping;
@@ -29,7 +26,11 @@ import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import javax.servlet.http.HttpServletRequest;
 
-public abstract class XWikiForm extends ActionForm {
+/**
+ * @version $Id$
+ */
+public abstract class XWikiForm extends ActionForm
+{
     private XWikiRequest request;
 
     /**
@@ -42,7 +43,8 @@ public abstract class XWikiForm extends ActionForm {
         this.request = new XWikiServletRequest(request);
     }
 
-    public void setRequest(PortletRequest request) {
+    public void setRequest(PortletRequest request)
+    {
         this.request = new XWikiPortletRequest(request);
     }
 
@@ -82,11 +84,10 @@ public abstract class XWikiForm extends ActionForm {
         readRequest();
     }
 
-
-    public XWikiRequest getRequest() {
+    public XWikiRequest getRequest()
+    {
         return request;
     }
 
     public abstract void readRequest();
-
 }

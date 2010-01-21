@@ -4290,7 +4290,7 @@ public class XWikiDocument implements DocumentModelBridge
             bobject = new BaseObject();
             addXObject(classReference, bobject);
         }
-        bobject.setName(getFullName());
+        bobject.setDocumentReference(getDocumentReference());
         bobject.setXClassReference(classReference);
         bobject.safeput(fieldName, value);
         setContentDirty(true);
@@ -4421,7 +4421,7 @@ public class XWikiDocument implements DocumentModelBridge
             bobject = new BaseObject();
             addXObject(classReference, bobject);
         }
-        bobject.setName(getFullName());
+        bobject.setDocumentReference(getDocumentReference());
         bobject.setXClassReference(classReference);
         bobject.setStringValue(fieldName, value);
         setContentDirty(true);
@@ -4478,7 +4478,7 @@ public class XWikiDocument implements DocumentModelBridge
             bobject = new BaseObject();
             addXObject(classReference, bobject);
         }
-        bobject.setName(getFullName());
+        bobject.setDocumentReference(getDocumentReference());
         bobject.setXClassReference(classReference);
         bobject.setStringListValue(fieldName, value);
         setContentDirty(true);
@@ -4503,7 +4503,7 @@ public class XWikiDocument implements DocumentModelBridge
             bobject = new BaseObject();
             addXObject(classReference, bobject);
         }
-        bobject.setName(getFullName());
+        bobject.setDocumentReference(getDocumentReference());
         bobject.setXClassReference(classReference);
         bobject.setDBStringListValue(fieldName, value);
         setContentDirty(true);
@@ -4528,7 +4528,7 @@ public class XWikiDocument implements DocumentModelBridge
             bobject = new BaseObject();
             addXObject(classReference, bobject);
         }
-        bobject.setName(getFullName());
+        bobject.setDocumentReference(getDocumentReference());
         bobject.setXClassReference(classReference);
         bobject.setLargeStringValue(fieldName, value);
         setContentDirty(true);
@@ -4553,7 +4553,7 @@ public class XWikiDocument implements DocumentModelBridge
             bobject = new BaseObject();
             addXObject(classReference, bobject);
         }
-        bobject.setName(getFullName());
+        bobject.setDocumentReference(getDocumentReference());
         bobject.setXClassReference(classReference);
         bobject.setIntValue(fieldName, value);
         setContentDirty(true);
@@ -5202,18 +5202,17 @@ public class XWikiDocument implements DocumentModelBridge
         loadArchive(context);
 
         XWikiDocument newdoc = (XWikiDocument) clone();
-        String newDocumentName = this.localEntityReferenceSerializer.serialize(newDocumentReference);
         newdoc.setOriginalDocument(null);
         newdoc.setDocumentReference(newDocumentReference);
         newdoc.setContentDirty(true);
-        newdoc.getXClass().setName(newDocumentName);
+        newdoc.getXClass().setDocumentReference(newDocumentReference);
         Map<DocumentReference, List<BaseObject>> objectClasses = newdoc.getXObjects();
         if (objectClasses != null) {
             for (List<BaseObject> objects : objectClasses.values()) {
                 if (objects != null) {
                     for (BaseObject object : objects) {
                         if (object != null) {
-                            object.setName(newDocumentName);
+                            object.setDocumentReference(newDocumentReference);
                             // Since GUIDs are supposed to be Unique, although this object holds the same data, it is
                             // not exactly the same object, so it should have a different identifier.
                             object.setGuid(UUID.randomUUID().toString());
@@ -5563,49 +5562,103 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
-    // This functions adds an object from an new object creation form
-    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject addXObjectFromRequest(XWikiContext context) throws XWikiException
     {
         // Read info in object
         ObjectAddForm form = new ObjectAddForm();
         form.setRequest((HttpServletRequest) context.getRequest());
         form.readRequest();
 
-        String className = form.getClassName();
-        BaseObject object = newObject(className, context);
+        DocumentReference classReference = this.currentMixedDocumentReferenceResolver.resolve(form.getClassName());
+        BaseObject object = newXObject(classReference, context);
         BaseClass baseclass = object.getXClass(context);
-        baseclass.fromMap(form.getObject(className), object);
+        baseclass.fromMap(form.getObject(this.localEntityReferenceSerializer.serialize(classReference)), object);
 
         return object;
     }
 
-    // This functions adds an object from an new object creation form
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject addObjectFromRequest(XWikiContext context) throws XWikiException
+    {
+        return addXObjectFromRequest(context);
+    }
+
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject addXObjectFromRequest(DocumentReference classReference, XWikiContext context)
+        throws XWikiException
+    {
+        return addXObjectFromRequest(classReference, "", 0, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
     public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, "", 0, context);
     }
 
-    // This functions adds an object from an new object creation form
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject addXObjectFromRequest(DocumentReference classReference, String prefix, XWikiContext context)
+        throws XWikiException
+    {
+        return addXObjectFromRequest(classReference, prefix, 0, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
     public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, prefix, 0, context);
     }
 
-    // This functions adds multiple objects from an new objects creation form
+    /**
+     * Adds multiple objects from an new objects creation form.
+     * @since 2.2M2
+     */
+    public List<BaseObject> addXObjectsFromRequest(DocumentReference classReference, XWikiContext context)
+        throws XWikiException
+    {
+        return addXObjectsFromRequest(classReference, "", context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectsFromRequest(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
     public List<BaseObject> addObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return addObjectsFromRequest(className, "", context);
     }
 
-    // This functions adds multiple objects from an new objects creation form
-    public List<BaseObject> addObjectsFromRequest(String className, String pref, XWikiContext context)
+    /**
+     * Adds multiple objects from an new objects creation form.
+     * @since 2.2M2
+     */
+    public List<BaseObject> addXObjectsFromRequest(DocumentReference classReference, String pref, XWikiContext context)
         throws XWikiException
     {
         Map map = context.getRequest().getParameterMap();
         List<Integer> objectsNumberDone = new ArrayList<Integer>();
         List<BaseObject> objects = new ArrayList<BaseObject>();
         Iterator it = map.keySet().iterator();
-        String start = pref + className + "_";
+        String start = pref + this.localEntityReferenceSerializer.serialize(classReference) + "_";
 
         while (it.hasNext()) {
             String name = (String) it.next();
@@ -5615,7 +5668,7 @@ public class XWikiDocument implements DocumentModelBridge
                 int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
                 if (!objectsNumberDone.contains(new Integer(num))) {
                     objectsNumberDone.add(new Integer(num));
-                    objects.add(addObjectFromRequest(className, pref, num, context));
+                    objects.add(addXObjectFromRequest(classReference, pref, num, context));
                 }
             }
         }
@@ -5623,75 +5676,169 @@ public class XWikiDocument implements DocumentModelBridge
         return objects;
     }
 
-    // This functions adds object from an new object creation form
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectsFromRequest(DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
+    public List<BaseObject> addObjectsFromRequest(String className, String pref, XWikiContext context)
+        throws XWikiException
+    {
+        return addXObjectsFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), pref, context);
+    }
+
+    /**
+     * Adds object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject addXObjectFromRequest(DocumentReference classReference, int num, XWikiContext context)
+        throws XWikiException
+    {
+        return addXObjectFromRequest(classReference, "", num, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, int, XWikiContext)}
+     */
+    @Deprecated
     public BaseObject addObjectFromRequest(String className, int num, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, "", num, context);
     }
 
-    // This functions adds object from an new object creation form
-    public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
-        throws XWikiException
+    /**
+     * Adds object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject addXObjectFromRequest(DocumentReference classReference, String prefix, int num,
+        XWikiContext context) throws XWikiException
     {
-        BaseObject object = newObject(className, context);
+        BaseObject object = newXObject(classReference, context);
         BaseClass baseclass = object.getXClass(context);
-        baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + num), object);
+        String newPrefix = prefix + this.localEntityReferenceSerializer.serialize(classReference) + "_" + num; 
+        baseclass.fromMap(Util.getObject(context.getRequest(), newPrefix), object);
 
         return object;
     }
 
-    // This functions adds an object from an new object creation form
+    /**
+     * @deprecated since 2.2M2 use {@link #addXObjectFromRequest(DocumentReference, String, int, XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
+        throws XWikiException
+    {
+        return addXObjectFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), prefix, num,
+            context);
+    }
+
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject updateXObjectFromRequest(DocumentReference classReference, XWikiContext context)
+        throws XWikiException
+    {
+        return updateXObjectFromRequest(classReference, "", context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
     public BaseObject updateObjectFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectFromRequest(className, "", context);
     }
 
-    // This functions adds an object from an new object creation form
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject updateXObjectFromRequest(DocumentReference classReference, String prefix, XWikiContext context)
+        throws XWikiException
+    {
+        return updateXObjectFromRequest(classReference, prefix, 0, context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
     public BaseObject updateObjectFromRequest(String className, String prefix, XWikiContext context)
         throws XWikiException
     {
         return updateObjectFromRequest(className, prefix, 0, context);
     }
 
-    // This functions adds an object from an new object creation form
-    public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context)
-        throws XWikiException
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public BaseObject updateXObjectFromRequest(DocumentReference classReference, String prefix, int num,
+        XWikiContext context) throws XWikiException
     {
         int nb;
-        BaseObject oldobject = getObject(className, num);
+        BaseObject oldobject = getXObject(classReference, num);
         if (oldobject == null) {
-            nb = createNewObject(className, context);
-            oldobject = getObject(className, nb);
+            nb = createXObject(classReference, context);
+            oldobject = getXObject(classReference, nb);
         } else {
             nb = oldobject.getNumber();
         }
         BaseClass baseclass = oldobject.getXClass(context);
-        BaseObject newobject =
-            (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + nb),
-                oldobject);
+        String newPrefix = prefix + this.localEntityReferenceSerializer.serialize(classReference) + "_" + nb;
+        BaseObject newobject = (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), newPrefix),
+            oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setGuid(oldobject.getGuid());
-        newobject.setName(getFullName());
-        setObject(className, nb, newobject);
+        newobject.setDocumentReference(getDocumentReference());
+        setXObject(classReference, nb, newobject);
 
         return newobject;
     }
 
-    // This functions adds an object from an new object creation form
+    /**
+     * @deprecated since 2.2M2 use {@link #updateXObjectFromRequest(DocumentReference, String, int, XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context)
+        throws XWikiException
+    {
+        return updateXObjectFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), prefix, num,
+            context);
+    }
+
+    /**
+     * Adds an object from an new object creation form.
+     * @since 2.2M2
+     */
+    public List<BaseObject> updateXObjectsFromRequest(DocumentReference classReference, XWikiContext context)
+        throws XWikiException
+    {
+        return updateXObjectsFromRequest(classReference, "", context);
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
     public List<BaseObject> updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectsFromRequest(className, "", context);
     }
 
-    // This functions adds multiple objects from an new objects creation form
-    public List<BaseObject> updateObjectsFromRequest(String className, String pref, XWikiContext context)
-        throws XWikiException
+    /**
+     * Adds multiple objects from an new objects creation form.
+     * @since 2.2M2
+     */
+    public List<BaseObject> updateXObjectsFromRequest(DocumentReference classReference, String pref,
+        XWikiContext context) throws XWikiException
     {
         Map map = context.getRequest().getParameterMap();
         List<Integer> objectsNumberDone = new ArrayList<Integer>();
         List<BaseObject> objects = new ArrayList<BaseObject>();
         Iterator it = map.keySet().iterator();
-        String start = pref + className + "_";
+        String start = pref + this.localEntityReferenceSerializer.serialize(classReference) + "_";
 
         while (it.hasNext()) {
             String name = (String) it.next();
@@ -5701,12 +5848,22 @@ public class XWikiDocument implements DocumentModelBridge
                 int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
                 if (!objectsNumberDone.contains(new Integer(num))) {
                     objectsNumberDone.add(new Integer(num));
-                    objects.add(updateObjectFromRequest(className, pref, num, context));
+                    objects.add(updateXObjectFromRequest(classReference, pref, num, context));
                 }
             }
         }
 
         return objects;
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #updateXObjectsFromRequest(DocumentReference, String, XWikiContext)}
+     */
+    @Deprecated
+    public List<BaseObject> updateObjectsFromRequest(String className, String pref, XWikiContext context)
+        throws XWikiException
+    {
+        return updateXObjectsFromRequest(this.currentMixedDocumentReferenceResolver.resolve(className), pref, context);
     }
 
     public boolean isAdvancedContent()
@@ -6248,20 +6405,34 @@ public class XWikiDocument implements DocumentModelBridge
         this.isMinorEdit = (isMinor != null && isMinor.booleanValue());
     }
 
-    public BaseObject newObject(String classname, XWikiContext context) throws XWikiException
+    /**
+     * @since 2.2M2
+     */
+    public BaseObject newXObject(DocumentReference classReference, XWikiContext context) throws XWikiException
     {
-        int nb = createNewObject(classname, context);
-
-        return getObject(classname, nb);
+        int nb = createXObject(classReference, context);
+        return getXObject(classReference, nb);
     }
 
-    public BaseObject getObject(String classname, boolean create, XWikiContext context)
+    /**
+     * @deprecated since 2.2M2 use {@link #newXObject(DocumentReference, XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject newObject(String classname, XWikiContext context) throws XWikiException
+    {
+        return newXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), context);
+    }
+
+    /**
+     * @since 2.2M2
+     */
+    public BaseObject getXObject(DocumentReference classReference, boolean create, XWikiContext context)
     {
         try {
-            BaseObject obj = getObject(classname);
+            BaseObject obj = getXObject(classReference);
 
             if ((obj == null) && create) {
-                return newObject(classname, context);
+                return newXObject(classReference, context);
             }
 
             if (obj == null) {
@@ -6272,6 +6443,15 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * @deprecated since 2.2M2 use {@link #getXObject(DocumentReference, boolean, XWikiContext)}
+     */
+    @Deprecated
+    public BaseObject getObject(String classname, boolean create, XWikiContext context)
+    {
+        return getXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), create, context);
     }
 
     public boolean validate(XWikiContext context) throws XWikiException

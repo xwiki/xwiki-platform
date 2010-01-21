@@ -3796,10 +3796,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         BaseObject memberObject = (BaseObject) groupClass.newObject(context);
-        memberObject.setClassName(groupClass.getName());
-        memberObject.setName(groupDoc.getFullName());
+        memberObject.setXClassReference(groupClass.getXClassReference());
+        memberObject.setDocumentReference(groupDoc.getDocumentReference());
         memberObject.setStringValue("member", userName);
-        groupDoc.addObject(groupClass.getName(), memberObject);
+        groupDoc.addXObject(groupClass.getDocumentReference(), memberObject);
         if (groupDoc.isNew()) {
             saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
         } else {

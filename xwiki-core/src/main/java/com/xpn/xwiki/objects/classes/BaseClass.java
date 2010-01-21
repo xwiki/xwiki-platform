@@ -76,6 +76,26 @@ public class BaseClass extends BaseCollection implements ClassInterface
     private String nameField;
 
     /**
+     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * @deprecated since 2.2M2 use {@link #getDocumentReference()}
+     */
+    @Deprecated
+    @Override public String getName()
+    {
+        return super.getName();
+    }
+
+    /**
+     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
+     */
+    @Deprecated
+    @Override public void setName(String name)
+    {
+        super.setName(name);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * This insures natural ordering between properties.

@@ -491,8 +491,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             // Verify if the document already exists
-            Query query =
-                session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
+            Query query = session.createQuery(
+                "select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
             query.setLong("id", doc.getId());
             if (query.uniqueResult() == null) {
                 session.save(doc);
@@ -503,16 +503,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             // Remove objects planned for removal
-            if (doc.getObjectsToRemove().size() > 0) {
-                for (BaseObject removedObject : doc.getObjectsToRemove()) {
+            if (doc.getXObjectsToRemove().size() > 0) {
+                for (BaseObject removedObject : doc.getXObjectsToRemove()) {
                     deleteXWikiObject(removedObject, context, false);
                 }
-                doc.setObjectsToRemove(new ArrayList<BaseObject>());
+                doc.setXObjectsToRemove(new ArrayList<BaseObject>());
             }
 
             // We should only save the class if we are using the class table mode
             if (bclass != null) {
-                bclass.setName(doc.getFullName());
+                bclass.setDocumentReference(doc.getDocumentReference());
                 if ((bclass.getFieldList().size() > 0) && (useClassesTable(true, context))) {
                     saveXWikiClass(bclass, context, false);
                 }
@@ -525,18 +525,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     // migrate values of list properties
                     if (prop instanceof StaticListClass || prop instanceof DBListClass) {
                         ListClass lc = (ListClass) prop;
-                        String[] classes =
-                            {DBStringListProperty.class.getName(), StringListProperty.class.getName(),
-                            StringProperty.class.getName()}; // @see
-                        // ListClass#newProperty()
+                        String[] classes = { DBStringListProperty.class.getName(), StringListProperty.class.getName(),
+                            StringProperty.class.getName()}; // @see ListClass#newProperty()
                         for (int i = 0; i < classes.length; i++) {
                             String oldclass = classes[i];
                             if (!oldclass.equals(lc.newProperty().getClass().getName())) {
-                                Query q =
-                                    session.createQuery(
-                                        "select p from " + oldclass + " as p, BaseObject as o" + " where o.className=?"
-                                            + "  and p.id=o.id and p.name=?").setString(0, bclass.getName()).setString(
-                                        1, lc.getName());
+                                Query q = session.createQuery("select p from " + oldclass + " as p, BaseObject as o"
+                                    + " where o.className=? and p.id=o.id and p.name=?").setString(0,
+                                    bclass.getName()).setString(1, lc.getName());
                                 for (Iterator it = q.list().iterator(); it.hasNext();) {
                                     BaseProperty lp = (BaseProperty) it.next();
                                     BaseProperty lp1 = lc.newProperty();
@@ -609,7 +605,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 for (List<BaseObject> objects : doc.getXObjects().values()) {
                     for (BaseObject obj : objects) {
                         if (obj != null) {
-                            obj.setName(doc.getFullName());
+                            obj.setDocumentReference(doc.getDocumentReference());
                             /* If the object doesn't have a GUID, create it before saving */
                             if (StringUtils.isEmpty(obj.getGuid())) {
                                 obj.setGuid(UUID.randomUUID().toString());

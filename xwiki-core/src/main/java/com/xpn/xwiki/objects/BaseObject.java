@@ -42,6 +42,26 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
     private String guid = UUID.randomUUID().toString();
 
     /**
+     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * @deprecated since 2.2M2 use {@link #getDocumentReference()}
+     */
+    @Deprecated
+    @Override public String getName()
+    {
+        return super.getName();
+    }
+
+    /**
+     * Note: This method is overridden to add the deprecation warning so that code using is can see it's deprecated.
+     * @deprecated since 2.2M2 use {@link #setDocumentReference(org.xwiki.model.reference.DocumentReference)}
+     */
+    @Deprecated
+    @Override public void setName(String name)
+    {
+        super.setName(name);
+    }
+    
+    /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.objects.BaseCollection#hashCode()

@@ -1045,7 +1045,7 @@ public class XWikiDocument implements DocumentModelBridge
             }
         } catch (Exception e) {
             LOG.warn("Failed to interpret title of document ["
-                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         try {
@@ -1053,7 +1053,7 @@ public class XWikiDocument implements DocumentModelBridge
             title = getRenderedContentTitle(outputSyntax, context);
         } catch (Exception e) {
             LOG.warn("Failed to extract title from content of document ["
-                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         // 3) No title has been found, return the page name as the title
@@ -2261,7 +2261,7 @@ public class XWikiDocument implements DocumentModelBridge
             result = display(fieldname, object, context);
         } catch (Exception e) {
             LOG.error("Failed to display field [" + fieldname + "] of document ["
-                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
         }
 
         return result;
@@ -2468,8 +2468,8 @@ public class XWikiDocument implements DocumentModelBridge
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object [" + obj.getName()
-                + "]");
+            LOG.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object of Class ["
+                + this.defaultEntityReferenceSerializer.serialize(obj.getDocumentReference()) + "]");
             ex.printStackTrace();
             return "";
         } finally {
@@ -2809,7 +2809,7 @@ public class XWikiDocument implements DocumentModelBridge
         if (templateDocumentReference != null) {
             String content = getContent();
             if ((!content.equals("\n")) && (!content.equals("")) && !isNew()) {
-                Object[] args = {this.compactEntityReferenceSerializer.serialize(getDocumentReference())};
+                Object[] args = {this.defaultEntityReferenceSerializer.serialize(getDocumentReference())};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                     "Cannot add a template to document {0} because it already has content", null, args);
@@ -2817,7 +2817,7 @@ public class XWikiDocument implements DocumentModelBridge
                 XWiki xwiki = context.getWiki();
                 XWikiDocument templatedoc = xwiki.getDocument(templateDocumentReference, context);
                 if (templatedoc.isNew()) {
-                    Object[] args = {this.compactEntityReferenceSerializer.serialize(templateDocumentReference),
+                    Object[] args = {this.defaultEntityReferenceSerializer.serialize(templateDocumentReference),
                         this.compactEntityReferenceSerializer.serialize(getDocumentReference())};
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
@@ -3374,7 +3374,7 @@ public class XWikiDocument implements DocumentModelBridge
                 el.addText(getDocumentArchive(context).getArchive(context));
                 docel.add(el);
             } catch (XWikiException e) {
-                LOG.error("Document [" + this.localEntityReferenceSerializer.serialize(getDocumentReference())
+                LOG.error("Document [" + this.defaultEntityReferenceSerializer.serialize(getDocumentReference())
                     + "] has malformed history");
             }
         }
@@ -5481,7 +5481,7 @@ public class XWikiDocument implements DocumentModelBridge
             syntax = this.syntaxFactory.createSyntaxFromIdString(syntaxId);
         } catch (ParseException e) {
             LOG.error("Failed to generate Syntax object for syntax identifier [" + syntaxId + "] in document ["
-                + this.compactWikiEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
+                + this.defaultEntityReferenceSerializer.serialize(getDocumentReference()) + "]", e);
 
             syntaxId = getDefaultDocumentSyntax();
             try {

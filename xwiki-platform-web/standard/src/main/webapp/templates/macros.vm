@@ -989,8 +989,10 @@ $fn
 ###
 #macro(panelheader $title)
 #set($cookieName = "${context.user}_${panel}")
-#set($expanded = "expanded")
 #set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
+#if(!$expanded)
+  #set($expanded = 'expanded')
+#end
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
 #set ($specialClassAttribute = "")

@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.syntax;
 
-import org.xwiki.rendering.syntax.SyntaxType;
-
 /**
  * Represents a wiki syntax that the user can use to enter wiki content. A syntax is made of two parts: a type
  * (eg XWiki, Confluence, MediaWiki, etc) and a version (1.0, 2.0, etc). 

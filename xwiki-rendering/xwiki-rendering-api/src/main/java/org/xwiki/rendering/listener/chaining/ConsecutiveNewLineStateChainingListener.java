@@ -37,8 +37,14 @@ import org.xwiki.rendering.syntax.Syntax;
 public class ConsecutiveNewLineStateChainingListener extends AbstractChainingListener implements
     StackableChainingListener
 {
+    /**
+     * Number of found new lines.
+     */
     private int newLineCount;
 
+    /**
+     * @param listenerChain see {@link #getListenerChain()}
+     */
     public ConsecutiveNewLineStateChainingListener(ListenerChain listenerChain)
     {
         setListenerChain(listenerChain);
@@ -54,6 +60,9 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
         return new ConsecutiveNewLineStateChainingListener(getListenerChain());
     }
 
+    /**
+     * @return the number of found new lines.
+     */
     public int getNewLineCount()
     {
         return this.newLineCount;
@@ -119,7 +128,7 @@ public class ConsecutiveNewLineStateChainingListener extends AbstractChainingLis
         this.newLineCount = 0;
         super.endGroup(parameters);
     }
-    
+
     /**
      * {@inheritDoc}
      * 

@@ -16,15 +16,31 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.transformation.TransformationManager;
 
+/**
+ * Default implementation for {@link Converter}.
+ * 
+ * @version $Id$
+ */
 @Component
 public class DefaultConverter implements Converter
 {
+    /**
+     * Used to lookup parser and renderer.
+     */
     @Requirement
     private ComponentManager componentManager;
 
+    /**
+     * Used to execute transformations.
+     */
     @Requirement
     private TransformationManager transformationManager;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.converter.Converter#convert(java.io.Reader, org.xwiki.rendering.syntax.Syntax, org.xwiki.rendering.syntax.Syntax, org.xwiki.rendering.renderer.printer.WikiPrinter)
+     */
     public void convert(Reader source, Syntax sourceSyntax, Syntax targetSyntax, WikiPrinter printer)
         throws ConversionException
     {

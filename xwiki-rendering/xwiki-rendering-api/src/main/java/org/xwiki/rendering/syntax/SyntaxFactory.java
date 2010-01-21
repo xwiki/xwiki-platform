@@ -38,5 +38,6 @@ public interface SyntaxFactory
      * @return a list of all Syntaxes for which there's a {@link org.xwiki.rendering.parser.Parser} available
      * @deprecated starting with 2.0M3 you should directly lookup the Parser using the Component Manager
      */
+    @Deprecated
     List<Syntax> getAvailableSyntaxes();
 }

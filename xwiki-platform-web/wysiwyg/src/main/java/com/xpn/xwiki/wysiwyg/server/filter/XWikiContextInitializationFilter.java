@@ -142,6 +142,9 @@ public class XWikiContextInitializationFilter implements Filter
             // Initialize the URL factory.
             context.setURLFactory(xwiki.getURLFactoryService().createURLFactory(context.getMode(), context));
 
+            // Prepare the localized resources, according to the selected language.
+            xwiki.prepareResources(context);
+
             // Initialize the current user.
             XWikiUser user = context.getWiki().checkAuth(context);
             if (user != null) {

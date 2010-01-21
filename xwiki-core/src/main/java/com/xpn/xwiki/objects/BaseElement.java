@@ -127,11 +127,7 @@ public abstract class BaseElement implements ElementInterface, Serializable
     {
         // If the name is already set then reset it since we're now using a reference
         this.reference = reference;
-        if (this.name != null) {
-            LOG.warn("Element was stored as name [" + this.name + "]. Will now be stored as a reference ["
-                + reference + "]");
-            this.name = null;
-        }
+        this.name = null;
     }
 
     /**

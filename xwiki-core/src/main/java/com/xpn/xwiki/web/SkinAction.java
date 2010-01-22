@@ -60,7 +60,7 @@ public class SkinAction extends XWikiAction
 
     /** The directory where the skins are placed in the webapp. */
     private static final String SKINS_DIRECTORY = "skins";
-    
+
     /** The directory where resources are placed in the webapp. */
     private static final String RESOURCES_DIRECTORY = "resources";
 
@@ -133,7 +133,7 @@ public class SkinAction extends XWikiAction
                 if (renderFileFromFilesystem(filename, context)) {
                     found = true;
                     break;
-                }                                                
+                }
             } catch (XWikiException ex) {
                 if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
                     // This means that the response couldn't be sent, although the file was
@@ -150,7 +150,7 @@ public class SkinAction extends XWikiAction
         }
         return null;
     }
-    
+
     /**
      * Get the path for the given skin file in the given skin.
      * 
@@ -161,7 +161,7 @@ public class SkinAction extends XWikiAction
     {
         return DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
     }
-    
+
     /**
      * Get the path for the given file in resources.
      * 
@@ -201,14 +201,14 @@ public class SkinAction extends XWikiAction
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context)
-                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()),
-                        context));
+                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderFileFromFilesystem(getSkinFilePath(filename,
+                        doc.getName()), context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response:", e);
-        }        
-        
+        }
+
         return renderFileFromFilesystem(getSkinFilePath(filename, doc.getName()), context);
     }
 
@@ -225,7 +225,7 @@ public class SkinAction extends XWikiAction
         if (LOG.isDebugEnabled()) {
             LOG.debug("Rendering filesystem file from path [" + path + "]");
         }
-        XWikiResponse response = context.getResponse();        
+        XWikiResponse response = context.getResponse();
         try {
             byte[] data;
             data = context.getWiki().getResourceContentAsBytes(path);
@@ -346,8 +346,8 @@ public class SkinAction extends XWikiAction
     public boolean isJavascriptMimeType(String mimetype)
     {
         boolean result =
-            "text/javascript".equalsIgnoreCase(mimetype) || "application/x-javascript".equalsIgnoreCase(mimetype)
-                || "application/javascript".equalsIgnoreCase(mimetype);
+                "text/javascript".equalsIgnoreCase(mimetype) || "application/x-javascript".equalsIgnoreCase(mimetype)
+                    || "application/javascript".equalsIgnoreCase(mimetype);
         result |= "application/ecmascript".equalsIgnoreCase(mimetype) || "text/ecmascript".equalsIgnoreCase(mimetype);
         return result;
     }

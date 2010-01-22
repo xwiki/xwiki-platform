@@ -3918,13 +3918,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                 // Allow including document in the XWiki Syntax 1.0 but also other syntaxes using the new rendering.
                 if (contentdoc.getSyntaxId().equals(XWikiDocument.XWIKI10_SYNTAXID)) {
-                    result =
-                        getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
-                            (XWikiDocument) context.get("doc"), context);
+                    result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
+                        (XWikiDocument) context.get("doc"), context);
                 } else {
                     // Note: the Script macro in the new rendering checks for programming rights for the document in
                     // the xwiki context.
-                    result = contentdoc.getRenderedContent(context);
+                    result = getRenderedContent(contentdoc, (XWikiDocument) context.get("doc"), context);
                 }
             } else {
                 // We stay in the included document context
@@ -3939,7 +3938,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     try {
                         originalDoc = context.getDoc();
                         context.put("doc", doc);
-                        result = contentdoc.getRenderedContent(context);
+                        result = getRenderedContent(contentdoc, doc, context);
                     } finally {
                         context.put("doc", originalDoc);
                     }
@@ -3989,6 +3988,43 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
             }
         }
+    }
+
+    /**
+     * Render content from the passed included document, setting the correct security doc (sdoc) and including doc
+     * (idoc). Note that this is needed for 2.0 syntax only since in 1.0 syntax the idoc and sdoc are set by
+     * {@link com.xpn.xwiki.render.XWikiRenderingEngine#renderText}.
+     * 
+     * @since 2.2M2
+     */
+    private String getRenderedContent(XWikiDocument includedDoc, XWikiDocument includingDoc, XWikiContext context)
+        throws XWikiException
+    {
+        String result;
+        XWikiDocument idoc = (XWikiDocument) context.get("idoc");
+        XWikiDocument sdoc = (XWikiDocument) context.get("sdoc");
+
+        context.put("idoc", includingDoc);
+        context.put("sdoc", includedDoc);
+        try {
+            result = includedDoc.getRenderedContent(context);
+        } finally {
+            // Remove including doc or set the previous one
+            if (idoc == null) {
+                context.remove("idoc");
+            } else {
+                context.put("idoc", idoc);
+            }
+
+            // Remove security doc or set the previous one
+            if (sdoc == null) {
+                context.remove("sdoc");
+            } else {
+                context.put("sdoc", sdoc);
+            }
+        }
+
+        return result;
     }
 
     public void deleteDocument(XWikiDocument doc, XWikiContext context) throws XWikiException

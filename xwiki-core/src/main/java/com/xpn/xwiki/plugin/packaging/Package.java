@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -645,7 +646,8 @@ public class Package
                     xa.getAttachment_content().setContentDirty(false);
                 }
 
-                context.getWiki().saveDocument(doc.getDoc(), context);
+                String saveMessage = context.getMessageTool().get("core.importer.saveDocumentComment");
+                context.getWiki().saveDocument(doc.getDoc(), saveMessage, context);
                 doc.getDoc().saveAllAttachments(false, true, context);
                 addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 

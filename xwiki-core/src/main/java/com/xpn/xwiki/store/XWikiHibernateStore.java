@@ -3024,11 +3024,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        String hql =
-            "select doc.language from XWikiDocument as doc where doc.space = '" + Utils.SQLFilter(doc.getSpace())
-                + "' and doc.name = '" + Utils.SQLFilter(doc.getName())
-                + "' and (doc.language <> '' or (doc.language is not null and '' is null))";
-        List<String> list = context.getWiki().search(hql, context);
+        String hql = "select doc.language from XWikiDocument as doc where doc.space = ? and doc.name = ? "
+                        + "and (doc.language <> '' or (doc.language is not null and '' is null))";
+        ArrayList<String> params = new ArrayList<String>();
+        params.add(doc.getSpace());
+        params.add(doc.getName());
+        List<String> list = search(hql, 0, 0, params, context);
         return (list == null) ? new ArrayList<String>() : list;
     }
 

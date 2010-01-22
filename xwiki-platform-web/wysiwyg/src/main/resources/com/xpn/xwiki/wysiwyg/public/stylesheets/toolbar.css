@@ -85,6 +85,11 @@ html>body .xToolbar .gwt-ToggleButton-down-disabled {
   vertical-align:top;
 }
 
+.xToolbar .gwt-ListBox optgroup {
+  font-size:small;
+  margin-top:6px;
+}
+
 .xToolbar .separator {
   background-color:#F0F0EE;
   border-color:buttonshadow buttonhighlight buttonhighlight buttonshadow;

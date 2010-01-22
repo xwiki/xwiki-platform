@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
+import com.google.gwt.dom.client.SelectElement;
 import com.google.gwt.user.client.ui.ListBox;
 
 /**
@@ -94,5 +95,15 @@ public abstract class AbstractListBoxPicker extends ListBox implements Picker
         }
         // No matching value found.
         setSelectedIndex(-1);
+    }
+
+    /**
+     * NOTE: We added this method because it is declared as private in the base class.
+     * 
+     * @return the select HTML element used by this list box picker
+     */
+    protected SelectElement getSelectElement()
+    {
+        return getElement().cast();
     }
 }

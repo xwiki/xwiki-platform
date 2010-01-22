@@ -77,11 +77,11 @@ $xwiki.ssx.use('Main.Dashboard')##
         &lt;dl&gt;
           #if($hasBlog || $context.action == 'inline')
             &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blog')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;#if($doc.syntaxId=='xwiki/1.0'){{html wiki="false"}}#end$doc.display('blog')#if($doc.syntaxId=='xwiki/1.0'){{/html}}#end&lt;/dd&gt;
+            &lt;dd&gt;$doc.display('blog')&lt;/dd&gt;
           #end
           #if($hasBlogFeed || $context.action == 'inline')
             &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.blogFeed')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;#if($doc.syntaxId=='xwiki/1.0'){{html wiki="false"}}#end$doc.display('blogfeed')#if($doc.syntaxId=='xwiki/1.0'){{/html}}#end&lt;/dd&gt;
+            &lt;dd&gt;$doc.display('blogfeed')&lt;/dd&gt;
           #end
         &lt;/dl&gt;
       #end

@@ -28,17 +28,16 @@
 #if(!$obj)
 {{info}}$msg.get('xe.admin.users.applyonusers'){{/info}}
 #else
-{{html clean="false" wiki="true"}}
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
-{{html wiki="true"}}
+{{html}}
 &lt;div class="dashboard"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="userPreferences"&gt;
       &lt;h1&gt;$msg.get('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;#if($doc.syntaxId=='xwiki/1.0'){{html wiki="false"}}#end$doc.display('editor')#if($doc.syntaxId=='xwiki/1.0'){{/html}}#end&lt;/dd&gt;
+        &lt;dd&gt;$doc.display('editor')&lt;/dd&gt;
       &lt;/dl&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editMode')&lt;/label&gt;&lt;/dt&gt;

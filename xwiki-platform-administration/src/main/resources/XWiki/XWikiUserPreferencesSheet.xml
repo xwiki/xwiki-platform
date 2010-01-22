@@ -38,7 +38,7 @@ $xwiki.ssx.use('Main.Dashboard')##
       &lt;h1&gt;$msg.get('platform.core.profile.section.editorPreferences')&lt;/h1&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editor')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;{{html wiki="false"}}$doc.display('editor'){{/html}}&lt;/dd&gt;
+        &lt;dd&gt;#if($doc.syntaxId=='xwiki/1.0'){{html wiki="false"}}#end$doc.display('editor')#if($doc.syntaxId=='xwiki/1.0'){{/html}}#end&lt;/dd&gt;
       &lt;/dl&gt;
       &lt;dl&gt;
         &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editMode')&lt;/label&gt;&lt;/dt&gt;

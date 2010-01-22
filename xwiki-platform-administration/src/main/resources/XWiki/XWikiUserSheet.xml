@@ -296,6 +296,24 @@ div.userInfo input[type="text"], div.userInfo input[type="password"], div.userIn
   font-weight: bold;
 }
 
+span.wikiWatchlistType, span.spaceWatchlistType, span.pageWatchlistType {
+  width: 16px;
+  height: 16px;
+  display: block;  
+}
+
+span.wikiWatchlistType {
+  background: url($xwiki.getSkinFile('icons/silk/world.gif')) no-repeat;
+}
+
+span.spaceWatchlistType {
+  background: url($xwiki.getSkinFile('icons/silk/folder.gif')) no-repeat;
+}
+
+span.pageWatchlistType {
+  background: url($xwiki.getSkinFile('icons/silk//page_white_text.gif')) no-repeat;
+}
+
 /* Tabs */
 
 div#vertical-panes {
@@ -394,8 +412,16 @@ $xwiki.jsx.use("XWiki.XWikiUserSheet")##
 ##
 ## Categories
 ##
-##set($categories = [['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.gif'], ['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/application_form.gif'], ['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchlistSheet', 'icons/silk/star.gif']])
-#set($categories = [['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.gif'], ['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/application_form.gif']])
+#set($categories = $util.arrayList)
+#set($discard = $categories.add(['profile', $msg.get('platform.core.profile.category.profile'), 'XWiki.XWikiUserProfileSheet', 'icons/silk/vcard.gif']))
+#set($isMyProfile = ($context.user == $doc.fullName))
+#if($isMyProfile || $hasAdmin)
+  #set($discard = $categories.add(['preferences', $msg.get('platform.core.profile.category.preferences'), 'XWiki.XWikiUserPreferencesSheet', 'icons/silk/application_form.gif']))
+#end
+## TODO: add APIs to be able to display users watchlists to admins
+#if($isMyProfile)
+  #set($discard = $categories.add(['watchlist', $msg.get('platform.core.profile.category.watchlist'), 'XWiki.XWikiUserWatchListSheet', 'icons/silk/star.gif']))
+#end
 ##
 ## Avatar
 ##

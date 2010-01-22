@@ -27,7 +27,7 @@ import java.util.Map;
  * 
  * @version $Id$
  */
-public class CachedListBoxPicker extends AbstractListBoxPicker
+public class CachedListBoxPicker extends DynamicListBoxPicker
 {
     /**
      * The cache maps values to their index in the list.
@@ -37,7 +37,7 @@ public class CachedListBoxPicker extends AbstractListBoxPicker
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setValue(int, String)
+     * @see DynamicListBoxPicker#setValue(int, String)
      */
     public void setValue(int index, String value)
     {
@@ -48,7 +48,7 @@ public class CachedListBoxPicker extends AbstractListBoxPicker
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractListBoxPicker#setSelectedValue(String, Matcher)
+     * @see DynamicListBoxPicker#setSelectedValue(String, Matcher)
      */
     protected void setSelectedValue(String value, Matcher<String> matcher)
     {

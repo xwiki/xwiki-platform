@@ -70,7 +70,11 @@ public interface Strings extends Constants
 
     String font();
 
+    String fontNameOther();
+
     String fontSize();
+
+    String fontSizeOther();
 
     String foreColor();
 

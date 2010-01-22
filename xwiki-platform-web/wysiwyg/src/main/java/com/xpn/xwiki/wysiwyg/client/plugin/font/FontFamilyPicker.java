@@ -19,8 +19,10 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.font;
 
-import org.xwiki.gwt.dom.client.Element;
 import org.xwiki.gwt.dom.client.Style;
+
+import com.google.gwt.dom.client.OptionElement;
+import com.xpn.xwiki.wysiwyg.client.editor.Strings;
 
 /**
  * A widget used for choosing a font family.
@@ -40,6 +42,7 @@ public class FontFamilyPicker extends CachedListBoxPicker
     public FontFamilyPicker()
     {
         addStyleName("xFontFamilyPicker");
+        setAdditionalOptionGroupLabel(Strings.INSTANCE.fontNameOther());
     }
 
     /**
@@ -50,7 +53,7 @@ public class FontFamilyPicker extends CachedListBoxPicker
     public void setValue(int index, String value)
     {
         super.setValue(index, value);
-        Element option = (Element) getElement().getChildNodes().getItem(index);
+        OptionElement option = getSelectElement().getOptions().getItem(index);
         option.getStyle().setProperty(Style.FONT_FAMILY.getJSName(), value);
     }
 

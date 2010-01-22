@@ -48,9 +48,9 @@ public class FontPlugin extends AbstractStatefulPlugin implements ChangeHandler
      * The list of default font names.
      */
     private static final String DEFAULT_FONT_NAMES =
-        "andale mono,arial,arial black,book antiqua,comic sans ms"
-            + ",courier new,georgia,helvetica,impact,symbol,tahoma,terminal"
-            + ",times new roman,trebuchet ms,verdana,webdings,wingdings";
+        "Andale Mono,Arial,Arial Black,Book Antiqua,Comic Sans MS"
+            + ",Courier New,Georgia,Helvetica,Impact,Symbol,Tahoma,Terminal"
+            + ",Times New Roman,Trebuchet MS,Verdana,Webdings,Wingdings";
 
     /**
      * The list of default font sizes.

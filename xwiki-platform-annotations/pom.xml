@@ -32,5 +32,4 @@
   <artifactId>xwiki-annotation-application</artifactId>
   <name>XWiki Annotation: Application</name>
   <packaging>xar</packaging>
-  <version>1.0-SNAPSHOT</version>
 </project>

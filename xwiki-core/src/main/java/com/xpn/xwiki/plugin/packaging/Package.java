@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -73,7 +72,7 @@ public class Package
     public static final String DefaultPluginName = "package";
 
     private static final Log LOG = LogFactory.getLog(Package.class);
-    
+
     private String name = "My package";
 
     private String description = "";
@@ -93,9 +92,9 @@ public class Package
     private boolean backupPack = false;
 
     private boolean preserveVersion = false;
-    
+
     private boolean withVersions = true;
-    
+
     private List<DocumentFilter> documentFilters = new ArrayList<DocumentFilter>();
 
     public String getName()
@@ -152,7 +151,7 @@ public class Package
      * If true, the package will preserve the original author during import, rather than updating the author to the
      * current (importing) user.
      * 
-     * @see #isWithVersions() 
+     * @see #isWithVersions()
      * @see #isVersionPreserved()
      */
     public boolean isBackupPack()
@@ -164,7 +163,7 @@ public class Package
     {
         this.backupPack = backupPack;
     }
-    
+
     /**
      * If true, the package will preserve the current document version during import, regardless of whether or not the
      * document history is included.
@@ -505,7 +504,7 @@ public class Package
     public int install(XWikiContext context) throws XWikiException
     {
         boolean isAdmin = context.getWiki().getRightService().hasAdminRights(context);
-        
+
         if (testInstall(isAdmin, context) == DocumentInfo.INSTALL_IMPOSSIBLE) {
             setStatus(DocumentInfo.INSTALL_IMPOSSIBLE, context);
             return DocumentInfo.INSTALL_IMPOSSIBLE;
@@ -543,18 +542,17 @@ public class Package
 
         return status;
     }
-    
+
     private int installDocument(DocumentInfo doc, boolean isAdmin, XWikiContext context) throws XWikiException
     {
-    	if (this.preserveVersion && this.withVersions)
-    	{
-    		// Right now importing an archive and the history revisions it contains
-    		// without overriding the existing document is not supported.
-    		// We fallback on adding a new version to the existing history without importing the
-    		// archive's revisions.
-    		this.withVersions = false;
-    	}
-    	
+        if (this.preserveVersion && this.withVersions) {
+            // Right now importing an archive and the history revisions it contains
+            // without overriding the existing document is not supported.
+            // We fallback on adding a new version to the existing history without importing the
+            // archive's revisions.
+            this.withVersions = false;
+        }
+
         int result = DocumentInfo.INSTALL_OK;
 
         if (LOG.isDebugEnabled()) {
@@ -601,14 +599,14 @@ public class Package
                 }
             }
             try {
-            	// Determine if the user performing the installation is a farm admin.
-            	// Right now, check for programming rights, which is the closer we can get to the notion
-            	// of farm admin.
-            	boolean isFarmAdmin = context.getWiki().getRightService().hasProgrammingRights(context);
-            	
+                // Determine if the user performing the installation is a farm admin.
+                // Right now, check for programming rights, which is the closer we can get to the notion
+                // of farm admin.
+                boolean isFarmAdmin = context.getWiki().getRightService().hasProgrammingRights(context);
+
                 if (!this.backupPack || !isFarmAdmin) {
-                	// We allow author preservation from the package only to farm admins,
-                	// In order to prevent sub-wiki admins to take control of a farm with forged packages
+                    // We allow author preservation from the package only to farm admins,
+                    // In order to prevent sub-wiki admins to take control of a farm with forged packages
                     doc.getDoc().setAuthor(context.getUser());
                     doc.getDoc().setContentAuthor(context.getUser());
                     // if the import is not a backup pack we set the date to now
@@ -620,24 +618,24 @@ public class Package
                 if (!this.withVersions) {
                     doc.getDoc().setVersion("1.1");
                 }
-                
-                if (this.preserveVersion && previousdoc != null) {                	
+
+                if (this.preserveVersion && previousdoc != null) {
                     // If it is not a backup pack and we are not overriding the versions
                     // then we want to insert the archive from the original doc
                     doc.getDoc().setDocumentArchive(previousdoc.getDocumentArchive(context));
-                } 
-                
-                else {
-                	// Reset or replace history
-                	// if there was not history in the source package then we should reset the version number to 1.1
-                	if (!this.documentContainsHistory(doc) || !this.withVersions) {
-                		doc.getDoc().setVersion("1.1");
-                	}
+                }
 
-                	// We don't want date and version to change
-                	// So we need to cancel the dirty status
-                	doc.getDoc().setContentDirty(false);
-                	doc.getDoc().setMetaDataDirty(false);
+                else {
+                    // Reset or replace history
+                    // if there was not history in the source package then we should reset the version number to 1.1
+                    if (!this.documentContainsHistory(doc) || !this.withVersions) {
+                        doc.getDoc().setVersion("1.1");
+                    }
+
+                    // We don't want date and version to change
+                    // So we need to cancel the dirty status
+                    doc.getDoc().setContentDirty(false);
+                    doc.getDoc().setMetaDataDirty(false);
                 }
 
                 // Attachment saving should not generate additional saving
@@ -660,9 +658,9 @@ public class Package
                 }
 
                 if (!this.preserveVersion && !this.withVersions) {
-                	// If we override and do not import version, (meaning reset document to 1.1)
-                	// We need manually reset possible existing revision for the document
-                	doc.getDoc().resetArchive(context);
+                    // If we override and do not import version, (meaning reset document to 1.1)
+                    // We need manually reset possible existing revision for the document
+                    doc.getDoc().resetArchive(context);
                 }
 
             } catch (XWikiException e) {
@@ -684,15 +682,13 @@ public class Package
      */
     private boolean documentContainsHistory(DocumentInfo doc)
     {
-    	if ((doc.getDoc().getDocumentArchive() == null)
-                || (doc.getDoc().getDocumentArchive().getNodes() == null)
-                || (doc.getDoc().getDocumentArchive().getNodes().size() == 0)) {
+        if ((doc.getDoc().getDocumentArchive() == null) || (doc.getDoc().getDocumentArchive().getNodes() == null)
+            || (doc.getDoc().getDocumentArchive().getNodes().size() == 0)) {
             return false;
         }
-    	return true;
+        return true;
     }
-    
-    
+
     private List<String> getStringList(String name, XWikiContext context)
     {
         List<String> list = (List<String>) context.get(name);
@@ -1036,7 +1032,7 @@ public class Package
         this.version = getElementText(infosEl, "version");
         this.backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
         this.preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
-        
+
         return domdoc;
     }
 
@@ -1169,7 +1165,6 @@ public class Package
      * 
      * @param wikiContext the XWiki context
      * @return a representation of this package under the JSON format
-     * 
      * @since 2.2M1
      */
     public JSONObject toJSON(XWikiContext wikiContext)
@@ -1196,13 +1191,13 @@ public class Package
             if (files.get(docInfo.getDoc().getSpace()) == null) {
                 files.put(docInfo.getDoc().getSpace(), new HashMap<String, List<Map<String, String>>>());
             }
-            
+
             // If the document name does not exists in the space map of docs, we create it.
             if (files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()) == null) {
                 files.get(docInfo.getDoc().getSpace()).put(docInfo.getDoc().getName(),
                     new ArrayList<Map<String, String>>());
             }
-            
+
             // Finally we add the file infos (language, fullname and action) to the list of translations
             // for that document.
             files.get(docInfo.getDoc().getSpace()).get(docInfo.getDoc().getName()).add(fileInfos);
@@ -1210,9 +1205,9 @@ public class Package
 
         json.put("infos", infos);
         json.put("files", files);
-        
+
         JSONObject jsonObject = JSONObject.fromObject(json);
-        
+
         return jsonObject;
     }
 }

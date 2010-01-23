@@ -115,3 +115,7 @@ div.notification {
 #xwikidata #commentscontent {
   background: transparent;
 }
+.commentPreview {
+  border: 1px dotted $theme.borderColor;
+  background: $theme.backgroundSecondaryColor;
+}

@@ -40,6 +40,7 @@ XWiki.viewers.Comments = Class.create({
     this.addReplyListener();
     this.addSubmitListener();
     this.addCancelListener();
+    this.addPreview();
   },
   /**
    * Parse the IDs of the comments to obtain the xobject number.
@@ -206,6 +207,80 @@ XWiki.viewers.Comments = Class.create({
       this.form.down("input[name='action_cancel']").observe('click', this.resetForm.bindAsEventListener(this));
     }
   },
+  /**
+   * Add a preview button that generates the rendered comment,
+   */
+  addPreview : function() {
+    if (!this.form) {
+      return;
+    }
+    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", $$("meta[name=space]")[0].content).replace("__page__", $$("meta[name=page]")[0].content);
+    var commentElt = $(this.form["XWiki.XWikiComments_comment"]);
+    var buttons = this.form.down('input[type=submit]').up('div');
+    this.previewButton = new Element('span', {'class' : 'buttonwrapper'}).update(new Element('input', {'type' : 'button', 'class' : 'button', 'value' : "$msg.get('core.viewers.comments.preview.button.preview')"}));
+    this.previewButton._x_modePreview = false;
+    this.previewContent = new Element('div', {'class' : 'commentcontent commentPreview'});
+    commentElt.insert({'before' : this.previewContent});
+    this.previewContent.hide();
+    buttons.insert({'top' : this.previewButton});
+    this.previewButton.observe('click', function() {
+      if (!this.previewButton._x_modePreview && !this.previewButton.disabled) {
+         this.previewButton.disabled = true;
+         var notification = new XWiki.widgets.Notification("$msg.get('core.viewers.comments.preview.inProgress')", "inprogress");
+         new Ajax.Request(previewURL, {
+            method : 'post',
+            parameters : {'xpage' : 'plain', 'content' : commentElt.value},
+            onSuccess : function (response) {
+              this.doPreview(response.responseText);
+              notification.hide();
+            }.bind(this),
+            /* If the content is empty or does not generate anything, we have the "This template does not exist" response,
+               with a 400 status code. */
+            on400 : function(response) {
+              this.doPreview('&nbsp;');
+              notification.hide();
+            }.bind(this),
+            onFailure : function (response) {
+              var failureReason = response.statusText;
+              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+                failureReason = 'Server not responding';
+              }
+              notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.preview.failed')" + failureReason, "error"));
+            },
+            on0 : function (response) {
+              response.request.options.onFailure(response);
+            },
+            onComplete : function (response) {
+              this.previewButton.disabled = false;
+            }.bind(this)
+        });
+      } else {
+        this.cancelPreview();
+      }
+    }.bindAsEventListener(this));
+  },
+  /**
+   * Display the comment preview instead of the comment textarea.
+   * 
+   * @param content the rendered comment, as HTML text
+   */
+  doPreview : function(content) {
+    this.previewButton._x_modePreview = true;
+    this.previewContent.update(content);
+    this.previewContent.show();
+    $(this.form["XWiki.XWikiComments_comment"]).hide();
+    this.previewButton.down('input').value = "$msg.get('core.viewers.comments.preview.button.back')";
+  },
+  /**
+   * Display the comment textarea instead of the comment preview.
+   */
+  cancelPreview : function() {
+    this.previewButton._x_modePreview = false;
+    this.previewContent.hide();
+    this.previewContent.update('');
+    $(this.form["XWiki.XWikiComments_comment"]).show();
+    this.previewButton.down('input').value = "$msg.get('core.viewers.comments.preview.button.preview')";
+  },
   resetForm : function (event) {
     if (this.form.up('.commentthread')) {
       if (event) {
@@ -218,6 +293,7 @@ XWiki.viewers.Comments = Class.create({
     }
     this.form["XWiki.XWikiComments_replyto"].value = "";
     this.form["XWiki.XWikiComments_comment"].value = "";
+    this.cancelPreview();
   },
   updateCount : function() {
     if ($("Commentstab") && $("Commentstab").down(".itemCount")) {

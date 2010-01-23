@@ -401,6 +401,24 @@ public class XWikiDocument implements DocumentModelBridge
         this.space = space;
     }
 
+    /**
+     * @deprecated use {@link #getSpace()} instead
+     */
+    @Deprecated
+    public String XWikiDocument.getWeb()
+    {
+        return getSpace();
+    }
+
+    /**
+     * @deprecated use {@link #setSpace(String)} instead
+     */
+    @Deprecated
+    public void XWikiDocument.setWeb(String web)
+    {
+        setSpace(web);
+    }
+
     public String getVersion()
     {
         return getRCSVersion().toString();

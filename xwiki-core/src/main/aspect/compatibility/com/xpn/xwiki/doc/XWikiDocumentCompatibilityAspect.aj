@@ -14,25 +14,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  */
 public aspect XWikiDocumentCompatibilityAspect
-{
-    /**
-     * @deprecated use {@link #getSpace()} instead
-     */
-    @Deprecated
-    public String XWikiDocument.getWeb()
-    {
-        return getSpace();
-    }
-
-    /**
-     * @deprecated use {@link #setSpace(String)} instead
-     */
-    @Deprecated
-    public void XWikiDocument.setWeb(String web)
-    {
-        setSpace(web);
-    }
-    
+{    
     /**
      * @deprecated use setStringListValue or setDBStringListProperty
      */

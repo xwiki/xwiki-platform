@@ -539,6 +539,29 @@ public class XWikiDocument implements DocumentModelBridge
         }
     }
 
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for saving a XWikiDocument.
+     * 
+     * @return the name of the space of the document
+     * @deprecated use {@link #getDocumentReference()} instead
+     */
+    @Deprecated
+    public String getWeb()
+    {
+        return getSpace();
+    }
+
+    /**
+     * Note that this method cannot be removed for now since it's used by Hibernate for loading a XWikiDocument.
+     * 
+     * @deprecated use {@link #setDocumentReference(DocumentReference)} instead
+     */
+    @Deprecated
+    public void setWeb(String space)
+    {
+        setSpace(space);
+    }
+
     public String getVersion()
     {
         return getRCSVersion().toString();
@@ -2830,7 +2853,7 @@ public class XWikiDocument implements DocumentModelBridge
                     // is copied into the new document
                     setSyntaxId(templatedoc.getSyntaxId());
 
-                    //ÊIf the parent is not set in the current document set the template parent as the parent.
+                    //ï¿½If the parent is not set in the current document set the template parent as the parent.
                     if (getParentReference() == null) {
                         setParentReference(templatedoc.getParentReference());
                     }

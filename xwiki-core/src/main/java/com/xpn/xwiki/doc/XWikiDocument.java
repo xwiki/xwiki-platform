@@ -2853,21 +2853,19 @@ public class XWikiDocument implements DocumentModelBridge
                     // is copied into the new document
                     setSyntaxId(templatedoc.getSyntaxId());
 
-                    //�If the parent is not set in the current document set the template parent as the parent.
+                    // If the parent is not set in the current document set the template parent as the parent.
                     if (getParentReference() == null) {
                         setParentReference(templatedoc.getParentReference());
                     }
 
                     if (isNew()) {
-                        // We might have received the object from the cache
-                        // and the template objects might have been copied already
-                        // we need to remove them
+                        // We might have received the object from the cache and the template objects might have been
+                        // copied already we need to remove them
                         setXObjects(new TreeMap<DocumentReference, List<BaseObject>>());
                     }
-                    // Merge the external objects
-                    // Currently the choice is not to merge the base class and object because it is
-                    // not
-                    // the prefered way of using external classes and objects.
+                    // Merge the external objects.
+                    // Currently the choice is not to merge the base class and object because it is not the prefered way
+                    // of using external classes and objects.
                     mergeXObjects(templatedoc);
                 }
             }

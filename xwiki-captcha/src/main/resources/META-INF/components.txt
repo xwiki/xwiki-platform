@@ -1,0 +1,2 @@
+org.xwiki.captcha.internal.DefaultImageCaptchaAction
+org.xwiki.captcha.internal.velocity.CaptchaVelocityContextInitializer

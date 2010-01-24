@@ -1,0 +1,741 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>Registration</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1264284581000</creationDate>
+<date>1264302409000</date>
+<contentUpdateDate>1264302409000</contentUpdateDate>
+<version>1.1</version>
+<title>Verified Registration Application</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<syntaxId>xwiki/2.0</syntaxId>
+<hidden>false</hidden>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>XWiki.Registration</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<guid>33337d77-e3e0-4ce0-a6d7-cffd352fa0b0</guid>
+<property>
+<tags/>
+</property>
+</object>
+<content>{{velocity}}
+#######################################################################
+## The Configuration
+#######################################################################
+##
+## These are defined in other places around XWiki, changing them here will result in undefined behavior.
+#set($redirectParam = 'xredirect')
+#set($userSpace = 'XWiki.')
+#set($loginPage = 'XWiki.XWikiLogin')
+#set($loginAction = 'loginsubmit')
+##
+## Use javascript based live validation see: http://www.livevalidation.com
+## Set false to stop using LiveValidation
+#set($useLiveValidation = true)
+$xwiki.get("jsfx").use('uicomponents/widgets/validation/livevalidation_prototype.js')
+$xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
+##
+## You can automatically log the user in after registration by using a redirect but it sends 
+## the username and password in a get request to the login action so in the event that the login
+## fails, the password will be shown in the address bar and in browser history.
+## Turned off by default.
+## #set($autoLogin = true)
+##
+## After the registration you can provide a login button for the user to be able to login,
+## this requires passing back the username and password in html into hidden fields.
+## Disable this and set password fields to 'noReturn' if your security policy precludes passing
+## passwords back in html.
+#set($loginButton = true)
+##
+## After the user is logged in this is the page they are redirected to if no redirect parameter is
+## passed to the registration application. Currently set to edit their user profile.
+#set($defaultRedirect = $xwiki.getURL("$userSpace$request.get('xwikiname')", "inline"))
+##
+## Defines what server generated error messages should look like
+## The error message when a field is entered incorrectly
+#set($failureMessageParams = { 'class' : 'LV_validation_message LV_invalid'})
+## Use this if LiveValidation is disabled and LiveValidation.css is unavailable.
+##set($failureMessageParams = {'style' : 'color:#C00; font-weight:bold; margin:0 0 0 5px;'})
+##
+## The * next to the fields to denote they are mandatory.
+#set($fieldMandatoryStar = $failureMessageParams)
+##
+## Client side javascript regex name validation.
+## Escaped version of: ^[^&lt;&gt;\'\"\\x5C]*$      blocks &lt; &gt; ' " \ characters
+#set($jsNameRegex = 'new RegExp(unescape("%5E%5B%5E%3C%3E%27%22%5Cx5C%5D*%24"))')
+## Equivilant expression for server side testing.
+#set($serverSideNameRegex = '/^[^&lt;&gt;\"\x27\\]*$/')
+#*
+ * The fields which will be seen on the registration page are defined here.
+ * $fields is an array and each field is a Map. The names shown below are Map keys.
+ * 
+ * Each field must have:
+ *   name - this is the name of the field, it will be the value for "name" and "id"
+ * 
+ * Each field may have:
+ *   prompt - this String will be written above the field.
+ *
+ *   tag - the HTML tag which will be created, default is &lt;input&gt;, may also be a non form tag such as &lt;img&gt;
+ *
+ *   params - a Map, each key value pair will be in the html tag. eg: {"size" : "30"} becomes &lt;input size=30...
+ *
+ *   validate a Map describing how to validate the field, validation is done in javascript then redone in velocity
+ *   |        for security and because not everyone has javascript.
+ *   |
+ *   +-mandatory (Optional) - Will fail if the field is not filled in.
+ *   | +-failureMessage (Required) - The message to display if the field is not filled in.
+ *   |
+ *   +-regex (Optional) - Will validate the field using a regular expression.
+ *   | |                  because of character escaping, you must provide a different expression for the
+ *   | |                  javascript validation and the server side validation. Both javascript and server side
+ *   | |                  validation are optional, but if you provide neither, then your field will not be validated.
+ *   | |
+ *   | +-failureMessage (Optional) - The message to display if the regex evaluation returns false.
+ *   | +-jsFailureMessage (Optional) - The message for Javascript to display if regex fails. 
+ *   | |                               If jsFailureMessage is not defined Javascript uses failureMessage.
+ *   | |
+ *   | +-pattern (Optional) - The regular expression to test the input at the server side, it's important to use
+ *   | |                      this if you need to validate the field for security reasons, also it is good because not
+ *   | |                      all browsers use javascript or have it enabled.
+ *   | |
+ *   | +-jsPattern (Optional) - The regular expression to use for client side, you can use excaped characters to avoid
+ *   |                          them being parsed as HTML or javascript. To get javascript to unexcape characters use:
+ *   |                          {"jsPattern" : "'+unescape('%5E%5B%24')+'"}
+ *   |                          NOTE: If no jsPattern is specified, the jsValidator will try to validate 
+ *   |                                using the server pattern.
+ *   |
+ *   +-mustMatch (Optional) - Will fail if the entry into the field is not the same as the entry in another field.
+ *   | |                      Good for password confirmation.
+ *   | |
+ *   | +-failureMessage (Required) - The message to display if the field doesn't match the named field.
+ *   | +-name (Required) - The name of the field which this field must match.
+ *   |
+ *   +-programmaticValidation (Optional) - This form of validation executes a piece of code which you give it and
+ *     |                                   if the code returns the word "failed" then it gives the error message.
+ *     |                                   Remember to put the code in singel quotes ('') because you want the value
+ *     |                                   of 'code' to equal the literal code, not the output from running it.
+ *     |
+ *     +-code (Required) - The code which will be executed to test whether the field is filled in correctly.
+ *     +-failureMessage (Required) - The message which will be displayed if evaluating the code returns "false"
+ *  
+ *   noReturn - If this is specified, the field will not be filled in if there is an error and the user has to fix their
+ *              registration information. If you don't want a password to be passed back in html then set this true
+ *              for the password fields. Used for the captcha because it makes no sense to pass back a captcha answer.
+ *  
+ *   doAfterRegistration - Some Velocity code which will be executed after a successfull registration. 
+ *                         This is used in the favorite color example.
+ *                         Remember to put the code in singel quotes ('') because you want the 'code' entry to equal the literal
+ *                         code, not the output from running it.
+ *  
+ * Each field may not have: (reserved names)
+ *   error - This is used to pass back any error message from the server side code.
+ *
+ *   value - This is used to pass back the value given by the user.
+ *
+ * NOTE: This template uses a registration method which requires:
+ *        * register_first_name
+ *        * register_last_name
+ *        * xwikiname
+ *        * register_password
+ *        * register2_password
+ *        * register_email
+ *       Removing or renaming any of these fields will result in undefined behavior.
+ *
+ *#
+#set($fields = [])
+##
+## The first name field, mandatory and checked for disallowed characters.
+#set($field = 
+  {'name' : 'register_first_name',
+    'prompt' : $msg.get('core.register.firstName'),
+    'params' : {
+      'type' : 'text',
+      'size' : '30'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'regex' : {
+        'pattern' : $serverSideNameRegex,
+        'failureMessage' : "$msg.get('XWiki.Registration.youCantUseCharacters') &amp;lt; &amp;gt; &amp;#39; &amp;#34; &amp;#92;",
+        'jsPattern' : $jsNameRegex,
+        'jsFailureMessage' : "$msg.get('XWiki.Registration.youCantUseCharacters') &lt; &gt; ' \" \\ "
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+##
+## The last name field, mandatory and checked for disallowed characters.
+#set($field = 
+  {'name' : 'register_last_name',
+    'prompt' : $msg.get('core.register.lastName'),
+    'params' : {
+      'type' : 'text',
+      'size' : '30'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'regex' : {
+        'pattern' : $serverSideNameRegex,
+        'failureMessage' : "$msg.get('XWiki.Registration.youCantUseCharacters') &amp;lt; &amp;gt; &amp;#39; &amp;#34; &amp;#92;",
+        'jsPattern' : $jsNameRegex,
+        'jsFailureMessage' : "$msg.get('XWiki.Registration.youCantUseCharacters') &lt; &gt; ' \" \\ "
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+##
+## The user name field, mandatory and programmatically checked to make sure the username doesn't exist.
+#set($field = 
+  {'name' : 'xwikiname',
+    'prompt' : $msg.get('core.register.username'),
+    'params' : {
+      'type' : 'text',
+      'onfocus' : 'prepareName(document.forms.register);',
+      'size' : '20'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'programmaticValidation' : {
+        'code' : '#nameAvailable($request.get("xwikiname"))',
+        'failureMessage' : $msg.get('core.register.userAlreadyExists')
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+## Make sure the chosen user name is not already taken
+## This macro is called by programmaticValidation for xwikiname (above)
+#macro(nameAvailable, $name)
+  #if($xwiki.exists("$userSpace$name"))
+    failed
+  #end
+#end
+##
+##The password field, mandatory and must be at least 8 characters long.
+#set($field = 
+  {'name' : 'register_password',
+    'prompt' : $msg.get('core.register.password'),
+    'params' : {
+      'type' : 'password',
+      'size' : '10'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'regex' : {
+        'pattern' : '/.{8,}/',
+        'failureMessage' : $msg.get('XWiki.Registration.passwordTooShort')
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+##
+##The confirm password field, mandatory and must match password field.
+#set($field = 
+  {'name' : 'register2_password',
+    'prompt' : $msg.get('core.register.passwordRepeat'),
+    'params' : {
+      'type' : 'password',
+      'size' : '10'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'mustMatch' : {
+        'name' : 'register_password',
+        'failureMessage' : $msg.get('XWiki.Registration.passwordMismatch')
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+##
+## The email address field, mandatory and regex checked with an email pattern.
+#set($field = 
+  {'name' : 'register_email',
+    'prompt' : $msg.get('core.register.email'),
+    'params' : {
+      'type' : 'text',
+      'size' : '30'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'regex' : {
+        'pattern' : '/^([^@\s]+)@((?:[-a-zA-Z0-9]+\.)+[a-zA-Z]{2,})$/',
+        'failureMessage' : $msg.get('XWiki.Registration.invalidEmail')
+      }
+    }
+  })
+#set($discard = $fields.add($field))
+##
+#* ## Uncomment this code to see an example of how you can easily add a field to the registration page
+## Note: The user's favorite color is not saved anywhere, see above for information on how to save it.
+#set($field = 
+  {'name' : 'favorite_color',
+    'prompt' : 'What is your favorite color',
+    'params' : {
+      'type' : 'text',
+      'size' : '30'
+    },
+    'validate' : {
+      'mandatory' : {
+        'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+      },
+      'regex' : {
+        'pattern' : '/^green$/i',
+        'failureMessage' : 'You are not cool enough to register here.'
+      }
+    },
+    'doAfterRegistration' : '#saveFavoriteColor()'
+  })
+#set($discard = $fields.add($field))
+## Save the user's favorite color on their user page.
+#macro(saveFavoriteColor)
+  #set($xwikiname = $request.get('xwikiname'))
+  #set($userDoc = $xwiki.getDocument("$userSpace$xwikiname"))
+  $userDoc.setContent("$userDoc.getContent() ${xwikiname}'s favorite color is $request.get('favorite_color')!")
+  ## The user (who is not yet logged in) can't save documents so saveWithProgrammingRights
+  ## will save the document as long as the user who last saved this registration page has programming rights.
+  $userDoc.saveWithProgrammingRights("Saved favorite color from registration form.")
+#end
+## *#
+## To disable the captcha on this page, comment out the next two entries.
+## The captcha image, not an input field but still defined the same way.
+#if($captchaservice &amp;&amp; $captchaservice.isEnabled())
+  ## Empty prompt field used for padding.
+  #set($field = 
+    {'name' : 'captcha_image',
+      'prompt' : '',
+      'tag' : 'img',
+      'params' : {
+        'src' : $doc.getURL('imagecaptcha'),
+        'alt' : $msg.get('core.captcha.image.alternateText', [$msg.get('core.register.submit')])
+      }
+    })
+  #set($discard = $fields.add($field))
+  ## The captcha field, mandatory, programmatically checked to make sure the captcha is right
+  ## and not filled back in if there is an error ('noReturn')
+  #set($field = 
+    {'name' : 'captcha_answer',
+      'prompt' : $msg.get('core.captcha.image.instruction'),
+      'params' : {
+        'type' : 'text',
+        'size' : '30'
+      },
+      'validate' : {
+        'mandatory' : {
+          'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
+        },
+        'programmaticValidation' : {
+          'code' : '#checkCaptcha($request, $request.get("captcha_answer"))',
+          'failureMessage' : $msg.get('core.captcha.captchaAnswerIsWrong')
+        }
+      },
+      'noReturn' : true
+    })
+  #set($discard = $fields.add($field))
+#end
+##
+## Checks the captcha answer; used by programmaticValidation above.
+#macro(checkCaptcha, $request, $answer)
+  #set($cv = $captchaservice.getCaptchaVerifier('image'))
+  #if(!$cv.isAnswerCorrect($cv.getUserId($request), $answer))
+    failed
+  #end 
+#end
+##
+#######################################################################
+## The Code.
+#######################################################################
+##
+## Removing this opens a reflective XSS hole because url parameters are put into fields.
+#blockXSS()
+## If the submit button has been pressed, then we test the input and maybe create the user.
+#if($request.getParameter('xwikiname'))
+  ## Do server side validation of input fields.
+  #set($discard = "#validateFields($fields, $request)")
+  ## If server side validation was successfull, create the user
+  #if(!$registrationFailed)
+    #createUser($fields, $request, $response)
+  #end
+#end
+## If the registration was not successful or if the user hasn't submitted the info yet
+## Then we display the registration form.
+#if(!$registrationDone)
+  #generateRegistrationForm($fields, $fieldMandatoryStar, $failureMessageParams)
+#end
+##
+####### The Macros (nothing below this point is run directly) #########
+#* 
+ * Server side validation, this is necessary for security and because not everyone has Javascript
+ *
+ * @param $fields The array of fields to validate.
+ * @param $request An XWikiRequest object which made the register request, used to get parameters.
+ *#
+#macro(validateFields, $fields, $request)
+  #foreach($field in $fields)
+    #if($field.get('validate') &amp;&amp; $field.get('name'))
+      #set($fieldName = $field.get('name'))
+      #set($validate = $field.get('validate'))
+      #set($error = '')
+      #if($request.get($fieldName) &amp;&amp; $request.get($fieldName) != '')
+        #set($value = $request.get($fieldName))
+        ##
+        ## Regex validation
+        #if($validate.get('regex'))
+          #set($regex = $validate.get('regex'))
+          #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
+            #if(!$xcontext.getUtil().match($regex.get('pattern'), $value))
+              #set($error = $regex.get('failureMessage'))
+            #end
+          #elseif($regex.get('pattern'))
+            ERROR: In field: ${fieldName}: regex validation must include failureMessage.
+          #end
+        #end
+        ##
+        ## If regex validation passed, check "mustMatch" validation
+        #if($error == '' &amp;&amp; $validate.get('mustMatch'))
+          #set($mustMatch = $validate.get('mustMatch'))
+          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
+            #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
+              #set($error = $mustMatch.get('failureMessage'))
+            #end
+          #else
+            ERROR: In field: ${fieldName}: mustMatch validation required both name 
+                   (of field which this field must match) and failureMessage.
+          #end
+        #end
+        ##
+        ## If regex and mustMatch validation passed, try programmatic validation
+        #if($error == '' &amp;&amp; $validate.get('programmaticValidation'))
+          #set($pv = $validate.get('programmaticValidation'))
+          #if($pv.get('code') &amp;&amp; $pv.get('failureMessage'))
+            #set($pvReturn = "#evaluate($pv.get('code'))")
+            #if($pvReturn.indexOf('failed') != -1)
+              #set($error = $pv.get('failureMessage'))
+            #end
+          #else
+            ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
+          #end
+        #end
+      ##
+      ## If no content, check if content is mandatory
+      #elseif($validate.get('mandatory'))
+        #set($mandatory = $validate.get('mandatory'))
+        #if($mandatory.get('failureMessage'))
+          #set($error = $mandatory.get('failureMessage'))
+        #else
+          ERROR: In field: ${fieldName}: mandatory validation requires a failureMessage
+        #end
+      #end
+      #if($error != '')
+        #set($discard = $field.put('error', $error))
+        #set($registrationFailed = true)
+      #end
+    #elseif(!$field.get('name'))
+      ERROR: Field with no name.
+    #end##if(validate)
+  #end##loop
+#end##macro
+#*
+ * Create the user.
+ * Calls $xwiki.createUser to create a new user.
+ *
+ * @param $request An XWikiRequest object which made the register request.
+ * @param $response The XWikiResponse object to send any redirects to.
+ *#
+#macro(createUser, $fields, $request, $response)
+  ## See if email verification is required and register the user.
+  #if($xwiki.getXWikiPreferenceAsInt('use_email_verification', 0) == 1)
+    #set($reg = $xwiki.createUser(true))
+  #else
+    #set($reg = $xwiki.createUser(false))
+  #end
+  ##
+  ## Handle output from the registration.
+  #if($reg &amp;&amp; $reg &lt;= 0)
+    {{error}}
+    #if($reg == -2)
+      $msg.get('core.register.passwordMismatch')
+    ## -3 means username taken, -8 means username is superadmin name
+    #elseif($reg == -3 || $reg == -8)
+      $msg.get('core.register.userAlreadyExists')
+    #elseif($reg == -4)
+      $msg.get('core.register.invalidUsername')
+    #else
+      $msg.get('core.register.registerFailed', [$reg])
+    #end
+    {{/error}}
+  #elseif($reg)
+  ## Registration was successful
+    #set($registrationDone = true)
+    ##
+    ## If there is any thing to "doAfterRegistration" then do it.
+    #foreach($field in $fields)
+      #if($field.get('doAfterRegistration'))
+        #evaluate($field.get('doAfterRegistration'))
+      #end
+    #end
+    ## Define some strings which may be used by autoLogin or loginButton
+    #set($userName = $!request.get('xwikiname'))
+    #set($password = $!request.get('register_password'))
+    #set($loginURL = $xwiki.getURL($loginPage, $loginAction))
+    ## Send redirect to loginsubmit page with credentials.
+    #if($autoLogin)
+      #if($request.getParameter($redirectParam))
+        #set($redirect = $request.getParameter($redirectParam))
+      #else
+        #set($redirect = $defaultRedirect)
+      #end
+      $response.sendRedirect("$loginURL?j_username=$!userName&amp;j_password=$!password&amp;$redirectParam=$!redirect");
+      ##
+    #else
+      ## Display a "registration successful" message
+      #set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
+      {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
+      ## Give the user a login button which posts their username and password to loginsubmit
+      #if($loginButton)
+        {{html}}
+          &lt;form id="loginForm" action="$loginURL" method="post"&gt;
+            &lt;input id="j_username" name="j_username" type="hidden" value="$!userName" /&gt;
+            &lt;input id="j_password" name="j_password" type="hidden" value="$!password" /&gt;
+            #if(!$request.get($redirectParam))
+              &lt;input id="$redirectParam" name="$redirectParam" type="hidden" value="$defaultRedirect" /&gt;
+            #end
+            &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
+              &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
+            &lt;/span&gt;
+          &lt;/form&gt;
+        {{/html}}
+      #end
+    #end
+  #end
+  ##
+#end## createUser Macro
+#*
+ * Generate registration form.
+ * Here we generate the actual HTML and Javascript code for the registration form.
+ *
+ * @param $fields The array of fields to put in the form.
+ * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
+ * @param $failureMessageParams The tag parameters for a failure message.
+ *#
+#macro(generateRegistrationForm, $fields, $fieldMandatoryStar, $failureMessageParams)
+  ##define($output)
+  {{html clean=false}}
+    #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
+    #if($useLiveValidation)
+      #generateJavascript($fields)
+    #end
+  {{/html}}
+  ##end
+  ## Remove whitespace from the beginnings of lines to make HTML reading easier for smaller output.
+  ##$xcontext.getUtil().getP5util().substitute('s/(\n)\s+/$1/g', "$output")
+#end
+#*
+ * Generate HTML form, this is the only place where HTML is written.
+ *
+ * @param $fields The array of fields to use for generating html code.
+ * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
+ * @param $failureMessageParams The tag parameters for a failure message.
+ *#
+#macro(generateHtml, $fields, $fieldMandatoryStar, $failureMessageParams)
+  #define($html)
+    ## Put the same values back into the fields.
+    #getParams($fields)
+    ##
+    &lt;form id="register" action="" method="post"&gt;
+    &lt;div&gt;
+      &lt;dl&gt;
+      ##
+      #foreach($field in $fields)
+        #if($field.get('name'))
+          #set($fieldName = $field.get('name'))
+          #if($field.get('prompt'))
+            #set($prompt = $field.get('prompt'))
+            &lt;dt&gt;$prompt
+            #if($field.get('validate').get('mandatory'))
+              &lt;span
+              #foreach($entry in $fieldMandatoryStar.entrySet())
+                $entry.getKey()="$entry.getValue()"
+              #end
+              &gt;*&lt;/span&gt;
+            #end
+            &lt;/dt&gt;
+          #end
+          ## If no tag then default tag is &lt;input&gt;
+          #if($field.get('tag'))
+            #set($tag = $field.get('tag'))
+          #else
+            #set($tag = 'input')
+          #end
+          &lt;dd&gt;&lt;$tag id="$fieldName" name="$fieldName"
+          #if($field.get('params'))
+            #set($params = $field.get('params'))
+            #foreach($entry in $params.entrySet())
+              $entry.getKey()="$entry.getValue()"
+            #end
+          #end
+          value="$!field.get('value')" /&gt;
+          #if($field.get('error'))
+            &lt;span 
+            #foreach($entry in $failureMessageParams.entrySet())
+              $entry.getKey()="$entry.getValue()"
+            #end
+            &gt;$field.get('error')&lt;/span&gt;
+          #end
+          &lt;/dd&gt;
+        #else
+          ERROR: Field with no name.
+        #end##if fieldName exists
+      #end
+    &lt;/dl&gt;
+    &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msg.get('core.register.submit')" class="button"/&gt;&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+  #end
+  ##
+  ## Remove newlines inside of tags because tags are generated by loops.
+  $xcontext.getUtil().getP5util().substitute('s/([^&gt;\s]+)\s+/$1 /g', "$html")
+#end
+#*
+ * Generate the Javascript for interacting with LiveValidation.
+ *
+ * @param $fields The array of fields which to validate.
+ *#
+#macro(generateJavascript, $fields)
+  &lt;script type='text/javascript'&gt;
+  /* &lt;![CDATA[ */
+  document.observe('dom:loaded', function() {
+  ##
+  #foreach($field in $fields)
+    #if($field.get('validate') &amp;&amp; $field.get('name'))
+      #set($validate = $field.get('validate'))
+      #set($fieldName = $field.get('name'))
+      var ${fieldName}Validator = new LiveValidation("$fieldName", { validMessage: "$msg.get('XWiki.Registration.fieldOkay')", wait: 500} );
+      ##
+      #if($validate.get('mandatory'))
+        #set($mandatory = $validate.get('mandatory'))
+        #if($mandatory.get('failureMessage'))
+          ${fieldName}Validator.add( Validate.Presence, { failureMessage: "$!mandatory.get('failureMessage')"} );
+        #end
+      #end
+      #if($validate.get('regex'))
+        #set($regex = $validate.get('regex'))
+        #set($pattern = "")
+        #if($regex.get('jsPattern'))
+          #set($pattern = $regex.get('jsPattern'))
+        #elseif($regex.get('pattern'))
+          #set($pattern = $regex.get('pattern'))
+        #end
+        #set($failMessage = "")
+        #if($regex.get('jsFailureMessage'))
+          #set($failMessage = $regex.get('jsFailureMessage'))
+        #elseif($regex.get('failureMessage'))
+          #set($failMessage = $regex.get('failureMessage'))
+        #end          
+        #if($pattern != '' &amp;&amp; $failMessage != '')
+          ${fieldName}Validator.add( Validate.Format, { pattern: $pattern, failureMessage: "$failMessage"} );
+        #end
+      #end
+      #if($validate.get('mustMatch'))
+        #set($mustMatch = $validate.get('mustMatch'))
+        #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
+          ${fieldName}Validator.add( Validate.Confirmation, { match: $$("input[name=$!mustMatch.get('name')]")[0], failureMessage: "$!mustMatch.get('failureMessage')"} );
+        #end
+      #end##if mustmatch
+    #end##if validate
+  #end##loop
+  });// ]]&gt;
+  &lt;/script&gt;
+#end##macro
+#*
+ * Get parameters from request so that values will be filled in if there is a mistake
+ * in one of the entries.
+ * Fields will not be returned if they have either noReturn or error specified.
+ *
+ * @param $fields The array of fields to get parameters for.
+ *#
+#macro(getParams $fields)
+  #foreach($field in $fields)
+    #if($field.get('name') &amp;&amp; $request.get($field.get('name')))
+      #if(!$field.get('noReturn') &amp;&amp; !$field.get('error'))
+        #set($discard = $field.put('value', $request.get($field.get('name'))))
+      #end
+    #end
+  #end
+#end
+#*
+ * Block XSS
+ *
+ * We must prevent non-persistent XSS by not getting parameters if the request is not a post
+ * or if the referer header is not this page.
+ * Imagine a link such as .../XWiki/Register?register_first_name=&lt;script&gt;badScript&lt;/script&gt;
+ *#
+#macro(blockXSS)
+  #if($request.getParameterMap().size() &gt; 0)
+    #if($request.getHeader('referer') != $xwiki.getRequestURL() || $request.getMethod() != 'POST')
+      ## If there is a redirect to send after registration is over, preserve it.
+      #set($redirect = $request.getParameter($redirectParam))
+      #if($redirect)
+        ## There is a redirect parameter, if that is not the only parameter, then send a redirect with 
+        ## xredirect being the only parameter.
+        #if($request.getParameterMap().size() &gt; 1)
+          $response.sendRedirect("$request.getRequestURI()?$!redirectParam=$!redirect")
+        #end
+      #else
+        ## There is no redirect parameter, no parameters are acceptable.
+        $response.sendRedirect($request.getRequestURI())
+      #end
+    #end
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

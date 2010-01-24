@@ -124,14 +124,6 @@
       <version>1.0a7</version>
     </dependency>
 
-    <!-- We need to get JCaptcha to upload its jar to the central repository.
-         See http://forge.octo.com/jcaptcha/jira/browse/FWK-65 -->
-    <dependency>
-      <groupId>jcaptcha</groupId>
-      <artifactId>jcaptcha-all</artifactId>
-      <version>1.0-RC3</version>
-    </dependency>
-
     <dependency>
       <groupId>com.novell.ldap</groupId>
       <artifactId>jldap</artifactId>

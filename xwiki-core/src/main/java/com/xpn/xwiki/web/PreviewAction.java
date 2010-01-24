@@ -27,7 +27,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 /**
  * <p>
@@ -110,14 +109,6 @@ public class PreviewAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-
-        if (xwiki.hasCaptcha(context)) {
-            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null) {
-                vcontext.put("captchaPlugin", captchaPluginApi);
-            }
-            vcontext.put("isResponseCorrect", captchaPluginApi.verifyCaptcha("edit").toString());
-        }
 
         String language = ((EditForm) form).getLanguage();
         XWikiDocument tdoc;

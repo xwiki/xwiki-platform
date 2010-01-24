@@ -29,7 +29,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class EditAction extends XWikiAction
 {
@@ -55,17 +54,6 @@ public class EditAction extends XWikiAction
         doc = (XWikiDocument) doc.clone();
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
-
-        // Add captcha plugin to avoid spam robots
-        if (xwiki.hasCaptcha(context)) {
-            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null) {
-                vcontext.put("captchaPlugin", captchaPluginApi);
-            } else {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "CaptchaPlugin not loaded");
-            }
-        }
 
         // Check for edit section
         String sectionContent = "";

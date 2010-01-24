@@ -31,7 +31,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class SaveAction extends PreviewAction
 {
@@ -53,25 +52,6 @@ public class SaveAction extends PreviewAction
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
-
-        // Confirm edit to avoid spam robots
-        Boolean isResponseCorrect = Boolean.TRUE;
-        // If 'save' action after preview
-        String isResponsePreviewCorrect = request.getParameter("isResponsePreviewCorrect");
-        if ((isResponsePreviewCorrect != null)) {
-            isResponseCorrect = Boolean.valueOf(isResponsePreviewCorrect);
-        } else {
-            if (xwiki.hasCaptcha(context)) {
-                CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-                if (captchaPluginApi != null) {
-                    isResponseCorrect = captchaPluginApi.verifyCaptcha("edit");
-                }
-            }
-        }
-        // If captcha is not correct it will be required again
-        if (!isResponseCorrect.booleanValue()) {
-            return true;
-        }
 
         // This is pretty useless, since contexts aren't shared between threads.
         // It just slows down execution.

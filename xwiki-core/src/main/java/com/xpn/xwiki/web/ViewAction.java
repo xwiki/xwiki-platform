@@ -23,7 +23,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 import org.apache.velocity.VelocityContext;
 
 import java.io.IOException;
@@ -81,19 +80,6 @@ public class ViewAction extends XWikiAction
         XWikiDocument doc = (XWikiDocument) context.get("doc");
         XWiki xwiki = context.getWiki();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-
-        // Register the captcha plugin in the Velocity context so that it can be used later on
-        // to avoid spam robots.
-        if (xwiki.hasCaptcha(context)) {
-            CaptchaPluginApi captchaPluginApi =
-                (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null) {
-                vcontext.put("captchaPlugin", captchaPluginApi);
-            } else {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                    XWikiException.ERROR_XWIKI_UNKNOWN, "CaptchaPlugin not loaded");
-            }
-        }
 
         String defaultTemplate = doc.getDefaultTemplate();
         if ((defaultTemplate != null) && (!defaultTemplate.equals(""))) {

@@ -26,7 +26,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class CommentAddAction extends XWikiAction
 {
@@ -38,43 +37,26 @@ public class CommentAddAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
-        Boolean isResponseCorrect = Boolean.TRUE;
-        if (xwiki.hasCaptcha(context)) {
-            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-            if (captchaPluginApi != null) {
-                isResponseCorrect = captchaPluginApi.verifyCaptcha("comment");
-            }
-        }
-
         // Make sure this class exists
         BaseClass baseclass = xwiki.getCommentsClass(context);
-        if (isResponseCorrect.booleanValue()) {
-            if (doc.isNew()) {
-                return true;
-            } else {
-                String className = baseclass.getName(); // XWiki.XWikiComments
-                BaseObject object = doc.newObject(className, context);
-                // TODO The map should be pre-filled with empty strings for all class properties, just like in
-                // ObjectAddAction, so that properties missing from the request are still added to the database.
-                baseclass.fromMap(oform.getObject(className), object);
-                doc.setAuthor(context.getUser());
-                // Consider comments not being content.
-                doc.setContentDirty(false);
-                // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
-                doc.setMetaDataDirty(true);
-                xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
-            }
-            // forward to edit
-            String redirect = Utils.getRedirect("edit", context);
-            sendRedirect(response, redirect);
+        if (doc.isNew()) {
+            return true;
         } else {
-            String url = context.getDoc().getURL("view", "xpage=comments&confirm=false", context);
-            try {
-                response.sendRedirect(url);
-            } catch (Exception e) {
-                System.err.println(e.getStackTrace().toString());
-            }
+            String className = baseclass.getName(); // XWiki.XWikiComments
+            BaseObject object = doc.newObject(className, context);
+            // TODO The map should be pre-filled with empty strings for all class properties, just like in
+            // ObjectAddAction, so that properties missing from the request are still added to the database.
+            baseclass.fromMap(oform.getObject(className), object);
+            doc.setAuthor(context.getUser());
+            // Consider comments not being content.
+            doc.setContentDirty(false);
+            // if contentDirty is false, in order for the change to create a new version metaDataDirty must be true.
+            doc.setMetaDataDirty(true);
+            xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
         }
+        // forward to edit
+        String redirect = Utils.getRedirect("edit", context);
+        sendRedirect(response, redirect);
         return false;
     }
 

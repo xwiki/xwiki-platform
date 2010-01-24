@@ -401,6 +401,11 @@
         </action>
 
 
+        <action path="/imagecaptcha/"
+                type="org.xwiki.captcha.internal.DefaultImageCaptchaAction">
+        </action>
+
+
         <action path="/unknown/"
                 type="com.xpn.xwiki.web.UnknownAction"
                 name="unknown"

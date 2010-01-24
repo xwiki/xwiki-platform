@@ -91,6 +91,12 @@
       <version>1.5.8</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Captcha component -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-captcha</artifactId>
+      <version>${platform.core.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

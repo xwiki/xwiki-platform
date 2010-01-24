@@ -69,6 +69,9 @@ li.reply {
 .commentreply a {
   background-image: url("$xwiki.getSkinFile('icons/silk/comments_add.gif')");
 }
+.commentedit a {
+  background-image: url("$xwiki.getSkinFile('icons/silk/pencil.gif')"); /*comment_edit*/
+}
 /* Form */
 #AddComment {
   border-top: 1px solid $theme.borderColor;
@@ -118,4 +121,13 @@ div.notification {
 .commentPreview {
   border: 1px dotted $theme.borderColor;
   background: $theme.backgroundSecondaryColor;
+}
+form.edit-xcomment .commentcontent {
+  padding: 0;
+}
+form.edit-xcomment .commentPreview {
+  padding: 0 36px 0 32px;
+}
+form.edit-xcomment .commentcontent textarea {
+  width: 100%;
 }

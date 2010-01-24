@@ -75,8 +75,12 @@ public class SkinAction extends XWikiAction
     @Override
     public String render(XWikiContext context) throws XWikiException
     {
+        return render(context.getRequest().getPathInfo(), context);
+    }
+
+    public String render(String path, XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
-        XWikiRequest request = context.getRequest();
         // Since skin paths usually contain the name of skin document, it is likely that the context document belongs to
         // the current skin.
         XWikiDocument doc = context.getDoc();
@@ -86,8 +90,6 @@ public class SkinAction extends XWikiAction
         XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
         // The default base skin is always a filesystem directory.
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
-
-        String path = request.getPathInfo();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: "

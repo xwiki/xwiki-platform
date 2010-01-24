@@ -1,6 +1,7 @@
 package com.xpn.xwiki.web;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -9,7 +10,10 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +36,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
      */
     protected static final Log LOG = LogFactory.getLog(ExportURLFactory.class);
 
+    /** The encoding to use when reading text resources from the filesystem and when sending css/javascript responses. */
+    private static final String ENCODING = "UTF-8";
+
+    private static final SkinAction SKINACTION = new SkinAction();
+
+    // TODO: use real css parser
+    private static Pattern CSSIMPORT = Pattern.compile("^\\s*@import\\s*\"(.*)\"\\s*;$", Pattern.MULTILINE);
+
     /**
      * Pages for which to convert URL to local.
      */
@@ -47,6 +59,8 @@ public class ExportURLFactory extends XWikiServletURLFactory
      */
     private Set<String> neededSkins = new HashSet<String>();
 
+    Set<String> exporteSkinFiles = new HashSet<String>();
+
     /**
      * ExportURLFactory constructor.
      */
@@ -60,6 +74,14 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public Collection<String> getNeededSkins()
     {
         return this.neededSkins;
+    }
+
+    /**
+     * @return the list of custom skin files.
+     */
+    public Collection<String> getExporteSkinFiles()
+    {
+        return this.exporteSkinFiles;
     }
 
     /**
@@ -140,30 +162,91 @@ public class ExportURLFactory extends XWikiServletURLFactory
      *      java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     @Override
-    public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context)
+    public URL createSkinURL(String fileName, String web, String name, String wikiId, XWikiContext context)
     {
+        URL skinURL = super.createSkinURL(fileName, web, name, wikiId, context);
+
         if (!"skins".equals(web)) {
-            return super.createSkinURL(filename, web, name, xwikidb, context);
+            return skinURL;
         }
 
         try {
             getNeededSkins().add(name);
 
+            StringBuffer filePathBuffer = new StringBuffer();
+            filePathBuffer.append("skins/");
+            filePathBuffer.append(name);
+            addFileName(filePathBuffer, fileName, false, context);
+
+            String filePath = filePathBuffer.toString();
+
+            if (!this.exporteSkinFiles.contains(filePath)) {
+                this.exporteSkinFiles.add(filePath);
+
+                File file = new File(this.exportDir, filePath);
+
+                // Make sure the folder exists
+                File folder = file.getParentFile();
+                if (!folder.exists()) {
+                    folder.mkdirs();
+                }
+
+                FileOutputStream fos = new FileOutputStream(file);
+                String database = context.getDatabase();
+
+                try {
+                    XWikiServletResponseStub response = new XWikiServletResponseStub();
+                    response.setOutpuStream(fos);
+                    context.setResponse(response);
+                    context.setDatabase(wikiId);
+
+                    SKINACTION.render(skinURL.getPath(), context);
+                } finally {
+                    fos.close();
+                    context.setDatabase(database);
+                }
+
+                followCssImports(file, web, name, wikiId, context);
+            }
+
             StringBuffer newpath = new StringBuffer();
-
             newpath.append("file://");
+            newpath.append(filePath);
 
-            newpath.append("skins/");
-            newpath.append(name);
-
-            addFileName(newpath, filename, false, context);
-
-            return new URL(newpath.toString());
+            skinURL = new URL(newpath.toString());
         } catch (Exception e) {
             LOG.error("Failed to create skin URL", e);
         }
 
-        return super.createSkinURL(filename, web, name, xwikidb, context);
+        return skinURL;
+    }
+
+    /**
+     * Resolve CSS <code>@import</code> targets.
+     */
+    private void followCssImports(File file, String web, String name, String wikiId, XWikiContext context)
+        throws IOException
+    {
+        // TODO: find better way to know it's css file (not sure it's possible, we could also try to find @import
+        // whatever the content)
+        if (file.getName().endsWith(".css")) {
+            FileInputStream fis = new FileInputStream(file);
+
+            try {
+                String content = IOUtils.toString(fis, ENCODING);
+
+                // TODO: use real css parser
+                Matcher matcher = CSSIMPORT.matcher(content);
+
+                while (matcher.find()) {
+                    String fileName = matcher.group(1);
+
+                    createSkinURL(fileName, web, name, wikiId, context);
+                }
+            } finally {
+                fis.close();
+            }
+        }
     }
 
     /**
@@ -253,8 +336,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         String db = (xwikidb == null ? context.getDatabase() : xwikidb);
         String path = "attachment/" + db + "." + space + "." + name + "." + filename;
 
-        File tempdir = this.exportDir;
-        File file = new File(tempdir, path);
+        File file = new File(this.exportDir, path);
         if (!file.exists()) {
             XWikiDocument doc =
                     context.getWiki().getDocument(

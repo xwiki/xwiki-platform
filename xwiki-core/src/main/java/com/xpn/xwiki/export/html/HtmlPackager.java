@@ -267,15 +267,15 @@ public class HtmlPackager
 
         // Add required skins to ZIP file
         for (String skinName : urlf.getNeededSkins()) {
-            addSkinToZip(skinName, zos, context);
+            addSkinToZip(skinName, zos, urlf.getExporteSkinFiles(), context);
         }
 
         // add "resources" folder
         File file = new File(context.getWiki().getEngineContext().getRealPath("/resources/"));
-        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR);
+        addDirToZip(file, zos, "resources" + ZIPPATH_SEPARATOR, urlf.getExporteSkinFiles());
 
-        // Add attachements files to ZIP file
-        addDirToZip(tempdir, zos, "");
+        // Add attachements and generated skin files files to ZIP file
+        addDirToZip(tempdir, zos, "", null);
 
         zos.setComment(description);
 
@@ -326,10 +326,11 @@ public class HtmlPackager
      * @param context the XWiki context.
      * @throws IOException error when adding the skin to package.
      */
-    private static void addSkinToZip(String skinName, ZipOutputStream out, XWikiContext context) throws IOException
+    private static void addSkinToZip(String skinName, ZipOutputStream out, Collection<String> exportedSkinFiles,
+        XWikiContext context) throws IOException
     {
         File file = new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
-        addDirToZip(file, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR);
+        addDirToZip(file, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR, exportedSkinFiles);
     }
 
     /**
@@ -340,7 +341,8 @@ public class HtmlPackager
      * @param basePath the path where to put the directory in the package.
      * @throws IOException error when adding the directory to package.
      */
-    private static void addDirToZip(File directory, ZipOutputStream out, String basePath) throws IOException
+    private static void addDirToZip(File directory, ZipOutputStream out, String basePath,
+        Collection<String> exportedSkinFiles) throws IOException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
@@ -361,22 +363,32 @@ public class HtmlPackager
         for (int i = 0; i < files.length; ++i) {
             File file = files[i];
             if (file.isDirectory()) {
-                addDirToZip(file, out, basePath + file.getName() + ZIPPATH_SEPARATOR);
-                continue;
+                addDirToZip(file, out, basePath + file.getName() + ZIPPATH_SEPARATOR, exportedSkinFiles);
+            } else {
+                String path = basePath + file.getName();
+
+                if (exportedSkinFiles != null && exportedSkinFiles.contains(path)) {
+                    continue;
+                }
+
+                FileInputStream in = new FileInputStream(file);
+
+                try {
+                    // Starts a new Zip entry. It automatically closes the previous entry if present.
+                    out.putNextEntry(new ZipEntry(path));
+
+                    try {
+                        int len;
+                        while ((len = in.read(tmpBuf)) > 0) {
+                            out.write(tmpBuf, 0, len);
+                        }
+                    } finally {
+                        out.closeEntry();
+                    }
+                } finally {
+                    in.close();
+                }
             }
-
-            FileInputStream in = new FileInputStream(file);
-
-            // Starts a new Zip entry. It automatically closes the previous entry if present.
-            out.putNextEntry(new ZipEntry(basePath + file.getName()));
-
-            int len;
-            while ((len = in.read(tmpBuf)) > 0) {
-                out.write(tmpBuf, 0, len);
-            }
-
-            out.closeEntry();
-            in.close();
         }
     }
 }

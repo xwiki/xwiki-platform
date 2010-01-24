@@ -338,7 +338,7 @@ XWiki.viewers.Comments = Class.create({
             }.bind(this)
         });
       } else {
-        this.cancelPreview();
+        this.cancelPreview(form);
       }
     }.bindAsEventListener(this));
   },

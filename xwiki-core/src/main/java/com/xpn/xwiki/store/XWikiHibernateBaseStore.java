@@ -2,6 +2,7 @@ package com.xpn.xwiki.store;
 
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.Map;
@@ -856,9 +857,49 @@ public class XWikiHibernateBaseStore implements Initializable
                     transaction.rollback();
                 }
             }
+        } catch (HibernateException e) {
+            // Ensure the original cause will get printed.
+            throw new HibernateException("Failed to commit or rollback transaction. Root cause ["
+                + getExceptionMessage(e) + "]", e);
         } finally {
             closeSession(session);
         }
+    }
+
+    /**
+     * Hibernate and JDBC will wrap the exception thrown by the trigger in another exception (the
+     * java.sql.BatchUpdateException) and this exception is sometimes wrapped again.
+     * Also the java.sql.BatchUpdateException stores the underlying trigger exception in the nextException and not
+     * in the cause property. The following method helps you to get to the underlying trigger message.
+     */
+    private String getExceptionMessage(Throwable t)
+    {
+        StringBuilder sb = new StringBuilder();
+        Throwable next = null;
+        for (Throwable current = t; current != null; current = next) {
+            next = current.getCause();
+            if (next == current) {
+                next = null;
+            }
+            if (current instanceof SQLException) {
+                SQLException sx = (SQLException) current;
+                while (sx.getNextException() != null) {
+                    sx = sx.getNextException();
+                    sb.append("\nSQL next exception = [" + sx + "]");
+                }
+            }
+        }
+
+/*
+        if (t.getCause() instanceof BatchUpdateException
+            && ((BatchUpdateException) t.getCause()).getNextException() != null) {
+            final BatchUpdateException bue = (BatchUpdateException) t.getCause();
+            return bue.getNextException().getMessage();
+        }
+
+        return t.getMessage();
+        */
+        return sb.toString();
     }
 
     /**

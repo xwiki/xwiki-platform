@@ -19,37 +19,73 @@
  */
 package com.xpn.xwiki.store;
 
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import junit.framework.TestCase;
+import com.xpn.xwiki.test.AbstractBridgedComponentTestCase;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.jmock.Expectations;
+import org.junit.Assert;
+
+import java.sql.SQLException;
 
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
  * 
  * @version $Id$
  */
-public class XWikiHibernateStoreTest extends AbstractBridgedXWikiComponentTestCase
+public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
 {
+    @org.junit.Test
     public void testGetColumnsForSelectStatement()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
-        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
-        assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
-        assertEquals(", doc.date, doc.name",
+        Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
+        Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
+        Assert.assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date"));
+        Assert.assertEquals(", doc.date, doc.name",
             store.getColumnsForSelectStatement("where 1=1 order by doc.date, doc.name"));
-        assertEquals(", doc.date, doc.name",
+        Assert.assertEquals(", doc.date, doc.name",
             store.getColumnsForSelectStatement("where 1=1 order by doc.date ASC, doc.name DESC"));
-        assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
+        Assert.assertEquals("", store.getColumnsForSelectStatement(", BaseObject as obj where obj.name=doc.fullName"));
     }
 
+    @org.junit.Test
     public void testCreateSQLQuery()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        assertEquals(
+        Assert.assertEquals(
             "select distinct doc.space, doc.name from XWikiDocument as doc where (doc.hidden <> true or doc.hidden is null)",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
-        assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
+        Assert.assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
             + "where (doc.hidden <> true or doc.hidden is null) and 1=1 order by doc.date desc", store.createSQLQuery(
             "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
+    }
+
+    @org.junit.Test
+    public void testEndTransactionWhenSQLBatchUpdateExceptionThrown() throws Exception
+    {
+        XWikiHibernateStore store = new XWikiHibernateStore("whatever");
+
+        final Transaction mockTransaction = getMockery().mock(Transaction.class);
+
+        SQLException sqlException2 = new SQLException("sqlexception2");
+        sqlException2.setNextException(new SQLException("nextexception2"));
+
+        final SQLException sqlException1 = new SQLException("sqlexception1", sqlException2);
+        sqlException1.setNextException(new SQLException("nextexception1"));
+
+        getMockery().checking(new Expectations() {{
+            oneOf(mockTransaction).commit(); will(throwException(new HibernateException("exception1", sqlException1)));
+        }});
+
+        store.setTransaction(mockTransaction, getContext());
+
+        try {
+            store.endTransaction(getContext(), true);
+            Assert.fail("Should have thrown an exception here");
+        } catch (HibernateException e) {
+            Assert.assertEquals("Failed to commit or rollback transaction. Root cause [\n"
+                + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
+                + "SQL next exception = [java.sql.SQLException: nextexception2]]", e.getMessage());
+        }
     }
 }

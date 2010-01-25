@@ -26,7 +26,7 @@
   <stylesheet src="stylesheets/Wysiwyg.css"/>
   <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg"/>
 
-  <extend-property name="locale" values="fr,de"/>
+  <extend-property name="locale" values="fr,de,es,it,sv,sk"/>
 
   <!-- ColorPlugin -->
   <replace-with class="com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPlugin">

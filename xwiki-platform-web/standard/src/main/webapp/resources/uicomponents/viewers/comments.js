@@ -250,6 +250,7 @@ XWiki.viewers.Comments = Class.create({
             parameters : formData,
             onSuccess : function () {
               this.restartNeeded = true;
+              this.editing = false;
               form._x_notification.replace(new XWiki.widgets.Notification("$msg.get('core.viewers.comments.add.done')", "done"));
             }.bind(this),
             onFailure : function (response) {

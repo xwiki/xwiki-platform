@@ -49,6 +49,14 @@ fieldset.xwikimessage {
   margin: 5px 0px;
 }
 
+ul.xlist , ul.xlist ul{
+  display: inline-block;
+}
+
+#informationcontent dd {
+  display: inline-block;
+}
+
 /* Should be in AdminSheet ssx */
 #userstable, #groupstable, #usersandgroupstable, #alldocstable,
 #userstable td, #groupstable td, #usersandgroupstable td, #alldocstable td {

@@ -153,9 +153,7 @@
 #-------------------------------------------------------------------------------------
 
 #-# [Since 2.2M2]
-#-# Enable captcha.
-#-# Specifies the output of $captchaservice.isEnabled()
-#-# Captchas will still work even if this is disabled.
+#-# Enable captcha: true|false
 #-#
 #-# Captcha is enabled by default.
-# captcha.internal.velocity.VelocityCaptchaService.enabled = true
+# captcha.enabled = true

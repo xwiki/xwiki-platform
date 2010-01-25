@@ -73,7 +73,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
     }
 
     protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
-        boolean isLast)
+        boolean isLastReference)
     {
         List<String> currentEscapeChars = this.escapes.get(currentReference.getType());
 
@@ -87,7 +87,7 @@ public class DefaultStringEntityReferenceSerializer implements EntityReferenceSe
         }
 
         //  If the reference is the last one in the chain then don't print the separator char
-        if (!isLast && currentReference.getChild() != null) {
+        if (!isLastReference && currentReference.getChild() != null) {
             String separatorChar = this.escapes.get(currentReference.getChild().getType()).get(0);
             representation.append(separatorChar);
         }

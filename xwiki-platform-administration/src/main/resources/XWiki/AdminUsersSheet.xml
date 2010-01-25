@@ -106,15 +106,10 @@
    &lt;script type="text/javascript"&gt;
   //&lt;![CDATA[
        var ta = new XWiki.widgets.LiveTable("$url", "userstable", displayUsers); 
-       #if(!$xwiki.hasAccessLevel("view","XWiki.Registration") || $xwiki.getDocument("XWiki.Registration").isNew())
-         #set($registerurl = $doc.getURL("view", "xpage=registeruser"))
-         #set($saveurl = $doc.getURL("register", "xpage=registeruser"))
-         #set($redirectuserurl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=${editor}&amp;section=Users")) 
-         Event.observe($('addNewUser'), "click", makeAddHandler("$registerurl", "$saveurl", "$redirectuserurl"));
-       #else
-         ## go to custom registration page
-         $('addNewUser').href = "$xwiki.getURL('XWiki.Registration')";
-       #end
+       #set($registerurl = $doc.getURL("view", "xpage=registeruser"))
+       #set($saveurl = $doc.getURL("register", "xpage=registeruser"))
+       #set($redirectuserurl = $xwiki.getDocument("XWiki.XWikiPreferences").getURL("admin", "editor=${editor}&amp;section=Users")) 
+       Event.observe($('addNewUser'), "click", makeAddHandler("$registerurl", "$saveurl", "$redirectuserurl"));
   //]]&gt;
    &lt;/script&gt;
   {/pre}

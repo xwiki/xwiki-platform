@@ -45,19 +45,6 @@
       <validationRegExp></validationRegExp>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </annotation>
-    <annotationID>
-      <customDisplay></customDisplay>
-      <name>annotationID</name>
-      <number>6</number>
-      <numberType>integer</numberType>
-      <prettyName>annotationID</prettyName>
-      <size>10</size>
-      <tooltip></tooltip>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage></validationMessage>
-      <validationRegExp></validationRegExp>
-      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
-    </annotationID>
     <author>
       <customDisplay></customDisplay>
       <name>author</name>
@@ -123,19 +110,19 @@
       <validationRegExp></validationRegExp>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </originalSelection>
-    <pageID>
+    <target>
       <customDisplay></customDisplay>
-      <name>pageID</name>
+      <name>target</name>
       <number>7</number>
       <picker>0</picker>
-      <prettyName>pageID</prettyName>
+      <prettyName>target</prettyName>
       <size>1024</size>
       <tooltip></tooltip>
       <unmodifiable>0</unmodifiable>
       <validationMessage></validationMessage>
       <validationRegExp></validationRegExp>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-    </pageID>
+    </target>
     <selection>
       <customDisplay></customDisplay>
       <name>selection</name>

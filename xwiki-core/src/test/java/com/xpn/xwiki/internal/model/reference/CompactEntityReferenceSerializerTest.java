@@ -93,6 +93,23 @@ public class CompactEntityReferenceSerializerTest extends AbstractBridgedXWikiCo
         xcontext.setDoc(new XWikiDocument("otherwiki", "space", "otherpage"));
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
     }
+    
+    @org.junit.Test
+    public void testSerializeSpaceReferenceWhenHasChildren() throws Exception 
+    {
+        AttachmentReference reference = new AttachmentReference("filename", new DocumentReference("wiki", "space", 
+            "page"));
+        XWikiContext xcontext = setUpXWikiContext();
+
+        xcontext.setDoc(new XWikiDocument("wiki", "space", "page"));
+        Assert.assertEquals("page", this.serializer.serialize(reference.getParent()));
+        Assert.assertEquals("space", this.serializer.serialize(reference.getParent().getParent()));
+        
+        xcontext.setDoc(new XWikiDocument("xwiki", "xspace", "xpage"));
+        Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference.getParent()));
+        Assert.assertEquals("wiki:space", this.serializer.serialize(reference.getParent().getParent()));
+        
+    }
 
     @org.junit.Test
     public void testSerializeAttachmentReferenceWhenContextDocument() throws Exception

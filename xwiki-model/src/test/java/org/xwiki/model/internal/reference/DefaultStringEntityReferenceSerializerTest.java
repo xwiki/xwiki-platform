@@ -147,13 +147,11 @@ public class DefaultStringEntityReferenceSerializerTest
     }
     
     @Test
-    public void testSerializeExtactedReference() 
+    public void testSerializeReferenceWithChild() 
     {
         EntityReference reference = resolver.resolve("wiki:Space.Page", EntityType.DOCUMENT);
-        EntityReference extractedSpaceRef = reference.extractReference(EntityType.SPACE);
-        Assert.assertEquals("wiki:Space", serializer.serialize(extractedSpaceRef));
+        Assert.assertEquals("wiki:Space", serializer.serialize(reference.getParent()));
         
-        EntityReference extractedWikiRef = reference.extractReference(EntityType.WIKI);
-        Assert.assertEquals("wiki", serializer.serialize(extractedWikiRef));
+        Assert.assertEquals("wiki", serializer.serialize(reference.getParent().getParent()));
     }
 }

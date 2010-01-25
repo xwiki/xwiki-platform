@@ -41,15 +41,17 @@ public class CompactWikiStringEntityReferenceSerializer extends DefaultStringEnt
 
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
+     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder, boolean)
      */
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation)
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
+        boolean isLastReference)
     {
         boolean shouldPrint = false;
 
         EntityReference wikiReference = this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-        if (wikiReference == null || currentReference.getChild() == null || representation.length() > 0) {
+        if (wikiReference == null || currentReference.getChild() == null || isLastReference 
+            || representation.length() > 0) {
             shouldPrint = true;
         } else {
             switch (currentReference.getType()) {
@@ -64,7 +66,7 @@ public class CompactWikiStringEntityReferenceSerializer extends DefaultStringEnt
             }
         }
         if (shouldPrint) {
-            super.serializeEntityReference(currentReference, representation);
+            super.serializeEntityReference(currentReference, representation, isLastReference);
         }
     }
 }

@@ -54,9 +54,9 @@ public class LocalStringEntityReferenceSerializerTest
     }
     
     @Test
-    public void testSerializeExtractedSpaceReference()
+    public void testSerializeSpaceReferenceWithChild()
     {
         EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("space", serializer.serialize(reference.extractReference(EntityType.SPACE)));        
+        Assert.assertEquals("space", serializer.serialize(reference.getParent()));
     }
 }

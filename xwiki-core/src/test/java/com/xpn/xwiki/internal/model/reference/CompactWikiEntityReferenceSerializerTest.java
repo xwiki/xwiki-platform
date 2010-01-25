@@ -65,6 +65,7 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
         }});
 
         Assert.assertEquals("space.page", this.serializer.serialize(reference));
+        Assert.assertEquals("space", this.serializer.serialize(reference.getParent()));
     }
 
     @org.junit.Test
@@ -77,5 +78,6 @@ public class CompactWikiEntityReferenceSerializerTest extends AbstractComponentT
         }});
 
         Assert.assertEquals("wiki:space.page", this.serializer.serialize(reference));
+        Assert.assertEquals("wiki:space", this.serializer.serialize(reference.getParent()));
     }
 }

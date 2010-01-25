@@ -47,10 +47,12 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference, StringBuilder)
+     * @see org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
+     *      #serializeEntityReference(EntityReference, StringBuilder, boolean)
      */
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation)
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
+        boolean isLastReference)
     {
         boolean shouldPrint = false;
 
@@ -60,8 +62,8 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
         // In addition an entity reference isn't printed only if all parent references are not printed either,
         // otherwise print it. For example "wiki:page" isn't allowed for a Document Reference.
 
-        if (getContext() == null || getContext().getDoc() == null || currentReference.getChild() == null
-            || representation.length() > 0)
+        if (getContext() == null || getContext().getDoc() == null || currentReference.getChild() == null 
+            || isLastReference || representation.length() > 0)
         {
             shouldPrint = true;
         } else {
@@ -88,7 +90,7 @@ public class CompactStringEntityReferenceSerializer extends DefaultStringEntityR
 
         }
         if (shouldPrint) {
-            super.serializeEntityReference(currentReference, representation);
+            super.serializeEntityReference(currentReference, representation, isLastReference);
         }
     }
 

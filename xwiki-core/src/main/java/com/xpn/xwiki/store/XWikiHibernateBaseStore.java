@@ -889,16 +889,6 @@ public class XWikiHibernateBaseStore implements Initializable
                 }
             }
         }
-
-/*
-        if (t.getCause() instanceof BatchUpdateException
-            && ((BatchUpdateException) t.getCause()).getNextException() != null) {
-            final BatchUpdateException bue = (BatchUpdateException) t.getCause();
-            return bue.getNextException().getMessage();
-        }
-
-        return t.getMessage();
-        */
         return sb.toString();
     }
 

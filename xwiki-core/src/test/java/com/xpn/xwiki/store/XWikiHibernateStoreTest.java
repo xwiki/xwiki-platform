@@ -70,7 +70,8 @@ public class XWikiHibernateStoreTest extends AbstractBridgedComponentTestCase
         SQLException sqlException2 = new SQLException("sqlexception2");
         sqlException2.setNextException(new SQLException("nextexception2"));
 
-        final SQLException sqlException1 = new SQLException("sqlexception1", sqlException2);
+        final SQLException sqlException1 = new SQLException("sqlexception1");
+        sqlException1.initCause(sqlException2);
         sqlException1.setNextException(new SQLException("nextexception1"));
 
         getMockery().checking(new Expectations() {{

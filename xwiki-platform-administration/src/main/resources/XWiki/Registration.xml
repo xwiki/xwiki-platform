@@ -6,16 +6,16 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>XWiki.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264302409000</date>
-<contentUpdateDate>1264302409000</contentUpdateDate>
+<date>1264431524000</date>
+<contentUpdateDate>1264431524000</contentUpdateDate>
 <version>1.1</version>
-<title>Verified Registration Application</title>
+<title>Registration</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -61,6 +61,12 @@
 #######################################################################
 ## The Configuration
 #######################################################################
+##
+## Heading (Shown even when the user has already registered.)
+#set($heading = "= $msg.get('core.register.title') =")
+##
+## Welcome message (only shown of user is registering)
+#set($welcomeMessage = $msg.get('core.register.welcome'))
 ##
 ## These are defined in other places around XWiki, changing them here will result in undefined behavior.
 #set($redirectParam = 'xredirect')
@@ -404,6 +410,8 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 ##
 ## Removing this opens a reflective XSS hole because url parameters are put into fields.
 #blockXSS()
+## Display the heading
+$heading
 ## If the submit button has been pressed, then we test the input and maybe create the user.
 #if($request.getParameter('xwikiname'))
   ## Do server side validation of input fields.
@@ -575,14 +583,14 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
  * @param $failureMessageParams The tag parameters for a failure message.
  *#
 #macro(generateRegistrationForm, $fields, $fieldMandatoryStar, $failureMessageParams)
-  ##define($output)
+  ## Read the welcome message.
+  $welcomeMessage
   {{html clean=false}}
     #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
     #if($useLiveValidation)
       #generateJavascript($fields)
     #end
   {{/html}}
-  ##end
   ## Remove whitespace from the beginnings of lines to make HTML reading easier for smaller output.
   ##$xcontext.getUtil().getP5util().substitute('s/(\n)\s+/$1/g', "$output")
 #end
@@ -665,43 +673,45 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   #foreach($field in $fields)
     #if($field.get('validate') &amp;&amp; $field.get('name'))
       #set($validate = $field.get('validate'))
-      #set($fieldName = $field.get('name'))
-      var ${fieldName}Validator = new LiveValidation("$fieldName", { validMessage: "$msg.get('XWiki.Registration.fieldOkay')", wait: 500} );
-      ##
-      #if($validate.get('mandatory'))
-        #set($mandatory = $validate.get('mandatory'))
-        #if($mandatory.get('failureMessage'))
-          ${fieldName}Validator.add( Validate.Presence, { failureMessage: "$!mandatory.get('failureMessage')"} );
+      #if($validate.get('mandatory') || $validate.get('regex') || $validate.get('mustMatch'))
+        #set($fieldName = $field.get('name'))
+        var ${fieldName}Validator = new LiveValidation("$fieldName", { validMessage: "$msg.get('XWiki.Registration.fieldOkay')", wait: 500} );
+        ##
+        #if($validate.get('mandatory'))
+          #set($mandatory = $validate.get('mandatory'))
+          #if($mandatory.get('failureMessage'))
+            ${fieldName}Validator.add( Validate.Presence, { failureMessage: "$!mandatory.get('failureMessage')"} );
+          #end
         #end
-      #end
-      #if($validate.get('regex'))
-        #set($regex = $validate.get('regex'))
-        #set($pattern = "")
-        #if($regex.get('jsPattern'))
-          #set($pattern = $regex.get('jsPattern'))
-        #elseif($regex.get('pattern'))
-          #set($pattern = $regex.get('pattern'))
+        #if($validate.get('regex'))
+          #set($regex = $validate.get('regex'))
+          #set($pattern = "")
+          #if($regex.get('jsPattern'))
+            #set($pattern = $regex.get('jsPattern'))
+          #elseif($regex.get('pattern'))
+            #set($pattern = $regex.get('pattern'))
+          #end
+          #set($failMessage = "")
+          #if($regex.get('jsFailureMessage'))
+            #set($failMessage = $regex.get('jsFailureMessage'))
+          #elseif($regex.get('failureMessage'))
+            #set($failMessage = $regex.get('failureMessage'))
+          #end          
+          #if($pattern != '' &amp;&amp; $failMessage != '')
+            ${fieldName}Validator.add( Validate.Format, { pattern: $pattern, failureMessage: "$failMessage"} );
+          #end
         #end
-        #set($failMessage = "")
-        #if($regex.get('jsFailureMessage'))
-          #set($failMessage = $regex.get('jsFailureMessage'))
-        #elseif($regex.get('failureMessage'))
-          #set($failMessage = $regex.get('failureMessage'))
-        #end          
-        #if($pattern != '' &amp;&amp; $failMessage != '')
-          ${fieldName}Validator.add( Validate.Format, { pattern: $pattern, failureMessage: "$failMessage"} );
-        #end
-      #end
-      #if($validate.get('mustMatch'))
-        #set($mustMatch = $validate.get('mustMatch'))
-        #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
-          ${fieldName}Validator.add( Validate.Confirmation, { match: $$("input[name=$!mustMatch.get('name')]")[0], failureMessage: "$!mustMatch.get('failureMessage')"} );
-        #end
-      #end##if mustmatch
+        #if($validate.get('mustMatch'))
+          #set($mustMatch = $validate.get('mustMatch'))
+          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
+            ${fieldName}Validator.add( Validate.Confirmation, { match: $$("input[name=$!mustMatch.get('name')]")[0], failureMessage: "$!mustMatch.get('failureMessage')"} );
+          #end
+        #end##if mustmatch
+      #end##if contains js validateable fields.
     #end##if validate
   #end##loop
-  });// ]]&gt;
-  &lt;/script&gt;
+    });// ]]&gt;
+    &lt;/script&gt;
 #end##macro
 #*
  * Get parameters from request so that values will be filled in if there is a mistake

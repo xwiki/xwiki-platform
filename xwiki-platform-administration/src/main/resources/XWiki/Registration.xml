@@ -87,8 +87,8 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 #set($loginButton = true)
 ##
 ## After the user is logged in this is the page they are redirected to if no redirect parameter is
-## passed to the registration application. Currently set to edit their user profile.
-#set($defaultRedirect = $xwiki.getURL("$userSpace$request.get('xwikiname')", "inline"))
+## passed to the registration application. Currently set to the main page.
+#set($defaultRedirect = $xwiki.getURL("Main.WebHome"))
 ##
 ## Defines what server generated error messages should look like
 ## The error message when a field is entered incorrectly
@@ -370,9 +370,6 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
         'size' : '30'
       },
       'validate' : {
-        'mandatory' : {
-          'failureMessage' : $msg.get('XWiki.Registration.fieldMandatory')
-        },
         'programmaticValidation' : {
           'code' : '#checkCaptcha($request, $request.get("captcha_answer"))',
           'failureMessage' : $msg.get('core.captcha.captchaAnswerIsWrong')

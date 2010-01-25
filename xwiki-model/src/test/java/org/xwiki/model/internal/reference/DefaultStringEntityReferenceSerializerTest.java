@@ -145,4 +145,15 @@ public class DefaultStringEntityReferenceSerializerTest
         reference = resolver.resolve(":.\\@", EntityType.ATTACHMENT);
         Assert.assertEquals("xwiki:XWiki.WebHome@:.\\@", serializer.serialize(reference));
     }
+    
+    @Test
+    public void testSerializeExtactedReference() 
+    {
+        EntityReference reference = resolver.resolve("wiki:Space.Page", EntityType.DOCUMENT);
+        EntityReference extractedSpaceRef = reference.extractReference(EntityType.SPACE);
+        Assert.assertEquals("wiki:Space", serializer.serialize(extractedSpaceRef));
+        
+        EntityReference extractedWikiRef = reference.extractReference(EntityType.WIKI);
+        Assert.assertEquals("wiki", serializer.serialize(extractedWikiRef));
+    }
 }

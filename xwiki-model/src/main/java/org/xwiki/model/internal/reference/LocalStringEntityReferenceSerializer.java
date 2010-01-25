@@ -38,13 +38,14 @@ public class LocalStringEntityReferenceSerializer extends DefaultStringEntityRef
 {
     /**
      * {@inheritDoc}
-     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference , StringBuilder)
+     * @see DefaultStringEntityReferenceSerializer#serializeEntityReference(EntityReference , StringBuilder, boolean)
      */
     @Override
-    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation)
+    protected void serializeEntityReference(EntityReference currentReference, StringBuilder representation, 
+        boolean isLast)
     {
         if (currentReference.getType() != EntityType.WIKI) {
-            super.serializeEntityReference(currentReference, representation);
+            super.serializeEntityReference(currentReference, representation, isLast);
         }
     }
 }

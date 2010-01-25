@@ -391,6 +391,16 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   #end 
 #end
 ##
+## Pass the name of the template to $xwiki.createUser so any contained information will be passed in.
+#set($field = 
+  {'name' : 'template',
+    'params' : {
+      'type' : 'hidden',
+      'value' : 'XWiki.XWikiUserTemplate'
+    }
+  })
+#set($discard = $fields.add($field))
+##
 #######################################################################
 ## The Code.
 #######################################################################

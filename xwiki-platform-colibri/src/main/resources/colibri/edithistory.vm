@@ -1,9 +1,0 @@
-###
-### History page in the "edit" mode
-###
-###
-<div id="xwikieditcontent" class="clear">
-<div id="document-title"><h1>$msg.get('core.viewers.history.title', [$xwiki.getXMLEncoded($doc.displayTitle), $doc.getURL()])</h1></div>
-#template("shortcuts.vm")
-#template("historyinline.vm")
-</div>

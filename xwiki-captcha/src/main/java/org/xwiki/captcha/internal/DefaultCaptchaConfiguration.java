@@ -17,24 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.captcha.internal.velocity;
+package org.xwiki.captcha.internal;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.Requirement;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.captcha.CaptchaConfiguration;
 
 /**
- * Thrown when the velocity programmer tries to get a CaptchaVerifier which doesn't exist.
- *
+ * Get configuration for captcha.
+ * 
  * @version $Id$
  * @since 2.2M2
  */
-public class CaptchaVerifierNotFoundException extends Exception
+@Component
+public class DefaultCaptchaConfiguration implements CaptchaConfiguration
 {
+    /** The configuration key for whether the captcha component is enabled.  */
+    private static final String IS_CAPTCHA_ENABLED_CFG_KEY = "captcha.enabled";
+
+    /** A ConfigurationSource in which to look for whether the captcha should be enabled. */
+    @Requirement
+    private ConfigurationSource configuration;
+
     /**
-     * The Constructor.
+     * {@inheritDoc}
      *
-     * @param captchaName The name of the CaptchaVerifier which was not found.
+     * @see org.xwiki.captcha.CaptchaConfiguration#isEnabled()
      */
-    public CaptchaVerifierNotFoundException(String captchaName)
+    public boolean isEnabled()
     {
-        super("The CaptchaVerifier you are trying to get (" + captchaName 
-              + ") doesn't exist in the list, try $captchaservice.listCaptchaNames()");
+        return configuration.getProperty(IS_CAPTCHA_ENABLED_CFG_KEY, Boolean.TRUE).booleanValue();
     }
 }

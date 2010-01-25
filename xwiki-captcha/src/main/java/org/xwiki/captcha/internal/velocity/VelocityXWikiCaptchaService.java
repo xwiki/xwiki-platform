@@ -20,35 +20,27 @@
 package org.xwiki.captcha.internal.velocity;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.captcha.XWikiCaptchaService;
-import org.xwiki.velocity.VelocityContextInitializer;
-
-import org.apache.velocity.VelocityContext;
+import org.xwiki.captcha.internal.DefaultXWikiCaptchaService;
+import org.xwiki.captcha.CaptchaVerifier;
+import org.xwiki.captcha.CaptchaVerifierNotFoundException;
 
 /**
- * Loads VelocityCaptchaService into the Velocity context.
- * 
+ * Provides access to the classes implementing Captcha.
+ *
  * @version $Id$
  * @since 2.2M2
  */
-@Component("captchaservice")
-public class CaptchaVelocityContextInitializer implements VelocityContextInitializer
+@Component("velocity")
+public class VelocityXWikiCaptchaService extends DefaultXWikiCaptchaService
 {
-    /** The key to use for the captcha in the velocity context. */
-    public static final String VELOCITY_CONTEXT_KEY = "captchaservice";
-
-    /** The service which we will be passing to the velocity context. */
-    @Requirement("velocity")
-    private XWikiCaptchaService service;
-
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.velocity.VelocityContextInitializer#initialize(VelocityContext)
+     * @see org.xwiki.captcha.DefaultXWikiCaptchaService#getCaptchaVerifier(java.lang.String)
      */
-    public void initialize(VelocityContext context)
+    @Override
+    public CaptchaVerifier getCaptchaVerifier(String captchaName) throws CaptchaVerifierNotFoundException
     {
-        context.put(VELOCITY_CONTEXT_KEY, service);
+        return new VelocityCaptchaVerifier(super.getCaptchaVerifier(captchaName));
     }
 }

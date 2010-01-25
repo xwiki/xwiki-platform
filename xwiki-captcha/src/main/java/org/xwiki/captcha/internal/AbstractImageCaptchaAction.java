@@ -37,9 +37,6 @@ import com.octo.captcha.service.image.ImageCaptchaService;
  */
 public abstract class AbstractImageCaptchaAction extends AbstractCaptchaAction<ImageCaptchaService>
 {
-    /** Easily puts a captcha from the captchaService to the response object as a jpeg image. */
-    private final ImageToJpegHelper helper = new ImageToJpegHelper();
-
     /**
      * {@inheritDoc}
      *
@@ -49,12 +46,12 @@ public abstract class AbstractImageCaptchaAction extends AbstractCaptchaAction<I
                                  HttpServletRequest request, HttpServletResponse response)
         throws Exception
     {
-        this.helper.flushNewCaptchaToResponse(request,
-                                              response,
-                                              null,
-                                              getCaptchaService(),
-                                              getUserId(request),
-                                              request.getLocale());
+        ImageToJpegHelper.flushNewCaptchaToResponse(request,
+                                                    response,
+                                                    null,
+                                                    getCaptchaService(),
+                                                    getUserId(request),
+                                                    request.getLocale());
         return null;
     }
 }

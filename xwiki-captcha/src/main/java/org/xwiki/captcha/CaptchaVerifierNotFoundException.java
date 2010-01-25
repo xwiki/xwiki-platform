@@ -17,38 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.captcha.internal.velocity;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.Requirement;
-import org.xwiki.captcha.XWikiCaptchaService;
-import org.xwiki.velocity.VelocityContextInitializer;
-
-import org.apache.velocity.VelocityContext;
+package org.xwiki.captcha;
 
 /**
- * Loads VelocityCaptchaService into the Velocity context.
- * 
+ * Thrown when the programmer tries to get a CaptchaVerifier which doesn't exist.
+ *
  * @version $Id$
  * @since 2.2M2
  */
-@Component("captchaservice")
-public class CaptchaVelocityContextInitializer implements VelocityContextInitializer
+public class CaptchaVerifierNotFoundException extends Exception
 {
-    /** The key to use for the captcha in the velocity context. */
-    public static final String VELOCITY_CONTEXT_KEY = "captchaservice";
-
-    /** The service which we will be passing to the velocity context. */
-    @Requirement("velocity")
-    private XWikiCaptchaService service;
-
     /**
-     * {@inheritDoc}
+     * The Constructor.
      *
-     * @see org.xwiki.velocity.VelocityContextInitializer#initialize(VelocityContext)
+     * @param message The message to give for the error.
      */
-    public void initialize(VelocityContext context)
+    public CaptchaVerifierNotFoundException(String message)
     {
-        context.put(VELOCITY_CONTEXT_KEY, service);
+        super(message);
     }
 }

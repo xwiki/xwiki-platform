@@ -37,9 +37,6 @@ import com.octo.captcha.service.sound.SoundCaptchaService;
  */
 public abstract class AbstractSoundCaptchaAction extends AbstractCaptchaAction<SoundCaptchaService>
 {
-    /** Easily puts a captcha from the captchaService to the response object as a jpeg image. */
-    private final SoundToWavHelper helper = new SoundToWavHelper();
-
     /**
      * {@inheritDoc}
      *
@@ -49,12 +46,12 @@ public abstract class AbstractSoundCaptchaAction extends AbstractCaptchaAction<S
                                  HttpServletRequest request, HttpServletResponse response)
         throws Exception
     {
-        this.helper.flushNewCaptchaToResponse(request,
-                                              response,
-                                              null,
-                                              getCaptchaService(),
-                                              getUserId(request),
-                                              request.getLocale());
+        SoundToWavHelper.flushNewCaptchaToResponse(request,
+                                                   response,
+                                                   null,
+                                                   getCaptchaService(),
+                                                   getUserId(request),
+                                                   request.getLocale());
         return null;
     }
 }

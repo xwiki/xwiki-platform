@@ -50,7 +50,7 @@ public abstract class AbstractCaptchaAction<T extends CaptchaService> extends Ac
     /**
      * {@inheritDoc}
      *
-     * @see CaptchaVerifier#getUserId()
+     * @see CaptchaVerifier#getUserId(javax.servlet.http.HttpServletRequest)
      */
     public String getUserId(HttpServletRequest request)
     {

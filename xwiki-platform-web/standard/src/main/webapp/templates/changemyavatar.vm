@@ -5,18 +5,18 @@
 ### TODO: Check extension
 ###
 #template("startpage.vm")
-<div class="minwidthb"></div>
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($doc.getObject("XWikiUsers", 0))
   #if($context.user == $doc.fullName || $hasAdmin)
     <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }"><div>
-      <h1>$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h1>
+      <div id="document-title"><h1>$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h1></div>
       <input type="hidden" name="xredirect" value="$doc.getURL("view", "xpage=changeavatar")"/>
       <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get('uploadavatarfile'):</label></div>
       <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>
       <div class="padded">
         <span class="buttonwrapper"><input type="submit" value="$msg.get('setthisavatar')" class="button"/></span>
-        <a href="$doc.getURL("view")">$msg.get('platform.core.profile.changePhoto.cancel')</a>
+        <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$msg.get('platform.core.profile.changePhoto.cancel')</a></span>
       </div>
     </div></form>
   #else
@@ -29,5 +29,6 @@
   #xwikimessageboxstart($msg.get('avatar') $msg.get('notauser'))
   #xwikimessageboxend()
 #end
-</div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

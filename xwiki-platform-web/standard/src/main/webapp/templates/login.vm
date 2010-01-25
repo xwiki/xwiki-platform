@@ -18,6 +18,7 @@ $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 <form id="loginForm" action="$doc.getURL("loginsubmit")" method="post">
 <div class="hidden"><input type="hidden" name="xredirect" value="$!request.xredirect"/>
 #if("$!request.srid" != "")
@@ -49,7 +50,8 @@ $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #end
 #xwikimessageboxend()
 </form>
-</div>
+</div>## mainContentArea
+</div>## main
 ## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
 <script type="text/javascript">
 //<![CDATA[

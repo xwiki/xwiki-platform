@@ -4,6 +4,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($xwiki.exists("XWiki.UserInactive"))
     $xwiki.includeForm("XWiki.UserInactive", false)
 #else
@@ -26,5 +27,6 @@ $msg.get("accountnotactive_email")
 #xwikimessageboxend()
 #end
 <div class="clearfloats"></div>
-</div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

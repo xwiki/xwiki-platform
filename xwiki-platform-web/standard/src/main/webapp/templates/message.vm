@@ -9,9 +9,11 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #xwikimessageboxstart("$!messageType" "$!message")
 $!details
 #xwikimessageboxend()
 <div class="clearfloats"></div>
-</div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

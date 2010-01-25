@@ -7,14 +7,17 @@
   $response.setStatus(404)
   #template("startpage.vm")
   <div class="main layoutsubsection">
+  <div id="mainContentArea">
     #error("$msg.get('core.rename.nonexistingDocument')")
-  </div>
+  </div>## mainContentArea
+  </div>## main
   #template("endpage.vm")
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-	<h1><span>$msg.get("core.copy.copydoc")</span></h1>
-	#set($sourcedoc = "$!{request.sourcedoc}")
+  <div id="mainContentArea">
+    <div id="document-title"><h1>$msg.get('core.copy.copydoc')</h1></div>
+    #set($sourcedoc = "$!{request.sourcedoc}")
     #set($targetdoc = "$!{request.targetdoc}")
     #if("$!request.language" != "")
       #set($language = $request.language)
@@ -35,7 +38,7 @@
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="">
-    <div><input type="hidden" name="xpage" value="copy" /></div>
+    <div class="hidden"><input type="hidden" name="xpage" value="copy" /></div>
     <table>
     <tr><td>$msg.get("core.copy.sourcedoc"):</td>
     <td>$doc.fullName <input type="hidden" name="sourcedoc" value="$doc.fullName" size="60"/></td></tr>
@@ -54,11 +57,12 @@
     #end
     <tr><td>$msg.get("core.copy.targetdoc"):</td>
     <td><input type="text" name="targetdoc" value="$!{request.targetdoc}" size="60" /></td></tr>
-    <tr><td><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></td></tr>
     </table>
+    <div><span class="buttonwrapper"><input type="submit" value="Copy" class="button"/></span></div>
     </form>
     #end
     <div class="clearfloats"></div>
-  </div>
+  </div>## mainContentArea
+  </div>## main
 #template("endpage.vm")
 #end

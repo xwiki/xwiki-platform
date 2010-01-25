@@ -4,6 +4,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($request.get("type"))
 #set($type= $request.get("type"))
 #else
@@ -35,5 +36,6 @@ $msg.get("currentdifftype"): $type (
 #set($origdoc = $xwiki.getDocument($tdoc,"1.0"))
 #template("changesdoc.vm")
 <div class="clearfloats"></div>
-</div>
+</div> ## mainContentArea
+</div> ## main
 #template("endpage.vm")

@@ -4,6 +4,7 @@
 ###
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($message)
   <div id="xwikimessage">$message</div>
 #end
@@ -18,5 +19,6 @@
   #xwikimessagebox($msg.get('core.delete') $fullmsg $doc.getURL('deleteversions', "confirm=1&amp;rev1=$rev1&amp;rev2=$rev2&amp;$!{redirectparam}&amp;$languageparams") $doc.getURL("view", "viewer=history$!{redirectparam}&amp;$languageparams") $msg.get('yes') $msg.get('no'))
 #end
 <div class="clearfloats"></div>
+</div>## mainContentArea
 </div>## main
 #template("endpage.vm")

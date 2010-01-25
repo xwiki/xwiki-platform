@@ -1,5 +1,6 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 <h3>$xwiki.parseMessage("availableversionsattachment")</h3>
 #if ($tdoc.realLanguage!="")
 #set($lang = "&language=${tdoc.realLanguage}")
@@ -32,5 +33,6 @@
     </tr>
 #end
 </table>
-</div> ## main
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

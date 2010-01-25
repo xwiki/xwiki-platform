@@ -5,6 +5,7 @@
 $response.setStatus(404)
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($xwiki.exists("XWiki.DocumentDoesNotExist"))
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
 #else
@@ -17,5 +18,6 @@ $xwiki.parseMessage("youcanclicktoedit")
 #xwikimessageboxend()
 #end
 <div class="clearfloats"></div>
-</div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

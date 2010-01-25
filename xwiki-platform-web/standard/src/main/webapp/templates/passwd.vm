@@ -5,6 +5,7 @@
 #template("startpage.vm")
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #if($doc.getObject("XWikiUsers", 0))
 #set($i = $context.user.indexOf(":")+1)
 #if($context.user.substring($i) == $doc.fullName || $hasAdmin)
@@ -18,7 +19,7 @@
 </dl>
     <div class="padded">
       <span class="buttonwrapper"><input type="submit" value="$msg.get("platform.core.profile.passwd.submit")" class="button"/></span>
-      <span class="buttonwrapper"><a href="$doc.getURL("view")">$msg.get("platform.core.profile.passwd.cancel")</a></span>
+      <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$msg.get("platform.core.profile.passwd.cancel")</a></span>
     </div>
   </form>
 #else
@@ -31,5 +32,6 @@ $response.setStatus(400)
 #xwikimessageboxstart($msg.get("platform.core.noticeMessageType") $msg.get("platform.core.profile.passwd.notaUser"))
 #xwikimessageboxend()
 #end
-</div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

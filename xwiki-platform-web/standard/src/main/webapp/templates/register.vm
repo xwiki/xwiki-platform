@@ -1,5 +1,7 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
+<div id="mainContentArea">
 #template("registerinline.vm")
-</div>
+</div>## mainContentArea
+</div>## main
 #template("endpage.vm")

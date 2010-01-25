@@ -405,7 +405,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated use {@link #getSpace()} instead
      */
     @Deprecated
-    public String XWikiDocument.getWeb()
+    public String getWeb()
     {
         return getSpace();
     }
@@ -414,7 +414,7 @@ public class XWikiDocument implements DocumentModelBridge
      * @deprecated use {@link #setSpace(String)} instead
      */
     @Deprecated
-    public void XWikiDocument.setWeb(String web)
+    public void setWeb(String web)
     {
         setSpace(web);
     }

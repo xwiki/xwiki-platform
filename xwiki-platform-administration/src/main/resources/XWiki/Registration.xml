@@ -12,10 +12,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264468490000</date>
-<contentUpdateDate>1264468490000</contentUpdateDate>
+<date>1264519966000</date>
+<contentUpdateDate>1264519966000</contentUpdateDate>
 <version>1.1</version>
-<title>Verified Registration Application</title>
+<title>Registration</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -60,7 +60,6 @@
 <content>{{velocity}}
 #######################################################################
 ## The Configuration
-## This cannot be edited using WYSIWYG.
 #######################################################################
 ##
 ## Heading (Shown when registering and in the "registration complete" page.)
@@ -648,7 +647,10 @@ $heading
               $entry.getKey()="$entry.getValue()"
             #end
           #end
-          value="$!field.get('value')" /&gt;
+          #if($field.get('value'))
+            value="$!field.get('value')"
+          #end
+          /&gt;
           #if($field.get('error'))
             &lt;span 
             #foreach($entry in $failureMessageParams.entrySet())

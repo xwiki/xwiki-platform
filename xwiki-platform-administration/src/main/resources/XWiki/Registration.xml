@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264531934000</date>
-<contentUpdateDate>1264531934000</contentUpdateDate>
+<date>1264538612000</date>
+<contentUpdateDate>1264538612000</contentUpdateDate>
 <version>1.1</version>
 <title>Registration</title>
 <template></template>
@@ -342,13 +342,15 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 ## The captcha image, not an input field but still defined the same way.
 #if($captchaservice &amp;&amp; $captchaservice.isEnabled() &amp;&amp; $xcontext.getUser() == "XWiki.XWikiGuest")
   ## Empty prompt field used for padding.
+  ## Empty 'name' field overriddes name="captcha_image" with "" so name is not specified at all.
   #set($field = 
     {'name' : 'captcha_image',
       'prompt' : '',
       'tag' : 'img',
       'params' : {
         'src' : $doc.getURL('imagecaptcha'),
-        'alt' : $msg.get('core.captcha.image.alternateText', [$msg.get('core.register.submit')])
+        'alt' : $msg.get('core.captcha.image.alternateText', [$msg.get('core.register.submit')]),
+        'name' : ''
       }
     })
   #set($discard = $fields.add($field))
@@ -443,10 +445,14 @@ $heading
 #if(!$registrationDone)
   $welcomeMessage
   {{html clean=false}}
+    ## I do not want to put this inside of a paragraph block so I end the block here and
+    ## start it at the end.
+    &lt;/p&gt;
     #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
     #if($useLiveValidation)
       #generateJavascript($fields)
     #end
+    &lt;p&gt;
   {{/html}}
 #end
 ##
@@ -580,15 +586,12 @@ $heading
     #else
       ## Display a "registration successful" message
       #set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
-      ## if no first/last name entered, set to username
-      #if($fullName.length() &lt; 2)
-        #set($fullName = $userName)
-      #end
       {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
       ## Give the user a login button which posts their username and password to loginsubmit
       #if($loginButton)
-        {{html}}
+        {{html clean=false}}
           &lt;form id="loginForm" action="$loginURL" method="post"&gt;
+            &lt;div&gt;
             &lt;input id="j_username" name="j_username" type="hidden" value="$!userName" /&gt;
             &lt;input id="j_password" name="j_password" type="hidden" value="$!password" /&gt;
             #if(!$request.get($redirectParam))
@@ -597,11 +600,12 @@ $heading
             &lt;span class="buttonwrapper" style="margin-left:47%;"&gt;
               &lt;input type="submit" value="$msg.get('login')" class="button"/&gt;
             &lt;/span&gt;
+            &lt;/div&gt;
           &lt;/form&gt;
         {{/html}}
-      #end##if login button
-    #end##if not autologin
-  #end##if registration was successful
+      #end
+    #end
+  #end
   ##
 #end## createUser Macro
 #*
@@ -641,11 +645,18 @@ $heading
           #else
             #set($tag = 'input')
           #end
-          &lt;dd&gt;&lt;$tag id="$fieldName" name="$fieldName"
+          &lt;dd&gt;&lt;$tag id="$fieldName"
           #if($field.get('params'))
             #set($params = $field.get('params'))
+            ## If no name parameter is spacified, then we use the field name
+            #if(!$params.get('name'))
+              #set($discard = $params.put('name', $fieldName))
+            #end
             #foreach($entry in $params.entrySet())
-              $entry.getKey()="$entry.getValue()"
+              ## If a parameter is specified as '' then we don't include it.
+              #if($entry.getValue() != '')
+                $entry.getKey()="$entry.getValue()"
+              #end
             #end
           #end
           /&gt;

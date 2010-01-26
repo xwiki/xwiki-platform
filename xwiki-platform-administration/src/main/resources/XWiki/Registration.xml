@@ -12,8 +12,8 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264519966000</date>
-<contentUpdateDate>1264519966000</contentUpdateDate>
+<date>1264531934000</date>
+<contentUpdateDate>1264531934000</contentUpdateDate>
 <version>1.1</version>
 <title>Registration</title>
 <template></template>
@@ -127,6 +127,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
  *   |
  *   +-mandatory (Optional) - Will fail if the field is not filled in.
  *   | +-failureMessage (Required) - The message to display if the field is not filled in.
+ *   | +-noscript (Optional) - will not be checked by javascript
  *   |
  *   +-regex (Optional) - Will validate the field using a regular expression.
  *   | |                  because of character escaping, you must provide a different expression for the
@@ -144,16 +145,19 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
  *   | |                      all browsers use javascript or have it enabled.
  *   | |
  *   | +-jsPattern (Optional) - The regular expression to use for client side, you can use escaped characters to avoid
- *   |                          them being parsed as HTML or javascript. To get javascript to unescape characters use:
- *   |                          {"jsPattern" : "'+unescape('%5E%5B%24')+'"}
- *   |                          NOTE: If no jsPattern is specified, the jsValidator will try to validate 
- *   |                                using the server pattern.
+ *   | |                        them being parsed as HTML or javascript. To get javascript to unescape characters use:
+ *   | |                        {"jsPattern" : "'+unescape('%5E%5B%24')+'"}
+ *   | |                        NOTE: If no jsPattern is specified, the jsValidator will try to validate 
+ *   | |                              using the server pattern.
+ *   | |
+ *   | +-noscript (Optional) - will not be checked by javascript
  *   |
  *   +-mustMatch (Optional) - Will fail if the entry into the field is not the same as the entry in another field.
  *   | |                      Good for password confirmation.
  *   | |
  *   | +-failureMessage (Required) - The message to display if the field doesn't match the named field.
  *   | +-name (Required) - The name of the field which this field must match.
+ *   | +-noscript (Optional) - will not be checked by javascript
  *   |
  *   +-programmaticValidation (Optional) - This form of validation executes a piece of code which you give it and
  *   | |                                   if the code returns the word "failed" then it gives the error message.
@@ -177,8 +181,6 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
  *  
  * Each field may not have: (reserved names)
  *   error - This is used to pass back any error message from the server side code.
- *
- *   value - This is used to pass back the value given by the user.
  *
  * NOTE: This template uses a registration method which requires:
  *        * register_first_name
@@ -351,8 +353,9 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
     })
   #set($discard = $fields.add($field))
   ## The captcha field, mandatory, programmatically checked to make sure the captcha is right
+  ## Not checked by javascript because javascript can't check the captcha and the Ok message because it passes the 
+  ## mandatory test is misleading.
   ## and not filled back in if there is an error ('noReturn')
-  ## The fieldOk message is '' because we don't want to give the user the idea that they are correct because it isn't empty
   #set($field = 
     {'name' : 'captcha_answer',
       'prompt' : $msg.get('core.captcha.image.instruction'),
@@ -361,6 +364,10 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
         'size' : '30' 
       },
       'validate' : {
+        'mandatory' : {
+          'failureMessage' : $msg.get('core.captcha.captchaAnswerIsWrong'),
+          'noscript' : true
+        },
         'programmaticValidation' : {
           'code' : '#checkCaptcha($request, $request.get("captcha_answer"))',
           'failureMessage' : $msg.get('core.captcha.captchaAnswerIsWrong')
@@ -434,7 +441,13 @@ $heading
 ## If the registration was not successful or if the user hasn't submitted the info yet
 ## Then we display the registration form.
 #if(!$registrationDone)
-  #generateRegistrationForm($fields, $fieldMandatoryStar, $failureMessageParams)
+  $welcomeMessage
+  {{html clean=false}}
+    #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
+    #if($useLiveValidation)
+      #generateJavascript($fields)
+    #end
+  {{/html}}
 #end
 ##
 ####### The Macros (nothing below this point is run directly) #########
@@ -451,52 +464,56 @@ $heading
       #set($validate = $field.get('validate'))
       #set($error = '')
       #set($value = $request.get($fieldName))
-      ##
-      ## Check if content is mandatory
-      #if($validate.get('mandatory') &amp;&amp;  (!$value || $value == ''))
-        #set($mandatory = $validate.get('mandatory'))
-        #if($mandatory.get('failureMessage'))
-          #set($error = $mandatory.get('failureMessage'))
-        #else
-          ERROR: In field: ${fieldName}: mandatory validation requires a failureMessage
-        #end
-      #end
-      ##
-      ## mustMatch validation
-      #if($error == '' &amp;&amp; $validate.get('mustMatch'))
-        #set($mustMatch = $validate.get('mustMatch'))
-        #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
-          #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
-            #set($error = $mustMatch.get('failureMessage'))
+      #if($value &amp;&amp; $value != '')
+        ##
+        ## mustMatch validation
+        #if($error == '' &amp;&amp; $validate.get('mustMatch'))
+          #set($mustMatch = $validate.get('mustMatch'))
+          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
+            #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
+              #set($error = $mustMatch.get('failureMessage'))
+            #end
+          #else
+            ERROR: In field: ${fieldName}: mustMatch validation required both name 
+                   (of field which this field must match) and failureMessage.
           #end
-        #else
-          ERROR: In field: ${fieldName}: mustMatch validation required both name 
-                 (of field which this field must match) and failureMessage.
         #end
-      #end
-      ##
-      ## Regex validation
-      #if($error == '' &amp;&amp; $validate.get('regex'))
-        #set($regex = $validate.get('regex'))
-        #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
-          #if(!$xcontext.getUtil().match($regex.get('pattern'), $value))
-            #set($error = $regex.get('failureMessage'))
+        ##
+        ## Regex validation
+        ## We won't bother with regex validation if there is no entry, that would defeat the purpose of 'mandatory'
+        #if($error == '' &amp;&amp; $validate.get('regex') &amp;&amp; $value &amp;&amp; $value != '')
+          #set($regex = $validate.get('regex'))
+          #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
+            #if(!$xcontext.getUtil().match($regex.get('pattern'), $value))
+              #set($error = $regex.get('failureMessage'))
+            #end
+          #elseif($regex.get('pattern'))
+            ERROR: In field: ${fieldName}: regex validation must include failureMessage.
           #end
-        #elseif($regex.get('pattern'))
-          ERROR: In field: ${fieldName}: regex validation must include failureMessage.
         #end
-      #end
-      ##
-      ## If regex and mustMatch validation passed, try programmatic validation
-      #if($error == '' &amp;&amp; $validate.get('programmaticValidation'))
-        #set($pv = $validate.get('programmaticValidation'))
-        #if($pv.get('code') &amp;&amp; $pv.get('failureMessage'))
-          #set($pvReturn = "#evaluate($pv.get('code'))")
-          #if($pvReturn.indexOf('failed') != -1)
-            #set($error = $pv.get('failureMessage'))
+        ##
+        ## If regex and mustMatch validation passed, try programmatic validation
+        #if($error == '' &amp;&amp; $validate.get('programmaticValidation'))
+          #set($pv = $validate.get('programmaticValidation'))
+          #if($pv.get('code') &amp;&amp; $pv.get('failureMessage'))
+            #set($pvReturn = "#evaluate($pv.get('code'))")
+            #if($pvReturn.indexOf('failed') != -1)
+              #set($error = $pv.get('failureMessage'))
+            #end
+          #else
+            ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
           #end
-        #else
-          ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
+        #end
+      #else
+        ##
+        ## If no content, check if content is mandatory
+        #if($validate.get('mandatory'))
+          #set($mandatory = $validate.get('mandatory'))
+          #if($mandatory.get('failureMessage'))
+            #set($error = $mandatory.get('failureMessage'))
+          #else
+            ERROR: In field: ${fieldName}: mandatory validation requires a failureMessage
+          #end
         #end
       #end
       #if($error != '')
@@ -563,6 +580,10 @@ $heading
     #else
       ## Display a "registration successful" message
       #set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")
+      ## if no first/last name entered, set to username
+      #if($fullName.length() &lt; 2)
+        #set($fullName = $userName)
+      #end
       {{info}}$msg.get('core.register.successful', ["[[$fullName&gt;&gt;$userSpace$userName]]", $userName]){{/info}}
       ## Give the user a login button which posts their username and password to loginsubmit
       #if($loginButton)
@@ -578,31 +599,11 @@ $heading
             &lt;/span&gt;
           &lt;/form&gt;
         {{/html}}
-      #end
-    #end
-  #end
+      #end##if login button
+    #end##if not autologin
+  #end##if registration was successful
   ##
 #end## createUser Macro
-#*
- * Generate registration form.
- * Here we generate the actual HTML and Javascript code for the registration form.
- *
- * @param $fields The array of fields to put in the form.
- * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
- * @param $failureMessageParams The tag parameters for a failure message.
- *#
-#macro(generateRegistrationForm, $fields, $fieldMandatoryStar, $failureMessageParams)
-  ## Read the welcome message.
-  $welcomeMessage
-  {{html clean=false}}
-    #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
-    #if($useLiveValidation)
-      #generateJavascript($fields)
-    #end
-  {{/html}}
-  ## Remove whitespace from the beginnings of lines to make HTML reading easier for smaller output.
-  ##$xcontext.getUtil().getP5util().substitute('s/(\n)\s+/$1/g', "$output")
-#end
 #*
  * Generate HTML form, this is the only place where HTML is written.
  *
@@ -647,9 +648,6 @@ $heading
               $entry.getKey()="$entry.getValue()"
             #end
           #end
-          #if($field.get('value'))
-            value="$!field.get('value')"
-          #end
           /&gt;
           #if($field.get('error'))
             &lt;span 
@@ -685,7 +683,9 @@ $heading
   #foreach($field in $fields)
     #if($field.get('validate') &amp;&amp; $field.get('name'))
       #set($validate = $field.get('validate'))
-      #if($validate.get('mandatory') || $validate.get('regex') || $validate.get('mustMatch'))
+      #if(($validate.get('mandatory') &amp;&amp; !$validate.get('mandatory').get('noscript'))
+          || ($validate.get('regex') &amp;&amp; !$validate.get('regex').get('noscript'))
+          || ($validate.get('mustMatch') &amp;&amp; !$validate.get('mustMatch').get('noscript')))
         #set($fieldName = $field.get('name'))
         #if($validate.get('fieldOkay'))
           #set($okayMessage = $validate.get('fieldOkayMessage'))
@@ -696,14 +696,14 @@ $heading
         ##
         #if($validate.get('mandatory'))
           #set($mandatory = $validate.get('mandatory'))
-          #if($mandatory.get('failureMessage'))
+          #if($mandatory.get('failureMessage') &amp;&amp; !$mandatory.get('noscript'))
             ${fieldName}Validator.add( Validate.Presence, { failureMessage: "$!mandatory.get('failureMessage')"} );
           #end
         #end
         ##
         #if($validate.get('mustMatch'))
           #set($mustMatch = $validate.get('mustMatch'))
-          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
+          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage')  &amp;&amp; !$mustMatch.get('noscript'))
             ${fieldName}Validator.add( Validate.Confirmation, { match: $$("input[name=$!mustMatch.get('name')]")[0], failureMessage: "$!mustMatch.get('failureMessage')"} );
           #end
         #end
@@ -722,7 +722,7 @@ $heading
           #elseif($regex.get('failureMessage'))
             #set($failMessage = $regex.get('failureMessage'))
           #end          
-          #if($pattern != '' &amp;&amp; $failMessage != '')
+          #if($pattern != '' &amp;&amp; $failMessage != '' &amp;&amp; !$regex.get('noscript'))
             ${fieldName}Validator.add( Validate.Format, { pattern: $pattern, failureMessage: "$failMessage"} );
           #end
         #end##if regex
@@ -734,7 +734,7 @@ $heading
 #end##macro
 #*
  * Get parameters from request so that values will be filled in if there is a mistake
- * in one of the entries.
+ * in one of the entries. Entries will pe returned to fields[n].params.value
  * Fields will not be returned if they have either noReturn or error specified.
  *
  * @param $fields The array of fields to get parameters for.
@@ -743,7 +743,13 @@ $heading
   #foreach($field in $fields)
     #if($field.get('name') &amp;&amp; $request.get($field.get('name')))
       #if(!$field.get('noReturn') &amp;&amp; !$field.get('error'))
-        #set($discard = $field.put('value', $request.get($field.get('name'))))
+        #if(!$field.get('params'))
+          #set($params = {})
+          #set($discard = $field.put('params', $params))
+        #else
+          #set($params = $field.get('params'))
+        #end
+        #set($discard = $params.put('value', $request.get($field.get('name'))))
       #end
     #end
   #end

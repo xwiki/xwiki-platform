@@ -20,7 +20,8 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
@@ -32,7 +33,9 @@
   <packaging>war</packaging>
   <description>XWiki's GWT WYSIWYG editor</description>
   <properties>
-    <gwt.js.style>OBF</gwt.js.style>
+    <gwt.args />
+    <gwt.skipTests>false</gwt.skipTests>
+    <gwt.style>OBF</gwt.style>
     <gwt.output.directory>${project.build.directory}/${project.build.finalName}/resources/js/xwiki/wysiwyg</gwt.output.directory>
     <xwe.directory>${gwt.output.directory}/xwe</xwe.directory>
     <xwe.module>com.xpn.xwiki.wysiwyg.Wysiwyg</xwe.module>
@@ -133,48 +136,47 @@
       <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <!--
+        HtmlUnit 2.6 used by GWT 2.0.0 to run the JUnit tests requires a newer version of Xalan than the one (2.5.1)
+        coming as a transitive dependency of XWiki Core.
+      -->
+      <groupId>xalan</groupId>
+      <artifactId>xalan</artifactId>
+      <version>2.7.1</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
         <configuration>
           <module>${xwe.module}</module>
+          <webappDirectory>${gwt.output.directory}</webappDirectory>
+          <includes>com/xpn/xwiki/wysiwyg/WysiwygClientTestSuite.java</includes>
+          <skipTests>${gwt.skipTests}</skipTests>
+          <style>${gwt.style}</style>
+          <disableCastChecking>true</disableCastChecking>
+          <!-- We use class meta data to detect the type of a macro parameter. -->
+          <disableClassMetadata>false</disableClassMetadata>
+          <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
+          <out>target/www-test${gwt.args}</out>
+          <!--
+            In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
+            value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT option.
+            See http://code.google.com/support/bin/answer.py?hl=en&answer=71442
+          -->
+          <extraJvmArgs>-Xmx1024m -Xss1024k -Djava.awt.headless=true</extraJvmArgs>
         </configuration>
         <executions>
           <execution>
-            <id>compile-gwt</id>
             <goals>
               <goal>compile</goal>
-            </goals>
-            <configuration>
-              <webappDirectory>${gwt.output.directory}</webappDirectory>
-              <style>${gwt.js.style}</style>
-              <!--
-                In order to prevent the "java.lang.InternalError: Can't connect to X11 window server using ':1.0' as the
-                value of the DISPLAY variable." error message we have to run the GWT compiler with the headless AWT
-                option. See http://code.google.com/support/bin/answer.py?hl=en&answer=71442
-              -->
-              <extraJvmArgs>-Xmx1024m -Xss1024k -Djava.awt.headless=true</extraJvmArgs>
-            </configuration>
-          </execution>
-          <execution>
-            <id>test-gwt</id>
-            <goals>
               <goal>test</goal>
             </goals>
-            <configuration>
-              <!-- Skip the tests by default because they need a 32-bit JRE and the CI machine is 64-bit -->
-              <skipTests>true</skipTests>
-              <!-- GWTTestCase derived tests need the hosted browser which in turn needs a 32-bit JRE. -->
-              <!-- <jvm>/usr/lib/jvm/ia32-java-6-sun/bin/java</jvm> -->
-              <!-- We can run the tests manually in any browser. -->
-              <!-- <extraJvmArgs>-Dgwt.args="-manual -port 54321 -style DETAILED"</extraJvmArgs> -->
-              <testTimeOut>120</testTimeOut>
-              <includes>com/xpn/xwiki/wysiwyg/WysiwygClientTestSuite.java</includes>
-            </configuration>
           </execution>
         </executions>
       </plugin>
@@ -281,39 +283,45 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <!--
+          GWT needs the client sources in development mode. We include all the sources for now because we cannot filter
+          server sources.
+        -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-source-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <!-- Resources are included in the classes jar. -->
+              <excludeResources>true</excludeResources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <profiles>
     <profile>
-      <id>hosted</id>
+      <id>dev</id>
       <properties>
-        <gwt.js.style>DETAILED</gwt.js.style>
         <xwe.module>com.xpn.xwiki.wysiwyg.WysiwygDev</xwe.module>
+        <gwt.style>DETAILED</gwt.style>
+        <gwt.skipTests>true</gwt.skipTests>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <!--
-              GWT's hosted browser needs client sources. We include all the sources for now because we cannot filter
-              server sources.
-            -->
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>build-source-jar</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <!-- Resources are included in the classes jar. -->
-                  <excludeResources>true</excludeResources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
+    </profile>
+    <profile>
+      <id>manual</id>
+      <properties>
+        <xwe.module>com.xpn.xwiki.wysiwyg.WysiwygDev</xwe.module>
+        <gwt.style>DETAILED</gwt.style>
+        <!-- Arguments required to run the tests manually in any browser. -->
+        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -runStyle "Manual:1</gwt.args>
+      </properties>
     </profile>
   </profiles>
 </project>

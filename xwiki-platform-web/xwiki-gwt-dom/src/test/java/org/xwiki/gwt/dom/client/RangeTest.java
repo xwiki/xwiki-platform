@@ -84,7 +84,7 @@ public class RangeTest extends AbstractDOMTest
         assertEquals("#b<ins>c</ins>", range.toHTML().toLowerCase());
 
         range.insertNode(getDocument().createImageElement());
-        assertEquals("<img>#b<ins>c</ins>", range.toHTML().toLowerCase());
+        assertEquals("<img>#b<ins>c</ins>", normalizeHTML(range.toHTML()));
     }
 
     /**

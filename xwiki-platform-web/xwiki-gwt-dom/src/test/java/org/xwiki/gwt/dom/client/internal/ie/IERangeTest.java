@@ -489,7 +489,7 @@ public class IERangeTest extends AbstractDOMTest
         getContainer().xSetInnerHTML("<!--x-->a<img/>");
         range.selectNode(getContainer().getLastChild());
         assertFalse(range.isCollapsed());
-        assertEquals("<img>", range.toHTML().toLowerCase());
+        assertEquals("<img>", normalizeHTML(range.toHTML()));
         assertEquals(getContainer(), range.getCommonAncestorContainer());
     }
 

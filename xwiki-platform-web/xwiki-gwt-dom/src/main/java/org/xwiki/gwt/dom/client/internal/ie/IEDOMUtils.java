@@ -162,17 +162,6 @@ public class IEDOMUtils extends DOMUtils
     /**
      * {@inheritDoc}
      * 
-     * @see DOMUtils#hasAttribute(Element, String)
-     */
-    public native boolean hasAttribute(Element element, String attrName)
-    /*-{
-        var attrNode = element.getAttributeNode(attrName);
-        return attrNode && attrNode.specified;
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see DOMUtils#hasAttributes(Element)
      */
     public boolean hasAttributes(Element element)

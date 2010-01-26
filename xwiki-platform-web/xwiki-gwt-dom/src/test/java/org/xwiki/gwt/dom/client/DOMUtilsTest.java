@@ -261,17 +261,17 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testCloneNodeUpwards()
     {
-        getContainer().setInnerHTML("<em><ins>abc<del>d</del></ins></em>e");
+        getContainer().setInnerHTML("<ins><del>abc<em>d</em></del></ins>e");
 
         Element clone =
             domUtils.cloneNode(getContainer().getParentNode(),
                 getContainer().getFirstChild().getFirstChild().getFirstChild(), 2, false).cast();
-        assertEquals("<em><ins>c<del>d</del></ins></em>e", clone.getInnerHTML().toLowerCase());
+        assertEquals("<ins><del>c<em>d</em></del></ins>e", clone.getInnerHTML().toLowerCase());
 
         clone =
             domUtils.cloneNode(getContainer().getParentNode(), getContainer().getFirstChild().getFirstChild(), 1, true)
                 .cast();
-        assertEquals("<em><ins>abc</ins></em>", clone.getInnerHTML().toLowerCase());
+        assertEquals("<ins><del>abc</del></ins>", clone.getInnerHTML().toLowerCase());
     }
 
     /**
@@ -334,15 +334,15 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testDeleteNodeContentsUpwards()
     {
-        getContainer().setInnerHTML("<span>x<em>y<!--z--><del>wiki</del></em></span>");
+        getContainer().setInnerHTML("<del>x<em>y<!--z--><span>wiki</span></em></del>");
         domUtils.deleteNodeContents(getContainer(), getContainer().getFirstChild().getChildNodes().getItem(1)
             .getChildNodes().getItem(2).getFirstChild(), 2, true);
-        assertEquals("<span><em><del>ki</del></em></span>", getContainer().getInnerHTML().toLowerCase());
+        assertEquals("<del><em><span>ki</span></em></del>", getContainer().getInnerHTML().toLowerCase());
 
-        getContainer().setInnerHTML("<span><em><del>wiki</del><!--z-->y</em>x</span>");
+        getContainer().setInnerHTML("<del><em><span>wiki</span><!--z-->y</em>x</del>");
         domUtils.deleteNodeContents(getContainer(), getContainer().getFirstChild().getFirstChild().getFirstChild()
             .getFirstChild(), 1, false);
-        assertEquals("<span><em><del>w</del></em></span>", getContainer().getInnerHTML().toLowerCase());
+        assertEquals("<del><em><span>w</span></em></del>", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -368,13 +368,13 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testSplitNodeUpwards()
     {
-        getContainer().setInnerHTML("u<del>v<strong><ins><!--x-->y</ins>z</strong><em>a</em></del>b");
+        getContainer().setInnerHTML("u<del>v<strong><em><!--x-->y</em>z</strong><ins>a</ins></del>b");
         Node rightNode =
             domUtils.splitNode(getContainer(), getContainer().getChildNodes().getItem(1).getChildNodes().getItem(1)
                 .getFirstChild(), 1);
-        assertEquals("<ins>y</ins>", Element.as(rightNode).getString().toLowerCase());
-        assertEquals("u<del>v<strong><ins><!--x--></ins></strong></del>"
-            + "<del><strong><ins>y</ins>z</strong><em>a</em></del>b", getContainer().getInnerHTML().toLowerCase());
+        assertEquals("<em>y</em>", Element.as(rightNode).getString().toLowerCase());
+        assertEquals("u<del>v<strong><em><!--x--></em></strong></del>"
+            + "<del><strong><em>y</em>z</strong><ins>a</ins></del>b", getContainer().getInnerHTML().toLowerCase());
     }
 
     /**
@@ -769,7 +769,7 @@ public class DOMUtilsTest extends AbstractDOMTest
     {
         getContainer().setInnerHTML("<p><em>a</em>b</p>");
         domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getFirstChild().getFirstChild(), 0);
-        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", getContainer().getInnerHTML().toLowerCase());
+        assertEquals("<p><em></em><br></p><p><em>a</em>b</p>", normalizeHTML(getContainer().getInnerHTML()));
 
         getContainer().setInnerHTML("<p><em>b</em>a</p>");
         domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getFirstChild().getFirstChild(), 1);
@@ -777,7 +777,7 @@ public class DOMUtilsTest extends AbstractDOMTest
 
         getContainer().setInnerHTML("<p><em>x</em>y</p>");
         domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getLastChild(), 1);
-        assertEquals("<p><em>x</em>y</p><p><br></p>", getContainer().getInnerHTML().toLowerCase());
+        assertEquals("<p><em>x</em>y</p><p><br></p>", normalizeHTML(getContainer().getInnerHTML()));
 
         getContainer().setInnerHTML("<p><em>y</em>x</p>");
         domUtils.splitHTMLNode(getContainer(), getContainer().getFirstChild().getLastChild(), 0);
@@ -805,7 +805,7 @@ public class DOMUtilsTest extends AbstractDOMTest
         assertEquals(getContainer().getFirstChild(), domUtils.getNextNode(range));
 
         range.selectNode(getContainer());
-        getContainer().setInnerHTML("<em><ins></ins></em><del>deleted</del>");
+        getContainer().setInnerHTML("<ins><em></em></ins><del>deleted</del>");
         range.selectNodeContents(getContainer().getFirstChild().getFirstChild());
         assertEquals(getContainer().getLastChild(), domUtils.getNextNode(range));
 
@@ -835,7 +835,7 @@ public class DOMUtilsTest extends AbstractDOMTest
         assertEquals(getContainer().getLastChild(), domUtils.getPreviousNode(range));
 
         range.selectNode(getContainer());
-        getContainer().setInnerHTML("<del>deleted</del><em><ins></ins></em>");
+        getContainer().setInnerHTML("<del>deleted</del><ins><em></em></ins>");
         range.selectNodeContents(getContainer().getLastChild().getFirstChild());
         assertEquals(getContainer().getFirstChild(), domUtils.getPreviousNode(range));
 
@@ -857,7 +857,7 @@ public class DOMUtilsTest extends AbstractDOMTest
      */
     public void testIsOrContainsLineBreak()
     {
-        getContainer().setInnerHTML("a<strong></strong><del>x</del><br/><span><br/></span><em><ins><br/></ins></em>");
+        getContainer().setInnerHTML("a<strong></strong><del>x</del><br/><span><br/></span><ins><em><br/></em></ins>");
         assertFalse(domUtils.isOrContainsLineBreak(null));
         assertFalse(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(0)));
         assertFalse(domUtils.isOrContainsLineBreak(getContainer().getChildNodes().getItem(1)));

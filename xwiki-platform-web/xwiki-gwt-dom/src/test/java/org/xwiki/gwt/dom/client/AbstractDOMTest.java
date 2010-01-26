@@ -30,6 +30,11 @@ import com.google.gwt.junit.client.GWTTestCase;
 public abstract class AbstractDOMTest extends GWTTestCase
 {
     /**
+     * Greater-than sign.
+     */
+    private static final String GT = ">";
+
+    /**
      * The document in which we run the tests.
      */
     private Document document;
@@ -89,5 +94,16 @@ public abstract class AbstractDOMTest extends GWTTestCase
     public String getModuleName()
     {
         return "org.xwiki.gwt.dom.DOM";
+    }
+
+    /**
+     * Normalizes the given HTML fragment so that it can be asserted on different browsers.
+     * 
+     * @param html the HTML fragment to be normalized
+     * @return the result of normalizing the given HTML fragment
+     */
+    protected String normalizeHTML(String html)
+    {
+        return html.trim().toLowerCase().replace("></br>", GT).replace("></img>", GT);
     }
 }

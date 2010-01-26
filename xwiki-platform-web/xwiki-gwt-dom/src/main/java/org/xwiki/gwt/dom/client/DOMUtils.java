@@ -1101,17 +1101,6 @@ public abstract class DOMUtils
 
     /**
      * @param element a DOM element
-     * @param attrName a string representing the name of an attribute
-     * @return true is the given element has an attribute with the specified name, false otherwise
-     * @see http://code.google.com/p/google-web-toolkit/issues/detail?id=2852
-     */
-    public native boolean hasAttribute(Element element, String attrName)
-    /*-{
-        return element.hasAttribute(attrName);
-    }-*/;
-
-    /**
-     * @param element a DOM element
      * @return {@code true} if the given element has any attributes
      */
     public native boolean hasAttributes(Element element)

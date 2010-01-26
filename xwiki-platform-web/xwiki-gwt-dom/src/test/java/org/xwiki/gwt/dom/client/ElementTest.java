@@ -57,10 +57,10 @@ public class ElementTest extends AbstractDOMTest
     public void testXGetStringWithoutMetaData()
     {
         Element element = getDocument().createDivElement().cast();
-        element.setInnerHTML("a<!--x--><em r=\"s\"><br/><!--y-->b<del>c</del></em>");
+        element.setInnerHTML("a<!--x--><em r=\"s\"><br/><!--y-->b<span>c</span></em>");
         element.setAttribute("q", "p");
-        assertEquals("<div q=\"p\">a<!--x--><em r=\"s\"><br><!--y-->b<del>c</del></em></div>", element.xGetString()
-            .trim().toLowerCase());
+        assertEquals("<div q=\"p\">a<!--x--><em r=\"s\"><br><!--y-->b<span>c</span></em></div>", normalizeHTML(element
+            .xGetString()));
     }
 
     /**
@@ -89,7 +89,7 @@ public class ElementTest extends AbstractDOMTest
     {
         getContainer().appendChild(getDocument().createTextNode("<\"'>&"));
         getContainer().appendChild(getDocument().createBRElement());
-        assertEquals("&lt;\"'&gt;&amp;<br>", getContainer().xGetInnerHTML().toLowerCase());
+        assertEquals("&lt;\"'&gt;&amp;<br>", normalizeHTML(getContainer().xGetInnerHTML()));
     }
 
     /**
@@ -218,7 +218,8 @@ public class ElementTest extends AbstractDOMTest
         element.addClassName("macro-selected");
         element.addClassName("macro");
         element.addClassName("macro ");
-        element.addClassName(null);
+        // Element#addClassName(String) is not null-safe anymore (since GWT2.0).
+        // element.addClassName(null);
         assertEquals("macro-selected macro", element.getClassName());
     }
 
@@ -236,7 +237,8 @@ public class ElementTest extends AbstractDOMTest
         element.removeClassName("colorCell");
         assertEquals("colorCell-selected", element.getClassName());
 
-        element.removeClassName(null);
+        // Element#removeClassName(String) is not null-safe anymore (since GWT2.0).
+        // element.removeClassName(null);
         element.removeClassName(" colorCell-selected");
         assertEquals("", element.getClassName());
     }

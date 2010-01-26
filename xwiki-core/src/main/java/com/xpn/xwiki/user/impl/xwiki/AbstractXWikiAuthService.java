@@ -94,7 +94,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
             }
         } else {
             principal = null;
-            context.put("message", "wrongpassword");
+            context.put("message", "invalidcredentials");
         }
 
         return principal;

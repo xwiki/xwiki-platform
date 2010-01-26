@@ -423,13 +423,13 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         // Check for empty usernames
         if (cannonicalUsername.equals("")) {
-            context.put("message", "nousername");
+            context.put("message", "invalidcredentials");
             return null;
         }
 
         // Check for empty passwords
         if ((password == null) || (password.trim().equals(""))) {
-            context.put("message", "nopassword");
+            context.put("message", "invalidcredentials");
             return null;
         }
 
@@ -474,10 +474,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                             return new SimplePrincipal(virtualXwikiName != null ? context.getDatabase() + ":" + user
                                 : user);
                         } else {
-                            context.put("message", "wrongpassword");
+                            context.put("message", "invalidcredentials");
                         }
                     } else {
-                        context.put("message", "wronguser");
+                        context.put("message", "invalidcredentials");
                     }
                 } catch (Exception e) {
                     // continue
@@ -492,11 +492,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                             if (checkPassword(user, password, context)) {
                                 return new SimplePrincipal(context.getDatabase() + ":" + user);
                             } else {
-                                context.put("message", "wrongpassword");
+                                context.put("message", "invalidcredentials");
                                 return null;
                             }
                         } else {
-                            context.put("message", "wronguser");
+                            context.put("message", "invalidcredentials");
                             return null;
                         }
                     } catch (Exception e) {

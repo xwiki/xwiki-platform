@@ -12,10 +12,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264463341000</date>
-<contentUpdateDate>1264463341000</contentUpdateDate>
-<version>20.1</version>
-<title>Verified Registration Application</title>
+<date>1264465422000</date>
+<contentUpdateDate>1264465422000</contentUpdateDate>
+<version>1.1</version>
+<title>Registration</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -391,21 +391,23 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 #set($discard = $fields.add($field))
 ##
 ## Allow permitted users to configure this application.
-#if($xcontext.hasAccessLevel("edit", $doc.getFullName()))
+#if($xcontext.getUser() != "XWiki.XWikiGuest")
   ## If this document doesn't exist then we are going to ASSUME that we are using registerinline.vm and it's pointing to XWiki.Registration...
   #if($doc.isNew())
     #set($docName = 'XWiki.Registration')
   #else
     #set($docName = $doc.getName())
   #end
-  #set($field = 
-    {'name' : 'configure',
-      'prompt' : "&lt;a href='$xwiki.getURL($docName, 'edit')?editor=wiki'&gt;You can configure this application by clicking here.&lt;/a&gt;",
-      'params' : {
-        'type' : 'hidden'
-      }
-    })
-  #set($discard = $fields.add($field))
+  #if($xcontext.hasAccessLevel("edit", $docName))
+    #set($field = 
+      {'name' : 'configure',
+        'prompt' : "&lt;a href='$xwiki.getURL($docName, 'edit')?editor=wiki'&gt;You can configure this application by clicking here.&lt;/a&gt;",
+        'params' : {
+          'type' : 'hidden'
+        }
+      })
+    #set($discard = $fields.add($field))
+  #end
 #end
 ##
 #######################################################################
@@ -413,7 +415,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
 #######################################################################
 ##
 ## This application's HTML is dynamically generated and editing in WYSIWYG would not work
-## Also blockXSS redirects causing an infinite loop (http://jira.xwiki.org/jira/browse/XWIKI-4211)
+## Also blockXSS redirects causeing an infinite loop (http://jira.xwiki.org/jira/browse/XWIKI-4211)
 #if($context.getAction() == "edit")
   $response.sendRedirect("$xwiki.getURL($doc.getFullName(), 'edit')?editor=wiki")
 #end

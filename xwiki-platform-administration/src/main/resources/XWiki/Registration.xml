@@ -12,10 +12,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1264284581000</creationDate>
-<date>1264465422000</date>
-<contentUpdateDate>1264465422000</contentUpdateDate>
+<date>1264468490000</date>
+<contentUpdateDate>1264468490000</contentUpdateDate>
 <version>1.1</version>
-<title>Registration</title>
+<title>Verified Registration Application</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -377,7 +377,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   #set($cv = $captchaservice.getCaptchaVerifier('image'))
   #if(!$cv.isAnswerCorrect($cv.getUserId($request), $answer))
     failed
-  #end 
+  #end
 #end
 ##
 ## Pass the name of the template to $xwiki.createUser so any contained information will be passed in.
@@ -398,7 +398,7 @@ $xwiki.get("ssfx").use('uicomponents/widgets/validation/livevalidation.css')
   #else
     #set($docName = $doc.getName())
   #end
-  #if($xcontext.hasAccessLevel("edit", $docName))
+  #if($xcontext.hasAccessLevel("edit", $doc.getFullName()))
     #set($field = 
       {'name' : 'configure',
         'prompt' : "&lt;a href='$xwiki.getURL($docName, 'edit')?editor=wiki'&gt;You can configure this application by clicking here.&lt;/a&gt;",
@@ -451,54 +451,53 @@ $heading
       #set($fieldName = $field.get('name'))
       #set($validate = $field.get('validate'))
       #set($error = '')
-      #if($request.get($fieldName) &amp;&amp; $request.get($fieldName) != '')
-        #set($value = $request.get($fieldName))
-        ##
-        ## Regex validation
-        #if($validate.get('regex'))
-          #set($regex = $validate.get('regex'))
-          #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
-            #if(!$xcontext.getUtil().match($regex.get('pattern'), $value))
-              #set($error = $regex.get('failureMessage'))
-            #end
-          #elseif($regex.get('pattern'))
-            ERROR: In field: ${fieldName}: regex validation must include failureMessage.
-          #end
-        #end
-        ##
-        ## If regex validation passed, check "mustMatch" validation
-        #if($error == '' &amp;&amp; $validate.get('mustMatch'))
-          #set($mustMatch = $validate.get('mustMatch'))
-          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
-            #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
-              #set($error = $mustMatch.get('failureMessage'))
-            #end
-          #else
-            ERROR: In field: ${fieldName}: mustMatch validation required both name 
-                   (of field which this field must match) and failureMessage.
-          #end
-        #end
-        ##
-        ## If regex and mustMatch validation passed, try programmatic validation
-        #if($error == '' &amp;&amp; $validate.get('programmaticValidation'))
-          #set($pv = $validate.get('programmaticValidation'))
-          #if($pv.get('code') &amp;&amp; $pv.get('failureMessage'))
-            #set($pvReturn = "#evaluate($pv.get('code'))")
-            #if($pvReturn.indexOf('failed') != -1)
-              #set($error = $pv.get('failureMessage'))
-            #end
-          #else
-            ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
-          #end
-        #end
+      #set($value = $request.get($fieldName))
       ##
-      ## If no content, check if content is mandatory
-      #elseif($validate.get('mandatory'))
+      ## Check if content is mandatory
+      #if($validate.get('mandatory') &amp;&amp;  (!$value || $value == ''))
         #set($mandatory = $validate.get('mandatory'))
         #if($mandatory.get('failureMessage'))
           #set($error = $mandatory.get('failureMessage'))
         #else
           ERROR: In field: ${fieldName}: mandatory validation requires a failureMessage
+        #end
+      #end
+      ##
+      ## mustMatch validation
+      #if($error == '' &amp;&amp; $validate.get('mustMatch'))
+        #set($mustMatch = $validate.get('mustMatch'))
+        #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
+          #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
+            #set($error = $mustMatch.get('failureMessage'))
+          #end
+        #else
+          ERROR: In field: ${fieldName}: mustMatch validation required both name 
+                 (of field which this field must match) and failureMessage.
+        #end
+      #end
+      ##
+      ## Regex validation
+      #if($error == '' &amp;&amp; $validate.get('regex'))
+        #set($regex = $validate.get('regex'))
+        #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
+          #if(!$xcontext.getUtil().match($regex.get('pattern'), $value))
+            #set($error = $regex.get('failureMessage'))
+          #end
+        #elseif($regex.get('pattern'))
+          ERROR: In field: ${fieldName}: regex validation must include failureMessage.
+        #end
+      #end
+      ##
+      ## If regex and mustMatch validation passed, try programmatic validation
+      #if($error == '' &amp;&amp; $validate.get('programmaticValidation'))
+        #set($pv = $validate.get('programmaticValidation'))
+        #if($pv.get('code') &amp;&amp; $pv.get('failureMessage'))
+          #set($pvReturn = "#evaluate($pv.get('code'))")
+          #if($pvReturn.indexOf('failed') != -1)
+            #set($error = $pv.get('failureMessage'))
+          #end
+        #else
+          ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
         #end
       #end
       #if($error != '')

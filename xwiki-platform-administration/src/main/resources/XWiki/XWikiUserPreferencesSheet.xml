@@ -40,7 +40,7 @@ $xwiki.ssx.use('Main.Dashboard')##
         &lt;dd&gt;$doc.display('editor')&lt;/dd&gt;
       &lt;/dl&gt;
       &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.editMode')&lt;/label&gt;&lt;/dt&gt;
+        &lt;dt class="label"&gt;&lt;label&gt;$msg.get('platform.core.profile.userType')&lt;/label&gt;&lt;/dt&gt;
         &lt;dd&gt;$doc.display('usertype')&lt;/dd&gt;
       &lt;/dl&gt;
     &lt;/div&gt;

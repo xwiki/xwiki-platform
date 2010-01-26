@@ -74,7 +74,7 @@ wikimanager.defaultdatetimeformat=yyyy MMMM dd 'at' HH:mm
 # LABELS
 ##
 wikimanager.createwiki=Create a new wiki
-wikimanager.totalnumberofwiki=Total number of wiki
+wikimanager.totalnumberofwiki=Total number of wikis
 wikimanager.wikitemplate=From wiki template
 wikimanager.wikipackage=From package (attached file)
 wikimanager.readers=Readers

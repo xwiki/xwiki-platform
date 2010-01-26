@@ -19,9 +19,6 @@
  */
 package org.xwiki.gwt.user.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gwt.core.client.JavaScriptObject;
 
 /**
@@ -79,15 +76,15 @@ public class Cache
     @SuppressWarnings("unchecked")
     public <T> T get(String key, CacheCallback<T> callback)
     {
-        Map<String, Object> map = getMap();
+        org.xwiki.gwt.dom.client.JavaScriptObject map = getMap();
         T object = null;
         if (map != null) {
-            object = (T) getMap().get(key);
+            object = (T) map.get(key);
         }
         if (object == null) {
             object = callback.get();
             if (map != null) {
-                map.put(key, object);
+                map.set(key, object);
             }
         }
         return object;
@@ -100,23 +97,21 @@ public class Cache
      */
     public void clear(boolean disable)
     {
-        Map<String, Object> map = getMap();
-        if (map != null) {
-            map.clear();
-            if (disable) {
-                cacheHolder.remove(CACHE_PROPERTY);
-            }
-        } else if (!disable) {
-            cacheHolder.set(CACHE_PROPERTY, new HashMap<String, Object>());
+        if (disable) {
+            cacheHolder.remove(CACHE_PROPERTY);
+        } else {
+            cacheHolder.set(CACHE_PROPERTY, JavaScriptObject.createObject());
         }
     }
 
     /**
+     * NOTE: We use a JavaScript object as a map because the cache keys are strings and the lookup is done in native
+     * code and thus should be faster.
+     * 
      * @return the map where the cached objects are stored
      */
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> getMap()
+    private org.xwiki.gwt.dom.client.JavaScriptObject getMap()
     {
-        return (Map<String, Object>) cacheHolder.get(CACHE_PROPERTY);
+        return (org.xwiki.gwt.dom.client.JavaScriptObject) cacheHolder.get(CACHE_PROPERTY);
     }
 }

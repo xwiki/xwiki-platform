@@ -375,7 +375,7 @@ public class InsertHTMLExecutableTest extends RichTextAreaTestCase
                 assertEquals("bob", rta.getDocument().getSelection().toString());
                 String insertedText = "*";
                 assertTrue(executable.execute(insertedText));
-                assertEquals(insertedText, Element.as(getBody().getChildNodes().getItem(1)).getInnerHTML());
+                assertEquals(insertedText, Element.as(getBody().getChildNodes().getItem(1)).getInnerText());
             }
         });
     }

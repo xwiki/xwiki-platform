@@ -47,6 +47,6 @@ public class DefaultCaptchaConfiguration implements CaptchaConfiguration
      */
     public boolean isEnabled()
     {
-        return configuration.getProperty(IS_CAPTCHA_ENABLED_CFG_KEY, Boolean.TRUE).booleanValue();
+        return configuration.getProperty(IS_CAPTCHA_ENABLED_CFG_KEY, Boolean.FALSE).booleanValue();
     }
 }

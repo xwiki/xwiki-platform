@@ -1603,7 +1603,7 @@ ${Msz}Mb##
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))<label for="xwiki-livetable-${divid}-filter-${velocityCount}">#end
                 $msg.get("${transprefix}${colname}")
-                #if($isFilterable)</label>#end
+                #if($isFilterable && ("$!colprop.type"=="text"||"$!colprop.type"=="number"))</label>#end
                 #if($isSortable)</a>#end
               </th>
               #end

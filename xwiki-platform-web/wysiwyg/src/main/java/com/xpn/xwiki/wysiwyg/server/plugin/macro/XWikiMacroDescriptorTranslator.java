@@ -88,7 +88,6 @@ public class XWikiMacroDescriptorTranslator implements MacroDescriptorTranslator
             String paramKey = macroKey + ".parameter." + paramDescriptor.getId();
             paramDescriptor.setName(translate(paramKey + FIELD_NAME, paramDescriptor.getName()));
             paramDescriptor.setDescription(translate(paramKey + FIELD_DESCRIPTION, paramDescriptor.getDescription()));
-            paramDescriptor.setDefaultValue(translate(paramKey + ".defaultValue", paramDescriptor.getDefaultValue()));
 
             if (paramDescriptor.getType().isEnum()) {
                 for (Entry<String, String> entry : paramDescriptor.getType().getEnumConstants().entrySet()) {

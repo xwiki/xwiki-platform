@@ -112,7 +112,7 @@
 |=(% scope="col" %)$msg.get("xe.panels.members.photo") |=(% scope="col" %) $msg.get("xe.panels.members.name")
 #foreach($user in $list)
 #set($userdoc = $xwiki.getDocument($user)) $userdoc.use("XWiki.XWikiUsers") 
-| #if($userdoc.attachmentList.size()&gt;0) #set($attach = $userdoc.attachmentList.get(0)) &lt;img src="$userdoc.getAttachmentURL($attach.filename,"download", "wdith=30")" width="30"/&gt; #end | [[$userdoc.display("first_name","view") $userdoc.display("last_name","view")&gt;&gt;$userdoc.fullName]]
+| #if($userdoc.attachmentList.size()&gt;0) #set($attach = $userdoc.attachmentList.get(0)) &lt;img src="$userdoc.getAttachmentURL($attach.filename, "download", "width=30")" width="30"/&gt; #end | [[$userdoc.display("first_name","view") $userdoc.display("last_name","view")&gt;&gt;$userdoc.fullName]]
 #end
 
 [[$msg.get("xe.panels.members.viewall")&gt;&gt;XWiki.XWikiUsers]]

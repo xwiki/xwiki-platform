@@ -155,5 +155,5 @@
 #-# [Since 2.2M2]
 #-# Enable captcha: true|false
 #-#
-#-# Captcha is enabled by default.
-# captcha.enabled = true
+#-# Captcha is disabled by default.
+# captcha.enabled = false

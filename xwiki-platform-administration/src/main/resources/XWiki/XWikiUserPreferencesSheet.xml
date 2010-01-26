@@ -30,7 +30,7 @@
 #else
 $xwiki.ssx.use("XWiki.XWikiUserSheet")##
 $xwiki.ssx.use('Main.Dashboard')##
-{{html}}
+{{html wiki="true"}}
 &lt;div class="dashboard"&gt;
   &lt;div class="dashboardleft"&gt;
     &lt;div class="userPreferences"&gt;

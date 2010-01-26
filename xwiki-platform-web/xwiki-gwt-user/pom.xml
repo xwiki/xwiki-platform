@@ -33,8 +33,7 @@
   <packaging>jar</packaging>
   <description>An extension of the GWT User package, providing improved widgets and additional utility classes.</description>
   <properties>
-    <gwt.skip.tests>true</gwt.skip.tests>
-    <gwt.extra.jvm.args />
+    <gwt.args />
   </properties>
   <dependencies>
     <!-- GWT core dependencies -->
@@ -48,7 +47,7 @@
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-incubator</artifactId>
-      <version>july-14-2009</version>
+      <version>20091216-r1739</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -90,14 +89,11 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>gwt-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
         <configuration>
-          <!-- Skip the tests by default because they need a 32-bit JRE and the CI machine is 64-bit -->
-          <skipTests>${gwt.skip.tests}</skipTests>
-          <!-- GWTTestCase derived tests need the hosted browser which in turn needs a 32-bit JRE. -->
-          <jvm>/usr/lib/jvm/ia32-java-6-sun/bin/java</jvm>
-          <extraJvmArgs>${gwt.extra.jvm.args}</extraJvmArgs>
-          <testTimeOut>120</testTimeOut>
+          <!-- HACK: We inject the GWT arguments in the out parameter because we have no other option. -->
+          <out>target/www-test${gwt.args}</out>
+          <style>DETAILED</style>
           <includes>org/xwiki/gwt/user/UserTestSuite.java</includes>
         </configuration>
         <executions>
@@ -145,16 +141,10 @@
   </build>
   <profiles>
     <profile>
-      <id>test</id>
-      <properties>
-        <gwt.skip.tests>false</gwt.skip.tests>
-      </properties>
-    </profile>
-    <profile>
       <id>manual</id>
       <properties>
         <!-- Arguments required to run the tests manually in any browser. -->
-        <gwt.extra.jvm.args>-Dgwt.args="-manual -port 54321 -style DETAILED"</gwt.extra.jvm.args>
+        <gwt.args>" -prod -userAgents gecko1_8 -port 54321 -codeServerPort 12345 -runStyle "Manual:1</gwt.args>
       </properties>
     </profile>
   </profiles>

@@ -27,6 +27,8 @@ import org.xwiki.gwt.user.client.FocusCommand;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.junit.DoNotRunWith;
+import com.google.gwt.junit.Platform;
 import com.google.gwt.junit.client.GWTTestCase;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.DeferredCommand;
@@ -34,9 +36,13 @@ import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * Base class for tests running on a rich text area.
+ * <p>
+ * NOTE: HtmlUnit 2.6 doesn't fully support the {@link Selection} API and also doesn't fire the load event on in-line
+ * frames. For now all test cases derived from this class are skipped when running on HtmlUnit.
  * 
  * @version $Id$
  */
+@DoNotRunWith(Platform.HtmlUnit)
 public abstract class AbstractRichTextAreaTestCase extends GWTTestCase implements LoadHandler
 {
     /**

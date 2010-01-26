@@ -43,7 +43,7 @@
 #else
   #xwikitopmenuentrystart($xwiki.getURL('Main.WebHome', 'view') $context.getDatabase() 'tmWiki' 'hasIcon')
   #if ($hasCreateSpace)
-    #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=space&amp;parent=$doc.fullName") $msg.get('core.menu.create.space') 'tmCreateSpace', '')
+    #submenuitem("$doc.getURL('view', 'xpage=createdocument&amp;tocreate=space')&amp;parent=$doc.fullName" $msg.get('core.menu.create.space') 'tmCreateSpace', '')
   #end
   #if ($hasWatch)
     #set ($isWikiWatched = $xwiki.watchlist.isWikiWatched())
@@ -73,7 +73,7 @@
 #else
   #xwikitopmenuentrystart($xwiki.getURL("${doc.space}.WebHome", 'view') $doc.space 'tmSpace' 'hasIcon')
   #if ($hasCreatePage)  
-    #submenuitem($xwiki.getURL('XWiki.CreatePage', 'view', "tocreate=page&amp;parent=$doc.fullName") $msg.get('core.menu.create.page') 'tmCreatePage', '')
+    #submenuitem("$doc.getURL('view', 'xpage=createdocument&amp;tocreate=page')&amp;parent=$doc.fullName" $msg.get('core.menu.create.page') 'tmCreatePage', '')
     #submenuitem($xwiki.getURL('XWiki.OfficeImporter', 'view', "&amp;parent=$doc.fullName") $msg.get('core.menu.create.pageFromOffice') 'tmCreatePageFromOffice', '')
   #end
   #if ($hasWatch)

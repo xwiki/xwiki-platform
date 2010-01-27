@@ -107,7 +107,7 @@
 
 #if($hasAdmin &amp;&amp; $context.isMainWiki())
 &lt;form action="$xwiki.requestURL" enctype="multipart/form-data" method="post"&gt;
-&lt;p&gt;
+&lt;div&gt;
   &lt;strong&gt;$msgActions&lt;/strong&gt;&lt;br/&gt;
 
   &lt;label for="action1" class="hidden"&gt;$actionStart&lt;/label&gt;
@@ -117,7 +117,7 @@
 
   #if($actionRestart)&lt;label for="action3" class="hidden"&gt;$actionRestart&lt;/label&gt;&lt;input id="action3" name="action" type="radio" value="restart"/&gt;$actionRestart&lt;br/&gt;#end
   &lt;span class="buttonwrapper"&gt;&lt;input type="submit" value="$msgUpdate" class="button"/&gt;&lt;/span&gt;
-&lt;/p&gt;
+&lt;/div&gt;
 &lt;/form&gt;
 #end
 

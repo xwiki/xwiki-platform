@@ -3796,7 +3796,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiDocument groupDoc = getDocument(groupName, context);
 
         BaseObject memberObject = (BaseObject) groupClass.newObject(context);
-        memberObject.setXClassReference(groupClass.getXClassReference());
+        memberObject.setXClassReference(groupClass.getDocumentReference());
         memberObject.setDocumentReference(groupDoc.getDocumentReference());
         memberObject.setStringValue("member", userName);
         groupDoc.addXObject(groupClass.getDocumentReference(), memberObject);

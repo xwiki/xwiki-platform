@@ -41,7 +41,7 @@
   </scm>
   <properties>
     <!-- Used by gwt and wysiwyg modules -->
-    <gwt.version>1.7.0</gwt.version>
+    <gwt.version>2.0.0</gwt.version>
     <smartgwt.version>1.2</smartgwt.version>
     <!-- XEM dependencies -->
     <platform.plugin.applicationmanager.version>1.11-SNAPSHOT</platform.plugin.applicationmanager.version>

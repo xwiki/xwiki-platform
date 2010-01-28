@@ -113,7 +113,7 @@ XWiki.widgets.LiveTable = Class.create({
 
     if (typeof this.tags != "undefined" && this.tags.length > 0) {
        this.tags.each(function(tag) {
-          url += ("&tag=" + tag);
+          url += ("&tag=" + encodeURIComponent(tag.unescapeHTML()));
        });
     }
 
@@ -613,12 +613,12 @@ var LiveTableTagCloud = Class.create({
             }
          }
          var tagLabel = this.tags[i].tag;
-         var tagSpan = new Element("span").update(tagLabel);
+         var tagSpan = new Element("span").update(tagLabel.escapeHTML());
          var tag = new Element("li", {'class':liClass}).update(tagSpan);
          if (typeof this.matchingTags[tagLabel] != "undefined") {
             tag.addClassName("selectable");
             Event.observe(tagSpan, "click", function(event) {
-                var tag = event.element().up("li").down("span").innerHTML;
+                var tag = event.element().up("li").down("span").innerHTML.unescapeHTML();
                 event.element().up("li").toggleClassName("selected");
                 if (event.element().up("li").hasClassName("selected")) {
                   self.selectedTags[tag] = {};

@@ -870,8 +870,8 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
     {
         XWikiDocument doc = new XWikiDocument();
 
-        DocumentReference expected1 = new DocumentReference("xwiki", "XWiki", "page");
-        assertEquals(expected1, doc.resolveReferenceWithSpecificSpace("page", "XWiki"));
+        DocumentReference expected1 = new DocumentReference("xwiki", "defaultSpace", "page");
+        assertEquals(expected1, doc.resolveReferenceWithSpecificSpace("page", "defaultSpace"));
 
         DocumentReference expected2 = new DocumentReference("xwiki", "space", "page");
         assertEquals(expected2, doc.resolveReferenceWithSpecificSpace("space.page", "XWiki"));

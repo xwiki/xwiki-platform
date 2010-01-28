@@ -423,13 +423,13 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
         // Check for empty usernames
         if (cannonicalUsername.equals("")) {
-            context.put("message", "invalidcredentials");
+            context.put("message", "nousername");
             return null;
         }
 
         // Check for empty passwords
         if ((password == null) || (password.trim().equals(""))) {
-            context.put("message", "invalidcredentials");
+            context.put("message", "nopassword");
             return null;
         }
 

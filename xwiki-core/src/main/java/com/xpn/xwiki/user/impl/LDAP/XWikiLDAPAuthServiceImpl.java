@@ -115,7 +115,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         // Check for empty usernames
         if (login.equals("")) {
-            context.put("message", "invalidcredentials");
+            context.put("message", "nousername");
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("LDAP authentication failed: login empty");
@@ -126,7 +126,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         // Check for empty passwords
         if ((password == null) || (password.trim().equals(""))) {
-            context.put("message", "invalidcredentials");
+            context.put("message", "nopassword");
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("LDAP authentication failed: password null or empty");

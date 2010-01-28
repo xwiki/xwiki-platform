@@ -71,7 +71,15 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
     @Override
     public void init(XWikiContext context)
     {
-        Utils.getComponent(ObservationManager.class).addListener(RightsManager.getInstance());
+        // Register a listener so that the RightsManager is called when a document with a XWikiUsers object is
+        // removed in order to remove that user from its groups.
+        // Make sure we allow this plugin to be initialized several times in a row; i.e. don't re-register the
+        // listener if it's already registered.
+        RightsManager rightsManager = RightsManager.getInstance();
+        ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
+        if (observationManager.getListener(rightsManager.getName()) == null) {
+            observationManager.addListener(rightsManager);
+        }
     }
 
     /**

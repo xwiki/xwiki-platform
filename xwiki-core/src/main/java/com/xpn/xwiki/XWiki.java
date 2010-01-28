@@ -2826,6 +2826,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         if (!isVirtualMode()) {
             if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
+                // If the XWikiPreferences document is modified, reload all plugins. The reason is that plugins may
+                // cache data taken from XWikiPreferences during their initialization.
+                // TODO: Fix the plugins, they should implement Observation listeners if they want to be aware of a
+                // change in the XWikiPreferences document but we should definitely not reinitialize all plugins like
+                // this.
                 preparePlugins(context);
             }
         }

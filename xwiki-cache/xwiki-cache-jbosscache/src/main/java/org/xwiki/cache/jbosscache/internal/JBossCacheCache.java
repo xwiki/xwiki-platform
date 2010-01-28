@@ -195,8 +195,12 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     public void nodeEvicted(NodeEvictedEvent event)
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info(MessageFormat.format("The node {0} should not has been evicted", event.getFqn()));
+            if (!event.getFqn().equals(ROOT_FQN)) {
+                LOG.warn(MessageFormat.format(
+                    "The [{0}] node has been evicted but it should not even have been part of the cache",
+                    event.getFqn()));
+            } else {
+                LOG.debug("The entire cache has been evicted");
             }
 
             return;
@@ -216,8 +220,12 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     public void nodeRemoved(NodeRemovedEvent event)
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info(MessageFormat.format("The node {0} should not has been removed", event.getFqn()));
+            if (!event.getFqn().equals(ROOT_FQN)) {
+                LOG.info(MessageFormat.format(
+                    "The [{0}] node has been removed but it should not even have been part of the cache",
+                    event.getFqn()));
+            } else {
+                LOG.debug("The entire cache has been removed");
             }
 
             return;

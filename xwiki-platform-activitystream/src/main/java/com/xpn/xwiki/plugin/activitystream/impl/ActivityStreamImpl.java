@@ -200,9 +200,12 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      */
     public void init(XWikiContext context) throws XWikiException
     {
-        // listen to notifications
-        Utils.getComponent(ObservationManager.class).addListener(this);
-        // init activitystream cleaner
+        // Listent to Events.
+        ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
+        if (observationManager.getListener(getName()) == null) {
+            observationManager.addListener(this);
+        }
+        // Init activitystream cleaner.
         ActivityStreamCleaner.getInstance().init(context);
     }
 

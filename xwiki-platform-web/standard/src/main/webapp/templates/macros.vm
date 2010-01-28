@@ -539,25 +539,22 @@ $xwiki.getUserName("xwiki:${username}")
     #set($picture = $picture.concat("' alt='$username' title='$username'/>"))
     #set($profiledoc = $xwiki.getDocument($username))
     #if(!$profiledoc.isNew())
-      #set($profileobj = $profiledoc.getObject("XWikiUsers", 0))
       #if($profiledoc.attachmentList.size() != 0)
-        #set($hasavatar = 0)
+        #set($profileobj = $profiledoc.getObject("XWiki.XWikiUsers", 0))
         #if($profileobj.avatar && $profileobj.avatar != "")
           #foreach ($attach in $profiledoc.attachmentList)
             #if($attach.filename == $profileobj.avatar)
-              #set($hasavatar = 1)
+              #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
+              #set($picture = "<img src='")
+              #set($picture = $picture.concat($pictureurl))
+              #set($picture = $picture.concat("' alt='"))
+              #set($picture = $picture.concat($username))
+              #set($picture = $picture.concat("' title='"))
+              #set($picture = $picture.concat($username))
+              #set($picture = $picture.concat("'/>"))
+              #break
             #end
           #end
-        #end
-        #if($hasavatar == 1)
-          #set($pictureurl = $profiledoc.getAttachmentURL($profileobj.avatar))
-          #set($picture = "<img src='")
-          #set($picture = $picture.concat($pictureurl))
-          #set($picture = $picture.concat("' alt='"))
-          #set($picture = $picture.concat($username))
-          #set($picture = $picture.concat("' title='"))
-          #set($picture = $picture.concat($username))
-          #set($picture = $picture.concat("'/>"))
         #end
       #end
     #end

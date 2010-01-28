@@ -443,7 +443,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
     public synchronized void init(XWikiContext context)
     {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("lucene plugin: in init");
+            LOG.debug("Lucene plugin: in init");
         }
 
         this.config = context.getWiki().getConfig();
@@ -518,12 +518,12 @@ public class LucenePlugin extends XWikiDefaultPlugin
             this.analyzer =
                     (Analyzer) Class.forName(this.config.getProperty(PROP_ANALYZER, DEFAULT_ANALYZER)).newInstance();
         } catch (Exception e) {
-            LOG.error("error instantiating analyzer : ", e);
-            LOG.warn("using default analyzer class: " + DEFAULT_ANALYZER);
+            LOG.error("Error instantiating analyzer : ", e);
+            LOG.warn("Using default analyzer class: " + DEFAULT_ANALYZER);
             try {
                 this.analyzer = (Analyzer) Class.forName(DEFAULT_ANALYZER).newInstance();
             } catch (Exception e1) {
-                throw new RuntimeException("instantiation of default analyzer " + DEFAULT_ANALYZER + " failed", e1);
+                throw new RuntimeException("Instantiation of default analyzer " + DEFAULT_ANALYZER + " failed", e1);
             }
         }
 
@@ -547,9 +547,15 @@ public class LucenePlugin extends XWikiDefaultPlugin
 
         openSearchers(context);
 
-        Utils.getComponent(ObservationManager.class).addListener(indexUpdater);
+        // Register the Index Updater as an Event Listener so that modified documents/attachments are added to the
+        // Lucene indexing queue.
+        // If the Index Updater is already registered don't do anything.
+        ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
+        if (observationManager.getListener(indexUpdater.getName()) == null) {
+            observationManager.addListener(indexUpdater);
+        }
 
-        LOG.debug("lucene plugin initialized.");
+        LOG.debug("Lucene plugin initialized.");
     }
 
     public void flushCache(XWikiContext context)
@@ -576,7 +582,7 @@ public class LucenePlugin extends XWikiDefaultPlugin
         try {
             closeSearchers(this.searchers);
         } catch (IOException e) {
-            LOG.warn("cannot close searchers", e);
+            LOG.warn("Cannot close searchers", e);
         }
 
         this.analyzer = null;
@@ -633,8 +639,8 @@ public class LucenePlugin extends XWikiDefaultPlugin
             closeSearchers(this.searchers);
             this.searchers = createSearchers(this.indexDirs, context);
         } catch (Exception e) {
-            LOG.error("error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e);
-            throw new RuntimeException("error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR),
+            LOG.error("Error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR), e);
+            throw new RuntimeException("Error opening searchers for index dirs " + config.getProperty(PROP_INDEX_DIR),
                 e);
         }
     }

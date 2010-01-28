@@ -99,14 +99,15 @@ public class XWikiServletURLFactoryTest extends AbstractBridgedXWikiComponentTes
             }
         };
         xwiki.setConfig((this.config = new XWikiConfig()));
+        xwiki.setDatabase(getContext().getDatabase());
 
-        Mock mockXWikiResquest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
-        mockXWikiResquest.stubs().method("getServletPath").will(returnValue(""));
-        mockXWikiResquest.stubs().method("getContextPath").will(returnValue("/xwiki"));
-        mockXWikiResquest.stubs().method("getHeader").will(returnValue(null));
+        Mock mockXWikiRequest = mock(XWikiRequest.class, new Class[] {}, new Object[] {});
+        mockXWikiRequest.stubs().method("getServletPath").will(returnValue(""));
+        mockXWikiRequest.stubs().method("getContextPath").will(returnValue("/xwiki"));
+        mockXWikiRequest.stubs().method("getHeader").will(returnValue(null));
 
         getContext().setWiki(xwiki);
-        getContext().setRequest((XWikiRequest) mockXWikiResquest.proxy());
+        getContext().setRequest((XWikiRequest) mockXWikiRequest.proxy());
 
         XWikiDocument wiki1Doc = getDocument(new DocumentReference(MAIN_WIKI_NAME, "XWiki", "XWikiServerWiki1"));
         BaseObject wiki1Obj = wiki1Doc.newObject("XWiki.XWikiServerClass", getContext());

@@ -221,7 +221,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
             if (!event.getFqn().equals(ROOT_FQN)) {
-                LOG.info(MessageFormat.format(
+                LOG.warn(MessageFormat.format(
                     "The [{0}] node has been removed but it should not even have been part of the cache",
                     event.getFqn()));
             } else {

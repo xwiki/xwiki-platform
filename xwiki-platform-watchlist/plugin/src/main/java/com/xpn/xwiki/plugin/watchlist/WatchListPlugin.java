@@ -115,7 +115,12 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         try {
             jobManager.init(context);
             store.init(context);
-            Utils.getComponent(ObservationManager.class).addListener(store);
+
+            // Listen to Events.
+            ObservationManager observationManager = Utils.getComponent(ObservationManager.class);
+            if (observationManager.getListener(store.getName()) == null) {
+                observationManager.addListener(store);
+            }
         } catch (XWikiException e) {
             LOG.error("init", e);
             e.printStackTrace();

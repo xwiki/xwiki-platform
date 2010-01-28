@@ -865,4 +865,15 @@ public class XWikiDocumentTest extends AbstractBridgedXWikiComponentTestCase
         assertNotSame(o, newDoc.getObject(CLASSNAME));
         assertFalse(newO.getGuid().equals(o.getGuid()));
     }
+
+    public void testResolveReferenceWithSpecificSpace() throws Exception
+    {
+        XWikiDocument doc = new XWikiDocument();
+
+        DocumentReference expected1 = new DocumentReference("xwiki", "XWiki", "page");
+        assertEquals(expected1, doc.resolveReferenceWithSpecificSpace("page", "XWiki"));
+
+        DocumentReference expected2 = new DocumentReference("xwiki", "space", "page");
+        assertEquals(expected2, doc.resolveReferenceWithSpecificSpace("space.page", "XWiki"));
+    }
 }

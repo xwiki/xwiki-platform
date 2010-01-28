@@ -440,7 +440,7 @@ public class XWikiDocument implements DocumentModelBridge
 
         DocumentReference reference;
         if (contextReference != null) {
-            reference = resolveReference(name,
+            reference = resolveReference(name, this.currentDocumentReferenceResolver,
                 this.currentReferenceDocumentReferenceResolver.resolve(contextReference));
             // Replace the resolved wiki by the passed wiki if not empty/null
             if (!StringUtils.isEmpty(wiki)) {
@@ -1835,7 +1835,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public Vector<BaseObject> getObjects(String classname)
     {
-        List<BaseObject> result = getXObjects(this.currentMixedDocumentReferenceResolver.resolve(classname));
+        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
+        // is used. Note that in the new API the current space is used instead.
+        List<BaseObject> result = getXObjects(resolveReferenceWithSpecificSpace(classname, "XWiki"));
         return result == null ? null : new Vector<BaseObject>(result);
     }
 
@@ -1853,8 +1855,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public void setObjects(String classname, Vector<BaseObject> objects)
     {
-        setXObjects(this.currentMixedDocumentReferenceResolver.resolve(classname),
-            new ArrayList<BaseObject>(objects));
+        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
+        // is used. Note that in the new API the current space is used instead.
+        setXObjects(resolveReferenceWithSpecificSpace(classname, "XWiki"), new ArrayList<BaseObject>(objects));
     }
 
     /**
@@ -1882,7 +1885,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public BaseObject getObject(String classname)
     {
-        return getXObject(this.currentMixedDocumentReferenceResolver.resolve(classname));
+        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
+        // is used. Note that in the new API the current space is used instead.
+        return getXObject(resolveReferenceWithSpecificSpace(classname, "XWiki"));
     }
 
     /**
@@ -1903,7 +1908,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public BaseObject getObject(String classname, int nb)
     {
-        return getXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), nb);
+        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
+        // is used. Note that in the new API the current space is used instead.
+        return getXObject(resolveReferenceWithSpecificSpace(classname, "XWiki"), nb);
     }
 
     /**
@@ -1920,7 +1927,7 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public BaseObject getObject(String classname, String key, String value)
     {
-        return getXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), key, value, false);
+        return getObject(classname, key, value, false);
     }
 
     /**
@@ -1971,7 +1978,9 @@ public class XWikiDocument implements DocumentModelBridge
     @Deprecated
     public BaseObject getObject(String classname, String key, String value, boolean failover)
     {
-        return getXObject(this.currentMixedDocumentReferenceResolver.resolve(classname), key, value, failover);
+        // In order to preserve backward compatibility, ensure that if no space is specified then the "XWiki" space
+        // is used. Note that in the new API the current space is used instead.
+        return getXObject(resolveReferenceWithSpecificSpace(classname, "XWiki"), key, value, failover);
     }
 
     /**
@@ -6891,16 +6900,27 @@ public class XWikiDocument implements DocumentModelBridge
         return syntaxId;
     }
 
-    private DocumentReference resolveReference(String referenceAsString, DocumentReference defaultReference)
+    private DocumentReference resolveReference(String referenceAsString, DocumentReferenceResolver resolver,
+        DocumentReference defaultReference)
     {
         XWikiContext xcontext = getXWikiContext();
         XWikiDocument originalCurentDocument = xcontext.getDoc();
         try {
             xcontext.setDoc(new XWikiDocument(defaultReference));
-            return this.currentDocumentReferenceResolver.resolve(referenceAsString);
+            return resolver.resolve(referenceAsString);
         } finally {
             xcontext.setDoc(originalCurentDocument);
         }
+    }
+
+    /**
+     * @return the resolved reference but using the passed space name if none is specified 
+     */
+    protected DocumentReference resolveReferenceWithSpecificSpace(String documentName, String spaceName)
+    {
+        EntityReference defaultSpaceReference = new EntityReference(spaceName, EntityType.SPACE);
+        return resolveReference(documentName, this.currentMixedDocumentReferenceResolver,
+            this.currentReferenceDocumentReferenceResolver.resolve(defaultSpaceReference));
     }
 
     private XWikiContext getXWikiContext()

@@ -50,9 +50,6 @@
         });
       });
     }
-    else {
-      alert("Browser is IE6!")
-    }
     
     /**
      * Extend input elements with check and uncheck methods to be able to check/uncheck

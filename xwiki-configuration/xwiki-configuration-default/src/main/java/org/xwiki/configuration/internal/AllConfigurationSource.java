@@ -60,7 +60,7 @@ public class AllConfigurationSource extends CompositeConfigurationSource impleme
      */
     public void initialize() throws InitializationException
     {
-        // First source is looked first when a property value is requested.
+        // First source is searched first when a property value is requested.
         addConfigurationSource(this.userPreferencesSource);
         addConfigurationSource(this.spacePreferencesSource);
         addConfigurationSource(this.wikiPreferencesSource);

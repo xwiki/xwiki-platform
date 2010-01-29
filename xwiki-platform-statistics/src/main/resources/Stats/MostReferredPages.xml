@@ -15,7 +15,7 @@
 <date>1196159734000</date>
 <contentUpdateDate>1196159734000</contentUpdateDate>
 <version>1.1</version>
-<title>Most Referred pages</title>
+<title>Most Referred Pages Panel</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -118,7 +118,7 @@
 <description>Displays the most referred pages</description>
 </property>
 <property>
-<name>MostReferredPages</name>
+<name>Most Referred Pages</name>
 </property>
 <property>
 <type>view</type>

@@ -15,7 +15,7 @@
 <date>1196176073000</date>
 <contentUpdateDate>1196176073000</contentUpdateDate>
 <version>1.1</version>
-<title>Most Edited Spaces</title>
+<title>Most Edited Spaces Panel</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -118,7 +118,7 @@
 <description>Display the most edited spaces</description>
 </property>
 <property>
-<name>MostEditedSpaces</name>
+<name>Most Edited Spaces</name>
 </property>
 <property>
 <type>view</type>

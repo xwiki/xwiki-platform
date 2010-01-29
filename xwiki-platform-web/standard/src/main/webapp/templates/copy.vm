@@ -27,8 +27,8 @@
     #if($targetdoc != "")
     #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
     #if($language)
-      #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}", "language=${language}"))
-      #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}", "language=${language}"))
+      #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}", "view", "language=${language}"))
+      #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}", "view", "language=${language}"))
     #else
       #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}"))
       #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}"))

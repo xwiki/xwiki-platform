@@ -26,15 +26,17 @@
     #set($targetwiki = $context.database)
     #if($targetdoc != "")
     #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
+    #set($prefixedSourcedoc = "#if($sourcewiki!=$context.database)$sourcewiki:#end$sourcedoc")
+    #set($prefixedTargetdoc = "#if($targetwiki!=$context.database)$targetwiki:#end$targetdoc")
     #if($language)
-      #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}", "view", "language=${language}"))
-      #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}", "view", "language=${language}"))
+      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc", "view", "language=${language}"))
+      #set($tourl = $xwiki.getURL("$prefixedTargetdoc", "view", "language=${language}"))
     #else
-      #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}"))
-      #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}"))
+      #set($fromurl = $xwiki.getURL("$prefixedSourcedoc"))
+      #set($tourl = $xwiki.getURL("$prefixedTargetdoc"))
     #end
-    #set($sourcelink = "<a href='${fromurl}'>#if($sourcewiki!='xwiki')$sourcewiki:#end$sourcedoc #if($language)($language)#end</a>")
-    #set($targetlink = "<a href='${tourl}'>#if($targetwiki!='xwiki')$targetwiki:#end$targetdoc</a>")
+    #set($sourcelink = "<a href='${fromurl}'>$prefixedSourcedoc #if($language)($language)#end</a>")
+    #set($targetlink = "<a href='${tourl}'>$prefixedTargetdoc</a>")
     #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
     #else
     <form action="">

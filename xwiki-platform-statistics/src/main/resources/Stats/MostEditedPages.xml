@@ -15,7 +15,7 @@
 <date>1196154107000</date>
 <contentUpdateDate>1196154107000</contentUpdateDate>
 <version>1.1</version>
-<title>Most Edited Pages</title>
+<title>Most Edited Pages Panel</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -118,7 +118,7 @@
 <description>Displays the most edited pages</description>
 </property>
 <property>
-<name>MostEditedPages</name>
+<name>Most Edited Pages</name>
 </property>
 <property>
 <type>view</type>
